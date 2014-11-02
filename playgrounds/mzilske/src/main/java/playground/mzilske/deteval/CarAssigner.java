@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -16,7 +15,7 @@ import org.matsim.vehicles.Vehicles;
 
 public class CarAssigner implements Runnable {
 
-	private static final VehicleType defaultType = new VehicleTypeImpl(new IdImpl("default-vehicle-Type"));
+	private static final VehicleType defaultType = new VehicleTypeImpl(Id.create("default-vehicle-Type", VehicleType.class));
 	private Population population;
 	private Vehicles vehicles;
 

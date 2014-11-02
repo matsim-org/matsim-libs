@@ -3,11 +3,11 @@ package playground.mzilske.otp;
 import java.io.File;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -34,7 +34,7 @@ public class ReadGraph {
 			for (Vertex v : graph.getVertices()) {
 				if (v instanceof IntersectionVertex) {
 					// Can be an OSM node, but can also be a split OSM way to insert a transit stop.
-					Node n = network.getFactory().createNode(new IdImpl(v.getIndex()), ct.transform(new CoordImpl(v.getX(), v.getY())));
+					Node n = network.getFactory().createNode(Id.create(v.getIndex(), Node.class), ct.transform(new CoordImpl(v.getX(), v.getY())));
 					network.addNode(n);
 				}
 			}
@@ -43,9 +43,9 @@ public class ReadGraph {
 				if (v instanceof IntersectionVertex) {
 					for (Edge e : v.getOutgoing()) {
 						if (e instanceof PlainStreetEdge) {
-							Node fromNode = network.getNodes().get(new IdImpl(e.getFromVertex().getIndex()));
-							Node toNode = network.getNodes().get(new IdImpl(e.getToVertex().getIndex()));
-							Link l = network.getFactory().createLink(new IdImpl(e.getFromVertex().getIndex() + "_" + e.getToVertex().getIndex()+ "_" + i++), fromNode, toNode);
+							Node fromNode = network.getNodes().get(Id.create(e.getFromVertex().getIndex(), Node.class));
+							Node toNode = network.getNodes().get(Id.create(e.getToVertex().getIndex(), Node.class));
+							Link l = network.getFactory().createLink(Id.create(e.getFromVertex().getIndex() + "_" + e.getToVertex().getIndex()+ "_" + i++, Link.class), fromNode, toNode);
 							network.addLink(l);
 						} else if (e instanceof StreetTransitLink) {
 							// Found a street transit link

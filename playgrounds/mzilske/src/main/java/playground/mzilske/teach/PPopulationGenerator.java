@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -84,18 +83,18 @@ public class PPopulationGenerator implements Runnable {
   	
   	private void fillZoneData() {//Where are the activities?
   		readShapeFile();
-  		zoneActivities.put("home_P", zoneGeometries.get((Integer)(12054000)));
-  		zoneActivities.put("work_P", zoneGeometries.get((Integer)(12054000)));
-  		zoneActivities.put("home_BER", zoneGeometries.get((Integer)(11)));
-  		zoneActivities.put("work_BER", zoneGeometries.get((Integer)(11)));
-  		zoneActivities.put("home_BH", zoneGeometries.get((Integer)(12051000)));
-  		zoneActivities.put("work_BH", zoneGeometries.get((Integer)(12051000)));
-  		zoneActivities.put("home_HVL", zoneGeometries.get((Integer)(12063000)));
-  		zoneActivities.put("work_HVL", zoneGeometries.get((Integer)(12063000)));
-  		zoneActivities.put("home_PMM", zoneGeometries.get((Integer)(12069000)));
-  		zoneActivities.put("work_PMM", zoneGeometries.get((Integer)(12069000)));
-  		zoneActivities.put("home_TFL", zoneGeometries.get((Integer)(12072000)));
-  		zoneActivities.put("work_TFL", zoneGeometries.get((Integer)(12072000)));
+  		zoneActivities.put("home_P", zoneGeometries.get((12054000)));
+  		zoneActivities.put("work_P", zoneGeometries.get((12054000)));
+  		zoneActivities.put("home_BER", zoneGeometries.get((11)));
+  		zoneActivities.put("work_BER", zoneGeometries.get((11)));
+  		zoneActivities.put("home_BH", zoneGeometries.get((12051000)));
+  		zoneActivities.put("work_BH", zoneGeometries.get((12051000)));
+  		zoneActivities.put("home_HVL", zoneGeometries.get((12063000)));
+  		zoneActivities.put("work_HVL", zoneGeometries.get((12063000)));
+  		zoneActivities.put("home_PMM", zoneGeometries.get((12069000)));
+  		zoneActivities.put("work_PMM", zoneGeometries.get((12069000)));
+  		zoneActivities.put("home_TFL", zoneGeometries.get((12072000)));
+  		zoneActivities.put("work_TFL", zoneGeometries.get((12072000)));
   		
   	}
   
@@ -123,7 +122,7 @@ public class PPopulationGenerator implements Runnable {
   			Coord homeLocation;
   			Coord workLocation;
   			if (i%3==0){//jede dritte Person f�hrt �PNV
-  				person = population.getFactory().createPerson(createId(from.substring(5), to.substring(5), i, TransportMode.pt));
+  				person = population.getFactory().createPerson(createPersonId(from.substring(5), to.substring(5), i, TransportMode.pt));
   				plan = population.getFactory().createPlan();
   				homeLocation = ct.transform(drawRandomPointFromGeometry(source));
   				workLocation = ct.transform(drawRandomPointFromGeometry(sink));
@@ -133,7 +132,7 @@ public class PPopulationGenerator implements Runnable {
   				plan.addLeg(createOPNVLeg());
   			}
   			else {
-  				person = population.getFactory().createPerson(createId(from.substring(5), to.substring(5), i, TransportMode.car));
+  				person = population.getFactory().createPerson(createPersonId(from.substring(5), to.substring(5), i, TransportMode.car));
   				plan = population.getFactory().createPlan();
   				homeLocation = ct.transform(drawRandomPointFromGeometry(source));
   				workLocation = ct.transform(drawRandomPointFromGeometry(sink));
@@ -187,8 +186,8 @@ public class PPopulationGenerator implements Runnable {
   		return activity;
   	}
   
- 	private Id createId(String source, String sink, int i, String transportMode) {
- 		return new IdImpl(source + "_" + sink + "_" + transportMode + "_" + i);
+ 	private Id<Person> createPersonId(String source, String sink, int i, String transportMode) {
+ 		return Id.create(source + "_" + sink + "_" + transportMode + "_" + i, Person.class);
  	}
  
  }

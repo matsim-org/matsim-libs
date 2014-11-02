@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.mzilske.ant2014.StreamingOutput;
@@ -93,7 +92,7 @@ class CloneHistogram {
                 pw.printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\n", "personid", "expnumber", "avgscore", "scorediff", "stratum", "basekm", "baseacts");
                 for (Map.Entry<String, Double> entry : expectedNumberOfClones.entrySet()) {
                     String stratum;
-                    IdImpl basePersonId = new IdImpl(entry.getKey());
+                    Id<Person> basePersonId = Id.create(entry.getKey(), Person.class);
                     Person basePerson = basePopulation.getPersons().get(basePersonId);
                     int size = basePerson.getSelectedPlan().getPlanElements().size();
                     int nActs;

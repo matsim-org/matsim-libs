@@ -9,7 +9,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -171,7 +170,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		String firstStopPostAreaId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopPostAreaId();
 		Id<TransitLine> lineId = umlaufStueck.getLine().getId();
 		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
-		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), new IdImpl(0));
+		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
 		log("Looking between " + earliestAtPoint + " and " + latestAtPoint);
 		SortedMap<UmlaufKey,Umlauf> fittingUmlaeufe = umlaeufe.subMap(earliestAtPoint, latestAtPoint);
 		Umlauf fittingUmlauf;

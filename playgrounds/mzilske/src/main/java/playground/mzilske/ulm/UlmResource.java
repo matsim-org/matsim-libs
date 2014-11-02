@@ -1,9 +1,9 @@
 package playground.mzilske.ulm;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -19,6 +19,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
+
 import playground.mzilske.ant2014.RunResource;
 import playground.mzilske.gtfs.GtfsConverter;
 
@@ -94,15 +95,15 @@ public class UlmResource {
 		config.planCalcScore().addActivityParams(work);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		
-		StrategySettings change = new StrategySettings(new IdImpl(1));
+		StrategySettings change = new StrategySettings(Id.create(1, StrategySettings.class));
 		change.setModuleName("ChangeExpBeta");
 		change.setProbability(0.8);
 	
-		StrategySettings reRoute = new StrategySettings(new IdImpl(2));
+		StrategySettings reRoute = new StrategySettings(Id.create(2, StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.1);
 		
-		StrategySettings time = new StrategySettings(new IdImpl(3));
+		StrategySettings time = new StrategySettings(Id.create(3, StrategySettings.class));
 		time.setModuleName("TimeAllocationMutator");
 		time.setProbability(0.1);
 	

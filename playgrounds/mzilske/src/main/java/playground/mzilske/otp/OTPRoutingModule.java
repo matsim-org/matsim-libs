@@ -13,11 +13,11 @@ import java.util.TimeZone;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingModule;
@@ -126,7 +126,7 @@ public class OTPRoutingModule implements RoutingModule {
 			System.out.println("None found " + nonefound++);
 		}
 
-		Id currentLinkId = fromFacility.getLinkId();
+		Id<Link> currentLinkId = fromFacility.getLinkId();
 		if (paths != null) {
 			GraphPath path = paths.get(0);
 			path.dump();
@@ -143,15 +143,15 @@ public class OTPRoutingModule implements RoutingModule {
 							stop = ((TransitVertex) state.getVertex()).getStopId().getId();
 							onBoard = true;
 							time = state.getElapsedTime();
-							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
+							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(Id.create(stop, TransitStopFacility.class));
 							if(!currentLinkId.equals(accessFacility.getLinkId())) {
 								throw new RuntimeException();
 							}
 						} else {
 							Leg leg = new LegImpl(TransportMode.pt);
 							String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
-							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(new IdImpl(stop));
-							TransitStopFacility egressFacility = transitSchedule.getFacilities().get(new IdImpl(newStop));
+							TransitStopFacility accessFacility = transitSchedule.getFacilities().get(Id.create(stop, TransitStopFacility.class));
+							TransitStopFacility egressFacility = transitSchedule.getFacilities().get(Id.create(newStop, TransitStopFacility.class));
 							final ExperimentalTransitRoute route = new ExperimentalTransitRoute(accessFacility, createLine(backTrip), createRoute(), egressFacility);
 							route.setTravelTime(travelTime);
 							leg.setRoute(route);
@@ -167,13 +167,13 @@ public class OTPRoutingModule implements RoutingModule {
 						if (state.getVertex() instanceof TransitVertex) {
 							String newStop = ((TransitVertex) state.getVertex()).getStopId().getId();
 							if (!newStop.equals(stop)) {
-								Id startLinkId;
+								Id<Link> startLinkId;
 								if (stop == null) {
 									startLinkId = fromFacility.getLinkId();
 								} else {
-									startLinkId = transitSchedule.getFacilities().get(new IdImpl(stop)).getLinkId();
+									startLinkId = transitSchedule.getFacilities().get(Id.create(stop, TransitStopFacility.class)).getLinkId();
 								}
-								Id endLinkId = transitSchedule.getFacilities().get(new IdImpl(newStop)).getLinkId();
+								Id<Link> endLinkId = transitSchedule.getFacilities().get(Id.create(newStop, TransitStopFacility.class)).getLinkId();
 								GenericRouteImpl route = new GenericRouteImpl(startLinkId, endLinkId);
 								route.setTravelTime(travelTime);
 								leg.setRoute(route);
@@ -218,11 +218,11 @@ public class OTPRoutingModule implements RoutingModule {
 
 	private TransitRoute createRoute() {
 		List<TransitRouteStop> emptyList = Collections.emptyList();
-		return tsf.createTransitRoute(new IdImpl(""), null , emptyList, null);
+		return tsf.createTransitRoute(Id.create("", TransitRoute.class), null , emptyList, null);
 	}
 
 	private TransitLine createLine(Trip backTrip) {
-		return tsf.createTransitLine(new IdImpl(backTrip.getRoute().getId().getId()+ "_"+backTrip.getRoute().getShortName()));
+		return tsf.createTransitLine(Id.create(backTrip.getRoute().getId().getId()+ "_"+backTrip.getRoute().getShortName(), TransitLine.class));
 	}
 
 }

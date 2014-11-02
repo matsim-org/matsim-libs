@@ -6,11 +6,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
@@ -192,15 +192,15 @@ public class RunSimulation {
 		config.setParam("changeLegMode", "ignoreCarAvailability", "true");
 		
 		
-		StrategySettings changeExp = new StrategySettings(new IdImpl(1));
+		StrategySettings changeExp = new StrategySettings(Id.create(1, StrategySettings.class));
 		changeExp.setModuleName("ChangeExpBeta");
 		changeExp.setProbability(0.8);
-		StrategySettings reRoute = new StrategySettings(new IdImpl(2));
+		StrategySettings reRoute = new StrategySettings(Id.create(2, StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		// reRoute.setModuleName("Duplicate");
 		reRoute.setProbability(0.1);
 		reRoute.setDisableAfter(150);
-		StrategySettings changeMode = new StrategySettings(new IdImpl(3));
+		StrategySettings changeMode = new StrategySettings(Id.create(3, StrategySettings.class));
 		changeMode.setModuleName("ChangeLegMode");
 		// changeMode.setModuleName("Duplicate");
 		changeMode.setProbability(0.1);

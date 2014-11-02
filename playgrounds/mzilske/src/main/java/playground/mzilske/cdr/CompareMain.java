@@ -1,8 +1,14 @@
 package playground.mzilske.cdr;
 
-import com.telmomenezes.jfastemd.Feature;
-import com.telmomenezes.jfastemd.JFastEMD;
-import com.telmomenezes.jfastemd.Signature;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,7 +20,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -29,11 +34,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.*;
+import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+import playground.mzilske.cdr.ZoneTracker.Zone;
+
+import com.telmomenezes.jfastemd.Feature;
+import com.telmomenezes.jfastemd.JFastEMD;
+import com.telmomenezes.jfastemd.Signature;
 
 @Singleton
 public class CompareMain {
@@ -181,7 +188,7 @@ public class CompareMain {
 		super();
 		this.scenario = scenario;
 
-		Map<Id, Id> initialPersonInZone = new HashMap<Id, Id>();
+		Map<Id<Person>, Id<Zone>> initialPersonInZone = new HashMap<>();
 
 
 		// final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(scenario.getNetwork());
@@ -191,7 +198,7 @@ public class CompareMain {
 		// linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, scenario.getNetwork());
 
 		for (Person p : scenario.getPopulation().getPersons().values()) {
-			Id linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
+			Id<Link> linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
 			System.out.println(linkId);
 			initialPersonInZone.put(p.getId(), this.linkToZoneResolver.resolveLinkToZone(linkId));
 		}
@@ -263,7 +270,7 @@ public class CompareMain {
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
 
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -307,7 +314,7 @@ public class CompareMain {
 		return getVolumesForLink(volumesAnalyzer1, link.getId());
 	}
 
-    public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id linkId) {
+    public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id<Link> linkId) {
         int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
         int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(linkId);
         if(maybeVolumes == null) {

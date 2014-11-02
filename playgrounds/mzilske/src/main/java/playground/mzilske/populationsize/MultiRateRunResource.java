@@ -22,12 +22,19 @@
 
 package playground.mzilske.populationsize;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +44,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -54,19 +60,33 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
+
 import playground.mzilske.ant2014.FileIO;
 import playground.mzilske.ant2014.IterationResource;
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cadyts.CadytsModule;
-import playground.mzilske.cdr.*;
+import playground.mzilske.cdr.CallBehavior;
+import playground.mzilske.cdr.CompareMain;
+import playground.mzilske.cdr.LinkIsZone;
+import playground.mzilske.cdr.PopulationFromSightings;
+import playground.mzilske.cdr.PowerPlans;
+import playground.mzilske.cdr.Sighting;
+import playground.mzilske.cdr.Sightings;
+import playground.mzilske.cdr.SightingsImpl;
+import playground.mzilske.cdr.SightingsReader;
+import playground.mzilske.cdr.SightingsWriter;
+import playground.mzilske.cdr.TrajectoryReRealizerFactory;
+import playground.mzilske.cdr.ZoneTracker;
 import playground.mzilske.clones.ClonesModule;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 
 class MultiRateRunResource {
 
@@ -252,7 +272,7 @@ class MultiRateRunResource {
         config.qsim().setRemoveStuckVehicles(false);
 
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+            StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setModuleName("SelectExpBeta");
             stratSets.setProbability(1.0);
             config.strategy().addStrategySettings(stratSets);
@@ -265,9 +285,9 @@ class MultiRateRunResource {
 //            config.strategy().addStrategySettings(stratSets);
 //        }
         {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setModuleName("ReRealize");
-            stratSets.setProbability(0.3 / (double) cloneFactor);
+            stratSets.setProbability(0.3 / cloneFactor);
             stratSets.setDisableAfter((int) (LAST_ITERATION * 0.8));
             config.strategy().addStrategySettings(stratSets);
         }
@@ -411,7 +431,7 @@ class MultiRateRunResource {
                     originalId = id.substring(id.indexOf("_")+1);
                 else
                     originalId = id;
-                pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, CountWorkers.isWorker(baseScenario.getPopulation().getPersons().get(new IdImpl(originalId))) ? "workers" : "non-workers", km);
+                pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, CountWorkers.isWorker(baseScenario.getPopulation().getPersons().get(Id.create(originalId, Person.class))) ? "workers" : "non-workers", km);
                 pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, "all", km);
             }
         }

@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -80,7 +79,7 @@ public class PotsdamPopTemplate implements Runnable {
 		for (int i=0; i<quantity; ++i) {
 			Geometry source = zoneGeometries.get(from);
 			Geometry sink = zoneGeometries.get(to);
-			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.car));
+			Person person = population.getFactory().createPerson(createPersonId(from, to, i, TransportMode.car));
 			Plan plan = population.getFactory().createPlan();
 			Coord homeLocation = shoot(source);
 			Coord workLocation = shoot(sink);
@@ -129,8 +128,8 @@ public class PotsdamPopTemplate implements Runnable {
 		return p;
 	}
 
-	private Id createId(String source, String sink, int i, String transportMode) {
-		return new IdImpl(transportMode + "_" + source + "_" + sink + "_" + i);
+	private Id<Person> createPersonId(String source, String sink, int i, String transportMode) {
+		return Id.create(transportMode + "_" + source + "_" + sink + "_" + i, Person.class);
 	}
 
 }

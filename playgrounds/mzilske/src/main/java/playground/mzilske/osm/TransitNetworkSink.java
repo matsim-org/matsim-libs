@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -227,7 +226,7 @@ public class TransitNetworkSink implements Sink {
 			}
 			String networkOperator = tags.get("network");
 //			System.out.println(networkOperator + " // " + route + " // " + ref + " // " + operator + " // " + name);
-			TransitLine line = transitSchedule.getFactory().createTransitLine(new IdImpl(operator + "-" + route + "-" + ref + "-" + name + "-" + relation.getId()));
+			TransitLine line = transitSchedule.getFactory().createTransitLine(Id.create(operator + "-" + route + "-" + ref + "-" + name + "-" + relation.getId(), TransitLine.class));
 			LinkedList<Node> stopsH = new LinkedList<Node>();
 			LinkedList<Node> stopsR = new LinkedList<Node>();
 			Stitcher stitcher = new Stitcher(network);
@@ -288,7 +287,7 @@ public class TransitNetworkSink implements Sink {
 				List<Double> forwardTravelTimes = stitcher.getForwardTravelTimes();
 				assert (stopLinkIdsH.size() == stopsH.size() - 1);
 				List<TransitRouteStop> stops = enterStopLinkIds(stopsH, stopLinkIdsH, forwardTravelTimes, line.getId() + "H", network.getLinks().get(linkIdsH.get(0)).getFromNode());
-				TransitRoute routeH = transitSchedule.getFactory().createTransitRoute(new IdImpl("H"), networkRouteH, stops, TransportMode.pt);
+				TransitRoute routeH = transitSchedule.getFactory().createTransitRoute(Id.create("H", TransitRoute.class), networkRouteH, stops, TransportMode.pt);
 				line.addRoute(routeH);
 			}
 
@@ -298,7 +297,7 @@ public class TransitNetworkSink implements Sink {
 				List<Double> backwardTravelTimes = stitcher.getBackwardTravelTimes();
 				assert (stopLinkIdsR.size() == stopsR.size() - 1);
 				List<TransitRouteStop> stops = enterStopLinkIds(stopsR, stopLinkIdsR, backwardTravelTimes, line.getId() + "R", network.getLinks().get(linkIdsR.get(0)).getFromNode());
-				TransitRoute routeR = transitSchedule.getFactory().createTransitRoute(new IdImpl("R"), networkRouteR, stops, TransportMode.pt);
+				TransitRoute routeR = transitSchedule.getFactory().createTransitRoute(Id.create("R", TransitRoute.class), networkRouteR, stops, TransportMode.pt);
 				line.addRoute(routeR);
 			}
 
@@ -327,17 +326,17 @@ public class TransitNetworkSink implements Sink {
 		} else {
 			firstStopName = "";
 		}
-		Link entryLink = network.getFactory().createLink(new IdImpl(routeRef + firstStopName + "_ENTRY"), node.getId(), node.getId());
+		Link entryLink = network.getFactory().createLink(Id.create(routeRef + firstStopName + "_ENTRY", Link.class), node, node);
 		network.addLink(entryLink);
 		TransitStopFacility firstFacility = transitSchedule.getFactory().createTransitStopFacility(createTransitStopId(routeRef, firstStopName, stopNo), firstCoordinate, false);
 		transitSchedule.addStopFacility(firstFacility);
 		stopNo++;
 		double time = 0;
 		transitRouteStops.add(transitSchedule.getFactory().createTransitRouteStop(firstFacility, time, time));
-		Id linkId = entryLink.getId();
+		Id<Link> linkId = entryLink.getId();
 		firstFacility.setLinkId(linkId);
 		while(i.hasNext()) {
-			Id nextLinkId = i.next();
+			Id<Link> nextLinkId = i.next();
 			if (nextLinkId != null) {
 				linkId = nextLinkId;
 			}
@@ -361,15 +360,15 @@ public class TransitNetworkSink implements Sink {
 		return transitRouteStops;
 	}
 
-	private IdImpl createTransitStopId(String ref, String stopName, int stopNo) {
-		return new IdImpl(ref + "_" + stopName + "_" + stopNo);
+	private Id<TransitStopFacility> createTransitStopId(String ref, String stopName, int stopNo) {
+		return Id.create(ref + "_" + stopName + "_" + stopNo, TransitStopFacility.class);
 	}
 
 	private NetworkRoute createNetworkRoute(List<Id<Link>> plinkIds) {
 		LinkedList<Id<Link>> linkIds = new LinkedList<Id<Link>>(plinkIds);
 		NetworkRoute networkRouteH = new LinkNetworkRouteImpl(linkIds.getFirst(), linkIds.getLast());
-		Id first = linkIds.removeFirst();
-		Id last = linkIds.removeLast();
+		Id<Link> first = linkIds.removeFirst();
+		Id<Link> last = linkIds.removeLast();
 		networkRouteH.setLinkIds(first, linkIds, last);
 		return networkRouteH;
 	}

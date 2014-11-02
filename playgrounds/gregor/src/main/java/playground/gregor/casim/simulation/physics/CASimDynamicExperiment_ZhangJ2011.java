@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -46,7 +45,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
-import playground.gregor.casim.monitoring.CALinkMonitorII;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -412,7 +410,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 					continue;
 				}
 				//				agents++;
-				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, new IdImpl(agents++), caLink);
+				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
 				a.materialize(i, 1);
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);

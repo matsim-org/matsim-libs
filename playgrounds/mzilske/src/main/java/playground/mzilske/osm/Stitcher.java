@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -65,7 +64,7 @@ public class Stitcher {
 		for (Tag tag : stop.getTags()) {
 			if (tag.getKey().startsWith("matsim:node-id")) {
 				System.out.println(tag);
-				Id nodeId = new IdImpl(tag.getValue());
+				Id<Node> nodeId = Id.create(tag.getValue(), Node.class);
 				if (!networkForThisRoute.getNodes().containsKey(nodeId)) {
 					Node nearestNode = (networkForThisRoute).getNearestNode(network.getNodes().get(nodeId).getCoord());
 					nodeId = nearestNode.getId();
@@ -82,7 +81,7 @@ public class Stitcher {
 		for (Tag tag : stop.getTags()) {
 			if (tag.getKey().startsWith("matsim:node-id")) {
 				System.out.println(tag);
-				Id nodeId = new IdImpl(tag.getValue());
+				Id<Node> nodeId = Id.create(tag.getValue(), Node.class);
 				if (!networkForThisRoute.getNodes().containsKey(nodeId)) {
 					nodeId = (networkForThisRoute).getNearestNode(network.getNodes().get(nodeId).getCoord()).getId();
 					System.out.println("  --> " + nodeId);
@@ -182,7 +181,7 @@ public class Stitcher {
 	}
 
 	private void addToRoute(String linkIdString) {
-		Id linkId = new IdImpl(linkIdString);
+		Id<Link> linkId = Id.create(linkIdString, Link.class);
 		Link link = network.getLinks().get(linkId);
 		addNode(link.getFromNode());
 		addNode(link.getToNode());

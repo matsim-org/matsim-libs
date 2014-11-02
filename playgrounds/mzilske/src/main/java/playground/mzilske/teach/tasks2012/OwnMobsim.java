@@ -1,10 +1,11 @@
 package playground.mzilske.teach.tasks2012;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -14,8 +15,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 public class OwnMobsim {
 
@@ -33,13 +34,13 @@ public class OwnMobsim {
 		@Override
 		public void run() {
 			OTFFileWriter writer = new OTFFileWriter(scenario, "output/movie.mvi");
-			Node start = scenario.getNetwork().getNodes().get(new IdImpl("1"));
-			Node end = scenario.getNetwork().getNodes().get(new IdImpl("14"));
+			Node start = scenario.getNetwork().getNodes().get(Id.create("1", Node.class));
+			Node end = scenario.getNetwork().getNodes().get(Id.create("14", Node.class));
 			for (double i=0; i<1000; i++) {
 				writer.beginSnapshot(i);
 				CoordImpl pos = new CoordImpl(start.getCoord().getX() + ( (end.getCoord().getX() - start.getCoord().getX()) / 1000.0) * i,  
 						start.getCoord().getY() + ( (end.getCoord().getY() - start.getCoord().getY()) / 1000.0)* i);
-				AgentSnapshotInfo agentSnapshotInfo = agentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl("1"), pos.getX(), pos.getY(), 0.0, 0.0);
+				AgentSnapshotInfo agentSnapshotInfo = agentSnapshotInfoFactory.createAgentSnapshotInfo(Id.create("1", Person.class), pos.getX(), pos.getY(), 0.0, 0.0);
 				System.out.println(pos);
 				agentSnapshotInfo.setAgentState(AgentState.PERSON_DRIVING_CAR);
 				writer.addAgent(agentSnapshotInfo);

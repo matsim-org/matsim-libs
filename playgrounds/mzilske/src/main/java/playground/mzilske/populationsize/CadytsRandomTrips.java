@@ -22,13 +22,12 @@
 
 package playground.mzilske.populationsize;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -43,11 +42,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -65,11 +64,18 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import java.util.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 
 public class CadytsRandomTrips {
 
@@ -114,14 +120,14 @@ public class CadytsRandomTrips {
         config.qsim().setRemoveStuckVehicles(false);
 
         {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setModuleName("SelectExpBeta");
 
             stratSets.setProbability(1.0);
             config.strategy().addStrategySettings(stratSets);
         }
         {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setModuleName("NewRandomTrip");
             stratSets.setProbability(0.1);
 //            stratSets.setDisableAfter(25);

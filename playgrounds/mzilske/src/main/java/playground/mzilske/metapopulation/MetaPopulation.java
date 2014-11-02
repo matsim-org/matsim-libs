@@ -31,13 +31,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
 class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
 
-    private final IdImpl id;
+    private final Id<Person> id;
     private List<MetaPopulationPlan> plans;
     private MetaPopulationPlan selectedPlan;
     private List<Person> currentPersons;
@@ -46,7 +45,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
     private int nextId = 0;
 
     MetaPopulation(Collection<Person> templatePopulation, String id) {
-        this.id = new IdImpl(id);
+        this.id = Id.create(id, Person.class);
         this.templatePopulation = new ArrayList<Person>(templatePopulation);
         plans = new ArrayList<MetaPopulationPlan>();
         currentPersons = new ArrayList<Person>(templatePopulation);
@@ -87,7 +86,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
     }
 
     @Override
-    public Id getId() {
+    public Id<Person> getId() {
         return id;
     }
 
@@ -97,7 +96,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
         if (deltaAgents > 0) {
             for (int i=0; i<deltaAgents; i++) {
                 Person templatePerson = templatePopulation.get(random.nextInt(templatePopulation.size()));
-                Person person = new PersonImpl(new IdImpl(id.toString() + "_" + nextId++));
+                Person person = new PersonImpl(Id.create(id.toString() + "_" + nextId++, Person.class));
                 for (Plan templatePlan : templatePerson.getPlans()) {
                     PlanImpl plan = new PlanImpl();
                     plan.copyFrom(templatePlan);

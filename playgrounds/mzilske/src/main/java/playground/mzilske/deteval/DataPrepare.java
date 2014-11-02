@@ -19,16 +19,19 @@
 
 package playground.mzilske.deteval;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -42,12 +45,9 @@ import org.matsim.visum.VisumNetwork.EdgeType;
 import org.matsim.visum.VisumNetworkReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class DataPrepare {
 
@@ -94,7 +94,7 @@ public class DataPrepare {
 
 			@Override
 			public void handleRow(Map<String, String> row) {
-				Id id = new IdImpl(row.get("NR"));
+				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				((NetworkImpl) network).createAndAddNode(id, coord);
 			}
@@ -109,15 +109,15 @@ public class DataPrepare {
 			@Override
 			public void handleRow(Map<String, String> row) {
 				String nr = row.get("NR");
-				IdImpl id = new IdImpl(nr);
-				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
-				IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+				Id<Link> id = Id.create(nr, Link.class);
+				Id<Node> fromNodeId = Id.create(row.get("VONKNOTNR"), Node.class);
+				Id<Node> toNodeId = Id.create(row.get("NACHKNOTNR"), Node.class);
 				Node fromNode = network.getNodes().get(fromNodeId);
 				Node toNode = network.getNodes().get(toNodeId);
 				Link lastEdge = network.getLinks().get(id);
 				if (lastEdge != null) {
 					if (lastEdge.getFromNode().getId().equals(toNodeId) && lastEdge.getToNode().getId().equals(fromNodeId)) {
-						id = new IdImpl(nr + 'R');
+						id = Id.create(nr + 'R', Link.class);
 					} else {
 						throw new RuntimeException("Duplicate edge.");
 					}
@@ -125,7 +125,7 @@ public class DataPrepare {
 				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.')) * 1000;
 				double freespeed = 0.0;
 				String edgeTypeIdString = row.get("TYPNR");
-				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+				Id<EdgeType> edgeTypeId = Id.create(edgeTypeIdString, EdgeType.class);
 				double capacity = getCapacity(edgeTypeId);
 				// kick out all irrelevant edge types
 				if (isEdgeTypeRelevant(edgeTypeId)) {
@@ -146,7 +146,7 @@ public class DataPrepare {
 					}
 					// kick out all edges in periphery that are irrelevant only there
 					else {
-						if(isEdgeTypeRelevantForPeriphery(edgeTypeId)){
+						if(isEdgeTypeRelevantForPeriphery(edgeTypeIdString)){
 							freespeed = getFreespeedTravelTime(edgeTypeId);
 							((NetworkImpl) network).createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
 							usedIds.add(edgeTypeIdString);
@@ -162,7 +162,7 @@ public class DataPrepare {
 		((NetworkImpl) network).setCapacityPeriod(16*3600);
 	}
 
-	private boolean isEdgeTypeRelevant(Id edgeTypeId) {
+	private boolean isEdgeTypeRelevant(Id<EdgeType> edgeTypeId) {
 		String idString = edgeTypeId.toString();
 		if (irrelevantIds.contains(idString)) {
 			return false;
@@ -184,28 +184,27 @@ public class DataPrepare {
 		return isInDetailedArea;
 	}
 
-	private boolean isEdgeTypeRelevantForPeriphery(Id edgeTypeId) {
-		String idString = edgeTypeId.toString();
-		if (additionalIrrelevantIdsPeriphery.contains(idString)) {
+	private boolean isEdgeTypeRelevantForPeriphery(String edgeTypeIdString) {
+		if (additionalIrrelevantIdsPeriphery.contains(edgeTypeIdString)) {
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	private double getCapacity(Id edgeTypeId) {
+	private double getCapacity(Id<EdgeType> edgeTypeId) {
 		VisumNetwork.EdgeType edgeType = findEdgeType(edgeTypeId);
 		double capacity = Double.parseDouble(edgeType.kapIV);
 		return capacity;
 	}
 
-	private double getFreespeedTravelTime(Id edgeTypeId) {
+	private double getFreespeedTravelTime(Id<EdgeType> edgeTypeId) {
 		VisumNetwork.EdgeType edgeType = findEdgeType(edgeTypeId);
 		double v0 = Double.parseDouble(edgeType.v0IV) / 3.6;
 		return v0;
 	}
 
-	private EdgeType findEdgeType(Id edgeTypeId) {
+	private EdgeType findEdgeType(Id<EdgeType> edgeTypeId) {
 		return visumNetwork.edgeTypes.get(edgeTypeId);
 	}
 

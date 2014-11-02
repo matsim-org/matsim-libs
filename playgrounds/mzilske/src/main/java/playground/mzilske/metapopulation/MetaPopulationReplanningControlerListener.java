@@ -24,11 +24,11 @@ package playground.mzilske.metapopulation;
 
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.population.PersonImpl;
@@ -61,7 +61,7 @@ class MetaPopulationReplanningControlerListener implements ReplanningListener {
             @Override
             public void run(HasPlansAndId<MetaPopulationPlan, Person> metaPopulation) {
                 MetaPopulationPlan selectedPlan = metaPopulation.getSelectedPlan();
-                Person person = new PersonImpl(new IdImpl("wurst"));
+                Person person = new PersonImpl(Id.create("wurst", Person.class));
                 PlanImpl p0 = new PlanImpl();
                 p0.setScore(0.0);
                 person.addPlan(p0);

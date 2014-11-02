@@ -22,15 +22,16 @@
 
 package playground.mzilske.matrices;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
-import playground.mzilske.cdr.Sighting;
-import playground.mzilske.cdr.Sightings;
-
 import java.util.Arrays;
 import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
+
+import playground.mzilske.cdr.Sighting;
+import playground.mzilske.cdr.Sightings;
 
 class MatricesToSightings {
 
@@ -42,7 +43,7 @@ class MatricesToSightings {
             for (Collection<Entry> entries : matrix.getFromLocations().values()) {
                 for (Entry entry : entries) {
                     for (int i = 0; i < entry.getValue(); i++) {
-                        Id personId = personId(entry, i);
+                        Id<Person> personId = personId(entry, i);
                         sightings.getSightingsPerPerson().put(personId, Arrays.asList(
                                         new Sighting(personId, (long) startTime, entry.getFromLocation().toString()),
                                         new Sighting(personId, (long) endTime, entry.getToLocation().toString()))
@@ -53,8 +54,8 @@ class MatricesToSightings {
         }
     }
 
-    static Id personId(Entry entry, int i) {
-        return new IdImpl(entry.getFromLocation().toString() + "_" + entry.getToLocation().toString() + "_" +i);
+    static Id<Person> personId(Entry entry, int i) {
+        return Id.create(entry.getFromLocation().toString() + "_" + entry.getToLocation().toString() + "_" +i, Person.class);
     }
 
 }

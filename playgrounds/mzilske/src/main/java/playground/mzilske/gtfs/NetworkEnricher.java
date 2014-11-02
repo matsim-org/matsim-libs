@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -25,8 +24,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 class NetworkEnricher {
-	
-	private Map<Id,NetworkRoute> outputRoutes = new HashMap<Id,NetworkRoute>();
 	
 	private Network inputNet;
 
@@ -38,12 +35,14 @@ class NetworkEnricher {
 		sc = (ScenarioUtils.createScenario(config));
 	}
 
-	Map<Id, NetworkRoute> replaceLinks(Map<Id, List<Coord>> shapedLinks, Map<Id,NetworkRoute> netRoutes) {
+	<T> Map<Id<T>, NetworkRoute> replaceLinks(Map<Id<Link>, List<Coord>> shapedLinks, Map<Id<T>,NetworkRoute> netRoutes) {
+		Map<Id<T>,NetworkRoute> outputRoutes = new HashMap<>();
+		
 		Map<Id,List<Id<Link>>> replacedLinks = new HashMap<Id,List<Id<Link>>>();
 		Map<Id,List<Id>> fromNodes = new HashMap<Id,List<Id>>();
 		Map<Coord,Node> existingNodes = new HashMap<Coord,Node>();
 		// Copy Nodes from original Network to new Network
-		for(Id id: inputNet.getNodes().keySet()){
+		for(Id<Node> id: inputNet.getNodes().keySet()){
 			((NetworkImpl) sc.getNetwork()).createAndAddNode(id, inputNet.getNodes().get(id).getCoord());
 			existingNodes.put(sc.getNetwork().getNodes().get(id).getCoord(), sc.getNetwork().getNodes().get(id));
 		}
@@ -60,7 +59,7 @@ class NetworkEnricher {
 					if(existingNodes.containsKey(x)){
 						n2 = existingNodes.get(x);
 					}else{
-						n2 = ((NetworkImpl) sc.getNetwork()).createAndAddNode(new IdImpl("s" + linkId.toString() + "." + shapeCounter), x);
+						n2 = ((NetworkImpl) sc.getNetwork()).createAndAddNode(Id.create("s" + linkId.toString() + "." + shapeCounter, Node.class), x);
 						existingNodes.put(x, n2);
 					}
 					if(fromNodes.containsKey(n1.getId())){
@@ -79,7 +78,7 @@ class NetworkEnricher {
 					if(addLink){
 						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());						
 						double freespeed = 50/3.6;
-						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);											
+						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);											
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
 						modes.add(TransportMode.pt);
@@ -96,7 +95,7 @@ class NetworkEnricher {
 						if(!(fromNodes.get(n1.getId()).contains(n2.getId()))){
 							double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
 							double freespeed = 50/3.6;
-							Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
+							Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);						
 							// Change the linktype to pt
 							Set<String> modes = new HashSet<String>();
 							modes.add(TransportMode.pt);
@@ -109,7 +108,7 @@ class NetworkEnricher {
 						fromNodes.put(n1.getId(), new ArrayList<Id>());
 						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
 						double freespeed = 50/3.6;
-						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
+						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);						
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
 						modes.add(TransportMode.pt);
@@ -152,10 +151,10 @@ class NetworkEnricher {
 			}
 		}
 		// ReplaceLinks in Netroute
-		for(Id id: netRoutes.keySet()){
+		for(Id<T> id: netRoutes.keySet()){
 			NetworkRoute route = netRoutes.get(id);
 			LinkedList<Id<Link>> routeIds = new LinkedList<Id<Link>>();
-			for(Id routedLinkId: route.getLinkIds()){
+			for(Id<Link> routedLinkId: route.getLinkIds()){
 				if(replacedLinks.containsKey(routedLinkId)){
 					routeIds.addAll(replacedLinks.get(routedLinkId));
 				}else{
@@ -170,7 +169,7 @@ class NetworkEnricher {
 	}
 
 	
-	private Link getLinkBetweenNodes(Network net2, Id fromId, Id toId) {
+	private Link getLinkBetweenNodes(Network net2, Id<Node> fromId, Id<Node> toId) {
 		Link result = null;
 		for(Link l: net2.getNodes().get(fromId).getOutLinks().values()){
 			if(l.getToNode().getId().equals(toId)){

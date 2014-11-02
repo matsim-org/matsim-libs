@@ -1,12 +1,14 @@
 package playground.mzilske.cdr;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -21,12 +23,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,13 +39,19 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cadyts.CadytsScoring;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModuleWithScenario;
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
-import javax.inject.Inject;
-import java.util.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 
 public class CDREquilTest {
 
@@ -65,7 +73,7 @@ public class CDREquilTest {
         @Override
         public boolean makeACall(Id id, double time) {
             double dailyRate = 0;
-            double secondlyProbability = dailyRate / (double) (24*60*60);
+            double secondlyProbability = dailyRate / (24*60*60);
             return Math.random() < secondlyProbability;
         }
 
@@ -266,13 +274,13 @@ public class CDREquilTest {
         tmp.setStorageCapFactor(100);
         tmp.setRemoveStuckVehicles(false);
         {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setModuleName("SelectExpBeta");
             stratSets.setProbability(0.7);
             phoneConfig.strategy().addStrategySettings(stratSets);
         }
         {
-            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setModuleName("ReRealize");
             stratSets.setProbability(0.3);
             stratSets.setDisableAfter(90);

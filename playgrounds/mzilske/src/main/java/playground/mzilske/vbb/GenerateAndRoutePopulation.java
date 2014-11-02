@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -14,14 +15,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -88,7 +88,7 @@ public class GenerateAndRoutePopulation {
 		for (int i=0; i<10; ++i) {
 			Coord source = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
 			Coord sink = new CoordImpl(minX + Math.random() * (maxX - minX), minY + Math.random() * (maxY - minY));
-			Person person = population.getFactory().createPerson(new IdImpl(Integer.toString(i)));
+			Person person = population.getFactory().createPerson(Id.create(Integer.toString(i), Person.class));
 			Plan plan = population.getFactory().createPlan();
 			plan.addActivity(createHome(source));
 			List<Leg> homeWork = createLeg(source, sink);

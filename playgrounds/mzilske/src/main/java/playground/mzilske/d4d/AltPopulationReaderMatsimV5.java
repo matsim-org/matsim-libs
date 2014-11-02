@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -55,9 +54,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 
@@ -135,7 +137,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 
 	private Person parsePerson(XMLStreamReader xmlr) throws XMLStreamException {
 		String id = xmlr.getAttributeValue(""	, "id");
-		PersonImpl person = new PersonImpl(new IdImpl(id));
+		PersonImpl person = new PersonImpl(Id.create(id, Person.class));
 		String sex = xmlr.getAttributeValue(""	, "sex");
 		if (sex!=null) person.setSex(sex);
 		String age = xmlr.getAttributeValue(""	, "age");
@@ -287,16 +289,16 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			currRoute = genericRoute;
 		} else if ("experimentalPt1".equals(routeType)) {
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
-			IdImpl accessStopId;
-			IdImpl lineId;
-			IdImpl routeId;
-			IdImpl egressStopId;
+			Id<TransitStopFacility> accessStopId;
+			Id<TransitLine> lineId;
+			Id<TransitRoute> routeId;
+			Id<TransitStopFacility> egressStopId;
 			if (routeDescription.startsWith(IDENTIFIER_1)) {
 				String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
-				accessStopId = new IdImpl(parts[1]);
-				lineId = new IdImpl(parts[2]);
-				routeId = new IdImpl(parts[3]);
-				egressStopId = new IdImpl(parts[4]);
+				accessStopId = Id.create(parts[1], TransitStopFacility.class);
+				lineId = Id.create(parts[2], TransitLine.class);
+				routeId = Id.create(parts[3], TransitRoute.class);
+				egressStopId = Id.create(parts[4], TransitStopFacility.class);
 				String description;
 				if (parts.length > 5) {
 					description = parts[5];

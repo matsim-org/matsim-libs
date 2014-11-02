@@ -9,8 +9,8 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
+import playground.mzilske.cdr.ZoneTracker.Zone;
 import playground.mzilske.util.ReadableQuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -20,7 +20,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class Zones {
@@ -169,7 +168,7 @@ public class Zones {
 		}
 	}
 
-	public Id locate(Coord coord) {
+	public Id<Zone> locate(Coord coord) {
 //		double dist = Double.POSITIVE_INFINITY;
 //		CellTower shortest = null;
 //		for (CellTower cellTower : cellTowers.values()) {
@@ -185,7 +184,7 @@ public class Zones {
 		if (shortest == null) {
 			throw new RuntimeException();
 		}
-		return new IdImpl(shortest.id);
+		return Id.create(shortest.id, Zone.class);
 	}
 
 

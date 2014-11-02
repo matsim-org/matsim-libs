@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,7 +13,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -35,7 +35,7 @@ class GeneratePopulation {
 		for (int i=0; i<100; ++i) {
 			Coord source = randomCoord();
 			Coord sink = randomCoord();
-			Person person = population.getFactory().createPerson(new IdImpl(Integer.toString(i)));
+			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = population.getFactory().createPlan();
 			Activity morning = population.getFactory().createActivityFromCoord("home", source);
 			morning.setEndTime(9*60*60);

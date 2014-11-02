@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Count;
@@ -129,7 +128,7 @@ public class Main {
         for (Map.Entry<Id<Link>, Count> entry : allCounts.getCounts().entrySet()) {
             String linkId = entry.getKey().toString();
             if (linkId.equals("1") || linkId.equals("21")) {
-                Count count = someCounts.createAndAddCount(new IdImpl(linkId), "wurst");
+                Count count = someCounts.createAndAddCount(Id.create(linkId, Link.class), "wurst");
                 for (Map.Entry<Integer, Volume> volume : entry.getValue().getVolumes().entrySet()) {
                     if (countHours.contains(volume.getKey())) {
                         count.createVolume(volume.getKey(), volume.getValue().getValue());

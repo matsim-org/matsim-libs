@@ -22,14 +22,15 @@
 
 package playground.mzilske.cdr;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public class SightingsReader {
 
@@ -46,7 +47,7 @@ public class SightingsReader {
                 String line = reader.readLine();
                 while (line != null) {
                     String tokens[] = line.split("\\s+");
-                    IdImpl personId = new IdImpl(tokens[0]);
+                    Id<Person> personId = Id.create(tokens[0], Person.class);
                     List<Sighting> perPerson = sightings.getSightingsPerPerson().get(personId);
                     if (perPerson == null) {
                         perPerson = new ArrayList<Sighting>();

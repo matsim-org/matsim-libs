@@ -10,7 +10,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -72,7 +71,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 			Iterator<TransitRoute> i = line.getRoutes().values().iterator();
 			TransitRoute routeH = i.next();
 			TransitRoute routeR = i.next();
-			Umlauf umlauf = new UmlaufImpl(new IdImpl(id++));
+			Umlauf umlauf = new UmlaufImpl(Id.create(id++, Umlauf.class));
 			List<Departure> departuresH = new ArrayList<Departure>(routeH.getDepartures().values());
 			Collections.sort(departuresH, departureTimeComparator);
 			Iterator<Departure> iH = departuresH.iterator();
@@ -96,8 +95,8 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		List<UmlaufStueckI> umlaufStuecke = umlauf.getUmlaufStuecke();
 		if (!umlaufStuecke.isEmpty()) {
 			UmlaufStueckI previousUmlaufStueck = umlaufStuecke.get(umlaufStuecke.size() - 1);
-			Id fromLinkId = previousUmlaufStueck.getCarRoute().getEndLinkId();
-			Id toLinkId = route.getRoute().getStartLinkId();
+			Id<Link> fromLinkId = previousUmlaufStueck.getCarRoute().getEndLinkId();
+			Id<Link> toLinkId = route.getRoute().getStartLinkId();
 			if (!fromLinkId.equals(toLinkId)) {
 				insertWenden(this.network.getLinks().get(fromLinkId), this.network.getLinks().get(toLinkId), umlauf);
 			}

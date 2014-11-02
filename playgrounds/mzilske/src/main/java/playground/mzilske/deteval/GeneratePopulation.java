@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -108,7 +107,7 @@ public class GeneratePopulation {
 
 	private Map<Id, Person> persons = new HashMap<Id, Person>();
 
-	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
+	private Map<Id<Person>, Plan> plans = new HashMap<>();
 
 	private Map<Integer, SimpleFeature> verkehrszellen = new HashMap<Integer, SimpleFeature>();
 
@@ -179,13 +178,13 @@ public class GeneratePopulation {
 
 	private void addHouseholds() throws IOException {
 		for (String caseid : cases.keySet()) {
-			IdImpl householdId = new IdImpl(caseid);
+			Id<Household> householdId = Id.create(caseid, Household.class);
 			Household household = households.getFactory().createHousehold(householdId);
 			Case caze = cases.get(caseid);
 			for (Person person : caze.members) {
 				household.getMemberIds().add(person.getId());
 			}
-			Set<Id> peopleWhoNeedCar = new HashSet<Id>();
+			Set<Id<Person>> peopleWhoNeedCar = new HashSet<>();
 			for (Person person : caze.members) {
 				if (CarAssigner.wantsCar(person)) {
 					peopleWhoNeedCar.add(person.getId());
@@ -196,19 +195,19 @@ public class GeneratePopulation {
 			// TODO: Then: Let the subtourmodechoice only select car legs for people who have a car.
 			// TODO: Later: Create only as many cars as households report on owning, let members compete for them.
 			for (Car car : caze.cars) {
-				Id vehicleId;
-				Id primaryUserPersonId;
+				Id<Vehicle> vehicleId;
+				Id<Person> primaryUserPersonId;
 				if (car.primary_user >= 0 && car.primary_user < household.getMemberIds().size()) {
 					primaryUserPersonId = household.getMemberIds().get(car.primary_user);
 				} else {
 					primaryUserPersonId = null;
 				}
 				if (primaryUserPersonId != null && peopleWhoNeedCar.contains(primaryUserPersonId)) {
-					vehicleId = primaryUserPersonId;
+					vehicleId = Id.create(primaryUserPersonId, Vehicle.class);
 				} else if (!peopleWhoNeedCar.isEmpty()) {
-					vehicleId = peopleWhoNeedCar.iterator().next();
+					vehicleId = Id.create(peopleWhoNeedCar.iterator().next(), Vehicle.class);
 				} else {
-					vehicleId = new IdImpl(caseid + "." + "additional_car_" + nCar);
+					vehicleId = Id.create(caseid + "." + "additional_car_" + nCar, Vehicle.class);
 				}
 				Vehicle vehicle = vehicles.getFactory().createVehicle(vehicleId, vehicleType(car.baujahr, car.antriebsart, car.hubraum));
 				vehicles.addVehicle( vehicle);
@@ -216,7 +215,7 @@ public class GeneratePopulation {
 				peopleWhoNeedCar.remove(vehicleId);
 				++nCar;
 			}
-			for (Id personWhoNeedsCar : peopleWhoNeedCar) {
+			for (Id<Person> personWhoNeedsCar : peopleWhoNeedCar) {
 				VehicleType vehicleType;
 				if (household.getVehicleIds().isEmpty()) {
 					vehicleType = defaultVehicleType();
@@ -225,7 +224,7 @@ public class GeneratePopulation {
 					vehicleType = vehicleToClone.getType();
 				}
 				
-				Vehicle vehicle = vehicles.getFactory().createVehicle(personWhoNeedsCar, vehicleType);
+				Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create(personWhoNeedsCar, Vehicle.class), vehicleType);
 				vehicles.addVehicle( vehicle);
 				household.getVehicleIds().add(vehicle.getId());
 				++nCar;
@@ -246,7 +245,7 @@ public class GeneratePopulation {
 	}
 
 	private VehicleType vehicleType(int baujahr, int antriebsart, int hubraum) {
-		IdImpl vehicleTypeId = new IdImpl(baujahr+"_"+antriebsart+"_"+hubraum);
+		Id<VehicleType> vehicleTypeId = Id.create(baujahr+"_"+antriebsart+"_"+hubraum, VehicleType.class);
 		VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
 		if (vehicleType == null) {
 			vehicleType = vehicles.getFactory().createVehicleType(vehicleTypeId);
@@ -257,7 +256,7 @@ public class GeneratePopulation {
 	}
 
 	private VehicleType defaultVehicleType() {
-		IdImpl defaultVehicleTypeId = new IdImpl("default");
+		Id<VehicleType> defaultVehicleTypeId = Id.create("default", VehicleType.class);
 		VehicleType defaultVehicleType = vehicles.getVehicleTypes().get(defaultVehicleTypeId);
 		if (defaultVehicleType == null) {
 			defaultVehicleType = vehicles.getFactory().createVehicleType(defaultVehicleTypeId);
@@ -328,8 +327,8 @@ public class GeneratePopulation {
 
 	private void addPlans() {
 		logger.info("Got " + plans.size() + " plans.");
-		for (Map.Entry<Id, Plan> entry : plans.entrySet()) {
-			Id personId = entry.getKey();
+		for (Map.Entry<Id<Person>, Plan> entry : plans.entrySet()) {
+			Id<Person> personId = entry.getKey();
 			Plan plan = entry.getValue();
 			boolean isGood = true;
 			for (PlanElement planElement : plan.getPlanElements()) {

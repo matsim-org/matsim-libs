@@ -7,11 +7,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+import playground.mzilske.cdr.ZoneTracker.Zone;
 
 public class ZoneTrackerTest {
 	
@@ -40,21 +43,21 @@ public class ZoneTrackerTest {
 		EventsManager linkEvents = EventsUtils.createEventsManager();
 		EventsManager zoneEvents = EventsUtils.createEventsManager();
 		
-		IdImpl person = new IdImpl("p1");
-		IdImpl vehicle = new IdImpl("v1");
-		IdImpl link1 = new IdImpl("l1");
+		Id<Person> person = Id.create("p1", Person.class);
+		Id<Vehicle> vehicle = Id.create("v1", Vehicle.class);
+		Id<Link> link1 = Id.create("l1", Link.class);
 		
-		Map<Id, Id> initialZones = new HashMap<Id, Id>();
-		initialZones.put(person, link1);
+		Map<Id<Person>, Id<Zone>> initialZones = new HashMap<>();
+		initialZones.put(person, Id.create(link1, Zone.class));
 		ZoneTracker testee = new ZoneTracker(zoneEvents, new LinkToZoneResolver() {
 
 			@Override
-			public Id resolveLinkToZone(Id linkId) {
-				return linkId;
+			public Id<Zone> resolveLinkToZone(Id<Link> linkId) {
+				return Id.create(linkId, Zone.class);
 			}
 
 			@Override
-			public Id chooseLinkInZone(String zoneId) {
+			public Id<Link> chooseLinkInZone(String zoneId) {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -65,11 +68,11 @@ public class ZoneTrackerTest {
 		linkEvents.addHandler(testee);
 		
 		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, link1, vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, new IdImpl("l2"), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, new IdImpl("l2"), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, new IdImpl("l3"), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, new IdImpl("l3"), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, new IdImpl("l4"), vehicle));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l2", Link.class), vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, Id.create("l2", Link.class), vehicle));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l3", Link.class), vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, Id.create("l3", Link.class), vehicle));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l4", Link.class), vehicle));
 		linkEvents.finishProcessing();
 	}
 	
@@ -78,26 +81,26 @@ public class ZoneTrackerTest {
 		EventsManager linkEvents = EventsUtils.createEventsManager();
 		EventsManager zoneEvents = EventsUtils.createEventsManager();
 		
-		IdImpl person = new IdImpl("p1");
-		IdImpl vehicle = new IdImpl("v1");
-		final IdImpl link1 = new IdImpl("l1");
-		final IdImpl link4 = new IdImpl("l4");
+		Id<Person> person = Id.create("p1", Person.class);
+		Id<Vehicle> vehicle = Id.create("v1", Vehicle.class);
+		final Id<Link> link1 = Id.create("l1", Link.class);
+		final Id<Link> link4 = Id.create("l4", Link.class);
 		
-		Map<Id, Id> initialZones = new HashMap<Id, Id>();
-		initialZones.put(person, link1);
+		Map<Id<Person>, Id<Zone>> initialZones = new HashMap<>();
+		initialZones.put(person, Id.create(link1, Zone.class));
 		ZoneTracker testee = new ZoneTracker(zoneEvents, new LinkToZoneResolver() {
 
 			@Override
-			public Id resolveLinkToZone(Id linkId) {
+			public Id<Zone> resolveLinkToZone(Id<Link> linkId) {
 				if (linkId.equals(link4) || linkId.equals(link1)) {
-					return linkId;
+					return Id.create(linkId, Zone.class);
 				} else {
 					return null;
 				}
 			}
 
 			@Override
-			public Id chooseLinkInZone(String zoneId) {
+			public Id<Link> chooseLinkInZone(String zoneId) {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -108,10 +111,10 @@ public class ZoneTrackerTest {
 		linkEvents.addHandler(testee);
 		
 		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, link1, vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, new IdImpl("l2"), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(2.0, person, new IdImpl("l2"), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(2.0, person, new IdImpl("l3"), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(3.0, person, new IdImpl("l3"), vehicle));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l2", Link.class), vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(2.0, person, Id.create("l2", Link.class), vehicle));
+		linkEvents.processEvent(new LinkEnterEvent(2.0, person, Id.create("l3", Link.class), vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(3.0, person, Id.create("l3", Link.class), vehicle));
 		linkEvents.processEvent(new LinkEnterEvent(3.0, person, link4, vehicle));
 		linkEvents.finishProcessing();
 	}

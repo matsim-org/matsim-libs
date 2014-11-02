@@ -23,17 +23,18 @@
 package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 
 public class LinkIsZone implements ZoneTracker.LinkToZoneResolver {
 
     @Override
-    public Id resolveLinkToZone(Id linkId) {
+    public Id resolveLinkToZone(Id<Link> linkId) {
         return linkId;
     }
 
-    public IdImpl chooseLinkInZone(String zoneId) {
-        return new IdImpl(zoneId);
+    @Override
+		public Id<Link> chooseLinkInZone(String zoneId) {
+        return Id.create(zoneId, Link.class);
     }
 
 }

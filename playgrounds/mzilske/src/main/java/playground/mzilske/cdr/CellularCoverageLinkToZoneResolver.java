@@ -28,12 +28,12 @@ public final class CellularCoverageLinkToZoneResolver implements
 	}
 
 	@Override
-	public Id resolveLinkToZone(Id linkId) {
+	public Id resolveLinkToZone(Id<Link> linkId) {
 		return cellularCoverage.locate(network.getLinks().get(linkId).getCoord());
 	}
 
 	@Override
-	public Id chooseLinkInZone(String zoneId) {
+	public Id<Link> chooseLinkInZone(String zoneId) {
 		CellTower cellTower = cellularCoverage.cellTowers.get(zoneId);
 		Geometry cell = cellTower.cell;
 		Point p = getRandomPointInFeature(MatsimRandom.getRandom(), cell);

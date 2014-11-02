@@ -1,14 +1,23 @@
 package playground.mzilske.ant2014;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -28,19 +37,11 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PowerPlans;
 import playground.mzilske.cdr.ZoneTracker;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 class MultiRateRunResource {
 
@@ -113,13 +114,13 @@ class MultiRateRunResource {
         tmp.setRemoveStuckVehicles(false);
         tmp.setStuckTime(10.0);
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+            StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setModuleName("ChangeExpBeta");
             stratSets.setProbability(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+            StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setModuleName("ReRoute");
             stratSets.setProbability(0.3);
             config.strategy().addStrategySettings(stratSets);
@@ -147,13 +148,13 @@ class MultiRateRunResource {
         tmp.setRemoveStuckVehicles(false);
         tmp.setStuckTime(10.0);
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+            StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setModuleName("ChangeExpBeta");
             stratSets.setProbability(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+            StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setModuleName("ReRoute");
             stratSets.setProbability(0.3);
             config.strategy().addStrategySettings(stratSets);
@@ -189,12 +190,13 @@ class MultiRateRunResource {
         }, new ZoneTracker.LinkToZoneResolver() {
 
             @Override
-            public Id resolveLinkToZone(Id linkId) {
+            public Id resolveLinkToZone(Id<Link> linkId) {
                 return linkId;
             }
 
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
+            @Override
+						public Id<Link> chooseLinkInZone(String zoneId) {
+                return Id.create(zoneId, Link.class);
             }
 
         });
@@ -239,12 +241,13 @@ class MultiRateRunResource {
         }, new ZoneTracker.LinkToZoneResolver() {
 
             @Override
-            public Id resolveLinkToZone(Id linkId) {
+            public Id resolveLinkToZone(Id<Link> linkId) {
                 return linkId;
             }
 
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
+            @Override
+						public Id<Link> chooseLinkInZone(String zoneId) {
+                return Id.create(zoneId, Link.class);
             }
 
         });

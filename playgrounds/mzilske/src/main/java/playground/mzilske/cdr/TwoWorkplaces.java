@@ -3,8 +3,12 @@ package playground.mzilske.cdr;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -36,31 +40,31 @@ class TwoWorkplaces {
 		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("two-workplaces.xml"));
 		Population population = scenario.getPopulation();
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(i));
+			Person person = population.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHomeMorning(new IdImpl("1")));
+			plan.addActivity(createHomeMorning(Id.create("1", Link.class)));
 			plan.addLeg(createDriveLeg());
-			plan.addActivity(createWork(new IdImpl("2")));
+			plan.addActivity(createWork(Id.create("2", Link.class)));
 			plan.addLeg(createDriveLeg());
-			plan.addActivity(createHomeEvening(new IdImpl("1")));
+			plan.addActivity(createHomeEvening(Id.create("1", Link.class)));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(quantity + i));
+			Person person = population.getFactory().createPerson(Id.create(quantity + i, Person.class));
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHomeMorning(new IdImpl("1")));
+			plan.addActivity(createHomeMorning(Id.create("1", Link.class)));
 			plan.addLeg(createDriveLeg());
-			plan.addActivity(createWork(new IdImpl("10")));
+			plan.addActivity(createWork(Id.create("10", Link.class)));
 			plan.addLeg(createDriveLeg());
-			plan.addActivity(createHomeEvening(new IdImpl("1")));
+			plan.addActivity(createHomeEvening(Id.create("1", Link.class)));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
 		return scenario;
     }
 
-	private Activity createHomeMorning(IdImpl idImpl) {
+	private Activity createHomeMorning(Id<Link> idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 		act.setEndTime(9 * 60 * 60);
 		return act;
@@ -70,20 +74,14 @@ class TwoWorkplaces {
         return scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 	}
 
-	private Activity createWork(IdImpl idImpl) {
+	private Activity createWork(Id<Link> idImpl) {
 		Activity act = scenario.getPopulation().getFactory().createActivityFromLinkId("work", idImpl);
 		act.setEndTime(9 * 60 * 60);
 		return act;
 	}
 
-	private Activity createHomeEvening(IdImpl idImpl) {
+	private Activity createHomeEvening(Id<Link> idImpl) {
         return scenario.getPopulation().getFactory().createActivityFromLinkId("home", idImpl);
 	}
-
-
-    private Id createId(int i) {
-        return new IdImpl(Integer.toString(i));
-    }
-
 
 }

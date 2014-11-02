@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -165,7 +164,7 @@ public class PotsdamPop implements Runnable {
 
 	private void createFromToCar(int source_zone, int sink_zone, int quantity) {
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(source_zone, sink_zone, i, TransportMode.car));
+			Person person = population.getFactory().createPerson(createPersonId(source_zone, sink_zone, i, TransportMode.car));
 			Plan plan = population.getFactory().createPlan();
 			Coord homeLocation = shoot(source_zone);
 			Coord workLocation = shoot(sink_zone);
@@ -181,7 +180,7 @@ public class PotsdamPop implements Runnable {
 
 	private void createFromToPt(int source_zone, int sink_zone, int quantity) {
 		for (int i=0; i<quantity; i++) {
-			Person person = population.getFactory().createPerson(createId(source_zone, sink_zone, i, TransportMode.pt));
+			Person person = population.getFactory().createPerson(createPersonId(source_zone, sink_zone, i, TransportMode.pt));
 			Plan plan = population.getFactory().createPlan();
 			Coord homeLocation = shoot(source_zone);
 			Coord workLocation = shoot(sink_zone);
@@ -233,8 +232,8 @@ public class PotsdamPop implements Runnable {
 		return ct.transform(point);
 	}
 
-	private Id createId(int source_zone, int sink_zone, int i, String transportMode) {
-		return new IdImpl(transportMode + "_" + source_zone + "_" + sink_zone + "_" + i);
+	private Id<Person> createPersonId(int source_zone, int sink_zone, int i, String transportMode) {
+		return Id.create(transportMode + "_" + source_zone + "_" + sink_zone + "_" + i, Person.class);
 	}
 
 	private double calculateNormallyDistributedTime(int i) {
