@@ -43,19 +43,22 @@ import playground.southafrica.utilities.Header;
 /**
  * Class to read all the {@link DigicoreVehicle}s in a given folder, and adapt
  * all the vehicle's activity chains ({@link DigicoreChain}s) by merging all
- * consecutive activities ({@link DigicoreActivity}) that occur at the same 
+ * consecutive activities ({@link DigicoreActivity}) that occur at the same
  * facility, i.e. having the same facility {@link Id}. The output is written to
  * folder called 'clean/' inside the given folder containing the vehicle files.
  * 
- * <br><br><b>Note:</b> Vehicle activities will only be associated with facilties
- * if the class {@link ClusteredChainGenerator} has been executed. That is, this
+ * <br>
+ * <br>
+ * <b>Note:</b> Vehicle activities will only be associated with facilities if
+ * the class {@link ClusteredChainGenerator} has been executed. That is, this
  * class must be run on the output folder, typically called 'xml2', of the class
  * {@link ClusteredChainGenerator}.
  * 
  * @author jwjoubert
  */
 public class DigicoreChainCleaner {
-	final private static Logger LOG = Logger.getLogger(DigicoreChainCleaner.class);
+	final private static Logger LOG = Logger
+			.getLogger(DigicoreChainCleaner.class);
 
 	/**
 	 * @param args
@@ -63,44 +66,48 @@ public class DigicoreChainCleaner {
 	public static void main(String[] args) {
 		Header.printHeader(DigicoreChainCleaner.class.toString(), args);
 		String xmlFolder = args[0];
-		int numberOfThreads = Integer.parseInt(args[1]);		
-		
+		int numberOfThreads = Integer.parseInt(args[1]);
+
 		/* Check the output folder is empty. */
 		File outputFolder = new File(xmlFolder + "clean/");
-		if(outputFolder.exists()){
-			LOG.warn("The output folder exists and will be overwritten: " + outputFolder.getAbsolutePath());
+		if (outputFolder.exists()) {
+			LOG.warn("The output folder exists and will be overwritten: "
+					+ outputFolder.getAbsolutePath());
 			FileUtils.delete(outputFolder);
 		}
 		outputFolder.mkdirs();
-		
+
 		/* Get vehicle files. */
-		List<File> vehicleFiles = FileUtils.sampleFiles(new File(xmlFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
-		
+		List<File> vehicleFiles = FileUtils.sampleFiles(new File(xmlFolder),
+				Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+
 		/* Execute the multi-threaded jobs */
-		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		ExecutorService threadExecutor = Executors
+				.newFixedThreadPool(numberOfThreads);
 		Counter threadCounter = new Counter("   vehicles completed: ");
-		
-		for(File vehicleFile : vehicleFiles){
-			RunnableChainCleaner rcr = new RunnableChainCleaner(vehicleFile, threadCounter, outputFolder);
+
+		for (File vehicleFile : vehicleFiles) {
+			RunnableChainCleaner rcr = new RunnableChainCleaner(vehicleFile,
+					threadCounter, outputFolder);
 			threadExecutor.execute(rcr);
 		}
-		
+
 		threadExecutor.shutdown();
-		while(!threadExecutor.isTerminated()){
+		while (!threadExecutor.isTerminated()) {
 		}
 		threadCounter.printCounter();
-		
+
 		Header.printFooter();
 	}
-	
-	
+
 	public static class RunnableChainCleaner implements Runnable {
 		private final File vehicleFile;
 		private Counter counter;
 		private String outputFolder;
 		private int numberOfActivitiesChanged = 0;
-		
-		public RunnableChainCleaner(File vehicleFile, Counter threadCounter, File outputFolder) {
+
+		public RunnableChainCleaner(File vehicleFile, Counter threadCounter,
+				File outputFolder) {
 			this.vehicleFile = vehicleFile;
 			this.counter = threadCounter;
 			this.outputFolder = outputFolder.getAbsolutePath();
@@ -111,55 +118,58 @@ public class DigicoreChainCleaner {
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 			dvr.parse(vehicleFile.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
-			
+
 			int chainIndex = 0;
-			while(chainIndex < dv.getChains().size()){
+			while (chainIndex < dv.getChains().size()) {
 				DigicoreChain chain = dv.getChains().get(chainIndex);
-				
+
 				cleanChain(chain);
-				
-				if(chain.size() < 2){
+
+				if (chain.size() < 2) {
 					/* It no longer is a valid chain, remove it. */
 					dv.getChains().remove(chainIndex);
-				} else{
+				} else {
 					/* Move to the next chain. */
 					chainIndex++;
 				}
 			}
-			
-			/* Write the vehicle to file, if it has at least one chain. */
-			if(dv.getChains().size() > 0){
-				DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-				dvw.write(outputFolder + "/" + dv.getId() + ".xml.gz",  dv);
 
-				/*TODO Remove after debugging. */
-				LOG.info("   ==> " + dv.getId().toString() + " -> " + numberOfActivitiesChanged);
+			/* Write the vehicle to file, if it has at least one chain. */
+			if (dv.getChains().size() > 0) {
+				DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
+				dvw.write(outputFolder + "/" + dv.getId() + ".xml.gz", dv);
+
+				/* TODO Remove after debugging. */
+				LOG.info("   ==> " + dv.getId().toString() + " -> "
+						+ numberOfActivitiesChanged);
 			}
-			
+
 			counter.incCounter();
 		}
-		
-		public DigicoreChain cleanChain(DigicoreChain chain){
+
+		public DigicoreChain cleanChain(DigicoreChain chain) {
 			int activityIndex = 0;
-			while(activityIndex < chain.getAllActivities().size()-1){
+			while (activityIndex < chain.getAllActivities().size() - 1) {
 				DigicoreActivity thisActivity = chain.get(activityIndex);
-				DigicoreActivity nextActivity = chain.get(activityIndex+1);
-				
-				if( thisActivity.getFacilityId() != null &&
-						nextActivity.getFacilityId() != null &&
-						thisActivity.getFacilityId().toString().equalsIgnoreCase(nextActivity.getFacilityId().toString()) ){
+				DigicoreActivity nextActivity = chain.get(activityIndex + 1);
+
+				if (thisActivity.getFacilityId() != null
+						&& nextActivity.getFacilityId() != null
+						&& thisActivity
+								.getFacilityId()
+								.toString()
+								.equalsIgnoreCase(
+										nextActivity.getFacilityId().toString())) {
 					/* Merge the two activities. */
 					numberOfActivitiesChanged++;
-					thisActivity.setEndTime( nextActivity.getEndTime() );
-					chain.remove( activityIndex+1 );						
-				} else{
+					thisActivity.setEndTime(nextActivity.getEndTime());
+					chain.remove(activityIndex + 1);
+				} else {
 					activityIndex++;
 				}
 			}
 			return chain;
 		}
-	} 
-	
-	
+	}
 
 }
