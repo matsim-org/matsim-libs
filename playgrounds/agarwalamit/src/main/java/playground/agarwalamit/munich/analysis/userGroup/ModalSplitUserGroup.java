@@ -36,15 +36,23 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ModalSplitUserGroup {
 
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run1/ei/";/*"./output/run2/";*/
-	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
-	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private SortedMap<UserGroup, SortedMap<String, double[]>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,double[]>>();
 	
-	private void run(){
+	public static void main(String[] args) {
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run6/";/*"./output/run2/";*/
+		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
+		for(String runCase :runCases){
+		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
+		msUG.run(outputDir+runCase);
+		}
+	}
+	
+	private void run(String outputDir){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork( this.populationFile, this.networkFile);
+		String populationFile = outputDir +"/output_plans.xml.gz";
+		String networkFile = outputDir+"/output_network.xml.gz";
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(populationFile, networkFile);
 		
 		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
 		
@@ -54,7 +62,7 @@ public class ModalSplitUserGroup {
 			this.userGrp2ModalSplit.put(ug, modalSplitPop);
 		}
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"/analysis/usrGrpToModalShare.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/usrGrpToModalShare.txt");
 		try {
 			writer.write("UserGroup \t");
 			
@@ -92,10 +100,5 @@ public class ModalSplitUserGroup {
 		} catch (Exception e) {
 			throw new RuntimeException("Data can not be written to file. Reason - "+e);
 		}
-	}
-	
-	public static void main(String[] args) {
-		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
-		msUG.run();
 	}
 }
