@@ -24,6 +24,7 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
@@ -60,8 +61,6 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.counts.CountControlerListener;
-import org.matsim.counts.Counts;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -355,12 +354,6 @@ public class Controler extends AbstractController {
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
 
-		// optional: use counts
-		if (this.config.counts().getCountsFileName() != null || this.scenarioData .getScenarioElement(Counts.ELEMENT_NAME) != null) {
-			CountControlerListener ccl = new CountControlerListener(this.config.counts());
-			this.addControlerListener(ccl);
-		}
-
 		if (this.config.scenario().isUseTransit()) {
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
@@ -392,6 +385,7 @@ public class Controler extends AbstractController {
                         }
                         // Bootstrap it with the Scenario and some controler context.
                         bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
+                        bindToInstance(IterationStopWatch.class, stopwatch);
                         bindToInstance(Scenario.class, scenarioData);
                     }
                 });

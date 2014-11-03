@@ -19,10 +19,6 @@
 
 package org.matsim.counts;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -43,17 +40,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @author mrieser
  */
-public class CountControlerListenerTest {
+public class CountsControlerListenerTest {
 
 	@Rule public MatsimTestUtils util = new MatsimTestUtils();
 	
 	@Test
 	public void testUseVolumesOfIteration() {
-		CountsConfigGroup config = new CountsConfigGroup();
-		CountControlerListener ccl = new CountControlerListener(config);
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		CountsConfigGroup config = scenario.getConfig().counts();
+		CountsControlerListener ccl = new CountsControlerListener(scenario, null, null, null);
 		
 		// test defaults
 		Assert.assertEquals(10, config.getWriteCountsInterval());

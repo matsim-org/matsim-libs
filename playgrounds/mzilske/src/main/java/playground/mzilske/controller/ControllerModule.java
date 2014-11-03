@@ -62,8 +62,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.counts.CountControlerListener;
-import org.matsim.counts.Counts;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -168,10 +166,6 @@ public class ControllerModule extends AbstractModule {
             OutputDirectoryHierarchy controlerIO) {
         List<ControlerListener> result = new ArrayList<ControlerListener>();
         result.add(scoreStats);
-        if (config.counts().getCountsFileName() != null || scenarioData.getScenarioElement(Counts.ELEMENT_NAME) != null) {
-            CountControlerListener ccl = new CountControlerListener(config.counts());
-            result.add(ccl);
-        }
         if (config.scenario().isUseTransit()) {
             if (config.ptCounts().getAlightCountsFileName() != null) {
                 result.add(new PtCountControlerListener(config));
