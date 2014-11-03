@@ -56,7 +56,7 @@ public class MobsimConnector implements Mobsim {
 		sim = new ParallelPseudoSim(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-		roadTravelTimes = new TravelTimeCalculator(1.5);
+		roadTravelTimes = MobsimConnectorFactory.getTravelTimeCalculator(1.5);
 	}
 	
 	/* (non-Javadoc)
@@ -75,18 +75,5 @@ public class MobsimConnector implements Mobsim {
 		sim.run(plans, scenario.getNetwork(), roadTravelTimes, eventsManager);
 	}
 
-	private static class TravelTimeCalculator implements TravelTime {
-
-		private final double factor;
-		
-		public TravelTimeCalculator(double factor) {
-			this.factor = factor;
-		}
-
-		@Override
-		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return factor * link.getLength() / link.getFreespeed();
-		}
-		
-	}
+	
 }

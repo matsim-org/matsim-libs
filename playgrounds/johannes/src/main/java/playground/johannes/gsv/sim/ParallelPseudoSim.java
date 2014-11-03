@@ -105,7 +105,7 @@ public class ParallelPseudoSim {
 		/*
 		 * wait for threads
 		 */
-		logger.debug("Runngin simulation threads...");
+		logger.debug("Running simulation threads...");
 		for (int i = 0; i < segments.length; i++) {
 			try {
 				futures[i].get();
@@ -158,9 +158,9 @@ public class ParallelPseudoSim {
 		public void run() {
 			eventList = new LinkedList<Event>();
 			for (Plan plan : plans) {
-				if (plan.getPerson().getId().toString().equals("211121.1clone678889")) {
-					System.err.println();
-				}
+//				if (plan.getPerson().getId().toString().equals("211121.1clone678889")) {
+//					System.err.println();
+//				}
 				List<PlanElement> elements = plan.getPlanElements();
 
 				double prevEndTime = 0;
@@ -245,11 +245,11 @@ public class ParallelPseudoSim {
 		}
 	}
 
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-		executor.shutdown();
-	}
+//	@Override
+//	public void finalize() throws Throwable {
+//		super.finalize();
+//		executor.shutdown();
+//	}
 
 	private static class DefaultLegSimEngine implements LegSimEngine {
 

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,7 +42,10 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.LegHistogramModule;
+import org.matsim.core.controler.corelisteners.LinkStatsModule;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -56,9 +60,11 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
@@ -106,13 +112,13 @@ public class Simulator {
 		
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setModuleName("activityLocations");
-		settings.setProbability(0.1);
+//		settings.setProbability(0.1);
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
 		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home"));
 		
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setModuleName("doNothing");
-		settings.setProbability(0.9);
+//		settings.setProbability(0.9);
 		
 		controler.addPlanStrategyFactory("doNothing", new PlanStrategyFactory() {
 			
@@ -164,7 +170,12 @@ public class Simulator {
 		
 		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
 		
-		
+		controler.setModules(new AbstractModule() {
+            @Override
+            public void install() {
+               bindToInstance(TravelTime.class, MobsimConnectorFactory.getTravelTimeCalculator(1.5));
+            }
+        });
 		controler.run();
 		
 	}

@@ -61,8 +61,8 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 		this.population = population;
 
 		rates = new TObjectDoubleHashMap<String>();
-//		rates.put("work", 1.2);
-		rates.put("work", 1);
+		rates.put("work", 1.2);
+//		rates.put("work", 1);
 		rates.put("edu", 1.7);
 		rates.put("shop", 1.5);
 		rates.put("private", 1.5);
