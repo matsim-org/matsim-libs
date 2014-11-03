@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -121,10 +119,10 @@ public class CompletenessPerConfiguration {
 		return inArea;
 	}
 	
-	public static Collection<Id> getFacilityIds(String networkPath) {
+	public static Collection<Id<ActivityFacility>> getFacilityIds(String networkPath) {
 		DigicoreNetworkParser dnr = new DigicoreNetworkParser();
 		DigicoreNetwork dn;
-		Collection<Id> facilityIdList = null;
+		Collection<Id<ActivityFacility>> facilityIdList = null;
 		try {
 			dn = dnr.parseNetwork(networkPath);
 			facilityIdList = dn.getVertices();
@@ -160,7 +158,7 @@ public class CompletenessPerConfiguration {
 
 				//Get the network and list of facilityIds
 				String networkPath = String.format("%s/%.0f_%d/%.0f_%d_network.txt", sourceFolder, thisRadius, thisPmin, thisRadius, thisPmin);
-				Collection<Id> facilityIdList = getFacilityIds(networkPath);
+				Collection<Id<ActivityFacility>> facilityIdList = getFacilityIds(networkPath);
 				//Get the vehicles
 				String vehicleFolder = String.format("%s/%.0f_%d/xml2/", sourceFolder, thisRadius, thisPmin);
 				List<File> listOfFiles = FileUtils.sampleFiles(new File(vehicleFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
@@ -205,7 +203,6 @@ public class CompletenessPerConfiguration {
 	
 	public static void  writeCompletenessOutput(ArrayList<Tuple<Tuple<Double, Integer>, Double>> results, String outputFolder) {
 		
-		File file = new File(outputFolder);
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder);
 		try{
 			bw.write("radius,pmin,completeness");
