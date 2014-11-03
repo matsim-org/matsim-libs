@@ -22,6 +22,8 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
@@ -40,7 +42,7 @@ public class AbsoluteDelays  {
 	}
 
 	public static void main(String[] args) {
-		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run6/";
 		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};
 		
 		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
@@ -50,8 +52,10 @@ public class AbsoluteDelays  {
 		BufferedWriter writer =IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteDelays.txt");
 
 		try {
+			writer.write("runCase \t absoluteDelaysInHr \t delaysCost \n");
 			for(String runCase : runCases){
-				writer.write(runCase+"\t"+totalDelayInHoursFromEventsFile(runCase)+"\n");
+				double delayInHr = totalDelayInHoursFromEventsFile(runCase);
+				writer.write(runCase+"\t"+delayInHr+"\t"+delayInHr*3600*getVTTS_car(runCase)+"\n");
 			}
 			writer.close();
 		} catch (IOException e) {
@@ -59,6 +63,19 @@ public class AbsoluteDelays  {
 		}
 	}
 
+	private double getVTTS_car(String runCase){
+		String configFile = outputDir+runCase+"/output_config.xml.gz";
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader reader = new MatsimConfigReader(config);
+		reader.readFile(configFile);
+
+		double vtts_car = ((config.planCalcScore().getTraveling_utils_hr()/3600) + 
+				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
+				/ (config.planCalcScore().getMarginalUtilityOfMoney());
+		return vtts_car;
+	}
+	
 	private  double totalDelayInHoursFromEventsFile(String runCase) {
 
 		String configFile = outputDir+runCase+"/output_config.xml";
