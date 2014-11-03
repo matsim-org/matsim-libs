@@ -32,9 +32,12 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * 
  * This class contains methods to do any of the following:
  * <ul>
- * <li> filter the *.xml.gz vehicle files and create a {@link List} of {@link File}s - this will read in all vehicle files in the specified folder.
+ * <li> filter the *.xml.gz vehicle files and create a {@link List} of {@link File}s - 
+ *      this will read in all vehicle files in the specified folder.
  * <li> split the vehicles into INTER-, INTRA- and EXTRA-Provincial vehicles.
- * <li> read a file containing the IDs of vehicles and store it in a {@link List} of {@link File}s. E.g. you only want to read intra-provincial vehicles from the vehicle files provided in a directory. 
+ * <li> read a file containing the IDs of vehicles and store it in a {@link List} 
+ *      of {@link File}s. E.g. you only want to read intra-provincial vehicles 
+ *      from the vehicle files provided in a directory. 
  * <li> write out the vehicle IDs in a {@link List} of {@link File}s to a .txt file.
  * </ul>
  * 

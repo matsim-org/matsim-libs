@@ -46,6 +46,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -130,10 +131,11 @@ public class FreightChainGenerator {
 		counter.printCounter();
 
 		/* Aggregate the output plans. */
+		PopulationFactory pf = sc.getPopulation().getFactory();
 		try {
 			int i = 0;
 			for(Future<Plan> job : listOfJobs){
-				Person vehicle = new PersonImpl( Id.create(prefix + "_" + i++, Person.class) );
+				Person vehicle = pf.createPerson( Id.create(prefix + "_" + i++, Person.class) );
 				Plan plan;
 				plan = job.get();
 
@@ -142,7 +144,11 @@ public class FreightChainGenerator {
 				sc.getPopulation().addPerson(vehicle);
 
 				/* Indicate the subpopulation. */
-				sc.getPopulation().getPersonAttributes().putAttribute(vehicle.getId().toString(), sc.getConfig().plans().getSubpopulationAttributeName(), "commercial");
+				sc.getPopulation().getPersonAttributes().putAttribute(
+						vehicle.getId().toString(), 
+						sc.getConfig().plans().getSubpopulationAttributeName(), 
+						"commercial"
+				);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -227,7 +233,7 @@ public class FreightChainGenerator {
 				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
 
-				// FIXME Is right right i.t.o. last major activity?
+				// FIXME Is this right i.t.o. last major activity?
 				if(activityType.equalsIgnoreCase("minor")){
 					thisActivity.setMaximumDuration(duration);
 				}
