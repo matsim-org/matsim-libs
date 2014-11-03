@@ -51,7 +51,7 @@ public class ReadAndAddSubActivities {
 		String initialPlans = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 		String initialConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCase.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_subActivities_baseCase.xml";
+		String outConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_subActivities_baseCase_msa.xml";
 		String outPlans = "../../munich/input/plans_1pct_subActivities.xml.gz";
 		ReadAndAddSubActivities add2Config =  new ReadAndAddSubActivities(initialConfig,sc);
 		add2Config.readConfig();
@@ -85,6 +85,7 @@ public class ReadAndAddSubActivities {
 		
 		config.controler().setOutputDirectory(null);
 		config.plans().setInputFile(inputPlans);
+		config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
 		
 		new ConfigWriter(config).write(outConfig);
 	}
