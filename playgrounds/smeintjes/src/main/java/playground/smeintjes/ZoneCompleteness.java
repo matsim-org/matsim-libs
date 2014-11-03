@@ -46,11 +46,16 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author sumarie
  *
  */
+@SuppressWarnings("deprecation")
 public class ZoneCompleteness {
 	final private static Logger LOG = Logger.getLogger(ZoneCompleteness.class); 
 	/**
-	 * @param args
+	 * @param sourceFolder the path to the folder containing the network files 
+	 * @param outputFolder the path to where the output should be written
+	 * @param numberOfThreads the number of threads to use for the multi-threading part
+	 * @param hexWidth the width of the hexagonal study areas
 	 */
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 		Header.printHeader(ZoneCompleteness.class.toString(), args);
 
@@ -83,6 +88,7 @@ public class ZoneCompleteness {
 	 * This method creates a QuadTree that includes the hexagons of the 10 study areas (in NMBM)  
 	 * as Polygons.
 	 */
+	@SuppressWarnings("rawtypes")
 	private static QuadTree<Tuple<Id, Polygon>> buildZoneQuadTree(Id[] idList, double totalWidth) {
 
 		double minX = 130000.0;
@@ -133,11 +139,12 @@ public class ZoneCompleteness {
 		return zoneQT;
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, String outputFolder, QuadTree<Tuple<Id, Polygon>> qt, double hexWidth, Id[] idList) {
 
 
-				double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
-				int[] pmins = {1, 5, 10, 15, 20, 25};
+				double[] radii = {20};
+				int[] pmins = {25};
 
 		//For testing purposes
 //		double[] radii = {15};
@@ -152,7 +159,7 @@ public class ZoneCompleteness {
 			for(int thisPmin : pmins){
 				/* Set configuration-specific filenames */
 				String vehicleFolder = String.format("%s/%.0f_%d/xml2/", sourceFolder, thisRadius, thisPmin);
-				String outputFile = String.format("%s%.0f_%d/%.0f_%d_zonePercentageActivities.csv", outputFolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				String outputFile = String.format("%s/%.0f_%d_zonePercentageActivities.csv", outputFolder, thisRadius, thisPmin);
 
 				LOG.info("================================================================================");
 				LOG.info("Performing percentage-facility-id analysis for radius " + thisRadius + ", and pmin of " + thisPmin);
@@ -248,6 +255,7 @@ public class ZoneCompleteness {
 	 * passed a vehicle file, which is parsed and analysed to determine whether the activities fall within 
 	 * one of the ten study areas.
 	 */
+	@SuppressWarnings("rawtypes")
 	private static class ExtractorCallable implements Callable<Map<Id, Tuple<Integer, Integer>>>{
 		private final QuadTree<Tuple<Id, Polygon>> qt;
 		private final File file;
