@@ -52,7 +52,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 public class InitialPlansConsistencyCheck {
-	//TODO[AA] put a check how many persons have act dur less than zeroUtilDuration
 	public static final Logger log = Logger.getLogger(InitialPlansConsistencyCheck.class);
 	private Scenario sc;
 	private Map<Person, List<String>> person2ActivityType;
