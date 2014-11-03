@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -138,7 +137,6 @@ public class Controler extends AbstractController {
 	protected StrategyManager strategyManager = null;
 
 	protected boolean scenarioLoaded = false;
-    private ScoreStatsControlerListener scoreStats = null;
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
@@ -642,7 +640,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final ScoreStats getScoreStats() {
-		return this.scoreStats;
+		return this.injector.getInstance(ScoreStats.class);
 	}
 
 	@SuppressWarnings("static-method")
