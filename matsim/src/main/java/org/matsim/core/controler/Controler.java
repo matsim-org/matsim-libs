@@ -127,17 +127,13 @@ public class Controler extends AbstractController {
 
 	};
 
-    // The modules to load.
-    // DefaultControlerModule contains submodules. If you want less than what the Controler does
-    // by default, you can leave DefaultControlerModule out, look at what DefaultControlerModule does,
-    // and only put in what you want.
+    // DefaultControlerModule includes submodules. If you want less than what the Controler does
+    // by default, you can leave ControlerDefaultsModule out, look at what it does,
+    // and only include what you want.
     private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
 
     protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
-
-	private CalcLinkStats linkStats = null;
-    private VolumesAnalyzer volumes = null;
 
 	protected boolean scenarioLoaded = false;
     private ScoreStatsControlerListener scoreStats = null;
@@ -340,17 +336,6 @@ public class Controler extends AbstractController {
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
-
-		/*
-		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
-		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
-		 * traveltimes in linkStats are the avg. traveltimes between xx.00 and
-		 * xx.15, and not between xx.00 and xx.59
-		 */
-		this.linkStats = new CalcLinkStats(this.network);
-		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
-		this.events.addHandler(this.volumes);
-
         CalcLegTimes legTimes = new CalcLegTimes();
 		this.events.addHandler(legTimes);
 		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
@@ -391,11 +376,6 @@ public class Controler extends AbstractController {
 			this.addControlerListener(ccl);
 		}
 
-		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
-            // Have to pass this here because TravelTimeCalculator isn't created yet.
-			this.addControlerListener(new LinkStatsControlerListener(this.config, this.getControlerIO(), this.linkStats, this.volumes, this));
-		}
-
 		if (this.config.scenario().isUseTransit()) {
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
@@ -418,19 +398,25 @@ public class Controler extends AbstractController {
         // As other things become modules, too, their interfaces and their dependencies and their getters can disappear
         // from the Controler.
         this.injector = Injector.createInjector(
+                config,
                 new AbstractModule() {
                     @Override
                     public void install() {
                         for (AbstractModule module : modules) {
                             include(module);
                         }
-                        // Bootstrap it with the Scenario.
+                        // Bootstrap it with the Scenario and some controler context.
+                        bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
                         bindToInstance(Scenario.class, scenarioData);
                     }
                 });
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
             this.events.addHandler(eventHandler);
+        }
+        Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            this.addControlerListener(controlerListener);
         }
 	}
 
@@ -661,11 +647,11 @@ public class Controler extends AbstractController {
 	 */
 	@Deprecated
 	public final CalcLinkStats getLinkStats() {
-		return this.linkStats;
+		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
     public final VolumesAnalyzer getVolumes() {
-		return this.volumes;
+		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
 	public final ScoreStats getScoreStats() {

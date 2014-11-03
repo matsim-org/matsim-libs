@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * DefaultControlerModules.java
+ *  * VolumesAnalyzerModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,17 +20,30 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler;
+package org.matsim.analysis;
 
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 
-public class ControlerDefaultsModule extends AbstractModule {
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+public class VolumesAnalyzerModule extends AbstractModule {
     @Override
     public void install() {
-        include(new TravelTimeCalculatorModule());
-        include(new LinkStatsModule());
-        include(new VolumesAnalyzerModule());
+        bindToProviderAsSingleton(VolumesAnalyzer.class, VolumesAnalyzerProvider.class);
+        addEventHandler(VolumesAnalyzer.class);
     }
+
+    static class VolumesAnalyzerProvider implements Provider<VolumesAnalyzer> {
+
+        @Inject
+        Scenario scenario;
+
+        @Override
+        public VolumesAnalyzer get() {
+            return new VolumesAnalyzer(3600, 24 * 3600 - 1, scenario.getNetwork());
+        }
+    }
+
 }

@@ -32,6 +32,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import javax.inject.Inject;
+
 /**
  * @author mrieser
  */
@@ -56,6 +58,7 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
         this.linkStatsConfigGroup = config.linkStats();
 	}
 
+    @Inject
     public LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, TravelTimeCalculator travelTimeCalculator) {
         this.config = config;
         this.controlerIO = controlerIO;

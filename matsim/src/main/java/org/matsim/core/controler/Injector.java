@@ -22,9 +22,9 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Guice;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 
 import java.util.ArrayList;
@@ -39,12 +39,24 @@ class Injector {
         this.injector = injector;
     }
 
-    static Injector createInjector(AbstractModule... modules) {
+    static Injector createInjector(final Config config, AbstractModule... modules) {
+        com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
+            @Override
+            public void configure(Binder binder) {
+                binder.requireExplicitBindings(); // For now, we are conservative
+                binder.disableCircularProxies(); // and disable any kind of magic.
+                binder.bind(Config.class).toInstance(config);
+            }
+        });
+        // A MATSim module needs the config at configuration time in order to decide what
+        // features to provide. So we create a bootstrapInjector which already has the config
+        // and provides it to the MATSim modules.
         List<com.google.inject.Module> guiceModules = new ArrayList<>();
         for (AbstractModule module : modules) {
+            bootstrapInjector.injectMembers(module);
             guiceModules.add(AbstractModule.toGuiceModule(module));
         }
-        return new Injector(Guice.createInjector(guiceModules));
+        return new Injector(bootstrapInjector.createChildInjector(guiceModules));
     }
 
     <T> T getInstance(Class<T> type) {
@@ -54,6 +66,13 @@ class Injector {
     Set<EventHandler> getEventHandlersDeclaredByModules() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Set<EventHandler>>() {
+                }
+        ));
+    }
+
+    Set<ControlerListener> getControlerListenersDeclaredByModules() {
+        return injector.getInstance(Key.get(
+                new TypeLiteral<Set<ControlerListener>>() {
                 }
         ));
     }

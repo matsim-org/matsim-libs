@@ -23,8 +23,12 @@
 package org.matsim.core.controler;
 
 import com.google.inject.Binder;
+import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -39,6 +43,11 @@ import org.matsim.core.events.handler.EventHandler;
 public abstract class AbstractModule {
 
     private Binder binder;
+    private Multibinder<EventHandler> eventHandlerMultibinder;
+    private Multibinder<ControlerListener> controlerListenerMultibinder;
+
+    @Inject
+    com.google.inject.Injector bootstrapInjector;
 
     static com.google.inject.Module toGuiceModule(final AbstractModule module) {
         return new com.google.inject.Module() {
@@ -51,13 +60,21 @@ public abstract class AbstractModule {
 
     final void configure(Binder binder) {
         this.binder = binder;
+        this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
+        this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.install();
     }
 
     public abstract void install();
 
+    protected final Config getConfig() {
+        return bootstrapInjector.getInstance(Config.class);
+    }
+
     protected final void include(AbstractModule module) {
-        binder.install(toGuiceModule(module));
+        bootstrapInjector.injectMembers(module);
+        Module guiceModule = toGuiceModule(module);
+        binder.install(guiceModule);
     }
 
     protected final <T> void bindToInstance(Class<T> type, T instance) {
@@ -77,13 +94,19 @@ public abstract class AbstractModule {
     }
 
     protected final void addEventHandler(Class<? extends EventHandler> type) {
-        Multibinder<EventHandler> eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         eventHandlerMultibinder.addBinding().to(type);
     }
 
     protected final void addEventHandler(EventHandler instance) {
-        Multibinder<EventHandler> eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         eventHandlerMultibinder.addBinding().toInstance(instance);
+    }
+
+    protected final void addControlerListener(Class<? extends ControlerListener> type) {
+        controlerListenerMultibinder.addBinding().to(type);
+    }
+
+    protected final void addControlerListener(ControlerListener instance) {
+        controlerListenerMultibinder.addBinding().toInstance(instance);
     }
 
 }

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * DefaultControlerModules.java
+ *  * LinkStatsModules.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,17 +20,45 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler;
+package org.matsim.core.controler.corelisteners;
 
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.analysis.CalcLinkStats;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 
-public class ControlerDefaultsModule extends AbstractModule {
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+public class LinkStatsModule extends AbstractModule {
+
     @Override
     public void install() {
-        include(new TravelTimeCalculatorModule());
-        include(new LinkStatsModule());
-        include(new VolumesAnalyzerModule());
+        Config config = getConfig();
+        if (config.linkStats().getWriteLinkStatsInterval() > 0) {
+
+            // "Do not use this, as it may not contain values in every iteration."
+            // says the original comment on the getter in the Controler.
+            // I assume this is still true.
+            bindToProviderAsSingleton(CalcLinkStats.class, CalcLinkStatsProvider.class);
+            addControlerListener(LinkStatsControlerListener.class);
+        }
     }
+
+    static class CalcLinkStatsProvider implements Provider<CalcLinkStats> {
+
+        @Inject
+        Scenario scenario;
+
+        @Override
+        public CalcLinkStats get() {
+            /*TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
+		    15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
+		    traveltimes in linkStats are the avg. traveltimes between xx.00 and
+		    xx.15, and not between xx.00 and xx.59*/
+            return new CalcLinkStats(scenario.getNetwork());
+        }
+
+    }
+
 }
