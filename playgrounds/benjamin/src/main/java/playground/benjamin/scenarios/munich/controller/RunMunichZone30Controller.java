@@ -23,6 +23,7 @@ package playground.benjamin.scenarios.munich.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
+import org.matsim.analysis.LegTimesControlerListener;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -31,12 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.AbstractController;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -141,7 +137,7 @@ public class RunMunichZone30Controller extends AbstractController {
 				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
 		this.addCoreControlerListener(plansDumping);
 
-		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
+		this.addCoreControlerListener(new LegTimesControlerListener(legTimes, getControlerIO()));
 		final EventsHandling eventsHandling = new EventsHandling((EventsManagerImpl) eventsManager,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
 				getControlerIO() );

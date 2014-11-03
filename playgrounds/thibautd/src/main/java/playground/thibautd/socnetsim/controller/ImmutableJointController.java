@@ -19,20 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
-import java.io.File;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
+import org.matsim.analysis.LegTimesControlerListener;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-
 import playground.ivt.utils.SubpopulationFilter;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.PsimAwareEventsWriter;
@@ -41,6 +37,9 @@ import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
+import java.io.File;
+import java.util.Collection;
 
 /**
  * A simple controler for the process with joint plans.
@@ -140,7 +139,7 @@ public final class ImmutableJointController extends AbstractController {
 				 });
 
 		this.addCoreControlerListener(
-				new LegTimesListener(
+				new LegTimesControlerListener(
 					registry.getLegTimes(),
 					getControlerIO()));
 		

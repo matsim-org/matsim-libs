@@ -23,7 +23,10 @@ package org.matsim.core.controler;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.matsim.analysis.*;
+import org.matsim.analysis.CalcLinkStats;
+import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.ScoreStatsControlerListener;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -335,10 +338,6 @@ public class Controler extends AbstractController {
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
-
-        CalcLegTimes legTimes = new CalcLegTimes();
-		this.events.addHandler(legTimes);
-		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));

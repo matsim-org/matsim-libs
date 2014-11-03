@@ -18,24 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLegTimes;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
-public class LegTimesListener implements AfterMobsimListener {
+import javax.inject.Inject;
 
-	private static Logger log = Logger.getLogger(LegTimesListener.class);
+public class LegTimesControlerListener implements AfterMobsimListener {
+
+	private static Logger log = Logger.getLogger(LegTimesControlerListener.class);
 	
 	private CalcLegTimes legTimes;
 	
 	private OutputDirectoryHierarchy controlerIO;
 	
-	public LegTimesListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
+	@Inject
+    public LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
 		this.legTimes = legTimes;
 		this.controlerIO = controlerIO;
 	}

@@ -40,7 +40,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.SnapshotWriterFactoryRegister;
 import org.matsim.core.controler.SnapshotWriterRegistrar;
-import org.matsim.core.controler.corelisteners.*;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -141,7 +144,7 @@ public class ControllerModule extends AbstractModule {
         result.add(new PlansScoring(scenarioData, events, controlerIO, scoringFunctionFactory));
         result.add(replanningControlerListener);
         result.add(new PlansDumping(scenarioData, config.controler().getFirstIteration(), config.controler().getWritePlansInterval(), stopwatch, controlerIO));
-        result.add(new LegTimesListener(calcLegTimes, controlerIO));
+        result.add(new LegTimesControlerListener(calcLegTimes, controlerIO));
         result.add(new EventsHandling(events, config.controler().getWriteEventsInterval(), config.controler().getEventsFileFormats(), controlerIO));
         return result;
     }
