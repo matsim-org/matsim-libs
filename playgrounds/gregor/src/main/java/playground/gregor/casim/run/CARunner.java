@@ -24,12 +24,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.casim.simulation.HybridQCAMobsimFactory;
+import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -51,38 +58,27 @@ public class CARunner implements IterationStartsListener{
 		}
 		String qsimConf = args[0];
 		Config c = ConfigUtils.loadConfig(qsimConf);
-		c.scenario().setUseVehicles(true);
 		
 		c.controler().setWriteEventsInterval(1);
+		
+		
+		
 		Scenario sc = ScenarioUtils.loadScenario(c);
 //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		
 //		c.qsim().setEndTime(120);
 //		c.qsim().setEndTime(23*3600);
 //		c.qsim().setEndTime(41*60);//+30*60);
-
-
-		
-		
-		//offsets needed to convert to doubles later in program
-		double minX = Double.POSITIVE_INFINITY;
-		double minY = minX;
-		for (Node n : sc.getNetwork().getNodes().values()) {
-			if (n.getCoord().getX() < minX) {
-				minX = n.getCoord().getX(); 
-			}
-			if (n.getCoord().getY() < minY) {
-				minY = n.getCoord().getY(); 
-			}
-		}
-//		sim2dc.setOffsets(minX, minY);
 		
 		Controler controller = new Controler(sc);
 
 		controller.setOverwriteFiles(true);
+		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
+		CATripRouterFactory tripRouter = new CATripRouterFactory(sc,cost);
 		
+		controller.setTripRouterFactory(tripRouter);
 
-		HybridQCAMobsimFactory factory = new HybridQCAMobsimFactory();
+		CAMobsimFactory factory = new CAMobsimFactory();
 		controller.addMobsimFactory("casim", factory);
 
 		
@@ -109,19 +105,34 @@ public class CARunner implements IterationStartsListener{
 		controller.run();
 	}
 
+	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(Scenario scenario) {
+		Config config = scenario.getConfig();
+		if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+            return new DijkstraFactory();
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+            return new AStarLandmarksFactory(
+                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+            return new FastDijkstraFactory();
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+            return new FastAStarLandmarksFactory(
+                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+        } else {
+            throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+        }
+	}
 	protected static void printUsage() {
 		System.out.println();
-		System.out.println("Controller2D");
-		System.out.println("Controller for hybrid sim2d qsim (pedestrian) simulations.");
+		System.out.println("CARunner");
+		System.out.println("Controller for ca (pedestrian) simulations.");
 		System.out.println();
-		System.out.println("usage : Controller2D sim2d-config-file qsim-config-file visualize");
+		System.out.println("usage : CARunner config visualize");
 		System.out.println();
-		System.out.println("sim2d-config-file:  A sim2d config file.");
-		System.out.println("qsim-config-file:   A MATSim config file.");
+		System.out.println("config:   A MATSim config file.");
 		System.out.println("visualize:   one of {true,false}.");
 		System.out.println();
 		System.out.println("---------------------");
-		System.out.println("2012, matsim.org");
+		System.out.println("2014, matsim.org");
 		System.out.println();
 	}
 

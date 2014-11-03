@@ -20,68 +20,48 @@
 
 package playground.gregor.casim.simulation;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
-//import org.matsim.core.mobsim.qsim.qnetsimengine.QSim
+import playground.gregor.casim.simulation.physics.CANetworkDynamic;
 
-public class CAEngine implements MobsimEngine {
+public class CANetsimEngine implements MobsimEngine {
 
-	private static final Logger log = Logger.getLogger(CAEngine.class);
+	private static final Logger log = Logger.getLogger(CANetsimEngine.class);
 
 	private final Scenario scenario;
 	private final QSim sim;
-	private InternalInterface internalInterface;
 
-
-	private final Map<Id,PhysicalSim2DEnvironment> penvs = new HashMap<Id,PhysicalSim2DEnvironment>();
-
-	private final double qSimStepSize;
-
+	
 
 
 	private final DepartureHandler dpHandler;
 
-	public CAEngine(QSim sim) {
+	private CANetworkDynamic caNet;
+
+	public CANetsimEngine(QSim sim) {
 		this.scenario = sim.getScenario();
 
 		this.sim = sim;
-		this.qSimStepSize = this.scenario.getConfig().qsim().getTimeStepSize();
-		this.dpHandler = new CAWalkerDepatureHandler(this);
+		this.dpHandler = new CAWalkerDepatureHandler(this,this.scenario);
 		
 	}
 
 
 	@Override
 	public void doSimStep(double time) {
-//		this.caNet.runUntil(time + this.qSimStepSize);
+		throw new RuntimeException("not yet implemented!");
 	}
 
 	@Override
 	public void onPrepareSim() {
 		log.info("prepare");
-//		this.caNet = new CANetwork(this.scenario.getNetwork(), this.sim.getEventsManager());
-		
-//		for (Sim2DEnvironment  env: this.sim2dsc.getSim2DEnvironments()) {
-//			PhysicalSim2DEnvironment e = new PhysicalSim2DEnvironment(env, this.sim2dsc, this.sim.getEventsManager());
-//			this.penvs.put(env.getId(),e);
-//			this.sim.addQueueSimulationListeners(e);
-//		}
-//		for (QSim2DTransitionLink hiResLink : this.hiResLinks) {
-//			Id id = this.sim2dsc.getSim2DEnvironment(hiResLink.getLink()).getId();
-//			PhysicalSim2DEnvironment penv = this.penvs.get(id);
-//			penv.createAndAddPhysicalTransitionSection(hiResLink);
-//		}
-
+		this.caNet = new CANetworkDynamic(sim.getScenario().getNetwork(), sim.getEventsManager());
 
 	}
 
@@ -93,7 +73,7 @@ public class CAEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
+		//
 	}
 
 
@@ -101,16 +81,11 @@ public class CAEngine implements MobsimEngine {
 		return this.dpHandler;
 	}
 
-//	public void registerHiResLink(QSimCATransitionLink hiResLink) {
-//		this.hiResLinks.add(hiResLink);
-//		
-//	}
-//
-//
-//	public void registerLowResLink(CAQTransitionLink lowResLink) {
-//		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
-//	}
-	
+
+	public CANetworkDynamic getCANetwork() {
+		return this.caNet;
+	}
+
 
 
 }

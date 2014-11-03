@@ -23,8 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.gregor.casim.simulation.CAAgentFactory;
-import playground.gregor.casim.simulation.CAEngine;
+import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 
@@ -38,12 +37,10 @@ import playground.gregor.sim2d_v4.scenario.TransportMode;
 public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
 
-	private final CAEngine hybridEngine;
-	private final CAAgentFactory agentBuilder;
+	private final CANetsimEngine hybridEngine;
 
-	public HybridQSimCANetworkFactory(CAEngine e, Scenario sc, CAAgentFactory aBuilder) {
+	public HybridQSimCANetworkFactory(CANetsimEngine e, Scenario sc) {
 		this.hybridEngine = e;
-		this.agentBuilder = aBuilder;
 	}
 
 	@Override

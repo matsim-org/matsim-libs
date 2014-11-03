@@ -33,11 +33,11 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 
 	private Id<Vehicle> id;
-	private Vehicle vehicle;
+	private MobsimDriverAgent agent;
 
-	public CAVehicle(final Vehicle basicVehicle) {
-		this.id = basicVehicle.getId();
-		this.vehicle = basicVehicle;
+	public CAVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent) {
+		this.id = vehicleId;
+		this.agent = agent;
 	}
 
 	@Override

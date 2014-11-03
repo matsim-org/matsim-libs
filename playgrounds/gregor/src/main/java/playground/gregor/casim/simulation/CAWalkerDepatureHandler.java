@@ -21,9 +21,12 @@
 package playground.gregor.casim.simulation;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.vehicles.Vehicle;
 
 import playground.gregor.casim.simulation.physics.CALink;
 import playground.gregor.casim.simulation.physics.CAVehicle;
@@ -32,10 +35,12 @@ import playground.gregor.sim2d_v4.scenario.TransportMode;
 public class CAWalkerDepatureHandler implements DepartureHandler {
 	
 	private static final String transportMode = TransportMode.walkca;
-	private final CAEngine engine;
+	private final CANetsimEngine engine;
+	private Scenario sc;
 
-	public CAWalkerDepatureHandler(CAEngine caEngine) {
+	public CAWalkerDepatureHandler(CANetsimEngine caEngine, Scenario sc) {
 		this.engine = caEngine;
+		this.sc = sc;
 	}
 
 	@Override
@@ -52,11 +57,12 @@ public class CAWalkerDepatureHandler implements DepartureHandler {
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent,
-			Id linkId) {
-//		CALink link = this.engine.getCANetwork().getCALink(linkId);
-//		Id vehicleId = agent.getPlannedVehicleId() ;
-//		CAVehicle veh = new CAVehicle(vehicleId,agent,linkId,link);
-//		link.letAgentDepart(veh);
+			Id<Link> linkId) {
+		CALink link = this.engine.getCANetwork().getCALink(linkId);
+		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
+		
+		CAVehicle veh = new CAVehicle(vehicleId,agent);
+		link.letAgentDepart(veh);
 		
 	}
 

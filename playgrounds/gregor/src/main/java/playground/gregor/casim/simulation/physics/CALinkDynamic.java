@@ -730,4 +730,10 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		}
 		
 	}
+
+	@Override
+	public void letAgentDepart(CAVehicle veh) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not yet implemented!");
+	}
 }
