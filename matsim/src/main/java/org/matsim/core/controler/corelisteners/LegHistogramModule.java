@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * DefaultControlerModules.java
+ *  * LegHistogramModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,19 +20,17 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler;
+package org.matsim.core.controler.corelisteners;
 
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.controler.corelisteners.LegHistogramModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.analysis.LegHistogram;
+import org.matsim.core.controler.AbstractModule;
 
-public class ControlerDefaultsModule extends AbstractModule {
+public class LegHistogramModule extends AbstractModule {
     @Override
     public void install() {
-        include(new TravelTimeCalculatorModule());
-        include(new LinkStatsModule());
-        include(new VolumesAnalyzerModule());
-        include(new LegHistogramModule());
+        LegHistogram legHistogram = new LegHistogram(300);
+        addEventHandler(legHistogram);
+        bindToInstance(LegHistogram.class, legHistogram);
+        addControlerListener(LegHistogramListener.class);
     }
 }

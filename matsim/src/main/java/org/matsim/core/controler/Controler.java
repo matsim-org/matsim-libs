@@ -358,12 +358,6 @@ public class Controler extends AbstractController {
 		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
-		// yy On the other hand, we could write a method clearControlerListeners() and one would have a similar flexibility without
-		// inheritance.  kai, may'13
-		// zz vote for clearControlerListeners(). dg, may'13
-
-		// optional: LegHistogram
-		this.addControlerListener(new LegHistogramListener(this.events, this.getControlerIO(), this.config.controler().isCreateGraphs()));
 
 		// optional: score stats
 		this.scoreStats = new ScoreStatsControlerListener(config, this.population,

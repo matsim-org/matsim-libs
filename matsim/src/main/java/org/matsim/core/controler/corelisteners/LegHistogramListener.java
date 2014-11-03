@@ -24,12 +24,14 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+
+import javax.inject.Inject;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the
@@ -38,21 +40,19 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  *
  * @author mrieser
  */
-public class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
+public final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-	private final EventsManager events;
 	private final LegHistogram histogram;
 	private final boolean outputGraph;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
     private final OutputDirectoryHierarchy controlerIO;
 
-    public LegHistogramListener(final EventsManager events, OutputDirectoryHierarchy controlerIO, final boolean outputGraph) {
-		this.events = events;
+    @Inject
+    LegHistogramListener(Config config, LegHistogram legHistogram, OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
-		this.histogram = new LegHistogram(300);
-		this.outputGraph = outputGraph;
-		this.events.addHandler(this.histogram);
+		this.histogram = legHistogram;
+		this.outputGraph = config.controler().isCreateGraphs();
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 
 	}
 
-	public void printStats() {
+	private void printStats() {
 		int nofLegs = 0;
 		for (int nofDepartures : this.histogram.getDepartures()) {
 			nofLegs += nofDepartures;

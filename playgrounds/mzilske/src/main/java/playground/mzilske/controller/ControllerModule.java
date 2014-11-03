@@ -164,7 +164,6 @@ public class ControllerModule extends AbstractModule {
             CalcLinkStats linkStats,
             OutputDirectoryHierarchy controlerIO) {
         List<ControlerListener> result = new ArrayList<ControlerListener>();
-        result.add(new LegHistogramListener(events, controlerIO, config.controler().isCreateGraphs()));
         result.add(scoreStats);
         if (config.counts().getCountsFileName() != null || scenarioData.getScenarioElement(Counts.ELEMENT_NAME) != null) {
             CountControlerListener ccl = new CountControlerListener(config.counts());
