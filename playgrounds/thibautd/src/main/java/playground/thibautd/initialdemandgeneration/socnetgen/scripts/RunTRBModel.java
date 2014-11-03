@@ -22,7 +22,6 @@ package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -32,11 +31,12 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
+import playground.ivt.utils.ArgParser;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.LockedSocialNetwork;
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIteratorFileListener;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelRunner;
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
@@ -55,10 +55,24 @@ public class RunTRBModel {
 	private static final double TARGET_CLUSTERING = 0.206;
 
 	public static void main(final String[] args) {
-		final String populationFile = args[ 0 ];
-		final String outputDirectory = args[ 1 ];
-		final int stepSizePrimary = args.length > 2 ? Integer.parseInt( args[ 2 ] ) : 1;
-		final int stepSizeSecondary = args.length > 3 ? Integer.parseInt( args[ 3 ] ) : 1;
+		final ArgParser parser = new ArgParser();
+
+		parser.setDefaultValue( "-p" , "--population-file" , null );
+		parser.setDefaultValue( "-o" , "--output-dir" , null );
+		parser.setDefaultValue( "-sp" , "--step-primary" , "1" );
+		parser.setDefaultValue( "-ss" , "--step-secondary" , "1" );
+
+		parser.addSwitch( "--null" , "--run-null-model" );
+
+		main( parser.parseArgs( args ) );
+	}
+
+	private static void main(final ArgParser.Args args) {
+		final String populationFile = args.getValue( "-p" );
+		final String outputDirectory = args.getValue( "-o" );
+		final int stepSizePrimary = args.getIntegerValue( "-sp" );
+		final int stepSizeSecondary = args.getIntegerValue( "-ss" );
+		final boolean isNullModel = args.isSwitched( "--null" );
 
 		MoreIOUtils.initOut( outputDirectory );
 
@@ -68,6 +82,7 @@ public class RunTRBModel {
 		log.info( "###### outputdir: "+outputDirectory );
 		log.info( "###### step size primary: "+stepSizePrimary );
 		log.info( "###### step size secondary: "+stepSizeSecondary );
+		log.info( "###### use null model: "+isNullModel );
 		log.info( "################################################################################" );
 
 
@@ -84,6 +99,8 @@ public class RunTRBModel {
 					public double calcTieUtility(
 							final ArentzeAgent ego,
 							final ArentzeAgent alter) {
+						if ( isNullModel ) return 0;
+
 						final int ageClassDifference = Math.abs( ego.getAgeCategory() - alter.getAgeCategory() );
 
 						// increase distance by 1 (normally meter) to avoid linking with all agents
