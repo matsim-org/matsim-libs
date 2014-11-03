@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
@@ -43,10 +44,11 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * <p> 1) How many persons do not have same first and last activity?
  * <p> 2) Out of them how many are from urban group (only for munich data) ?
  * <p> 3) Also writes the activity sequence of such inconsistent plans and their frequency.
+ * <p> 4) How may activities have zero durations.
  * @author amit
  */
 public class InitialPlansConsistencyCheck {
-
+	//TODO[AA] put a check how many persons have act dur less than zeroUtilDuration
 	public static final Logger log = Logger.getLogger(InitialPlansConsistencyCheck.class);
 	private Scenario sc;
 	private Map<Person, List<String>> person2ActivityType;
@@ -62,7 +64,7 @@ public class InitialPlansConsistencyCheck {
 	public static void main(String[] args) {
 		String initialPlansFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input"
 				+ "/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String outputFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/analysis/plansConsistency.txt";
+		String outputFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 
 		new InitialPlansConsistencyCheck(initialPlansFile).run(outputFile);
 	}
@@ -70,17 +72,18 @@ public class InitialPlansConsistencyCheck {
 	public void run(String outputFile){
 		initializePlansStatsWriter(outputFile);
 		checkFor1stAndLastActivity();
+		checkForZeroActivitDuration(outputFile);
 	}
 
 	private void initializePlansStatsWriter (String outputFile){
 
 		pf = new PersonFilter();
-		
+
 		getUserGrp2NumberOfPersons();
 		getPersonId2ActivitiesAndLegs();
 
-		writer = IOUtils.getBufferedWriter(outputFile);
-		
+		writer = IOUtils.getBufferedWriter(outputFile+"analysis/plansConsistency_differentFirstAndLastActivities.txt");
+
 		try {
 			writer.write("UserGroup \t numberOfPersons \n");
 			for(UserGroup ug : UserGroup.values()){
@@ -93,10 +96,10 @@ public class InitialPlansConsistencyCheck {
 	}
 
 	private void getPersonId2ActivitiesAndLegs(){
-		
+
 		person2ActivityType = new HashMap<Person, List<String>>();
 		person2Legs = new HashMap<Person, List<String>>();
-		
+
 		for(Person p : sc.getPopulation().getPersons().values()){
 			for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
 				if (pe instanceof Activity ) {
@@ -111,7 +114,7 @@ public class InitialPlansConsistencyCheck {
 			}
 		}
 	}
-	
+
 	private void getUserGrp2NumberOfPersons() {
 		userGroup2NumberOfPersons = new HashMap<UserGroup, Integer>();
 
@@ -130,6 +133,38 @@ public class InitialPlansConsistencyCheck {
 				}
 			}
 		}
+	}
+
+	private void checkForZeroActivitDuration(String outputFile){
+		log.info("Consistency check for zero activity duration.");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile+"analysis/zeroActivityDurationPersons.txt");
+		int zeroDurCount =0;
+		try {
+			writer.write("Person \t activity \t startTime \t endTime \n");
+			for(Person p : sc.getPopulation().getPersons().values()){
+				for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
+					if (pe instanceof Activity ) {
+						double dur = ((Activity)pe).getEndTime() - ((Activity)pe).getStartTime();
+						if(dur==0){
+							if(zeroDurCount<1){
+								log.warn("Activity duration of person "+p.toString()+" for activity "+
+										((Activity)pe).getType()+" is zero, it may result in higher utility loss.");
+								log.warn(Gbl.ONLYONCE);
+							}
+							zeroDurCount ++;
+							writer.write(p.getId()+"\t"+((Activity)pe).getType()+"\t"+((Activity)pe).getStartTime()+
+									"\t"+((Activity)pe).getEndTime()+"\n");
+
+						}
+					} 
+				}
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"Data is not written. Reason - " + e);
+		}
+		log.warn("There are "+zeroDurCount+" instances where person have activity duration zero. Check for written file for detailed discription.");
 	}
 
 	private void checkFor1stAndLastActivity(){
