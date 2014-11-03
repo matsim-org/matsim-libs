@@ -30,9 +30,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author mrieser
@@ -44,27 +44,17 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
     private final CalcLinkStats linkStats;
     private final VolumesAnalyzer volumes;
     private final OutputDirectoryHierarchy controlerIO;
-    private TravelTimeCalculator travelTimeCalculator;
-    private Controler controler;
+    private final Provider<TravelTime> travelTime;
     private int iterationsUsed = 0;
 	private boolean doReset = false;
-	
-	public LinkStatsControlerListener(final Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Controler controler) {
-        this.config = config;
-        this.controlerIO = controlerIO;
-        this.linkStats = linkStats;
-        this.volumes = volumes;
-        this.controler = controler;
-        this.linkStatsConfigGroup = config.linkStats();
-	}
 
     @Inject
-    public LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, TravelTimeCalculator travelTimeCalculator) {
+    public LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Provider<TravelTime> travelTime) {
         this.config = config;
         this.controlerIO = controlerIO;
         this.linkStats = linkStats;
         this.volumes = volumes;
-        this.travelTimeCalculator = travelTimeCalculator;
+        this.travelTime = travelTime;
         this.linkStatsConfigGroup = config.linkStats();
     }
 
@@ -74,13 +64,7 @@ public class LinkStatsControlerListener implements IterationEndsListener, Iterat
 		
 		if (useVolumesOfIteration(iteration, config.controler().getFirstIteration())) {
 			this.iterationsUsed++;
-            TravelTime travelTimes;
-            if (travelTimeCalculator != null) {
-                travelTimes = travelTimeCalculator.getLinkTravelTimes();
-            } else {
-                travelTimes = controler.getLinkTravelTimes();
-            }
-            linkStats.addData(volumes, travelTimes);
+            linkStats.addData(volumes, travelTime.get());
 		}
 
 		if (createLinkStatsInIteration(iteration)) {

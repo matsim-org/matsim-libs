@@ -169,9 +169,6 @@ public class ControllerModule extends AbstractModule {
             CountControlerListener ccl = new CountControlerListener(config.counts());
             result.add(ccl);
         }
-        if (config.linkStats().getWriteLinkStatsInterval() > 0) {
-            result.add(new LinkStatsControlerListener(config, controlerIO, linkStats, volumes, travelTimeCalculator));
-        }
         if (config.scenario().isUseTransit()) {
             if (config.ptCounts().getAlightCountsFileName() != null) {
                 result.add(new PtCountControlerListener(config));

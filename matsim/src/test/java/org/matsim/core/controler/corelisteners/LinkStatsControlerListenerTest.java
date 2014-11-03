@@ -19,10 +19,6 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @author mrieser
  */
@@ -53,7 +53,7 @@ public class LinkStatsControlerListenerTest {
 	@Test
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
-		LinkStatsControlerListener lscl = new LinkStatsControlerListener(config, null, null, null, new Controler(ConfigUtils.createConfig()));
+		LinkStatsControlerListener lscl = new LinkStatsControlerListener(config, null, null, null, null);
 		
 		// test defaults
 		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
