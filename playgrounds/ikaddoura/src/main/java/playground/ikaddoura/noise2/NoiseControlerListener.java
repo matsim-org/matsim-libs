@@ -38,12 +38,8 @@ import org.matsim.core.controler.listener.StartupListener;
 
 public class NoiseControlerListener implements AfterMobsimListener , IterationEndsListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseControlerListener.class);
-
-	// ##############################################################################
 	
 	final double annualCostRate = NoiseConfigParameters.getAnnualCostRate();
-
-	// ##############################################################################
 
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
@@ -79,8 +75,8 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 		// calculate noise emission for each link and time interval
 		log.info("Calculating noise emission...");
 		this.noiseEmissionHandler.calculateNoiseEmission();
-		this.noiseEmissionHandler.writeNoiseEmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/it." + event.getIteration() + ".analysis_emissionStats.csv");
-		this.noiseEmissionHandler.writeNoiseEmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/it." + event.getIteration() + ".analysis_emissionStatsPerHour.csv");
+		this.noiseEmissionHandler.writeNoiseEmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStats.csv");
+		this.noiseEmissionHandler.writeNoiseEmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStatsPerHour.csv");
 		log.info("Calculating noise emission... Done.");
 		
 		// calculate activity durations for each agent
@@ -94,6 +90,8 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
+		this.noiseImmission.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
+		this.noiseImmission.writeNoiseImmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 	
 	}
@@ -105,6 +103,10 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 //		noiseImmissionHandler.setLinkId2timeBin2avgToll();
 //		noiseImmissionHandler.setLinkId2timeBin2avgTollCar();
 //		noiseImmissionHandler.setLinkId2timeBin2avgTollHdv();
+		
+		log.info("Total Caused Noise Cost: " + noiseImmission.getTotalCausedNoiseCost());
+		log.info("Total Affected Noise Cost: " + noiseImmission.getTotalAffectedNoiseCost());
+
 //		
 //		log.info("total toll (second approach L_den)"+(noiseImmissionHandler.getTotalTollAffectedAgentBasedCalculation()));
 //		log.info("control value: "+(noiseImmissionHandler.getTotalTollAffectedAgentBasedCalculationControl()));

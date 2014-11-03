@@ -22,6 +22,10 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,11 +87,11 @@ public class NoiseImmission {
 	private Map<Id,Map<Double,Map<Id,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = new HashMap<Id, Map<Double,Map<Id,Double>>>();
 
 	// some additional analysis
-	private Map<Id,Double> personId2tollSum = new HashMap<Id, Double>();
-	private Map<Id,Double> personId2damageSum = new HashMap<Id, Double>();
-	private Map<Id,Double> personId2homeBasedDamageSum = new HashMap<Id, Double>();
-	private double totalToll = 0.;
-	private double totalTollAffected = 0.;
+	private Map<Id,Double> personId2causedNoiseCosts = new HashMap<Id, Double>();
+	private Map<Id,Double> personId2affectedNoiseCosts = new HashMap<Id, Double>();
+	private Map<Id,Double> personId2affectedNoiseCostsHomeBased = new HashMap<Id, Double>();
+	private double totalCausedNoiseCost = 0.;
+	private double totalAffectedNoiseCost = 0.;
 	
 	// to be filled during the computation of noise events
 	private List<NoiseEventCaused> noiseEvents = new ArrayList<NoiseEventCaused>();
@@ -123,19 +127,19 @@ public class NoiseImmission {
 	
 	public void setTunnelLinks(ArrayList<Id> tunnelLinks) {
 		if (tunnelLinks == null) {
-			
+			log.warn("No information on tunnels provided.");
 		} else {
 			this.tunnelLinks.addAll(tunnelLinks);
-			// TODO
+			log.warn("Consideration of tunnels not yet implemented.");
 		}
 	}
 	
 	public void setNoiseBarrierLinks(ArrayList<Id> noiseBarrierLinks) {
 		if (noiseBarrierLinks == null) {
-			
+			log.warn("No information on noise barriers provided.");
 		} else {
 			this.noiseBarrierLinks.addAll(noiseBarrierLinks);
-			// TODO
+			log.warn("Consideration of noise barriers not yet implemented.");
 		}
 	}
 	
@@ -144,12 +148,13 @@ public class NoiseImmission {
 		calculateImmissionSharesPerReceiverPointPerTimeInterval();
 		calculateFinalNoiseImmissions();
 		
-		// calculate noise exposure (damage) for each receiver point (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCost)
+		// calculate noise exposure (damage) for each receiver point
 		calculateDamagePerReceiverPoint();
 		
+		// allocate the total exposure cost (per receiver point) to the relevant links
 		calculateCostSharesPerLinkPerTimeInterval();
-						
-		log.info("calculateCostsPerVehiclePerLinkPerTimeInterval...");
+		
+		// allocate the exposure cost per link to the vehicle categories and vehicles
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		
 		throwNoiseEventsCaused();
@@ -170,8 +175,6 @@ public class NoiseImmission {
 					Coord coord = spatialInfo.getReceiverPointId2Coord().get(coordId);
 					if (!(noiseEmission == 0.)) {
 						noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , coord);						
-					} else {
-//						log.info("emission is 0");
 					}
 					noiseLinks2isolatedImmission.put(linkId,noiseImmission);
 				}
@@ -333,7 +336,6 @@ public class NoiseImmission {
 		}
 		
 		//summing up the link-based-costs
-		//initializing the map:
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
 			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
 			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
@@ -448,14 +450,14 @@ public class NoiseImmission {
 					} else {
 						this.noiseEventsCar.add(noiseEvent);
 					}
-//					
-					totalToll = totalToll + amount;
 					
-					if(personId2tollSum.containsKey(agentId)) {
-						double newTollSum = personId2tollSum.get(agentId) + amount;
-						personId2tollSum.put(agentId,newTollSum);
+					totalCausedNoiseCost = totalCausedNoiseCost + amount;
+					
+					if(personId2causedNoiseCosts.containsKey(agentId)) {
+						double newTollSum = personId2causedNoiseCosts.get(agentId) + amount;
+						personId2causedNoiseCosts.put(agentId,newTollSum);
 					} else {
-						personId2tollSum.put(agentId,amount);
+						personId2causedNoiseCosts.put(agentId,amount);
 					}
 				}
 			}
@@ -479,13 +481,13 @@ public class NoiseImmission {
 							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(timeInterval,personId,amount,receiverPointId,actType);
 							events.processEvent(noiseEventAffected);
 							this.noiseEventsAffected.add(noiseEventAffected);
-							totalTollAffected = totalTollAffected + amount;
+							totalAffectedNoiseCost = totalAffectedNoiseCost + amount;
 						
-							if (personId2damageSum.containsKey(personId)) {
-								double newTollSum = personId2damageSum.get(personId) + amount;
-								personId2damageSum.put(personId,newTollSum);
+							if (personId2affectedNoiseCosts.containsKey(personId)) {
+								double newTollSum = personId2affectedNoiseCosts.get(personId) + amount;
+								personId2affectedNoiseCosts.put(personId,newTollSum);
 							} else {
-								personId2damageSum.put(personId,amount);
+								personId2affectedNoiseCosts.put(personId,amount);
 							}
 						}
 					}
@@ -498,7 +500,7 @@ public class NoiseImmission {
 		
 		for (Id receiverPointId : receiverPointId2ListOfHomeAgents.keySet()) {
 			for (Id personId : receiverPointId2ListOfHomeAgents.get(receiverPointId)) {
-				personId2homeReceiverPointId.put(personId,receiverPointId);
+				personId2homeReceiverPointId.put(personId, receiverPointId);
 			}
 		}
 		
@@ -514,15 +516,179 @@ public class NoiseImmission {
 				}
 				homeBasedDamageSum = homeBasedDamageSum + cost;
 			}
-			personId2homeBasedDamageSum.put(personId, homeBasedDamageSum);
+			personId2affectedNoiseCostsHomeBased.put(personId, homeBasedDamageSum);
 		}
 	}
 	
+	// write immission infos
+	
+	public void writeNoiseImmissionStats(String fileName) {
+		File file = new File(fileName);
+				
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("receiver point Id;avg noise immission;avg noise immission (day);avg noise immission (night);avg noise immission (peak);avg noise immission (off-peak)");
+			bw.newLine();
+			
+			List<Double> day = new ArrayList<Double>();
+			for(double timeInterval = 6 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+				day.add(timeInterval);
+			}
+			List<Double> night = new ArrayList<Double>();
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+				if(!(day.contains(timeInterval))) {
+					night.add(timeInterval);
+				}
+			}
+			
+			List<Double> peak = new ArrayList<Double>();
+			for(double timeInterval = 7 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+				peak.add(timeInterval);
+			}
+			for(double timeInterval = 15 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+				peak.add(timeInterval);
+			}
+			List<Double> offPeak = new ArrayList<Double>();
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+				if(!(peak.contains(timeInterval))) {
+					offPeak.add(timeInterval);
+				}
+			}
+			
+			for (Id rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
+				double avgNoise = 0.;
+				double avgNoiseDay = 0.;
+				double avgNoiseNight = 0.;
+				double avgNoisePeak = 0.;
+				double avgNoiseOffPeak = 0.;
+				
+				double sumAvgNoise = 0.;
+				int counterAvgNoise = 0;
+				double sumAvgNoiseDay = 0.;
+				int counterAvgNoiseDay = 0;
+				double sumAvgNoiseNight = 0.;
+				int counterAvgNoiseNight = 0;
+				double sumAvgNoisePeak = 0.;
+				int counterAvgNoisePeak = 0;
+				double sumAvgNoiseOffPeak = 0.;
+				int counterAvgNoiseOffPeak = 0;
+				
+				for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(rpId).keySet()) {
+					double noiseValue = receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval);
+					double termToAdd = Math.pow(10., noiseValue/10.);
+					
+					if(timeInterval < 30 * 3600) {
+						sumAvgNoise = sumAvgNoise + termToAdd;
+						counterAvgNoise++;
+					}
+					
+					if(day.contains(timeInterval)) {
+						sumAvgNoiseDay = sumAvgNoiseDay + termToAdd;
+						counterAvgNoiseDay++;
+					}
+					
+					if(night.contains(timeInterval)) {
+						sumAvgNoiseNight = sumAvgNoiseNight + termToAdd;
+						counterAvgNoiseNight++;
+					}
+				
+					if(peak.contains(timeInterval)) {
+						sumAvgNoisePeak = sumAvgNoisePeak + termToAdd;
+						counterAvgNoisePeak++;
+					}
+					
+					if(offPeak.contains(timeInterval)) {
+						sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + termToAdd;
+						counterAvgNoiseOffPeak++;
+					}	
+				}
+				
+				avgNoise = 10 * Math.log10(sumAvgNoise / (counterAvgNoise));
+				avgNoiseDay = 10 * Math.log10(sumAvgNoiseDay / counterAvgNoiseDay);
+				avgNoiseNight = 10 * Math.log10(sumAvgNoiseNight / counterAvgNoiseNight);
+				avgNoisePeak = 10 * Math.log10(sumAvgNoisePeak / counterAvgNoisePeak);
+				avgNoiseOffPeak = 10 * Math.log10(sumAvgNoiseOffPeak / counterAvgNoiseOffPeak);
+								
+				bw.write(rpId + ";" + avgNoise + ";" + avgNoiseDay+";"+avgNoiseNight+";"+avgNoisePeak+";"+avgNoiseOffPeak);
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+				
+	}
+	
+	public void writeNoiseImmissionStatsPerHour(String fileName) {
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("receiver point;");
+		
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(";time;affected agent units;noise immission;");
+			}
+			bw.newLine();
+			
+			for (Id rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
+				bw.write(rpId.toString() + ";");
+				for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(rpId).keySet()) {
+					double affectedAgentUnits = 0.;
+					double noiseImmission = 0.;
+					if (receiverPointId2timeInterval2affectedAgentUnits.get(rpId) != null) {
+						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(rpId).get(timeInterval);
+					}
+					
+					if (receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval) != null) {
+						noiseImmission = receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval);
+					}
+
+					bw.write(";" + timeInterval + ";" + affectedAgentUnits + ";" + noiseImmission + ";");	
+				}
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	// analysis
+	
+	public Map<Id, Double> getPersonId2causedNoiseCosts() {
+		return personId2causedNoiseCosts;
+	}
+
+	public Map<Id, Double> getPersonId2affectedNoiseCosts() {
+		return personId2affectedNoiseCosts;
+	}
+
+	public Map<Id, Double> getPersonId2affectedNoiseCostsHomeBased() {
+		return personId2affectedNoiseCostsHomeBased;
+	}
+
+	public double getTotalCausedNoiseCost() {
+		return totalCausedNoiseCost;
+	}
+
+	public double getTotalAffectedNoiseCost() {
+		return totalAffectedNoiseCost;
+	}
+	
 	// for testing purposes
+	
 	public Map<Id, Map<Double, Map<Id, Double>>> getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission() {
 		return receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
 	}
-	
+
 	public Map<Id, Map<Double, Double>> getReceiverPointId2timeInterval2noiseImmission() {
 		return receiverPointId2timeInterval2noiseImmission;
 	}

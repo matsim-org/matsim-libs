@@ -322,9 +322,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	
 	public void writeNoiseEmissionStats(String fileName) {
 		File file = new File(fileName);
-		
-		Map<Id,Double> linkId2noiseEmissionDay = new HashMap<Id, Double>();
-		
+				
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			bw.write("link;avg noiseEmission;avg noiseEmission (day);avg noiseEmission (night);avg noiseEmission (peak);avg noiseEmission (off-peak)");
@@ -408,9 +406,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				avgNoiseNight = 10 * Math.log10(sumAvgNoiseNight / counterAvgNoiseNight);
 				avgNoisePeak = 10 * Math.log10(sumAvgNoisePeak / counterAvgNoisePeak);
 				avgNoiseOffPeak = 10 * Math.log10(sumAvgNoiseOffPeak / counterAvgNoiseOffPeak);
-				
-				linkId2noiseEmissionDay.put(linkId, avgNoiseDay);
-				
+								
 				bw.write(linkId + ";" + avgNoise + ";" + avgNoiseDay+";"+avgNoiseNight+";"+avgNoisePeak+";"+avgNoiseOffPeak);
 				bw.newLine();
 			}
