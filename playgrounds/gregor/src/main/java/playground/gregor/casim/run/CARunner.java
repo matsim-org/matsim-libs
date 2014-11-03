@@ -30,6 +30,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.HybridQCAMobsimFactory;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -50,13 +51,14 @@ public class CARunner implements IterationStartsListener{
 		}
 		String qsimConf = args[0];
 		Config c = ConfigUtils.loadConfig(qsimConf);
+		c.scenario().setUseVehicles(true);
+		
 		c.controler().setWriteEventsInterval(1);
-//		c.controler().setLastIteration(300);
 		Scenario sc = ScenarioUtils.loadScenario(c);
 //		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 		
 //		c.qsim().setEndTime(120);
-		c.qsim().setEndTime(23*3600);
+//		c.qsim().setEndTime(23*3600);
 //		c.qsim().setEndTime(41*60);//+30*60);
 
 
@@ -79,111 +81,27 @@ public class CARunner implements IterationStartsListener{
 
 		controller.setOverwriteFiles(true);
 		
-//		controller.getEvents().addHandler(new SimSpeedObserver());
 
 		HybridQCAMobsimFactory factory = new HybridQCAMobsimFactory();
 		controller.addMobsimFactory("casim", factory);
 
 		
-//		ShapeFileReader sr = new ShapeFileReader();
-//		sr.readFileAndInitialize("/Users/laemmel/devel/gct/analysis/measurement_areas.shp");
-//		
-//		for (SimpleFeature a : sr.getFeatureSet()) {
-//			FlowAreaAnalysis fa = new FlowAreaAnalysis((Geometry)a.getDefaultGeometry(), "/Users/laemmel/devel/gct_TRB/small_single/fnd"+a.getID(),controller.getEvents());
-//			controller.getEvents().addHandler(fa);
-//		}
-//		CrossSectionFlowAnalysis cr = new CrossSectionFlowAnalysis(new IdImpl("sim2d_0_rev_-3499"), new IdImpl("sim2d_0_-3499"), "/Users/laemmel/devel/gct_TRB/small_single/flow", 5);
-//		controller.getEvents().addHandler(cr);
-		
-		
-//		FlowAnalysis fa1 = new FlowAnalysis(new Envelope(-8235101, -8235088, 4948062,4948069),"/Users/laemmel/devel/gct_TRB/small_single/fnd01.txt");
-//		FlowAnalysis fa2 = new FlowAnalysis(new Envelope(-8235077.88, -8235076.36, 4948033.56,4948034.37),"/Users/laemmel/devel/gct_TRB/small_single/fnd02.txt");
-//		FlowAnalysis fa3 = new FlowAnalysis(new Envelope(-8235139, -8235136, 4947984,4947985),"/Users/laemmel/devel/gct_TRB/small_single/fnd03.txt");
-//		
-//		
-//		
-//		controller.getEvents().addHandler(fa1);
-//		controller.getEvents().addHandler(fa2);
-//		controller.getEvents().addHandler(fa3);
 		if (args[1].equals("true")) {
 			//VIS only
 			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
 			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
 			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 			
-//			VDPath vdp = new VDPath(controller.getEvents());
-//			controller.getEvents().addHandler(vdp);
-//			
-//			QuadTreePath qdp = new QuadTreePath(controller.getEvents());
-//			controller.getEvents().addHandler(qdp);
-			
-//			Sim2DRunner runner = new Sim2DRunner();
-//			runner.test = new EventBasedVisDebuggerEngine(sc);
-//
-//			
-//			runner.visDebugger = new VisDebugger( sim2dc.getTimeStepSize(), minX, minY);
-////			runner.visDebugger.setTransformationStuff(minX, minY);
-//			controller.addControlerListener(runner);
-//			runner.controller = controller;
-//			runner.factory = factory;
-//			runner.qSimDrawer = new QSimDensityDrawer(sc);
-////			runner.burgdorfInfoDrawer = new BurgdorfInfoDrawer(sc);
-//			
-//			runner.visDebugger.addAdditionalDrawer(runner.qSimDrawer);
-//			runner.visDebugger.addAdditionalDrawer(runner.burgdorfInfoDrawer);
-//			runner.visDebugger.addAdditionalDrawer();
-//			runner.visDebugger.addAdditionalDrawer(new ScaleBarDrawer());
-//			runner.visDebugger.addAdditionalDrawer(new MousePositionDrawer());
-//			FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing", "png", 3);
-//			runner.visDebugger.setFrameSaver(fs);
-			
-			
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 			InfoBox iBox = new InfoBox(dbg,sc);
-//			SeeCasino iCasion = new SeeCasino();
-//			LinkFNDDrawer fnd = new LinkFNDDrawer(sc);
-//			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
-//			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(new Envelope(-3,3,-197.5,-192.5));
-//			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
 			dbg.addAdditionalDrawer(iBox);
-//			dbg.addAdditionalDrawer(new Branding());
+			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-//			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
-			
 			dbg.addAdditionalDrawer(qDbg);
-//			dbg.addAdditionalDrawer(qDbg2);
-			
-//			dbg.addAdditionalDrawer(vFND);
-//			dbg.addAdditionalDrawer(vFND1);
-//			dbg.addAdditionalDrawer(fnd);;
-//			dbg.addAdditionalDrawer(iCasion);
-//			dbg.addAdditionalDrawer(new GregorsOffice());
-//			dbg.addAdditionalDrawer(v);
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
-//			controller.getEvents().addHandler(qDbg2);
-//			VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-50,-40),controller.getEvents());
-//			controller.getEvents().addHandler(vdt);
-//			controller.addControlerListener(vdt);
-//			controller.getEvents().addHandler(vFND);
-//			controller.getEvents().addHandler(vFND1);
-//			controller.getEvents().addHandler(fnd);
-//			controller.getEvents().addHandler(iCasion);
-//			controller.getEvents().addHandler(v);
-			
 		}
 		
-//		VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-27.5,-22.5),controller.getEvents());
-////		VDTester vdt = new VDTester(new Envelope(19,21,-1,1),controller.getEvents());
-//		controller.getEvents().addHandler(vdt);
-//		controller.addControlerListener(vdt);
-
-		
-//		controller.setCreateGraphs(false);
-//		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
-		
-//		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-//		
 //		DefaultTripRouterFactoryImpl fac = builder.build(sc);
 //		DefaultTripRouterFactoryImpl fac = new DefaultTripRouterFactoryImpl(sc, null, null);
 	

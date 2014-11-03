@@ -20,41 +20,90 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
-public class CAVehicle extends CAAgent {
+public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
-	private final MobsimDriverAgent agent;
-	private final Id initialLinkId;
-	private CALink currentLink;
 
-	public CAVehicle(Id id, MobsimDriverAgent agent, Id linkId, CALink current) {
-		super(id);
-		this.agent = agent;
-		this.initialLinkId = linkId;
-		this.currentLink = current;
+	private Id<Vehicle> id;
+	private Vehicle vehicle;
+
+	public CAVehicle(final Vehicle basicVehicle) {
+		this.id = basicVehicle.getId();
+		this.vehicle = basicVehicle;
 	}
 
 	@Override
-	Id getNextLinkId() {
-		return this.agent.chooseNextLinkId();
+	public Vehicle getVehicle() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MobsimDriverAgent getDriver() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Id<Vehicle> getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Link getCurrentLink() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double getSizeInEquivalents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean addPassenger(PassengerAgent passenger) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removePassenger(PassengerAgent passenger) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Collection<? extends PassengerAgent> getPassengers() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getPassengerCapacity() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	Id<Link> getNextLinkId() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	void moveOverNode(CALink nextLink, double time) {
-		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
-		this.currentLink = nextLink;
-
-	}
-	
-	/*package*/ Id getInitialLinkId() {
-		return this.initialLinkId;
-	}
-
-	@Override
-	CALink getCurrentLink() {
-		return this.currentLink;
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -68,5 +117,7 @@ public class CAVehicle extends CAAgent {
 		// TODO Auto-generated method stub
 		
 	}
+
+	
 
 }

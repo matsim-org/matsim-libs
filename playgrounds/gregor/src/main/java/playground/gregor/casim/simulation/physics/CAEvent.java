@@ -29,14 +29,14 @@ public class CAEvent implements Comparable<CAEvent>{
 
 
 	private final double time;
-	private final CAAgent agent;
+	private final CAMoveableEntity agent;
 	private final CANetworkEntity entity;
 	private final CAEventType type;
 	public long cnt;
 	private final AgentState validState;
 	private boolean isObsolete = false;
 
-	public CAEvent(double time, CAAgent agent, CANetworkEntity entity, CAEventType type){
+	public CAEvent(double time, CAMoveableEntity agent, CANetworkEntity entity, CAEventType type){
 		if (Double.isNaN(time)) {
 			throw new RuntimeException("NaN");
 		}
@@ -78,7 +78,7 @@ public class CAEvent implements Comparable<CAEvent>{
 		return this.time;
 	}
 
-	public CAAgent getCAAgent() {
+	public CAMoveableEntity getCAAgent() {
 		return this.agent;
 	}
 

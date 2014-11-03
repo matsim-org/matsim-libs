@@ -79,7 +79,7 @@ public class CANetworkDynamic {
 
 	private CALinkMonitorExact monitor;
 
-	private Set<CAAgent> agents = new HashSet<CAAgent>();
+	private Set<CAMoveableEntity> agents = new HashSet<CAMoveableEntity>();
 
 	private static int EXP_WARN_CNT;
 
@@ -119,44 +119,40 @@ public class CANetworkDynamic {
 
 	}
 
-	/*package*/ void registerAgent(CAAgent a) {
+	/*package*/ void registerAgent(CAMoveableEntity a) {
 		if (!this.agents.add(a)) {
 			throw new RuntimeException("Agent: " + a + " has already been registered!");
 		}
 	}
 
-	/*package*/ void unregisterAgent(CAAgent a) {
+	/*package*/ void unregisterAgent(CAMoveableEntity a) {
 		if (!this.agents.remove(a)){
 			throw new RuntimeException("Could not unregister agent: " + a + "!");
 		}
 	}
 
-
-
-	public double getRho(CAAgent a) {
-		return a.getAgentInfo().getRho();
-	}
-
-
 	/*package*/ void updateRho() {
 
-		for (CAAgent a : this.agents){
-			double rho = (estRho(a)+a.getAgentInfo().getRho())/2;
-			a.getAgentInfo().setRho(rho);
+		for (CAMoveableEntity a : this.agents){
+			double rho = (estRho(a)+a.getRho())/2;
+			a.setRho(rho);
 		}
 
 	}
 
-	public double estRho(CAAgent a) {
-		CALink current = a.getCurrentLink();
-		CAAgent[] currentParts = current.getParticles();
+	public double estRho(CAMoveableEntity a) {
+		if (a.getCurrentCANetworkEntity() instanceof CANodeDynamic) {
+			return a.getRho();
+		} 
+		CALink current = (CALink)a.getCurrentCANetworkEntity();
+		CAMoveableEntity[] currentParts = current.getParticles();
 		int pos = a.getPos();
 		int dir = a.getDir();
 		int [] spacings;// = new int []{0,0};
 		if (currentParts[pos] != a) {
 			//agent on node
 			//			log.warn("not yet implemented!!");
-			return a.getAgentInfo().getRho();
+			return a.getRho();
 		} else {
 
 			double rho = bSplinesKernel(0);
@@ -183,7 +179,7 @@ public class CANetworkDynamic {
 					CANode nn = next.getUpstreamCANode();
 					int nextDir;
 					int nextPos;
-					CAAgent[] nextParts = next.getParticles();
+					CAMoveableEntity[] nextParts = next.getParticles();
 					if (n == nn) {
 						nextDir = 1;
 						nextPos = 0;
@@ -205,7 +201,7 @@ public class CANetworkDynamic {
 		}
 	}
 
-	private double traverseLink(CAAgent[] parts, int dir, int idx,int[] spacings, double rho) {
+	private double traverseLink(CAMoveableEntity[] parts, int dir, int idx,int[] spacings, double rho) {
 		if (idx < 0 || idx >= parts.length) {
 			return rho;
 		}
@@ -321,6 +317,12 @@ public class CANetworkDynamic {
 	}
 
 	public void pushEvent(CAEvent event) {
+		
+		//HACK for testing w/o mobsim
+		if (event.getCAAgent().arrived()) {
+			event.setObsolete();
+		}
+		
 		event.getCAAgent().setCurrentEvent(event);
 		this.events.add(event);
 	}

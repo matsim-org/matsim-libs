@@ -25,22 +25,24 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class CASimpleDynamicAgent extends CAAgent {
+//This class is for testing only will be removed in future [GL Nov '14]
+@Deprecated
+public class CASimpleDynamicAgent extends CAMoveableEntity {
 
 	private CANetworkEntity currentEntity;
 
 	private final List<Link> links;
 	private int next;
+	
+	
+	private int cnt =0;
+	
 	private final Id<CASimpleDynamicAgent> id;
-	private CALink link;
-
 
 	public CASimpleDynamicAgent(List<Link> links, int i, Id<CASimpleDynamicAgent> id, CALink caLink) {
-		super(id);
 		this.links = links;
 		this.next = i;
 		this.id = id;
-		this.link = caLink;
 		this.currentEntity = caLink;
 	}
 
@@ -57,26 +59,27 @@ public class CASimpleDynamicAgent extends CAAgent {
 
 	@Override
 	void moveOverNode(CALink link, double time) {
-		this.link = link;
 		this.currentEntity = link;
 		this.next++;
 		if (this.next == this.links.size()) {
 			this.next = this.links.size()-1;
+			this.letAgentArrive();
 		}
 	}
-
-
-
+	
 	@Override
-	public CALink getCurrentLink() {
-		return this.link;
+	public Link getCurrentLink() {
+		return this.links.get(next-1);
 	}
-
-
 
 	@Override
 	public CANetworkEntity getCurrentCANetworkEntity() {
 		return this.currentEntity;
+	}
+
+	@Override
+	public Id getId() {
+		return id;
 	}
 
 	

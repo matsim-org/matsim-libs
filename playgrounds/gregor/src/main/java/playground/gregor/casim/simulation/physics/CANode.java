@@ -28,11 +28,11 @@ public interface CANode extends CANetworkEntity{
 
 	public abstract void addLink(CALink link);
 
-	public abstract void putAgent(CAAgent a);
+	public abstract void putAgent(CAMoveableEntity a);
 
-	public abstract CAAgent peekForAgent();
+	public abstract CAMoveableEntity peekForAgent();
 
-	public abstract CAAgent pollAgent(double time);
+	public abstract CAMoveableEntity pollAgent(double time);
 	
 	public abstract Node getNode();
 	

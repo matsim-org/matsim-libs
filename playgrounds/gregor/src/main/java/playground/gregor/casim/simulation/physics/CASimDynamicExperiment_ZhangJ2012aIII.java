@@ -134,18 +134,22 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 
 						Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(-100,0));
 						Node n2ex = fac.createNode(Id.createNodeId("2ex"), new CoordImpl(-100,100));
+						Node n2ex2 = fac.createNode(Id.createNodeId("2ex2"), new CoordImpl(-101,100));
 
 
 						Node n3ex = fac.createNode(Id.createNodeId("3ex"), new CoordImpl(100,-100));
+						Node n3ex2 = fac.createNode(Id.createNodeId("3ex2"), new CoordImpl(101,100));
 						Node n5 = fac.createNode(Id.createNodeId("5"), new CoordImpl(100,0));
 
 						net.addNode(n2ex);net.addNode(n3ex);net.addNode(n5);net.addNode(n0);
+						net.addNode(n2ex2);net.addNode(n3ex2);
 
 						Link l0 = fac.createLink(Id.createLinkId("0"), n0, n5);
 						Link l0rev = fac.createLink(Id.createLinkId("0rev"), n5, n0);
 						Link l2ex = fac.createLink(Id.createLinkId("2ex"), n0, n2ex);
-
 						Link l3ex = fac.createLink(Id.createLinkId("3ex"), n5, n3ex);
+						Link l2ex2 = fac.createLink(Id.createLinkId("2ex2"), n2ex,n2ex2);
+						Link l3ex2 = fac.createLink(Id.createLinkId("3ex2"), n3ex,n3ex2);
 
 
 
@@ -153,14 +157,16 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 						l0rev.setLength(200);
 						l2ex.setLength(100);
 						l3ex.setLength(100);
-
+						l2ex2.setLength(1);
+						l3ex2.setLength(1);
 
 
 						net.addLink(l0);
 						net.addLink(l0rev);
 						net.addLink(l2ex);
 						net.addLink(l3ex);
-
+						net.addLink(l2ex2);
+						net.addLink(l3ex2);
 
 
 
@@ -180,12 +186,14 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 						List<Link> linksLR = new ArrayList<Link>();
 						linksLR.add(l0);
 						linksLR.add(l3ex);
+						linksLR.add(l3ex2);
 
 
 
 						List<Link> linksRL = new ArrayList<Link>();
 						linksRL.add(l0);
 						linksRL.add(l2ex);
+						linksRL.add(l2ex2);
 
 						System.out.println(" " + bL + " " + bCor + " " + bR +"\n");
 
@@ -222,7 +230,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 		int agents = 0;
 		{
 			CALink caLinkLR = caNet.getCALink(linksLR.get(0).getId());
-			CAAgent[] particles = caLinkLR.getParticles();
+			CAMoveableEntity[] particles = caLinkLR.getParticles();
 			System.out.println("part left:" + particles.length);
 
 
@@ -237,7 +245,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 
 				if (agents % 2 == 0) 
 				{
-					CAAgent a = new CASimpleDynamicAgent(linksLR, 1, Id.create("g"+agents++, CASimpleDynamicAgent.class), caLinkLR);
+					CAMoveableEntity a = new CASimpleDynamicAgent(linksLR, 1, Id.create("g"+agents++, CASimpleDynamicAgent.class), caLinkLR);
 					a.materialize(i, 1);
 					particles[i] = a;
 					CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
@@ -255,7 +263,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 					//					break;
 					//				}
 				{
-					CAAgent a = new CASimpleDynamicAgent(linksRL, 1, Id.create("r"+-(agents++), CASimpleDynamicAgent.class), caLinkLR);
+					CAMoveableEntity a = new CASimpleDynamicAgent(linksRL, 1, Id.create("r"+-(agents++), CASimpleDynamicAgent.class), caLinkLR);
 					a.materialize(i, -1);
 					particles[i] = a;
 					CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);

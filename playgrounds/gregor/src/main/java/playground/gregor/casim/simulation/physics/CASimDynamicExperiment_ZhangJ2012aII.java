@@ -468,11 +468,11 @@ public class CASimDynamicExperiment_ZhangJ2012aII {
 
 		{
 			CALink caLink = caNet.getCALink(linksRL.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
+			CAMoveableEntity[] particles = caLink.getParticles();
 			System.out.println("part left:" + particles.length);
-			CAAgent last = null;
+			CAMoveableEntity last = null;
 			for (int i = particles.length-1; i > skip; i--) {
-				CAAgent a = new CASimpleDynamicAgent(linksRL, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
+				CAMoveableEntity a = new CASimpleDynamicAgent(linksRL, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
 				a.materialize(i, -1);
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
@@ -488,11 +488,11 @@ public class CASimDynamicExperiment_ZhangJ2012aII {
 		
 		{
 			CALink caLink = caNet.getCALink(linksLR.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
+			CAMoveableEntity[] particles = caLink.getParticles();
 			System.out.println("part left:" + particles.length);
-			CAAgent last = null;
+			CAMoveableEntity last = null;
 			for (int i = 0; i < particles.length-skip; i++) {
-				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
+				CAMoveableEntity a = new CASimpleDynamicAgent(linksLR, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
 				a.materialize(i, 1);
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);

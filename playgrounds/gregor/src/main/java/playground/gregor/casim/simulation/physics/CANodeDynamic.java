@@ -41,14 +41,14 @@ public class CANodeDynamic implements CANode{
 
 
 
-	private CAAgent agent;
+	private CAMoveableEntity agent;
 	private final Node node;
 	private final CANetworkDynamic net;
 
 	private final List<CALinkDynamic> links = new ArrayList<CALinkDynamic>();
 
 	private final Map<CALink,Double> towardsLinkLastExitTimes = new HashMap<CALink,Double>();
-	private final Map<CALink,CASimpleDynamicAgent> towardsLinkLastExitAgents = new HashMap<CALink,CASimpleDynamicAgent>();
+	private final Map<CALink,CAMoveableEntity> towardsLinkLastExitAgents = new HashMap<CALink,CAMoveableEntity>();
 
 	private final double width;
 
@@ -95,7 +95,7 @@ public class CANodeDynamic implements CANode{
 
 
 	@Override
-	public void putAgent(CAAgent a) {
+	public void putAgent(CAMoveableEntity a) {
 		if (this.agent != null) {
 			throw new RuntimeException("There is already an agent on node:" + this.node.getId());
 
@@ -104,13 +104,13 @@ public class CANodeDynamic implements CANode{
 		a.moveToNode(this);
 	}
 	@Override
-	public CAAgent peekForAgent() {
+	public CAMoveableEntity peekForAgent() {
 		return this.agent;
 	}
 
 	@Override
-	public CAAgent pollAgent(double time) {
-		CAAgent a = this.agent;
+	public CAMoveableEntity pollAgent(double time) {
+		CAMoveableEntity a = this.agent;
 		this.agent = null;
 		this.agentLeft = time;
 		return a;
@@ -118,24 +118,19 @@ public class CANodeDynamic implements CANode{
 
 	@Override
 	public void handleEvent(CAEvent e) {
-		CAAgent a = e.getCAAgent();
-		if (!(a instanceof CASimpleDynamicAgent)) {
-			throw new RuntimeException("Cannot handle agent+" + a+ " only instances of" + CASimpleDynamicAgent.class.getName() + " are allowd");
-		}
-
-		CASimpleDynamicAgent dyna = (CASimpleDynamicAgent)a;
+		CAMoveableEntity a = e.getCAAgent();
 
 		double time = e.getEventExcexutionTime();
 		if (e.getCAEventType() == CAEventType.SWAP){
-			handelSwap(dyna,time);
+			handelSwap(a,time);
 		} else if (e.getCAEventType() == CAEventType.TTA){
-			handleTTA(dyna,time);
+			handleTTA(a,time);
 		} else {
 			throw new RuntimeException("Unknown event type: " + e.getCAEventType());
 		}
 	}
 
-	private void handleTTA(CASimpleDynamicAgent a, double time) {
+	private void handleTTA(CAMoveableEntity a, double time) {
 
 		Id<Link> nextLinkId = a.getNextLinkId();
 		CALinkDynamic nextLink = (CALinkDynamic)this.net.getCALink(nextLinkId);
@@ -151,7 +146,7 @@ public class CANodeDynamic implements CANode{
 
 	}
 
-	private void handleTTAEnterNextLinkFromUpstreamEnd(CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+	private void handleTTAEnterNextLinkFromUpstreamEnd(CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 
 		//check pre-condition
 		if (nextLink.getParticles()[0] == null) {
@@ -170,7 +165,7 @@ public class CANodeDynamic implements CANode{
 
 
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition1(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 		
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
@@ -194,8 +189,8 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void checkPostConditionForAgentEnteredLinkFromUpstreamEnd(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
-		CAAgent inFrontOfMe = nextLink.getParticles()[1];
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
+		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[1];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) { //oncoming
 				double d = nextLink.getD(a);
@@ -209,7 +204,7 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition2(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 		double z = nextLink.getZ(a);
 		z *= this.ratio;
 		double zStar = z - (time - nextLink.getLastLeftTimes()[0]);
@@ -219,14 +214,14 @@ public class CANodeDynamic implements CANode{
 		this.net.pushEvent(e);
 	}
 
-	private void handleTTAOnPrecondition3(CASimpleDynamicAgent a, double time) {
+	private void handleTTAOnPrecondition3(CAMoveableEntity a, double time) {
 		// nothing to be done here
 
 	}
 
 	/////////////////////////
 
-	private void handleTTAEnterNextLinkFromDownstreamEnd(CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+	private void handleTTAEnterNextLinkFromDownstreamEnd(CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 
 		//check pre-condition
 		if (nextLink.getParticles()[nextLink.getNumOfCells()-1] == null) {
@@ -244,7 +239,7 @@ public class CANodeDynamic implements CANode{
 
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition1(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 		
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		this.towardsLinkLastExitAgents.put(nextLink, a);
@@ -268,8 +263,8 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void checkPostConditionForAgentEnteredLinkFromDownstreamEnd(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
-		CAAgent inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-2];
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
+		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-2];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) { //oncoming
 				double d = nextLink.getD(a);
@@ -283,7 +278,7 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition2(
-			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
+			CALinkDynamic nextLink, CAMoveableEntity a, double time) {
 		double z = nextLink.getZ(a);
 		z *= this.ratio;
 		double zStar = z - (time - nextLink.getLastLeftTimes()[nextLink.getNumOfCells()-1]);
@@ -293,13 +288,13 @@ public class CANodeDynamic implements CANode{
 	}
 
 
-	private void triggerSWAP(CAAgent a, CANetworkEntity ne, double time) {
+	private void triggerSWAP(CAMoveableEntity a, CANetworkEntity ne, double time) {
 		CAEvent e = new CAEvent(time, a, ne, CAEventType.SWAP);
 		this.net.pushEvent(e);
 
 	}
 
-	private void triggerTTA(CAAgent toBeTriggered, CANetworkEntity ne, double time) {
+	private void triggerTTA(CAMoveableEntity toBeTriggered, CANetworkEntity ne, double time) {
 		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTA);
 		this.net.pushEvent(e);
 
@@ -308,19 +303,19 @@ public class CANodeDynamic implements CANode{
 
 	//======================================================
 
-	private void triggerPrevAgent(double time, CASimpleDynamicAgent a) {
+	private void triggerPrevAgent(double time, CAMoveableEntity a) {
 
 		double cap = 0;
-		List<Tuple<CALinkDynamic,CAAgent>> cands = new ArrayList<Tuple<CALinkDynamic,CAAgent>>();
+		List<Tuple<CALinkDynamic,CAMoveableEntity>> cands = new ArrayList<Tuple<CALinkDynamic,CAMoveableEntity>>();
 		for (CALinkDynamic l : this.links) {
 			if (l.getDownstreamCANode() == this) {
 				if (l.getParticles()[l.getNumOfCells()-1] != null && l.getParticles()[l.getNumOfCells()-1].getDir() == 1) {
-					cands.add(new Tuple<CALinkDynamic,CAAgent>(l,l.getParticles()[l.getNumOfCells()-1]));
+					cands.add(new Tuple<CALinkDynamic,CAMoveableEntity>(l,l.getParticles()[l.getNumOfCells()-1]));
 					cap += 1;//l.getLink().getCapacity();
 				}
 			} else if (l.getUpstreamCANode() == this) {
 				if (l.getParticles()[0] != null && l.getParticles()[0].getDir() == -1) {
-					cands.add(new Tuple<CALinkDynamic,CAAgent>(l,l.getParticles()[0]));
+					cands.add(new Tuple<CALinkDynamic,CAMoveableEntity>(l,l.getParticles()[0]));
 					cap += 1;//l.getLink().getCapacity();
 				}
 			}
@@ -332,7 +327,7 @@ public class CANodeDynamic implements CANode{
 		double rnd = cap*MatsimRandom.getRandom().nextDouble();
 		double incr = cap/cands.size();
 		double comp = incr;
-		for (Tuple<CALinkDynamic, CAAgent> t : cands) {
+		for (Tuple<CALinkDynamic, CAMoveableEntity> t : cands) {
 			if (rnd <= comp) {
 				double z = t.getFirst().getZ(t.getSecond());
 				z *= this.ratio;
@@ -350,7 +345,7 @@ public class CANodeDynamic implements CANode{
 
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	private void handelSwap(CASimpleDynamicAgent a, double time) {
+	private void handelSwap(CAMoveableEntity a, double time) {
 		Id<Link> nextLinkId = a.getNextLinkId();
 		CALinkDynamic nextLink = (CALinkDynamic)this.net.getCALink(nextLinkId);
 
@@ -365,10 +360,10 @@ public class CANodeDynamic implements CANode{
 
 	}
 
-	private void handleSwapWithUpStreamEnd(CASimpleDynamicAgent a, double time,
+	private void handleSwapWithUpStreamEnd(CAMoveableEntity a, double time,
 			CALinkDynamic nextLink) {
 		
-		CAAgent swapA = nextLink.getParticles()[0];
+		CAMoveableEntity swapA = nextLink.getParticles()[0];
 		this.pollAgent(0);
 		this.putAgent(swapA);
 		nextLink.getParticles()[0] = a;
@@ -385,7 +380,7 @@ public class CANodeDynamic implements CANode{
 
 	}
 
-	private void checkPostConditionForAgentSwapedToNode(CAAgent swapA,
+	private void checkPostConditionForAgentSwapedToNode(CAMoveableEntity swapA,
 			double time) {
 		Id<Link> nextLinkId = swapA.getNextLinkId();
 		CALinkDynamic nextLink = (CALinkDynamic)this.net.getCALink(nextLinkId);
@@ -398,9 +393,9 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd(
-			CAAgent swapA, CALinkDynamic nextLink, double time) {
+			CAMoveableEntity swapA, CALinkDynamic nextLink, double time) {
 
-		CAAgent inFrontOfMe = nextLink.getParticles()[0];
+		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[0];
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) {
 				double d = nextLink.getD(swapA);
@@ -414,8 +409,8 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromDownstreamEnd(
-			CAAgent swapA, CALinkDynamic nextLink, double time) {
-		CAAgent inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-1];
+			CAMoveableEntity swapA, CALinkDynamic nextLink, double time) {
+		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-1];
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) {
 				double d = nextLink.getD(swapA);
@@ -427,10 +422,10 @@ public class CANodeDynamic implements CANode{
 		}
 	}
 
-	private void handleSwapWithDownStreamEnd(CASimpleDynamicAgent a,
+	private void handleSwapWithDownStreamEnd(CAMoveableEntity a,
 			double time, CALinkDynamic nextLink) {
 		
-		CAAgent swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
+		CAMoveableEntity swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
 		this.pollAgent(0);
 		this.putAgent(swapA);
 		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a;
@@ -452,7 +447,7 @@ public class CANodeDynamic implements CANode{
 		return this.node;
 	}
 
-	public double getLastNodeExitTimeForAgent(CASimpleDynamicAgent a) {
+	public double getLastNodeExitTimeForAgent(CAMoveableEntity a) {
 		Id<Link> n = a.getNextLinkId();
 		CALinkDynamic nextLink = (CALinkDynamic)this.net.getCALink(n);
 		return this.towardsLinkLastExitTimes.get(nextLink);

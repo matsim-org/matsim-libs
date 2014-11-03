@@ -37,21 +37,18 @@ public interface CALink extends CANetworkEntity{
 
 	public abstract int getNumOfCells();
 	
-	public abstract CAAgent[] getParticles();
+	public abstract CAMoveableEntity[] getParticles();
 
 	public abstract double[] getTimes();
 	
-	public abstract void fireDownstreamEntered(CAAgent a, double time);
+	public abstract void fireDownstreamEntered(CAMoveableEntity a, double time);
 	
-	public abstract void fireUpstreamEntered(CAAgent a, double time);
+	public abstract void fireUpstreamEntered(CAMoveableEntity a, double time);
 
-	public abstract void fireDownstreamLeft(CAAgent a, double time);
+	public abstract void fireDownstreamLeft(CAMoveableEntity a, double time);
 	
-	public abstract void fireUpstreamLeft(CAAgent a, double time);
+	public abstract void fireUpstreamLeft(CAMoveableEntity a, double time);
 	
-	//MATSim integration
-	public abstract void letAgentDepart(CAVehicle veh);
-
 	public abstract void reset();
 
 }

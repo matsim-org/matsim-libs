@@ -23,7 +23,7 @@ package playground.gregor.casim.simulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.casim.simulation.physics.CAAgent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 
 public class CAAgentFactory {
@@ -32,7 +32,7 @@ public class CAAgentFactory {
 		// TODO Auto-generated constructor stub
 	}
 
-	public CAAgent buildAgent(QVehicle veh) {
+	public CAMoveableEntity buildAgent(QVehicle veh) {
 		// TODO Auto-generated method stub
 		return null;
 	}

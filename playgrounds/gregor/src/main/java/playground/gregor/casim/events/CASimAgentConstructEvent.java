@@ -22,13 +22,13 @@ package playground.gregor.casim.events;
 
 import org.matsim.api.core.v01.events.Event;
 
-import playground.gregor.casim.simulation.physics.CAAgent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 
 public class CASimAgentConstructEvent extends Event{
 
-	private final CAAgent agent;
+	private final CAMoveableEntity agent;
 
-	public CASimAgentConstructEvent(double time, CAAgent a) {
+	public CASimAgentConstructEvent(double time, CAMoveableEntity a) {
 		super(time);
 		this.agent = a;
 	}
@@ -40,7 +40,7 @@ public class CASimAgentConstructEvent extends Event{
 		return EVENT_TYP;
 	}
 	
-	public CAAgent getCAAgent() {
+	public CAMoveableEntity getCAAgent() {
 		return this.agent;
 	}
 

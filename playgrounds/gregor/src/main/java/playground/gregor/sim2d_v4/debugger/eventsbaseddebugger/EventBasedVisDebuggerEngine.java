@@ -37,7 +37,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.events.CASimAgentConstructEventHandler;
-import playground.gregor.casim.simulation.physics.CAAgent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEventHandler;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
@@ -296,7 +296,7 @@ public class EventBasedVisDebuggerEngine implements CASimAgentConstructEventHand
 
 	@Override
 	public void handleEvent(CASimAgentConstructEvent e) {
-		CAAgent a = e.getCAAgent();
+		CAMoveableEntity a = e.getCAAgent();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) (0.5/5.091);
 		int nr = a.getId().toString().hashCode()%100;

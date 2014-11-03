@@ -8,21 +8,21 @@ import java.util.List;
 
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.gregor.casim.simulation.physics.CAAgent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CALink;
 
 public class CALinkMonitorExact {
 
 	private CALink l;
-	private CAAgent[] parts;
+	private CAMoveableEntity[] parts;
 	private int from;
 	private int to;
 	private double area;
 
-	private CAAgent lastDsLv = null;
-	private CAAgent lastDsEnt = null;
-	private CAAgent lastUsLv = null;
-	private CAAgent lastUsEnt = null;
+	private CAMoveableEntity lastDsLv = null;
+	private CAMoveableEntity lastDsEnt = null;
+	private CAMoveableEntity lastUsLv = null;
+	private CAMoveableEntity lastUsEnt = null;
 
 
 	private LinkedList<AgentInfo> dsl = new LinkedList<AgentInfo>();
