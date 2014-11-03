@@ -94,8 +94,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_SCORESTATS = "scorestats";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
+    public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
 	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
 	public static final String FILENAME_NETWORK = "output_network.xml.gz";
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
@@ -357,11 +356,6 @@ public class Controler extends AbstractController {
 		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
-
-		// optional: score stats
-		this.scoreStats = new ScoreStatsControlerListener(config, this.population,
-				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
-		this.addControlerListener(this.scoreStats);
 
 		// optional: use counts
 		if (this.config.counts().getCountsFileName() != null || this.scenarioData .getScenarioElement(Counts.ELEMENT_NAME) != null) {

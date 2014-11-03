@@ -77,6 +77,10 @@ public abstract class AbstractModule {
         binder.install(guiceModule);
     }
 
+    protected final <T> void bindTo(Class<T> type, Class<? extends T> implementation) {
+        binder.bind(type).to(implementation);
+    }
+
     protected final <T> void bindToInstance(Class<T> type, T instance) {
         binder.bind(type).toInstance(instance);
     }

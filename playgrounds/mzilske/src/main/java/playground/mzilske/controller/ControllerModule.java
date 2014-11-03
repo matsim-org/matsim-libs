@@ -152,7 +152,7 @@ public class ControllerModule extends AbstractModule {
     @Provides
     ScoreStatsControlerListener provideScoreStatsControlerListener(Population population, OutputDirectoryHierarchy controlerIO, Config config) {
         return new ScoreStatsControlerListener(config, population,
-                controlerIO.getOutputFilename(Controler.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+                controlerIO.getOutputFilename(ScoreStatsControlerListener.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
     }
 
     @Provides @Named("defaultControlerListeners")

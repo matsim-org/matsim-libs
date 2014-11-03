@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * DefaultControlerModules.java
+ *  * ScoreStatsModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,23 +20,15 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler;
+package org.matsim.analysis;
 
-import org.matsim.analysis.LegTimesModule;
-import org.matsim.analysis.ScoreStatsModule;
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.controler.corelisteners.LegHistogramModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
+import org.matsim.core.controler.AbstractModule;
 
-public class ControlerDefaultsModule extends AbstractModule {
+public class ScoreStatsModule extends AbstractModule {
     @Override
     public void install() {
-        include(new TravelTimeCalculatorModule());
-        include(new LinkStatsModule());
-        include(new VolumesAnalyzerModule());
-        include(new LegHistogramModule());
-        include(new LegTimesModule());
-        include(new ScoreStatsModule());
+        bindAsSingleton(ScoreStatsControlerListener.class);
+        addControlerListener(ScoreStatsControlerListener.class);
+        bindTo(ScoreStats.class, ScoreStatsControlerListener.class);
     }
 }

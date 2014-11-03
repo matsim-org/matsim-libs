@@ -25,13 +25,14 @@ package playground.sergioo.singapore2012;
 //import org.matsim.api.core.v01.Id;
 
 //import playground.artemc.calibration.CalibrationStatsListener;
+
+import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
-
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
@@ -62,7 +63,7 @@ public class ControlerPTWW extends Controler {
 		ControlerPTWW controler = new ControlerPTWW(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getPopulation()));
-		controler.addCoreControlerListener(new ScoreStats(controler.getPopulation(), FILENAME_SCORESTATS, true));
+		controler.addCoreControlerListener(new ScoreStats(controler.getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);

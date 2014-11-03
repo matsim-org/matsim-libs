@@ -25,13 +25,12 @@ import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.core.config.ConfigUtils;
-
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 
 public class EnergyFlowsController extends Controler {
@@ -73,9 +72,9 @@ public class EnergyFlowsController extends Controler {
 		}
 		
 		// add subpopulation score stats
-		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(config, nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(config, nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(nonTransitScoreStats);
-		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(config, transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(config, transitPopulation, super.getControlerIO().getOutputFilename("transit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(transitScoreStats);
 
 		// add subpopulation travel distance stats

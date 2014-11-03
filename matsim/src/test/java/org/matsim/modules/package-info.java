@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * DefaultControlerModules.java
+ *  * package-info.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,23 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler;
-
-import org.matsim.analysis.LegTimesModule;
-import org.matsim.analysis.ScoreStatsModule;
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.controler.corelisteners.LegHistogramModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-
-public class ControlerDefaultsModule extends AbstractModule {
-    @Override
-    public void install() {
-        include(new TravelTimeCalculatorModule());
-        include(new LinkStatsModule());
-        include(new VolumesAnalyzerModule());
-        include(new LegHistogramModule());
-        include(new LegTimesModule());
-        include(new ScoreStatsModule());
-    }
-}
+/**
+ * Testing modules with the Controler, only through their external interface.
+ */
+package org.matsim.modules;
