@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis;
+package playground.agarwalamit.analysis.activity;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -31,9 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.ActivityType2ActDurationsAnalyzer;
-import playground.agarwalamit.analysis.ActivityType2DurationHandler;
 import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
+import playground.agarwalamit.analysis.activity.ActivityType2DurationHandler;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 

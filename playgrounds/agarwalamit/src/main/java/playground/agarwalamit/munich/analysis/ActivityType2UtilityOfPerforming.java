@@ -33,8 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.ActivityType2ActDurationsAnalyzer;
-import playground.agarwalamit.analysis.ActivityType2DurationHandler;
+import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
+import playground.agarwalamit.analysis.activity.ActivityType2DurationHandler;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
