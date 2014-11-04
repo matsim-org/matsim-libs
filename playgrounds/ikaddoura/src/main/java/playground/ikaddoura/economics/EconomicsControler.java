@@ -94,7 +94,7 @@ public class EconomicsControler {
 			config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 9.);
 			config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 			config.planCalcScore().setConstantCar(-1. * cost);
-			config.controler().setOutputDirectory(path + "output_CostFunctions_" + cost + "/");
+			config.controler().setOutputDirectory(path + "output_DemandFunction_" + cost + "/");
 			
 			Population population = PopulationUtils.createPopulation(config);
 					
