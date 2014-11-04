@@ -57,8 +57,8 @@ public class DistanceStats implements IterationEndsListener {
 		for (Person p : event.getControler().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
-			if (!this.isInteger(p.getId().toString()) ||
-					Integer.parseInt(p.getId().toString()) > Integer.parseInt(this.config.locationchoice().getIdExclusion())) continue;
+			if (this.config.locationchoice().getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
+					Long.parseLong(p.getId().toString()) > Long.parseLong(this.config.locationchoice().getIdExclusion())) continue;
 					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			
@@ -92,9 +92,9 @@ public class DistanceStats implements IterationEndsListener {
 		this.bins.plotBinnedDistribution(path, "#", "m");
 	}
 	
-	private boolean isInteger(String str) {
+	private boolean isLong(String str) {
 	    try {
-	        Integer.parseInt(str);
+	        Long.parseLong(str);
 	        return true;
 	    } catch (NumberFormatException nfe) {}
 	    return false;

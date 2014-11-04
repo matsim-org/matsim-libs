@@ -37,6 +37,7 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -70,8 +71,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 
 	private double[] facilitiesKValuesArray;
 	private double[] personsKValuesArray;
-	private Map<Id, Integer> facilityIndices;
-	private Map<Id, Integer> personIndices;
+	private Map<Id<ActivityFacility>, Integer> facilityIndices;
+	private Map<Id<Person>, Integer> personIndices;
 		
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
@@ -99,19 +100,19 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 		
-		this.personIndices = new HashMap<Id, Integer>();
+		this.personIndices = new HashMap<Id<Person>, Integer>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;
-		for (Id personId : this.scenario.getPopulation().getPersons().keySet()) {
+		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
 			this.personIndices.put(personId, personIndex);
 			this.personsKValuesArray[personIndex] = (Double) this.personsKValues.getAttribute(personId.toString(), "k");
 			personIndex++;
 		}		
 		
-		this.facilityIndices = new HashMap<Id, Integer>();
+		this.facilityIndices = new HashMap<Id<ActivityFacility>, Integer>();
 		this.facilitiesKValuesArray = new double[this.scenario.getActivityFacilities().getFacilities().size()];
 		int facilityIndex = 0;
-		for (Id facilityId : this.scenario.getActivityFacilities().getFacilities().keySet()) {
+		for (Id<ActivityFacility> facilityId : this.scenario.getActivityFacilities().getFacilities().keySet()) {
 			this.facilityIndices.put(facilityId, facilityIndex);
 			this.facilitiesKValuesArray[facilityIndex] = (Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k");
 			facilityIndex++;
@@ -207,19 +208,19 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return facilitiesKValuesArray;
 	}
 
-	public Map<Id, Integer> getPersonIndices() {
+	public Map<Id<Person>, Integer> getPersonIndices() {
 		return Collections.unmodifiableMap(this.personIndices);
 	}
 	
-	public int getPersonIndex(Id id) {
+	public int getPersonIndex(Id<Person> id) {
 		return this.personIndices.get(id);
 	}
 	
-	public Map<Id, Integer> getFacilityIndices() {
+	public Map<Id<ActivityFacility>, Integer> getFacilityIndices() {
 		return Collections.unmodifiableMap(this.facilityIndices);
 	}
 	
-	public int getFacilityIndex(Id id) {
+	public int getFacilityIndex(Id<ActivityFacility> id) {
 		return this.facilityIndices.get(id);
 	}
 	
