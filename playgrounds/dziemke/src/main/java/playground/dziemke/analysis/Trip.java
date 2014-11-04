@@ -25,7 +25,8 @@ public class Trip {
 	private int useOtherCar;
 	private int useHouseholdCarPool;
 	private int useOtherCarPool;
-	private int mode;
+	//private int mode;
+	private String mode;
 	private double distanceBeeline;
 	private double distanceRoutedFastest;
 	private double distanceRoutedShortest;
@@ -152,11 +153,13 @@ public class Trip {
 		this.useOtherCarPool = useOtherCarPool;
 	}
 	
-	public int getMode() {
+	//public int getMode() {
+	public String getMode() {
 		return this.mode;
 	}
 
-	public void setMode(int mode) {
+	//public void setMode(int mode) {
+	public void setMode(String mode) {
 		this.mode = mode;
 	}
 	

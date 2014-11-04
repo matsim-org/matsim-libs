@@ -374,7 +374,7 @@ public class SrVTripAnalyzer {
 	    
 	    
 	    // write a routed distance vs. beeline distance comparison file
-	    writer.writeComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "beeline.txt", tripCounter);
+	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "beeline.txt", tripCounter);
 
 	    
 	    // return number of trips that have no calculable speed

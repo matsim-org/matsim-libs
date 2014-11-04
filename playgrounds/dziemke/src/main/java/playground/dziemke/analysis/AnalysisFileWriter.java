@@ -185,7 +185,7 @@ public class AnalysisFileWriter {
 	
 	
 	// file writer for comparison file routed distance vs. beeline distance
-	public void writeComparisonFile(Map<Id<Trip>, Double> mapRouted, Map<Id<Trip>, Double> mapBeeline, String outputFile, int tripCounter) {
+	public void writeRoutedBeelineDistanceComparisonFile(Map<Id<Trip>, Double> mapRouted, Map<Id<Trip>, Double> mapBeeline, String outputFile, int tripCounter) {
 		BufferedWriter bufferedWriter = null;
 		
 		try {
@@ -208,16 +208,22 @@ public class AnalysisFileWriter {
 	    			double distanceRouted = mapRouted.get(tripId);
 	    			double distanceBeeline = mapBeeline.get(tripId);
 	    			double ratioRoutedBeeline = distanceRouted / distanceBeeline;
-	    			    			
+	    			
+	    			// not that calcuations which do not make sense are written here to the lines in the files
+	    			// but not included into the below calculation of the average
 	    			bufferedWriter.write(tripId + "\t" + distanceRouted + "\t" + distanceBeeline + "\t" + ratioRoutedBeeline);
 	    			mapEntryCounter++;
 	    			bufferedWriter.newLine();
 	    			
+	    			// adjust minimum and maximum distances if new minumum or maximum is found
 	    			if (distanceRouted < minDistanceRouted) { minDistanceRouted = distanceRouted; }
 	    			if (distanceRouted > maxDistanceRouted) { maxDistanceRouted = distanceRouted; }
 	    			if (distanceBeeline < minDistanceBeeline) { minDistanceBeeline = distanceBeeline; }
 	    			if (distanceBeeline > maxDistanceBeeline) { maxDistanceBeeline = distanceBeeline; }
-	    			if (distanceBeeline > 1 && distanceRouted > 1) {
+	    			
+	    			// only consider trips of a distance of at least 1km for calculation of average ratio
+	    			// this also precludes erroneous calculations based on non-existent distances
+	    			if (distanceBeeline > 1. && distanceRouted > 1.) {
 	    				aggregateRatioRoutedBeeline = aggregateRatioRoutedBeeline + ratioRoutedBeeline;
 	    				counter++;
 	    				if (ratioRoutedBeeline < minRatioBeeline) { minRatioBeeline = ratioRoutedBeeline; }
@@ -225,20 +231,36 @@ public class AnalysisFileWriter {
 	    			}
     			}
      		}
-    		bufferedWriter.write("Number of map entries = " + "\t" + mapEntryCounter);
+    		bufferedWriter.write("Number of map entries = " + mapEntryCounter);
+    		bufferedWriter.newLine();
     		    		
     		if (mapEntryCounter != tripCounter) {
     			System.err.println("Number of map entries in " + outputFile + " is not equal to number of trips!");
     		}
+    		
+    		//
     		double averageRatioRoutedBeeline = aggregateRatioRoutedBeeline / counter;
     		
-    		System.out.println("Minimum routed distance is = " + minDistanceRouted);
-    		System.out.println("Maximum routed distance is = " + maxDistanceRouted);
-    		System.out.println("Minimum beeline distance is = " + minDistanceBeeline);
-    		System.out.println("Maximum beeline distance is = " + maxDistanceBeeline);
-    		System.out.println("Minimum ratio routed/beeline distance is = " + minRatioBeeline);
-    		System.out.println("Average ratio routed/beeline distance is = " + averageRatioRoutedBeeline);
-    		System.out.println("Maximum ratio routed/beeline distance is = " + maxRatioBeeline);
+//    		System.out.println("Minimum routed distance is = " + minDistanceRouted);
+//    		System.out.println("Maximum routed distance is = " + maxDistanceRouted);
+//    		System.out.println("Minimum beeline distance is = " + minDistanceBeeline);
+//    		System.out.println("Maximum beeline distance is = " + maxDistanceBeeline);
+//    		System.out.println("Minimum ratio routed/beeline distance is = " + minRatioBeeline);
+//    		System.out.println("Average ratio routed/beeline distance is = " + averageRatioRoutedBeeline);
+//    		System.out.println("Maximum ratio routed/beeline distance is = " + maxRatioBeeline);
+    		bufferedWriter.write("Minimum routed distance is = " + minDistanceRouted);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Maximum routed distance is = " + maxDistanceRouted);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Minimum beeline distance is = " + minDistanceBeeline);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Maximum beeline distance is = " + maxDistanceBeeline);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Minimum ratio routed/beeline distance is = " + minRatioBeeline);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Average ratio routed/beeline distance is = " + averageRatioRoutedBeeline);
+    		bufferedWriter.newLine();
+    		bufferedWriter.write("Maximum ratio routed/beeline distance is = " + maxRatioBeeline);
     		
 	    } catch (FileNotFoundException ex) {
 	        ex.printStackTrace();

@@ -30,53 +30,28 @@ public class CemdapPersonFileAnalyzer {
 		boolean onlyInterior = false; // int
 		boolean onlyBerlinBased = true; // ber	usually varied for analysis
 		boolean distanceFilter = true; // dist	usually varied for analysis
-		//double minDistance = 0;
+//		double minDistance = 0;
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
 		
-		// --------------------------------------------------------------------------------------------------
-		Integer minAge = 66;
-		Integer maxAge = 66;	
-		// --------------------------------------------------------------------------------------------------
+//		Integer minAge = 66;
+		Integer maxAge = 65;	
 		
 		String runId = "run_145";
-		String usedIteration = "150"; // most frequently used value: 150
-	    
+		String usedIteration = "150"; // most frequently used value: 150 
 
 	    
-	    // Input and output files
+	    // Input files
 	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	    //String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
+//	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
 	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
 	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
 	    
-//	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
-//	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-//	    
 	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
-//
-//	    Integer usedIt = Integer.parseInt(usedIteration);
-//	    if (!usedIt.equals(150)) {
-//	    	outputDirectory = outputDirectory + "_" + usedIteration;
-//	    }
-//	    if (onlyInterior == true) {
-//			outputDirectory = outputDirectory + "_int";
-//	    }
-//		if (onlyBerlinBased == true) {
-//			outputDirectory = outputDirectory + "_ber";
-//		}
-//		if (distanceFilter == true) {
-//			outputDirectory = outputDirectory + "_dist";
-//		}
-//		
-//		// --------------------------------------------------------------------------------------------------
-//		outputDirectory = outputDirectory + "_" + minAge.toString();
-//		outputDirectory = outputDirectory + "_" + maxAge.toString();
-//		// --------------------------------------------------------------------------------------------------
-		
+
 		
 		// Create an EventsManager instance (MATSim infrastructure)
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -96,12 +71,10 @@ public class CemdapPersonFileAnalyzer {
 	    System.out.println(numberOfIncompleteTrips + " trips are incomplete.");
 	    
 	    
-	    // --------------------------------------------------------------------------------------------------
-	 	// parse person file
+	    // parse person file
 	 	CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
 	 	cemdapPersonFileReader.parse(cemdapPersonFile);
-	 	// --------------------------------------------------------------------------------------------------
-	    
+	 	
 	    	    	    
 	    // get network, which is needed to calculate distances
 	    Config config = ConfigUtils.createConfig();
@@ -167,34 +140,42 @@ public class CemdapPersonFileAnalyzer {
 //	    		}
 	    		
 	    		
-	    		// --------------------------------------------------------------------------------------------------
+	    		// person-specific attributes
 				String personId = trip.getPersonId().toString();
 				int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
 				    
 //				if (age < minAge) {
 //					considerTrip = false;
 //				}
+				
 				if (age > maxAge) {
 					considerTrip = false;
 				}
 				
 				int employed = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "employed");
-				if (employed == 1) {
+				if (employed == 0) { // can be varied
 					considerTrip = false;
 				}
-				    
+				
+				
+				// (further) trip-specific attributes
+//				boolean doesWorkTrip = false;
+//	    		if (trip.getActivityEndActType().equals("work")) {
+//	    			doesWorkTrip = true;	    			
+//	    		}
+//	    		
+//				if (doesWorkTrip == false) { // can be varied
+//	    			considerTrip = false;
+//	    		}
 	    		
-	    		
-	    	
+				
+				// counter
 	    		if (considerTrip == true) {
 	    			counter++;
 	    		}
-				    
-	
 	    	}
 	    }
 	    
 	    System.out.println("Counter = " + counter);
-
 	}	
 }

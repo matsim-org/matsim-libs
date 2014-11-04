@@ -26,18 +26,18 @@ public class PlanFileModifier {
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static int maxNumberOfAgentsConsidered = 100;
-	static String runId = "run_145";
-	static int iteration = 150;
+	static String runId = "run_172";
+	static int iteration = 300;
 	
 	
 	// Input and output files
-	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
+	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans.xml.gz";
 //	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
 //			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
 	//static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
-	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected_reduced.xml.gz";
+	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans_reduced.xml.gz";
 //	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
 //			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities_reduced.xml.gz";
 	//static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans_modified.xml.gz";

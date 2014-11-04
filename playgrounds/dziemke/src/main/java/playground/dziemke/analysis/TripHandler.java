@@ -7,17 +7,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
-public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler {
+public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
 	private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
-	private Map<Id, Integer> activityEndCount = new HashMap <Id, Integer>();
-	private Map<Id, Integer> activityStartCount = new HashMap <Id, Integer>();
+	private Map<Id<Person>, Integer> activityEndCount = new HashMap <Id<Person>, Integer>();
+	private Map<Id<Person>, Integer> activityStartCount = new HashMap <Id<Person>, Integer>();
 	
 	int noPreviousEndOfActivityCounter = 0;
 	
@@ -47,7 +49,6 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		
 		
 		// create an instance of the object "Trip"
-		//Trip trip = new Trip(personId);
 		Trip trip = new Trip();
 		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
 		trip.setTripId(tripId);
@@ -64,7 +65,8 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 			int numberOfLastArrival = activityStartCount.get(personId);
 			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
 			if (!trips.get(tripId).getDepartureLinkId().equals(trips.get(lastTripId).getArrivalLinkId())) {
-				System.err.println("Activity end link differs from previous activity start link.");
+				//System.err.println("Activity end link differs from previous activity start link.");
+				throw new RuntimeException("Activity end link differs from previous activity start link.");
 			} 
 		}
 		
@@ -74,7 +76,8 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 			int numberOfLastArrival = activityStartCount.get(personId);
 			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
 			if (!trips.get(tripId).getActivityEndActType().equals(trips.get(lastTripId).getActivityStartActType())) {
-				System.err.println("Type of ending activity is not the same as type of previously started activity.");
+				//System.err.println("Type of ending activity is not the same as type of previously started activity.");
+				throw new RuntimeException("Type of ending activity is not the same as type of previously started activity.");
 			} 
 		}
 	}
@@ -119,7 +122,8 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		
 		// check if number of activity ends and number of activity starts are the same
 		if(activityStartCount.get(personId) != activityEndCount.get(personId)) {
-			System.err.println("Activity start count differs from activity end count.");
+			//System.err.println("Activity start count differs from activity end count.");
+			throw new RuntimeException("Activity start count differs from activity end count.");
 		}
 		
 		
@@ -138,22 +142,39 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		//Id vehicleId = event.getVehicleId();
 		
 		
-		// add information to the object "Trip"
+		// add information concerning passed links to the object "Trip"
 		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
-		//if (trips2.get(tripId) != null) {
 		if (trips.get(tripId).getLinks().isEmpty()) {
 			if (trips.get(tripId).getDepartureLinkId().equals(linkId)) {
 				trips.get(tripId).getLinks().add(linkId);
 				//System.out.println("Added first link to trip " + tripId);
 			} else {
-				System.err.println("First route link different from departure link!");
+				//System.err.println("First route link different from departure link!");
+				throw new RuntimeException("First route link different from departure link!");
 			}
 		} else {
 			trips.get(tripId).getLinks().add(linkId);
-			//System.out.println("Added another link to trip " + tripId);
-			//System.out.println("List of trip " + tripId + " has now " + trips2.get(tripId).getLinks().size() + " elements");
-		}
+//			System.out.println("Added another link to trip " + tripId);
+//			System.out.println("List of trip " + tripId + " has now " + trips.get(tripId).getLinks().size() + " elements");
+		}		
 	}
+	
+	
+//	// --------------------------------------------------------------------------------------------------
+	public void handleEvent(PersonArrivalEvent event) {
+		// store information from event to variable
+		String legMode = event.getLegMode();
+		//System.out.println("Mode of current trip is " + legModeString);
+		Id<Person> personId = event.getPersonId();
+		// other information not needed
+		
+		// add information concerning leg mode to the object "Trip"
+		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
+		trips.get(tripId).setMode(legMode);
+		
+		
+	}
+// --------------------------------------------------------------------------------------------------
 	
 	
 	@Override

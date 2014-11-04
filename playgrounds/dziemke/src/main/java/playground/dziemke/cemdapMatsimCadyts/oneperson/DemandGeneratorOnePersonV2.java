@@ -23,8 +23,6 @@ public class DemandGeneratorOnePersonV2 {
 	public static void main(String[] args) {
 	
 		// main parameters
-		// carFactor of 0.67 for commuter work/education trips (taken from "Regionaler Nahverkehrsplan-Fortschreibung, MVV 2007)
-		// socialSecurityFactor of 1.29, since Pendlermatrix only considers "sozialversicherungspflichtige Arbeitnehmer" (taken from GuthEtAl2005)
 		double scalingFactor = 0.01;
 		double carShareBE = 0.37;
 		double carShareBB = 0.55;
@@ -36,6 +34,7 @@ public class DemandGeneratorOnePersonV2 {
 		// Gemeindeschluessel of Berlin is 11000000
 		Integer planningAreaId = 11000000;
 		
+		
 		// input and output files
 		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
 		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
@@ -44,12 +43,13 @@ public class DemandGeneratorOnePersonV2 {
 		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
 		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test/";
-		//String outputBase = "D:/Workspace/container/demand/input/cemdap_berlin/test/04/";
+		
 		
 		// create a PendlerMatrixReader and store its output to a list
 		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
 				carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId.toString());
 		List<CommuterRelation> commuterRelations = commuterFileReader.getCommuterRelations();
+		
 		
 		// create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
@@ -60,21 +60,17 @@ public class DemandGeneratorOnePersonV2 {
 			mapOfPersonsMaps.put(i, persons);
 		}
 		
+		
 		// read in LORs	
-		// readShape(shapeFileLors, lors);
 		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
+		
 		
 		// create households and persons
 		int householdIdCounter = 1;
-			
+		
+		
 		for (int i = 0; i<commuterRelations.size(); i++){
-			
-			// print sth in console
-			//CommuterRelation currentRelation = commuterRelations.get(i);
-			//log.info("from: " + currentRelation.getFromName() + " - " + currentRelation.getFrom() + " - to: " + currentRelation.getToName()
-			//		+ " - " + currentRelation.getTo() + " - quantity: " + currentRelation.getQuantity());
-					
-	       	int quantity = commuterRelations.get(i).getQuantity();
+			int quantity = commuterRelations.get(i).getQuantity();
 	        	
 	       	int source = commuterRelations.get(i).getFrom();
 			int sink = commuterRelations.get(i).getTo();
@@ -92,15 +88,12 @@ public class DemandGeneratorOnePersonV2 {
 				Household household = new Household(householdId, homeTSZLocation);
 				households.put(householdId, household);
 				
+				
 				// create persons
-				// #################################################################################################
 				int sex = getSex();			
-				// #################################################################################################
-				//int age = getRandomAge();
 				int age = getAge();
 				String personId = householdId + "01";
-				//int employed = 1;
-				// #################################################################################################
+
 				int employed;
 				if (age > 65) {
 					employed = 0;
@@ -114,8 +107,7 @@ public class DemandGeneratorOnePersonV2 {
 				} else {
 					student = 0;
 				}
-				// #################################################################################################
-								
+				
 				for (int k=1; k<=numberOfPlansPerPerson; k++) {
 					int locationOfWork;
 					if (sink == 11000000){
@@ -123,7 +115,7 @@ public class DemandGeneratorOnePersonV2 {
 					} else {
 						locationOfWork = sink;
 					}
-					// #################################################################################################
+					
 					if (employed == 0) {
 						locationOfWork = -99;
 					}
@@ -138,9 +130,7 @@ public class DemandGeneratorOnePersonV2 {
 					if (student == 0) {
 						locationOfSchool = -99;
 					}
-					// #################################################################################################
-					
-					//Person person = new Person(personId, householdId, employed, locationOfWork, age);
+
 					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork, locationOfSchool, sex, age);
 					mapOfPersonsMaps.get(k).put(personId, person);
 				}	
@@ -155,27 +145,6 @@ public class DemandGeneratorOnePersonV2 {
 		}
 		
 	
-//	public static void readShape(String shapeFileLors, Map<Integer, String> lors) {
-//		Collection<SimpleFeature> allLors = ShapeFileReader.getAllFeatures(shapeFileLors);
-//	
-//		for (SimpleFeature lor : allLors) {
-//			Integer lorschluessel = Integer.parseInt((String) lor.getAttribute("SCHLUESSEL"));
-//			String name = (String) lor.getAttribute("LOR");
-//			lors.put(lorschluessel, name);
-//		}
-//	}
-		
-
-//	private static Integer getRandomAge() {
-//		int rangeMin = 18;
-//		int rangeMax = 99;
-//		Random r = new Random();
-//		int randomAge = (int) (rangeMin + (rangeMax - rangeMin) * r.nextDouble());
-//		return randomAge;
-//	}
-	
-	
-	// #############################################################################################
 	private static int getSex() {
 		Random r = new Random();
 		double randomNumber = r.nextDouble();
@@ -259,7 +228,6 @@ public class DemandGeneratorOnePersonV2 {
 			return 0;
 		}
 	}
-	// #############################################################################################
 	
 	
 	private static Integer getRandomLor(Map<Integer, String> lors) {
@@ -286,7 +254,6 @@ public class DemandGeneratorOnePersonV2 {
     			int driversLicence = persons.get(key).getDriversLicence();
     			int locationOfWork = persons.get(key).getLocationOfWork();
     			int locationOfSchool = persons.get(key).getLocationOfSchool();
-    			//int female = persons.get(key).getFemale();
     			int female = persons.get(key).getSex();
     			int age = persons.get(key).getAge();
     			int parent = persons.get(key).getParent();

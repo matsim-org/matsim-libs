@@ -29,20 +29,21 @@ import com.vividsolutions.jts.geom.Point;
 public class TripAnalyzer {
 	public static void main(String[] args) {
 	    // Parameters
+		boolean onlyCar = true; //car; new, should be used for runs with ChangeLedModes enabled
 		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = true; // ber	usually varied for analysis
-		boolean distanceFilter = true; // dist	usually varied for analysis
+		boolean onlyBerlinBased = true; // ber; usually varied for analysis
+		boolean distanceFilter = true; // dist; usually varied for analysis
 		//double minDistance = 0;
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
 		
-		// --------------------------------------------------------------------------------------------------
-		Integer minAge = 80;
-		Integer maxAge = 119;	
-		// --------------------------------------------------------------------------------------------------
+//		// --------------------------------------------------------------------------------------------------
+//		Integer minAge = 80;
+//		Integer maxAge = 119;	
+//		// --------------------------------------------------------------------------------------------------
 		
-		String runId = "run_145";
-		String usedIteration = "150"; // most frequently used value: 150
+		String runId = "run_170";
+		String usedIteration = "300"; // most frequently used value: 150
 	    
 	    int maxBinDuration = 120;
 	    int binWidthDuration = 1;
@@ -65,7 +66,7 @@ public class TripAnalyzer {
 	    //String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
 	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
-	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
+//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
 	    
 	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
 	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
@@ -78,20 +79,32 @@ public class TripAnalyzer {
 	    if (!usedIt.equals(150)) {
 	    	outputDirectory = outputDirectory + "_" + usedIteration;
 	    }
+	    
+	    // --------------------------------------------------------------------------------------------------
+	    if (onlyCar == true) {
+			outputDirectory = outputDirectory + "_car";
+		}
+	    
+	    int counterCar = 0;
+	    int counterPt = 0;
+	    // --------------------------------------------------------------------------------------------------
+	    
 	    if (onlyInterior == true) {
 			outputDirectory = outputDirectory + "_int";
 	    }
+	    
 		if (onlyBerlinBased == true) {
 			outputDirectory = outputDirectory + "_ber";
 		}
+		
 		if (distanceFilter == true) {
 			outputDirectory = outputDirectory + "_dist";
 		}
 		
-		// --------------------------------------------------------------------------------------------------
-		outputDirectory = outputDirectory + "_" + minAge.toString();
-		outputDirectory = outputDirectory + "_" + maxAge.toString();
-		// --------------------------------------------------------------------------------------------------
+//		// --------------------------------------------------------------------------------------------------
+//		outputDirectory = outputDirectory + "_" + minAge.toString();
+//		outputDirectory = outputDirectory + "_" + maxAge.toString();
+//		// --------------------------------------------------------------------------------------------------
 		
 		
 		// Create an EventsManager instance (MATSim infrastructure)
@@ -112,11 +125,11 @@ public class TripAnalyzer {
 	    System.out.println(numberOfIncompleteTrips + " trips are incomplete.");
 	    
 	    
-	    // --------------------------------------------------------------------------------------------------
-	 	// parse person file
-	 	CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
-	 	cemdapPersonFileReader.parse(cemdapPersonFile);
-	 	// --------------------------------------------------------------------------------------------------
+//	    // --------------------------------------------------------------------------------------------------
+//	 	// parse person file
+//	 	CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
+//	 	cemdapPersonFileReader.parse(cemdapPersonFile);
+//	 	// --------------------------------------------------------------------------------------------------
 	    
 	    	    	    
 	    // get network, which is needed to calculate distances
@@ -193,6 +206,8 @@ public class TripAnalyzer {
 	    		
     			
 	    		// choose if trip will be considered
+    			// Note: Check of "interior"/"berlinBased" has to come first since this sets the "considerTrip"
+    			// variable to true.
 	    		if (onlyInterior == true) {
 	    			if (berlinGeometry.contains(arrivalLocation) && berlinGeometry.contains(departureLocation)) {
 	    				considerTrip = true;
@@ -205,6 +220,26 @@ public class TripAnalyzer {
 	    			considerTrip = true;
 	    		}
 	    		
+	    		// --------------------------------------------------------------------------------------------------
+				if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
+					throw new RuntimeException("In current implementation leg mode must either be car or pt");
+				}
+				
+				if (trip.getMode().equals("car")) {
+					counterCar++;
+				} else if (trip.getMode().equals("pt")) {
+					counterPt++;
+				} else {
+					throw new RuntimeException("In current implementation leg mode must either be car or pt");
+				}
+				
+				if (onlyCar == true) {
+					if (!trip.getMode().equals("car")) {
+						considerTrip = false;
+					}
+				}
+			    // --------------------------------------------------------------------------------------------------
+	    		
 	    		if (distanceFilter == true && tripDistanceBeeline >= maxDistance) {
 	    			considerTrip = false;
 	    		}
@@ -213,17 +248,17 @@ public class TripAnalyzer {
 //	    			considerTrip = false;
 //	    		}
 	    		
-	    		// --------------------------------------------------------------------------------------------------
-				String personId = trip.getPersonId().toString();
-			    int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
-			    
-			    if (age < minAge) {
-					considerTrip = false;
-				}
-			    if (age > maxAge) {
-					considerTrip = false;
-				}
-			    // --------------------------------------------------------------------------------------------------
+//	    		// --------------------------------------------------------------------------------------------------
+//				String personId = trip.getPersonId().toString();
+//			    int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
+//			    
+//			    if (age < minAge) {
+//					considerTrip = false;
+//				}
+//			    if (age > maxAge) {
+//					considerTrip = false;
+//				}
+//			    // --------------------------------------------------------------------------------------------------
 	    		
 	    		if (considerTrip == true) {
 		    		tripCounter++;
@@ -327,7 +362,12 @@ public class TripAnalyzer {
 	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
 	    
 	    // write a routed distance vs. beeline distance comparison file
-	    writer.writeComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
+	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
+	    
+	    // --------------------------------------------------------------------------------------------------
+	    System.out.println("CounterCar = " + counterCar);
+	    System.out.println("CounterPt = " + counterPt);
+	    // --------------------------------------------------------------------------------------------------
 	}
 
 

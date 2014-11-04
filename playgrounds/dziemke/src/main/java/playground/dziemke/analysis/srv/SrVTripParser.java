@@ -63,7 +63,7 @@ public class SrVTripParser {
 	private static final String DEPARTURE_TIME = "V_BEGINN";
 	private static final String ARRIVAL_TIME = "V_ANKUNFT";
 	private static final String DISTANCE_BEELINE = "V_LAENGE";
-	private static final String MODE = "E_HVM";
+	//private static final String MODE = "E_HVM";
 	private static final String DURATION = "E_DAUER";
 	private static final String SPEED = "E_GESCHW";
 	private static final String DISTANCE_ROUTED_FASTEST = "E_LAENGE_SCHNELL";
@@ -120,7 +120,8 @@ public class SrVTripParser {
 				Integer useOtherCar = new Integer(entries[columnNumbers.get(USE_OTHER_CAR)]);
 				Integer useHouseholdCarPool = new Integer(entries[columnNumbers.get(USE_HOUSEHOLD_CAR_POOL)]);
 				Integer useOtherCarPool = new Integer(entries[columnNumbers.get(USE_OTHER_CAR_POOL)]);
-				Integer mode = new Integer(entries[columnNumbers.get(MODE)]);
+				//Integer mode = new Integer(entries[columnNumbers.get(MODE)]);
+				//String mode = new String(entries[columnNumbers.get(MODE)]);
 				Double distanceBeeline = new Double(entries[columnNumbers.get(DISTANCE_BEELINE)]);
 				Double distanceRoutedFastest = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_FASTEST)]);
 				Double distanceRoutedShortest = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_SHORTEST)]);
@@ -146,7 +147,7 @@ public class SrVTripParser {
 				trip.setUseOtherCar(useOtherCar);
 				trip.setUseHouseholdCarPool(useHouseholdCarPool);
 				trip.setUseOtherCarPool(useOtherCarPool);
-				trip.setMode(mode);
+				//trip.setMode(mode);
 				trip.setDistanceBeeline(distanceBeeline);
 				trip.setDistanceRoutedFastest(distanceRoutedFastest);
 				trip.setDistanceRoutedShortest(distanceRoutedShortest);
