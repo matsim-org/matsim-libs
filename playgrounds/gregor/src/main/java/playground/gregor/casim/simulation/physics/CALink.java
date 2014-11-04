@@ -51,6 +51,6 @@ public interface CALink extends CANetworkEntity{
 	
 	public abstract void reset();
 
-	public abstract void letAgentDepart(CAVehicle veh);
+	public abstract void letAgentDepart(CAVehicle veh, double now);
 
 }

@@ -33,15 +33,6 @@ public abstract class CAMoveableEntity {
 	
 	
 	
-	//HACK for testing w/o mobsim
-	private boolean arrived = false;
-	public boolean arrived() {
-		return arrived;
-	}
-	public void letAgentArrive(){
-		this.arrived = true;
-	}
-	
 	public void proceed() {
 		this.pos += this.dir;
 	}

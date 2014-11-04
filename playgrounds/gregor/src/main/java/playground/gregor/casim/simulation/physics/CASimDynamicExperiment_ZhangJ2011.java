@@ -391,7 +391,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			vis.addAdditionalDrawer(new InfoBox(vis, sc));
 			vis.addAdditionalDrawer(qDbg);
 		}
-		CANetworkDynamic caNet = new CANetworkDynamic(net,em);
+		CANetworkDynamic caNet = new CANetworkDynamic(net,em,null);
 
 
 

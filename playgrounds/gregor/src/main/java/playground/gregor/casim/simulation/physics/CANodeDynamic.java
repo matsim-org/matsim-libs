@@ -175,7 +175,7 @@ public class CANodeDynamic implements CANode{
 
 		nextLink.getParticles()[0] = a; 
 		a.materialize(0, 1);
-		this.towardsLinkLastExitTimes.put(nextLink, time);
+//		this.towardsLinkLastExitTimes.put(nextLink, time);
 		a.moveOverNode(nextLink, time);
 		nextLink.fireUpstreamEntered(a, time);
 
@@ -248,7 +248,6 @@ public class CANodeDynamic implements CANode{
 
 		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a; 
 		a.materialize(nextLink.getNumOfCells()-1, -1);
-		this.towardsLinkLastExitTimes.put(nextLink, time);
 		a.moveOverNode(nextLink, time);
 		nextLink.fireDownstreamEntered(a, time);
 
@@ -449,6 +448,9 @@ public class CANodeDynamic implements CANode{
 
 	public double getLastNodeExitTimeForAgent(CAMoveableEntity a) {
 		Id<Link> n = a.getNextLinkId();
+		if (n == null) {
+			System.out.println("got you!!");
+		}
 		CALinkDynamic nextLink = (CALinkDynamic)this.net.getCALink(n);
 		return this.towardsLinkLastExitTimes.get(nextLink);
 	}

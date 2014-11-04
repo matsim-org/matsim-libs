@@ -48,8 +48,10 @@ public class CASimpleDynamicAgent extends CAMoveableEntity {
 
 	@Override
 	Id<Link> getNextLinkId() {
-
-		return this.links.get(this.next).getId();
+		if (next < this.links.size()) {
+			return this.links.get(this.next).getId();
+		} 
+		return null;
 	}
 
 	@Override
@@ -61,10 +63,10 @@ public class CASimpleDynamicAgent extends CAMoveableEntity {
 	void moveOverNode(CALink link, double time) {
 		this.currentEntity = link;
 		this.next++;
-		if (this.next == this.links.size()) {
-			this.next = this.links.size()-1;
-			this.letAgentArrive();
-		}
+//		if (this.next == this.links.size()) {
+//			this.next = this.links.size()-1;
+//			this.letAgentArrive();
+//		}
 	}
 	
 	@Override

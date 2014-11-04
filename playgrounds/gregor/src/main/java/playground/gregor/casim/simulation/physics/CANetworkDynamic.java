@@ -38,6 +38,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
+import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.debug.RectEvent;
 
@@ -81,11 +82,15 @@ public class CANetworkDynamic {
 
 	private Set<CAMoveableEntity> agents = new HashSet<CAMoveableEntity>();
 
+
+	private CANetsimEngine engine;
+
 	private static int EXP_WARN_CNT;
 
-	public CANetworkDynamic(Network net, EventsManager em) {
+	public CANetworkDynamic(Network net, EventsManager em, CANetsimEngine engine) {
 		this.net = net;
 		this.em = em;
+		this.engine = engine;
 		init();
 	}
 
@@ -141,7 +146,7 @@ public class CANetworkDynamic {
 	}
 
 	public double estRho(CAMoveableEntity a) {
-		if (a.getCurrentCANetworkEntity() instanceof CANodeDynamic) {
+		if (a.getCurrentCANetworkEntity() instanceof CANodeDynamic || a.getNextLinkId() == null) {
 			return a.getRho();
 		} 
 		CALink current = (CALink)a.getCurrentCANetworkEntity();
@@ -222,6 +227,43 @@ public class CANetworkDynamic {
 		return rho;
 	}
 
+	public void doSimStep(double time) {
+		updateRho();
+		//		draw2();
+		while (this.events.size() > 0 && this.events.peek().getEventExcexutionTime() < time+1) {
+			CAEvent e = this.events.poll();
+			if (this.monitor != null){
+				this.monitor.trigger(e.getEventExcexutionTime());
+			}
+			
+			if (e.isObsolete()){
+				if (EXP_WARN_CNT++ < 10 ) {
+					log.info("dropping obsolete event: " + e);
+					if (EXP_WARN_CNT == 10) {
+						log.info(Gbl.FUTURE_SUPPRESSED);
+					}
+				}
+				continue;
+			}
+
+
+			if (e.isObsolete()){
+				log.info("dropping obsolete event: " + e);
+				continue;
+			}
+
+
+			e.getCANetworkEntity().handleEvent(e);
+
+			this.globalTime = e.getEventExcexutionTime();
+
+		}
+		if (CASimDynamicExperiment_ZhangJ2011.VIS) {
+			//				updateDensity();
+			draw2(time);
+		}
+	}
+	
 
 	/*package*/ void run() {
 		this.globalTime = this.events.peek().getEventExcexutionTime();
@@ -264,13 +306,13 @@ public class CANetworkDynamic {
 
 			if (CASimDynamicExperiment_ZhangJ2011.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
 				//				updateDensity();
-				draw2();
+				draw2(this.globalTime);
 				this.globalTime = e.getEventExcexutionTime();
 			}
 		}
 	}
 
-	private void draw2() {
+	private void draw2(double time) {
 		for (CALink l : this.caLinks.values()) {
 			double dx = l.getLink().getToNode().getCoord().getX()-l.getLink().getFromNode().getCoord().getX();
 			double dy = l.getLink().getToNode().getCoord().getY()-l.getLink().getFromNode().getCoord().getY();
@@ -287,20 +329,17 @@ public class CANetworkDynamic {
 			double y = l.getLink().getFromNode().getCoord().getY();//+dy/2;
 			for (int i = 0; i < l.getNumOfCells(); i++) {
 				if (l.getParticles()[i]!= null) {
-					if (l.getParticles()[i].getId().toString().equals("g272")){
-						//						log.info(l.getParticles()[i]);
-					}
 					double ddx = 1;
 					if (l.getParticles()[i].getDir() == -1) {
 						ddx = -1;
 					};
-					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x+dx/2, y+dy/2, ldx*ddx, ldy*ddx, this.globalTime);
+					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x+dx/2, y+dy/2, ldx*ddx, ldy*ddx, time);
 
 					this.em.processEvent(e);
 					//					System.out.println(l.getParticles()[i]);
 				} else {
-					RectEvent e = new RectEvent(this.globalTime, x, y+width/2, dx, width, false);
-					this.em.processEvent(e);
+//					RectEvent e = new RectEvent(time, x, y+width/2, dx, width, false);
+//					this.em.processEvent(e);
 				}
 				x+=dx;
 				y+=dy;
@@ -310,18 +349,13 @@ public class CANetworkDynamic {
 			if (n.peekForAgent() != null) {
 				double x = n.getNode().getCoord().getX();
 				double y = n.getNode().getCoord().getY();
-				XYVxVyEventImpl e = new XYVxVyEventImpl(n.peekForAgent().getId(), x, y, 0, 0, this.globalTime);
+				XYVxVyEventImpl e = new XYVxVyEventImpl(n.peekForAgent().getId(), x, y, 0, 0, time);
 				this.em.processEvent(e);
 			}
 		}
 	}
 
 	public void pushEvent(CAEvent event) {
-		
-		//HACK for testing w/o mobsim
-		if (event.getCAAgent().arrived()) {
-			event.setObsolete();
-		}
 		
 		event.getCAAgent().setCurrentEvent(event);
 		this.events.add(event);
@@ -371,4 +405,12 @@ public class CANetworkDynamic {
 
 		return 0.;
 	}
+
+
+	public CANetsimEngine getEngine() {
+		return this.engine;
+	}
+
+
+
 }

@@ -70,7 +70,7 @@ public class CAExperiments {
 	private static String inputDir = "/Users/laemmel/devel/casimpleexp/input";
 	private static String outputDir = "/Users/laemmel/devel/casimpleexp/output";
 
-	private static final int nrAgents = 200;
+	private static final int nrAgents = 800;
 
 
 	public static void main(String [] args) {
@@ -161,20 +161,20 @@ public class CAExperiments {
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
-		for (int i = nrAgents/2; i < nrAgents; i++) {
-			Person pers = fac.createPerson(Id.create("a"+i, Person.class));
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", Id.create("l4_rev", Link.class));
-			act0.setEndTime(t);
-			plan.addActivity(act0);
-			Leg leg = fac.createLeg("walkca");
-			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l0_rev", Link.class));
-			plan.addActivity(act1);
-			pop.addPerson(pers);
-		}
+//		for (int i = nrAgents/2; i < nrAgents; i++) {
+//			Person pers = fac.createPerson(Id.create("a"+i, Person.class));
+//			Plan plan = fac.createPlan();
+//			pers.addPlan(plan);
+//			Activity act0;
+//			act0 = fac.createActivityFromLinkId("origin", Id.create("l4_rev", Link.class));
+//			act0.setEndTime(t);
+//			plan.addActivity(act0);
+//			Leg leg = fac.createLeg("walkca");
+//			plan.addLeg(leg);
+//			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l0_rev", Link.class));
+//			plan.addActivity(act1);
+//			pop.addPerson(pers);
+//		}
 	}
 
 	
@@ -184,12 +184,14 @@ public class CAExperiments {
 		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(-40,0));
 		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(-10,0));
 		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(-5,0));
+		Node n2b= fac.createNode(Id.create("n2b", Node.class), new CoordImpl(0,5));
 		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(5,0));
 		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(10,0));
 		Node n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(40,0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
+		net.addNode(n2b);
 		net.addNode(n4);
 		net.addNode(n5);
 		net.addNode(n3);
@@ -197,6 +199,8 @@ public class CAExperiments {
 		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
 		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
 		Link l2 = fac.createLink(Id.create("l2", Link.class), n2, n3);
+		Link l2b = fac.createLink(Id.create("l2b", Link.class), n1, n2b);
+		Link l2c = fac.createLink(Id.create("l2c", Link.class), n2b, n3);
 		Link l3 = fac.createLink(Id.create("l3", Link.class), n3, n4);
 		Link l4 = fac.createLink(Id.create("l4", Link.class), n4, n5);
 		
@@ -211,13 +215,15 @@ public class CAExperiments {
 		modes.add("walkca");
 		l0.setLength(30);
 		l1.setLength(5);
-		l2.setLength(5);
+		l2.setLength(10);
 		l3.setLength(5);
 		l4.setLength(30);
+		l2b.setLength(11.18);
+		l2c.setLength(7);
 		
 		l0Rev.setLength(30);
 		l1Rev.setLength(5);
-		l2Rev.setLength(5);
+		l2Rev.setLength(10);
 		l3Rev.setLength(5);
 		l4Rev.setLength(30);
 
@@ -236,6 +242,8 @@ public class CAExperiments {
 		l0.setFreespeed(1.34);
 		l1.setFreespeed(1.34);
 		l2.setFreespeed(1.34);
+		l2b.setFreespeed(1.34);
+		l2c.setFreespeed(1.34);
 		l3.setFreespeed(1.34);
 		l4.setFreespeed(1.34);
 
@@ -247,32 +255,38 @@ public class CAExperiments {
 		
 		l0.setCapacity(flow);
 		l1.setCapacity(flow);
-		l2.setCapacity(flow);
+		l2.setCapacity(flow/5);
+		l2b.setCapacity(flow);
+		l2c.setCapacity(flow);
 		l3.setCapacity(flow);
 		l4.setCapacity(flow);
 
 		l0Rev.setCapacity(flow);
 		l1Rev.setCapacity(flow);
-		l2Rev.setCapacity(flow);
+		l2Rev.setCapacity(flow/5);
 		l3Rev.setCapacity(flow);
 		l4Rev.setCapacity(flow);
 		
 		double lanes = 2/0.71;
 		l0.setNumberOfLanes(lanes);
 		l1.setNumberOfLanes(lanes);
-		l2.setNumberOfLanes(lanes);
+		l2.setNumberOfLanes(lanes/5);
+		l2b.setNumberOfLanes(lanes);
+		l2c.setNumberOfLanes(lanes);
 		l3.setNumberOfLanes(lanes);
 		l4.setNumberOfLanes(lanes);
 		
 		l0Rev.setNumberOfLanes(lanes);
 		l1Rev.setNumberOfLanes(lanes);
-		l2Rev.setNumberOfLanes(lanes);
+		l2Rev.setNumberOfLanes(lanes/5);
 		l3Rev.setNumberOfLanes(lanes);
 		l4Rev.setNumberOfLanes(lanes);
 		
 		net.addLink(l0);
 		net.addLink(l1);
 		net.addLink(l2);
+		net.addLink(l2b);
+		net.addLink(l2c);
 		net.addLink(l3);
 		net.addLink(l4);
 		

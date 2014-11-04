@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 
+import playground.gregor.casim.events.CASimAgentConstructEvent;
+import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 
 
@@ -179,15 +181,14 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 		//check post-condition and generate events
 		//first for persons behind
-		checkPostConditionForPersonBehindOnDownStreamAdvance(idx,a,time);
+		checkPostConditionForPersonBehindOnDownStreamAdvance(idx,time);
 
 		//second for oneself
 		checkPostConditionForAgentOnDownStreamAdvance(idx,a, time);
 
 	}
 
-	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx,
-			CAMoveableEntity a, double time) {
+	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx, double time) {
 		if (idx-1 < 0) {
 			CAMoveableEntity toBeTriggered = this.us.peekForAgent();
 			if (toBeTriggered != null) {
@@ -288,15 +289,14 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 		//check post-condition and generate events
 		//first for persons behind
-		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,a,time);
+		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,time);
 
 		//second for oneself
 		checkPostConditionForAgentOnUpStreamAdvance(idx,a, time);
 
 	}
 
-	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx,
-			CAMoveableEntity a, double time) {
+	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx, double time) {
 		if (idx+1 >= this.size) {
 			CAMoveableEntity toBeTriggered = this.ds.peekForAgent();
 			if (toBeTriggered != null) {
@@ -376,12 +376,12 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 
 	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
-//		//HACK break condition agent is at the end of its last link
-//		if (a.getNextLinkId().equals(a.getCurrentLink().getId())) {
-//			this.lastLeftTimes[this.size-1] = time;
-//			this.particles[this.size-1] = null;
-//			return;
-//		}
+		//TODO incomplete method implement letAgentArrive
+		if (a.getNextLinkId() == null) {
+			letAgentArrive(a, time,this.size-1);
+			checkPostConditionForPersonBehindOnDownStreamAdvance(this.size-1,time);
+			return;
+		}
 		
 		//check pre-condition
 		if (this.ds.peekForAgent() == null) {
@@ -398,6 +398,8 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	}
 
+
+
 	private void handleTTADownStreamNodeOnPreCondition1(CAMoveableEntity a,
 			double time) {
 
@@ -409,7 +411,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		
 		//check post-condition and generate events
 		//first for persons behind
-		checkPostConditionForPersonBehindOnDownStreamAdvance(this.size-1,a,time);
+		checkPostConditionForPersonBehindOnDownStreamAdvance(this.size-1,time);
 
 		//second for oneself
 		checkPostConditionForOneSelfOnNodeAdvance(this.ds,a, time);
@@ -468,10 +470,13 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	}
 
 	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
-		//TODO  HACK break condition agent is at the end of its last link
-		if (a.getNextLinkId().equals(a.getCurrentLink().getId())) {
+		//TODO  incomplete ... implement letAgentArrive!!
+		if (a.getNextLinkId() == null) {
 			this.lastLeftTimes[0] = time;
 			this.particles[0] = null;
+			//check post-condition and generate events
+			//first for persons behind
+			checkPostConditionForPersonBehindOnUpStreamAdvance(0,time);
 			return;
 		}
 		//check pre-condition
@@ -500,7 +505,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		
 		//check post-condition and generate events
 		//first for persons behind
-		checkPostConditionForPersonBehindOnUpStreamAdvance(0,a,time);
+		checkPostConditionForPersonBehindOnUpStreamAdvance(0,time);
 
 		//second for oneself
 		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
@@ -558,7 +563,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		swapA.materialize(0, 1);
 		
 		
-		this.particles[0] = (CASimpleDynamicAgent) swapA;
+		this.particles[0] = swapA;
 		this.lastLeftTimes[0] = time;
 		this.us.putAgent(a);
 		
@@ -567,7 +572,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		
 		//check post-condition and generate events
 		//first for swapA
-		checkPostConditionForAgentOnDownStreamAdvance(-1, ((CASimpleDynamicAgent)swapA), time);
+		checkPostConditionForAgentOnDownStreamAdvance(-1, swapA, time);
 		
 		//second for oneself
 		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
@@ -576,7 +581,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	@Override
 	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent(time, a.getId(), this.usl.getId(), a.getId());
+		LinkEnterEvent e = new LinkEnterEvent((int)time, a.getId(), this.usl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
 		//		System.out.println("down");
 
@@ -584,21 +589,21 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	@Override
 	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent(time, a.getId(), this.dsl.getId(), a.getId());
+		LinkEnterEvent e = new LinkEnterEvent((int)time, a.getId(), this.dsl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
 		//		System.out.println("up");
 	}
 
 	@Override
 	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent(time, a.getId(), this.dsl.getId(), a.getId());
+		LinkLeaveEvent e = new LinkLeaveEvent((int)time, a.getId(), this.dsl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
 
 	}
 
 	@Override
 	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent(time, a.getId(), this.usl.getId(), a.getId());
+		LinkLeaveEvent e = new LinkLeaveEvent((int)time, a.getId(), this.usl.getId(), a.getId());
 		this.net.getEventsManager().processEvent(e);
 	}
 
@@ -732,8 +737,57 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	}
 
 	@Override
-	public void letAgentDepart(CAVehicle veh) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not yet implemented!");
+	public void letAgentDepart(CAVehicle veh, double now) {
+		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
+		CALink nextCALink = this.net.getCALink(nextLinkId);
+		int dir;
+		if (this.ds == nextCALink.getDownstreamCANode() || this.ds == nextCALink.getUpstreamCANode()) {
+			dir = 1;
+		} else if (this.us == nextCALink.getDownstreamCANode() || this.us == nextCALink.getUpstreamCANode()) {
+			dir = -1;
+		} else {
+			throw new RuntimeException("inconsitent network or plan!");
+		}
+		int pos = -1;
+		for (int i = 0; i < this.size-1; i++) {
+			if (this.particles[i] == null) {
+				pos = i;
+			}
+		}
+		if (pos == -1) {
+			log.warn("could not find a free spot for agent: " + veh + ". Dropping it!");
+		}
+		this.particles[pos] = veh;
+		veh.materialize(pos, dir);
+		
+//		fire
+		if (dir == 1) {
+			fireUpstreamEntered(veh, now);
+		} else {
+			fireDownstreamEntered(veh, now);
+		}
+		
+		
+		if (this.particles[pos+dir] == null) {
+			triggerTTA(veh, this, now + tFree);
+		} else if (this.particles[pos+dir].getDir() != dir) {
+			triggerSWAP(veh, this, now + getD(this.particles[pos+dir]) + tFree);
+		}
+		
+		//VIS only
+		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(now, veh);
+		this.net.getEventsManager().processEvent(ee);
+		
+//		System.out.println(next);
+//		throw new RuntimeException("not yet implemented!");
+	}
+	
+	private void letAgentArrive(CAMoveableEntity a, double time, int idx) {
+		this.lastLeftTimes[idx] = time;
+		this.particles[idx] = null;
+		CANetsimEngine engine = this.net.getEngine();
+		if (engine != null) {
+			engine.letVehicleArrive((CAVehicle) a);
+		}
 	}
 }

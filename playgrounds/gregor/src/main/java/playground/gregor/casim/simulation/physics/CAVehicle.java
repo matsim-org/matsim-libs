@@ -31,7 +31,6 @@ import org.matsim.vehicles.Vehicle;
 
 public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
-
 	private Id<Vehicle> id;
 	private MobsimDriverAgent agent;
 
@@ -48,61 +47,28 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 	@Override
 	public MobsimDriverAgent getDriver() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.agent;
 	}
 
+	public void setDriver( MobsimDriverAgent driver) {
+		this.agent = null;
+	}
+	
 	@Override
 	public Id<Vehicle> getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
 
-	@Override
-	public Link getCurrentLink() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	public double getSizeInEquivalents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean addPassenger(PassengerAgent passenger) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean removePassenger(PassengerAgent passenger) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public Collection<? extends PassengerAgent> getPassengers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int getPassengerCapacity() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	Id<Link> getNextLinkId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.agent.chooseNextLinkId();
 	}
 
 	@Override
 	void moveOverNode(CALink nextLink, double time) {
-		// TODO Auto-generated method stub
+		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
 		
 	}
 
@@ -118,6 +84,39 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 		
 	}
 
+	@Override
+	public Link getCurrentLink() {
+		return null;
+	}
+
+///////////////////////////////////////
+	
+	@Override
+	public double getSizeInEquivalents() {
+		throw new RuntimeException("unsed method");
+	}
+
+	@Override
+	public boolean addPassenger(PassengerAgent passenger) {
+		throw new RuntimeException("unsed method");
+	}
+
+	@Override
+	public boolean removePassenger(PassengerAgent passenger) {
+		throw new RuntimeException("unsed method");
+	}
+
+	@Override
+	public Collection<? extends PassengerAgent> getPassengers() {
+		throw new RuntimeException("unsed method");
+	}
+
+	@Override
+	public int getPassengerCapacity() {
+		throw new RuntimeException("unsed method");
+	}
+
+	
 	
 
 }

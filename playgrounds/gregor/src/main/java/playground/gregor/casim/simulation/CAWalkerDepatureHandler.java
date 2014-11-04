@@ -62,7 +62,7 @@ public class CAWalkerDepatureHandler implements DepartureHandler {
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		
 		CAVehicle veh = new CAVehicle(vehicleId,agent);
-		link.letAgentDepart(veh);
+		link.letAgentDepart(veh,now);
 		
 	}
 
