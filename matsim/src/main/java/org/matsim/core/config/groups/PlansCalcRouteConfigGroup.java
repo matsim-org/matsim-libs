@@ -83,6 +83,20 @@ public class PlansCalcRouteConfigGroup extends Module {
 		}
 
 		@Override
+		public void checkConsistency() {
+			if ( mode == null ) throw new RuntimeException( "mode for parameter set "+this+" is null!" );
+
+			if ( teleportedModeSpeed == null && teleportedModeFreespeedFactor == null ) {
+				throw new RuntimeException( "no teleported mode speed nor freespeed factor defined for mode "+mode );
+			}
+
+			if ( teleportedModeSpeed != null && teleportedModeFreespeedFactor != null ) {
+				// this should not happen anyway as the setters forbid it
+				throw new RuntimeException( "both teleported mode speed or freespeed factor are set for mode "+mode );
+			}
+		}
+
+		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
 

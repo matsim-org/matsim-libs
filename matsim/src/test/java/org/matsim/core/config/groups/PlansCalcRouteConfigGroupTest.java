@@ -102,6 +102,30 @@ public class PlansCalcRouteConfigGroupTest {
 		assertIdentical("re-read v2", initialGroup, configV2.plansCalcRoute());
 	}
 
+	@Test( expected=RuntimeException.class )
+	public void testConsistencyCheckIfNoTeleportedSpeed() {
+		final Config config = ConfigUtils.createConfig();
+
+		final ModeRoutingParams params = new ModeRoutingParams( "skateboard" );
+		config.plansCalcRoute().addModeRoutingParams( params );
+
+		config.checkConsistency();
+	}
+
+	@Test( expected=IllegalStateException.class )
+	public void testCannotAddSpeedAfterFactor() {
+		final ModeRoutingParams params = new ModeRoutingParams( "overboard" );
+		params.setTeleportedModeFreespeedFactor( 2.0 );
+		params.setTeleportedModeSpeed( 12.0 );
+	}
+
+	@Test( expected=IllegalStateException.class )
+	public void testCannotAddFactorAfterSpeed() {
+		final ModeRoutingParams params = new ModeRoutingParams( "overboard" );
+		params.setTeleportedModeSpeed( 12.0 );
+		params.setTeleportedModeFreespeedFactor( 2.0 );
+	}
+
 	private void assertIdentical(
 			final String msg,
 			final PlansCalcRouteConfigGroup initialGroup,
