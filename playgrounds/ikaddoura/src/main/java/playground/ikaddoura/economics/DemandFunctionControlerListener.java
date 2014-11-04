@@ -28,34 +28,32 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 
 /**
  * @author ikaddoura
  *
  */
 
-public class DemandFunctionControlerListener implements IterationEndsListener {
+public class DemandFunctionControlerListener implements ShutdownListener {
 	
 	private int demand = 0;
 
+	public int getDemand() {
+		return demand;
+	}
+
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+	public void notifyShutdown(ShutdownEvent event) {
 		for (Person person : event.getControler().getPopulation().getPersons().values()) {
 			
 			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
 			
 			if (leg.getMode().equals(TransportMode.car)) {
-				
+				System.out.println(person.getId().toString());
 				demand++;
 			}
 		}
 	}
-
-	public int getDemand() {
-		return demand;
-	}
-	
 }
