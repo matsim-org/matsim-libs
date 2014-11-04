@@ -30,7 +30,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -61,8 +63,8 @@ public class RunTRBModel {
 		final String configFile = args[ 0 ];
 
 		final SocialNetworkGenerationConfigGroup config = new SocialNetworkGenerationConfigGroup();
-		ConfigUtils.loadConfig( configFile , config );
-		printToLog( config );
+		final TRBModelConfigGroup pars = new TRBModelConfigGroup();
+		loadAndLogGroups( configFile , config , pars );
 
 		MoreIOUtils.initOut( config.getOutputDirectory() );
 
@@ -76,7 +78,7 @@ public class RunTRBModel {
 
 		final SocialPopulation<ArentzeAgent> population = parsePopulation( config.getInputPopulationFile() );
 
-		final ModelRunner<ArentzeAgent> runner = new ModelRunner<ArentzeAgent>();
+		final ModelRunner<ArentzeAgent> runner = new ModelRunner< >();
 
 		runner.setStepSizePrimary( config.getStepSizePrimary() );
 		runner.setStepSizeSecondary( config.getStepSizeSecondary() );
@@ -89,16 +91,19 @@ public class RunTRBModel {
 				// increase distance by 1 (normally meter) to avoid linking with all agents
 				// living in the same place.
 				// TODO: test sensitivity of the results to this
-				return -1.222 * Math.log( CoordUtils.calcDistance( ego.getCoord(), alter.getCoord() ) + 1 ) + 0.725 * dummy( ego.isMale() == alter.isMale() )
-						+ 0.918 * dummy( ageClassDifference == 0 ) - 0.227 * dummy( ageClassDifference == 2 ) - 1.314 * dummy( ageClassDifference == 3 )
-						- 1.934 * dummy( ageClassDifference == 4 );
+				return pars.getB_logDist() * Math.log( CoordUtils.calcDistance( ego.getCoord(), alter.getCoord() ) + 1 )
+						+ pars.getB_sameGender() * dummy( ego.isMale() == alter.isMale() )
+						+ pars.getB_ageDiff0() * dummy( ageClassDifference == 0 )
+						+ pars.getB_ageDiff2() * dummy( ageClassDifference == 2 )
+						+ pars.getB_ageDiff3() * dummy( ageClassDifference == 3 )
+						+ pars.getB_ageDiff4() * dummy( ageClassDifference == 4 );
 			}
 		} );
 
 		runner.setThresholds(
 				new ThresholdFunction(
 					config.getInitialPrimaryThreshold(),
-					config.getInitialSecondaryThreshold() ) );
+					config.getInitialSecondaryReduction() ) );
 
 		final ModelIterator modelIterator = new ModelIterator();
 		final ModelIteratorFileListener listener = new ModelIteratorFileListener( config.getOutputDirectory() + "/thresholdEvolution.dat" );
@@ -117,13 +122,18 @@ public class RunTRBModel {
 		MoreIOUtils.closeOutputDirLogging();
 	}
 
-	private static void printToLog( Module... groups ) {
+	private static void loadAndLogGroups( final String file , final Module... groups ) {
 		final Config config = new Config();
 		for ( Module group : groups ) config.addModule( group );
+
+		new MatsimConfigReader( config ).readFile( file );
 
 		final String newline = System.getProperty( "line.separator" );// use native line endings for logfile
 		final StringWriter writer = new StringWriter();
 		new ConfigWriter( config ).writeStream( new PrintWriter( writer ), newline );
+
+		log.info( "Config params:" );
+		log.info( writer.getBuffer().toString() );
 	}
 
 	private static double dummy(final boolean b) {
@@ -228,6 +238,81 @@ public class RunTRBModel {
 		public void setCoord(final Coord coord) {
 			if ( this.coord != null ) throw new IllegalStateException();
 			this.coord = coord;
+		}
+	}
+
+	private static class TRBModelConfigGroup extends ReflectiveModule {
+		private static final String GROUP_NAME = "utility";
+
+		private double b_logDist = -1.222;
+		private double b_sameGender = 0.725;
+		private double b_ageDiff0 = 0.918;
+		private double b_ageDiff2 = -0.227;
+		private double b_ageDiff3 = -1.314;
+		private double b_ageDiff4 = -1.934;
+
+		public TRBModelConfigGroup( ) {
+			super( GROUP_NAME );
+		}
+
+		@StringGetter( "b_logDist" )
+		public double getB_logDist() {
+			return b_logDist;
+		}
+
+		@StringSetter( "b_logDist" )
+		public void setB_logDist( double b_logDist ) {
+			this.b_logDist = b_logDist;
+		}
+
+		@StringGetter( "b_sameGender" )
+		public double getB_sameGender() {
+			return b_sameGender;
+		}
+
+		@StringSetter( "b_sameGender" )
+		public void setB_sameGender( double b_sameGender ) {
+			this.b_sameGender = b_sameGender;
+		}
+
+		@StringGetter( "b_ageDiff0" )
+		public double getB_ageDiff0() {
+			return b_ageDiff0;
+		}
+
+		@StringSetter( "b_ageDiff0" )
+		public void setB_ageDiff0( double b_ageDiff0 ) {
+			this.b_ageDiff0 = b_ageDiff0;
+		}
+
+		@StringGetter( "b_ageDiff2" )
+		public double getB_ageDiff2() {
+			return b_ageDiff2;
+		}
+
+		@StringSetter( "b_ageDiff2" )
+		public void setB_ageDiff2( double b_ageDiff2 ) {
+			this.b_ageDiff2 = b_ageDiff2;
+		}
+
+		@StringGetter( "b_ageDiff3" )
+		public double getB_ageDiff3() {
+			return b_ageDiff3;
+		}
+
+		@StringSetter( "b_ageDiff3" )
+		public void setB_ageDiff3( double b_ageDiff3 ) {
+			this.b_ageDiff3 = b_ageDiff3;
+		}
+
+		@StringGetter( "b_ageDiff4" )
+		public double getB_ageDiff4() {
+			return b_ageDiff4;
+		}
+
+		@StringSetter( "b_ageDiff4" )
+		public void setB_ageDiff4( double b_ageDiff4 ) {
+			this.b_ageDiff4 = b_ageDiff4;
 		}
 	}
 }

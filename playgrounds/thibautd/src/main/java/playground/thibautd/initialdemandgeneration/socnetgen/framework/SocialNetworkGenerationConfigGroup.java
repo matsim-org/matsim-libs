@@ -39,7 +39,7 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveModule {
 	private int iterationsToTarget = 2;
 
 	private double initialPrimaryThreshold = -8.8;
-	private double initialSecondaryThreshold = 230;
+	private double initialSecondaryReduction = 230;
 
 	public SocialNetworkGenerationConfigGroup( ) {
 		super( GROUP_NAME );
@@ -125,14 +125,14 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveModule {
 		this.initialPrimaryThreshold = initialPrimaryThreshold;
 	}
 
-	@StringGetter( "initialSecondaryThreshold" )
-	public double getInitialSecondaryThreshold() {
-		return initialSecondaryThreshold;
+	@StringGetter( "initialSecondaryReduction" )
+	public double getInitialSecondaryReduction() {
+		return initialSecondaryReduction;
 	}
 
-	@StringSetter( "initialSecondaryThreshold" )
-	public void setInitialSecondaryThreshold( double initialSecondaryThreshold ) {
-		this.initialSecondaryThreshold = initialSecondaryThreshold;
+	@StringSetter( "initialSecondaryReduction" )
+	public void setInitialSecondaryReduction( double initialSecondaryThreshold ) {
+		this.initialSecondaryReduction = initialSecondaryThreshold;
 	}
 
 }
