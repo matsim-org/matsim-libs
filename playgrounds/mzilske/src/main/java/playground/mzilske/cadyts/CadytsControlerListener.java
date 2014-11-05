@@ -31,18 +31,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,7 +49,7 @@ import javax.inject.Singleton;
  * select plans that better match to given occupancy counts.
  */
 @Singleton
-class CadytsControlerListener implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
     private static final String FLOWANALYSIS_FILENAME = "flowAnalysis.txt";
 
@@ -63,19 +60,16 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
 	private final double countsScaleFactor;
     private final boolean writeAnalysisFile;
     private AnalyticalCalibrator<Link> calibrator;
-    private EventsManager eventsManager;
     private OutputDirectoryHierarchy controlerIO;
     private Scenario scenario;
     private VolumesAnalyzer volumesAnalyzer;
 
     @Inject
 	CadytsControlerListener(Config config,
-                            EventsManager eventsManager,
                             OutputDirectoryHierarchy controlerIO,
                             Scenario scenario,
                             VolumesAnalyzer volumesAnalyzer,
-                            AnalyticalCalibrator<Link> calibrator) {
-        this.eventsManager = eventsManager;
+                            AnalyticalCalibrator calibrator) {
         this.controlerIO = controlerIO;
         this.scenario = scenario;
         this.volumesAnalyzer = volumesAnalyzer;
@@ -84,11 +78,6 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
         CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfig.setWriteAnalysisFile(true);
         this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
-	}
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		eventsManager.addHandler(ptStep);
 	}
 
     @Override

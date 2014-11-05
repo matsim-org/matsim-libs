@@ -26,6 +26,7 @@ import com.google.inject.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,10 @@ class Injector {
                 new TypeLiteral<Set<ControlerListener>>() {
                 }
         ));
+    }
+
+    public void retrofitScoringFunctionFactory(ScoringFunctionFactory scoringFunctionFactory) {
+        injector.injectMembers(scoringFunctionFactory);
     }
 
 }

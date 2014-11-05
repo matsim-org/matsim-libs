@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CallControlerListener.java
+ *  * ClonesConfigGroup.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,33 +20,25 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
+package playground.mzilske.clones;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
-import javax.inject.Inject;
+public class ClonesConfigGroup extends ReflectiveModule {
 
-class CallControlerListener implements ShutdownListener {
+    public static final String NAME = "clones";
 
-    @Inject
-    Scenario scenario;
-
-    @Inject
-    Sightings sightings;
-
-    @Inject
-    CallProcessTicker ticker;
-
-    @Inject
-    CallProcess callProcess;
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
-        ticker.finish();
-        callProcess.finish();
-        scenario.addScenarioElement("sightings", sightings);
+    public double getCloneFactor() {
+        return cloneFactor;
     }
 
+    public void setCloneFactor(double cloneFactor) {
+        this.cloneFactor = cloneFactor;
+    }
+
+    private double cloneFactor = 1.0;
+
+    public ClonesConfigGroup() {
+        super(NAME);
+    }
 }

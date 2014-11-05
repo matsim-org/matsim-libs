@@ -1,20 +1,11 @@
 package playground.mzilske.ant2014;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -24,7 +15,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsUtils;
@@ -37,11 +30,16 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import playground.mzilske.cdr.*;
 
-import playground.mzilske.cdr.CallBehavior;
-import playground.mzilske.cdr.CompareMain;
-import playground.mzilske.cdr.PowerPlans;
-import playground.mzilske.cdr.ZoneTracker;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 class MultiRateRunResource {
 
@@ -163,9 +161,10 @@ class MultiRateRunResource {
         return config;
     }
 
-    private void runPhoneOnActivityStartEnd(Scenario scenario) {
+    private void runPhoneOnActivityStartEnd(Scenario baseScenario) {
         EventsManager events = EventsUtils.createEventsManager();
-        CompareMain compareMain = new CompareMain(scenario, events, new CallBehavior() {
+        LinkIsZone linkIsZone = new LinkIsZone();
+        AbstractModule phoneModule = new CallBehaviorModule(new CallBehavior() {
 
             @Override
             public boolean makeACall(ActivityEndEvent event) {
@@ -187,35 +186,30 @@ class MultiRateRunResource {
                 return true;
             }
 
-        }, new ZoneTracker.LinkToZoneResolver() {
+        }, linkIsZone);
+        ReplayEvents.Results results = ReplayEvents.run(
+                baseScenario,
+                getBaseRun().getLastIteration().getEventsFileName(),
+                new CollectSightingsModule(),
+                phoneModule);
 
-            @Override
-            public Id resolveLinkToZone(Id<Link> linkId) {
-                return linkId;
-            }
 
-            @Override
-						public Id<Link> chooseLinkInZone(String zoneId) {
-                return Id.create(zoneId, Link.class);
-            }
+        final Sightings sightings = results.get(Sightings.class);
 
-        });
-        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(baseScenario.getConfig());
+        scenario.getConfig().controler().setOutputDirectory(WD + "/rates/actevents");
+        scenario.setNetwork(baseScenario.getNetwork());
+        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkIsZone, sightings);
+        PopulationFromSightings.preparePopulation(scenario, linkIsZone, sightings);
 
-        Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/actevents");
-        compareMain.close();
-        final ScenarioImpl scenario2 = compareMain.createScenarioFromSightings(config);
-
-        Controler controler = new Controler(scenario2);
+        Controler controler = new Controler(scenario);
         controler.setCreateGraphs(false);
         controler.run();
     }
 
     private void runRate(final Scenario baseScenario, final int dailyRate) {
         final RunResource run = getRateRun(Integer.toString(dailyRate)); // The run we are producing
-        EventsManager events = EventsUtils.createEventsManager();
-        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+        CallBehavior callBehavior = new CallBehavior() {
 
             @Override
             public boolean makeACall(ActivityEndEvent event) {
@@ -229,7 +223,7 @@ class MultiRateRunResource {
 
             @Override
             public boolean makeACall(Id id, double time) {
-                double secondlyProbability = dailyRate / (double) (24*60*60);
+                double secondlyProbability = dailyRate / (double) (24 * 60 * 60);
                 return Math.random() < secondlyProbability;
             }
 
@@ -238,24 +232,23 @@ class MultiRateRunResource {
                 return false;
             }
 
-        }, new ZoneTracker.LinkToZoneResolver() {
+        };
 
-            @Override
-            public Id resolveLinkToZone(Id<Link> linkId) {
-                return linkId;
-            }
 
-            @Override
-						public Id<Link> chooseLinkInZone(String zoneId) {
-                return Id.create(zoneId, Link.class);
-            }
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        ReplayEvents.Results results = ReplayEvents.run(
+                baseScenario,
+                getBaseRun().getLastIteration().getEventsFileName(),
+                new VolumesAnalyzerModule(),
+                new CollectSightingsModule(),
+                new CallBehaviorModule(callBehavior, linkToZoneResolver));
 
-        });
-        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
         final Config config = phoneConfig();
         config.controler().setOutputDirectory(WD + "/rates/" + dailyRate);
-        compareMain.close();
-        final Scenario scenario = compareMain.createScenarioFromSightings(config);
+        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        scenario.setNetwork(baseScenario.getNetwork());
+        PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario, linkToZoneResolver, results.get(Sightings.class));
+        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, results.get(Sightings.class));
         final double flowCapacityFactor = config.qsim().getFlowCapFactor();
         final double storageCapacityFactor = config.qsim().getStorageCapFactor();
         Controler controler = new Controler(scenario);

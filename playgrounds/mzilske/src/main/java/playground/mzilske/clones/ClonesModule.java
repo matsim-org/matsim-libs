@@ -22,18 +22,15 @@
 
 package playground.mzilske.clones;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
-import org.matsim.core.controler.listener.ControlerListener;
+
+import org.matsim.core.controler.AbstractModule;
 
 public class ClonesModule extends AbstractModule {
 
     @Override
-    protected void configure() {
-        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-        controlerListenerBinder.addBinding().toProvider(ClonesControlerListener.class);
-        controlerListenerBinder.addBinding().toProvider(CloneHistogramControlerListener.class);
-
+    public void install() {
+        bindAsSingleton(CloneService.class, CloneServiceImpl.class);
+        addControlerListenerByProvider(ClonesControlerListener.class);
+        addControlerListenerByProvider(CloneHistogramControlerListener.class);
     }
-
 }

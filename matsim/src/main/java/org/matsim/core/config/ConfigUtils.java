@@ -19,12 +19,12 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * @author mrieser
@@ -139,12 +139,10 @@ public abstract class ConfigUtils {
 			try {
 				module = moduleClass.newInstance();
 				config.addModule(module);
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException e) {
 				throw new RuntimeException(e);
 			}
-		}
+        }
 		return moduleClass.cast(module);
 	}
 }

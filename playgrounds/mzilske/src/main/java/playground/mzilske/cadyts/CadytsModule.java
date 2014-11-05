@@ -24,7 +24,7 @@ package playground.mzilske.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import com.google.common.collect.ImmutableMap;
-import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.LookUp;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -45,9 +46,7 @@ import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -56,19 +55,19 @@ import java.util.Set;
 public class CadytsModule extends AbstractModule {
 
     @Override
-    protected void configure() {
-        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-        controlerListenerBinder.addBinding().to(CadytsControlerListener.class);
-        controlerListenerBinder.addBinding().toProvider(MyControlerListenerProvider.class);
-        Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder(binder(), new TypeLiteral<MeasurementLoader<Link>>(){});
-        bind(new TypeLiteral<AnalyticalCalibrator<Link>>(){}).toProvider(CalibratorProvider.class).in(Singleton.class);
-        bind(new TypeLiteral<PlansTranslator<Link>>(){}).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
+    public void install() {
+        Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder((Binder) getDelegate(), new TypeLiteral<MeasurementLoader<Link>>(){});
+        bindToProviderAsSingleton(AnalyticalCalibrator.class, CalibratorProvider.class);
+        bindAsSingleton(PlanToPlanStepBasedOnEvents.class);
+        bindAsSingleton(PlansTranslator.class, PlanToPlanStepBasedOnEvents.class);
+        addControlerListener(CadytsControlerListener.class);
+        addControlerListenerByProvider(MyControlerListenerProvider.class);
+        addEventHandler(PlanToPlanStepBasedOnEvents.class);
     }
 
     static class CalibratorProvider implements Provider<AnalyticalCalibrator<Link>> {
 
         @Inject Scenario scenario;
-        @Inject @Named("calibrationCounts") Counts counts;
         @Inject Set<MeasurementLoader<Link>> measurementLoaders;
 
         @Override
@@ -79,7 +78,7 @@ public class CadytsModule extends AbstractModule {
                     return scenario.getNetwork().getLinks().get(id);
                 }
             };
-            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts, linkLookUp);
+            AnalyticalCalibrator<Link> linkAnalyticalCalibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), (Counts) scenario.getScenarioElement("calibrationCounts"), linkLookUp);
             for (MeasurementLoader<Link> measurementLoader : measurementLoaders) {
                 measurementLoader.load(linkAnalyticalCalibrator);
             }
@@ -88,7 +87,6 @@ public class CadytsModule extends AbstractModule {
     }
 
     static class MyControlerListenerProvider implements Provider<ControlerListener> {
-        @Inject @Named("allCounts") Counts counts;
         @Inject Scenario scenario;
         @Inject OutputDirectoryHierarchy controlerIO;
         @Inject VolumesAnalyzer volumesAnalyzer;
@@ -115,7 +113,7 @@ public class CadytsModule extends AbstractModule {
 
                         @Override
                         public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                            CountsComparisonAlgorithm countsComparisonAlgorithm = new CountsComparisonAlgorithm(volumesAnalyzer, counts, scenario.getNetwork(), 1.0);
+                            CountsComparisonAlgorithm countsComparisonAlgorithm = new CountsComparisonAlgorithm(volumesAnalyzer, (Counts) scenario.getScenarioElement("counts"), scenario.getNetwork(), 1.0);
                             countsComparisonAlgorithm.run();
                             final List<CountSimComparison> comparison = countsComparisonAlgorithm.getComparison();
                             return new StreamingOutput() {

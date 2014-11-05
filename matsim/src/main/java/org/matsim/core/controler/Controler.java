@@ -327,6 +327,21 @@ public class Controler extends AbstractController {
 			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData ) ;
 		}
 
+        this.injector = Injector.createInjector(
+                config,
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        for (AbstractModule module : modules) {
+                            include(module);
+                        }
+                        // Bootstrap it with the Scenario and some controler context.
+                        bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
+                        bindToInstance(IterationStopWatch.class, stopwatch);
+                        bindToInstance(Scenario.class, scenarioData);
+                    }
+                });
+        this.injector.retrofitScoringFunctionFactory(this.scoringFunctionFactory);
         PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.scoringFunctionFactory);
 		this.addCoreControlerListener(plansScoring);
 
@@ -371,24 +386,6 @@ public class Controler extends AbstractController {
 			addControlerListener(new VspPlansCleaner(this.scenarioData ));
 		}
 
-        // Set up the Injector, which is the dependency injection container for the Controler I have been talking about.
-        // The TravelTimeCalculator is my first customer. I moved it into a Module.
-        // As other things become modules, too, their interfaces and their dependencies and their getters can disappear
-        // from the Controler.
-        this.injector = Injector.createInjector(
-                config,
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        for (AbstractModule module : modules) {
-                            include(module);
-                        }
-                        // Bootstrap it with the Scenario and some controler context.
-                        bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
-                        bindToInstance(IterationStopWatch.class, stopwatch);
-                        bindToInstance(Scenario.class, scenarioData);
-                    }
-                });
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
             this.events.addHandler(eventHandler);

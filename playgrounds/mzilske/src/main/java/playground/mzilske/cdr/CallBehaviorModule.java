@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CDRModules.java
+ *  * CallBehaviorModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,18 +22,19 @@
 
 package playground.mzilske.cdr;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
-import org.matsim.core.controler.listener.ControlerListener;
+public class CallBehaviorModule extends org.matsim.core.controler.AbstractModule {
+    private final CallBehavior phonerate;
 
-public class CDRModule extends AbstractModule {
+    private final ZoneTracker.LinkToZoneResolver linkToZoneResolver;
+
+    public CallBehaviorModule(CallBehavior phonerate, ZoneTracker.LinkToZoneResolver linkToZoneResolver) {
+        this.phonerate = phonerate;
+        this.linkToZoneResolver = linkToZoneResolver;
+    }
+
     @Override
-    protected void configure() {
-        requireBinding(ZoneTracker.LinkToZoneResolver.class);
-        requireBinding(CallBehavior.class);
-        bind(CompareMain.class).in(Singleton.class);
-        Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-        controlerListenerBinder.addBinding().toProvider(new CallControlerListener());
+    public void install() {
+        bindToInstance(CallBehavior.class, phonerate);
+        bindToInstance(ZoneTracker.LinkToZoneResolver.class, linkToZoneResolver);
     }
 }

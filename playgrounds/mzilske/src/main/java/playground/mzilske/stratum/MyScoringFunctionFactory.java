@@ -23,16 +23,17 @@
 package playground.mzilske.stratum;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import playground.mzilske.cadyts.CadytsScoring;
+import playground.mzilske.clones.ClonesConfigGroup;
 
 import javax.inject.Inject;
 
@@ -42,22 +43,16 @@ class MyScoringFunctionFactory implements ScoringFunctionFactory {
     Config config;
 
     @Inject
-    AnalyticalCalibrator<Link> cadyts;
+    AnalyticalCalibrator cadyts;
 
     @Inject
-    PlansTranslator<Link> ptStep;
-
-    @Inject @Named("clonefactor")
-    double clonefactor;
-
-    @Inject @Named("cadytsweight")
-    double cadytsweight;
+    PlansTranslator ptStep;
 
     @Override
     public ScoringFunction createNewScoringFunction(final Person person) {
+        final ClonesConfigGroup clonesConfig = ConfigUtils.addOrGetModule(config, ClonesConfigGroup.NAME, ClonesConfigGroup.class);
         SumScoringFunction sumScoringFunction = new SumScoringFunction();
         CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, ptStep, cadyts);
-        scoringFunction.setWeight(cadytsweight);
         sumScoringFunction.addScoringFunction(scoringFunction);
 
         // prior
@@ -71,7 +66,7 @@ class MyScoringFunctionFactory implements ScoringFunctionFactory {
             @Override
             public double getScore() {
                 if (hasLeg) {
-                    return - Math.log( clonefactor - 1.0 );
+                    return - Math.log( clonesConfig.getCloneFactor() - 1.0 );
                 } else {
                     return 0.0;
                 }

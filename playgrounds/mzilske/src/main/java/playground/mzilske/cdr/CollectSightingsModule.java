@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CallControlerListener.java
+ *  * CDRModules.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,31 +22,44 @@
 
 package playground.mzilske.cdr;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.AbstractModule;
 
-import javax.inject.Inject;
+import javax.inject.Provider;
 
-class CallControlerListener implements ShutdownListener {
-
-    @Inject
-    Scenario scenario;
-
-    @Inject
-    Sightings sightings;
-
-    @Inject
-    CallProcessTicker ticker;
-
-    @Inject
-    CallProcess callProcess;
-
+public class CollectSightingsModule extends AbstractModule {
     @Override
-    public void notifyShutdown(ShutdownEvent event) {
-        ticker.finish();
-        callProcess.finish();
-        scenario.addScenarioElement("sightings", sightings);
+    public void install() {
+        bindTo(Sightings.class, SightingsImpl.class);
+        bindAsSingleton(CallProcess.class);
+        bindAsSingleton(ZoneTracker.class);
+        bindToProviderAsSingleton(CallProcessTicker.class, CallProcessTickerProvider.class);
+        addEventHandler(CallProcessTicker.class);
+        addControlerListener(CallControlerListener.class);
     }
 
+    private static class CallProcessTickerProvider implements Provider<CallProcessTicker> {
+
+        @Inject
+        Scenario scenario;
+
+        @Inject
+        Sightings sightings;
+
+        @Inject
+        CallProcess callProcess;
+
+        @Inject
+        ZoneTracker zoneTracker;
+
+        @Override
+        public CallProcessTicker get() {
+            CallProcessTicker ticker = new CallProcessTicker();
+            ticker.addHandler(zoneTracker);
+            ticker.addHandler(callProcess);
+            ticker.addSteppable(callProcess);
+            return ticker;
+        }
+    }
 }

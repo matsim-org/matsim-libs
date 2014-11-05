@@ -22,10 +22,6 @@
 
 package playground.mzilske.stratum;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -39,35 +35,36 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.SightingsImpl;
 import playground.mzilske.cdr.ZoneTracker;
+
+import javax.inject.Provider;
 
 class ScenarioReconstructor implements Provider<Scenario> {
 
-    @Inject
+    private final Sightings sightings;
     Config config;
 
-    @Inject @Named("groundTruthNetwork")
     Network network;
 
-    @Inject
     CompareMain compareMain;
 
-    @Inject
     ZoneTracker.LinkToZoneResolver linkToZoneResolver;
 
-
+    ScenarioReconstructor(Network network, Sightings sightings, ZoneTracker.LinkToZoneResolver linkToZoneResolver) {
+        this.config = new ConfigProvider().get();
+        this.network = network;
+        this.sightings = sightings;
+        this.linkToZoneResolver = linkToZoneResolver;
+    }
 
     @Override
-		public Scenario get() {
+    public Scenario get() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(network);
 
-        Sightings sightings = new SightingsImpl(compareMain.getSightingsPerPerson());
         PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, sightings);
         PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, sightings);
 
@@ -79,17 +76,13 @@ class ScenarioReconstructor implements Provider<Scenario> {
 
     static class ConfigProvider implements Provider<Config> {
 
-        @Inject @Named("outputDirectory")
-        String outputDirectory;
-
         @Override
-				public Config get() {
+        public Config get() {
             final Config config = ConfigUtils.createConfig();
             CadytsConfigGroup cadyts = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
             cadyts.setVarianceScale(0.00000000001);
             cadyts.setMinFlowStddev_vehPerHour(10.0);
 
-            config.controler().setOutputDirectory(outputDirectory);
             config.controler().setLastIteration(50);
             config.qsim().setFlowCapFactor(100);
             config.qsim().setStorageCapFactor(100);

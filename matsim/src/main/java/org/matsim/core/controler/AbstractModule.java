@@ -89,6 +89,10 @@ public abstract class AbstractModule {
         binder.bind(type).in(Singleton.class);
     }
 
+    protected final <T> void bindAsSingleton(Class<T> type, Class<? extends T> implementation) {
+        binder.bind(type).to(implementation).in(Singleton.class);
+    }
+
     protected final <T> void bindToProviderAsSingleton(Class<T> type, Class<? extends javax.inject.Provider<? extends T>> providerType) {
         binder.bind(type).toProvider(providerType).in(Singleton.class);
     }
@@ -105,12 +109,20 @@ public abstract class AbstractModule {
         eventHandlerMultibinder.addBinding().toInstance(instance);
     }
 
+    protected final void addControlerListenerByProvider(Class<? extends javax.inject.Provider<? extends ControlerListener>> providerType) {
+        controlerListenerMultibinder.addBinding().toProvider(providerType);
+    }
+
     protected final void addControlerListener(Class<? extends ControlerListener> type) {
         controlerListenerMultibinder.addBinding().to(type);
     }
 
     protected final void addControlerListener(ControlerListener instance) {
         controlerListenerMultibinder.addBinding().toInstance(instance);
+    }
+
+    protected final Object getDelegate() {
+        return binder;
     }
 
 }

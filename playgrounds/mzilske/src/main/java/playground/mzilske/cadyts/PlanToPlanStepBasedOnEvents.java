@@ -35,10 +35,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.counts.Counts;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,15 +46,13 @@ class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEve
         PersonDepartureEventHandler, PersonArrivalEventHandler {
 
     private final Scenario scenario;
-    private Counts counts;
 
     private final Map<Id, PlanBuilder<Link>> driverAgents;
 
     @Inject
-    PlanToPlanStepBasedOnEvents(final Scenario scenario, @Named("calibrationCounts") Counts counts) {
+    PlanToPlanStepBasedOnEvents(final Scenario scenario) {
         this.scenario = scenario;
-        this.counts = counts;
-        this.driverAgents = new HashMap<Id, PlanBuilder<Link>>();
+        this.driverAgents = new HashMap<>();
         for (Person person : scenario.getPopulation().getPersons().values()) {
             driverAgents.put(person.getId(), new PlanBuilder<Link>());
         }
@@ -89,7 +85,6 @@ class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEve
     @Override
     public void handleEvent(LinkLeaveEvent event) {
         if (!driverAgents.containsKey(event.getPersonId())) return;
-     //   if (!counts.getCounts().keySet().contains(event.getLinkId())) return;
         PlanBuilder<Link> planBuilder = driverAgents.get(event.getPersonId());
         Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
         planBuilder.addTurn(link, (int) event.getTime());

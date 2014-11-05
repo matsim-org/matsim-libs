@@ -1,16 +1,11 @@
 package playground.mzilske.stratum;
 
-import javax.inject.Inject;
-
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -18,14 +13,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Provider;
-
 class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
 
-
     private Scenario scenario;
-
-    @Inject Config config;
 
     static class ConfigProvider implements Provider<Config> {
         @Override
@@ -52,7 +42,7 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
     @Override
 		public Scenario get() {
         int quantity = 1000;
-        scenario = ScenarioUtils.createScenario(config);
+        scenario = ScenarioUtils.createScenario(new ConfigProvider().get());
         new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
         Population population = scenario.getPopulation();
         for (int i=0; i<quantity; i++) {

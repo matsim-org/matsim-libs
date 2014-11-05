@@ -1,20 +1,13 @@
 package playground.mzilske.cdr;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.telmomenezes.jfastemd.Feature;
+import com.telmomenezes.jfastemd.JFastEMD;
+import com.telmomenezes.jfastemd.Signature;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
@@ -34,18 +27,18 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
-import playground.mzilske.cdr.ZoneTracker.Zone;
 
-import com.telmomenezes.jfastemd.Feature;
-import com.telmomenezes.jfastemd.JFastEMD;
-import com.telmomenezes.jfastemd.Signature;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Arrays;
 
 @Singleton
 public class CompareMain {
 
-	private static class VolumeOnLinkFeature implements Feature {
+    private final Sightings sightings;
+
+    private static class VolumeOnLinkFeature implements Feature {
 
 		final Link link;
 		final int hour;
@@ -67,8 +60,6 @@ public class CompareMain {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
-    private CallProcessTicker ticker;
-	private CallProcess callProcess;
 
     public VolumesAnalyzer getGroundTruthVolumes() {
         return groundTruthVolumes;
@@ -78,38 +69,9 @@ public class CompareMain {
 	private LinkToZoneResolver linkToZoneResolver;
 	private Scenario scenario;
 
-    public ScenarioImpl createScenarioFromSightings(Config config) {
-		final ScenarioImpl scenario21 = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		scenario21.setNetwork(scenario.getNetwork());
-
-        final Sightings allSightings = new SightingsImpl(getSightingsPerPerson());
-		
-		
-		PopulationFromSightings.createPopulationWithEndTimesAtLastSightings(scenario21, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario21, linkToZoneResolver, allSightings);
-        return scenario21;
-	}
-
-    public Map<Id, List<Sighting>> getSightingsPerPerson() {
-        final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
-        for (Sighting sighting : callProcess.getSightings()) {
-
-            List<Sighting> sightingsOfPerson = allSightings.get(sighting.getAgentId());
-            if (sightingsOfPerson == null) {
-                sightingsOfPerson = new ArrayList<Sighting>();
-                allSightings.put(sighting.getAgentId(), sightingsOfPerson);
-
-            }
-            sightingsOfPerson.add(sighting);
-        }
-        return allSightings;
-    }
 
 
-    public void close() {
-		ticker.finish();
-		callProcess.dump();
-	}
+
 
 	static double compareEMD(Scenario scenario, VolumesAnalyzer cdrVolumes, VolumesAnalyzer groundTruthVolumes) {
 		Network network = scenario.getNetwork();
@@ -184,38 +146,12 @@ public class CompareMain {
 	}
 
     @Inject
-	public CompareMain(Scenario scenario, EventsManager events, CallBehavior callingBehavior, LinkToZoneResolver linkToZoneResolver) {
+	public CompareMain(Scenario scenario, Sightings sightings, LinkToZoneResolver linkToZoneResolver, VolumesAnalyzer volumesAnalyzer) {
 		super();
 		this.scenario = scenario;
-
-		Map<Id<Person>, Id<Zone>> initialPersonInZone = new HashMap<>();
-
-
-		// final Zones cellularCoverage = SyntheticCellTowerDistribution.naive(scenario.getNetwork());
-
+        this.sightings = sightings;
+        this.groundTruthVolumes = volumesAnalyzer;
         this.linkToZoneResolver = linkToZoneResolver;
-
-		// linkToZoneResolver = new CellularCoverageLinkToZoneResolver(cellularCoverage, scenario.getNetwork());
-
-		for (Person p : scenario.getPopulation().getPersons().values()) {
-			Id<Link> linkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
-			System.out.println(linkId);
-			initialPersonInZone.put(p.getId(), this.linkToZoneResolver.resolveLinkToZone(linkId));
-		}
-
-		ticker = new CallProcessTicker();
-		events.addHandler(ticker);
-
-
-		ZoneTracker zoneTracker = new ZoneTracker(events, this.linkToZoneResolver, initialPersonInZone);
-		callProcess = new CallProcess(null, scenario.getPopulation(), zoneTracker, callingBehavior);
-		ticker.addHandler(zoneTracker);
-
-		ticker.addHandler(callProcess);
-		ticker.addSteppable(callProcess);
-
-		groundTruthVolumes = new VolumesAnalyzer(TIME_BIN_SIZE, MAX_TIME, scenario.getNetwork());
-		events.addHandler(groundTruthVolumes);
 	}
 
 	private static Signature makeSignature(Network network, VolumesAnalyzer volumesAnalyzer) {

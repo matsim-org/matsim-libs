@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -43,9 +44,6 @@ class ClonesControlerListener implements Provider<ControlerListener> {
 
     public static final String EMPTY_CLONE_PLAN = "emptyClonePlan";
 
-    @Inject @com.google.inject.name.Named("clonefactor")
-    double clonefactor;
-
     @Inject
     Scenario scenario;
 
@@ -54,6 +52,7 @@ class ClonesControlerListener implements Provider<ControlerListener> {
 
     @Override
     public ControlerListener get() {
+        final double clonefactor = ConfigUtils.addOrGetModule(scenario.getConfig(), ClonesConfigGroup.NAME, ClonesConfigGroup.class).getCloneFactor();
         return new StartupListener() {
             @Override
             public void notifyStartup(StartupEvent event) {

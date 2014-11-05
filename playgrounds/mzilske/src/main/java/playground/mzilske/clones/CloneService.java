@@ -22,12 +22,10 @@
 
 package playground.mzilske.clones;
 
-import com.google.inject.ImplementedBy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.SumScoringFunction;
 
-@ImplementedBy(CloneServiceImpl.class)
 public interface CloneService {
 
     public Id<Person> resolveParentId(Id<Person> cloneId);

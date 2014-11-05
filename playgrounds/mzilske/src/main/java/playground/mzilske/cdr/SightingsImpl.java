@@ -35,15 +35,6 @@ public class SightingsImpl implements Sightings {
 
     private Map<Id, List<Sighting>> sightings = new HashMap<Id, List<Sighting>>();
 
-
-    public SightingsImpl() {
-
-    }
-
-    public SightingsImpl(Map<Id, List<Sighting>> sightings) {
-        this.sightings = sightings;
-    }
-
     @Override
     public Map<Id, List<Sighting>> getSightingsPerPerson() {
         return sightings;

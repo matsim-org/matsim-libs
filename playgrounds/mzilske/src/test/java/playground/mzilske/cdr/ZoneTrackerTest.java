@@ -1,8 +1,5 @@
 package playground.mzilske.cdr;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -10,9 +7,10 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.cdr.ZoneTracker.Zone;
 
@@ -46,23 +44,8 @@ public class ZoneTrackerTest {
 		Id<Person> person = Id.create("p1", Person.class);
 		Id<Vehicle> vehicle = Id.create("v1", Vehicle.class);
 		Id<Link> link1 = Id.create("l1", Link.class);
-		
-		Map<Id<Person>, Id<Zone>> initialZones = new HashMap<>();
-		initialZones.put(person, Id.create(link1, Zone.class));
-		ZoneTracker testee = new ZoneTracker(zoneEvents, new LinkToZoneResolver() {
 
-			@Override
-			public Id<Zone> resolveLinkToZone(Id<Link> linkId) {
-				return Id.create(linkId, Zone.class);
-			}
-
-			@Override
-			public Id<Link> chooseLinkInZone(String zoneId) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-		}, initialZones );
+		ZoneTracker testee = new ZoneTracker(ScenarioUtils.createScenario(ConfigUtils.createConfig()), new LinkIsZone());
 		zoneEvents.addHandler(new TestHandler());
 		
 		linkEvents.addHandler(testee);
@@ -85,10 +68,8 @@ public class ZoneTrackerTest {
 		Id<Vehicle> vehicle = Id.create("v1", Vehicle.class);
 		final Id<Link> link1 = Id.create("l1", Link.class);
 		final Id<Link> link4 = Id.create("l4", Link.class);
-		
-		Map<Id<Person>, Id<Zone>> initialZones = new HashMap<>();
-		initialZones.put(person, Id.create(link1, Zone.class));
-		ZoneTracker testee = new ZoneTracker(zoneEvents, new LinkToZoneResolver() {
+
+		ZoneTracker testee = new ZoneTracker(ScenarioUtils.createScenario(ConfigUtils.createConfig()), new LinkToZoneResolver() {
 
 			@Override
 			public Id<Zone> resolveLinkToZone(Id<Link> linkId) {
@@ -101,11 +82,10 @@ public class ZoneTrackerTest {
 
 			@Override
 			public Id<Link> chooseLinkInZone(String zoneId) {
-				// TODO Auto-generated method stub
 				return null;
 			}
 			
-		}, initialZones );
+		});
 		zoneEvents.addHandler(new TestHandler());
 		
 		linkEvents.addHandler(testee);

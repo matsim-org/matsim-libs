@@ -22,18 +22,22 @@
 
 package playground.mzilske.clones;
 
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 
 import javax.inject.Inject;
 
 class CloneServiceImpl implements CloneService {
 
+    private final double clonefactor;
+
     @Inject
-    @Named("clonefactor")
-    double clonefactor;
+    CloneServiceImpl(Config config) {
+        this.clonefactor = ConfigUtils.addOrGetModule(config, ClonesConfigGroup.NAME, ClonesConfigGroup.class).getCloneFactor();
+    }
 
     @Override
     public Id<Person> resolveParentId(Id<Person> cloneId) {

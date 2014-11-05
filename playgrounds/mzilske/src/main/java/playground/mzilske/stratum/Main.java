@@ -22,37 +22,26 @@
 
 package playground.mzilske.stratum;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-
 import playground.mzilske.cadyts.CadytsModule;
-import playground.mzilske.cdr.CDRModule;
-import playground.mzilske.cdr.CallBehavior;
-import playground.mzilske.cdr.CompareMain;
-import playground.mzilske.cdr.ZoneTracker;
+import playground.mzilske.cdr.*;
+import playground.mzilske.clones.ClonesConfigGroup;
 import playground.mzilske.clones.ClonesModule;
-import playground.mzilske.controller.CharyparNagelModule;
-import playground.mzilske.controller.Controller;
-import playground.mzilske.controller.ControllerModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.Singleton;
-import com.google.inject.name.Names;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 
 public class Main {
 
@@ -63,63 +52,42 @@ public class Main {
     }
 
     private static void run(final String outputDirectory, List<Integer> countHours) {
-        Module phoneModule = new AbstractModule() {
+        AbstractModule phoneModule = new AbstractModule() {
             @Override
-            protected void configure() {
-                bind(ZoneTracker.LinkToZoneResolver.class).to(MyLinkToZoneResolver.class);
-                bind(CallBehavior.class).to(MyCallBehavior.class);
+            public void install() {
+                bindTo(ZoneTracker.LinkToZoneResolver.class, MyLinkToZoneResolver.class);
+                bindTo(CallBehavior.class, MyCallBehavior.class);
             }
         };
 
-        Injector injector = Guice.createInjector(
-                new ControllerModule(),
-                new CDRModule(),
-                new CharyparNagelModule(),
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(Config.class).toProvider(OneWorkplaceOneStratumUnderestimated.ConfigProvider.class).in(Singleton.class);
-                        bind(Scenario.class).toProvider(OneWorkplaceOneStratumUnderestimated.class).in(Singleton.class);
-                    }
-                },
-                phoneModule
-        );
-
-
-        Controller controler = injector.getInstance(Controller.class);
+        Scenario groundTruth = new OneWorkplaceOneStratumUnderestimated().get();
+        groundTruth.getConfig().controler().setOutputDirectory(outputDirectory + "-orig");
+        Controler controler = new Controler(groundTruth);
+        controler.setModules(
+                new ControlerDefaultsModule(),
+                new CollectSightingsModule(),
+                phoneModule);
         controler.run();
 
-        final Network groundTruthNetwork = injector.getInstance(Network.class);
-        final VolumesAnalyzer groundTruthVolumes = injector.getInstance(VolumesAnalyzer.class);
-        final CompareMain compareMain = injector.getInstance(CompareMain.class);
+        final VolumesAnalyzer groundTruthVolumes = controler.getVolumes();
 
-        final Counts allCounts = CompareMain.volumesToCounts(groundTruthNetwork, groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(groundTruth.getNetwork(), groundTruthVolumes);
         final Counts calibrationCounts = filterCounts(allCounts, countHours);
 
-        Injector injector2 = Guice.createInjector(
-                new ControllerModule(),
-                new CadytsModule(),
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(String.class).annotatedWith(Names.named("outputDirectory")).toInstance(outputDirectory);
-                        bind(Network.class).annotatedWith(Names.named("groundTruthNetwork")).toInstance(groundTruthNetwork);
-                        bind(VolumesAnalyzer.class).annotatedWith(Names.named("groundTruthVolumes")).toInstance(groundTruthVolumes);
-                        bind(CompareMain.class).toInstance(compareMain);
-                        bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(2.0);
-                        bind(Double.class).annotatedWith(Names.named("cadytsweight")).toInstance(1.0);
-                        bind(Config.class).toProvider(ScenarioReconstructor.ConfigProvider.class).in(Singleton.class);
-                        bind(Scenario.class).toProvider(ScenarioReconstructor.class).in(Singleton.class);
-                        bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
-                        bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(calibrationCounts);
-                        bind(ScoringFunctionFactory.class).to(MyScoringFunctionFactory.class);
-                    }
-                },
-                new ClonesModule(),
-                phoneModule
-        );
+        Scenario cdrScenario = new ScenarioReconstructor(groundTruth.getNetwork(), (Sightings) groundTruth.getScenarioElement("sightings"), new MyLinkToZoneResolver()).get();
+        cdrScenario.addScenarioElement(Counts.ELEMENT_NAME, allCounts);
+        cdrScenario.addScenarioElement("calibrationCounts", calibrationCounts);
+        cdrScenario.getConfig().controler().setOutputDirectory(outputDirectory);
+        ClonesConfigGroup clonesConfig = ConfigUtils.addOrGetModule(cdrScenario.getConfig(), ClonesConfigGroup.NAME, ClonesConfigGroup.class);
+        clonesConfig.setCloneFactor(2.0);
 
-        Controller controler2 = injector2.getInstance(Controller.class);
+        Controler controler2 = new Controler(cdrScenario);
+        controler2.setModules(
+                new ControlerDefaultsModule(),
+                phoneModule,
+                new CadytsModule(),
+                new ClonesModule());
+        controler2.setScoringFunctionFactory(new MyScoringFunctionFactory());
         controler2.run();
     }
 
