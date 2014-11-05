@@ -40,7 +40,8 @@ import java.util.*;
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener {
     private final FastDijkstraFactoryWithCustomTravelTimes refreshableDijkstra;
-    private  boolean initialRouting;
+    private final Scenario scenario;
+    private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
     private int numberOfPSimIterations;
@@ -55,10 +56,8 @@ public class SlaveControler implements IterationStartsListener {
     private ObjectOutputStream writer;
     private PSimFactory pSimFactory;
     private Map<String, PlanSerializable> plansCopyForSending;
-    private boolean readyToSendPlans = false;
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
-    private boolean loadBalance;
     private boolean somethingWentWrong = false;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
@@ -72,6 +71,8 @@ public class SlaveControler implements IterationStartsListener {
         options.addOption("t", true, "Number of threads for parallel events handling.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
+
+
         if (commandLine.hasOption("c")) {
             try {
                 config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -87,43 +88,9 @@ public class SlaveControler implements IterationStartsListener {
             System.exit(1);
         }
 
-        Socket readSocket;
-        Socket writeSocket;
-        int socketNumber = 12345;
-        String hostname = "localhost";
-        if (commandLine.hasOption("h")) {
-            hostname = commandLine.getOptionValue("h");
-        } else
-            System.err.println("No host specified, using default (localhost)");
-        if (commandLine.hasOption("p"))
-            try {
-                socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
-            } catch (NumberFormatException e) {
-                System.err.println("Port number should be integer");
-                System.out.println(options.toString());
-                System.exit(1);
-            }
-        else {
-            System.err.println("Will accept connections on default port number 12345");
-        }
-        readSocket = new Socket(hostname, socketNumber);
-        writeSocket = new Socket(hostname, socketNumber + 1);
-        this.reader = new ObjectInputStream(readSocket.getInputStream());
-        this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
-
-
-        /*
-        * INITIALIZING COMMS
-        * */
-        myNumber = reader.readInt();
-        slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
-
-        numberOfPSimIterations = reader.readInt();
-        slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
-
-        initialRouting = reader.readBoolean();
-        slaveLogger.warn("Performing initial routing.");
-
+        //The following line will make the controler use the events manager that doesn't check for event order
+        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
         int numThreadsForEventsHandling = 1;
         if (commandLine.hasOption("t"))
             try {
@@ -137,19 +104,55 @@ public class SlaveControler implements IterationStartsListener {
             System.err.println("Will use the default of a single thread for events handling.");
         }
         config.parallelEventHandling().setNumberOfThreads(numThreadsForEventsHandling);
-        config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        List<String> idStrings = (List<String>) reader.readObject();
-        slaveLogger.warn("RECEIVED agent ids for removal from master.");
-//      The following line will make the controler use the events manager that doesn't check for event order
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-        //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
+        String hostname = "localhost";
+        if (commandLine.hasOption("h")) {
+            hostname = commandLine.getOptionValue("h");
+        } else
+            System.err.println("No host specified, using default (localhost)");
+
+        /*
+        * INITIALIZING COMMS
+        * */
+        Socket socket;
+        int socketNumber = 12345;
+        if (commandLine.hasOption("p")) {
+            try {
+                socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
+            } catch (NumberFormatException e) {
+                System.err.println("Port number should be integer");
+                System.out.println(options.toString());
+                System.exit(1);
+            }
+        } else {
+            System.err.println("Will accept connections on default port number 12345");
+        }
+        socket = new Socket(hostname, socketNumber);
+        this.reader = new ObjectInputStream(socket.getInputStream());
+        this.writer = new ObjectOutputStream(socket.getOutputStream());
+
+        myNumber = reader.readInt();
+        slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
+
+        numberOfPSimIterations = reader.readInt();
+        slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
+
+        initialRouting = reader.readBoolean();
+        slaveLogger.warn("Performing initial routing.");
+
+        config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
+        scenario = ScenarioUtils.loadScenario(config);
+
         matsimControler = new Controler(scenario);
-        removeNonSimulatedAgents(idStrings);
         matsimControler.setOverwriteFiles(true);
         matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
+
+        List<String> idStrings = (List<String>) reader.readObject();
+        slaveLogger.warn("RECEIVED agent ids for removal from master.");
+        //only remove persons if you're not the only slave
+        if (idStrings.size() < matsimControler.getPopulation().getPersons().size())
+            removeNonSimulatedAgents(idStrings);
 
         //override the LeastCostPathCalculatorFactory set in the config with one that can be customized
         //with travel times from the master
@@ -167,11 +170,12 @@ public class SlaveControler implements IterationStartsListener {
                     .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
             //tell PlanSerializable to record transit routes
-            PlanSerializable.isUseTransit=true;
+            PlanSerializable.isUseTransit = true;
         }
+
         if (commandLine.hasOption("s")) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
-            //this is a fix for location choice to work with pt, very obscure
+            //this is a fix for location choice to work with pt, by sergioo
             //in location choice, if the facility's link doesn't accommodate the mode you're using,
             //then it won't allow you to go there
             for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -179,10 +183,8 @@ public class SlaveControler implements IterationStartsListener {
                 modes.add("pt");
                 link.setAllowedModes(modes);
             }
-
-            //this is some more magic hacking to get location choice by car to work,
-            // figured out by that great genius, sergio "Mr. Java" ordonez.
-            //sergio creates a car-only network, then associates each activity and facility with a car link.
+            //this is some more magic hacking to get location choice by car to work, by sergioo
+            //sergioo creates a car-only network, then associates each activity and facility with a car link.
             Set<String> carMode = new HashSet<>();
             carMode.add("car");
             NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
@@ -193,13 +195,12 @@ public class SlaveControler implements IterationStartsListener {
                         ((ActivityImpl) planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl) planElement).getCoord()).getId());
             for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
                 ((ActivityFacilityImpl) facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
-            //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration,
-            //like the car router of standard matsim, where best response routing is ok for car, not transit... :)
+            //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
             matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
             //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
         }
-        //no use for this, if you don't exactly know the state of population when something goes wrong.
+        //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);
     }
@@ -223,12 +224,7 @@ public class SlaveControler implements IterationStartsListener {
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
             this.totalIterationTime = getTotalIterationTime();
             communications();
-            if(somethingWentWrong)
-                Runtime.getRuntime().halt(0);
-            if (loadBalance) {
-                slaveLogger.warn("Load balancing complete on all slaves.");
-                iterationTimes = new ArrayList<>();
-            }
+            if (somethingWentWrong) Runtime.getRuntime().halt(0);
             initialRouting = false;
         }
         lastIterationStartTime = System.currentTimeMillis();
@@ -254,8 +250,6 @@ public class SlaveControler implements IterationStartsListener {
             plans.add(person.getSelectedPlan());
         pSimFactory.setPlans(plans);
         numberOfIterations++;
-
-
     }
 
     private void removeNonSimulatedAgents(List<String> idStrings) {
@@ -300,115 +294,99 @@ public class SlaveControler implements IterationStartsListener {
         return personsToSend;
     }
 
-    public void communications() {
-
+    public void transmitPlans() throws IOException, ClassNotFoundException {
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
         for (Person person : matsimControler.getPopulation().getPersons().values())
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
         plansCopyForSending = tempPlansCopyForSending;
-        boolean res = false;
+        slaveLogger.warn("Sending plans...");
+        writer.writeObject(plansCopyForSending);
+        slaveLogger.warn("Sending completed.");
+
+    }
+
+    public void transmitTravelTimes() throws IOException, ClassNotFoundException {
+        slaveLogger.warn("RECEIVING travel times...");
+        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
+        if (config.scenario().isUseTransit()) {
+            stopStopTimes = (StopStopTime) reader.readObject();
+            waitTimes = (WaitTime) reader.readObject();
+        }
+        slaveLogger.warn("RECEIVING travel times completed.");
+    }
+
+    public void transmitPerformance() throws IOException {
+        slaveLogger.warn("Spent a total of " + totalIterationTime +
+                " running " + plansCopyForSending.size() +
+                " person plans for " + numberOfPSimIterations +
+                " PSim iterations.");
+        writer.writeDouble(totalIterationTime);
+        writer.writeInt(matsimControler.getPopulation().getPersons().size());
+    }
+
+    public void distributePersons() throws IOException, ClassNotFoundException {
+        addPersons((List<PersonSerializable>) reader.readObject());
+        iterationTimes = new ArrayList<>();
+        slaveLogger.warn("Load balancing done. waiting for others to finish...");
+    }
+
+    public void poolPersons() throws IOException {
+        slaveLogger.warn("Load balancing...");
+        int diff = reader.readInt();
+        slaveLogger.warn("Received " + diff + " as lb instr from master");
+        List<PersonSerializable> personsToSend = new ArrayList<>();
+        if (diff > 0) {
+            personsToSend = getPersonsToSend(diff);
+        }
+        writer.writeObject(personsToSend);
+        slaveLogger.warn("Sent " + personsToSend.size() + " pax to master");
+    }
+
+    public void communications() {
+        CommunicationsMode communicationsMode = CommunicationsMode.WAIT;
+        slaveLogger.warn("Initializing communications...");
         try {
-            slaveLogger.warn("Checking for master...");
-            res = reader.readBoolean();
-        } catch (IOException e) {
-            slaveLogger.error("Master terminated. Exiting.");
+            while (!communicationsMode.equals(CommunicationsMode.CONTINUE)) {
+                communicationsMode = (CommunicationsMode) reader.readObject();
+                switch (communicationsMode) {
+                    case TRANSMIT_SCENARIO:
+                        break;
+                    case TRANSMIT_TRAVEL_TIMES:
+                        transmitTravelTimes();
+                        break;
+                    case POOL_PERSONS:
+                        poolPersons();
+                        break;
+                    case DISTRIBUTE_PERSONS:
+                        distributePersons();
+                        break;
+                    case TRANSMIT_PLANS_TO_MASTER:
+                        transmitPlans();
+                        break;
+                    case TRANSMIT_PERFORMANCE:
+                        transmitPerformance();
+                        break;
+                    case CONTINUE:
+                        break;
+                    case WAIT:
+                        Thread.sleep(10);
+                        break;
+                    case DIE:
+                        slaveLogger.error("Got the kill signal from MASTER. Bye.");
+                        Runtime.getRuntime().halt(0);
+                        break;
+                }
+                // sending a boolean forces the thread on the master to wait
+                writer.writeBoolean(true);
+                writer.flush();
+            }
+            writer.reset();
+        } catch (ClassNotFoundException | IOException | InterruptedException e) {
+            e.printStackTrace();
+            slaveLogger.error("Something went wrong. Exiting.");
             somethingWentWrong = true;
             return;
         }
-        try {
-            if (res) {
-                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-//                reader.reset();
-                writer.reset();
-                slaveLogger.warn("Spent a total of " + totalIterationTime +
-                        " running " + plansCopyForSending.size() +
-                        " person plans for " + numberOfPSimIterations +
-                        " PSim iterations.");
-                slaveLogger.warn("RECEIVING travel times.");
-                linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-                if (config.scenario().isUseTransit()) {
-                    stopStopTimes = (StopStopTime) reader.readObject();
-                    waitTimes = (WaitTime) reader.readObject();
-                }
-                writer.writeDouble(totalIterationTime);
-                writer.writeInt(matsimControler.getPopulation().getPersons().size());
-                writer.flush();
-                slaveLogger.warn("RECEIVING completed.");
-                slaveLogger.warn("Sending plans...");
-                writer.writeObject(plansCopyForSending);
-                writer.flush();
-                slaveLogger.warn("Sending completed.");
-            } else {
-                slaveLogger.error("Master terminated. Exiting.");
-                somethingWentWrong=true;
-                return;
-            }
-            loadBalance = reader.readBoolean();
-            if (loadBalance) {
-                slaveLogger.warn("Load balancing...");
-
-                int diff = reader.readInt();
-                slaveLogger.warn("Received " + diff + " as lb instr from master");
-
-                List<PersonSerializable> personsToSend = new ArrayList<>();
-                if (diff > 0) {
-                    personsToSend = getPersonsToSend(diff);
-                }
-                writer.writeObject(personsToSend);
-                writer.flush();
-                slaveLogger.warn("Sent " + diff + " pax to master");
-
-                addPersons((List<PersonSerializable>) reader.readObject());
-                slaveLogger.warn("Load balancing done. waiting for others to finish...");
-                //this line is only there tto ensure that slave timing is synchronized, otherwise system becomes chaotic
-                reader.readBoolean();
-            }
-
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-            slaveLogger.error("Something went wrong. Exiting.");
-            somethingWentWrong=true;
-        }
-
+        slaveLogger.warn("Communications completed.");
     }
-
-    class PlansSender implements Runnable {
-        final Logger timesLogger = Logger.getLogger(this.getClass());
-
-        @Override
-        public void run() {
-//            while (true) {
-//                boolean res = false;
-//                try {
-//                    timesLogger.warn("trying to read boolean from master");
-//                    res = reader.readBoolean();
-//                } catch (IOException e) {
-//                    System.out.println("Master terminated. Exiting.");
-//                    System.exit(0);
-//                }
-            try {
-//                    if (res) {
-//                        timesLogger.warn("Receiving travel times.");
-//                        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-//                        stopStopTimes = (StopStopTime) reader.readObject();
-//                        waitTimes = (WaitTime) reader.readObject();
-//                        timesLogger.warn("Checking to see if plans are ready to be sent");
-//                        while (!readyToSendPlans){
-//                            Thread.sleep(10);
-//                        }
-                timesLogger.warn("SENDING plans...");
-                writer.writeObject(plansCopyForSending);
-                timesLogger.warn("SENDING completed.");
-//                    } else {
-//                        System.out.println("Master terminated. Exiting.");
-//                        System.exit(0);
-//                    }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            }
-        }
-
-    }
-
 }

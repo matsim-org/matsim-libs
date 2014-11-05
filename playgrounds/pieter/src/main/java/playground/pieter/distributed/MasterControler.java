@@ -10,15 +10,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -30,15 +30,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener {
+public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
     private final Logger masterLogger = Logger.getLogger(this.getClass());
     private final HashMap<String, Plan> newPlans = new HashMap<>();
-    private boolean initialRouing = false;
+    private int numSlaves;
+    private boolean initialRoutingOnSlaves = false;
     private int numberOfPSimIterations = 5;
     private Config config;
     private Controler matsimControler;
@@ -46,7 +46,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private SerializableLinkTravelTimes linkTravelTimes;
-    private AtomicInteger numThreads;
+    private AtomicInteger numThreads = new AtomicInteger(0);
     private List<PersonSerializable> personPool;
     private int loadBalanceInterval;
     private boolean isLoadBalanceIteration;
@@ -64,7 +64,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("l", false, "Number of iterations between load balancing. Default = 5");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
-        int numSlaves = 0;
         if (commandLine.hasOption("n"))
             numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
         else {
@@ -106,7 +105,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
         if (commandLine.hasOption("r")) {
             masterLogger.warn("ROUTING initial plans on slaves.");
-            initialRouing = true;
+            initialRoutingOnSlaves = true;
         }
         if (commandLine.hasOption("c")) {
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -117,32 +116,32 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         ServerSocket writeServer = new ServerSocket(socketNumber);
-        ServerSocket readServer = new ServerSocket(socketNumber + 1);
         for (int i = 0; i < numSlaves; i++) {
-            Socket writeSocket = writeServer.accept();
-            Socket readSocket = readServer.accept();
+            Socket socket = writeServer.accept();
             masterLogger.warn("Slave " + i + " out of " + numSlaves + " accepted.");
-            slaves[i] = new Slave(writeSocket, readSocket, i);
+            slaves[i] = new Slave(socket, i);
 
             //order is important
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
-            slaves[i].sendBoolean(initialRouing);
+            slaves[i].sendBoolean(initialRoutingOnSlaves);
         }
         writeServer.close();
-        readServer.close();
 
         matsimControler = new Controler(ScenarioUtils.loadScenario(config));
         matsimControler.setOverwriteFiles(true);
         matsimControler.setMobsimFactory(new QSimFactory());
         Set<Id<Person>> ids = matsimControler.getScenario().getPopulation().getPersons().keySet();
         List<Id<Person>>[] split = CollectionUtils.split(ids, numSlaves);
+
         for (int i = 0; i < numSlaves; i++) {
             List<String> idStrings = new ArrayList<>();
             for (Id id : split[i])
                 idStrings.add(id.toString());
-            slaves[i].sendIds(idStrings);
+            slaves[i].writer.writeObject(idStrings);
+            slaves[i].writer.flush();
         }
+
         if (config.scenario().isUseTransit()) {
 //            linkTimeCalculator =
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), config.travelTimeCalculator().getTraveltimeBinSize(),
@@ -153,7 +152,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     .getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
-            PlanSerializable.isUseTransit=true;
+            PlanSerializable.isUseTransit = true;
         }
 
         matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
@@ -165,7 +164,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             matsimControler.setMobsimFactory(new PTQSimFactory());
         }
-        masterLogger.warn("master inited");
+        masterLogger.warn("MASTER inited");
     }
 
     public static void main(String[] args) {
@@ -174,92 +173,101 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             master = new MasterControler(args);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
-            System.exit(1);
+            Runtime.getRuntime().halt(0);
         }
         master.run();
-    }
-
-    public Controler getMATSimControler() {
-        return matsimControler;
+        Runtime.getRuntime().halt(0);
     }
 
     void run() {
         matsimControler.run();
     }
 
+    public void startSlavesInMode(CommunicationsMode mode) {
+        if (numThreads.get() > 0)
+            masterLogger.warn("All slaves have not finished previous operation but they are being asked to " + mode.toString());
+        numThreads = new AtomicInteger(numSlaves);
+        for (Slave slave : slaves) {
+            slave.communicationsMode = mode;
+            new Thread(slave).start();
 
+        }
+    }
 
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event) {
-        isLoadBalanceIteration = slaves.length > 1 && event.getIteration() % loadBalanceInterval == 0;
-        TravelTime linkTravelTimesUnserialized;
-        try {
-            linkTravelTimesUnserialized = matsimControler.getLinkTravelTimes();
-        } catch (NullPointerException e) {
-            linkTravelTimesUnserialized = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(matsimControler.getNetwork(),
-                    this.config.travelTimeCalculator()).getLinkTravelTimes();
-        }
-        linkTravelTimes = new SerializableLinkTravelTimes(linkTravelTimesUnserialized, config
-                .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
-                .getNetwork().getLinks().values());
-        numThreads = new AtomicInteger(slaves.length);
-        Thread[] myThreads = new Thread[slaves.length];
-        for (int i = 0; i < slaves.length; i++) {
-            myThreads[i] = new Thread(slaves[i]);
-            myThreads[i].start();
-        }
+    public void waitForSlaveThreads() {
         while (numThreads.get() > 0)
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-
+                throw new RuntimeException();
             }
-
-        mergePlansFromSlaves();
-        //do load balancing, if necessary
-        if (isLoadBalanceIteration) {
-            personPool = new ArrayList<>();
-            masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
-            List<Integer> loadBalanceNumbers = loadBalanceNumbers();
-            numThreads = new AtomicInteger(slaves.length);
-            for (int i = 0; i < slaves.length; i++) {
-                slaves[i].target = loadBalanceNumbers.get(i);
-                slaves[i].state = SimulationState.PoolPersons;
-                new Thread(slaves[i]).start();
-            }
-            while (numThreads.get() > 0)
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException();
-                }
-            mergePersonsFromSlaves();
-            masterLogger.warn("Distributing persons between  slaves");
-            numThreads = new AtomicInteger(slaves.length);
-            for (int i = 0; i < slaves.length; i++) {
-                slaves[i].state = SimulationState.DistributePersons;
-                new Thread(slaves[i]).start();
-            }
-            while (numThreads.get() > 0)
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException();
-                }
-            for (Slave slave : slaves)
-                slave.state = SimulationState.TransmitTravelTimes;
-        }
-        isLoadBalanceIteration = false;
-        if (personPool != null)
-            personPool.clear();
-        if(somethingWentWrong){
+        if (somethingWentWrong) {
             masterLogger.error("Something went wrong. Exiting.");
             throw new RuntimeException();
         }
+    }
 
+    @Override
+    public void notifyStartup(StartupEvent event) {
+        //wait for previous transmissions to complete, if necessary
+        if (initialRoutingOnSlaves) {
+            startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+            waitForSlaveThreads();
+            mergePlansFromSlaves();
+            //this code is a copy of the replanning strategy
+            for (Person person : matsimControler.getPopulation().getPersons().values()) {
+                person.removePlan(person.getSelectedPlan());
+                Plan plan = newPlans.get(person.getId().toString());
+                person.addPlan(plan);
+                person.setSelectedPlan(plan);
+            }
+            if (numSlaves > 1) loadBalance();
+        }
+    }
+
+
+    @Override
+    public void notifyIterationStarts(IterationStartsEvent event) {
+        //wait for previous transmissions to complete, if necessary
+        waitForSlaveThreads();
+        //start receiving plans from slaves as the QSim runs
+        startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+    }
+
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+        //wating for slaves to receive plans from notifyIterationStarts()
+        waitForSlaveThreads();
+        mergePlansFromSlaves();
+        startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
+        isLoadBalanceIteration = numSlaves > 1 && event.getIteration() % loadBalanceInterval == 0;
+        //do load balancing, if necessary
+        if (isLoadBalanceIteration)
+            loadBalance();
+        isLoadBalanceIteration = false;
+    }
+
+    @Override
+    public void notifyShutdown(ShutdownEvent event) {
+        //start receiving plans from slaves as the QSim runs
+        startSlavesInMode(CommunicationsMode.DIE);
+    }
+
+    private void loadBalance() {
+        waitForSlaveThreads();
+        startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
+        waitForSlaveThreads();
+        personPool = new ArrayList<>();
+        masterLogger.warn("About to start load balancing.");
+        setSlaveTargetPopulationSizes();
+        startSlavesInMode(CommunicationsMode.POOL_PERSONS);
+        waitForSlaveThreads();
+        mergePersonsFromSlaves();
+        masterLogger.warn("Distributing persons between  slaves");
+        startSlavesInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
+        waitForSlaveThreads();
+        startSlavesInMode(CommunicationsMode.CONTINUE);
     }
 
     private void mergePlansFromSlaves() {
@@ -279,7 +287,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
         }
         return outList;
-
     }
 
     private void mergePersonsFromSlaves() {
@@ -289,7 +296,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
     }
 
-    private List<Integer> loadBalanceNumbers() {
+    private void setSlaveTargetPopulationSizes() {
         List<Double> timesPerPlan = new ArrayList<>();
         List<Integer> personsPerSlave = new ArrayList<>();
         List<Integer> optimalNumberPerSlave = new ArrayList<>();
@@ -299,9 +306,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         int largestAllocationIndex = 0;
 
         for (Slave slave : slaves) {
-            timesPerPlan.add(slave.averageIterationTime / slave.myPopulationSize);
-            personsPerSlave.add(slave.myPopulationSize);
-            sumOfReciprocals += 1 / (slave.averageIterationTime / slave.myPopulationSize);
+            timesPerPlan.add(slave.totalIterationTime / slave.currentPopulationSize);
+            personsPerSlave.add(slave.currentPopulationSize);
+            sumOfReciprocals += 1 / (slave.totalIterationTime / slave.currentPopulationSize);
         }
 //        find number of plans that should be allocated to each slave
         for (int i = 0; i < timesPerPlan.size(); i++) {
@@ -317,9 +324,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         int newval = optimalNumberPerSlave.get(largestAllocationIndex) + remainder;
         optimalNumberPerSlave.set(largestAllocationIndex, newval);
         List<Integer> differences = new ArrayList<>();
-        for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
+        for (int i = 0; i < numSlaves; i++) {
             differences.add(personsPerSlave.get(i) - optimalNumberPerSlave.get(i));
-
+            slaves[i].targetPopulationSize = optimalNumberPerSlave.get(i);
         }
         StringBuffer sb = new StringBuffer();
         String[] lines = {"slave", "time per plan", "pax per slave", "optimum", "diff"};
@@ -350,33 +357,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             sb.append("\n");
         }
         masterLogger.warn(sb.toString());
-        return differences;
-    }
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
-        for (Slave slave : slaves) {
-            try {
-                slave.shutdown();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void notifyStartup(StartupEvent event) {
-        if (initialRouing) {
-            notifyAfterMobsim(new AfterMobsimEvent(matsimControler, 0));
-            //this code is a copy of the replanning strategy
-            for(Person person:matsimControler.getPopulation().getPersons().values()){
-                person.removePlan(person.getSelectedPlan());
-                Plan plan = newPlans.get(person.getId().toString());
-                person.addPlan(plan);
-                person.setSelectedPlan(plan);
-            }
-        }
     }
 
     private class Slave implements Runnable {
@@ -384,105 +364,100 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         final Map<String, Plan> plans = new HashMap<>();
         ObjectInputStream reader;
         ObjectOutputStream writer;
-        double averageIterationTime;
+        double totalIterationTime;
         List<PersonSerializable> slavePersonPool;
-        int target = 0;
-        SimulationState state = SimulationState.TransmitTravelTimes;
+        int targetPopulationSize = 0;
+        CommunicationsMode communicationsMode = CommunicationsMode.TRANSMIT_TRAVEL_TIMES;
+        Collection<String> idStrings;
         private int myNumber;
-        private int myPopulationSize;
+        private int currentPopulationSize;
 
-        public Slave(Socket writeSocket, Socket readSocket, int i) throws IOException {
+        public Slave(Socket socket, int i) throws IOException {
             super();
             myNumber = i;
-            this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
-            this.reader = new ObjectInputStream(readSocket.getInputStream());
+            this.writer = new ObjectOutputStream(socket.getOutputStream());
+            this.reader = new ObjectInputStream(socket.getInputStream());
+        }
+
+        public void transmitPlans() throws IOException, ClassNotFoundException {
+            plans.clear();
+            slaveLogger.warn("Waiting to receive plans from slave number " + myNumber);
+            Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
+            slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
+            for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
+                plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
+            }
+        }
+
+        public void transmitPerformance() throws IOException {
+            totalIterationTime = this.reader.readDouble();
+            currentPopulationSize = this.reader.readInt();
+        }
+
+        public void transmitTravelTimes() throws IOException {
+            slaveLogger.warn("About to send travel times to slave number " + myNumber);
+            writer.writeObject(linkTravelTimes);
+            if (config.scenario().isUseTransit()) {
+                writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
+                writer.writeObject(waitTimeCalculator.getWaitTimes());
+            }
+            writer.flush();
+            slaveLogger.warn("SENT travel times to slave number " + myNumber);
+        }
+
+        public void poolPersons() throws IOException, ClassNotFoundException {
+            slaveLogger.warn("Trying to receive persons from slave " + myNumber);
+            slaveLogger.warn("Currently has " + currentPopulationSize + " persons, target is " + targetPopulationSize);
+            slavePersonPool = new ArrayList<>();
+            writer.writeInt(currentPopulationSize - targetPopulationSize);
+            writer.flush();
+            slavePersonPool = (List<PersonSerializable>) reader.readObject();
+        }
+
+        public void distributePersons() throws IOException, InterruptedException {
+            slaveLogger.warn("Distributing persons to slave" + myNumber);
+            slavePersonPool = new ArrayList<>();
+            writer.writeObject(getPersonsFromPool(currentPopulationSize - targetPopulationSize));
+            writer.flush();
         }
 
         @Override
         public void run() {
-            if (state.equals(SimulationState.TransmitTravelTimes)) {
-                try {
-//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-//                    reader.reset();
-                    writer.reset();
-                    plans.clear();
-                    writer.writeBoolean(true);
-                    slaveLogger.warn("About to send travel times to slave number " + myNumber);
-                    writer.writeObject(linkTravelTimes);
-                    if (config.scenario().isUseTransit()) {
-                        writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
-                        writer.writeObject(waitTimeCalculator.getWaitTimes());
-                    }
-                    writer.flush();
-                    slaveLogger.warn("SENT travel times to slave number " + myNumber);
-                    averageIterationTime = this.reader.readDouble();
-                    myPopulationSize = this.reader.readInt();
-                    slaveLogger.warn("waiting to receive plans from slave number " + myNumber);
-                    Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
-                    slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
-                    for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
-                        plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
-                    }
-                    writer.writeBoolean(isLoadBalanceIteration);
-                    writer.flush();
-                    numThreads.decrementAndGet();
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                    somethingWentWrong  = true;
-                    numThreads.decrementAndGet();
+            try {
+                writer.writeObject(communicationsMode);
+                writer.flush();
+                switch (communicationsMode) {
+                    case TRANSMIT_TRAVEL_TIMES:
+                        transmitTravelTimes();
+                        reader.readBoolean();
+                        communicationsMode = CommunicationsMode.CONTINUE;
+                        writer.writeObject(communicationsMode);
+                        writer.flush();
+                        break;
+                    case POOL_PERSONS:
+                        poolPersons();
+                        break;
+                    case DISTRIBUTE_PERSONS:
+                        distributePersons();
+                        break;
+                    case TRANSMIT_PLANS_TO_MASTER:
+                        writer.reset();
+                        transmitPlans();
+                        break;
+                    case TRANSMIT_PERFORMANCE:
+                        transmitPerformance();
+                        break;
                 }
+                reader.readBoolean();
+            } catch (IOException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException e) {
+                e.printStackTrace();
+                somethingWentWrong = true;
+                numThreads.decrementAndGet();
             }
-
-            if (state.equals(SimulationState.PoolPersons)) {
-                slaveLogger.warn("Trying to receive persons from slave " + myNumber);
-                slaveLogger.warn("Target is " + target);
-                slavePersonPool = new ArrayList<>();
-                try {
-                    writer.writeInt(target);
-                    writer.flush();
-                    slavePersonPool = (List<PersonSerializable>) reader.readObject();
-                    numThreads.decrementAndGet();
-                } catch (ClassNotFoundException | IOException e) {
-                    e.printStackTrace();
-                    somethingWentWrong  = true;
-                    numThreads.decrementAndGet();
-                }
-            }
-
-            if (state.equals(SimulationState.DistributePersons)) {
-                slaveLogger.warn("Distributing persons to slave" + myNumber);
-                slavePersonPool = new ArrayList<>();
-                try {
-                    writer.writeObject(getPersonsFromPool(target));
-                    writer.flush();
-                    numThreads.decrementAndGet();
-                    //ensure that slaves start at approximately the same time after load balancing
-                    while (numThreads.get() > 0)
-                        Thread.sleep(10);
-                    writer.writeBoolean(true);
-                    writer.flush();
-                } catch (IOException | InterruptedException | IndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                    somethingWentWrong  = true;
-                    numThreads.decrementAndGet();
-                }
-
-            }
-
-
+            //end of a successful Thread.run()
+            numThreads.decrementAndGet();
         }
 
-        public void sendIds(Collection<String> idStrings) throws IOException {
-            slaveLogger.warn("Sending ids.");
-            writer.writeObject(idStrings);
-            writer.flush();
-        }
-
-        public void shutdown() throws IOException {
-            // kills the slave
-            writer.writeBoolean(false);
-            writer.flush();
-        }
 
         public void sendNumber(int i) throws IOException {
             writer.writeInt(i);
@@ -499,8 +474,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             writer.flush();
         }
     }
-
-
 
 
 }
