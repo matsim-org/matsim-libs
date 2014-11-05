@@ -75,7 +75,7 @@ public class ClusteredChainGenerator {
 		int idField = Integer.parseInt(args[4]);
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {30}; //, 10, 15, 20, 25, 30, 35, 40};
+		double[] radii = {10, 15}; //, 10, 15, 20, 25, 30, 35, 40};
 		int[] pmins = {10, 15}; //, 10, 15, 20, 25};
 
 		/* Read the study area from shapefile. This is necessary as we
