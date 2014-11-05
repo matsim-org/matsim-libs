@@ -141,11 +141,16 @@ public class SlaveControler implements IterationStartsListener {
         slaveLogger.warn("Performing initial routing.");
 
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
+        //limit IO
+        config.linkStats().setWriteLinkStatsInterval(0);
+        config.controler().setCreateGraphs(false);
+        config.controler().setWriteEventsInterval(0);
+        config.controler().setWritePlansInterval(0);
+        config.controler().setWriteSnapshotsInterval(0);
         scenario = ScenarioUtils.loadScenario(config);
 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
-        matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
 
         List<String> idStrings = (List<String>) reader.readObject();

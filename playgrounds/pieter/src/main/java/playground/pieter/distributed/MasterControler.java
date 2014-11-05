@@ -61,7 +61,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("n", true, "Number of slaves to distribute to.");
         options.addOption("i", true, "Number of PSim iterations for every QSim iteration.");
         options.addOption("r", false, "Perform initial routing of plans on slaves.");
-        options.addOption("l", false, "Number of iterations between load balancing. Default = 5");
+        options.addOption("l", true, "Number of iterations between load balancing. Default = 5");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         if (commandLine.hasOption("n"))
@@ -223,6 +223,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 person.setSelectedPlan(plan);
             }
             if (numSlaves > 1) loadBalance();
+            waitForSlaveThreads();
+            startSlavesInMode(CommunicationsMode.CONTINUE);
         }
     }
 
@@ -240,12 +242,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //wating for slaves to receive plans from notifyIterationStarts()
         waitForSlaveThreads();
         mergePlansFromSlaves();
-        startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         isLoadBalanceIteration = numSlaves > 1 && event.getIteration() % loadBalanceInterval == 0;
         //do load balancing, if necessary
         if (isLoadBalanceIteration)
             loadBalance();
         isLoadBalanceIteration = false;
+        waitForSlaveThreads();
+        startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
     }
 
     @Override
@@ -266,8 +269,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         mergePersonsFromSlaves();
         masterLogger.warn("Distributing persons between  slaves");
         startSlavesInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
-        waitForSlaveThreads();
-        startSlavesInMode(CommunicationsMode.CONTINUE);
     }
 
     private void mergePlansFromSlaves() {
