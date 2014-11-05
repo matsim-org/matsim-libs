@@ -157,7 +157,10 @@ public class ClusteredChainGenerator {
 			log.warn("  --> " + folder.getAbsolutePath());
 			FileUtils.delete(folder);
 		}
-		folder.mkdirs();
+		boolean created = folder.mkdirs();
+		if(!created){
+			log.error("Could not create the output folder " + folder.getAbsolutePath());
+		}
 		
 		/* Read vehicle files. */
 		List<File> vehicleList = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
