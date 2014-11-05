@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CALink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,37 +19,40 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.PriorityQueue;
 
-public interface CALink extends CANetworkEntity {
+/**
+ * a PriorityQueue backed bucket queue implementation, probably it should be
+ * defined in a different package and it should be implement the Queue interface
+ * .
+ * 
+ * @author laemmel
+ *
+ */
+public class CAEventsBucketQueue {
 
-	@Override
-	public abstract void handleEvent(CAEvent e);
+	private final Map<Double, Bucket> bucketsMap = new HashMap<>();
+	private final PriorityQueue<Bucket> bucketsQueue = new PriorityQueue<>();
 
-	public abstract CANode getUpstreamCANode();
+	private static final class Bucket {
 
-	public abstract CANode getDownstreamCANode();
+		LinkedList<CAEvent> events = new LinkedList<CAEvent>();
 
-	public abstract Link getLink();
+		public CAEvent peek() {
+			return events.peek();
+		}
 
-	public abstract Link getUpstreamLink();
+		public CAEvent poll() {
+			return events.poll();
+		}
 
-	public abstract int getNumOfCells();
+		public void add(CAEvent e) {
+			this.events.add(e);
+		}
 
-	public abstract CAMoveableEntity[] getParticles();
-
-	public abstract double[] getTimes();
-
-	public abstract void fireDownstreamEntered(CAMoveableEntity a, double time);
-
-	public abstract void fireUpstreamEntered(CAMoveableEntity a, double time);
-
-	public abstract void fireDownstreamLeft(CAMoveableEntity a, double time);
-
-	public abstract void fireUpstreamLeft(CAMoveableEntity a, double time);
-
-	public abstract void reset();
-
-	public abstract void letAgentDepart(CAVehicle veh, double now);
+	}
 
 }

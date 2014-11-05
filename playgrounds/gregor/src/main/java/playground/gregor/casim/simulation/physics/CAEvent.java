@@ -20,23 +20,27 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.core.gbl.MatsimRandom;
+/**
+ * An event that can be handled by CA sim
+ * 
+ * @author laemmel
+ *
+ */
+public class CAEvent implements Comparable<CAEvent> {
 
-
-public class CAEvent implements Comparable<CAEvent>{
-
-	public enum CAEventType {SWAP,TTA,TTE};
-
+	public enum CAEventType {
+		SWAP, TTA, TTE
+	};
 
 	private final double time;
 	private final CAMoveableEntity agent;
 	private final CANetworkEntity entity;
 	private final CAEventType type;
 	public long cnt;
-	private final AgentState validState;
 	private boolean isObsolete = false;
 
-	public CAEvent(double time, CAMoveableEntity agent, CANetworkEntity entity, CAEventType type){
+	public CAEvent(double time, CAMoveableEntity agent, CANetworkEntity entity,
+			CAEventType type) {
 		if (Double.isNaN(time)) {
 			throw new RuntimeException("NaN");
 		}
@@ -44,14 +48,11 @@ public class CAEvent implements Comparable<CAEvent>{
 		this.agent = agent;
 		this.entity = entity;
 		this.type = type;
-		this.validState = new AgentState(agent.getCurrentCANetworkEntity(),agent.getPos(),agent.getDir());
 	}
-
 
 	public CAEventType getCAEventType() {
 		return this.type;
 	}
-
 
 	@Override
 	public int compareTo(CAEvent o) {
@@ -64,10 +65,11 @@ public class CAEvent implements Comparable<CAEvent>{
 			int dir = agent.getDir();
 			if (dir < oDir) {
 				return -1;
-			} if (dir > oDir) {
+			}
+			if (dir > oDir) {
 				return 1;
-			}  
-//			return MatsimRandom.getRandom().nextBoolean() ? -1 : 1;
+			}
+			// return MatsimRandom.getRandom().nextBoolean() ? -1 : 1;
 			return 0;
 
 		}
@@ -86,41 +88,31 @@ public class CAEvent implements Comparable<CAEvent>{
 		return this.entity;
 	}
 
-	//	public boolean isValid() {
-	//		if (this.agent.getCurrentCANetworkEntity() != this.validState.e) {
-	//			return false;
-	//		}
-	//		if (this.validState.e instanceof CANode) {
-	//			return true;
-	//		}
-	//		if (this.agent.getPos() != this.validState.pos) {
-	//			return false;
-	//		}
-	//		if (this.agent.getDir() != this.validState.dir) {
-	//			return false;
-	//		}
-	//		return true;
-	//	}
+	// public boolean isValid() {
+	// if (this.agent.getCurrentCANetworkEntity() != this.validState.e) {
+	// return false;
+	// }
+	// if (this.validState.e instanceof CANode) {
+	// return true;
+	// }
+	// if (this.agent.getPos() != this.validState.pos) {
+	// return false;
+	// }
+	// if (this.agent.getDir() != this.validState.dir) {
+	// return false;
+	// }
+	// return true;
+	// }
 
 	@Override
 	public String toString() {
-		return "time:" + this.time + " type:" + this.type + " obsolete:" + isObsolete() + " agent:" + this.agent.getId() + " pos:" + this.agent.getPos();
-	}
-
-	public class AgentState{
-		CANetworkEntity e;
-		int pos;
-		int dir;
-		public AgentState(CANetworkEntity e, int pos,
-				int dir) {
-			this.e = e;
-			this.pos = pos;
-			this.dir = dir;
-		}
+		return "time:" + this.time + " type:" + this.type + " obsolete:"
+				+ isObsolete() + " agent:" + this.agent.getId() + " pos:"
+				+ this.agent.getPos();
 	}
 
 	public void setObsolete() {
-		this.isObsolete  = true;
+		this.isObsolete = true;
 
 	}
 

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScenarioGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.scenariogen.casimpleexp;
+package playground.gregor.casim.examples;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,47 +35,55 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-public class CAExperiments {
-	private static String inputDir = "/Users/laemmel/devel/casimpleexp/input";
-	private static String outputDir = "/Users/laemmel/devel/casimpleexp/output";
+import playground.gregor.casim.run.CATripRouterFactory;
+import playground.gregor.casim.simulation.CAMobsimFactory;
 
-	private static final int nrAgents = 800;
+public class BypassTest extends MatsimTestCase {
 
-	public static void main(String[] args) {
+	private final int nrAgents = 200;
+
+	@Test
+	public void testBypassScenario() {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
+		createScenario(c, sc);
+	}
 
+	private void createScenario(Config c, Scenario sc) {
 		createNetwork(sc);
 
 		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);
 		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(3600);
 
-		c.network().setInputFile(inputDir + "/network.xml.gz");
-
 		// c.strategy().addParam("Module_1",
 		// "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", ".1");
-		c.strategy().addParam("ModuleDisableAfterIteration_1", "50");
+		c.strategy().addParam("ModuleDisableAfterIteration_1", "10");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", ".9");
 
-		c.controler().setOutputDirectory(outputDir);
-		c.controler().setLastIteration(100);
-
-		c.plans().setInputFile(inputDir + "/population.xml.gz");
+		c.controler().setOutputDirectory(getOutputDirectory());
+		c.controler().setLastIteration(20);
 
 		ActivityParams pre = new ActivityParams("origin");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
@@ -109,19 +117,56 @@ public class CAExperiments {
 
 		c.qsim().setEndTime(21 * 3600);
 
-		new ConfigWriter(c).write(inputDir + "/config.xml");
-
-		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
-
 		createPopulation(sc);
 
-		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork()).write(c.plans()
-				.getInputFile());
+		Controler controller = new Controler(sc);
 
+		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
+		CATripRouterFactory tripRouter = new CATripRouterFactory(sc, cost);
+
+		controller.setTripRouterFactory(tripRouter);
+
+		CAMobsimFactory factory = new CAMobsimFactory();
+		controller.addMobsimFactory("casim", factory);
+		controller.run();
+
+		String ref = getInputDirectory() + "/20.events.xml.gz";
+		String test = getOutputDirectory() + "/ITERS/it.20/20.events.xml.gz";
+		int res = EventsFileComparator.compare(ref, test);
+		assertEquals("Equal events files", 0, res);
 	}
 
-	private static void createPopulation(Scenario sc) {
+	private LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
+			Scenario scenario) {
+		Config config = scenario.getConfig();
+		if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+			return new DijkstraFactory();
+		} else if (config
+				.controler()
+				.getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+			return new AStarLandmarksFactory(
+					scenario.getNetwork(),
+					new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
+					config.global().getNumberOfThreads());
+		} else if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+			return new FastDijkstraFactory();
+		} else if (config
+				.controler()
+				.getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+			return new FastAStarLandmarksFactory(
+					scenario.getNetwork(),
+					new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		} else {
+			throw new IllegalStateException(
+					"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+		}
+	}
+
+	private void createPopulation(Scenario sc) {
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -158,9 +203,10 @@ public class CAExperiments {
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
+
 	}
 
-	private static void createNetwork(Scenario sc) {
+	private void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(
@@ -287,5 +333,7 @@ public class CAExperiments {
 		((NetworkImpl) net).setCapacityPeriod(1);
 		((NetworkImpl) net).setEffectiveCellSize(.26);
 		((NetworkImpl) net).setEffectiveLaneWidth(.71);
+
 	}
+
 }

@@ -17,7 +17,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.gregor.casim.simulation;
 
 import org.matsim.api.core.v01.Id;
@@ -33,37 +32,37 @@ import playground.gregor.casim.simulation.physics.CAVehicle;
 import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 public class CAWalkerDepatureHandler implements DepartureHandler {
-	
+
 	private static final String transportMode = TransportMode.walkca;
 	private final CANetsimEngine engine;
-	private Scenario sc;
 
 	public CAWalkerDepatureHandler(CANetsimEngine caEngine, Scenario sc) {
 		this.engine = caEngine;
-		this.sc = sc;
 	}
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent,
+			Id<Link> linkId) {
 		if (agent.getMode().equals(transportMode)) {
-			if ( agent instanceof MobsimDriverAgent ) {
-				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
+			if (agent instanceof MobsimDriverAgent) {
+				handleCarDeparture(now, (MobsimDriverAgent) agent, linkId);
 				return true;
 			} else {
-				throw new UnsupportedOperationException("wrong agent type to depart on a network mode");
+				throw new UnsupportedOperationException(
+						"wrong agent type to depart on a network mode");
 			}
-		} 
+		}
 		return false;
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent,
 			Id<Link> linkId) {
 		CALink link = this.engine.getCANetwork().getCALink(linkId);
-		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
-		
-		CAVehicle veh = new CAVehicle(vehicleId,agent);
-		link.letAgentDepart(veh,now);
-		
+		Id<Vehicle> vehicleId = agent.getPlannedVehicleId();
+
+		CAVehicle veh = new CAVehicle(vehicleId, agent, link);
+		link.letAgentDepart(veh, now);
+
 	}
 
 }

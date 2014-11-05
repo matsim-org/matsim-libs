@@ -33,10 +33,12 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 	private Id<Vehicle> id;
 	private MobsimDriverAgent agent;
+	private CANetworkEntity currentCANetorkEntity;
 
-	public CAVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent) {
+	public CAVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent, CALink link) {
 		this.id = vehicleId;
 		this.agent = agent;
+		this.currentCANetorkEntity = link;
 	}
 
 	@Override
@@ -50,16 +52,14 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 		return this.agent;
 	}
 
-	public void setDriver( MobsimDriverAgent driver) {
+	public void setDriver(MobsimDriverAgent driver) {
 		this.agent = null;
 	}
-	
+
 	@Override
 	public Id<Vehicle> getId() {
 		return this.id;
 	}
-
-
 
 	@Override
 	Id<Link> getNextLinkId() {
@@ -68,20 +68,22 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 	@Override
 	void moveOverNode(CALink nextLink, double time) {
-		this.agent.notifyMoveOverNode(nextLink.getLink().getId());
-		
+		this.currentCANetorkEntity = nextLink;
+		if (this.getPos() == 0) {
+			this.agent.notifyMoveOverNode(nextLink.getLink().getId());
+		} else {
+			this.agent.notifyMoveOverNode(nextLink.getUpstreamLink().getId());
+		}
 	}
 
 	@Override
 	public CANetworkEntity getCurrentCANetworkEntity() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.currentCANetorkEntity;
 	}
 
 	@Override
 	public void moveToNode(CANode n) {
-		// TODO Auto-generated method stub
-		
+		this.currentCANetorkEntity = n;
 	}
 
 	@Override
@@ -89,8 +91,8 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 		return null;
 	}
 
-///////////////////////////////////////
-	
+	// /////////////////////////////////////
+
 	@Override
 	public double getSizeInEquivalents() {
 		throw new RuntimeException("unsed method");
@@ -115,8 +117,5 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 	public int getPassengerCapacity() {
 		throw new RuntimeException("unsed method");
 	}
-
-	
-	
 
 }

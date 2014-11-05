@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controller2D.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,7 +20,6 @@
 package playground.gregor.casim.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -37,6 +35,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.CAMobsimFactory;
+import playground.gregor.casim.simulation.physics.CANetworkDynamic;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -46,50 +45,49 @@ import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
-public class CARunner implements IterationStartsListener{
+public class CARunner implements IterationStartsListener {
 
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
 
-	public static void main(String [] args) {
+	public static void main(String[] args) {
 		if (args.length != 2) {
 			printUsage();
 			System.exit(-1);
 		}
 		String qsimConf = args[0];
 		Config c = ConfigUtils.loadConfig(qsimConf);
-		
+
 		c.controler().setWriteEventsInterval(1);
-		
-		
-		
+
 		Scenario sc = ScenarioUtils.loadScenario(c);
-//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
-		
-//		c.qsim().setEndTime(120);
-//		c.qsim().setEndTime(23*3600);
-//		c.qsim().setEndTime(41*60);//+30*60);
-		
+		// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
+
+		// c.qsim().setEndTime(120);
+		// c.qsim().setEndTime(23*3600);
+		// c.qsim().setEndTime(41*60);//+30*60);
+
 		Controler controller = new Controler(sc);
 
 		controller.setOverwriteFiles(true);
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
-		CATripRouterFactory tripRouter = new CATripRouterFactory(sc,cost);
-		
+		CATripRouterFactory tripRouter = new CATripRouterFactory(sc, cost);
+
 		controller.setTripRouterFactory(tripRouter);
 
 		CAMobsimFactory factory = new CAMobsimFactory();
 		controller.addMobsimFactory("casim", factory);
 
-		
 		if (args[1].equals("true")) {
-			//VIS only
+			CANetworkDynamic.EMIT_VIS_EVENTS = true;
+			// VIS only
 			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
 			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
-			
-			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
-			InfoBox iBox = new InfoBox(dbg,sc);
+			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+
+			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(
+					sc);
+			InfoBox iBox = new InfoBox(dbg, sc);
 			dbg.addAdditionalDrawer(iBox);
 			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
@@ -97,30 +95,45 @@ public class CARunner implements IterationStartsListener{
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
 		}
-		
-//		DefaultTripRouterFactoryImpl fac = builder.build(sc);
-//		DefaultTripRouterFactoryImpl fac = new DefaultTripRouterFactoryImpl(sc, null, null);
-	
-//		controller.setTripRouterFactory(fac);
+
+		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
+		// DefaultTripRouterFactoryImpl fac = new
+		// DefaultTripRouterFactoryImpl(sc, null, null);
+
+		// controller.setTripRouterFactory(fac);
 		controller.run();
 	}
 
-	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(Scenario scenario) {
+	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
+			Scenario scenario) {
 		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-            return new DijkstraFactory();
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-            return new AStarLandmarksFactory(
-                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-            return new FastDijkstraFactory();
-        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-            return new FastAStarLandmarksFactory(
-                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-        } else {
-            throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-        }
+		if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+			return new DijkstraFactory();
+		} else if (config
+				.controler()
+				.getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+			return new AStarLandmarksFactory(
+					scenario.getNetwork(),
+					new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
+					config.global().getNumberOfThreads());
+		} else if (config.controler().getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+			return new FastDijkstraFactory();
+		} else if (config
+				.controler()
+				.getRoutingAlgorithmType()
+				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+			return new FastAStarLandmarksFactory(
+					scenario.getNetwork(),
+					new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+		} else {
+			throw new IllegalStateException(
+					"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+		}
 	}
+
 	protected static void printUsage() {
 		System.out.println();
 		System.out.println("CARunner");
@@ -139,14 +152,14 @@ public class CARunner implements IterationStartsListener{
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
-//			this.factory.debug(this.visDebugger);
+			// this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(true);
 		} else {
-//			this.factory.debug(null);
+			// this.factory.debug(null);
 			this.controller.getEvents().removeHandler(this.qSimDrawer);
 			this.controller.setCreateGraphs(false);
 		}
-//		this.visDebugger.setIteration(event.getIteration());
+		// this.visDebugger.setIteration(event.getIteration());
 	}
 }

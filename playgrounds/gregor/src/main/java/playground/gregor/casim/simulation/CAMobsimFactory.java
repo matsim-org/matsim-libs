@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package playground.gregor.casim.simulation;
 
 import org.matsim.api.core.v01.Scenario;
@@ -15,7 +33,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 public class CAMobsimFactory implements MobsimFactory {
 
@@ -23,7 +40,8 @@ public class CAMobsimFactory implements MobsimFactory {
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
-			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+			throw new NullPointerException(
+					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
 		QSim qSim = new QSim(sc, eventsManager);
@@ -31,8 +49,8 @@ public class CAMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-        CANetsimEngineModule.configure(qSim);
-		
+		CANetsimEngineModule.configure(qSim);
+
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 
@@ -40,7 +58,8 @@ public class CAMobsimFactory implements MobsimFactory {
 		if (sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			transitEngine
+					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);
 			qSim.addMobsimEngine(transitEngine);
@@ -48,9 +67,10 @@ public class CAMobsimFactory implements MobsimFactory {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
 		if (sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(
+				sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
