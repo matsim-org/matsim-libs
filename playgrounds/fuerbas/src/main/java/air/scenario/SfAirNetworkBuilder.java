@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -59,9 +58,9 @@ public class SfAirNetworkBuilder {
 			Coord airportCoord = coordtransform.transform(coord);
 			airportcounter++;
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2)
-				new SfMatsimAirport(new IdImpl(airportCode), airportCoord, null).createTwoRunways(network);
+				new SfMatsimAirport(Id.create(airportCode, Node.class), airportCoord, null).createTwoRunways(network);
 			else
-				new SfMatsimAirport(new IdImpl(airportCode), airportCoord, null).createOneRunway(network);
+				new SfMatsimAirport(Id.create(airportCode, Node.class), airportCoord, null).createOneRunway(network);
 		}
 		
 		while (brRoutes.ready()) {
@@ -77,27 +76,27 @@ public class SfAirNetworkBuilder {
 			
 			Id originRunwayOutNodeId;
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2) {
-				originRunwayOutNodeId = new IdImpl(origin+"runwayOutbound");
+				originRunwayOutNodeId = Id.create(origin+"runwayOutbound", Node.class);
 			}
 			else {
-				originRunwayOutNodeId = new IdImpl(origin+"runway");
+				originRunwayOutNodeId = Id.create(origin+"runway", Node.class);
 			}
 			
 			Node destinationNode = null;
 			if (DgCreateSfFlightScenario.doCreateStars) {
-				Id destinationStar = new IdImpl(destination+"star");
+				Id<Node> destinationStar = Id.create(destination+"star", Node.class);
 				destinationNode = network.getNodes().get(destinationStar);
 			}
 			else {
 				if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS == 2){
-					destinationNode = network.getNodes().get(new IdImpl(destination + "runwayInbound"));
+					destinationNode = network.getNodes().get(Id.create(destination + "runwayInbound", Node.class));
 				}
 				else {
-					destinationNode = network.getNodes().get(new IdImpl(destination + "runway"));
+					destinationNode = network.getNodes().get(Id.create(destination + "runway", Node.class));
 				}
 			}
 			
-			Link originToDestination = network.getFactory().createLink(new IdImpl(origin+destination), 
+			Link originToDestination = network.getFactory().createLink(Id.create(origin+destination, Link.class), 
 					network.getNodes().get(originRunwayOutNodeId), destinationNode);
 			originToDestination.setAllowedModes(allowedModes);
 
