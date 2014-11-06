@@ -62,8 +62,6 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private CharyparNagelScoringParameters params;
 	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
 	private int arekValsRead = 1;
-	private ObjectAttributes facilitiesKValues;
-	private ObjectAttributes personsKValues;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 	private ObjectAttributes prefsAttributes = new ObjectAttributes();
@@ -97,15 +95,15 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private void readOrCreateKVals(long seed) {
 		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, (ScenarioImpl) this.scenario);
 		this.arekValsRead = computer.run();
-		this.personsKValues = computer.getPersonsKValues();
-		this.facilitiesKValues = computer.getFacilitiesKValues();
+		ObjectAttributes personsKValues = computer.getPersonsKValues();
+		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
 		
 		this.personIndices = new HashMap<Id<Person>, Integer>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;
 		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
 			this.personIndices.put(personId, personIndex);
-			this.personsKValuesArray[personIndex] = (Double) this.personsKValues.getAttribute(personId.toString(), "k");
+			this.personsKValuesArray[personIndex] = (Double) personsKValues.getAttribute(personId.toString(), "k");
 			personIndex++;
 		}		
 		
@@ -114,7 +112,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		int facilityIndex = 0;
 		for (Id<ActivityFacility> facilityId : this.scenario.getActivityFacilities().getFacilities().keySet()) {
 			this.facilityIndices.put(facilityId, facilityIndex);
-			this.facilitiesKValuesArray[facilityIndex] = (Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k");
+			this.facilitiesKValuesArray[facilityIndex] = (Double) facilitiesKValues.getAttribute(facilityId.toString(), "k");
 			facilityIndex++;
 		}
 	}
