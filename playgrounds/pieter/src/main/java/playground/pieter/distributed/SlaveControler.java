@@ -14,14 +14,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
@@ -38,9 +44,10 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener {
+public class SlaveControler implements IterationStartsListener, StartupListener {
     private final FastDijkstraFactoryWithCustomTravelTimes refreshableDijkstra;
     private final Scenario scenario;
+    private final MemoryUsageCalculator memoryUsageCalculator;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
@@ -59,6 +66,7 @@ public class SlaveControler implements IterationStartsListener {
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
     private boolean somethingWentWrong = false;
+    private long fSLEEP_INTERVAL = 100;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -111,6 +119,9 @@ public class SlaveControler implements IterationStartsListener {
         } else
             System.err.println("No host specified, using default (localhost)");
 
+
+
+
         /*
         * INITIALIZING COMMS
         * */
@@ -140,6 +151,12 @@ public class SlaveControler implements IterationStartsListener {
         initialRouting = reader.readBoolean();
         slaveLogger.warn("Performing initial routing.");
 
+        memoryUsageCalculator = new MemoryUsageCalculator();
+        writeMemoryStats();
+        writer.writeInt(config.global().getNumberOfThreads());
+        writer.flush();
+
+
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
@@ -147,17 +164,14 @@ public class SlaveControler implements IterationStartsListener {
         config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
-        scenario = ScenarioUtils.loadScenario(config);
+        scenario = ScenarioUtils.createScenario(config);
+        //assume basic scenario for now, can create a loadScenario later
+        loadScenario();
+
 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
-
-        List<String> idStrings = (List<String>) reader.readObject();
-        slaveLogger.warn("RECEIVED agent ids for removal from master.");
-        //only remove persons if you're not the only slave
-        if (idStrings.size() < matsimControler.getPopulation().getPersons().size())
-            removeNonSimulatedAgents(idStrings);
 
         //override the LeastCostPathCalculatorFactory set in the config with one that can be customized
         //with travel times from the master
@@ -208,6 +222,38 @@ public class SlaveControler implements IterationStartsListener {
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);
+    }
+
+    private void writeMemoryStats() throws IOException {
+        writer.writeLong(memoryUsageCalculator.getMemoryUse());
+        writer.writeLong(Runtime.getRuntime().maxMemory());
+        writer.writeInt(getTotalNumberOfPlans());
+    }
+
+    private int getTotalNumberOfPlans() {
+        int total = 0;
+        try {
+            for (Person person : scenario.getPopulation().getPersons().values()) {
+                total += person.getPlans().size();
+            }
+        } catch (NullPointerException e) {
+        }
+        return total;
+    }
+
+    /**
+     * currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.
+     */
+    private void loadScenario() {
+        slaveLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
+        new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+        new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
+        if (config.scenario().isUseTransit()) {
+            new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
+            if (this.config.scenario().isUseVehicles()) {
+                new VehicleReaderV1(this.scenario.getVehicles()).readFile(this.config.transit().getVehiclesFile());
+            }
+        }
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
@@ -327,6 +373,36 @@ public class SlaveControler implements IterationStartsListener {
                 " PSim iterations.");
         writer.writeDouble(totalIterationTime);
         writer.writeInt(matsimControler.getPopulation().getPersons().size());
+        //send memory usage fraction of max to prevent being assigned more persons
+        writer.writeDouble(getMemoryUse());
+
+    }
+
+    private double getMemoryUse() {
+        putOutTheGarbage();
+        double totalMemory = Runtime.getRuntime().totalMemory();
+        putOutTheGarbage();
+        double freeMemory = Runtime.getRuntime().freeMemory();
+        double usedMemoryEst = totalMemory - freeMemory;
+        double maxMemory = Runtime.getRuntime().maxMemory();
+        return usedMemoryEst / maxMemory;
+    }
+
+    private void putOutTheGarbage() {
+        collectGarbage();
+        collectGarbage();
+    }
+
+    private void collectGarbage() {
+        try {
+            System.gc();
+            Thread.currentThread().sleep(fSLEEP_INTERVAL);
+            System.runFinalization();
+            Thread.currentThread().sleep(fSLEEP_INTERVAL);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+            somethingWentWrong = true;
+        }
     }
 
     public void distributePersons() throws IOException, ClassNotFoundException {
@@ -355,6 +431,7 @@ public class SlaveControler implements IterationStartsListener {
                 communicationsMode = (CommunicationsMode) reader.readObject();
                 switch (communicationsMode) {
                     case TRANSMIT_SCENARIO:
+                        distributePersons();
                         break;
                     case TRANSMIT_TRAVEL_TIMES:
                         transmitTravelTimes();
@@ -393,5 +470,10 @@ public class SlaveControler implements IterationStartsListener {
             return;
         }
         slaveLogger.warn("Communications completed.");
+    }
+
+    @Override
+    public void notifyStartup(StartupEvent event) {
+        communications();
     }
 }

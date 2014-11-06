@@ -22,191 +22,193 @@ import java.util.ArrayList;
 import java.util.List;
 
 class PlanSerializable implements Serializable {
-    public static boolean isUseTransit=false;
-	private interface PlanElementSerializable extends Serializable {
+    public static boolean isUseTransit = false;
 
-	}
+    private interface PlanElementSerializable extends Serializable {
 
-	class ActivitySerializable implements PlanElementSerializable {
-		private final CoordSerializable coord;
-		private final double endTime;
-		private final String facIdString;
-		private final String linkIdString;
-		private final double maximumDuration;
-		private final double startTime;
-		private final String type;
+    }
 
-		public ActivitySerializable(Activity act) {
-			coord = new CoordSerializable(act.getCoord());
-			endTime = act.getEndTime();
-			facIdString = act.getFacilityId() == null ? null : act.getFacilityId().toString();
-			linkIdString = act.getLinkId().toString();
-			maximumDuration = act.getMaximumDuration();
-			startTime = act.getStartTime();
-			type = act.getType();
-		}
+    class ActivitySerializable implements PlanElementSerializable {
+        private final CoordSerializable coord;
+        private final double endTime;
+        private final String facIdString;
+        private final String linkIdString;
+        private final double maximumDuration;
+        private final double startTime;
+        private final String type;
 
-		public Activity getActivity() {
-			ActivityImpl activity = new ActivityImpl(type, coord.getCoord(), Id.createLinkId(linkIdString));
-			activity.setEndTime(endTime);
-			activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
-			activity.setMaximumDuration(maximumDuration);
-			activity.setStartTime(startTime);
-			return activity;
-		}
-	}
+        public ActivitySerializable(Activity act) {
+            coord = new CoordSerializable(act.getCoord());
+            endTime = act.getEndTime();
+            facIdString = act.getFacilityId() == null ? null : act.getFacilityId().toString();
+            linkIdString = act.getLinkId() == null ? null : act.getLinkId().toString();
+            maximumDuration = act.getMaximumDuration();
+            startTime = act.getStartTime();
+            type = act.getType();
+        }
 
-	class LegSerializable implements PlanElementSerializable {
-		private final double departureTime;
-		private final String mode;
-		private final double travelTime;
-		private RouteSerializable route;
+        public Activity getActivity() {
+            ActivityImpl activity = new ActivityImpl(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
+            activity.setEndTime(endTime);
+            activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
+            activity.setMaximumDuration(maximumDuration);
+            activity.setStartTime(startTime);
+            return activity;
+        }
+    }
 
-		public LegSerializable(Leg leg) {
-			departureTime = leg.getDepartureTime();
-			mode = leg.getMode();
-			travelTime = leg.getTravelTime();
-			if(mode.equals(TransportMode.pt))
-				System.out.print("");
-			if (leg.getRoute() instanceof NetworkRoute)
-				route = new LinkNetworkRouteSerializable((NetworkRoute) leg.getRoute());
-			else if (leg.getRoute() instanceof GenericRoute)
-				route = new GenericRouteSerializable((GenericRoute) leg.getRoute());
+    class LegSerializable implements PlanElementSerializable {
+        private final double departureTime;
+        private final String mode;
+        private final double travelTime;
+        private RouteSerializable route;
 
-			
-		}
+        public LegSerializable(Leg leg) {
+            departureTime = leg.getDepartureTime();
+            mode = leg.getMode();
+            travelTime = leg.getTravelTime();
+            if (mode.equals(TransportMode.pt))
+                System.out.print("");
+            if (leg.getRoute() instanceof NetworkRoute)
+                route = new LinkNetworkRouteSerializable((NetworkRoute) leg.getRoute());
+            else if (leg.getRoute() instanceof GenericRoute)
+                route = new GenericRouteSerializable((GenericRoute) leg.getRoute());
 
-		public Leg getLeg() {
-			Leg leg = new LegImpl(mode);
-			leg.setDepartureTime(departureTime);
-			leg.setTravelTime(travelTime);
-			leg.setRoute(route.getRoute(mode));
-			return leg;
-		}
-	}
 
-	class CoordSerializable implements Serializable {
-		private final double x;
-		private final double y;
+        }
 
-		public CoordSerializable(Coord coord) {
-			x = coord.getX();
-			y = coord.getY();
-		}
+        public Leg getLeg() {
+            Leg leg = new LegImpl(mode);
+            leg.setDepartureTime(departureTime);
+            leg.setTravelTime(travelTime);
+            leg.setRoute(route == null ? null : route.getRoute(mode));
+            return leg;
+        }
+    }
 
-		public Coord getCoord() {
-			return new CoordImpl(x, y);
+    class CoordSerializable implements Serializable {
+        private final double x;
+        private final double y;
 
-		}
-	}
+        public CoordSerializable(Coord coord) {
+            x = coord.getX();
+            y = coord.getY();
+        }
 
-	interface RouteSerializable extends Serializable {
-		Route getRoute(String mode);
-	}
+        public Coord getCoord() {
+            return new CoordImpl(x, y);
 
-	class LinkNetworkRouteSerializable implements RouteSerializable {
+        }
+    }
 
-		private final double distance;
-		private final String endLinkIdString;
-		private final String startLinkIdString;
-		private final double travelCost;
-		private final double travelTime;
-		private final String vehicleIdString;
-		private final List<String> linkIdStrings;
+    interface RouteSerializable extends Serializable {
+        Route getRoute(String mode);
+    }
 
-		public LinkNetworkRouteSerializable(NetworkRoute route) {
-			distance = route.getDistance();
-			endLinkIdString = route.getEndLinkId().toString();
-			startLinkIdString = route.getStartLinkId().toString();
-			travelCost = route.getTravelCost();
-			travelTime = route.getTravelTime();
-			vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
-			List<Id<Link>> linkIds = route.getLinkIds();
-			linkIdStrings = new ArrayList<>();
-			for (Id<Link> linkid : linkIds)
-				linkIdStrings.add(linkid.toString());
-		}
+    class LinkNetworkRouteSerializable implements RouteSerializable {
 
-		@Override
-		public Route getRoute(String mode) {
+        private final double distance;
+        private final String endLinkIdString;
+        private final String startLinkIdString;
+        private final double travelCost;
+        private final double travelTime;
+        private final String vehicleIdString;
+        private final List<String> linkIdStrings;
+
+        public LinkNetworkRouteSerializable(NetworkRoute route) {
+            distance = route.getDistance();
+            endLinkIdString = route.getEndLinkId().toString();
+            startLinkIdString = route.getStartLinkId().toString();
+            travelCost = route.getTravelCost();
+            travelTime = route.getTravelTime();
+            vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
+            List<Id<Link>> linkIds = route.getLinkIds();
+            linkIdStrings = new ArrayList<>();
+            for (Id<Link> linkid : linkIds)
+                linkIdStrings.add(linkid.toString());
+        }
+
+        @Override
+        public Route getRoute(String mode) {
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
-			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
-			route.setDistance(distance);
-			List<Id<Link>> linkIds = new ArrayList<>();
-			for (String linkId : linkIdStrings)
-				linkIds.add(Id.createLinkId(linkId));
-			route.setLinkIds(startLinkId, linkIds, endLinkId);
-			route.setTravelCost(travelCost);
-			route.setTravelTime(travelTime);
-			route.setVehicleId(vehicleIdString == null ? null : Id.create(vehicleIdString, Vehicle.class));
-			return route;
-		}
+            NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+            route.setDistance(distance);
+            List<Id<Link>> linkIds = new ArrayList<>();
+            for (String linkId : linkIdStrings)
+                linkIds.add(Id.createLinkId(linkId));
+            route.setLinkIds(startLinkId, linkIds, endLinkId);
+            route.setTravelCost(travelCost);
+            route.setTravelTime(travelTime);
+            route.setVehicleId(vehicleIdString == null ? null : Id.create(vehicleIdString, Vehicle.class));
+            return route;
+        }
 
-	}
+    }
 
-	class GenericRouteSerializable implements RouteSerializable {
+    class GenericRouteSerializable implements RouteSerializable {
 
-		private final double distance;
-		private final String endLinkIdString;
-		private final String routeDescription;
-		private final String startLinkIdString;
-		private final double travelTime;
+        private final double distance;
+        private final String endLinkIdString;
+        private final String routeDescription;
+        private final String startLinkIdString;
+        private final double travelTime;
 
-		public GenericRouteSerializable(GenericRoute route) {
-			distance = route.getDistance();
-			endLinkIdString = route.getEndLinkId().toString();
-			routeDescription = route.getRouteDescription();
-			startLinkIdString = route.getStartLinkId().toString();
-			travelTime = route.getTravelTime();
-		}
+        public GenericRouteSerializable(GenericRoute route) {
+            distance = route.getDistance();
+            endLinkIdString = route.getEndLinkId().toString();
+            routeDescription = route.getRouteDescription();
+            startLinkIdString = route.getStartLinkId().toString();
+            travelTime = route.getTravelTime();
+        }
 
-		@Override
-		public Route getRoute(String mode) {
-			GenericRoute route;
+        @Override
+        public Route getRoute(String mode) {
+            GenericRoute route;
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
-            if(mode.equals(TransportMode.pt) && isUseTransit){
-				route = (GenericRoute) new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
-			}else{
-				route = new GenericRouteImpl(startLinkId, endLinkId);
-			}
-			route.setDistance(distance);
-			route.setTravelTime(travelTime);
-			route.setRouteDescription(startLinkId, routeDescription, endLinkId);
-			return route;
-		}
+            if (mode.equals(TransportMode.pt) && isUseTransit) {
+                route = (GenericRoute) new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
+            } else {
+                route = new GenericRouteImpl(startLinkId, endLinkId);
+            }
+            route.setDistance(distance);
+            route.setTravelTime(travelTime);
+            route.setRouteDescription(startLinkId, routeDescription, endLinkId);
+            return route;
+        }
 
-	}
+    }
 
-	private final ArrayList<PlanElementSerializable> planElements;
-	private final String personId;
-	private final Double score;
-	private final String type;
+    private final ArrayList<PlanElementSerializable> planElements;
+    private final String personId;
+    private final Double score;
+    private final String type;
 
-	public PlanSerializable(Plan plan) {
-		planElements = new ArrayList<>();
-		for (PlanElement planElement : plan.getPlanElements())
-			if (planElement instanceof Activity)
-				planElements.add(new ActivitySerializable((Activity) planElement));
-			else
-				planElements.add(new LegSerializable((Leg) planElement));
-		personId = plan.getPerson().getId().toString();
-		score = plan.getScore();
-		type = plan.getType();
-	}
+    public PlanSerializable(Plan plan) {
+        planElements = new ArrayList<>();
+        for (PlanElement planElement : plan.getPlanElements())
+            if (planElement instanceof Activity)
+                planElements.add(new ActivitySerializable((Activity) planElement));
+            else
+                planElements.add(new LegSerializable((Leg) planElement));
+        personId = plan.getPerson().getId().toString();
+        score = plan.getScore();
+        type = plan.getType();
+    }
 
-	public Plan getPlan(Population population) {
-		Plan plan = new PlanImpl(population.getPersons().get(Id.createPersonId(personId)));
-		plan.setScore(score);
-		plan.setType(type);
-		for (PlanElementSerializable planElementSerializable : planElements)
-			if (planElementSerializable instanceof ActivitySerializable)
-				plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
-			else
-				plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
-		return plan;
-	}
+    public Plan getPlan(Population population) {
+        Plan plan = new PlanImpl(population.getPersons().get(Id.createPersonId(personId)));
+        plan.setScore(score);
+        plan.setType(type);
+        for (PlanElementSerializable planElementSerializable : planElements)
+            if (planElementSerializable instanceof ActivitySerializable)
+                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
+            else
+                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
+        return plan;
+    }
+
     public Plan getPlan() {
         Plan plan = new PlanImpl();
         plan.setScore(score);

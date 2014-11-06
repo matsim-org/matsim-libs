@@ -3,7 +3,7 @@ package playground.pieter.distributed;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -17,8 +17,13 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -35,8 +40,16 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
+    private static final double MAX_MEMORY_USE = 0.5;
     private final Logger masterLogger = Logger.getLogger(this.getClass());
     private final HashMap<String, Plan> newPlans = new HashMap<>();
+    private  Scenario scenario;
+    private  long scenarioMemoryUse;
+    private  MemoryUsageCalculator memoryUsageCalculator;
+    private  long bytesPerPlan;
+    private long usedMemory;
+    private long freeMemory;
+    private long currentPopulationMemoryUse;
     private int numSlaves;
     private boolean initialRoutingOnSlaves = false;
     private int numberOfPSimIterations = 5;
@@ -115,6 +128,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             System.exit(1);
         }
 
+//        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
@@ -125,22 +139,36 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
             slaves[i].sendBoolean(initialRoutingOnSlaves);
+            slaves[i].readMemoryStats();
+            slaves[i].readNumberOfThreadsOnSlave();
         }
         writeServer.close();
 
-        matsimControler = new Controler(ScenarioUtils.loadScenario(config));
-        matsimControler.setOverwriteFiles(true);
-        matsimControler.setMobsimFactory(new QSimFactory());
-        Set<Id<Person>> ids = matsimControler.getScenario().getPopulation().getPersons().keySet();
-        List<Id<Person>>[] split = CollectionUtils.split(ids, numSlaves);
+        scenario = ScenarioUtils.createScenario(config);
+        loadScenario();
+//        determine the memory use of the population for some initial load balancing
+        memoryUsageCalculator = new MemoryUsageCalculator();
+        scenarioMemoryUse = memoryUsageCalculator.getMemoryUse();
+        loadPopulation();
+        currentPopulationMemoryUse = memoryUsageCalculator.getMemoryUse()- scenarioMemoryUse;
+        bytesPerPlan = currentPopulationMemoryUse/getTotalNumberOfPlansOnMaster();
+        masterLogger.warn("Estimated memory use per plan is "+ bytesPerPlan +" bytes");
 
+        matsimControler = new Controler(scenario);
+        matsimControler.setOverwriteFiles(true);
+
+        //split the population to be sent to the slaves
+
+        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getPopulation().getPersons().values(), numSlaves);
         for (int i = 0; i < numSlaves; i++) {
-            List<String> idStrings = new ArrayList<>();
-            for (Id id : split[i])
-                idStrings.add(id.toString());
-            slaves[i].writer.writeObject(idStrings);
-            slaves[i].writer.flush();
+            List<PersonSerializable> personsToSend = new ArrayList<>();
+            for(PersonImpl p:personSplit[i]){
+                personsToSend.add(new PersonSerializable(p));
+            }
+            slaves[i].slavePersonPool = personsToSend;
         }
+
+
 
         if (config.scenario().isUseTransit()) {
 //            linkTimeCalculator =
@@ -165,6 +193,44 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             matsimControler.setMobsimFactory(new PTQSimFactory());
         }
         masterLogger.warn("MASTER inited");
+    }
+
+    private int getTotalNumberOfPlansFromSlaves() {
+        int total=0;
+        for(Slave slave:slaves){
+            total += slave.numberOfPlans;
+        }
+        return total;
+    }
+
+    private int getTotalNumberOfPlansOnMaster() {
+        int total=0;
+        for(Person person:scenario.getPopulation().getPersons().values()){
+            total += person.getPlans().size();
+        }
+        return total;
+    }
+
+    /**
+     * Currently a simple population without attributes
+     */
+    private void loadPopulation() {
+        new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
+    }
+
+    /**
+     * currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.
+     */
+    private void loadScenario() {
+        masterLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
+        new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
+        new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
+        if(this.config.scenario().isUseTransit()){
+            new TransitScheduleReader(scenario).readFile(this.config.transit().getTransitScheduleFile());
+            if (this.config.scenario().isUseVehicles()) {
+                new VehicleReaderV1(scenario.getVehicles()).readFile(this.config.transit().getVehiclesFile());
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -210,8 +276,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        //wait for previous transmissions to complete, if necessary
+        startSlavesInMode(CommunicationsMode.TRANSMIT_SCENARIO);
         if (initialRoutingOnSlaves) {
+            waitForSlaveThreads();
             startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
             waitForSlaveThreads();
             mergePlansFromSlaves();
@@ -298,58 +365,76 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     private void setSlaveTargetPopulationSizes() {
-        List<Double> timesPerPlan = new ArrayList<>();
-        List<Integer> personsPerSlave = new ArrayList<>();
-        List<Integer> optimalNumberPerSlave = new ArrayList<>();
+        double[] timesPerPlan = new double[numSlaves];
+        int[] personsPerSlave = new int[numSlaves];
+        int[] optimalNumberPerSlave = new int[numSlaves];
         double sumOfReciprocals = 0.0;
         int totalAllocated = 0;
-        int largestAllocation = 0;
-        int largestAllocationIndex = 0;
 
-        for (Slave slave : slaves) {
-            timesPerPlan.add(slave.totalIterationTime / slave.currentPopulationSize);
-            personsPerSlave.add(slave.currentPopulationSize);
-            sumOfReciprocals += 1 / (slave.totalIterationTime / slave.currentPopulationSize);
+        for (int i = 0; i < numSlaves; i++) {
+            timesPerPlan[i]=(slaves[i].totalIterationTime / slaves[i].currentPopulationSize);
+            personsPerSlave[i]=(slaves[i].currentPopulationSize);
+            sumOfReciprocals += 1 / (slaves[i].totalIterationTime / slaves[i].currentPopulationSize);
         }
-//        find number of plans that should be allocated to each slave
-        for (int i = 0; i < timesPerPlan.size(); i++) {
-            optimalNumberPerSlave.add((int) (matsimControler.getPopulation().getPersons().size() / timesPerPlan.get(i) / sumOfReciprocals));
-            totalAllocated += optimalNumberPerSlave.get(i);
-            if (optimalNumberPerSlave.get(i) > largestAllocation) {
-                largestAllocation = optimalNumberPerSlave.get(i);
-                largestAllocationIndex = i;
+        Set<Integer> slavesForLoadDistribution = new HashSet<>();
+//        find number of persons that should be allocated to each slave
+        for (int i = 0; i < numSlaves; i++) {
+            slavesForLoadDistribution.add(i);
+            optimalNumberPerSlave[i] = ((int) (matsimControler.getPopulation().getPersons().size() / timesPerPlan[i] / sumOfReciprocals));
+            totalAllocated += optimalNumberPerSlave[i];
+            if (slaves[i].memoryUse > MAX_MEMORY_USE && optimalNumberPerSlave[i] > slaves[i].currentPopulationSize) {
+                totalAllocated -= (optimalNumberPerSlave[i] - slaves[i].currentPopulationSize);
+                optimalNumberPerSlave[i] = slaves[i].currentPopulationSize;
+                slavesForLoadDistribution.remove(i);
             }
-
+        }
+        if(numSlaves == slavesForLoadDistribution.size()) {
+            masterLogger.error("All slaves are nearing their maximum memory capacity!! Probably not a sustainable situation...");
+            //just distribute as if nothing has happened..
+            for (int i = 0; i < numSlaves; i++) {
+                slavesForLoadDistribution.add(i);
+            }
         }
         int remainder = matsimControler.getPopulation().getPersons().size() - totalAllocated;
-        int newval = optimalNumberPerSlave.get(largestAllocationIndex) + remainder;
-        optimalNumberPerSlave.set(largestAllocationIndex, newval);
+        if(remainder>0){
+            int extra = remainder/slavesForLoadDistribution.size();
+            int evenMoreExtra = remainder - (extra * slavesForLoadDistribution.size());
+            for(int i:slavesForLoadDistribution){
+                optimalNumberPerSlave[i] += extra;
+            }
+            //just give the one or two persons remaining to the first slave
+            optimalNumberPerSlave[0] += evenMoreExtra;
+        }
+
         List<Integer> differences = new ArrayList<>();
         for (int i = 0; i < numSlaves; i++) {
-            differences.add(personsPerSlave.get(i) - optimalNumberPerSlave.get(i));
-            slaves[i].targetPopulationSize = optimalNumberPerSlave.get(i);
+            differences.add(personsPerSlave[i] - optimalNumberPerSlave[i]);
+            slaves[i].targetPopulationSize = optimalNumberPerSlave[i];
         }
         StringBuffer sb = new StringBuffer();
-        String[] lines = {"slave", "time per plan", "pax per slave", "optimum", "diff"};
-        for (int j = 0; j < 5; j++) {
+        String[] lines = {"slave", "time per plan", "pax per slave", "optimum", "diff", "mem"};
+        for (int j = 0; j < 6; j++) {
 
             sb.append("\t\t\t" + lines[j] + "\t");
-            for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
+            for (int i = 0; i < numSlaves; i++) {
                 switch (j) {
                     case 0:
                         sb.append("slave_" + i + "\t");
                         break;
                     case 1:
-                        sb.append(timesPerPlan.get(i) + "\t");
+                        sb.append(String.format("%10.3f",timesPerPlan[i]) + "\t");
                         break;
                     case 2:
-                        sb.append(personsPerSlave.get(i) + "\t");
+                        sb.append(String.format("%10d",personsPerSlave[i]) + "\t");
                         break;
                     case 3:
-                        sb.append(optimalNumberPerSlave.get(i) + "\t");
+                        sb.append(String.format("%10d",optimalNumberPerSlave[i]) + "\t");
                         break;
                     case 4:
-                        sb.append(differences.get(i) + "\t");
+                        sb.append(String.format("%10d",differences.get(i)) + "\t");
+                        break;
+                    case 5:
+                        sb.append(String.format("%10.3f",slaves[i].memoryUse) + "\t");
                         break;
 
                 }
@@ -372,6 +457,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         Collection<String> idStrings;
         private int myNumber;
         private int currentPopulationSize;
+        private double memoryUse;
+        private long usedMemory;
+        private long maxMemory;
+        private int numberOfPlans;
+        private int numThreadsOnSlave;
 
         public Slave(Socket socket, int i) throws IOException {
             super();
@@ -393,6 +483,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         public void transmitPerformance() throws IOException {
             totalIterationTime = this.reader.readDouble();
             currentPopulationSize = this.reader.readInt();
+            memoryUse  =this.reader.readDouble();
         }
 
         public void transmitTravelTimes() throws IOException {
@@ -417,8 +508,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         public void distributePersons() throws IOException, InterruptedException {
             slaveLogger.warn("Distributing persons to slave" + myNumber);
-            slavePersonPool = new ArrayList<>();
             writer.writeObject(getPersonsFromPool(currentPopulationSize - targetPopulationSize));
+            writer.flush();
+        }
+
+        public void transmitInitialPlans() throws IOException {
+            writer.writeObject(slavePersonPool);
             writer.flush();
         }
 
@@ -448,6 +543,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
                         break;
+                    case TRANSMIT_SCENARIO:
+                        transmitInitialPlans();
+                        reader.readBoolean();
+                        communicationsMode = CommunicationsMode.CONTINUE;
+                        writer.writeObject(communicationsMode);
+                        writer.flush();
+                        break;
                 }
                 reader.readBoolean();
             } catch (IOException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException e) {
@@ -474,7 +576,47 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             writer.writeBoolean(initialRouing);
             writer.flush();
         }
+
+        public void readNumberOfThreadsOnSlave() throws IOException {
+            this.numThreadsOnSlave = reader.readInt();
+        }
+
+        public void readMemoryStats() throws IOException {
+            this.usedMemory = reader.readLong();
+            this.maxMemory = reader.readLong();
+            this.numberOfPlans = reader.readInt();;
+        }
     }
 
 
+}
+
+
+class MemoryUsageCalculator{
+    private static long fSLEEP_INTERVAL = 100;
+
+    public long getMemoryUse(){
+        putOutTheGarbage();
+        long totalMemory = Runtime.getRuntime().totalMemory();
+        putOutTheGarbage();
+        long freeMemory = Runtime.getRuntime().freeMemory();
+        return (totalMemory - freeMemory);
+    }
+
+    private void putOutTheGarbage() {
+        collectGarbage();
+        collectGarbage();
+    }
+
+    private void collectGarbage() {
+        try {
+            System.gc();
+            Thread.currentThread().sleep(fSLEEP_INTERVAL);
+            System.runFinalization();
+            Thread.currentThread().sleep(fSLEEP_INTERVAL);
+        }
+        catch (InterruptedException ex){
+            ex.printStackTrace();
+        }
+    }
 }
