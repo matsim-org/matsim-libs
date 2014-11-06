@@ -41,7 +41,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
@@ -61,12 +60,10 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
@@ -369,21 +366,8 @@ public class Controler extends AbstractController {
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
 
-		if (this.config.scenario().isUseTransit()) {
-			if (this.config.ptCounts().getAlightCountsFileName() != null) {
-				// only works when all three files are defined! kai, oct'10
-				addControlerListener(new PtCountControlerListener(this.config));
-			}
-		}
-
 		if (this.config.scenario().isUseSignalSystems()) {
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
-		}
-
-		ActivityDurationInterpretation actDurInterpr = this.config.plans().getActivityDurationInterpretation() ;
-		if ( actDurInterpr != ActivityDurationInterpretation.minOfDurationAndEndTime 
-				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-			addControlerListener(new VspPlansCleaner(this.scenarioData ));
 		}
 
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();

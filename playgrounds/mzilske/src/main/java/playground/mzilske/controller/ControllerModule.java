@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.SnapshotWriterFactoryRegister;
@@ -62,7 +61,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.population.VspPlansCleaner;
 import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -173,10 +171,6 @@ public class ControllerModule extends AbstractModule {
         }
         if (config.scenario().isUseSignalSystems()) {
             result.add(signalsFactory.createSignalsControllerListener());
-        }
-        VspExperimentalConfigGroup.ActivityDurationInterpretation actDurInterpr = config.plans().getActivityDurationInterpretation() ;
-        if ( actDurInterpr != VspExperimentalConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime || config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-            result.add(new VspPlansCleaner(scenarioData));
         }
         return result;
     }

@@ -29,6 +29,8 @@ import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
+import org.matsim.population.VspPlansCleanerModule;
+import org.matsim.pt.counts.PtCountsModule;
 
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
@@ -40,5 +42,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         include(new LegTimesModule());
         include(new ScoreStatsModule());
         include(new CountsModule());
+        include(new PtCountsModule());
+        include(new VspPlansCleanerModule());
     }
 }
