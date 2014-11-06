@@ -1,4 +1,4 @@
-package sampleFiles;
+package playground.smeintjes;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ import playground.southafrica.utilities.Header;
  * 
  * @author sumarie
  */
-public class SampleFiles {
-private final static Logger LOG = Logger.getLogger(SampleFiles.class);
+public class SampleValidationVehicles{
+private final static Logger LOG = Logger.getLogger(SampleValidationVehicles.class);
 	
 	public static void main(String[] args) {
-		Header.printHeader(SampleFiles.class.toString(), args);
+		Header.printHeader(SampleValidationVehicles.class.toString(), args);
 		
 		String inputFolder = args[0];
 		String outputValidationFolder = args[1];
