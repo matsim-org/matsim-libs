@@ -34,12 +34,12 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -219,7 +219,7 @@ public class EconomicsControler {
 			Coord homeLocation = getHomeCoord();	
 			Coord workLocation = new CoordImpl(15000., 0.);	
 			
-			Person person = population.getFactory().createPerson(new IdImpl("person_" + personNr));
+			Person person = population.getFactory().createPerson(Id.create("person_" + personNr, Person.class));
 			Plan plan = population.getFactory().createPlan();
 
 			Activity activity0 = population.getFactory().createActivityFromCoord("h", homeLocation);

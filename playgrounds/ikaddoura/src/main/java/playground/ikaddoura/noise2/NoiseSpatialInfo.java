@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
@@ -61,7 +60,7 @@ public class NoiseSpatialInfo {
 	private final double gridCentroidGapDensity = 250.; // distance between two grid cell centroids along x- and y-axes (relevant for computation of activity density)
 	
 	private Scenario scenario;
-	private Map<Id,List<Coord>> personId2listOfCoords = new HashMap<Id, List<Coord>>();
+	private Map<Id<Person>,List<Coord>> personId2listOfCoords = new HashMap<>();
 	private List <Coord> allActivityCoords = new ArrayList <Coord>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
@@ -71,28 +70,28 @@ public class NoiseSpatialInfo {
 	
 	private Map<Tuple<Integer,Integer>,List<Coord>> zoneTuple2listOfActivityCoords = new HashMap<Tuple<Integer,Integer>, List<Coord>>();
 
-	private Map<Id,Coord> receiverPointId2Coord = new HashMap<Id,Coord>();
-	private Map<Tuple<Integer,Integer>,List<Id>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer,Integer>, List<Id>>();
+	private Map<Id<ReceiverPoint>,Coord> receiverPointId2Coord = new HashMap<>();
+	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<>();
 
-	private Map<Coord,Id> activityCoord2receiverPointId = new HashMap<Coord,Id>();
-	private Map<Coord,Id> coord2receiverPointId = new HashMap<Coord,Id>();
+	private Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<>();
+	private Map<Coord,Id<ReceiverPoint>> coord2receiverPointId = new HashMap<>();
 	
 	private double xCoordMinLinkNodes = Double.MAX_VALUE;
 	private double xCoordMaxLinkNodes = Double.MIN_VALUE;
 	private double yCoordMinLinkNodes = Double.MAX_VALUE;
 	private double yCoordMaxLinkNodes = Double.MIN_VALUE;
-	private Map<Tuple<Integer,Integer>,List<Id>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer,Integer>, List<Id>>();
+	private Map<Tuple<Integer,Integer>,List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
 	
-	private Map<Id,List<Id>> receiverPointId2relevantLinkIds = new HashMap<Id, List<Id>>();
-	private Map<Id, Map<Id,Double>> receiverPointId2relevantLinkId2correctionTermDs = new HashMap<Id, Map<Id,Double>>();
-	private Map<Id, Map<Id,Double>> receiverPointId2relevantLinkId2correctionTermAngle = new HashMap<Id, Map<Id,Double>>();
+	private Map<Id<ReceiverPoint>,List<Id<Link>>> receiverPointId2relevantLinkIds = new HashMap<>();
+	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermDs = new HashMap<>();
+	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermAngle = new HashMap<>();
 				
 	public NoiseSpatialInfo(Scenario scenario) {
 		this.scenario = scenario;
 	}	
 	
 	public void setActivityCoords () {
-		Map<Id, Queue<Coord>> personId2coordsOfActivities = new HashMap<Id, Queue<Coord>>();
+		Map<Id<Person>, Queue<Coord>> personId2coordsOfActivities = new HashMap<>();
 
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 	
@@ -167,12 +166,12 @@ public class NoiseSpatialInfo {
 		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - receiverPointGap ; y = y - receiverPointGap) {
 			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + receiverPointGap ; x = x + receiverPointGap) {
 				Coord coord = new CoordImpl(x, y);
-				Id rpId = new IdImpl(counter);
+				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
 				receiverPointId2Coord.put(rpId, coord);
 				counter++;
 							
 				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
-				List<Id> listOfReceiverPointIDs = new ArrayList<Id>();
+				List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
 				if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
 					listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
 				}
@@ -187,10 +186,10 @@ public class NoiseSpatialInfo {
 	
 	private void writeReceiverPoints() {
 
-		HashMap<Id,Double> id2xCoord = new HashMap<Id, Double>();
-		HashMap<Id,Double> id2yCoord = new HashMap<Id, Double>();
+		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
+		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
-		for(Id id : receiverPointId2Coord.keySet()) {
+		for(Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
 			c++;
 			if(c%1000 == 0) {
 				log.info("receiver points "+c);
@@ -203,14 +202,14 @@ public class NoiseSpatialInfo {
 		headers.add("xCoord");
 		headers.add("yCoord");
 		
-		List<HashMap<Id,Double>> values = new ArrayList<HashMap<Id,Double>>();
+		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
 		values.add(id2xCoord);
 		values.add(id2yCoord);
 		
 		write(scenario.getConfig().controler().getOutputDirectory() + "/", 3, headers, values);
 	}
 	
-	private void write (String fileName , int columns , List<String> headers , List<HashMap<Id,Double>> values) {
+	private void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
 		
 		File file = new File(fileName);
 		file.mkdirs();
@@ -226,7 +225,7 @@ public class NoiseSpatialInfo {
 			}
 			bw.newLine();
 			
-			for(Id id : values.get(0).keySet()) {
+			for(Id<ReceiverPoint> id : values.get(0).keySet()) {
 				bw.write(id.toString());
 				for(int i = 0 ; i < (columns-1) ; i++) {
 					bw.write(";"+values.get(i).get(id));
@@ -253,12 +252,12 @@ public class NoiseSpatialInfo {
 			
 			if (!(activityCoord2receiverPointId.containsKey(coord))) {
 			
-				Id receiverPointId = this.getNearestReceiverPoint(coord);
+				Id<ReceiverPoint> receiverPointId = this.getNearestReceiverPoint(coord);
 				activityCoord2receiverPointId.put(coord, receiverPointId);
 			}
 		}
 				
-		for (Id id : receiverPointId2Coord.keySet()) {
+		for (Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
 			
 			xi++;
 			
@@ -288,7 +287,7 @@ public class NoiseSpatialInfo {
 				
 		int counter = 0;
 		
-		for (Id pointId : receiverPointId2Coord.keySet()) {
+		for (Id<ReceiverPoint> pointId : receiverPointId2Coord.keySet()) {
 			counter++;
 			if (counter % 1000. == 0.) {
 				log.info("receiver point ... " + counter);
@@ -297,14 +296,14 @@ public class NoiseSpatialInfo {
 			double pointCoordX = receiverPointId2Coord.get(pointId).getX();
 			double pointCoordY = receiverPointId2Coord.get(pointId).getY();
 
-			Map<Id,Double> relevantLinkIds2Ds = new HashMap<Id, Double>();
-			Map<Id,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<Id, Double>();
+			Map<Id<Link>,Double> relevantLinkIds2Ds = new HashMap<>();
+			Map<Id<Link>,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<>();
 		
 			// get the zone grid cell around the receiver point
 			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(receiverPointId2Coord.get(pointId));
 			
 			// collect all Ids of links in this zone grid cell...
-			List<Id> potentialLinks = new ArrayList<Id>();
+			List<Id<Link>> potentialLinks = new ArrayList<>();
 			if(zoneTuple2listOfLinkIds.containsKey(zoneTuple)) {
 				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(zoneTuple));
 			}
@@ -345,8 +344,8 @@ public class NoiseSpatialInfo {
 			}
 
 			// go through these (potential) links
-			List<Id> relevantLinkIds = new ArrayList<Id>();
-			for (Id linkId : potentialLinks){
+			List<Id<Link>> relevantLinkIds = new ArrayList<>();
+			for (Id<Link> linkId : potentialLinks){
 				if (!(relevantLinkIds.contains(linkId))) {
 					double fromCoordX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
 					double fromCoordY = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
@@ -434,7 +433,7 @@ public class NoiseSpatialInfo {
 	
 	private void setLinksMinMax() {
 		
-		for (Id linkId : scenario.getNetwork().getLinks().keySet()){
+		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) < xCoordMinLinkNodes) {
 				xCoordMinLinkNodes = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
 			}
@@ -452,7 +451,7 @@ public class NoiseSpatialInfo {
 	
 	private void setLinksToZones() {
 		
-		for (Id linkId : scenario.getNetwork().getLinks().keySet()){
+		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			
 			// split up the link into link segments with the following length
 			double partLength = 0.25 * relevantRadius;
@@ -470,8 +469,8 @@ public class NoiseSpatialInfo {
 			coords.add(scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord());
 			coords.add(scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord());
 			for (int i = 1 ; i<parts ; i++) {
-				double x = fromX + (i*((1./((double)parts))*vectorX));
-				double y = fromY + (i*((1./((double)parts))*vectorY));
+				double x = fromX + (i*((1./(parts))*vectorX));
+				double y = fromY + (i*((1./(parts))*vectorY));
 				Coord  coordTmp = new CoordImpl(x,y);
 				coords.add(coordTmp);
 			}
@@ -488,11 +487,11 @@ public class NoiseSpatialInfo {
 			// go through these zone grid cells and save the link Id 			
 			for(Tuple<Integer,Integer> tuple : relevantTuples) {
 				if(zoneTuple2listOfLinkIds.containsKey(tuple)) {
-					List<Id> linkIds = zoneTuple2listOfLinkIds.get(tuple);
+					List<Id<Link>> linkIds = zoneTuple2listOfLinkIds.get(tuple);
 					linkIds.add(linkId);
 					zoneTuple2listOfLinkIds.put(tuple, linkIds);
 				} else {
-					List<Id> linkIds = new ArrayList<Id>();
+					List<Id<Link>> linkIds = new ArrayList<>();
 					linkIds.add(linkId);
 					zoneTuple2listOfLinkIds.put(tuple, linkIds);
 				}
@@ -597,8 +596,8 @@ public class NoiseSpatialInfo {
 		return zoneDefinition;
 	}
 	
-	private Id getNearestReceiverPoint (Coord coord) {
-		Id nearestReceiverPointId = null;
+	private Id<ReceiverPoint> getNearestReceiverPoint (Coord coord) {
+		Id<ReceiverPoint> nearestReceiverPointId = null;
 
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
@@ -626,17 +625,17 @@ public class NoiseSpatialInfo {
 		Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
 		tuples.add(TupleSO);
 		
-		Map<Id,Coord> relevantId2Coord = new HashMap<Id, Coord>();
+		Map<Id<ReceiverPoint>,Coord> relevantId2Coord = new HashMap<>();
 		for(Tuple<Integer,Integer> tuple : tuples) {
 			if(zoneTuple2listOfReceiverPointIds.containsKey(tuple)) {
-				for(Id id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
+				for(Id<ReceiverPoint> id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
 					Coord relevantCoord = receiverPointId2Coord.get(id);
 					relevantId2Coord.put(id,relevantCoord);
 				}
 			}
 		}
 		
-		for(Id receiverPointId : relevantId2Coord.keySet()) {
+		for(Id<ReceiverPoint> receiverPointId : relevantId2Coord.keySet()) {
 			double xValue = relevantId2Coord.get(receiverPointId).getX();
 			double yValue = relevantId2Coord.get(receiverPointId).getY();
 			
@@ -655,31 +654,31 @@ public class NoiseSpatialInfo {
 		return nearestReceiverPointId;
 	}
 
-	public Map<Id, Coord> getReceiverPointId2Coord() {
+	public Map<Id<ReceiverPoint>, Coord> getReceiverPointId2Coord() {
 		return receiverPointId2Coord;
 	}
 	
-	public Map<Id, List<Coord>> getPersonId2listOfCoords() {
+	public Map<Id<Person>, List<Coord>> getPersonId2listOfCoords() {
 		return personId2listOfCoords;
 	}
 
-	public Map<Coord, Id> getActivityCoord2receiverPointId() {
+	public Map<Coord, Id<ReceiverPoint>> getActivityCoord2receiverPointId() {
 		return activityCoord2receiverPointId;
 	}
 	
-	public Map<Coord,Id> getCoord2receiverPointId() {
+	public Map<Coord,Id<ReceiverPoint>> getCoord2receiverPointId() {
 		return coord2receiverPointId;
 	}	
 	
-	public Map<Id, List<Id>> getReceiverPointId2relevantLinkIds() {
+	public Map<Id<ReceiverPoint>, List<Id<Link>>> getReceiverPointId2relevantLinkIds() {
 		return receiverPointId2relevantLinkIds;
 	}
 	
-	public Map<Id, Map<Id, Double>> getReceiverPointId2relevantLinkId2correctionTermAngle() {
+	public Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> getReceiverPointId2relevantLinkId2correctionTermAngle() {
 		return receiverPointId2relevantLinkId2correctionTermAngle;
 	}
 
-	public Map<Id, Map<Id, Double>> getReceiverPointId2relevantLinkId2correctionTermDs() {
+	public Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> getReceiverPointId2relevantLinkId2correctionTermDs() {
 		return receiverPointId2relevantLinkId2correctionTermDs;
 	}
 
@@ -689,8 +688,14 @@ public class NoiseSpatialInfo {
 	}
 
 	// for testing purposes
-	public Map<Tuple<Integer, Integer>, List<Id>> getZoneTuple2listOfReceiverPointIds() {
+	public Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
 		return zoneTuple2listOfReceiverPointIds;
 	}
-		
+
+	/**
+	 * only used for typed Ids
+	 */
+	public static interface ReceiverPoint {
+	}
+	
 }

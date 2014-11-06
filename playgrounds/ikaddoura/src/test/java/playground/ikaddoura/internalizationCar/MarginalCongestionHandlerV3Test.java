@@ -31,8 +31,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
@@ -115,8 +115,8 @@ public class MarginalCongestionHandlerV3Test {
 		}
 		
 		// assert
-		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(new IdImpl("testAgent7")), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong values for testAgent7", 12.0, personId2affectedDelay.get(new IdImpl("testAgent7")), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong values for testAgent7", 12.0, personId2affectedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);
 		// ...
 	 }
 }
