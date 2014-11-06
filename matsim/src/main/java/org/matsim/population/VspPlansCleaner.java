@@ -19,13 +19,9 @@
  * *********************************************************************** */
 package org.matsim.population;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -37,11 +33,12 @@ import org.matsim.core.utils.misc.Time;
  * @author nagel
  *
  */
-public class VspPlansCleaner implements BeforeMobsimListener {
+class VspPlansCleaner implements BeforeMobsimListener {
 
     private final Scenario scenario;
 
-    public VspPlansCleaner(Scenario scenarioData) {
+    @Inject
+    VspPlansCleaner(Scenario scenarioData) {
         this.scenario = scenarioData;
     }
 	
