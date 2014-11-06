@@ -27,6 +27,11 @@ public class AgentMover {
 			}
 		}
 	}
+	
+	//FOR MATSIM CONNECTOR
+	public void step(double time){
+		throw new RuntimeException("this method is not implemented here");
+	}
 
 	private void moveToUniverse(Agent pedestrian) {
 		pedestrian.leavePedestrianGrid();

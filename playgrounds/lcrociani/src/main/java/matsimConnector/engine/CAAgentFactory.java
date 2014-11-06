@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import pedCA.agents.Agent;
 import pedCA.engine.AgentsGenerator;
 import pedCA.environment.grid.GridPoint;
 
@@ -28,8 +27,8 @@ public class CAAgentFactory {
 	public Pedestrian buildPedestrian(Id<CAEnvironment> environmentId, QVehicle vehicle, TransitionArea transitionArea){
 		GridPoint gp = transitionArea.calculateEnterPosition();
 		int destinationId = extractDestinationId(vehicle);
-		Agent agent = generators.get(environmentId).generatePedestrian(gp, destinationId);
-		return new Pedestrian(agent,vehicle,transitionArea);
+		Pedestrian pedestrian = generators.get(environmentId).generatePedestrian(gp, destinationId, vehicle,transitionArea);
+		return pedestrian;
 	}
 
 	private int extractDestinationId(QVehicle vehicle) {

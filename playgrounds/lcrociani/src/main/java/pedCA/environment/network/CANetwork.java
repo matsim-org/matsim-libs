@@ -20,7 +20,7 @@ public class CANetwork{
 		nodes.add(node);
 	}
 	
-	private void createUndirectEdge(CANode n1, CANode n2){
+	private void createBidirectionalEdge(CANode n1, CANode n2){
 		edges.add(new CAEdge(n1,n2));
 		edges.add(new CAEdge(n2,n1));
 	}
@@ -35,7 +35,7 @@ public class CANetwork{
 			
 		for(int i=0;i<nodes.size();i++)
 			for(int j=i+1; j<nodes.size();j++)
-				createUndirectEdge(nodes.get(i),nodes.get(j));
+				createBidirectionalEdge(nodes.get(i),nodes.get(j));
 	}
 	
 	public ArrayList <CANode> getNodes(){

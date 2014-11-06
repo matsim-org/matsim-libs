@@ -1,8 +1,6 @@
 package matsimConnector.engine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import matsimConnector.scenario.CAEnvironment;
@@ -11,6 +9,7 @@ import matsimConnector.utility.Constants;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -25,9 +24,10 @@ public class CAEngine implements MobsimEngine{
 	private final Scenario scenario;
 	private final CAScenario scenarioCA;
 	private Map<Id<CAEnvironment>, SimulationEngine> enginesCA;
+	private CAAgentFactory agentFactoryCA;
 	
-	private final List<QCALink> hiResLinks = new ArrayList<QCALink>();
-	private final List<CAQLink> lowResLinks = new ArrayList<CAQLink>();
+	private final Map<Id<Link>,QCALink> linkToQCALink = new HashMap<Id<Link>,QCALink>();
+	private final Map<Id<Link>,CAQLink> linkToCAQLink = new HashMap<Id<Link>,CAQLink>();
 	private double simCATime;
 	
 	public CAEngine(QSim qSim, CAAgentFactory agentFactoryCA){
@@ -35,8 +35,7 @@ public class CAEngine implements MobsimEngine{
 		this.scenario = qSim.getScenario();
 		this.scenarioCA = (CAScenario) scenario.getScenarioElement(Constants.CASCENARIO_NAME);
 		this.enginesCA = new HashMap <Id<CAEnvironment>, SimulationEngine>();
-		generateCAEngines();
-		initGenerators(agentFactoryCA);
+		this.agentFactoryCA = agentFactoryCA;
 	}
 		
 	private void initGenerators(CAAgentFactory agentFactoryCA) {
@@ -46,7 +45,7 @@ public class CAEngine implements MobsimEngine{
 
 	private void generateCAEngines() {
 		for(CAEnvironment environmentCA : scenarioCA.getEnvironments().values())
-			addEngine(environmentCA);
+			createAndAddEngine(environmentCA);
 	}
 
 	@Override
@@ -60,8 +59,8 @@ public class CAEngine implements MobsimEngine{
 
 	@Override
 	public void onPrepareSim() {
-		// TODO Auto-generated method stub
-		
+		generateCAEngines();
+		initGenerators(agentFactoryCA);
 	}
 
 	@Override
@@ -76,16 +75,27 @@ public class CAEngine implements MobsimEngine{
 		
 	}
 	
-	private void addEngine(CAEnvironment environmentCA){
-		enginesCA.put(environmentCA.getId(), new SimulationEngine(environmentCA.getContext()));
+	private void createAndAddEngine(CAEnvironment environmentCA){
+		SimulationEngine engine = new SimulationEngine(environmentCA.getContext());
+		engine.setAgentMover(new CAAgentMover(this, environmentCA.getContext()));
+		enginesCA.put(environmentCA.getId(), engine);
 	}
 
 	public void registerHiResLink(QCALink hiResLink) {
-		hiResLinks.add(hiResLink);
+		linkToQCALink.put(hiResLink.getLink().getId(),hiResLink);
 	}
 
 	public void registerLowResLink(CAQLink lowResLink) {
-		lowResLinks.add(lowResLink);
+		linkToCAQLink.put(lowResLink.getLink().getId(), lowResLink);
+		//lowResLinks.add(lowResLink);
+	}
+	
+	public QCALink getQCALink(Id<Link> linkId){
+		return linkToQCALink.get(linkId);
+	}
+	
+	public CAQLink getCAQLink(Id<Link> linkId){
+		return linkToCAQLink.get(linkId); 
 	}
 	
 }

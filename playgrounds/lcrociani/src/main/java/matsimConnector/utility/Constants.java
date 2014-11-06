@@ -2,7 +2,7 @@ package matsimConnector.utility;
 
 public class Constants {
 
-	public static final Object CA_MOBSIM_MODE = "MobsimCA";
+	public static final String CA_MOBSIM_MODE = "MobsimCA";
 	public static final String CA_LINK_MODE = "walkCA";
 	public static final String TO_Q_LINK_MODE = "CA->Q";
 	public static final String TO_CA_LINK_MODE = "Q->CA";
@@ -18,7 +18,8 @@ public class Constants {
 	
 	public static final Double TRANSITION_AREA_LENGTH = 2.;
 	public static final Double FAKE_LINK_WIDTH = 5.;
-	public static final Double TRANSITION_LINK_LENGTH = TRANSITION_AREA_LENGTH/2.;
+	public static final Double TRANSITION_LINK_LENGTH = 5.;//TRANSITION_AREA_LENGTH/2.;
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);
+	public static final String INPUT_PATH = "C:/Users/Luca/Documents/uni/Dottorato/Juelich/developing_stuff/Test/input";;
 	
 }

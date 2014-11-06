@@ -51,10 +51,8 @@ public class CAScenario {
 		matsimScenario.addScenarioElement(Constants.CASCENARIO_NAME, this);
 		this.matsimScenario = matsimScenario;
 		Network scNet = matsimScenario.getNetwork();
-		for (CAEnvironment environment : environments.values()) {
-			Network envNet = environment.getNetwork();
-			connect(envNet,scNet);
-			}
+		for (CAEnvironment environmentCA : environments.values()) 
+			connect(environmentCA,scNet);
 		this.connected = true;
 	}
 	
@@ -63,14 +61,15 @@ public class CAScenario {
 		addCAEnvironment(new CAEnvironment(""+0, context));
 	}
 	
-	private static void connect(Network envNet, Network scNet) {
+	private void connect(CAEnvironment environmentCA, Network scNet) {
+		Network envNet = environmentCA.getNetwork();
 		for (Node nodeCA : envNet.getNodes().values()) {
 			Node nodeMatsim = scNet.getNodes().get(nodeCA.getId());
 			if (nodeMatsim == null) {
 				nodeCA.getInLinks().clear();
 				nodeCA.getOutLinks().clear();
 				scNet.addNode(nodeCA);
-				plugNode(nodeCA,scNet);
+				plugNode(nodeCA,scNet, environmentCA);
 			}else{
 				Log.warning("Node already present in the network!");
 			}
@@ -92,21 +91,35 @@ public class CAScenario {
 		}
 	}
 
-	private static void plugNode(Node n, Network scNet) {
+	private void plugNode(Node n, Network scNet, CAEnvironment environmentCA) {
 		Node pivot = null;
 		double radius = Constants.TRANSITION_LINK_LENGTH;
-		for (Node node : scNet.getNodes().values())
+		Set<String> modesToCA = new HashSet<String>();
+		modesToCA.add("car");
+		modesToCA.add("walk");
+		modesToCA.add(Constants.TO_CA_LINK_MODE);
+		Set<String> modesToQ = new HashSet<String>();
+		modesToQ.add("car");
+		modesToQ.add("walk");
+		modesToQ.add(Constants.TO_Q_LINK_MODE);
+		for (Node node : scNet.getNodes().values()){
+			Log.log(n.getCoord()+" "+node.getCoord());
 			if (node != n && MathUtility.EuclideanDistance(n.getCoord(),node.getCoord()) <= radius){
 				pivot = node;
 				break;
 			}
+		}
+				
 		Id<Node> fromId = pivot.getId();
 		Id<Node> toId = n.getId();
 		
 		for(Link link : pivot.getOutLinks().values()){
+			scNet.removeLink(link.getId());
 			link.setFromNode(n);
 			link.setLength(link.getLength()+Constants.TRANSITION_LINK_LENGTH);
-			link.getAllowedModes().add(Constants.TO_Q_LINK_MODE);
+			link.setAllowedModes(modesToQ);
+			scNet.addLink(link);
+			mapLinkToEnvironment(link, environmentCA);
 		}
 		
 		//Set<String> modesToQ = new HashSet<String>();
@@ -118,14 +131,12 @@ public class CAScenario {
 		//LinkUtility.initLink(toQ, Constants.TRANSITION_LINK_LENGTH, modesToQ);
 		//scNet.addLink(toQ);
 		
-		Set<String> modesToCA = new HashSet<String>();
-		modesToCA.add("car");
-		modesToCA.add("walk");
-		modesToCA.add(Constants.TO_CA_LINK_MODE);
+		
 		Id <Link> toCAId = IdUtility.createLinkId(fromId, toId);
 		Link toCA = scNet.getFactory().createLink(toCAId, pivot, n);
-		LinkUtility.initLink(toCA, Constants.TRANSITION_LINK_LENGTH, modesToCA);
+		LinkUtility.initLink(toCA, Constants.TRANSITION_LINK_LENGTH, 3, modesToCA);
 		scNet.addLink(toCA);
+		mapLinkToEnvironment(toCA, environmentCA);
 	}
 
 	public Map<Id<CAEnvironment>, CAEnvironment> getEnvironments(){

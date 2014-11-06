@@ -40,7 +40,7 @@ public class QCALink extends AbstractQLink {
 	@Override
 	public Link getLink() {
 		// TODO Auto-generated method stub
-		return null;
+		return link;
 	}
 
 	@Override

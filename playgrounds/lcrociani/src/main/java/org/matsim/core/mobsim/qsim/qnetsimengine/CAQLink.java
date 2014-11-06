@@ -1,12 +1,16 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import matsimConnector.environment.TransitionArea;
+
 import org.matsim.api.core.v01.network.Link;
 
 public class CAQLink {
 	private final QLinkInternalI ql;
-
-	CAQLink(QLinkInternalI qLinkImpl) {
+	private final TransitionArea transitionArea;
+	
+	CAQLink(QLinkInternalI qLinkImpl, TransitionArea transitionArea) {
 		this.ql = qLinkImpl;
+		this.transitionArea = transitionArea;
 	}
 
 	public boolean isAcceptingFromUpstream() {
@@ -19,5 +23,9 @@ public class CAQLink {
 
 	public void addFromUpstream(QVehicle veh) {
 		this.ql.addFromUpstream(veh);
+	}
+	
+	public TransitionArea getTransitionArea(){
+		return transitionArea;
 	}
 }

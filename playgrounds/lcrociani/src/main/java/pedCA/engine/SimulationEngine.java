@@ -42,13 +42,18 @@ public class SimulationEngine {
 		Log.log("STEP at: "+time);
 		agentUpdater.step();
 		conflictSolver.step();
-		agentMover.step();			
+		agentMover.step(time);			
 		step++;
 	}
 	
 	//FOR MATSIM CONNECTOR
 	public AgentsGenerator getAgentGenerator(){
 		return agentGenerator;
+	}
+	
+	//FOR MATSIM CONNECTOR
+	public void setAgentMover(AgentMover agentMover){
+		this.agentMover = agentMover;
 	}
 	
 	public void run(){

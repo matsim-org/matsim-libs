@@ -84,7 +84,7 @@ public class EnvironmentTests extends MatsimTestCase {
 		int cols = 10;
 		String path = "c:/tmp/pedCATest/corridor";
 		EnvironmentGrid environment = new EnvironmentGrid(rows, cols);
-		EnvironmentGenerator.initCorridor(environment);
+		EnvironmentGenerator.initCorridorWithWalls(environment);
 		Destination eastDestination = EnvironmentGenerator.getCorridorEastDestination(environment);
 		Destination westDestination = EnvironmentGenerator.getCorridorWestDestination(environment);
 		FloorFieldsGrid ff = new FloorFieldsGrid(environment);
@@ -104,7 +104,7 @@ public class EnvironmentTests extends MatsimTestCase {
 		int cols = 10;
 		String path = "c:/tmp/pedCATest/corridor";
 		EnvironmentGrid environment = new EnvironmentGrid(rows, cols);
-		EnvironmentGenerator.initCorridor(environment);
+		EnvironmentGenerator.initCorridorWithWalls(environment);
 		MarkerConfiguration markerConf = new MarkerConfiguration();
 		markerConf.addDestination(EnvironmentGenerator.getCorridorEastDestination(environment));
 		markerConf.addDestination(EnvironmentGenerator.getCorridorWestDestination(environment));

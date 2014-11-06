@@ -42,9 +42,9 @@ public class CAMobsimFactory implements MobsimFactory{
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 	
-		CAQNetworkFactory networkFactory = new CAQNetworkFactory(engineCA,sc, agentFactoryCA);
+		CAQNetworkFactory networkFactoryCA = new CAQNetworkFactory(engineCA,sc, agentFactoryCA);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, networkFactory);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, networkFactoryCA);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

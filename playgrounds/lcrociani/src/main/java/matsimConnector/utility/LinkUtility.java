@@ -29,6 +29,12 @@ public class LinkUtility {
 		link.setNumberOfLanes(lanes);
 	}
 	
+	public static int getTransitionAreaWidth(Node borderNode, CAEnvironment environmentCA){
+		int destinationId = IdUtility.nodeIdToDestinationId(borderNode.getId());
+		TacticalDestination tacticalDestination = (TacticalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId);
+		return (int)(tacticalDestination.getWidth()/Constants.CA_CELL_SIDE);
+	}
+	
 	public static double getTransitionLinkWidth(Link link, CAEnvironment environmentCA){
 		int destinationId = IdUtility.linkIdToDestinationId(link.getId());
 		return ((TacticalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId)).getWidth();
@@ -39,8 +45,8 @@ public class LinkUtility {
 	}
 	
 	public static TransitionArea getDestinationTransitionArea(QVehicle vehicle){
-		Node destinationNode = vehicle.getCurrentLink().getToNode();
-		for (Link link : destinationNode.getInLinks().values())
+		Node borderNode = vehicle.getCurrentLink().getFromNode();
+		for (Link link : borderNode.getInLinks().values())
 			if (link instanceof QCALink)
 				return ((QCALink)link).getTransitionArea();
 		

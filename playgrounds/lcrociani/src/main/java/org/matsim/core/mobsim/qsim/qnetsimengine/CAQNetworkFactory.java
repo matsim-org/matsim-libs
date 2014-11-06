@@ -1,5 +1,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import matsimConnector.engine.CAAgentFactory;
 import matsimConnector.engine.CAEngine;
 import matsimConnector.environment.TransitionArea;
@@ -20,6 +23,7 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	private CAEngine engineCA;
 	private CAAgentFactory agentFactoryCA;
 	private CAScenario scenarioCA;
+	private Map<Node, TransitionArea> nodeToTransitionArea = new HashMap<Node, TransitionArea>();
 
 	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA) {
 		this.engineCA = engineCA;
@@ -39,34 +43,61 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 
 		boolean isCAQLink = link.getAllowedModes().contains(Constants.TO_Q_LINK_MODE);
 		boolean isQCALink = link.getAllowedModes().contains(Constants.TO_CA_LINK_MODE);
+		boolean isCALink = link.getAllowedModes().contains(Constants.CA_LINK_MODE);
 		
 		if (isQCALink) {
 			QCALink hiResLink = createQCALink(link, network, qLink);
 			return hiResLink;
 		} 
-		if (isCAQLink) {
+		else if (isCAQLink) {
 			createCAQLink(qLink);
 			return qLink;
 		}
-		
+		else if (isCALink){
+			//TODO FIND THE GOOD WAY TO DO THIS
+			return qLink;
+		}
 		return qLink;
 	}
 
-	protected void createCAQLink(QLinkInternalI qLink) {
-		CAQLink lowResLink = new CAQLink(qLink);
+	protected CAQLink createCAQLink(QLinkInternalI qLink) {
+		CAEnvironment environmentCA = this.scenarioCA.getCAEnvironment(qLink.getLink());
+		Node borderNode = qLink.getLink().getFromNode();
+		TransitionArea transitionArea;
+		if (nodeToTransitionArea.containsKey(borderNode))
+			transitionArea = nodeToTransitionArea.get(borderNode);
+		else
+			transitionArea = createTransitionArea(borderNode, environmentCA);
+		CAQLink lowResLink = new CAQLink(qLink, transitionArea);
 		this.engineCA.registerLowResLink(lowResLink);
+		return lowResLink;
 	}
 
 	private QCALink createQCALink(Link link, QNetwork network, QLinkInternalI qLink) {
 		CAEnvironment environmentCA = this.scenarioCA.getCAEnvironment(link);
-		int rows = LinkUtility.getTransitionAreaWidth(link, environmentCA);
-		int columns = Constants.TRANSITION_AREA_COLUMNS;
-		int destinationId = IdUtility.linkIdToDestinationId(link.getId());
-		TacticalDestination destination = environmentCA.getDestination(destinationId);
-		TransitionArea transitionArea = new TransitionArea(rows,columns,destination.getRotation(),destination.getEnvironmentRef());
+		Node borderNode = link.getToNode();
+		TransitionArea transitionArea;
+		if (nodeToTransitionArea.containsKey(borderNode))
+			transitionArea = nodeToTransitionArea.get(borderNode);
+		else
+			transitionArea = createTransitionArea(borderNode, environmentCA);
 		QCALink linkQCA = new QCALink(link, network, qLink, environmentCA, this.agentFactoryCA, transitionArea);
-		engineCA.registerHiResLink(linkQCA);
+		this.engineCA.registerHiResLink(linkQCA);
 		environmentCA.addTransitionArea(linkQCA.getLinkId(), transitionArea);
 		return linkQCA;
+	}
+
+	public TransitionArea createTransitionArea(Node borderNode, CAEnvironment environmentCA) {
+		int rows = LinkUtility.getTransitionAreaWidth(borderNode, environmentCA);
+		int columns = Constants.TRANSITION_AREA_COLUMNS;
+		int destinationId = IdUtility.nodeIdToDestinationId(borderNode.getId());
+		TacticalDestination destination = environmentCA.getDestination(destinationId);
+		TransitionArea transitionArea = new TransitionArea(rows,columns,destination.getRotation(),destination.getEnvironmentRef());
+		registerTransitionArea(borderNode, transitionArea);
+		return transitionArea;
+	}
+	
+	private void registerTransitionArea(Node node, TransitionArea transitionArea){
+		this.nodeToTransitionArea.put(node,transitionArea);
 	}
 }

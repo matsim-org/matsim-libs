@@ -2,6 +2,11 @@ package pedCA.engine;
 
 import java.util.ArrayList;
 
+import matsimConnector.agents.Pedestrian;
+import matsimConnector.environment.TransitionArea;
+
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+
 import pedCA.agents.Agent;
 import pedCA.agents.Population;
 import pedCA.context.Context;
@@ -49,12 +54,13 @@ public class AgentsGenerator {
 	}
 
 	//FOR MATSIM CONNECTOR
-	public Agent generatePedestrian(GridPoint initialPosition, int destinationId){
+	public Pedestrian generatePedestrian(GridPoint initialPosition, int destinationId, QVehicle vehicle, TransitionArea transitionArea){
 		int pedID = getPopulation().getPedestrians().size();
 		Destination destination = context.getMarkerConfiguration().getDestination(destinationId);
-		Agent pedestrian = new Agent(pedID,initialPosition,destination,context);
+		Agent agent = new Agent(pedID,initialPosition,destination,context);
+		Pedestrian pedestrian = new Pedestrian(agent, vehicle, transitionArea);
 		getPopulation().addPedestrian(pedestrian);
-		context.getPedestrianGrid().addPedestrian(initialPosition, pedestrian);
+		//context.getPedestrianGrid().addPedestrian(initialPosition, pedestrian);
 		return pedestrian;
 	}
 	
