@@ -34,7 +34,7 @@ import playground.artemc.utils.Writer;
 
 public class SimplePopulationGenerator {
 
-	private static Integer populationSize = 15000;
+	private static Integer populationSize = 12000;
 	private static Double noCarPercentage = 0.0;
 	private static Integer corridorLength = 20000;
 	
@@ -108,11 +108,11 @@ public class SimplePopulationGenerator {
 			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", workLocation);
 			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
 			LegImpl leg = (LegImpl) pf.createLeg("pt");
-			actHome.setEndTime(3600.00*8.00 + generator.nextGaussian()*3600);
+			actHome.setEndTime(3600.00*8.00 + generator.nextGaussian()*1800);
 			plan.addActivity(actHome);
 			plan.addLeg(leg);
-			actWork.setStartTime(3600.00*9);
-			actWork.setEndTime(3600.00*18 + generator.nextGaussian()*1800);
+			actWork.setStartTime(actHome.getEndTime()+1800.0);
+			actWork.setEndTime(3600.00*17.5 + generator.nextGaussian()*1800);
 			plan.addActivity(actWork);
 			plan.addLeg(leg);
 			plan.addActivity(actHome2);

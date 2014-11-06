@@ -20,10 +20,13 @@ import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 import org.matsim.core.utils.misc.Time;
 
+import playground.artemc.scoring.functions.PersonalScoringParameters;
+
 public class DisaggregatedSumScoringFunction implements ScoringFunction {
 	
 	private static Logger log = Logger.getLogger(DisaggregatedSumScoringFunction.class);
 	
+	private PersonalScoringParameters params = null;
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
 	private ArrayList<MoneyScoring> moneyScoringFunctions = new ArrayList<MoneyScoring>();
@@ -191,6 +194,14 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 	public void addLegScoringFunction(String mode, LegScoring scoringFunction) {
 		basicScoringFunctions.add(scoringFunction);
 		legScoringFunctions.put(mode, scoringFunction);
+	}
+
+	public PersonalScoringParameters getParams() {
+		return params;
+	}
+
+	public void setParams(PersonalScoringParameters params) {
+		this.params = params;
 	}
 
 

@@ -28,16 +28,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -59,6 +61,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler;
+	private ScheduleDelayCostHandler  scheduleDelayCostHandler;
 
 	public TripAnalysisHandler getTripAnalysisHandler() {
 		return tripAnalysisHandler;
@@ -83,25 +86,43 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	private Map<Integer, Double> it2transitWalkLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2busLegs = new TreeMap<Integer, Double>();
 
+	private Map<Integer, HashMap<String, Double>> ttc_morning =  new TreeMap<Integer,  HashMap<String, Double>>();
+	private Map<Integer, HashMap<String, Double>> scd_morning =  new TreeMap<Integer,  HashMap<String, Double>>();
+	private Map<Integer, HashMap<String, Double>> ttc_evening =  new TreeMap<Integer,  HashMap<String, Double>>();
+	private Map<Integer, HashMap<String, Double>> scd_evening =  new TreeMap<Integer,  HashMap<String, Double>>();
+
+	private HashMap<String, Double> currentTTC_morning;
+	private HashMap<String, Double> currentSCD_morning;
+	private HashMap<String, Double> currentTTC_evening;
+	private HashMap<String, Double> currentSCD_evening;
+	private HashMap<String, ArrayList<Id<Person>>> person2mode = new HashMap<String, ArrayList<Id<Person>>>();
+
 
 	public AnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
 		this.tripAnalysisHandler = new TripAnalysisHandler(scenario);
+		this.scheduleDelayCostHandler = new ScheduleDelayCostHandler();
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(moneyHandler);
 		event.getControler().getEvents().addHandler(tripAnalysisHandler);
+		this.scheduleDelayCostHandler.setControler(event.getControler());
+		event.getControler().getEvents().addHandler(scheduleDelayCostHandler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		writeAnalysis(event);
+
+		runCalculation(event);
+
+		writeWelfareAnalysis(event);
+		writeTripAnalysis(event);
+		writeTimeCostAnalysis(event);
 	}
 
-	private void writeAnalysis(IterationEndsEvent event) {
-
+	private void runCalculation(IterationEndsEvent  event){
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
 		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
@@ -126,24 +147,74 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 		//		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getWalkLegs());
 		//		this.it2transitWalkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getTransitWalkLegs());
 		//		this.it2busLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getBusLegs());
-		//		
+		//	
+
+
+		this.currentTTC_morning  =  new HashMap<String, Double>();
+		this.currentSCD_morning  =  new HashMap<String, Double>();
+		this.currentTTC_evening  =  new HashMap<String, Double>();
+		this.currentSCD_evening  =  new HashMap<String, Double>();
+
+		HashMap<String, ArrayList<Double>> ttcMorningByMode = new HashMap<String, ArrayList<Double>>();
+		HashMap<String, ArrayList<Double>> ttcEveningByMode = new HashMap<String, ArrayList<Double>>();
+		HashMap<String, ArrayList<Double>> sdcMorningByMode = new HashMap<String, ArrayList<Double>>();
+		HashMap<String, ArrayList<Double>> sdcEveningByMode = new HashMap<String, ArrayList<Double>>();
+
+		for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+			ttcMorningByMode.put(mode, new ArrayList<Double>());
+			ttcEveningByMode.put(mode, new ArrayList<Double>());
+			sdcMorningByMode.put(mode, new ArrayList<Double>());
+			sdcEveningByMode.put(mode, new ArrayList<Double>());
+		}
+
+		for(Id<Person> id:event.getControler().getPopulation().getPersons().keySet()){
+
+			if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
+				ttcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getTTC_morning().get(id));
+				ttcEveningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(1)).add(this.scheduleDelayCostHandler.getTTC_evening().get(id));
+				sdcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getSDC_morning().get(id));
+				sdcEveningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(1)).add(this.scheduleDelayCostHandler.getSDC_evening().get(id));
+
+//				System.out.println(id.toString());
+//				System.out.println("ttc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getTTC_morning().get(id));
+//				System.out.println("ttc_evening: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getTTC_evening().get(id));
+//				System.out.println("sdc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getSDC_morning().get(id));
+//				System.out.println("sdc_eveningg: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getSDC_evening().get(id));
+//				System.out.println();
+			}
+			else{
+				log.warn("Stucked Agents are not considered! Agent stucked: "+id.toString());
+			}
+		}
+
+		MeanCalculator meanCalculator = new MeanCalculator();
+		for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+			this.currentTTC_morning.put(mode, meanCalculator.getMean(ttcMorningByMode.get(mode)));
+			this.currentTTC_evening.put(mode, meanCalculator.getMean(ttcEveningByMode.get(mode)));	
+			this.currentSCD_morning.put(mode, meanCalculator.getMean(sdcMorningByMode.get(mode)));
+			this.currentSCD_evening.put(mode, meanCalculator.getMean(sdcEveningByMode.get(mode)));
+		}
+
+				this.ttc_morning.put(event.getIteration(), this.currentTTC_morning);
+				this.scd_morning.put(event.getIteration(), this.currentSCD_morning);
+				this.ttc_evening.put(event.getIteration(), this.currentTTC_evening);
+				this.scd_evening.put(event.getIteration(), this.currentSCD_evening);
+
+	}
+
+	private void writeWelfareAnalysis(IterationEndsEvent event) {	
+
 		String welfareFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
 		File welfareFile = new File(welfareFilePath);
 
-		String tripsFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/tripsAnalysis.csv";
-		File tripsFile = new File(tripsFilePath);
-
-
 		try {
 			BufferedWriter welfareWriter = new BufferedWriter(new FileWriter(welfareFile));
-			BufferedWriter tripsWriter = new BufferedWriter(new FileWriter(tripsFile));
 			welfareWriter.write("Iteration;" +
 					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
 					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
 					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events;");
-			tripsWriter.write("Car Trips;Pt Trips;Walk Trips; TrasitWalk Legs");
+
 			welfareWriter.newLine();
-			tripsWriter.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
 				welfareWriter.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
 						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected.get(it)
@@ -155,26 +226,14 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 						+ ";" + (this.it2totalTravelTimeCarMode.get(it) / this.it2carLegs.get(it))
 						+ ";" + this.it2stuckEvents.get(it)
 						);
-				tripsWriter.write(it 
-						+ ";" + this.it2carLegs.get(it)
-						+ ";" + this.it2ptLegs.get(it)
-						+ ";" + this.it2walkLegs.get(it)
-						+ ";" + this.it2transitWalkLegs.get(it)
-						);
 				welfareWriter.newLine();
-				tripsWriter.newLine();
+
 			}
-
 			welfareWriter.close();
-			tripsWriter.close();
-			
 			log.info("Welfare analysis Output written to " + welfareFilePath);
-			log.info("Trip analysis Output written to " + tripsFilePath);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 
 		// ##################################################
 
@@ -194,6 +253,87 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 		writeGraphDiv("avgTripTravelTimeCar", "Seconds", it2totalTravelTimeCarMode, it2carLegs);
 	}
+
+	private void writeTripAnalysis(IterationEndsEvent event){
+
+		String tripsFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/tripsAnalysis.csv";
+		File tripsFile = new File(tripsFilePath);
+
+		try {
+			BufferedWriter tripsWriter = new BufferedWriter(new FileWriter(tripsFile));
+
+			tripsWriter.write("Car Trips;Pt Trips;Walk Trips; TrasitWalk Legs");
+
+			tripsWriter.newLine();
+
+			for (Integer it : this.it2userBenefits_selected.keySet()){
+				tripsWriter.write(it 
+						+ ";" + this.it2carLegs.get(it)
+						+ ";" + this.it2ptLegs.get(it)
+						+ ";" + this.it2walkLegs.get(it)
+						+ ";" + this.it2transitWalkLegs.get(it)
+						);
+
+				tripsWriter.newLine();
+			}
+			tripsWriter.close();
+			log.info("Trip analysis Output written to " + tripsFilePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void writeTimeCostAnalysis(IterationEndsEvent event){
+
+		String timeCostFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCost.csv";
+		File timeCostFile = new File( timeCostFilePath);
+
+		try {
+			BufferedWriter timeCostWriter = new BufferedWriter(new FileWriter(timeCostFile));
+
+			String header="It;";
+
+			for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+				header=header+"TTC_morning_"+mode+";";
+				header=header+"SCD_morning_"+mode+";";
+			}
+
+			for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+				header=header+"TTC_evening_"+mode+";";
+				header=header+"SCD_evening_"+mode+";";
+			}
+
+
+			timeCostWriter.write(header);
+			timeCostWriter.newLine();
+
+			for (Integer it: this.scd_morning.keySet()){
+				String data=it+";";
+
+				for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+					data=data+ttc_morning.get(it).get(mode)+";";
+					data=data+scd_morning.get(it).get(mode)+";";
+				}
+
+				for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+					data=data+ttc_evening.get(it).get(mode)+";";
+					data=data+scd_evening.get(it).get(mode)+";";
+				}
+
+				timeCostWriter.write(data);
+				timeCostWriter.newLine();
+			}
+			timeCostWriter.close();
+			log.info("Trip analysis Output written to " + timeCostFilePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
 
 	private void writeGraphSum(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
 

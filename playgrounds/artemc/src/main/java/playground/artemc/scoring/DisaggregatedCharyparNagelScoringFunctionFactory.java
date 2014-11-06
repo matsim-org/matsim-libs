@@ -129,6 +129,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		}
 
 		DisaggregatedSumScoringFunction sumScoringFunction = new DisaggregatedSumScoringFunction();
+		sumScoringFunction.setParams(this.params);
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));		
 		for(String mode:config.getModes().keySet()){
 			sumScoringFunction.addLegScoringFunction(mode, new CharyparNagelLegScoring(this.params, this.network));
