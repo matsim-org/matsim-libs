@@ -16,31 +16,25 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author dziemke
  * 
- * Reads in a plans file and copies person with their plans into a new plans file according to a
- * configurable {@values selectionProbability}. Then writes new plans file to a given location.
+ * Reads in a plans file and copies persons with their plans into a new plans file according to
+ * configurable parameters. Then writes new plans file to a given location.
  */
 public class PlanFileModifier {
 	// Parameters
 	static double selectionProbability = 1.;
-	static boolean onlyTransferSelectedPlan = false;
+	static boolean onlyTransferSelectedPlan = true;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
-	static int maxNumberOfAgentsConsidered = 100;
-	static String runId = "run_172";
+	static int maxNumberOfAgentsConsidered = 10000000;
+	static String runId = "run_171";
 	static int iteration = 300;
 	
 	
 	// Input and output files
 	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-//	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
-	//static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
 	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_reduced.xml.gz";
-//	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities_reduced.xml.gz";
-	//static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans_modified.xml.gz";
+			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
 	
 	
 	public static void main(String[] args) {

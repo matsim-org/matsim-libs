@@ -25,13 +25,12 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_170";
-	static int numberOfIterations = 300;
+	static String runId = "run_171b";
+	static int numberOfIterations = 100;
 	//static int plansFileInterval = 50;
-	static int plansFileInterval = 300;
+	static int plansFileInterval = 100;
 	static boolean useInterimPlans = true;
 	static boolean useOutputPlans = false;
-//	static boolean usePt = false;
 	
 	// Output file
 	static String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis/";

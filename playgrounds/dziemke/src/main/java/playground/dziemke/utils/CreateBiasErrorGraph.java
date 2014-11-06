@@ -26,25 +26,17 @@ public class CreateBiasErrorGraph {
 	 */
 	public static void main(String[] args) throws IOException {
 		// parameters
-		String runId = "run_172";
-//		String runId = "benchmark";
-		//String runId = "54";
-		int iterationNumber = 300;
-		//int width=400;
+		String runId = "run_171b";
+		int iterationNumber = 100;
 		int width=440;
-		//int height=300;
 		int height=330;
 		String filename = "biasErrorGraph.png";
 		
 		// input file and output directory
 		String inputFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iterationNumber
 				+ "/" + runId + "." + iterationNumber + ".countscompare.txt";
-		
-//		String inputFile = "D:/VSP/Masterarbeit/Run 791/run791/output_rerun/ITERS/it.600/biasErrorGraphData2.txt";
-		//String inputFile = "D:/Workspace/container/examples/equil/output/" + runId + "/ITERS/it." + iterationNumber
-		//		+ "/" + runId + "." + iterationNumber + ".countscompare.txt";
-		String outputDirectory = "D:/VSP/cemdapMatsimCadyts/Images/" + runId + "/";
-		//String outputDirectory = "D:/VSP/Masterarbeit/Images/" + "equil " + runId + "/";
+		//String outputDirectory = "D:/VSP/cemdapMatsimCadyts/Images/" + runId + "/";
+		String outputDirectory = "D:/Workspace/shared-svn/papers/2014/cemdapMatsimCadyts/Images/" + runId + "/";
 		
 		// other objects
 		List<CountSimComparison> countSimComparisonList = new ArrayList<CountSimComparison>();

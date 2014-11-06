@@ -31,8 +31,8 @@ public class TripAnalyzer {
 	    // Parameters
 		boolean onlyCar = true; //car; new, should be used for runs with ChangeLedModes enabled
 		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = true; // ber; usually varied for analysis
-		boolean distanceFilter = true; // dist; usually varied for analysis
+		boolean onlyBerlinBased = false; // ber; usually varied for analysis
+		boolean distanceFilter = false; // dist; usually varied for analysis
 		//double minDistance = 0;
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
@@ -42,8 +42,8 @@ public class TripAnalyzer {
 //		Integer maxAge = 119;	
 //		// --------------------------------------------------------------------------------------------------
 		
-		String runId = "run_170";
-		String usedIteration = "300"; // most frequently used value: 150
+		String runId = "run_171b";
+		String usedIteration = "100"; // most frequently used value: 150
 	    
 	    int maxBinDuration = 120;
 	    int binWidthDuration = 1;
@@ -84,9 +84,6 @@ public class TripAnalyzer {
 	    if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
 		}
-	    
-	    int counterCar = 0;
-	    int counterPt = 0;
 	    // --------------------------------------------------------------------------------------------------
 	    
 	    if (onlyInterior == true) {
@@ -225,14 +222,6 @@ public class TripAnalyzer {
 					throw new RuntimeException("In current implementation leg mode must either be car or pt");
 				}
 				
-				if (trip.getMode().equals("car")) {
-					counterCar++;
-				} else if (trip.getMode().equals("pt")) {
-					counterPt++;
-				} else {
-					throw new RuntimeException("In current implementation leg mode must either be car or pt");
-				}
-				
 				if (onlyCar == true) {
 					if (!trip.getMode().equals("car")) {
 						considerTrip = false;
@@ -363,11 +352,6 @@ public class TripAnalyzer {
 	    
 	    // write a routed distance vs. beeline distance comparison file
 	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
-	    
-	    // --------------------------------------------------------------------------------------------------
-	    System.out.println("CounterCar = " + counterCar);
-	    System.out.println("CounterPt = " + counterPt);
-	    // --------------------------------------------------------------------------------------------------
 	}
 
 
