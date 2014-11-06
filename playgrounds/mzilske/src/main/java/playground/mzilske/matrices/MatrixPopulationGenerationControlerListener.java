@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * MatricesModule.java
+ *  * CreateODDemand.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,19 +22,40 @@
 
 package playground.mzilske.matrices;
 
-import org.matsim.core.controler.AbstractModule;
-import playground.mzilske.cdr.LinkIsZone;
+import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
+import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.SightingsImpl;
 import playground.mzilske.cdr.ZoneTracker;
 
-public class MatricesModule extends AbstractModule {
+import javax.inject.Inject;
+
+class MatrixPopulationGenerationControlerListener implements Provider<ControlerListener> {
+
+    @Inject
+    Sightings sightings;
+
+    @Inject
+    TimedMatrices timedMatrices;
+
+    @Inject
+    Scenario scenario;
+
+    @Inject
+    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
+
     @Override
-    public void install() {
-        bindAsSingleton(Sightings.class, SightingsImpl.class);
-        bindAsSingleton(ZoneTracker.LinkToZoneResolver.class, LinkIsZone.class);
-        addControlerListenerByProvider(MatrixPopulationGenerationControlerListener.class);
-        addControlerListener(MatrixResetControlerListener.class);
-        addEventHandler(IncrementMatrixCellEventHandler.class);
+    public ControlerListener get() {
+        return new StartupListener() {
+            @Override
+            public void notifyStartup(StartupEvent event) {
+                MatricesToSightings.insertSightingsForMatrices(timedMatrices, sightings);
+                PopulationFromSightings.createPopulationWithRandomRealization(scenario, sightings, linkToZoneResolver);
+             }
+        };
     }
+
 }

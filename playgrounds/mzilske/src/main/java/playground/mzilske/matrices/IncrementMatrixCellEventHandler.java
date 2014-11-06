@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CreateODDemand.java
+ *  * ODMatrixEventHandler.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,40 +22,46 @@
 
 package playground.mzilske.matrices;
 
-import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.StartupListener;
-import playground.mzilske.cdr.PopulationFromSightings;
-import playground.mzilske.cdr.Sightings;
-import playground.mzilske.cdr.ZoneTracker;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.matrices.Entry;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
-class MatrixDemandControlerListener implements Provider<ControlerListener> {
-
-    @Inject
-    Sightings sightings;
+class IncrementMatrixCellEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
     @Inject
     TimedMatrices timedMatrices;
 
-    @Inject
-    Scenario scenario;
-
-    @Inject
-    ZoneTracker.LinkToZoneResolver linkToZoneResolver;
+    private Map<Id, PersonDepartureEvent> departures = new HashMap<>();
 
     @Override
-    public ControlerListener get() {
-        return new StartupListener() {
-            @Override
-            public void notifyStartup(StartupEvent event) {
-                MatricesToSightings.insertSightingsForMatrices(timedMatrices, sightings);
-                PopulationFromSightings.createPopulationWithRandomRealization(scenario, sightings, linkToZoneResolver);
-             }
-        };
+    public void handleEvent(PersonDepartureEvent event) {
+        departures.put(event.getPersonId(), event);
+    }
+
+    @Override
+    public void handleEvent(PersonArrivalEvent arrival) {
+        PersonDepartureEvent departure = departures.remove(arrival.getPersonId());
+        for (TimedMatrix matrix : timedMatrices.getMatrices()) {
+            if (departure.getTime() >= matrix.getStartTime() &&
+                    departure.getTime() < matrix.getEndTime()) {
+                Entry entry = matrix.getMatrix().getEntry(departure.getLinkId().toString(), arrival.getLinkId().toString());
+                if (entry != null) {
+                    entry.setValue(entry.getValue() + 1.0);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void reset(int iteration) {
+
     }
 
 }
