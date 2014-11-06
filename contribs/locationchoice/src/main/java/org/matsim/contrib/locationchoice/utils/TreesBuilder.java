@@ -134,7 +134,8 @@ public class TreesBuilder {
 			String type = type_it.next();
 
 			// do not construct tree for home and tta act
-			if (type.startsWith("h") || type.startsWith("tta")) continue;
+//			if (type.startsWith("h") || type.startsWith("tta")) continue;	// startsWith("h") also removed oder activity types such as "hotel". cdobler, nov'14
+			if (type.equals("h") || type.equals("home") || type.startsWith("tta")) continue;
 
 			this.quadTreesOfType.put(this.converter.convertType(type), this.buildFacQuadTree(this.converter.convertType(type), tree_of_type));
 			this.facilitiesOfType.put(this.converter.convertType(type), tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()]));
