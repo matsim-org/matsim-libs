@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -22,7 +22,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -101,7 +100,7 @@ public class BlnPlansGenerator {
 //			log.info("Start generating persons...");
 		for (String[] data : personData) {
 
-			PersonImpl person = new PersonImpl(new IdImpl(data[0]));
+			PersonImpl person = new PersonImpl(Id.create(data[0], Person.class));
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth
@@ -125,7 +124,7 @@ public class BlnPlansGenerator {
 				person.setEmployed(Boolean.TRUE);
 			}
 
-			// person.setHousehold(hh)(new IdImpl(data[1]));
+			// person.setHousehold(hh)(Id.create(data[1]));
 
 			if(Integer.parseInt(data[18]) == 2){
 				person.setLicence("yes");
@@ -156,7 +155,7 @@ public class BlnPlansGenerator {
 		log.info("...finished reading " + unsortedTripData.size() + " entries in trip file.");
 
 		for (String[] tripDataString : unsortedTripData) {
-			IdImpl personId = new IdImpl(tripDataString[1]);
+			Id<Person> personId = Id.create(tripDataString[1], Person.class);
 			if(tripData.get(personId) != null){
 				tripData.get(personId).add(tripDataString);
 			} else {
@@ -242,7 +241,7 @@ public class BlnPlansGenerator {
 
 		HashMap<Id, ArrayList<String[]>> sortedCoordMapData = new HashMap<Id, ArrayList<String[]>>();
 		for (String[] coordMapEntry : unsortedCoordMapData) {
-			IdImpl personId = new IdImpl(coordMapEntry[0]);
+			Id<Person> personId = Id.create(coordMapEntry[0], Person.class);
 			if(sortedCoordMapData.get(personId) != null){
 				sortedCoordMapData.get(personId).add(coordMapEntry);
 			} else {
