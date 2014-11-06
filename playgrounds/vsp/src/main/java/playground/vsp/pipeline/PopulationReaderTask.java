@@ -14,9 +14,9 @@ public class PopulationReaderTask implements PersonSource, Runnable {
 
 	private PersonSink sink;
 	
-	private String filename;
+	private final String filename;
 
-	private Network network;
+	private final Network network;
 	
 	public PopulationReaderTask(String filename, Network network) {
 		super();

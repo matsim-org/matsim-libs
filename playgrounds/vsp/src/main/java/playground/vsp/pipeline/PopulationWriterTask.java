@@ -11,15 +11,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationWriterTask implements PersonSink {
 	
-	private String filename;
-	
-	private ScenarioImpl scenario;
+	private final String filename;
 
-	private PopulationImpl population;
+    private PopulationImpl population;
 
 	private PopulationWriter populationWriter;
 
-	private Network network;
+	private final Network network;
 	
 	public PopulationWriterTask(String filename, Network network) {
 		super();
@@ -29,7 +27,7 @@ public class PopulationWriterTask implements PersonSink {
 	}
 	
 	private void init() {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		populationWriter = new PopulationWriter(population, network);
