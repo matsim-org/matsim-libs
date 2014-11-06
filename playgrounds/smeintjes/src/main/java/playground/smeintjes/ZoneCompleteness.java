@@ -16,7 +16,6 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -46,7 +45,6 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author sumarie
  *
  */
-@SuppressWarnings("deprecation")
 public class ZoneCompleteness {
 	final private static Logger LOG = Logger.getLogger(ZoneCompleteness.class); 
 	/**
@@ -64,20 +62,20 @@ public class ZoneCompleteness {
 		int numberOfThreads = Integer.parseInt(args[2]);
 		Double hexWidth = Double.parseDouble(args[3]);
 
-		Id zone1 = new IdImpl(1);
-		Id zone2 = new IdImpl(2);
-		Id zone3 = new IdImpl(3);
-		Id zone4 = new IdImpl(4);
-		Id zone5 = new IdImpl(5);
-		Id zone6 = new IdImpl(6);
-		Id zone7 = new IdImpl(7);
-		Id zone8 = new IdImpl(8);
-		Id zone9 = new IdImpl(9);
-		Id zone10 = new IdImpl(10);
-		Id[] idList = {zone1,zone2,zone3,zone4,zone5,zone6,zone7,zone8,zone9,zone10};
+		Id<Polygon> zone1 = Id.create(1, Polygon.class);
+		Id<Polygon> zone2 = Id.create(2, Polygon.class);
+		Id<Polygon> zone3 = Id.create(3, Polygon.class);
+		Id<Polygon> zone4 = Id.create(4, Polygon.class);
+		Id<Polygon> zone5 = Id.create(5, Polygon.class);
+		Id<Polygon> zone6 = Id.create(6, Polygon.class);
+		Id<Polygon> zone7 = Id.create(7, Polygon.class);
+		Id<Polygon> zone8 = Id.create(8, Polygon.class);
+		Id<Polygon> zone9 = Id.create(9, Polygon.class);
+		Id<Polygon> zone10 = Id.create(10, Polygon.class);
+		Id<Polygon>[] idList = new Id[] {zone1,zone2,zone3,zone4,zone5,zone6,zone7,zone8,zone9,zone10};
 
 
-		QuadTree<Tuple<Id, Polygon>> qt = buildZoneQuadTree(idList, hexWidth);
+		QuadTree<Tuple<Id<Polygon>, Polygon>> qt = buildZoneQuadTree(idList, hexWidth);
 		getZoneCompleteness(numberOfThreads, sourceFolder, outputFolder, qt, hexWidth, idList);
 
 		Header.printFooter();
@@ -88,15 +86,14 @@ public class ZoneCompleteness {
 	 * This method creates a QuadTree that includes the hexagons of the 10 study areas (in NMBM)  
 	 * as Polygons.
 	 */
-	@SuppressWarnings("rawtypes")
-	private static QuadTree<Tuple<Id, Polygon>> buildZoneQuadTree(Id[] idList, double totalWidth) {
+	private static QuadTree<Tuple<Id<Polygon>, Polygon>> buildZoneQuadTree(Id<Polygon>[] idList, double totalWidth) {
 
 		double minX = 130000.0;
 		double minY = -3707000.0;
 		double maxX = 152000.0;
 		double maxY = -3684000.0;
 
-		QuadTree<Tuple<Id, Polygon>> zoneQT = new QuadTree<Tuple<Id, Polygon>>(minX, minY, maxX, maxY);
+		QuadTree<Tuple<Id<Polygon>, Polygon>> zoneQT = new QuadTree<Tuple<Id<Polygon>, Polygon>>(minX, minY, maxX, maxY);
 
 		Coord centroid1 = new CoordImpl(130048.2549,-3685018.8482);
 		Coord centroid2 = new CoordImpl(148048.2549,-3702339.3562);
@@ -131,7 +128,7 @@ public class ZoneCompleteness {
 			LinearRing hexRing = new LinearRing(coordinateSeq, gf);
 			Polygon hex = gf.createPolygon(hexRing, null); 
 
-			Tuple<Id, Polygon> zoneTuple = new Tuple<Id, Polygon>(idList[counter],hex);
+			Tuple<Id<Polygon>, Polygon> zoneTuple = new Tuple<Id<Polygon>, Polygon>(idList[counter],hex);
 			zoneQT.put(x, y, zoneTuple);
 			counter++;
 		}
@@ -139,8 +136,7 @@ public class ZoneCompleteness {
 		return zoneQT;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, String outputFolder, QuadTree<Tuple<Id, Polygon>> qt, double hexWidth, Id[] idList) {
+	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, String outputFolder, QuadTree<Tuple<Id<Polygon>, Polygon>> qt, double hexWidth, Id<Polygon>[] idList) {
 
 
 				double[] radii = {20};
@@ -173,12 +169,12 @@ public class ZoneCompleteness {
 				/* Set up the multi-threaded infrastructure. */
 				LOG.info("Setting up multi-threaded infrastructure");
 				ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
-				List<Future<Map<Id, Tuple<Integer, Integer>>>> jobs = new ArrayList<Future<Map<Id, Tuple<Integer, Integer>>>>();
+				List<Future<Map<Id<Polygon>, Tuple<Integer, Integer>>>> jobs = new ArrayList<Future<Map<Id<Polygon>, Tuple<Integer, Integer>>>>();
 
 				LOG.info("Processing the vehicle files...");
 				for(File file : listOfFiles){
-					Callable<Map<Id, Tuple<Integer, Integer>>> job = new ExtractorCallable(qt, file, counter);
-					Future<Map<Id, Tuple<Integer, Integer>>> result = threadExecutor.submit(job);
+					Callable<Map<Id<Polygon>, Tuple<Integer, Integer>>> job = new ExtractorCallable(qt, file, counter);
+					Future<Map<Id<Polygon>, Tuple<Integer, Integer>>> result = threadExecutor.submit(job);
 					jobs.add(result);
 				}
 				counter.printCounter();
@@ -191,12 +187,12 @@ public class ZoneCompleteness {
 
 				/* Consolidate the output */
 				LOG.info("Consolidating output...");
-				Map<Id, Tuple<Integer, Integer>> consolidatedMap = new TreeMap<Id, Tuple<Integer,Integer>>();
+				Map<Id<Polygon>, Tuple<Integer, Integer>> consolidatedMap = new TreeMap<Id<Polygon>, Tuple<Integer,Integer>>();
 
 				try{
-					for(Future<Map<Id, Tuple<Integer, Integer>>> job : jobs){
-						Map<Id, Tuple<Integer, Integer>> thisJob = job.get();
-						for(Id id : thisJob.keySet()){
+					for(Future<Map<Id<Polygon>, Tuple<Integer, Integer>>> job : jobs){
+						Map<Id<Polygon>, Tuple<Integer, Integer>> thisJob = job.get();
+						for(Id<Polygon> id : thisJob.keySet()){
 							if(!consolidatedMap.containsKey(id)){
 								consolidatedMap.put(id, thisJob.get(id));
 							} else{
@@ -225,7 +221,7 @@ public class ZoneCompleteness {
 					bw.write("ZoneId,Total,NumberWithFacilityId");
 					bw.newLine();
 
-					for(Id id: consolidatedMap.keySet()){
+					for(Id<Polygon> id: consolidatedMap.keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(consolidatedMap.get(id).getFirst()));
@@ -256,13 +252,13 @@ public class ZoneCompleteness {
 	 * one of the ten study areas.
 	 */
 	@SuppressWarnings("rawtypes")
-	private static class ExtractorCallable implements Callable<Map<Id, Tuple<Integer, Integer>>>{
-		private final QuadTree<Tuple<Id, Polygon>> qt;
+	private static class ExtractorCallable implements Callable<Map<Id<Polygon>, Tuple<Integer, Integer>>>{
+		private final QuadTree<Tuple<Id<Polygon>, Polygon>> qt;
 		private final File file;
 		public Counter counter;
 
 
-		public ExtractorCallable(QuadTree<Tuple<Id, Polygon>> qt, File file, Counter counter) {
+		public ExtractorCallable(QuadTree<Tuple<Id<Polygon>, Polygon>> qt, File file, Counter counter) {
 			this.qt = qt;
 			this.file = file;
 			this.counter = counter;
@@ -270,8 +266,8 @@ public class ZoneCompleteness {
 
 
 		@Override
-		public Map<Id, Tuple<Integer, Integer>> call() throws Exception {
-			Map<Id, Tuple<Integer, Integer>> zoneMap = new TreeMap<Id,Tuple<Integer, Integer>>();
+		public Map<Id<Polygon>, Tuple<Integer, Integer>> call() throws Exception {
+			Map<Id<Polygon>, Tuple<Integer, Integer>> zoneMap = new TreeMap<>();
 			GeometryFactory gf = new GeometryFactory();
 
 			/* Parse the vehicle from file. */

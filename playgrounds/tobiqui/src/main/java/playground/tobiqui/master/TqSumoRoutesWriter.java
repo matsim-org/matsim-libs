@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
@@ -83,13 +83,12 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			super.writeStartTag("routes", null);
 			super.writeStartTag("vType", vType, true);
 			
-			Map<Id,Integer> sortedDepartures = sortHashMapByValues(plans.firstDepartures);
+			Map<Id<Person>,Integer> sortedDepartures = sortHashMapByValues(plans.firstDepartures);
 			
-			Iterator<?> it = sortedDepartures.entrySet().iterator();
+			Iterator<Map.Entry<Id<Person>, Integer>> it = sortedDepartures.entrySet().iterator();
 			while (it.hasNext()) {
-				@SuppressWarnings("rawtypes")
-				Map.Entry pairs = (Map.Entry) it.next();
-				Id id = new IdImpl(pairs.getKey().toString());
+				Map.Entry<Id<Person>, Integer> pairs = it.next();
+				Id<Person> id = pairs.getKey();
 				list.clear();
 				list.add(new Tuple<String, String>("id", id.toString()));
 				list.add(new Tuple<String, String>("depart", pairs.getValue().toString()));
@@ -155,31 +154,30 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Map<Id,Integer> sortHashMapByValues(Map<Id, Integer> map){
-		List<Id> mapKeys = new ArrayList(map.keySet());
-		List<Integer> mapValues = new ArrayList(map.values());
+	public <T> Map<Id<T>,Integer> sortHashMapByValues(Map<Id<T>, Integer> map){
+		List<Id<T>> mapKeys = new ArrayList<>(map.keySet());
+		List<Integer> mapValues = new ArrayList<>(map.values());
 		Collections.sort(mapKeys);
 		Collections.sort(mapValues);
 		
 //		System.out.println(mapValues.toString());
 		
-		Map<Id,Integer> sortedMap = new LinkedHashMap<Id,Integer>();
+		Map<Id<T>,Integer> sortedMap = new LinkedHashMap<>();
 		
-		Iterator valueIt = mapValues.iterator();
+		Iterator<Integer> valueIt = mapValues.iterator();
 		while (valueIt.hasNext()){
-			Object value = valueIt.next();
-			Iterator keyIt = mapKeys.iterator();
+			Integer value = valueIt.next();
+			Iterator<Id<T>> keyIt = mapKeys.iterator();
 			
 			while(keyIt.hasNext()){
-				Object key = keyIt.next();
+				Id<T> key = keyIt.next();
 				String comp1 = map.get(key).toString();
 				String comp2 = value.toString();
 				
 				if (comp1.equals(comp2)){
 					map.remove(key);
 					mapKeys.remove(key);
-					sortedMap.put(new IdImpl(key.toString()), (Integer) value);
+					sortedMap.put(key, value);
 					break;
 				}
 			}

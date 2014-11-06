@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -35,7 +34,7 @@ public class CreatePopulation {
 	private QuadTree<ActivityFacility> homeFacilitiesTree;
 	private QuadTree<ActivityFacility> workFacilitiesTree;
 	
-	private TreeMap<Id, Coord> municipalityCentroids = new TreeMap<Id, Coord>();
+	private TreeMap<String, Coord> municipalityCentroids = new TreeMap<String, Coord>();
 	private Random random = new Random(3838494); 
 	
 	private ObjectAttributes personHomeAndWorkLocations = new ObjectAttributes();
@@ -113,7 +112,7 @@ public class CreatePopulation {
 					 * Assign a work location and buffer it somewhere. 
 					 * This could also be done in the persons knowledge. But we use ObjectAttributes here.
 					 */
-					Id municipalityId = new IdImpl(Integer.parseInt(parts[index_workLocation]));
+					String municipalityId = parts[index_workLocation];
 					ActivityFacility workFacility = this.getWorkFacility(municipalityId);
 					personHomeAndWorkLocations.putAttribute(person.getId().toString(), "work", workFacility);
 				}
@@ -133,12 +132,12 @@ public class CreatePopulation {
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				
-				Id id = new IdImpl(parts[0]);
+				String id = parts[0];
 				/*
 				 * COORD: pay attention to coordinate systems!
 				 */
 				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
-				this.municipalityCentroids.put(id, coord);;
+				this.municipalityCentroids.put(id, coord);
 			}
 			
 		} // end try
@@ -147,7 +146,7 @@ public class CreatePopulation {
 		}
 	}
 	
-	private ActivityFacility getWorkFacility(Id municipalityId) {
+	private ActivityFacility getWorkFacility(String municipalityId) {
 		Coord coord = this.municipalityCentroids.get(municipalityId);
 		ArrayList<ActivityFacility> list = 
 			(ArrayList<ActivityFacility>) this.workFacilitiesTree.get(coord.getX(), coord.getY(), 8000);

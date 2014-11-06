@@ -10,9 +10,7 @@ import java.util.List;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.util.Solutions;
 
 import org.apache.log4j.Logger;
@@ -24,7 +22,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
@@ -35,7 +32,6 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -60,7 +56,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
 	public static Coord depotCoord;
-	public static Id depotLink;
+	public static Id<Link> depotLink;
 	//	public CarrierVehicleTypes carrierVehicleTypes;
 	//	public static Carrier carrier;
 	//	public static Scenario scenario;
@@ -104,7 +100,7 @@ public class MyCarrierPlanGenerator {
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
 		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
-		depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink((Coord) depotCoord).getId();
+		depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(depotCoord).getId();
 
 		MyFileSampler mfs = new MyFileSampler(demandInputDir);
 		List<File> files = mfs.sampleFiles(Integer.MAX_VALUE, new MyFileFilter(".csv"));
@@ -114,7 +110,7 @@ public class MyCarrierPlanGenerator {
 			MyCarrierPlanGenerator mcpg = new MyCarrierPlanGenerator();
 			Carriers carriers = new Carriers();
 			/* Create carrier and assign carrier capabilities to carrier */
-			carriers.addCarrier(CarrierImpl.newInstance(new IdImpl("MyCarrier")));
+			carriers.addCarrier(CarrierImpl.newInstance(Id.create("MyCarrier", Carrier.class)));
 //			new CarrierPlanXmlReaderV2(carriers).read(carrierInput);
 
 			CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
@@ -122,7 +118,7 @@ public class MyCarrierPlanGenerator {
 
 			new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
 
-			Carrier carrier = carriers.getCarriers().get(new IdImpl("MyCarrier"));
+			Carrier carrier = carriers.getCarriers().get(Id.create("MyCarrier", Carrier.class));
 
 //					mcpg.buildAndWriteVehicleTypes(vehicleTypeOutputFile, true);
 
@@ -141,7 +137,7 @@ public class MyCarrierPlanGenerator {
 			mcpg.createInitialPlans(carrier, network, initialPlanAlgorithm, carrierVehicleTypes);
 
 			//			carriers.getCarriers().clear();
-			carriers.getCarriers().put(new IdImpl("MyCarrier"), carrier);
+			carriers.getCarriers().put(Id.create("MyCarrier", Carrier.class), carrier);
 			CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
 			planWriter.write(outputDir + filename + "_" + speed +  ".xml");
 
@@ -292,9 +288,9 @@ public class MyCarrierPlanGenerator {
 				double end = Double.parseDouble(array[8]);
 
 				Coord coord = new CoordImpl(longi, lati);
-				Id linkId = ((NetworkImpl)network).getNearestLink(coord).getId();
+				Id<Link> linkId = ((NetworkImpl)network).getNearestLink(coord).getId();
 
-				CarrierService serv = CarrierService.Builder.newInstance(new IdImpl(i), linkId).
+				CarrierService serv = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), linkId).
 						setCapacityDemand((int) mass).
 						setServiceDuration(duration).
 						setName(customer).

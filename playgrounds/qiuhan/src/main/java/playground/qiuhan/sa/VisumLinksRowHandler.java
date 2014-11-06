@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.EdgeType;
@@ -45,16 +45,16 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 	@Override
 	public void handleRow(Map<String, String> row) {
 		String nr = row.get("NR");
-		IdImpl id = new IdImpl(nr);
-		IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
-		IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+		Id<Link> id = Id.create(nr, Link.class);
+		Id<Node> fromNodeId = Id.create(row.get("VONKNOTNR"), Node.class);
+		Id<Node> toNodeId = Id.create(row.get("NACHKNOTNR"), Node.class);
 		Node fromNode = network.getNodes().get(fromNodeId);
 		Node toNode = network.getNodes().get(toNodeId);
 		Link lastEdge = network.getLinks().get(id);
 		if (lastEdge != null) {
 			if (lastEdge.getFromNode().getId().equals(toNodeId)
 					&& lastEdge.getToNode().getId().equals(fromNodeId)) {
-				id = new IdImpl(nr + 'R');
+				id = Id.create(nr + 'R', Link.class);
 			} else {
 				throw new RuntimeException("Duplicate edge.");
 			}
@@ -62,7 +62,7 @@ public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 		double length = Double.parseDouble(row.get("LAENGE").replace(',', '.')) * 1000;
 		// double freespeed = 0.0;
 		String edgeTypeIdString = row.get("TYPNR");
-		IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+		Id<EdgeType> edgeTypeId = Id.create(edgeTypeIdString, EdgeType.class);
 
 		EdgeType edgeType = visumNetwork.edgeTypes.get(edgeTypeId);
 		// double capacity = getCapacity(edgeTypeId);

@@ -20,6 +20,19 @@
 package herbie.creation.freight;
 
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,24 +42,29 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.facilities.*;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import utils.BuildTrees;
 
-import java.io.*;
-import java.text.DecimalFormat;
-import java.util.*;
+import utils.BuildTrees;
 
 public class CreateFreightTraffic {
 	
@@ -62,9 +80,9 @@ public class CreateFreightTraffic {
 	private String zonesfilePath;
 	private String outpath;
 	private double radius;
-	private TreeMap<Id, Zone> zones = new TreeMap<Id, Zone>();
+	private TreeMap<Id<Zone>, Zone> zones = new TreeMap<Id<Zone>, Zone>();
 	private final int numberOfZones = 1434;
-	private Id [] zoneIds = new Id[numberOfZones];
+	private Id<Zone> [] zoneIds = new Id[numberOfZones];
 	private double roundingLimit;
 	
 	private QuadTree<ActivityFacility> facilityTree;
@@ -135,7 +153,7 @@ public class CreateFreightTraffic {
 				Coord coordEnd = this.zones.get(this.zoneIds[j]).getCentroidCoord();
 				
 				if (od[i][j] > this.roundingLimit) {
-					odRelations.add(new ODRelation(new IdImpl(cnt), coordStart, coordEnd, od[i][j], this.zones.get(this.zoneIds[i]).getName(),
+					odRelations.add(new ODRelation(Id.create(cnt, ODRelation.class), coordStart, coordEnd, od[i][j], this.zones.get(this.zoneIds[i]).getName(),
 							this.zones.get(this.zoneIds[j]).getName(), this.zoneIds[i], this.zoneIds[j]));
 					cnt++;
 				}
@@ -173,7 +191,7 @@ public class CreateFreightTraffic {
 			for (int i = 0; i < this.numberOfZones; i++) {
 				line = bufferedReader.readLine();
 				String parts[] = line.split("\t");
-				Id id = new IdImpl(Integer.parseInt(parts[0].trim()));
+				Id<Zone> id = Id.create(Integer.parseInt(parts[0].trim()), Zone.class);
 				double x = Double.parseDouble(parts[1]);
 				double y = Double.parseDouble(parts[2]);
 				String name = "external";
@@ -232,7 +250,7 @@ public class CreateFreightTraffic {
 	}
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
-		Person p = new PersonImpl(new IdImpl(this.freightOffset + index));
+		Person p = new PersonImpl(Id.create(this.freightOffset + index, Person.class));
 		((PersonImpl)p).setEmployed(true);
 		((PersonImpl)p).setCarAvail("always");
 		((PersonImpl)p).createDesires("freight");
@@ -273,7 +291,7 @@ public class CreateFreightTraffic {
 			// fill the zones id index
 			String header[] = line.split(",");
 			for (int i = 0; i < numberOfZones; i++) {
-				this.zoneIds[i] = new IdImpl(header[i + 1].trim());
+				this.zoneIds[i] = Id.create(header[i + 1].trim(), Zone.class);
 			}			
 			double cnt = 0.0;
 			for (int i = 0; i < numberOfZones; i++) {

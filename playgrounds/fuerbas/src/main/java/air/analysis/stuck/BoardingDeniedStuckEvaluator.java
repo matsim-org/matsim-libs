@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -52,7 +53,7 @@ public class BoardingDeniedStuckEvaluator {
 	private Map<Id, PersonEvents> boardingDeniedNoStuck = new HashMap<Id, PersonEvents>();
 
 	private Map<Id, BoardingDeniedStuck> airportStuckCountMap = new HashMap<Id, BoardingDeniedStuck>();
-	private Map<Tuple<Id, Id>, BoardingDeniedStuck> odStuckCountMap = new HashMap<Tuple<Id, Id>, BoardingDeniedStuck>();
+	private Map<Tuple<Id<Link>, Id<Link>>, BoardingDeniedStuck> odStuckCountMap = new HashMap<>();
 	
 	public BoardingDeniedStuckEvaluator(Map<Id, PersonEvents> map, Population pop) {
 		this.personStats = map;
@@ -100,7 +101,7 @@ public class BoardingDeniedStuckEvaluator {
 		try {
 			bw.write(header);
 			bw.newLine();
-			for (Entry<Tuple<Id, Id>, BoardingDeniedStuck> e : this.odStuckCountMap.entrySet()) {
+			for (Entry<Tuple<Id<Link>, Id<Link>>, BoardingDeniedStuck> e : this.odStuckCountMap.entrySet()) {
 				StringBuilder sb = new StringBuilder();
 				sb.append(e.getKey().getFirst().toString());
 				sb.append(";");
@@ -139,7 +140,7 @@ public class BoardingDeniedStuckEvaluator {
 	private void evalutateStuckStats(){
 		for (Entry<Id, PersonEvents> entry : this.personStats.entrySet()){
 			PersonEvents pe = entry.getValue();
-			Tuple<Id, Id> odTuple = this.getOdTuple(entry.getKey());
+			Tuple<Id<Link>, Id<Link>> odTuple = this.getOdTuple(entry.getKey());
 			BoardingDeniedStuck odCount = this.getOdCount(odTuple);
 			if (pe.stuckEvent != null) { // STUCK
 				Id airportCode = pe.stuckEvent.getLinkId();
@@ -162,15 +163,15 @@ public class BoardingDeniedStuckEvaluator {
 		}
 	}
 
-	private Tuple<Id, Id> getOdTuple(Id personId) {
+	private Tuple<Id<Link>, Id<Link>> getOdTuple(Id<Person> personId) {
 		Person person = this.population.getPersons().get(personId);
 		Plan plan = person.getPlans().get(0);
-		Id fromLinkId = ((Activity)plan.getPlanElements().get(0)).getLinkId();
-		Id toLinkId = ((Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1)).getLinkId();
+		Id<Link> fromLinkId = ((Activity)plan.getPlanElements().get(0)).getLinkId();
+		Id<Link> toLinkId = ((Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1)).getLinkId();
 		if (fromLinkId.equals(toLinkId)){
 			log.warn("person id "+ personId.toString() + " has same from and to link " + toLinkId);
 		}
-		Tuple<Id, Id> t = new Tuple<Id, Id>(fromLinkId, toLinkId);
+		Tuple<Id<Link>, Id<Link>> t = new Tuple<Id<Link>, Id<Link>>(fromLinkId, toLinkId);
 		return t;
 	}
 	
@@ -183,7 +184,7 @@ public class BoardingDeniedStuckEvaluator {
 		return airportCount;
 	}
 	
-	private BoardingDeniedStuck getOdCount(Tuple<Id, Id> odTuple) {
+	private BoardingDeniedStuck getOdCount(Tuple<Id<Link>, Id<Link>> odTuple) {
 		BoardingDeniedStuck odCount = odStuckCountMap.get(odTuple);
 		if (odCount == null) {
 			odCount = new BoardingDeniedStuck();
@@ -192,14 +193,10 @@ public class BoardingDeniedStuckEvaluator {
 		return odCount;
 	}
 
-
-
 	
-	public Map<Tuple<Id, Id>, BoardingDeniedStuck> getOdStuckCountMap() {
+	public Map<Tuple<Id<Link>, Id<Link>>, BoardingDeniedStuck> getOdStuckCountMap() {
 		return odStuckCountMap;
 	}
-	
-	
 	
 
 }

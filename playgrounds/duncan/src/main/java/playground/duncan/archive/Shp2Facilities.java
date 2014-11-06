@@ -29,7 +29,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -83,7 +83,8 @@ public class Shp2Facilities {
 			Point center = polygon.getCentroid();
 			Coord coord = new CoordImpl ( center.getX() , center.getY() ) ;
 			
-			Id id = new IdImpl( cnt ) ; cnt++ ;
+			Id<ActivityFacility> id = Id.create( cnt , ActivityFacility.class) ;
+			cnt++ ;
 			
 			ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, coord ) ;
 			

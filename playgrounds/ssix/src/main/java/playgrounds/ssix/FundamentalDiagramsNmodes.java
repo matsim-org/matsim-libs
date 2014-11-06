@@ -27,7 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author ssix
@@ -43,19 +44,19 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	private static final Logger log = Logger.getLogger(FundamentalDiagramsNmodes.class);
 	
 	private Scenario scenario;
-	private Map<Id, ModeData> modesData;
+	private Map<String, ModeData> modesData;
 	private ModeData globalData;
 	
-	public final static Id studiedMeasuringPointLinkId = new IdImpl(0);
+	public final static Id<Link> studiedMeasuringPointLinkId = Id.create(0, Link.class);
 		
 	private boolean permanentRegime;
 
 	
-	public FundamentalDiagramsNmodes(Scenario sc, Map<Id, ModeData> modesData){
+	public FundamentalDiagramsNmodes(Scenario sc, Map<String, ModeData> modesData){
 		this.scenario =  sc;
 		this.modesData = modesData;
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-			this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).initDynamicVariables();
+			this.modesData.get(DreieckNmodes.NAMES[i]).initDynamicVariables();
 		}
 		this.globalData = new ModeData();
 		this.globalData.setnumberOfAgents(sc.getPopulation().getPersons().size());
@@ -66,20 +67,21 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	@Override
 	public void reset(int iteration) {	
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-			this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).reset();
+			this.modesData.get(DreieckNmodes.NAMES[i]).reset();
 		}
 		this.globalData.reset();
 		this.permanentRegime = false;
 	}
 
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (!(permanentRegime)){
-			Id personId = event.getVehicleId();
+			Id<Vehicle> personId = event.getVehicleId();
 			double pcu_person = 0.;
 			
 			//Disaggregated data updating methods
-			Id transportMode = new IdImpl( (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode"));
+			String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
 			this.modesData.get(transportMode).handle(event);
 			pcu_person = this.modesData.get(transportMode).getVehicleType().getPcuEquivalents();
 			
@@ -106,10 +108,10 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 					//Checking modes stability
 					boolean modesStable = true;
 					for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-						if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).numberOfAgents != 0){
-							if (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable()) {
+						if (this.modesData.get(DreieckNmodes.NAMES[i]).numberOfAgents != 0){
+							if (this.modesData.get(DreieckNmodes.NAMES[i]).isSpeedStable()) {
 								//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is speed stable, checking for flow...");
-								if ( ! (this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isFlowStable()) ){
+								if ( ! (this.modesData.get(DreieckNmodes.NAMES[i]).isFlowStable()) ){
 									//System.out.println("Mode "+DreieckNmodes.NAMES[i]+" is not flow stable yet.");
 									modesStable = false;
 									break;
@@ -133,7 +135,7 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 							//log.info("Global permanent regime attained");
 							System.out.println("Global permanent regime attained");
 							for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
-								this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).saveDynamicVariables();
+								this.modesData.get(DreieckNmodes.NAMES[i]).saveDynamicVariables();
 							}
 							this.globalData.setPermanentAverageVelocity(this.globalData.getActualAverageVelocity());
 							//this.permanentFlow = this.getActualFlow();
@@ -161,7 +163,7 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 		return this.globalData;
 	}
 
-	public Map<Id, ModeData> getModesData() {
+	public Map<String, ModeData> getModesData() {
 		return modesData;
 	}
 	

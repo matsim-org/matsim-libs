@@ -6,11 +6,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -79,7 +79,7 @@ public class CreateFacilities {
 				Coord coord = new CoordImpl(Double.parseDouble(parts[index_xCoord]),
 						Double.parseDouble(parts[index_yCoord]));
 				
-				ActivityFacility facility = factory.createActivityFacility(new IdImpl(cnt), coord);
+				ActivityFacility facility = factory.createActivityFacility(Id.create(cnt, ActivityFacility.class), coord);
 				facilities.addActivityFacility(facility);
 				
 				String types [] = parts[index_types].split(",");
@@ -113,7 +113,7 @@ public class CreateFacilities {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				
-				ActivityFacility facility = factory.createActivityFacility(new IdImpl(startIndex + cnt), homeCoord);
+				ActivityFacility facility = factory.createActivityFacility(Id.create(startIndex + cnt, ActivityFacility.class), homeCoord);
 				facilities.addActivityFacility(facility);
 				addActivityOption(facility, "home");
 				cnt++;

@@ -34,8 +34,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -62,7 +60,7 @@ public class SfOsmAerowayParser extends MatsimXmlParser {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if ("node".equals(name)) {
-			Id id = new IdImpl(atts.getValue("id"));				
+			long id = Long.parseLong(atts.getValue("id"));				
 			double lat = Double.parseDouble(atts.getValue("lat"));
 			double lon = Double.parseDouble(atts.getValue("lon"));
 			this.currentNode = new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat)));
@@ -127,11 +125,11 @@ public class SfOsmAerowayParser extends MatsimXmlParser {
 
 	
 	class OsmNode {
-		public Id id;
+		public long id;
 		public final Coord coord;
 		public final Map<String, String> tags = new HashMap<String, String>();
 
-		public OsmNode(final Id id, final Coord coord) {
+		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
 			this.coord = coord;
 		}

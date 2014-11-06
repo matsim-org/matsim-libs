@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -127,8 +126,8 @@ public class MatrixToPersons {
 					SimpleFeature toZoneFeature = zoneIdFeatures.get(toZoneId.toString());
 					int numberPersons = (int) entry.getValue();
 					for (int i = 0; i < numberPersons; i++) {
-						Id personId = new IdImpl(m.getId() + "-" + fromZoneId
-								+ "-" + toZoneId + "-" + i);
+						Id<Person> personId = Id.create(m.getId() + "-" + fromZoneId
+								+ "-" + toZoneId + "-" + i, Person.class);
 						Coord fromCoord = this.getRandomPointInFeature(fromZoneFeature);
 						Coord toCoord = this
 								.getRandomPointInFeature(toZoneFeature);
@@ -146,8 +145,8 @@ public class MatrixToPersons {
 					int numberPersons = (int) entry.getValue();
 
 					for (int i = 0; i < numberPersons; i++) {
-						Id personId = new IdImpl(m.getId() + "-" + fromZoneId
-								+ "-" + toZoneId + "-" + i);
+						Id<Person> personId = Id.create(m.getId() + "-" + fromZoneId
+								+ "-" + toZoneId + "-" + i, Person.class);
 						createPerson(personId, fromZone, toZone);
 					}
 				}
@@ -175,7 +174,7 @@ public class MatrixToPersons {
 	 * @param from
 	 * @param to
 	 */
-	private void createPerson(Id personId, Coord from, Coord to) {
+	private void createPerson(Id<Person> personId, Coord from, Coord to) {
 		Person per = new PersonImpl(personId);
 
 		createPlans(per, from, to);

@@ -3,6 +3,7 @@ package analyzer.exampleScenario;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -10,7 +11,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -50,8 +50,8 @@ public class ScenarioCreator {
 						int nPersons = 1 + nPersonsBase/((xFrom+yFrom)*(xTo+yTo)); //minimum 1
 						nPersonsTotal += nPersons;
 
-						Coord fromCoord = new CoordImpl((double) (xFrom*1000), (double) (yFrom*1000));
-						Coord toCoord = new CoordImpl((double) (xTo*1000), (double) (yTo*1000));//arrivalCoordinates in Act2Mode appear to be different
+						Coord fromCoord = new CoordImpl(xFrom*1000, yFrom*1000);
+						Coord toCoord = new CoordImpl(xTo*1000, yTo*1000);//arrivalCoordinates in Act2Mode appear to be different
 						System.out.println(nPersons+"pt Agents from " + xFrom + yFrom + " (" + fromCoord.toString() + ") to "+xTo+yTo+" ("+toCoord.toString());
 						createPersons(rnd, pop, nPersons, fromCoord, toCoord, 5, 12, "pt", xFrom, yFrom, xTo, yTo);//i,j,k,l for Agent Ids which include node numbers where work and home places are located
 						createPersons(rnd, pop, nPersons, fromCoord, toCoord, 7, 9, "pt", xFrom, yFrom, xTo, yTo);
@@ -73,7 +73,7 @@ public class ScenarioCreator {
 		
 		for (int ii = 0; ii < nPersonsToBeCreated; ii++) {
 			nPersonsCreated++;
-			Person person = pop.getFactory().createPerson(new IdImpl(transportMode+"_"+xFrom+yFrom+"_to_"+xTo+yTo+"_Nr"+nPersonsCreated));//ii not in Id, because this method is called twice for car and twice for pt, so every ii is included twice in the ids
+			Person person = pop.getFactory().createPerson(Id.create(transportMode+"_"+xFrom+yFrom+"_to_"+xTo+yTo+"_Nr"+nPersonsCreated, Person.class));//ii not in Id, because this method is called twice for car and twice for pt, so every ii is included twice in the ids
 			Plan plan = pop.getFactory().createPlan();
 			
 			Activity h = pop.getFactory().createActivityFromCoord("h", fromCoord);

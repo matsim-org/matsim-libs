@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -38,7 +39,7 @@ import org.matsim.vehicles.VehicleType;
 
 public class ModeData {
 	
-	private Id modeId;
+	private String modeId;
 	private VehicleType vehicleType=null;//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
 									     //	     So far programmed to contain also global data, i.e. data without a specific vehicleType (ssix, 30.09.13)
 	public int numberOfAgents;
@@ -47,7 +48,7 @@ public class ModeData {
 	private double permanentAverageVelocity;
 	private double permanentFlow;
 		
-	private Map<Id,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
+	private Map<Id<Vehicle>,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
@@ -60,14 +61,14 @@ public class ModeData {
 	
 	public ModeData(){}
 	
-	public ModeData(Id id, VehicleType vT){
+	public ModeData(String id, VehicleType vT){
 		this.modeId = id;
 		this.vehicleType = vT;
 	}
 	
 	public void handle(LinkEnterEvent event){
 		if (event.getLinkId().equals(FundamentalDiagramsNmodes.studiedMeasuringPointLinkId)){
-			Id personId = event.getVehicleId();
+			Id<Vehicle> personId = event.getVehicleId();
 			double nowTime = event.getTime();
 			
 			//Updating flow, speed
@@ -156,7 +157,7 @@ public class ModeData {
 		this.lastXFlows900.set(0, nowFlow);
 	}
 	
-	public void updateSpeedTable(double nowTime, Id personId){
+	public void updateSpeedTable(double nowTime, Id<Vehicle> personId){
 		if (this.lastSeenOnStudiedLinkEnter.containsKey(personId)){
 			double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
 			double speed = DreieckNmodes.length * 3 / (nowTime-lastSeenTime);//in m/s!!
@@ -260,7 +261,7 @@ public class ModeData {
 		}
 		this.speedStability = false;
 		this.flowStability = false;
-		this.lastSeenOnStudiedLinkEnter = new TreeMap<Id,Double>();
+		this.lastSeenOnStudiedLinkEnter = new TreeMap<>();
 		this.permanentDensity = 0.;
 		this.permanentAverageVelocity =0.;
 		this.permanentFlow = 0.;
@@ -319,7 +320,7 @@ public class ModeData {
 		return this.vehicleType;
 	}
 	
-	public Id getModeId(){
+	public String getModeId(){
 		return this.modeId;
 	}
 	
@@ -394,7 +395,7 @@ public class ModeData {
 		return this.lastSeenOnStudiedLinkEnter.size();
 	}
 	
-	public Map<Id, Double> getLastSeenOnStudiedLinkEnter() {
+	public Map<Id<Vehicle>, Double> getLastSeenOnStudiedLinkEnter() {
 		return lastSeenOnStudiedLinkEnter;
 	}
 

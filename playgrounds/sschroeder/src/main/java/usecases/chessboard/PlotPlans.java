@@ -4,6 +4,7 @@ import jsprit.analysis.toolbox.Plotter;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -12,7 +13,6 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -33,7 +33,7 @@ public class PlotPlans {
 		new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		
-		final Carrier carrier = carriers.getCarriers().get(new IdImpl("carrier1"));
+		final Carrier carrier = carriers.getCarriers().get(Id.create("carrier1", Carrier.class));
 		VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		

@@ -1,13 +1,24 @@
 package playground.ssix;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -25,7 +36,12 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -34,12 +50,9 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
 import playgrounds.ssix.MZilskePassingVehicleQ;
 import playgrounds.ssix.ModeData;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
 
 /**
  * @author ssix
@@ -65,7 +78,7 @@ public class LangeStreckeSzenario{
 	private PrintStream writer;
 	private Scenario scenario;
 	private static DataAnalyzer analyzer;
-	private Map<Id, ModeData> modesData;
+	private Map<String, ModeData> modesData;
 		
 	
 	public LangeStreckeSzenario(int networkCapacity){
@@ -123,15 +136,15 @@ public class LangeStreckeSzenario{
 		Network n = scenario.getNetwork();
 		
 		//NODES
-		Node node0 = scenario.getNetwork().getFactory().createNode(  new IdImpl(0)  ,   scenario.createCoord(-200., 0.));
-		Node node1 = scenario.getNetwork().getFactory().createNode(  new IdImpl(1)  ,   scenario.createCoord(0., 0.));
-		Node node2 = scenario.getNetwork().getFactory().createNode(  new IdImpl(2)  ,   scenario.createCoord(2500., 0.));
-		Node node3 = scenario.getNetwork().getFactory().createNode(  new IdImpl(3)  ,   scenario.createCoord(5000., 0.));
-		Node node4 = scenario.getNetwork().getFactory().createNode(  new IdImpl(4)  ,   scenario.createCoord(5500., 0.));
-		Node node5 = scenario.getNetwork().getFactory().createNode(  new IdImpl(5)  ,   scenario.createCoord(8000., 0.));
-		Node node6 = scenario.getNetwork().getFactory().createNode(  new IdImpl(6)  ,   scenario.createCoord(9800., 0.));
-		Node node7 = scenario.getNetwork().getFactory().createNode(  new IdImpl(7)  ,   scenario.createCoord(10000., 0.));
-		Node node8 = scenario.getNetwork().getFactory().createNode(  new IdImpl(8)  ,   scenario.createCoord(10200., 0.));
+		Node node0 = scenario.getNetwork().getFactory().createNode(  Id.create(0, Node.class)  ,   scenario.createCoord(-200., 0.));
+		Node node1 = scenario.getNetwork().getFactory().createNode(  Id.create(1, Node.class)  ,   scenario.createCoord(0., 0.));
+		Node node2 = scenario.getNetwork().getFactory().createNode(  Id.create(2, Node.class)  ,   scenario.createCoord(2500., 0.));
+		Node node3 = scenario.getNetwork().getFactory().createNode(  Id.create(3, Node.class)  ,   scenario.createCoord(5000., 0.));
+		Node node4 = scenario.getNetwork().getFactory().createNode(  Id.create(4, Node.class)  ,   scenario.createCoord(5500., 0.));
+		Node node5 = scenario.getNetwork().getFactory().createNode(  Id.create(5, Node.class)  ,   scenario.createCoord(8000., 0.));
+		Node node6 = scenario.getNetwork().getFactory().createNode(  Id.create(6, Node.class)  ,   scenario.createCoord(9800., 0.));
+		Node node7 = scenario.getNetwork().getFactory().createNode(  Id.create(7, Node.class)  ,   scenario.createCoord(10000., 0.));
+		Node node8 = scenario.getNetwork().getFactory().createNode(  Id.create(8, Node.class)  ,   scenario.createCoord(10200., 0.));
 		n.addNode(node0);
 		n.addNode(node1);
 		n.addNode(node2);
@@ -146,56 +159,56 @@ public class LangeStreckeSzenario{
 		double speedUp = 35;
 		double speedDown = 25;
 		
-		Link link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("0to1")  ,  n.getNodes().get(new IdImpl(0))  ,   n.getNodes().get(new IdImpl(1)));
+		Link link = this.scenario.getNetwork().getFactory().createLink( Id.create("0to1", Link.class)  ,  n.getNodes().get(Id.create(0, Node.class))  ,   n.getNodes().get(Id.create(1, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedUp);
 		link.setLength(200.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("1to2")  ,  n.getNodes().get(new IdImpl(1))  ,   n.getNodes().get(new IdImpl(2)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("1to2", Link.class)  ,  n.getNodes().get(Id.create(1, Node.class))  ,   n.getNodes().get(Id.create(2, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedUp);
 		link.setLength(2500.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("2to3")  ,  n.getNodes().get(new IdImpl(2))  ,   n.getNodes().get(new IdImpl(3)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("2to3", Link.class)  ,  n.getNodes().get(Id.create(2, Node.class))  ,   n.getNodes().get(Id.create(3, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedUp);
 		link.setLength(2500.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("3to4")  ,  n.getNodes().get(new IdImpl(3))  ,   n.getNodes().get(new IdImpl(4)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("3to4", Link.class)  ,  n.getNodes().get(Id.create(3, Node.class))  ,   n.getNodes().get(Id.create(4, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedUp);
 		link.setLength(500.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("4to5")  ,  n.getNodes().get(new IdImpl(4))  ,   n.getNodes().get(new IdImpl(5)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("4to5", Link.class)  ,  n.getNodes().get(Id.create(4, Node.class))  ,   n.getNodes().get(Id.create(5, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedUp);
 		link.setLength(2500.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("5to6")  ,  n.getNodes().get(new IdImpl(5))  ,   n.getNodes().get(new IdImpl(6)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("5to6", Link.class)  ,  n.getNodes().get(Id.create(5, Node.class))  ,   n.getNodes().get(Id.create(6, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedDown);
 		link.setLength(1800.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("6to7")  ,  n.getNodes().get(new IdImpl(6))  ,   n.getNodes().get(new IdImpl(7)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("6to7", Link.class)  ,  n.getNodes().get(Id.create(6, Node.class))  ,   n.getNodes().get(Id.create(7, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedDown);
 		link.setLength(200.);
 		link.setNumberOfLanes(1.);
 		n.addLink(link);
 		
-		link = this.scenario.getNetwork().getFactory().createLink( new IdImpl("7to8")  ,  n.getNodes().get(new IdImpl(7))  ,   n.getNodes().get(new IdImpl(8)));
+		link = this.scenario.getNetwork().getFactory().createLink( Id.create("7to8", Link.class)  ,  n.getNodes().get(Id.create(7, Node.class))  ,   n.getNodes().get(Id.create(8, Node.class)));
 		link.setCapacity(LangeStreckeSzenario.NETWORK_CAPACITY);
 		link.setFreespeed(speedDown);
 		link.setLength(200.);
@@ -226,7 +239,7 @@ public class LangeStreckeSzenario{
 						transportMode = "cars";
 					}
 					
-					Person person = population.getFactory().createPerson(new IdImpl(vehID));
+					Person person = population.getFactory().createPerson(Id.create(vehID, Person.class));
 					Map<String, Object> customMap = person.getCustomAttributes();
 					
 					Plan plan = population.getFactory().createPlan();
@@ -237,16 +250,16 @@ public class LangeStreckeSzenario{
 					Leg leg = population.getFactory().createLeg(transportMode);
 					
 					//The one and only route
-					final Id startLinkId = new IdImpl("0to1");
+					final Id<Link> startLinkId = Id.create("0to1", Link.class);
 					List<Id<Link>> routeDescription = new ArrayList<Id<Link>>();
-						routeDescription.add(new IdImpl("1to2"));
-						routeDescription.add(new IdImpl("2to3"));
-						routeDescription.add(new IdImpl("3to4"));
-						routeDescription.add(new IdImpl("4to5"));
-						routeDescription.add(new IdImpl("5to6"));
-						routeDescription.add(new IdImpl("6to7"));
-						routeDescription.add(new IdImpl("7to8"));
-					final Id endLinkId = new IdImpl("7to8");
+						routeDescription.add(Id.create("1to2", Link.class));
+						routeDescription.add(Id.create("2to3", Link.class));
+						routeDescription.add(Id.create("3to4", Link.class));
+						routeDescription.add(Id.create("4to5", Link.class));
+						routeDescription.add(Id.create("5to6", Link.class));
+						routeDescription.add(Id.create("6to7", Link.class));
+						routeDescription.add(Id.create("7to8", Link.class));
+					final Id<Link> endLinkId = Id.create("7to8", Link.class);
 					NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 					route.setLinkIds(startLinkId, routeDescription, endLinkId);
 					leg.setRoute(route);
@@ -321,7 +334,7 @@ public class LangeStreckeSzenario{
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
         
         for (int i=0; i < NUMBER_OF_MODES; i++){
-			Id modeId = new IdImpl(NAMES[i]);
+			Id<VehicleType> modeId = Id.create(NAMES[i], VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
 			vehicleType.setPcuEquivalents(Pcus[i]);
 			vehicleType.setMaximumVelocity(Speeds[i]);
@@ -350,7 +363,7 @@ public class LangeStreckeSzenario{
 	}
 	
 	private Activity createHome(int endTime){
-		Id homeLinkId = new IdImpl("0to1");
+		Id<Link> homeLinkId = Id.create("0to1", Link.class);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		activity.setEndTime(endTime);
 		
@@ -358,7 +371,7 @@ public class LangeStreckeSzenario{
 	}
 	
 	private Activity createWork(){
-		Id workLinkId = new IdImpl("7to8");
+		Id<Link> workLinkId = Id.create("7to8", Link.class);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
 		return activity;
 	}

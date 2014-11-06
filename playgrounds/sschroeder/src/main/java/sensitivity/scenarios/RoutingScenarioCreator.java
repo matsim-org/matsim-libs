@@ -10,9 +10,9 @@ import jsprit.core.util.Coordinate;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.utils.MatsimStuffLoader;
 import org.matsim.contrib.freight.utils.MatsimStuffLoader.MatsimStuff;
-import org.matsim.core.basic.v01.IdImpl;
 
 import sensitivity.scenarios.ServiceScenarioCreator.BoundingDemand;
 import sensitivity.scenarios.ServiceScenarioCreator.BoundingGeoByLink;
@@ -25,14 +25,14 @@ public class RoutingScenarioCreator {
 		
 		MatsimStuff matsimStuff = MatsimStuffLoader.loadNetworkAndGetStuff("sensitivity/network.xml");
 		
-		new ServiceScenarioCreator(matsimStuff.getNetwork(),new BoundingGeoByLink(makeId(600),makeId(5695)),100)
+		new ServiceScenarioCreator(matsimStuff.getNetwork(),new BoundingGeoByLink(Id.create(600, Link.class),Id.create(5695, Link.class)),100)
 			.setBoundingDemand(new BoundingDemand(1,10))
 			.setTimeWindowLengths(Arrays.asList(0.2*3600), 1*3600, 2*3600)
 			.setServiceTime(10*60)
 			.createAndLoad(vrpBuilder);
 		
 		VehicleTypeImpl vType = VehicleTypeImpl.Builder.newInstance("type1").addCapacityDimension(0, 40).setCostPerDistance(1.0).setFixedCost(100).build();
-		Coord vCoord = matsimStuff.getNetwork().getLinks().get(makeId(25594)).getCoord();
+		Coord vCoord = matsimStuff.getNetwork().getLinks().get(Id.create(25594, Link.class)).getCoord();
 		VehicleImpl v = VehicleImpl.Builder.newInstance("v1")
 				.setEarliestStart(0.0).setLatestArrival(24*3600)
 				.setStartLocationId("25594")
@@ -45,12 +45,6 @@ public class RoutingScenarioCreator {
 		VehicleRoutingProblem vrp = vrpBuilder.build();
 		
 		new VrpXMLWriter(vrp).write("sensitivity/vrp_tight_tw.xml");
-	}
-
-	
-
-	private static Id makeId(int i) {
-		return new IdImpl(i);
 	}
 
 }

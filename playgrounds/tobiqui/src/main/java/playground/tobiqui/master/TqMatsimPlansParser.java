@@ -5,7 +5,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -26,9 +26,9 @@ public class TqMatsimPlansParser extends MatsimXmlParser{
 
 		@SuppressWarnings("unused")
 		private final CoordinateTransformation transform;
-		private Id currentId;
+		private Id<Person> currentId;
 		private boolean selected;
-		protected Map<Id, Integer> firstDepartures = new HashMap<Id, Integer>();
+		protected Map<Id<Person>, Integer> firstDepartures = new HashMap<>();
 		
 		protected Map<Id, String> routes = new HashMap<Id, String>();
 		
@@ -60,7 +60,7 @@ public class TqMatsimPlansParser extends MatsimXmlParser{
 		public void startTag(String name, Attributes atts, Stack<String> context) {
 			if ("person".equals(name)){
 				this.tripCount = 0;
-				currentId = new IdImpl(atts.getValue("id"));
+				currentId = Id.create(atts.getValue("id"), Person.class);
 				this.persons.put(this.currentId, new HashMap<Integer,Trip>());
 			}
 			

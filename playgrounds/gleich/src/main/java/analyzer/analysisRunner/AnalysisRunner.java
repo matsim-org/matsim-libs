@@ -14,8 +14,8 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -412,7 +412,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 
 	private void rAct2ModeWithPlanCoord() {
 		Set<Id> personsOfInterest = new TreeSet<Id>();
-		//personsOfInterest.add(new IdImpl("car_11_to_12_Nr100"));
+		//personsOfInterest.add(Id.create("car_11_to_12_Nr100"));
 		
 		for(Id id: scenario.getPopulation().getPersons().keySet()){
 			personsOfInterest.add(id);
@@ -541,9 +541,9 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	}
 	
 	private void rPlansSubset(){
-		Set<Id> selection = new TreeSet<Id>();
-		selection.add(new IdImpl(2));
-		selection.add(new IdImpl(256));
+		Set<Id<Person>> selection = new TreeSet<>();
+		selection.add(Id.create(2, Person.class));
+		selection.add(Id.create(256, Person.class));
 		GetPlansSubset gps = new GetPlansSubset(scenario, selection, true);
 		//gps.preProcessData(); //unused, no EventHandler
 		gps.postProcessData();

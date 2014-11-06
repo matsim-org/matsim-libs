@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -31,13 +30,13 @@ public class Expander4NetworkWithNullCapLinks {
 	 *         checked, if the link in the opposite direction exists in the
 	 *         network
 	 */
-	public static Id getLinkIdInOppositeDirection(Id currentLinkId) {
+	public static Id<Link> getLinkIdInOppositeDirection(Id<Link> currentLinkId) {
 		String crtLinkIdStr = currentLinkId.toString();
 		if (crtLinkIdStr.endsWith("R")) {
-			return new IdImpl(crtLinkIdStr.substring(0,
-					crtLinkIdStr.lastIndexOf("R")));
+			return Id.create(crtLinkIdStr.substring(0,
+					crtLinkIdStr.lastIndexOf("R")), Link.class);
 		} else {
-			return new IdImpl(crtLinkIdStr + "R");
+			return Id.create(crtLinkIdStr + "R", Link.class);
 		}
 
 	}

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author fuerbas
@@ -47,8 +47,9 @@ public class SfMatsimAirport {
 	public static final double TAXI_TOL_TIME = 3 * (taxiwayLength / taxiwayFreespeed) + // time for taxi out and taxi in
 			2 * (runwayLength / runwayFreespeed); // time for take-off and landing (TOL)
 
-	public Id id, incomingFlightsNodeId, outgoingFlightsNodeId;
-	private Id transitStopFacilityId;
+	public Id<Node> id;
+	public Id<Node> incomingFlightsNodeId, outgoingFlightsNodeId;
+	private Id<TransitStopFacility> transitStopFacilityId;
 
 	private List<Id<Link>> departureLinkIdList = new ArrayList<Id<Link>>();
 	private List<Id<Link>> arrivalLinkIdList = new ArrayList<Id<Link>>();
@@ -79,7 +80,7 @@ public class SfMatsimAirport {
 	private Coord coord;
 	private DgAirportCapacity capacityData;
 
-	public SfMatsimAirport(Id id, Coord coord, DgAirportCapacity capacityData) {
+	public SfMatsimAirport(Id<Node> id, Coord coord, DgAirportCapacity capacityData) {
 		this.id = id;
 		this.coord = coord;
 		this.capacityData = capacityData;
@@ -88,11 +89,11 @@ public class SfMatsimAirport {
 		allowedModes.add("car");
 	}
 
-	public Id getIncomingFlightsNodeId() {
+	public Id<Node> getIncomingFlightsNodeId() {
 		return this.incomingFlightsNodeId;
 	}
 
-	public Id getOutgoingFlightsNodeId() {
+	public Id<Node> getOutgoingFlightsNodeId() {
 		return this.outgoingFlightsNodeId;
 	}
 
@@ -120,14 +121,14 @@ public class SfMatsimAirport {
 	}
 
 	private void createApron(Network network) {
-		Id idApron = this.id; 
-		Id idApronEnd = new IdImpl(this.id + "apron"); 
+		Id<Node> idApron = this.id; 
+		Id<Node> idApronEnd = Id.create(this.id + "apron", Node.class); 
 		nodeApronStart = network.getFactory().createNode(idApron, this.coordApronEnd); 
 		nodeApronEnd = network.getFactory().createNode(idApronEnd, coordApronStart); 
 		network.addNode(nodeApronStart);
 		network.addNode(nodeApronEnd);
-		Link linkApron = network.getFactory().createLink(idApron, nodeApronStart, nodeApronEnd);
-		this.transitStopFacilityId = linkApron.getId();
+		Link linkApron = network.getFactory().createLink(Id.create(idApron, Link.class), nodeApronStart, nodeApronEnd);
+		this.transitStopFacilityId = Id.create(linkApron.getId(), TransitStopFacility.class);
 		linkApron.setAllowedModes(allowedModes);
 		linkApron.setCapacity(this.capacityData.getApronFlowCapacityCarEquivPerHour());
 		linkApron.setLength(taxiwayLength);
@@ -136,7 +137,7 @@ public class SfMatsimAirport {
 	}
 
 	private void createStar(Network network) {
-		Id idStar = new IdImpl(this.id.toString() + "star"); // Id for STAR route
+		Id<Link> idStar = Id.create(this.id.toString() + "star", Link.class); // Id for STAR route
 		this.arrivalLinkIdList.add(0, idStar);
 		Link linkStarIn = null;
 		DgStarinfo starInfo = DgCreateSfFlightScenario.stars.get(this.id.toString());
@@ -145,7 +146,7 @@ public class SfMatsimAirport {
 		}
 		Coord coordStar = new CoordImpl(coordRunwayInboundStart.getX() - starInfo.getLength(),
 				coordRunwayInboundStart.getY());
-		Node nodeStar = network.getFactory().createNode(idStar, coordStar); // start of STAR
+		Node nodeStar = network.getFactory().createNode(Id.create(idStar, Node.class), coordStar); // start of STAR
 		network.addNode(nodeStar);
 		linkStarIn = network.getFactory().createLink(idStar, nodeStar, nodeRunwayInboundStart);
 		linkStarIn.setAllowedModes(allowedModes);
@@ -157,14 +158,14 @@ public class SfMatsimAirport {
 	}
 
 	private void createTaxiWays(Network network) {
-		Id idNodeTaxiInStart = new IdImpl(this.id + "taxiInbound"); 
-		Id idNodeTaxiOutStart = new IdImpl(this.id + "taxiOutbound");
+		Id<Node> idNodeTaxiInStart = Id.create(this.id + "taxiInbound", Node.class); 
+		Id<Node> idNodeTaxiOutStart = Id.create(this.id + "taxiOutbound", Node.class);
 		nodeTaxiInboundStart = network.getFactory().createNode(idNodeTaxiInStart, coordTaxiInboundStart); 
 		nodeTaxiOutboundEnd = network.getFactory().createNode(idNodeTaxiOutStart, coordTaxiOutboundEnd); 
 		network.addNode(nodeTaxiInboundStart);
 		network.addNode(nodeTaxiOutboundEnd);
-		linkTaxiInbound = network.getFactory().createLink(idNodeTaxiInStart, nodeTaxiInboundStart, nodeApronStart);
-		linkTaxiOutbound = network.getFactory().createLink(idNodeTaxiOutStart, nodeApronEnd, nodeTaxiOutboundEnd);
+		linkTaxiInbound = network.getFactory().createLink(Id.create(idNodeTaxiInStart, Link.class), nodeTaxiInboundStart, nodeApronStart);
+		linkTaxiOutbound = network.getFactory().createLink(Id.create(idNodeTaxiOutStart, Link.class), nodeApronEnd, nodeTaxiOutboundEnd);
 		linkTaxiInbound.setAllowedModes(allowedModes);
 		linkTaxiOutbound.setAllowedModes(allowedModes);
 		linkTaxiInbound.setCapacity(this.capacityData.getInboundTaxiwayFlowCapacityCarEquivPerHour());
@@ -181,14 +182,14 @@ public class SfMatsimAirport {
 	}
 
 	private void create2Runways(Network network) {
-		Id idRunwayIn = new IdImpl(this.id + "runwayInbound"); // Id for runway link and end of runway node
-		Id idRunwayOut = new IdImpl(this.id + "runwayOutbound"); // Id for runway link and end of runway node
+		Id<Node> idRunwayIn = Id.create(this.id + "runwayInbound", Node.class); // Id for runway link and end of runway node
+		Id<Node> idRunwayOut = Id.create(this.id + "runwayOutbound", Node.class); // Id for runway link and end of runway node
 		nodeRunwayInboundStart = network.getFactory().createNode(idRunwayIn, coordRunwayInboundStart); // start of inbound runway
 		nodeRunwayOutboundEnd = network.getFactory().createNode(idRunwayOut, coordRunwayOutboundEnd); // end of outbound runway
 		network.addNode(nodeRunwayInboundStart);
 		network.addNode(nodeRunwayOutboundEnd);
 
-		linkRunwayInbound = network.getFactory().createLink(idRunwayIn, nodeRunwayInboundStart,
+		linkRunwayInbound = network.getFactory().createLink(Id.create(idRunwayIn, Link.class), nodeRunwayInboundStart,
 				nodeTaxiInboundStart);
 		linkRunwayInbound.setAllowedModes(allowedModes);
 		linkRunwayInbound.setFreespeed(this.capacityData.getInboundRunwayFreespeedForStorageRestriction(runwayLength));
@@ -197,7 +198,7 @@ public class SfMatsimAirport {
 		// c_s = link_length * nr_lanes / 7.5 -> nr_lanes = c_s /link_length * 7.5, using c_s = 1
 		linkRunwayInbound.setNumberOfLanes(1.0 / runwayLength * 7.5);
 
-		linkRunwayOutbound = network.getFactory().createLink(idRunwayOut, nodeTaxiOutboundEnd,
+		linkRunwayOutbound = network.getFactory().createLink(Id.create(idRunwayOut, Link.class), nodeTaxiOutboundEnd,
 				nodeRunwayOutboundEnd);
 		linkRunwayOutbound.setAllowedModes(allowedModes);
 		linkRunwayOutbound.setLength(runwayLength);
@@ -215,7 +216,7 @@ public class SfMatsimAirport {
 	}
 
 	private void create1Runway(Network network) {
-		Id idRunwayIn = new IdImpl(this.id + "runwayInOutbound"); // Id for runway link and end of runway node
+		Id<Link> idRunwayIn = Id.create(this.id + "runwayInOutbound", Link.class); // Id for runway link and end of runway node
 		nodeRunwayInboundStart = nodeTaxiOutboundEnd;
 		nodeRunwayOutboundEnd = nodeTaxiInboundStart;
 		linkRunwayInbound = network.getFactory()
@@ -262,12 +263,12 @@ public class SfMatsimAirport {
 		}
 	}
 
-	public Id getId() {
+	public Id<Node> getId() {
 		return this.id;
 	}
 
-	public Id getStopFacilityLinkId() {
-		return this.transitStopFacilityId;
+	public Id<Link> getStopFacilityLinkId() {
+		return Id.create(this.transitStopFacilityId, Link.class);
 	}
 
 	public List<Id<Link>> getDepartureLinkIdList() {

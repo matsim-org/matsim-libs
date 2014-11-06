@@ -3,7 +3,7 @@ package playground.qvanheerden.freight;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
@@ -13,12 +13,13 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import playground.southafrica.utilities.Header;
 
@@ -38,7 +39,7 @@ public class MyCarrierCapabilityGenerator {
 		config.network().setInputFile(networkFile);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Id depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink((Coord) depotCoord).getId();
+		Id<Link> depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(depotCoord).getId();
 
 		MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
 		CarrierVehicleTypes carrierVehicleTypesTotal = mccg.buildAndWriteVehicleTypes(outputDir + "/vehicleTypes_total.xml", true);
@@ -47,7 +48,7 @@ public class MyCarrierCapabilityGenerator {
 		CarrierCapabilities carrierCapabilitiesTotal = mccg.createVehicles(carrierVehicleTypesTotal, depotLink);
 		CarrierCapabilities carrierCapabilitiesVar = mccg.createVehicles(carrierVehicleTypesVar, depotLink);
 
-		Carrier carrierTotal = CarrierImpl.newInstance(new IdImpl("MyCarrier"));
+		Carrier carrierTotal = CarrierImpl.newInstance(Id.create("MyCarrier", Carrier.class));
 		carrierTotal.setCarrierCapabilities(carrierCapabilitiesTotal);
 
 		Carriers carriersTotal = new Carriers();
@@ -55,7 +56,7 @@ public class MyCarrierCapabilityGenerator {
 		CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriersTotal);
 		planWriter.write(outputDir + "/carrier_total.xml");
 
-		Carrier carrierVar = CarrierImpl.newInstance(new IdImpl("MyCarrier"));
+		Carrier carrierVar = CarrierImpl.newInstance(Id.create("MyCarrier", Carrier.class));
 		carrierVar.setCarrierCapabilities(carrierCapabilitiesVar);
 
 		Carriers carriersVar = new Carriers();
@@ -79,15 +80,15 @@ public class MyCarrierCapabilityGenerator {
 	 * </ul>
 	 * 
 	 */
-	public CarrierCapabilities createVehicles(CarrierVehicleTypes carrierVehicleTypes, Id depotLink){
+	public CarrierCapabilities createVehicles(CarrierVehicleTypes carrierVehicleTypes, Id<Link> depotLink){
 		double earliestStart = 21600; //6am
 		double latestEnd = 75600; //9pm
 		//		double earliestStart = 0; //0
 		//		double latestEnd = 172800; //48
 		//		
-		CarrierVehicle.Builder builder = CarrierVehicle.Builder.newInstance(new IdImpl("truck_3_1"), depotLink) ;
-		builder.setTypeId(new IdImpl("3_tonner")) ;
-		builder.setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("3_tonner")));
+		CarrierVehicle.Builder builder = CarrierVehicle.Builder.newInstance(Id.create("truck_3_1", Vehicle.class), depotLink) ;
+		builder.setTypeId(Id.create("3_tonner", VehicleType.class)) ;
+		builder.setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("3_tonner", VehicleType.class)));
 		builder.setEarliestStart(earliestStart);
 		builder.setLatestEnd(latestEnd);
 		CarrierVehicle truck_3_1 = builder.build();
@@ -98,92 +99,92 @@ public class MyCarrierCapabilityGenerator {
 
 		CarrierCapabilities capabilities = CarrierCapabilities.Builder.
 				newInstance().
-				addType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("3_tonner"))).
+				addType(carrierVehicleTypes.getVehicleTypes().get(Id.create("3_tonner", VehicleType.class))).
 				addVehicle(truck_3_1).build();
 
-		CarrierVehicle truck_6_1 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_6_1"), depotLink).
-				setTypeId(new IdImpl("6_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("3_tonner"))).
+		CarrierVehicle truck_6_1 = CarrierVehicle.Builder.newInstance(Id.create("truck_6_1", Vehicle.class), depotLink).
+				setTypeId(Id.create("6_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("3_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 
 		capabilities.getCarrierVehicles().add(truck_6_1);
-		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner")));
+		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_6_2 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_6_2"), depotLink).
-				setTypeId(new IdImpl("6_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner"))).
+		CarrierVehicle truck_6_2 = CarrierVehicle.Builder.newInstance(Id.create("truck_6_2", Vehicle.class), depotLink).
+				setTypeId(Id.create("6_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 
 		capabilities.getCarrierVehicles().add(truck_6_2);
-		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner")));
+		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_6_3 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_6_3"), depotLink).
-				setTypeId(new IdImpl("6_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner"))).
+		CarrierVehicle truck_6_3 = CarrierVehicle.Builder.newInstance(Id.create("truck_6_3", Vehicle.class), depotLink).
+				setTypeId(Id.create("6_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 
 		capabilities.getCarrierVehicles().add(truck_6_3);
-		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner")));
+		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_6_4 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_6_4"), depotLink).
-				setTypeId(new IdImpl("6_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner"))).
+		CarrierVehicle truck_6_4 = CarrierVehicle.Builder.newInstance(Id.create("truck_6_4", Vehicle.class), depotLink).
+				setTypeId(Id.create("6_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_6_4);
-		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("6_tonner")));
+		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("6_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_7_1 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_7_1"), depotLink).
-				setTypeId(new IdImpl("7_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("7_tonner"))).
+		CarrierVehicle truck_7_1 = CarrierVehicle.Builder.newInstance(Id.create("truck_7_1", Vehicle.class), depotLink).
+				setTypeId(Id.create("7_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("7_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_7_1);
-		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("7_tonner")));
+		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("7_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_7_2 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_7_2"), depotLink).
-				setTypeId(new IdImpl("7_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("7_tonner"))).
+		CarrierVehicle truck_7_2 = CarrierVehicle.Builder.newInstance(Id.create("truck_7_2", Vehicle.class), depotLink).
+				setTypeId(Id.create("7_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("7_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_7_2);
-		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("7_tonner")));
+		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("7_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_12_1 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_12_1"), depotLink).
-				setTypeId(new IdImpl("12_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("12_tonner"))).
+		CarrierVehicle truck_12_1 = CarrierVehicle.Builder.newInstance(Id.create("truck_12_1", Vehicle.class), depotLink).
+				setTypeId(Id.create("12_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("12_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_12_1);
-		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("12_tonner")));
+		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("12_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_15_1 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_15_1"), depotLink).
-				setTypeId(new IdImpl("15_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("15_tonner"))).
+		CarrierVehicle truck_15_1 = CarrierVehicle.Builder.newInstance(Id.create("truck_15_1", Vehicle.class), depotLink).
+				setTypeId(Id.create("15_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("15_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_15_1);
-		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("15_tonner")));
+		capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("15_tonner", VehicleType.class)));
 
-		CarrierVehicle truck_15_2 = CarrierVehicle.Builder.newInstance(new IdImpl("truck_15_2"), depotLink).
-				setTypeId(new IdImpl("15_tonner")).
-				setType(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("15_tonner"))).
+		CarrierVehicle truck_15_2 = CarrierVehicle.Builder.newInstance(Id.create("truck_15_2", Vehicle.class), depotLink).
+				setTypeId(Id.create("15_tonner", VehicleType.class)).
+				setType(carrierVehicleTypes.getVehicleTypes().get(Id.create("15_tonner", VehicleType.class))).
 				setEarliestStart(earliestStart).
 				setLatestEnd(latestEnd).
 				build();
 		capabilities.getCarrierVehicles().add(truck_15_2);
-		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(new IdImpl("15_tonner")));
+		//capabilities.getVehicleTypes().add(carrierVehicleTypes.getVehicleTypes().get(Id.create("15_tonner", VehicleType.class)));
 
 		return capabilities;
 	}
@@ -209,31 +210,31 @@ public class MyCarrierCapabilityGenerator {
 		//		double[] varCostPerKm = {0,0,0,0,0};
 
 		CarrierVehicleType typeThree = CarrierVehicleType.Builder.
-				newInstance(new IdImpl("3_tonner")).
+				newInstance(Id.create("3_tonner", VehicleType.class)).
 				setCapacity(3000).
 				setCostPerDistanceUnit(varCostPerKm[0] + fixCostPerKm[0]).
 //				setFixCost(100000).
 				build();
 		CarrierVehicleType typeSix = CarrierVehicleType.Builder.
-				newInstance(new IdImpl("6_tonner")).
+				newInstance(Id.create("6_tonner", VehicleType.class)).
 				setCapacity(6000).
 				setCostPerDistanceUnit(varCostPerKm[1] + fixCostPerKm[1]).
 //				setFixCost(200000).
 				build();
 		CarrierVehicleType typeSeven = CarrierVehicleType.Builder.
-				newInstance(new IdImpl("7_tonner")).
+				newInstance(Id.create("7_tonner", VehicleType.class)).
 				setCapacity(7000).
 				setCostPerDistanceUnit(varCostPerKm[2] + fixCostPerKm[2]).
 //				setFixCost(300000).
 				build();
 		CarrierVehicleType typeTwelve = CarrierVehicleType.Builder.
-				newInstance(new IdImpl("12_tonner")).
+				newInstance(Id.create("12_tonner", VehicleType.class)).
 				setCapacity(12000).
 				setCostPerDistanceUnit(varCostPerKm[3] + fixCostPerKm[3]).
 //				setFixCost(400000).
 				build();
 		CarrierVehicleType typeFifteen = CarrierVehicleType.Builder.
-				newInstance(new IdImpl("15_tonner")).
+				newInstance(Id.create("15_tonner", VehicleType.class)).
 				setCapacity(15000).
 				setCostPerDistanceUnit(varCostPerKm[4] + fixCostPerKm[4]).
 //				setFixCost(500000).

@@ -1,6 +1,6 @@
 package usecases.chessboard;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -26,11 +26,11 @@ public class RunPassengerPlansFromScratch {
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
 		
-		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
+		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
 		bestScore.setModuleName("BestScore");
 		bestScore.setProbability(0.5);
 		
-		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.5);
 //		reRoute.setDisableAfter(300);

@@ -22,7 +22,6 @@ import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -30,6 +29,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
@@ -63,7 +63,7 @@ public class MyCarrierPlanInterpreter {
 			Carriers carriers = new Carriers();
 			carriers.getCarriers().clear();
 			new CarrierPlanXmlReaderV2(carriers).read(file.getAbsolutePath());
-			Carrier carrier = carriers.getCarriers().get(new IdImpl("MyCarrier"));
+			Carrier carrier = carriers.getCarriers().get(Id.create("MyCarrier", Carrier.class));
 			CarrierPlan plan = carrier.getSelectedPlan();
 
 			//use filename to generate output filename
@@ -86,7 +86,7 @@ public class MyCarrierPlanInterpreter {
 		for(ScheduledTour tour : tours){
 			tourList = new ArrayList<Double>();
 			//vehicle ID
-			Id vehId = tour.getVehicle().getVehicleId();
+			Id<Vehicle> vehId = tour.getVehicle().getVehicleId();
 
 			List<Double> interActDistance = new ArrayList<Double>();
 			List<Double> interActTravelTime = new ArrayList<Double>();
@@ -144,7 +144,7 @@ public class MyCarrierPlanInterpreter {
 			tourList.add(totalActivityTime);
 			
 			if(tourMap.keySet().contains(vehId) || detailMap.keySet().contains(vehId)){
-				vehId = new IdImpl(vehId.toString() + "_" + number);
+				vehId = Id.create(vehId.toString() + "_" + number, Vehicle.class);
 				number++;
 			}
 			

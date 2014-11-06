@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -59,18 +59,18 @@ public class DgTransitBuilder {
 		this.scenario = scenario;
 	}
 
-	public void createFacilities(Map<Id, SfMatsimAirport> airportMap){
+	public void createFacilities(Map<Id<Node>, SfMatsimAirport> airportMap){
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleFactory sf = schedule.getFactory();
 		
 		for (SfMatsimAirport airport : airportMap.values()){
-			TransitStopFacility transitStopFacility = sf.createTransitStopFacility(airport.getId(), airport.coordApronEnd, false);
+			TransitStopFacility transitStopFacility = sf.createTransitStopFacility(Id.create(airport.getId(), TransitStopFacility.class), airport.coordApronEnd, false);
 			transitStopFacility.setLinkId(airport.getStopFacilityLinkId());
 			schedule.addStopFacility(transitStopFacility);
 		}
 	}
 	
-	public void createSchedule(DgOagFlightsData flightsData, Map<Id, SfMatsimAirport> airportMap) {
+	public void createSchedule(DgOagFlightsData flightsData, Map<Id<Node>, SfMatsimAirport> airportMap) {
 		this.createFacilities(airportMap);
 		
 		Vehicles veh = this.scenario.getVehicles();
@@ -78,16 +78,16 @@ public class DgTransitBuilder {
 		TransitScheduleFactory sf = schedule.getFactory();
 		
 		for (DgOagFlight flight : flightsData.getFlightDesignatorFlightMap().values()){
-			Id lineId = new IdImpl(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getCarrier());
+			Id<TransitLine> lineId = Id.create(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getCarrier(), TransitLine.class);
 			TransitLine line = schedule.getTransitLines().get(lineId);
 			if (line == null) {
 				line = sf.createTransitLine(lineId);
 				schedule.addTransitLine(line);
 			}
-			Id id = new IdImpl(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getFlightDesignator());
+			Id<Link> id = Id.create(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getFlightDesignator(), Link.class);
 
-			Id fromId = new IdImpl(flight.getOriginCode());
-			Id toId = new  IdImpl(flight.getDestinationCode());
+			Id<Link> fromId = Id.create(flight.getOriginCode(), Link.class);
+			Id<Link> toId = Id.create(flight.getDestinationCode(), Link.class);
 			TransitStopFacility fromFacility = schedule.getFacilities().get(fromId);
 			TransitStopFacility toFacility = schedule.getFacilities().get(toId);
 			TransitRouteStop fromStop = sf.createTransitRouteStop(fromFacility, 0.0, 0.0);
@@ -105,15 +105,15 @@ public class DgTransitBuilder {
 			routeLinkIds.addAll(toAirport.getArrivalLinkIdList());
 			route.setLinkIds(fromId, routeLinkIds, toId);
 
-			TransitRoute transitRoute = sf.createTransitRoute(id, route, stopList, TransportMode.pt);
+			TransitRoute transitRoute = sf.createTransitRoute(Id.create(id, TransitRoute.class), route, stopList, TransportMode.pt);
 			line.addRoute(transitRoute);
 
-			Departure departure = sf.createDeparture(id, flight.getDepartureTime());
-			Id vehicleId = new IdImpl(flight.getFlightDesignator());
+			Departure departure = sf.createDeparture(Id.create(id, Departure.class), flight.getDepartureTime());
+			Id<Vehicle> vehicleId = Id.create(flight.getFlightDesignator(), Vehicle.class);
 			departure.setVehicleId(vehicleId);
 			transitRoute.addDeparture(departure);
 			
-			Id typeId = new IdImpl(flight.getAircraftType() + "_" + flight.getCarrier() + "_" + flight.getSeatsAvailable());
+			Id<VehicleType> typeId = Id.create(flight.getAircraftType() + "_" + flight.getCarrier() + "_" + flight.getSeatsAvailable(), VehicleType.class);
 			VehicleType vehType = veh.getVehicleTypes().get(typeId);
 			if ( vehType == null ){
 				vehType = veh.getFactory().createVehicleType(typeId);

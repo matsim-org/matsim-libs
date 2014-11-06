@@ -20,6 +20,15 @@
 
 package playgrounds.ssix;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,9 +36,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -47,20 +59,22 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
 
 
 /**
@@ -129,7 +143,7 @@ public class DreieckNmodes {
 		}
 
 		@Override
-		public final Id getCurrentLinkId() {
+		public final Id<Link> getCurrentLinkId() {
 			return delegate.getCurrentLinkId();
 		}
 
@@ -144,12 +158,12 @@ public class DreieckNmodes {
 		}
 
 		@Override
-		public final Id getDestinationLinkId() {
+		public final Id<Link> getDestinationLinkId() {
 			return delegate.getDestinationLinkId();
 		}
 
 		@Override
-		public final Id getId() {
+		public final Id<Person> getId() {
 			return delegate.getId();
 		}
 
@@ -159,16 +173,16 @@ public class DreieckNmodes {
 		}
 
 		@Override
-		public final void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+		public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		}
 
 		@Override
-		public Id chooseNextLinkId() {
+		public Id<Link> chooseNextLinkId() {
 			if (DreieckNmodes.funfunfun.isPermanent()){ goHome = true; }
 			
-			Id forcedLeftTurnLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor - 1);
-			Id forcedStraightForwardLinkId = new IdImpl(DreieckNmodes.subdivisionFactor - 1);
+			Id<Link> forcedLeftTurnLinkId = Id.create(3*DreieckNmodes.subdivisionFactor - 1, Link.class);
+			Id<Link> forcedStraightForwardLinkId = Id.create(DreieckNmodes.subdivisionFactor - 1, Link.class);
 			
 			if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){ // not 3n-1
 				if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){ //not 3n-1 and not n-1
@@ -177,14 +191,14 @@ public class DreieckNmodes {
 					if (!(goHome)){ //n-1 but not goHome
 						return delegate.chooseNextLinkId();
 					} else { //n-1 and goHome
-						Id afterGoingStraightForwardLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor);
+						Id<Link> afterGoingStraightForwardLinkId = Id.create(3*DreieckNmodes.subdivisionFactor, Link.class);
 						delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
 						delegate.setCurrentLinkIdIndex(3*DreieckNmodes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
 						return afterGoingStraightForwardLinkId;
 					}
 				}
 			} else { //3n-1
-				Id afterLeftTurnLinkId = new IdImpl((0));
+				Id<Link> afterLeftTurnLinkId = Id.create(0, Link.class);
 				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
 				delegate.setCurrentLinkIdIndex(0);
 				return afterLeftTurnLinkId;
@@ -192,7 +206,7 @@ public class DreieckNmodes {
 		}
 
 		@Override
-		public void notifyMoveOverNode(Id newLinkId) {
+		public void notifyMoveOverNode(Id<Link> newLinkId) {
 			delegate.notifyMoveOverNode(newLinkId);
 		}
 
@@ -207,7 +221,7 @@ public class DreieckNmodes {
 		}
 
 		@Override
-		public Id getPlannedVehicleId() {
+		public Id<Vehicle> getPlannedVehicleId() {
 			return delegate.getPlannedVehicleId();
 		}
 	}
@@ -231,7 +245,7 @@ public class DreieckNmodes {
 	private PrintStream writer;
 	private Scenario scenario;
 	private static FundamentalDiagramsNmodes funfunfun;
-	private Map<Id, ModeData> modesData;
+	private Map<String, ModeData> modesData;
 		
 	
 	public DreieckNmodes(int networkCapacity){
@@ -259,10 +273,10 @@ public class DreieckNmodes {
 		
 		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams, no workaround still found
 		//Need to be currently initialized at this point to initialize output and modified QSim
-		this.modesData = new HashMap<Id, ModeData>();
+		this.modesData = new HashMap<>();
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			Id modeId = new IdImpl(NAMES[i]);
-			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
+			String modeId = NAMES[i];
+			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(Id.create(modeId, VehicleType.class));
 			vehicleType.setPcuEquivalents(Pcus[i]);
 			vehicleType.setMaximumVelocity(Speeds[i]);
 			VehicleCapacity cap = new VehicleCapacityImpl();
@@ -405,7 +419,7 @@ public class DreieckNmodes {
 	private void singleRun(List<Integer> pointToRun) {
 		this.createWantedPopulation(pointToRun, 2);
 		for (int i=0; i<NAMES.length; i++){
-			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());
+			this.modesData.get(NAMES[i]).setnumberOfAgents(pointToRun.get(i).intValue());
 		}
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -423,22 +437,22 @@ public class DreieckNmodes {
 		//writer.doSomething
 		writer.format("%d\t\t",fundiN.getGlobalData().numberOfAgents);
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			writer.format("%d\t", this.modesData.get(new IdImpl(NAMES[i])).numberOfAgents);
+			writer.format("%d\t", this.modesData.get(NAMES[i]).numberOfAgents);
 		}
 		writer.print("\t");
 		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentDensity());
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentDensity());
+			writer.format("%.2f\t", this.modesData.get(NAMES[i]).getPermanentDensity());
 		}
 		writer.print("\t");
 		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentFlow());
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentFlow());
+			writer.format("%.2f\t", this.modesData.get(NAMES[i]).getPermanentFlow());
 		}
 		writer.print("\t");
 		writer.format("%.2f\t", fundiN.getGlobalData().getPermanentAverageVelocity());
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			writer.format("%.2f\t", this.modesData.get(new IdImpl(NAMES[i])).getPermanentAverageVelocity());
+			writer.format("%.2f\t", this.modesData.get(NAMES[i]).getPermanentAverageVelocity());
 		}
 		writer.print("\n");
 	}
@@ -457,7 +471,7 @@ public class DreieckNmodes {
 				}
 			}
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl(i);
+			Id<Node> id = Id.create(i, Node.class);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);	
@@ -467,7 +481,7 @@ public class DreieckNmodes {
 			double x = DreieckNmodes.length - (DreieckNmodes.length/(2*DreieckNmodes.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*(DreieckNmodes.length-x);
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl(DreieckNmodes.subdivisionFactor+i+1);
+			Id<Node> id = Id.create(DreieckNmodes.subdivisionFactor+i+1, Node.class);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
@@ -477,34 +491,34 @@ public class DreieckNmodes {
 			double x = DreieckNmodes.length/2 - (DreieckNmodes.length/(2*DreieckNmodes.subdivisionFactor))*(i+1);
 			double y = Math.sqrt(3.)*x;
 			Coord coord = scenario.createCoord(x, y);
-			Id id = new IdImpl(2*DreieckNmodes.subdivisionFactor+i+1);
+			Id<Node> id = Id.create(2*DreieckNmodes.subdivisionFactor+i+1, Node.class);
 			
 			Node node = scenario.getNetwork().getFactory().createNode(id, coord);
 			network.addNode(node);
 		}
 		//additional startNode and endNode for home and work activities
 		Coord coord = scenario.createCoord(-50.0, 0.0);
-		Id startId = new IdImpl(-1);
+		Id<Node> startId = Id.create(-1, Node.class);
 		Node startNode = scenario.getNetwork().getFactory().createNode(startId, coord);
 		network.addNode(startNode);
 		coord = scenario.createCoord(DreieckNmodes.length+50.0, 0.0);
-		Id endId = new IdImpl(3*DreieckNmodes.subdivisionFactor);
+		Id<Node> endId = Id.create(3*DreieckNmodes.subdivisionFactor, Node.class);
 		Node endNode = scenario.getNetwork().getFactory().createNode(endId, coord);
 		network.addNode(endNode);
 		
 		//LINKS
 		//all triangle links
 		for (int i = 0; i<3*DreieckNmodes.subdivisionFactor; i++){
-			Id idFrom = new IdImpl(i);
-			Id idTo;
+			Id<Node> idFrom = Id.create(i, Node.class);
+			Id<Node> idTo;
 			if (i != 3*DreieckNmodes.subdivisionFactor-1)
-				idTo = new IdImpl(i+1);
+				idTo = Id.create(i+1, Node.class);
 			else
-				idTo = new IdImpl(0);
+				idTo = Id.create(0, Node.class);
 			Node from = network.getNodes().get(idFrom);
 			Node to = network.getNodes().get(idTo);
 			
-			Link link = this.scenario.getNetwork().getFactory().createLink(idFrom, from, to);
+			Link link = this.scenario.getNetwork().getFactory().createLink(Id.create(idFrom, Link.class), from, to);
 			link.setCapacity(DreieckNmodes.NETWORK_CAPACITY);
 			link.setFreespeed(DreieckNmodes.FREESPEED/3.6);
 			link.setLength(calculateLength(from,to));
@@ -512,13 +526,13 @@ public class DreieckNmodes {
 			network.addLink(link);
 		}
 		//additional startLink and endLink for home and work activities
-		Link startLink = this.scenario.getNetwork().getFactory().createLink(startId, startNode, this.scenario.getNetwork().getNodes().get(new IdImpl(0)));
+		Link startLink = this.scenario.getNetwork().getFactory().createLink(Id.create(startId, Link.class), startNode, this.scenario.getNetwork().getNodes().get(Id.create(0, Node.class)));
 		startLink.setCapacity(capMax);
 		startLink.setFreespeed(DreieckNmodes.FREESPEED/3.6);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(2.);
 		network.addLink(startLink);
-		Link endLink = this.scenario.getNetwork().getFactory().createLink(endId, this.scenario.getNetwork().getNodes().get(new IdImpl(DreieckNmodes.subdivisionFactor)), endNode);
+		Link endLink = this.scenario.getNetwork().getFactory().createLink(Id.create(endId, Link.class), this.scenario.getNetwork().getNodes().get(Id.create(DreieckNmodes.subdivisionFactor, Node.class)), endNode);
 		endLink.setCapacity(capMax);
 		endLink.setFreespeed(DreieckNmodes.FREESPEED/3.6);
 		endLink.setLength(25.);
@@ -542,7 +556,7 @@ public class DreieckNmodes {
 		
 		for (long i = 0; i<numberOfPeople; i++){
 			
-			Person person = population.getFactory().createPerson(new IdImpl(i+1));
+			Person person = population.getFactory().createPerson(Id.create(i+1, Person.class));
 			Map<String, Object> customMap = person.getCustomAttributes();
 			
 			Plan plan = population.getFactory().createPlan();
@@ -565,11 +579,11 @@ public class DreieckNmodes {
 			Leg leg = population.getFactory().createLeg(transportMode);
 			
 			//Handy route definition for making the agents stay on the track
-			final Id startLinkId = new IdImpl(-1);
-			final Id endLinkId = new IdImpl(3*subdivisionFactor);
+			final Id<Link> startLinkId = Id.create(-1, Link.class);
+			final Id<Link> endLinkId = Id.create(3*subdivisionFactor, Link.class);
 			List<Id<Link>> routeDescription = new ArrayList<Id<Link>>();
 			for (long k=0; k<3*subdivisionFactor;k++){
-				routeDescription.add(new IdImpl(k));
+				routeDescription.add(Id.create(k, Link.class));
 			}
 			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 			route.setLinkIds(startLinkId, routeDescription, endLinkId);
@@ -615,7 +629,7 @@ public class DreieckNmodes {
 
 
         };
-        QNetsimEngine netsimEngine = new QNetsimEngine((QSim) qSim, netsimNetworkFactory);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
 		////////////////////////////////////////////////////////
 		
 		qSim.addMobsimEngine(netsimEngine);
@@ -635,8 +649,8 @@ public class DreieckNmodes {
         //Third modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
         for (int i=0; i<modesData.size(); i++){
-        	String id = modesData.get(new IdImpl(NAMES[i])).getModeId().toString();
-        	VehicleType vT = modesData.get(new IdImpl(NAMES[i])).getVehicleType();
+        	String id = modesData.get(NAMES[i]).getModeId().toString();
+        	VehicleType vT = modesData.get(NAMES[i]).getVehicleType();
         	modeVehicleTypes.put(id, vT);
         }
         agentSource.setModeVehicleTypes(modeVehicleTypes);
@@ -654,25 +668,25 @@ public class DreieckNmodes {
 		}
 		writer.print("n\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
 			String strn = "n_"+str;
 			writer.print(strn+"\t");
 		}
 		writer.print("\tk\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
 			String strk = "k_"+str;
 			writer.print(strk+"\t");
 		}
 		writer.print("\tq\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
 			String strq = "q_"+str;
 			writer.print(strq+"\t");
 		}
 		writer.print("\tv\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
@@ -684,7 +698,7 @@ public class DreieckNmodes {
 	}
 	
 	private Activity createHome(int sekundenFrequenz, long identifier, long numberOfPeople){
-		Id homeLinkId = new IdImpl(-1);
+		Id<Link> homeLinkId = Id.create(-1, Link.class);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
 		Random r = new Random();
@@ -703,7 +717,7 @@ public class DreieckNmodes {
 	}
 	
 	private Activity createWork(){
-		Id workLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor);
+		Id<Link> workLinkId = Id.create(3*DreieckNmodes.subdivisionFactor, Link.class);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
 		return activity;
 	}

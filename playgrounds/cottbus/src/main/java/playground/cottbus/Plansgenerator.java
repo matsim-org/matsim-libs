@@ -21,12 +21,13 @@
 package playground.cottbus;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -38,7 +39,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -63,7 +63,7 @@ public class Plansgenerator {
 	private Population plans;
 
 	private void init() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = this.scenario.getNetwork();
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
 	}
@@ -322,8 +322,8 @@ public class Plansgenerator {
 	 */
 	private int addCommodity(final String HOME_LINK, final String TARGET_LINK, final int START_TIME, final int DURATION, final int CARS_PER_HOUR, final String ROUTE, int CURRENT_ID){
 		int homeEndtime = 0;
-		final Link start = network.getLinks().get(new IdImpl(HOME_LINK));
-		final Link target = network.getLinks().get(new IdImpl(TARGET_LINK));
+		final Link start = network.getLinks().get(Id.create(HOME_LINK, Link.class));
+		final Link target = network.getLinks().get(Id.create(TARGET_LINK, Link.class));
 		final int visPlaces = 2000; //better visualization of start and target
 		final Coord startCoord = start.getToNode().getCoord();
 		final Coord targetCoord = target.getFromNode().getCoord();
@@ -337,7 +337,7 @@ public class Plansgenerator {
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
 
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home

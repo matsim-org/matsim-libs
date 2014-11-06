@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -89,7 +88,7 @@ public class SfTransitBuilder {
 		
 		Vehicles veh = VehicleUtils.createVehiclesContainer();
 				
-		Map<Id, List<Id<Link>>> linkListMap = new HashMap<Id, List<Id<Link>>>(); 
+		Map<Id<TransitRoute>, List<Id<Link>>> linkListMap = new HashMap<>(); 
 		Map<Id, List<TransitRouteStop>> stopListMap = new HashMap<Id, List<TransitRouteStop>>();
 		Map<Id, NetworkRoute> netRouteMap = new HashMap<Id, NetworkRoute>();
 		Map<Id, TransitRoute> transRouteMap = new HashMap<Id, TransitRoute>();
@@ -108,12 +107,12 @@ public class SfTransitBuilder {
 			double distance = 1000.0 * (Double.parseDouble(lineEntries[7])); //km to m
 //			double vehicleSpeed =(100*Math.round(distance/(duration-TAXI_TOL_TIME)))/100.;
 			double vehicleSpeed = distance / (duration - TAXI_TOL_TIME);
-			Id originId = new IdImpl(origin);
-			Id destinationId = new IdImpl(destination);
-			Id routeId = new IdImpl(transitRoute);	//origin IATA code + destination IATA code
-			Id transitLineId = new IdImpl(transitLine);		//origin IATA code + destination IATA code + airline IATA code
-			Id flightNumber = new IdImpl(lineEntries[2]);	//flight number
-			Id vehTypeId = new IdImpl(lineEntries[5]+"_"+lineEntries[6]+"_"+flightNumber);	//IATA aircraft code + seats avail
+			Id<TransitStopFacility> originId = Id.create(origin, TransitStopFacility.class);
+			Id<TransitStopFacility> destinationId = Id.create(destination, TransitStopFacility.class);
+			Id<TransitRoute> routeId = Id.create(transitRoute, TransitRoute.class);	//origin IATA code + destination IATA code
+			Id<TransitLine> transitLineId = Id.create(transitLine, TransitLine.class);		//origin IATA code + destination IATA code + airline IATA code
+			Id<Departure> flightNumber = Id.create(lineEntries[2], Departure.class);	//flight number
+			Id<VehicleType> vehTypeId = Id.create(lineEntries[5]+"_"+lineEntries[6]+"_"+flightNumber, VehicleType.class);	//IATA aircraft code + seats avail
 			int aircraftCapacity = Integer.parseInt(lineEntries[6]);
 			List<Id<Link>> linkList = new ArrayList<Id<Link>>();	//evtl in Map mit Route als key verpacken
 			List<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>();	//evtl in Map mit Route als key verpacken
@@ -122,11 +121,11 @@ public class SfTransitBuilder {
 			
 			if (!stopListMap.containsKey(routeId)) {			
 				TransitStopFacility transStopFacil = sf.createTransitStopFacility(originId, network.getNodes().get(originId).getCoord(), false);
-				transStopFacil.setLinkId(originId);
+				transStopFacil.setLinkId(Id.create(originId, Link.class));
 				TransitRouteStop transStop = sf.createTransitRouteStop(transStopFacil, 0, 0);
 				stopList.add(transStop);				
 				TransitStopFacility transStopFacil2 = sf.createTransitStopFacility(destinationId, network.getNodes().get(destinationId).getCoord(), false);
-				transStopFacil2.setLinkId(destinationId);
+				transStopFacil2.setLinkId(Id.create(destinationId, Link.class));
 				TransitRouteStop transStop2 = sf.createTransitRouteStop(transStopFacil2, 0, 0);
 				stopList.add(transStop2);	
 				if (!schedule.getFacilities().containsKey(originId)) schedule.addStopFacility(transStopFacil);
@@ -137,42 +136,42 @@ public class SfTransitBuilder {
 			//nur ausführen, wenn linkListMap noch keinen entsprechenden key enthält
 			
 			if (!linkListMap.containsKey(routeId) && DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==2) {
-				linkList.add(new IdImpl(origin+"taxiOutbound"));
-				linkList.add(new IdImpl(origin+"runwayOutbound"));
-				linkList.add(new IdImpl(origin+destination));
+				linkList.add(Id.create(origin+"taxiOutbound", Link.class));
+				linkList.add(Id.create(origin+"runwayOutbound", Link.class));
+				linkList.add(Id.create(origin+destination, Link.class));
 				if (DgCreateSfFlightScenario.doCreateStars) {
-					linkList.add(new IdImpl(destination+"star"));
+					linkList.add(Id.create(destination+"star", Link.class));
 				}
-				linkList.add(new IdImpl(destination+"runwayInbound"));
-				linkList.add(new IdImpl(destination+"taxiInbound"));
+				linkList.add(Id.create(destination+"runwayInbound", Link.class));
+				linkList.add(Id.create(destination+"taxiInbound", Link.class));
 				linkListMap.put(routeId, linkList);
 			}
 			
 			if (!linkListMap.containsKey(routeId) && DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS==1) {
-				linkList.add(new IdImpl(origin+"taxiOutbound"));
-				linkList.add(new IdImpl(origin+"runway"));
-				linkList.add(new IdImpl(origin+destination));
+				linkList.add(Id.create(origin+"taxiOutbound", Link.class));
+				linkList.add(Id.create(origin+"runway", Link.class));
+				linkList.add(Id.create(origin+destination, Link.class));
 				if (DgCreateSfFlightScenario.doCreateStars) {
-					linkList.add(new IdImpl(destination+"star"));
+					linkList.add(Id.create(destination+"star", Link.class));
 				}
-				linkList.add(new IdImpl(destination+"runway"));
-				linkList.add(new IdImpl(destination+"taxiInbound"));
+				linkList.add(Id.create(destination+"runway", Link.class));
+				linkList.add(Id.create(destination+"taxiInbound", Link.class));
 				linkListMap.put(routeId, linkList);
 			}
 			
 			if (!netRouteMap.containsKey(transitLineId)) {
-				NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl(origin), new IdImpl(destination));		
-				netRoute.setLinkIds(new IdImpl(origin), linkListMap.get(routeId), new IdImpl(destination));
+				NetworkRoute netRoute = new LinkNetworkRouteImpl(Id.create(origin, Link.class), Id.create(destination, Link.class));		
+				netRoute.setLinkIds(Id.create(origin, Link.class), linkListMap.get(routeId), Id.create(destination, Link.class));
 				netRouteMap.put(transitLineId, netRoute);
 			}			
 			
 			if (!transRouteMap.containsKey(transitLineId)) {
-				TransitRoute transRoute = sf.createTransitRoute(new IdImpl(transitRoute), netRouteMap.get(transitLineId), stopListMap.get(routeId), "pt");
+				TransitRoute transRoute = sf.createTransitRoute(Id.create(transitRoute, TransitRoute.class), netRouteMap.get(transitLineId), stopListMap.get(routeId), "pt");
 				transRouteMap.put(transitLineId, transRoute);
 			}
 						
 			Departure departure = sf.createDeparture(flightNumber, departureTime);
-			departure.setVehicleId(flightNumber);
+			departure.setVehicleId(Id.create(flightNumber, Vehicle.class));
 			transRouteMap.get(transitLineId).addDeparture(departure);
 						
 			if (!schedule.getTransitLines().containsKey(transitLineId)) {
@@ -190,7 +189,7 @@ public class SfTransitBuilder {
 				type.setMaximumVelocity(vehicleSpeed);
 				veh.addVehicleType(type); 
 			}
-			Vehicle vehicle = veh.getFactory().createVehicle(flightNumber, type); 
+			Vehicle vehicle = veh.getFactory().createVehicle(Id.create(flightNumber, Vehicle.class), type); 
 			veh.addVehicle( vehicle);
 			
 		}

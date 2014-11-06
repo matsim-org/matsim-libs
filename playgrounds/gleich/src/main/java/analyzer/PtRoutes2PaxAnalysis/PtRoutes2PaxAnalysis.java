@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -126,7 +126,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 	 */
 	private void writeCounts2File(TransitRoute transitRoute, Integer maxSlice, Counts counts, String file) {
 		BufferedWriter w = IOUtils.getBufferedWriter(file);
-		Id stopId; 
+		Id<Link> stopId; 
 		Count c;
 		Volume v;
 		try {
@@ -140,7 +140,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 			w.write(";>" + Time.writeTime(maxSlice * interval, Time.TIMEFORMAT_HHMM) + "\n");
 			// write numbers for stops in the correct order
 			for(int i = 0; i < transitRoute.getStops().size(); i++){
-				stopId = new IdImpl(i);
+				stopId = Id.create(i, Link.class);
 				c = counts.getCount(stopId);
 				w.write(String.valueOf(i) + ";" + c.getCsId() + ";" + transitRoute.getStops().get(i).getStopFacility().getName());
 				for(int j = 0; j < (maxSlice + 1); j++){

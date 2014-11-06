@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -53,7 +52,7 @@ public class DgAirNetworkBuilder {
 
 	private Scenario scenario;
 
-	private Map<Id, SfMatsimAirport> airportMap;
+	private Map<Id<Node>, SfMatsimAirport> airportMap;
 
 	private CoordinateTransformation transform;
 
@@ -65,12 +64,12 @@ public class DgAirNetworkBuilder {
 		this.modelConfig = modelConfig;
 	}
 
-	private Map<Id, SfMatsimAirport> createAndAddAirports(Map<String, Coord> airports, Network network){
-		Map<Id, SfMatsimAirport> airportMap = new HashMap<Id, SfMatsimAirport>();
+	private Map<Id<Node>, SfMatsimAirport> createAndAddAirports(Map<String, Coord> airports, Network network){
+		Map<Id<Node>, SfMatsimAirport> airportMap = new HashMap<>();
 		for (Entry<String, Coord> e : airports.entrySet()) {
 			Coord transformedCoord = this.transform.transform(e.getValue());
 			DgAirportCapacity capacityData = modelConfig.getAirportsCapacityData().getAirportCapacity(e.getKey());
-			SfMatsimAirport airport = new SfMatsimAirport(new IdImpl(e.getKey()), transformedCoord, capacityData);
+			SfMatsimAirport airport = new SfMatsimAirport(Id.create(e.getKey(), Node.class), transformedCoord, capacityData);
 			airportMap.put(airport.getId(), airport);
 			if (DgCreateSfFlightScenario.NUMBER_OF_RUNWAYS == 2) {
 				airport.createTwoRunways(network);
@@ -82,19 +81,19 @@ public class DgAirNetworkBuilder {
 		return airportMap;
 	}
 	
-	private void createAndAddConnections(DgOagFlightsData flightsData, Map<Id, SfMatsimAirport> airportMap, NetworkImpl network){
+	private void createAndAddConnections(DgOagFlightsData flightsData, Map<Id<Node>, SfMatsimAirport> airportMap, NetworkImpl network){
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
 		allowedModes.add("car");
 
 		for (DgOagFlight flight : flightsData.getFlightDesignatorFlightMap().values()){
-			SfMatsimAirport oa = airportMap.get(new IdImpl( flight.getOriginCode()));
-			SfMatsimAirport da = airportMap.get(new IdImpl( flight.getDestinationCode()));
+			SfMatsimAirport oa = airportMap.get(Id.create( flight.getOriginCode(), Node.class));
+			SfMatsimAirport da = airportMap.get(Id.create( flight.getDestinationCode(), Node.class));
 			
 			Node startNode = network.getNodes().get(oa.getOutgoingFlightsNodeId());
 			Node endNode = network.getNodes().get(da.getIncomingFlightsNodeId());
 			
-			Id linkId = new IdImpl(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getFlightDesignator());
+			Id<Link> linkId = Id.create(flight.getOriginCode() + "_" + flight.getDestinationCode() + "_" + flight.getFlightDesignator(), Link.class);
 			Link originToDestination = network.getFactory().createLink(linkId, startNode, endNode);
 			
 			originToDestination.setAllowedModes(allowedModes);
@@ -132,7 +131,7 @@ public class DgAirNetworkBuilder {
 		return network;
 	}
 	
-	public Map<Id, SfMatsimAirport>  getAirportMap(){
+	public Map<Id<Node>, SfMatsimAirport>  getAirportMap(){
 		return this.airportMap;
 	}
 

@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -64,7 +64,7 @@ public class Simplifier {
 							if(!outLink.getToNode().equals(inLink.getFromNode())){
 								if(bothLinksHaveSameLinkStats(inLink, outLink)){
 									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-											new IdImpl(inLink.getId() + "-" + outLink.getId()),
+											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
 											inLink.getFromNode(),
 											outLink.getToNode(),
 											inLink.getLength() + outLink.getLength(),

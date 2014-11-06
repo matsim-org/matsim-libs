@@ -2,11 +2,19 @@
 package herbie.creation.ptAnalysis;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -20,15 +28,12 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 public class QuickLegAnalysisPtPlanbased {
 	
@@ -184,8 +189,8 @@ public class QuickLegAnalysisPtPlanbased {
 						String[] description =  routeDescription.split(SEPARATOR);
 						
 						if(description.length > 2 && isElementOfLine(description[2])){
-							IdImpl idLine = new IdImpl(description[2]);
-							IdImpl idRoute = new IdImpl(description[3]);
+							Id<TransitLine> idLine = Id.create(description[2], TransitLine.class);
+							Id<TransitRoute> idRoute = Id.create(description[3], TransitRoute.class);
 														
 							recordPt.addTraveltime(getTravelTime(leg));
 							
@@ -265,7 +270,7 @@ public class QuickLegAnalysisPtPlanbased {
 
 	private boolean isElementOfLine(String line) {
 		
-		IdImpl id = new IdImpl(line);
+		Id<TransitLine> id = Id.create(line, TransitLine.class);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		

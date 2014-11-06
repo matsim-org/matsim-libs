@@ -25,7 +25,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -282,11 +281,11 @@ public class PtScenarioAdaption {
 
 	private void setNewDeparture() {
 		
-		IdImpl newId = new IdImpl(vehicleNumber);
+		Id<Departure> newId = Id.create(vehicleNumber, Departure.class);
 		
 		Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
 		
-		Id newVehicleId = new IdImpl("tr_" + vehicleNumber);
+		Id<Vehicle> newVehicleId = Id.create("tr_" + vehicleNumber, Vehicle.class);
 		
 		newDepImpl.setVehicleId(newVehicleId);
 		newDepartures.put(implDeparture, newDepImpl);

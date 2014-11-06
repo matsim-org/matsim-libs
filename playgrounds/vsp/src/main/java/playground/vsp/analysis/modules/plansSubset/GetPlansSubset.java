@@ -42,7 +42,7 @@ public class GetPlansSubset extends AbstractAnalyisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GetPlansSubset.class);
-	private Collection<Id> ids;
+	private Collection<Id<Person>> ids;
 	private Scenario sc;
 	private Scenario newSc;
 	private boolean selectedOnly;
@@ -54,7 +54,7 @@ public class GetPlansSubset extends AbstractAnalyisModule{
 	 * @param ids, the person-ids of the persons you want to write. might be null.
 	 * @param selectedPlansOnly, set this true if you are interested in the selected plans only
 	 */
-	public GetPlansSubset(Scenario sc, Collection<Id> ids, boolean selectedPlansOnly) {
+	public GetPlansSubset(Scenario sc, Collection<Id<Person>> ids, boolean selectedPlansOnly) {
 		super(GetPlansSubset.class.getSimpleName());
 		this.ids = ids;
 		this.sc = sc;
@@ -67,7 +67,7 @@ public class GetPlansSubset extends AbstractAnalyisModule{
 	 * @param sc, the scenario, containing population AND network
 	 * @param ids, the person-ids of the persons you want to write. might be null.
 	 */
-	public GetPlansSubset(Scenario sc, Collection<Id> ids) {
+	public GetPlansSubset(Scenario sc, Collection<Id<Person>> ids) {
 		this(sc, ids, false);
 	}
 

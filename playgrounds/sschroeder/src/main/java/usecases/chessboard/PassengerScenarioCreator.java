@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -41,25 +40,25 @@ public class PassengerScenarioCreator {
 		Population population = scenario.getPopulation(); 
 		
 		for(int i=1;i<10;i++){
-			IdImpl homeId = new IdImpl("i("+i+",9)R");
-			IdImpl workId = new IdImpl("i("+i+",0)");
+			Id<Link> homeId = Id.create("i("+i+",9)R", Link.class);
+			Id<Link> workId = Id.create("i("+i+",0)", Link.class);
 			List<Person> persons = createPersons(homeId,workId,scenario);
 			for(Person p : persons) population.addPerson(p);
 
-			IdImpl homeIdR = new IdImpl("i("+i+",0)");
-			IdImpl workIdR = new IdImpl("i("+i+",9)R");
+			Id<Link> homeIdR = Id.create("i("+i+",0)", Link.class);
+			Id<Link> workIdR = Id.create("i("+i+",9)R", Link.class);
 			List<Person> personsR = createPersons(homeIdR,workIdR,scenario);
 			for(Person p : personsR) population.addPerson(p);
 		}
 		
 		for(int i=1;i<10;i++){
-			IdImpl homeId = new IdImpl("j(0,"+i+")R");
-			IdImpl workId = new IdImpl("j(9,"+i+")");
+			Id<Link> homeId = Id.create("j(0,"+i+")R", Link.class);
+			Id<Link> workId = Id.create("j(9,"+i+")", Link.class);
 			List<Person> persons = createPersons(homeId,workId,scenario);
 			for(Person p : persons) population.addPerson(p);
 			
-			IdImpl homeIdR = new IdImpl("j(9,"+i+")");
-			IdImpl workIdR = new IdImpl("j(0,"+i+")R");
+			Id<Link> homeIdR = Id.create("j(9,"+i+")", Link.class);
+			Id<Link> workIdR = Id.create("j(0,"+i+")R", Link.class);
 			List<Person> personsR = createPersons(homeIdR,workIdR,scenario);
 			for(Person p : personsR) population.addPerson(p);
 		}
@@ -67,14 +66,14 @@ public class PassengerScenarioCreator {
 		new PopulationWriter(population, scenario.getNetwork()).write("input/usecases/chessboard/passenger/passengerPlansV2.xml");
 	}
 
-	private static List<Person> createPersons(IdImpl homeId, IdImpl workId,Scenario scenario) {
+	private static List<Person> createPersons(Id<Link> homeId, Id<Link> workId,Scenario scenario) {
 		LeastCostPathCalculator lcpa = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), 
 				new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0), new FreespeedTravelTimeAndDisutility(-1.0, -1.0, -1.0));
         PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		List<Person> persons = new ArrayList<Person>();
 		for(int agent=0;agent<nuOfAgentsPerHomeLink;agent++){
 			
-			Person person = popFactory.createPerson(new IdImpl(agentCounter));
+			Person person = popFactory.createPerson(Id.create(agentCounter, Person.class));
 			agentCounter++;
 			Plan plan = popFactory.createPlan();
 			plan.setPerson(person);

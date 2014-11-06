@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -94,7 +93,8 @@ public class MyControler2 {
 
 			// generate correct number of persons:
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
-				Id id = new IdImpl( popCnt ) ; popCnt++ ;
+				Id<Person> id = Id.create( popCnt , Person.class) ;
+				popCnt++ ;
 				PersonImpl newPerson = new PersonImpl( id ) ;
 				population.addPerson( newPerson ) ;
 				PlanImpl plan = newPerson.createAndAddPlan(true);

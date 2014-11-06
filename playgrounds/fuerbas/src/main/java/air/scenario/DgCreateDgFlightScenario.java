@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -114,7 +115,7 @@ public class DgCreateDgFlightScenario {
 		
 		DgAirNetworkBuilder networkBuilder = new DgAirNetworkBuilder(scenario, transform, flightScenarioData);
 		networkBuilder.createNetwork(flightsData, airports, outputNetworkFilename);
-		Map<Id, SfMatsimAirport> airportMap = networkBuilder.getAirportMap();
+		Map<Id<Node>, SfMatsimAirport> airportMap = networkBuilder.getAirportMap();
 		//
 		DgTransitBuilder transitBuilder = new DgTransitBuilder(scenario);
 		transitBuilder.createSchedule(flightsData, airportMap);

@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
@@ -21,7 +21,7 @@ import playground.southafrica.utilities.Header;
 public class MyDemandAnalyser {
 
 	public static Logger log = Logger.getLogger(MyDemandAnalyser.class); 
-	public static Map<String, Id> customerMap = new HashMap<String, Id>();
+	public static Map<String, Id<Person>> customerMap = new HashMap<String, Id<Person>>();
 	
 	public static void main(String[] args) {
 		Header.printHeader(MyDemandAnalyser.class.toString(), args);
@@ -54,7 +54,7 @@ public class MyDemandAnalyser {
 			String line;
 			while((line=br.readLine())!=null){
 				String[] array = line.split(",");
-				Id id = new IdImpl(array[0]);
+				Id<Person> id = Id.create(array[0], Person.class);
 				String customer = array[1];
 
 				customerMap.put(customer, id);
@@ -151,7 +151,7 @@ public class MyDemandAnalyser {
 			bw.newLine();
 			for(String cust : orderMap.keySet()){
 				List<Double> list = orderMap.get(cust);
-				Id custId = customerMap.get(cust);
+				Id<Person> custId = customerMap.get(cust);
 				
 				bw.write(
 						custId.toString() + "," +

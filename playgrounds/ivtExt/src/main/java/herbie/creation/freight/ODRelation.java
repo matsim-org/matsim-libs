@@ -4,17 +4,17 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public class ODRelation implements Comparable<ODRelation> {
-	private Id id;
+	private Id<ODRelation> id;
 	private String originName;
 	private String destinationName;
 	private Coord origin;
 	private Coord destination;
 	private double weight;
-	private Id originId;
-	private Id destinationId;
+	private Id<Zone> originId;
+	private Id<Zone> destinationId;
 	
-	public ODRelation(Id id, Coord coordOrigin, Coord coordDestination, double weight, String originName, String destinationName, 
-			Id originId, Id destinationId) {
+	public ODRelation(Id<ODRelation> id, Coord coordOrigin, Coord coordDestination, double weight, String originName, String destinationName, 
+			Id<Zone> originId, Id<Zone> destinationId) {
 		this.id = id;
 		this.origin = coordOrigin;
 		this.destination = coordDestination;
@@ -37,10 +37,10 @@ public class ODRelation implements Comparable<ODRelation> {
 	public void setDestination(Coord destination) {
 		this.destination = destination;
 	}
-	public Id getId() {
+	public Id<ODRelation> getId() {
 		return id;
 	}
-	public void setId(Id id) {
+	public void setId(Id<ODRelation> id) {
 		this.id = id;
 	}
 	public double getWeight() {
@@ -85,19 +85,19 @@ public class ODRelation implements Comparable<ODRelation> {
 		this.destinationName = destinationName;
 	}
 
-	public Id getOriginId() {
+	public Id<Zone> getOriginId() {
 		return originId;
 	}
 
-	public void setOriginId(Id originId) {
+	public void setOriginId(Id<Zone> originId) {
 		this.originId = originId;
 	}
 
-	public Id getDestinationId() {
+	public Id<Zone> getDestinationId() {
 		return destinationId;
 	}
 
-	public void setDestinationId(Id destinationId) {
+	public void setDestinationId(Id<Zone> destinationId) {
 		this.destinationId = destinationId;
 	}
 }

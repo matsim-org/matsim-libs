@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -71,8 +70,8 @@ public class DistanceCalculations {
 		
 		for (int i = 0; i < (nodeIDs.length - 1); i++) {
 			
-			Node node1 = network.getNodes().get(new IdImpl(nodeIDs[i]));
-			Node node2 = network.getNodes().get(new IdImpl(nodeIDs[i+1]));
+			Node node1 = network.getNodes().get(Id.create(nodeIDs[i], Node.class));
+			Node node2 = network.getNodes().get(Id.create(nodeIDs[i+1], Node.class));
 			if (node1 == null) {
 				System.out.println("could not find node with id " + nodeIDs[i]);
 			}

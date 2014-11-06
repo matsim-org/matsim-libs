@@ -26,8 +26,8 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -134,7 +134,7 @@ public class DgDemandSeatsStuckAnalysis {
 					bw.write("-");
 				}
 				bw.write("\t");
-				BoardingDeniedStuck odStuck = stuckEvaluator.getOdStuckCountMap().get(new Tuple<Id, Id>(new IdImpl(rel.getFromAirportCode()), new IdImpl(rel.getToAirportCode())));
+				BoardingDeniedStuck odStuck = stuckEvaluator.getOdStuckCountMap().get(new Tuple<Id<Link>, Id<Link>>(Id.create(rel.getFromAirportCode(), Link.class), Id.create(rel.getToAirportCode(), Link.class)));
 				if (odStuck != null) {
 					bw.write(Integer.toString(odStuck.getStuckAndBoardingDenied() + odStuck.getStuckNoBoardingDenied()));
 				}

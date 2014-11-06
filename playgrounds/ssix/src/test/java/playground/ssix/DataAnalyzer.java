@@ -11,25 +11,26 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class DataAnalyzer implements LinkLeaveEventHandler, LinkEnterEventHandler {
 	
 	private Scenario scenario;
 	
-	private Map<Id, Double> linkEnterTimes;
+	private Map<Id<Person>, Double> linkEnterTimes;
 	private Map<Integer, Integer> intervalNVeh;
 	private Map<Integer, List<Double>> intervalSpeeds;
 	private Map<Integer, Double> intervalMeanSpeed;
 	private Map<Integer, Double> intervalFlow;
 	
-	public final static Id studiedMeasuringPointLinkId = new IdImpl("4to5");
+	public final static Id<Link> studiedMeasuringPointLinkId = Id.create("4to5", Link.class);
 	public final static double AGGREGATION_TIME = 600.;
 	public final static double DT2ONEHOUR = 3600/DataAnalyzer.AGGREGATION_TIME;
 	
 	public DataAnalyzer(Scenario sc){
 		this.scenario =  sc;
-		this.linkEnterTimes = new HashMap<Id, Double>();
+		this.linkEnterTimes = new HashMap<>();
 		this.intervalNVeh = new HashMap<Integer, Integer>();
 		this.intervalSpeeds = new HashMap<Integer, List<Double>>();
 		this.intervalFlow = new HashMap<Integer, Double>();
@@ -50,14 +51,16 @@ public class DataAnalyzer implements LinkLeaveEventHandler, LinkEnterEventHandle
 	}
 
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().equals(new IdImpl("9to1"))){
+		if (event.getLinkId().equals(Id.create("9to1", Link.class))){
 			this.linkEnterTimes.put(event.getPersonId(), event.getTime());
 		}
 	}
 	
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().equals(new IdImpl("9to1"))){
+		if (event.getLinkId().equals(Id.create("9to1", Link.class))){
 			double nowTime = event.getTime();
 			
 			Integer key =  new Integer ( (int) (nowTime / DataAnalyzer.AGGREGATION_TIME) ) * 600;
