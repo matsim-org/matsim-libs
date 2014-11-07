@@ -45,7 +45,7 @@ public class SpatialAveragingInputData {
 	private String configFile1;
 	private String emissionFile1, emissionFile2;
 	private Integer lastIteration1;
-
+	private String plansfile;
 	
 	public SpatialAveragingInputData(String baseCase, String compareCase) {
 		setFieldsForBaseCase(baseCase);
@@ -81,7 +81,7 @@ public class SpatialAveragingInputData {
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
 		}
-		
+		plansfile = runDirectory1 + "output_plans.xml.gz";
 	}
 	private void setFieldsForCompareCase(String baseCase, String compareCase) {
 		if(baseCase.equals("exposureInternalization")){
@@ -188,6 +188,15 @@ public class SpatialAveragingInputData {
 
 	public double getBoundingboxSizeSquareMeter() {
 		return ((xMax-xMin)*(yMax-yMin));
+	}
+
+	public String getPlansFile() {
+		return plansfile;
+	}
+
+	public String getEventsFile() {
+//		return (runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".events.xml.gz");
+		return (runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz");
 	}
 
 }
