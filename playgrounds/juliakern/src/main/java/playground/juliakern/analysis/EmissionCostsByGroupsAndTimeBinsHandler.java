@@ -22,11 +22,14 @@ package playground.juliakern.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import playground.benjamin.internalization.EmissionCostModule;
@@ -42,20 +45,22 @@ public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEven
 	private int numberOfTimeBins;
 
 	public EmissionCostsByGroupsAndTimeBinsHandler(double timeBinSize, int numberOfTimeBins){
+		System.out.println(" created handler");
 		this.timeBinSize = timeBinSize;
 		this.numberOfTimeBins = numberOfTimeBins;
 		this.personFilter = new PersonFilter();
-		this.reset(0);
-	}
-	@Override
-	public void reset(int iteration) {
 		this.timeBin2group2link2flatEmissionCost = new HashMap<Integer, GroupLinkFlatEmissions>();
 		for(int i=0; i<numberOfTimeBins; i++){
 			timeBin2group2link2flatEmissionCost.put(i, new GroupLinkFlatEmissions());
 		}
 		this.ecm = new EmissionCostModule(1.0);		
 	}
+	@Override
+	public void reset(int iteration) {	
+	}
 
+
+	
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		// calc emission costs of event
@@ -88,8 +93,12 @@ public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEven
 		return null;
 	}
 
+	public HashMap<Integer, GroupLinkFlatEmissions> getAllFlatCosts() {
+		return timeBin2group2link2flatEmissionCost;
+	}
+
 	@Override
-	public void handleEvent(WarmEmissionEvent event) {
+	public void handleEvent(WarmEmissionEvent event){
 		// calc emission costs of event
 		double emissionCost = ecm.calculateWarmEmissionCosts(event.getWarmEmissions());
 		
@@ -103,11 +112,6 @@ public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEven
 		
 		// store cost for (timebin x usergroup x link) combination
 		timeBin2group2link2flatEmissionCost.get(timeBin).addEmissionCosts(userGroup, linkId, emissionCost);
-		
-	}
-
-	public HashMap<Integer, GroupLinkFlatEmissions> getAllFlatCosts() {
-		return timeBin2group2link2flatEmissionCost;
 	}
 
 }

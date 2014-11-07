@@ -19,10 +19,9 @@
 
 package playground.juliakern.analysis;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -34,19 +33,16 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 public class GroupXGroupEmissionCosts {
 	
 	Double [][] groupXgroupMatrix;
-	Map <UserGroup, Integer> userGroupToMatrixIndex;
+//	Map <UserGroup, Integer> userGroupToMatrixIndex;
 	private UserGroup[] userGroups;
+	private Double scalingFactor;
+	private static final Logger logger = Logger.getLogger(GroupXGroupEmissionCosts.class);
 
-	public GroupXGroupEmissionCosts(){
+	public GroupXGroupEmissionCosts(Double scalingFactor){
 		userGroups = UserGroup.values();
 		groupXgroupMatrix = new Double[userGroups.length][userGroups.length];
 		initializeMatrix(groupXgroupMatrix);
-		userGroupToMatrixIndex = new HashMap<UserGroup, Integer>();
-		int i=0;
-		for(UserGroup ug: userGroups){
-			userGroupToMatrixIndex.put(ug, i);
-			i++;
-		}
+		this.scalingFactor= scalingFactor;
 	}
 
 
@@ -56,19 +52,20 @@ public class GroupXGroupEmissionCosts {
 			Double averageDurationPerCell, Map<Id<Link>, ? extends Link> links) { //TODO
 		
 			if(averageDurationPerCell<=0.0)averageDurationPerCell=1.0;
-			Double normalizationFactor = linkweightUtil.getNormalizationFactor();
+			Double normalizationFactor = linkweightUtil.getNormalizationFactor()*scalingFactor;
 			// for every causing group
-			for(UserGroup causingGroup: userGroups){
-			
+			for(int causing=0; causing<userGroups.length; causing++){
+				logger.info("Causing group:" + userGroups[causing].toString());
 				// for every caused flat emission by causing group:
-				Map<Id<Link>, Double> causedFlatEmissionsByCurrentCausingGroup = causingGroupLinkFlatEmissions.getLinks2FlatEmissionsFromCausingUserGroup(causingGroup);
+				Map<Id<Link>, Double> causedFlatEmissionsByCurrentCausingGroup = causingGroupLinkFlatEmissions.getLinks2FlatEmissionsFromCausingUserGroup(userGroups[causing]);
 				
 				for(Id<Link> linkId: causedFlatEmissionsByCurrentCausingGroup.keySet()){
 				
 				// for each receiving group
-				for(UserGroup receivingGroup: userGroups){ 
+					for(int receiving=0; receiving<userGroups.length; receiving++){
+						
 					// go through all cells
-					SpatialGrid durationsOfReceivingGroup = mapOfDurations.get(receivingGroup);
+					SpatialGrid durationsOfReceivingGroup = mapOfDurations.get(userGroups[receiving]);
 					for(Cell cell: durationsOfReceivingGroup.getCells()){
 						// calc weight of link for that cell
 						Double weightOfLinkForCell = linkweightUtil.getWeightFromLink(links.get(linkId), cell.getCentroid())*normalizationFactor;		
@@ -76,9 +73,9 @@ public class GroupXGroupEmissionCosts {
 						Double durationDensity = cell.getWeightedValue()/averageDurationPerCell;	
 						// emission cost from causing group to receiving group 
 						// = duration density x flat emission cost x link weight
-						Double causedEmissionCost = weightOfLinkForCell*durationDensity*causedFlatEmissionsByCurrentCausingGroup.get(linkId);
+						Double causedEmissionCost = scalingFactor*weightOfLinkForCell*durationDensity*causedFlatEmissionsByCurrentCausingGroup.get(linkId);
 						// add to matrix
-						groupXgroupMatrix[userGroupToMatrixIndex.get(causingGroup)][userGroupToMatrixIndex.get(receivingGroup)]+= causedEmissionCost;
+						groupXgroupMatrix[causing][receiving]+= causedEmissionCost;
 					}
 				}
 			}
@@ -87,27 +84,41 @@ public class GroupXGroupEmissionCosts {
 
 	public void print() {
 		System.out.println("     ");
-			for(UserGroup causing: userGroups){
-				System.out.print(causing.toString() + "   ");
+		System.out.println(" Causing: ");
+		for(UserGroup causing: userGroups){
+			System.out.print(causing.toString() + "   ");
+		}
+		System.out.println("total");
+		System.out.println();
+		for(int receiving=0; receiving<userGroups.length; receiving++){
+			System.out.print("Receiving:" + userGroups[receiving].toString() + "  ");
+			Double totalReceivedValue =0.0;
+			for(int causing=0; causing<userGroups.length; causing++){
+				System.out.print(groupXgroupMatrix[causing][receiving] + "   ");
+				totalReceivedValue+= groupXgroupMatrix[causing][receiving];
 			}
+			
+			System.out.println(totalReceivedValue);
 			System.out.println();
-			for(UserGroup receiving: userGroups){
-				System.out.println(receiving.toString());
-				for(UserGroup causing: userGroups){
-					System.out.print(groupXgroupMatrix[userGroupToMatrixIndex.get(causing)][userGroupToMatrixIndex.get(receiving)] + "   ");
-				}
+		}
+		System.out.print("Total receiving:   ");
+		for(int causing=0; causing<userGroups.length; causing++){
+			Double totalCausing=0.0;
+			for(int receiving=0; receiving<userGroups.length; receiving++){
+				totalCausing+= groupXgroupMatrix[causing][receiving];
 			}
-		
-	}
-	
-	
-	private void initializeMatrix(Double[][] groupXgroupMatrix2) {
-		for(int i=0; i<groupXgroupMatrix2.length; i++){
-			for(int j=0; j<groupXgroupMatrix2[i].length; j++){
-				groupXgroupMatrix2[i][j]=new Double(0.0);
-			}
+			System.out.print(totalCausing + "   ");
 		}
 		
+		System.out.println();
 	}
-
+	
+	
+	private void initializeMatrix(Double[][] matrix) {
+		for(int i=0; i<matrix.length; i++){
+			for(int j=0; j<matrix[i].length; j++){
+				matrix[i][j]=new Double(0.0);
+			}
+		}
+	}
 }
