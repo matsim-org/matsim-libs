@@ -24,35 +24,33 @@
 
 package playground.ikaddoura.economics;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author ikaddoura
  *
  */
 
-public class DemandFunctionControlerListener implements ShutdownListener {
+public class FlatPricingControlerListener implements StartupListener {
+
+	private final ScenarioImpl scenario;
+	private PricingHandler flatPricingHandler;
+	private double toll;
+
+	public FlatPricingControlerListener(ScenarioImpl scenario, double toll){
+		this.scenario = scenario;
+		this.toll = toll;
+	}
 	
-	private int demand = 0;
-
-	public int getDemand() {
-		return demand;
-	}
-
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		for (Person person : event.getControler().getPopulation().getPersons().values()) {
-			
-			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
-			
-			if (leg.getMode().equals(TransportMode.car)) {
-				demand++;
-			}
-		}
+	public void notifyStartup(StartupEvent event) {
+		
+		EventsManager eventsManager = event.getControler().getEvents();
+		this.flatPricingHandler = new PricingHandler(eventsManager, scenario, toll);
+		event.getControler().getEvents().addHandler(flatPricingHandler);		
 	}
+
 }

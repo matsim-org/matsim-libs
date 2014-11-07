@@ -40,17 +40,23 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.ikaddoura.internalizationCar.MarginalCostPricing;
+import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
+import playground.ikaddoura.internalizationCar.TollHandler;
+import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
@@ -66,11 +72,11 @@ public class EconomicsControler {
 	
 	private final int minDemand = 0;
 	private final int maxDemand = 1000;
-	private final int incrementDemand = 10;
+	private final int incrementDemand = 100;
 	
-	private final double minCost = 700.;
-	private final double maxCost = 2000.;
-	private final double incrementCost = 10.;
+	private final double minCost = 1000.;
+	private final double maxCost = 3000.;
+	private final double incrementCost = 100.;
 	
 	private Map<Integer, Double> demand2privateCost = new HashMap<Integer, Double>();
 	private Map<Integer, Double> demand2externalCost = new HashMap<Integer, Double>();
@@ -81,10 +87,113 @@ public class EconomicsControler {
 	public static void main(String[] args) throws IOException {
 				
 		EconomicsControler main = new EconomicsControler();
-		main.generateCostAsFunctionOfDemand(); // cost as function of demand
-		main.generateDemandAsFunctionOfCost(); // demand as function of cost
+		main.generateCostAsFunctionOfDemand(); // cost as function of demand (fixed demand)
+		main.generateDemandAsFunctionOfCost(); // demand as function of cost (fixed cost)
+		main.standardRunNoPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
+		main.standardRunFlatPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
+		main.standardRunUserSpecifictPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
 	}
 	
+	private void standardRunUserSpecifictPricing() {
+						
+		String configFileStandardRunFlatPricing = path + "input/configStandardRun.xml";
+		Config config = ConfigUtils.loadConfig(configFileStandardRunFlatPricing);
+		
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 9.);
+		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
+
+		config.controler().setOutputDirectory(path + "output_StandardRunUserSpecificPricing/");
+		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+
+		Controler controler = new Controler(scenario);
+
+		// analysis
+		WelfareAnalysisControlerListener analysis = new WelfareAnalysisControlerListener(scenario);
+		controler.addControlerListener(analysis);
+
+		// congestion pricing
+		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.run();
+		
+	}
+
+	private void standardRunFlatPricing() {
+		
+		double flatToll = 448.5;
+		
+		String csvFile = path + "/economics_StandardRunFlatPricing.csv";
+		File file = new File(csvFile);
+				
+		String configFileStandardRunFlatPricing = path + "input/configStandardRun.xml";
+		Config config = ConfigUtils.loadConfig(configFileStandardRunFlatPricing);
+		
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 9.);
+		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
+
+		config.controler().setOutputDirectory(path + "output_StandardRunFlatPricing_" + flatToll + "/");
+		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+
+		Controler controler = new Controler(scenario);
+		
+		WelfareAnalysisControlerListener analysis = new WelfareAnalysisControlerListener(scenario);
+		controler.addControlerListener(analysis);
+
+		FlatPricingControlerListener flatPricing = new FlatPricingControlerListener(scenario, flatToll);
+		controler.addControlerListener(flatPricing);
+		
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.run();
+		
+	}
+
+	private void standardRunNoPricing() {
+		String csvFile = path + "/economics_StandardRunNoPricing.csv";
+		File file = new File(csvFile);
+				
+		String configFileStandardRunNoPricing = path + "input/configStandardRun.xml";
+		Config config = ConfigUtils.loadConfig(configFileStandardRunNoPricing);
+		
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 9.);
+		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
+
+		config.controler().setOutputDirectory(path + "output_StandardRunNoPricing/");
+		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
+		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
+
+		Controler controler = new Controler(scenario);
+
+		WelfareAnalysisControlerListener analysis = new WelfareAnalysisControlerListener(scenario);
+		controler.addControlerListener(analysis);
+		
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.run();
+	}
+
 	private void generateDemandAsFunctionOfCost() {
 		
 		String csvFile = path + "/economics_DemandAsFunctionOfCost.csv";
@@ -99,14 +208,12 @@ public class EconomicsControler {
 			config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 			config.planCalcScore().setConstantCar(-1. * cost);
 			config.controler().setOutputDirectory(path + "output_DemandAsFunctionOfCost_" + cost + "/");
+			config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 			
-			Population population = PopulationUtils.createPopulation(config);
-			population = generatePopulation(population, maxDemand);
-
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 			
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
-			scenario.setPopulation(population);
+			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 			
 			Controler controler = new Controler(scenario);
 
@@ -162,15 +269,20 @@ public class EconomicsControler {
 			population = generatePopulation(population, demand);
 			
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-			
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 			scenario.setPopulation(population);
+			
+			if (demand == maxDemand) {
+				PopulationWriter populationWriter = new PopulationWriter(population, scenario.getNetwork());
+				populationWriter.write(path + "input/population_" + demand + ".xml");
+			}
 			
 			Controler controler = new Controler(scenario);
 
 			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
 
 			controler.setOverwriteFiles(true);
+			controler.setCreateGraphs(false);
 			controler.addControlerListener(economicsControlerListener);
 			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 			controler.run();
