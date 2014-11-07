@@ -38,7 +38,7 @@ public class SimplePopulationGenerator {
 	private static Double noCarPercentage = 0.0;
 	private static Integer corridorLength = 20000;
 	
-	private Random random = new Random(102830259L);
+	private Random random = new Random(10830239345L);
 	private ObjectAttributes incomes = new ObjectAttributes();
 	private HashMap<Id<Person>,Integer> incomeData = new HashMap<Id<Person>,Integer>();
 	
