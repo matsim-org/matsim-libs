@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.invermo.sim;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
@@ -39,7 +40,7 @@ public class CopyHomeLocations implements SamplerListener {
 
 	private final long interval;
 	
-	private long iter;
+	private final AtomicLong iter = new AtomicLong();
 	
 	public CopyHomeLocations(long interval) {
 		this.interval = interval;
@@ -47,8 +48,7 @@ public class CopyHomeLocations implements SamplerListener {
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
+		if(iter.get() % interval == 0) {
 			for(ProxyPerson thePerson : population) {
 				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 				ProxyPlan plan = thePerson.getPlans().get(0);
@@ -59,7 +59,8 @@ public class CopyHomeLocations implements SamplerListener {
 				}
 			}
 		}
-
+		
+		iter.incrementAndGet();
 	}
 
 }

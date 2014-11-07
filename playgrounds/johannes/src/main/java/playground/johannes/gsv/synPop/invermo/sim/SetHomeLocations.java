@@ -119,20 +119,21 @@ public class SetHomeLocations {
 		/*
 		 * need to copy home location user key to activity attributes
 		 */
-		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
-		lComposite.addComponent(new BlockingSamplerListener(new CopyHomeLocations(1), dumpInterval));
-		/*
-		 * add a population writer
-		 */
+		long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
-		PopulationWriter popWriter = new PopulationWriter(outputDir);
-		popWriter.setDumpInterval(1);
-		lComposite.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
+		
+		SamplerListenerComposite dumpListener = new SamplerListenerComposite();
+		dumpListener.addComponent(new CopyHomeLocations(dumpInterval));
+		dumpListener.addComponent(new PopulationWriter(outputDir, dumpInterval));
+		
+		lComposite.addComponent(new BlockingSamplerListener(dumpListener, dumpInterval, numThreads));
 		/*
 		 * add loggers
 		 */
 		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
-		lComposite.addComponent(new HamiltonianLogger(persDen, logInterval, outputDir));
+		lComposite.addComponent(new BlockingSamplerListener(new HamiltonianLogger(persDen, logInterval, outputDir), logInterval, numThreads));
+		
 		SamplerLogger slogger = new SamplerLogger();
 		lComposite.addComponent(slogger);
 		
@@ -141,7 +142,7 @@ public class SetHomeLocations {
 				
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
-		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
+		
 		sampler.run(iters, numThreads);
 		slogger.stop();
 		logger.info("Done.");

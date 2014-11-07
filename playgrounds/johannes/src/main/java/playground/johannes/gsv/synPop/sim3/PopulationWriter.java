@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
@@ -28,37 +29,38 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class PopulationWriter implements SamplerListener {
-	
+
 	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
 
-	private String outputDir;
-	
-	private XMLWriter writer;
-	
-	private int dumpInterval = 100000;
-	
-	private long iteration = 0;
-	
-	public PopulationWriter(String outputDir) {
+	private final String outputDir;
+
+	private final XMLWriter writer;
+
+	private long interval;
+
+	private final AtomicLong iteration = new AtomicLong();
+
+	public PopulationWriter(String outputDir, long interval) {
 		this.outputDir = outputDir;
+		this.interval = interval;
 		writer = new XMLWriter();
-		
+
 	}
-	
+
 	public void setDumpInterval(int interval) {
-		dumpInterval = interval;
+		this.interval = interval;
 	}
-	
+
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
-		iteration++;
-		if(iteration % dumpInterval == 0) {
+		if (iteration.get() % interval == 0) {
 			logger.info("Dumping population...");
 			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), population);
 			logger.info("Done.");
 		}
+		iteration.incrementAndGet();
 	}
 }

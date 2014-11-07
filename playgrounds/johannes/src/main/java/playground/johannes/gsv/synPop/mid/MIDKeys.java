@@ -41,6 +41,8 @@ public interface MIDKeys {
 	
 	public static final String LEG_MAIN_TYPE = "w04";
 	
+	public static final String LEG_SUB_TYPE = "w04_dzw";
+	
 	public static final String LEG_ORIGIN = "w01";
 	
 	public static final String LEG_DESTINATION = "w13";

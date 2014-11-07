@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -50,7 +51,7 @@ public class HamiltonianLogger implements SamplerListener {
 	
 	private final long logInterval;
 	
-	private long iter;
+	private AtomicLong iter = new AtomicLong();
 	
 	private BufferedWriter writer;
 	
@@ -80,10 +81,8 @@ public class HamiltonianLogger implements SamplerListener {
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
-		iter++;
-		
-		if(iter % logInterval == 0) {
-			long iterNow = iter;
+		if(iter.get() % logInterval == 0) {
+			long iterNow = iter.get();
 			double[] values = new double[population.size()];
 			int i = 0;
 			for(ProxyPerson person : population) {
@@ -134,11 +133,12 @@ public class HamiltonianLogger implements SamplerListener {
 			File afile = new File(file);
 			afile.mkdirs();
 			try {
-				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iter));
+				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iterNow));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
+		iter.incrementAndGet();
 	}
 }

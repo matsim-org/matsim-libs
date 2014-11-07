@@ -238,8 +238,8 @@ public class TXTReader {
 		composite.addComponent(new CleanLegLocations());
 		composite.addComponent(new SetActivityTypes());
 		composite.addComponent(new CleanLegPurposes());
-		
-//		composite.addComponent(new SetActivityTypeTask());
+		composite.addComponent(new InfereVacationsType());
+
 //		composite.addComponent(new SetFirstActivityTypeTask());
 //		composite.addComponent(new RoundTripTask());
 		
@@ -298,28 +298,28 @@ public class TXTReader {
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
 		
-		logger.info("Deleting plans with out of bounds trips.");
-		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
-		ProxyTaskRunner.runAndDelete(new DeleteOutOfBounds(bounds), persons);
-		persons = ProxyTaskRunner.runAndDelete(new DeleteNoPlans(), persons);
-		logger.info("Population size = " + persons.size());
-		
-		logger.info("Cloning persons...");
-		persons = PersonCloner.weightedClones(persons, 3000000, new XORShiftRandom());
-		new ApplySampleProbas(82000000).apply(persons);
-		logger.info("Population size = " + persons.size());
-				
-		logger.info("Deleting person with no legs...");
-		persons = ProxyTaskRunner.runAndDelete(new DeleteNoLegs(), persons);
-		logger.info("Population size = " + persons.size());
-		
-		logger.info("Deleting persons with no car legs...");
-		persons = ProxyTaskRunner.runAndDelete(new DeleteModes("car"), persons);
-		logger.info("Population size = " + persons.size());
-		
-		logger.info("Initializing target distances...");
-		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
-		
-		writer.write("/home/johannes/gsv/invermo/pop.de.car.3M.xml", persons);
+//		logger.info("Deleting plans with out of bounds trips.");
+//		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
+//		ProxyTaskRunner.runAndDelete(new DeleteOutOfBounds(bounds), persons);
+//		persons = ProxyTaskRunner.runAndDelete(new DeleteNoPlans(), persons);
+//		logger.info("Population size = " + persons.size());
+//		
+//		logger.info("Cloning persons...");
+//		persons = PersonCloner.weightedClones(persons, 3000000, new XORShiftRandom());
+//		new ApplySampleProbas(82000000).apply(persons);
+//		logger.info("Population size = " + persons.size());
+//				
+//		logger.info("Deleting person with no legs...");
+//		persons = ProxyTaskRunner.runAndDelete(new DeleteNoLegs(), persons);
+//		logger.info("Population size = " + persons.size());
+//		
+//		logger.info("Deleting persons with no car legs...");
+//		persons = ProxyTaskRunner.runAndDelete(new DeleteModes("car"), persons);
+//		logger.info("Population size = " + persons.size());
+//		
+//		logger.info("Initializing target distances...");
+//		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+//		
+//		writer.write("/home/johannes/gsv/invermo/pop.de.car.3M.xml", persons);
 	}
 }

@@ -87,7 +87,7 @@ public class PersonLau2Inhabitants implements Hamiltonian {
 		if(zone == null) {
 			return null;
 		} else {
-			Integer inhabs = (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			Integer inhabs = ((Double)zone.getAttribute().get(LandUseData.POPULATION_KEY)).intValue();
 			inhabitants.put(home, inhabs);
 			return inhabs;
 		}

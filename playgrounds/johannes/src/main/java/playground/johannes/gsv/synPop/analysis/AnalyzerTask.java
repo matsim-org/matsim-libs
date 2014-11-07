@@ -88,7 +88,7 @@ public abstract class AnalyzerTask {
 			Histogram.normalize(hist);
 			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
 		} else {
-			logger.debug("Cannot create histogram. No samples.");
+			logger.debug(String.format("Cannot create histogram: No samples for %s.", name));
 		}
 	}
 	

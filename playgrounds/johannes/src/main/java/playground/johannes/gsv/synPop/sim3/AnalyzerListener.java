@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
@@ -47,19 +48,23 @@ public class AnalyzerListener implements SamplerListener {
 	private final TrajectoryAnalyzerTaskComposite task;
 
 	private final AnalyzerTask pTask;
-	
+
 	private final String rootDir;
 
-	private long iters;
+	private final long interval;
 
-	public AnalyzerListener(DataPool dataPool, String rootDir) {
+	private final AtomicLong iters = new AtomicLong();
+
+	public AnalyzerListener(DataPool dataPool, String rootDir, long interval) {
 		this.rootDir = rootDir;
+		this.interval = interval;
+
 		task = new TrajectoryAnalyzerTaskComposite();
 
 		FacilityData data = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		// task.addTask(new FacilityOccupancyTask(facilities));
 		task.addTask(new TripDistanceTask(data.getAll(), CartesianDistanceCalculator.getInstance()));
-		
+
 		pTask = new LegTargetDistanceTask("car");
 		ProxyAnalyzer.setAppend(true);
 
@@ -67,21 +72,22 @@ public class AnalyzerListener implements SamplerListener {
 
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
-		iters++;
-		
-		new CopyFacilityUserData().afterStep(population, mutations, accepted);
-		
-		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
-		String output = String.format("%s/%s", rootDir, String.valueOf(iters));
-		File file = new File(output);
-		file.mkdirs();
-		try {
-			TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
-			ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// new CopyFacilityUserData().afterStep(population, mutations,
+		// accepted);
 
+		if (iters.get() % interval == 0) {
+			Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
+			String output = String.format("%s/%s", rootDir, String.valueOf(iters));
+			File file = new File(output);
+			file.mkdirs();
+			try {
+				TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
+				ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		iters.incrementAndGet();
 	}
 
 }

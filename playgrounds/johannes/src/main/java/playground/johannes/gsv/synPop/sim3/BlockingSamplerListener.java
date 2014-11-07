@@ -20,6 +20,8 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicLong;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 
@@ -29,7 +31,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class BlockingSamplerListener implements SamplerListener {
 
-	private long iters;
+	private final AtomicLong iters = new AtomicLong();
 	
 	private final long interval;
 	
@@ -37,22 +39,50 @@ public class BlockingSamplerListener implements SamplerListener {
 	
 	private final SamplerListener delegate;
 	
-	public BlockingSamplerListener(SamplerListener delegate, long interval) {
+	private final ThePhaser phaser;
+	
+	public BlockingSamplerListener(SamplerListener delegate, long interval, int numThreads) {
 		this.delegate = delegate;
 		this.interval = interval;
-		this.next = interval;
+		this.next = 0;
+		
+		phaser = new ThePhaser();
+		for(int i = 0; i < numThreads; i++) phaser.register();
 	}
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accept) {
-		iters++;
-		if(iters >= next) {
-			synchronized(this) {
-				if(iters >= next) {
-					delegate.afterStep(population, mutations, accept);
-					next += interval;
-				}
-			}
+		if(iters.get() >= next) {
+			phaser.setState(population, mutations, accept);
+			phaser.arriveAndAwaitAdvance();
+		} else {
+			delegate.afterStep(population, mutations, accept);
 		}
+		iters.incrementAndGet();
+	}
+	
+	private class ThePhaser extends Phaser {
+
+		private Collection<ProxyPerson> tmpPopulation;
+		
+		private Collection<ProxyPerson> tmpMutations;
+		
+		private boolean tmpAccept;
+
+		private synchronized void setState(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accept) {
+			this.tmpPopulation = population;
+			this.tmpMutations = mutations;
+			this.tmpAccept = accept;
+		}
+		
+		@Override
+		protected boolean onAdvance(int phase, int registeredParties) {
+			for(int i = 0; i < registeredParties; i++)
+				delegate.afterStep(tmpPopulation, tmpMutations, tmpAccept);
+			
+			next += interval;
+			return false;
+		}
+		
 	}
 }

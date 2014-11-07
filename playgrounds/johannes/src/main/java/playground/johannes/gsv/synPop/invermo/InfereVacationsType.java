@@ -17,55 +17,70 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim3;
+package playground.johannes.gsv.synPop.invermo;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicLong;
+import java.text.ParseException;
+import java.util.Date;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.joda.time.DateTime;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
-public class CopyFacilityUserData implements SamplerListener {
+/**
+ * @author johannes
+ * 
+ */
+public class InfereVacationsType implements ProxyPlanTask {
 
-	private static final Logger logger = Logger.getLogger(CopyFacilityUserData.class);
-
-	private AtomicLong iter = new AtomicLong();
-
-	private final long interval;
-
-	public CopyFacilityUserData(long interval) {
-		this.interval = interval;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes
+	 * .gsv.synPop.ProxyPlan)
+	 */
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
-		if (iter.get() % interval == 0) {
-			logger.debug("Copying facility user data to attributes...");
-			int cnt = 0;
+	public void apply(ProxyPlan plan) {
+		boolean hasVacations = false;
+		for (ProxyObject act : plan.getActivities()) {
+			if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				hasVacations = true;
+				break;
+			}
+		}
 
-			for (ProxyPerson person : population) {
-				for (ProxyPlan plan : person.getPlans()) {
-					for (ProxyObject act : plan.getActivities()) {
-						ActivityFacility f = (ActivityFacility) act.getUserData(ActivityLocationMutator.USER_DATA_KEY);
-						if (f != null) {
-							act.setAttribute(CommonKeys.ACTIVITY_FACILITY, f.getId().toString());
+		if (hasVacations) {
+			boolean isLong = false;
+
+			ProxyObject first = plan.getLegs().get(0);
+			ProxyObject last = plan.getLegs().get(plan.getLegs().size() - 1);
+
+			String startStr = first.getAttribute(CommonKeys.LEG_START_TIME);
+			String endStr = last.getAttribute(CommonKeys.LEG_END_TIME);
+
+			if (startStr != null && endStr != null) {
+				DateTime start = SplitPlanTask.formatter.parseDateTime(startStr);
+				DateTime end = SplitPlanTask.formatter.parseDateTime(endStr);
+
+				if (end.getDayOfYear() - start.getDayOfYear() > 3) {
+					isLong = true;
+				}
+
+				for (ProxyObject act : plan.getActivities()) {
+					if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						if (isLong) {
+							act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
 						} else {
-							cnt++;
+							act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
 						}
 					}
 				}
 			}
 
-			if (cnt > 0) {
-				logger.warn(String.format("%s activities with unset facility.", cnt));
-			}
 		}
-
-		iter.incrementAndGet();
 	}
+
 }

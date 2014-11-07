@@ -89,7 +89,7 @@ public class ParallelPseudoSim {
 	public void run(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
 		logger.debug("Preparing simulation threads...");
 
-		legSimEngines.put(TransportMode.car, new CarLegSimEngine(network, linkTravelTimes));
+		legSimEngines.put(TransportMode.car, new CarLegSimEngine(network, linkTravelTimes, eventManager));
 		/*
 		 * split collection in approx even segments
 		 */
@@ -116,23 +116,24 @@ public class ParallelPseudoSim {
 			}
 		}
 
-		logger.debug("Collecting and sorting events...");
-		List<Event> eventList = new ArrayList<>();
-		for (int i = 0; i < segments.length; i++) {
-			eventList.addAll(threads[i].getEventList());
-		}
-
-		Collections.sort(eventList, new Comparator<Event>() {
-			@Override
-			public int compare(Event o1, Event o2) {
-				return Double.compare(o1.getTime(), o2.getTime());
-			}
-		});
-
-		logger.debug("Processing events...");
-		for (Event event : eventList) {
-			eventManager.processEvent(event);
-		}
+		eventManager.afterSimStep(2*86400);
+//		logger.debug("Collecting and sorting events...");
+//		List<Event> eventList = new ArrayList<>();
+//		for (int i = 0; i < segments.length; i++) {
+//			eventList.addAll(threads[i].getEventList());
+//		}
+//
+//		Collections.sort(eventList, new Comparator<Event>() {
+//			@Override
+//			public int compare(Event o1, Event o2) {
+//				return Double.compare(o1.getTime(), o2.getTime());
+//			}
+//		});
+//
+//		logger.debug("Processing events...");
+//		for (Event event : eventList) {
+//			eventManager.processEvent(event);
+//		}
 
 		executor.shutdown();
 	}
@@ -141,22 +142,22 @@ public class ParallelPseudoSim {
 
 		private Collection<Plan> plans;
 
-		// private EventsManager eventManager;
+		 private EventsManager eventManager;
 
-		private LinkedList<Event> eventList;
+//		private LinkedList<Event> eventList;
 
 		public void init(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
 			this.plans = plans;
-			// this.eventManager = eventManager;
+			 this.eventManager = eventManager;
 		}
 
-		public List<Event> getEventList() {
-			return eventList;
-		}
+//		public List<Event> getEventList() {
+//			return eventList;
+//		}
 
 		@Override
 		public void run() {
-			eventList = new LinkedList<Event>();
+//			eventList = new LinkedList<Event>();
 			for (Plan plan : plans) {
 //				if (plan.getPerson().getId().toString().equals("211121.1clone678889")) {
 //					System.err.println();
@@ -185,7 +186,8 @@ public class ParallelPseudoSim {
 							engine = defaultLegSimEngine;
 						}
 
-						travelTime = engine.simulate(plan.getPerson(), leg, prevEndTime, eventList);
+//						travelTime = engine.simulate(plan.getPerson(), leg, prevEndTime, eventList);
+						travelTime = engine.simulate(plan.getPerson(), leg, prevEndTime, null);
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
 						/*
@@ -204,12 +206,12 @@ public class ParallelPseudoSim {
 						 */
 						PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, plan.getPerson().getId(), act.getLinkId(),
 								leg.getMode());
-						// eventManager.processEvent(arrivalEvent);
-						eventList.add(arrivalEvent);
+						 eventManager.processEvent(arrivalEvent);
+//						eventList.add(arrivalEvent);
 						ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, plan.getPerson().getId(), act.getLinkId(),
 								act.getFacilityId(), act.getType());
-						// eventManager.processEvent(startEvent);
-						eventList.add(startEvent);
+						 eventManager.processEvent(startEvent);
+//						eventList.add(startEvent);
 					}
 
 					if (idx < elements.size() - 1) {
@@ -219,26 +221,26 @@ public class ParallelPseudoSim {
 						 */
 						ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, plan.getPerson().getId(), act.getLinkId(), act.getFacilityId(),
 								act.getType());
-						// eventManager.processEvent(endEvent);
-						eventList.add(endEvent);
+						 eventManager.processEvent(endEvent);
+//						eventList.add(endEvent);
 						Leg leg = (Leg) elements.get(idx + 1);
 						PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, plan.getPerson().getId(), act.getLinkId(),
 								leg.getMode());
-						// eventManager.processEvent(deparutreEvent);
-						eventList.add(departureEvent);
+						 eventManager.processEvent(departureEvent);
+//						eventList.add(departureEvent);
 					}
 
 					prevEndTime = actEndTime;
 				}
 			}
 
-			Collections.sort(eventList, new Comparator<Event>() {
-
-				@Override
-				public int compare(Event o1, Event o2) {
-					return Double.compare(o1.getTime(), o2.getTime());
-				}
-			});
+//			Collections.sort(eventList, new Comparator<Event>() {
+//
+//				@Override
+//				public int compare(Event o1, Event o2) {
+//					return Double.compare(o1.getTime(), o2.getTime());
+//				}
+//			});
 			// for(Event event : eventList) {
 			// eventManager.processEvent(event);
 			// }

@@ -23,68 +23,68 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 
-
 /**
  * @author johannes
- *
+ * 
  */
 public class SamplerLogger implements SamplerListener {
 
-	private final Logger logger = Logger.getLogger(SamplerLogger.class);
-	
-	private Timer timer;
-	
-	private Task task;
-	
-	private boolean isRunning = false;
-	
+	private static final Logger logger = Logger.getLogger(SamplerLogger.class);
+
+	private final Timer timer;
+
+	private final Task task;
+
 	public SamplerLogger() {
 		timer = new Timer();
 		task = new Task();
+		timer.schedule(task, 2000, 2000);
 	}
-	
+
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		if(!isRunning) {
-			timer.schedule(task, 2000, 2000);
-			isRunning = true;
-		}
-		
 		task.afterStep(population, person, accpeted);
 
 	}
-	
+
 	public void stop() {
 		timer.cancel();
 	}
-	
+
 	private class Task extends TimerTask implements SamplerListener {
 
-		private long iter;
-		
-		private long accepts;
-		
-		private long iters2;
-		
+		private final AtomicLong iter = new AtomicLong();
+
+		private final AtomicLong iters2 = new AtomicLong();
+
+		private final AtomicLong accepts = new AtomicLong();
+
+		private long lastIter;
+
 		@Override
 		public void run() {
-			logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, accepts/(double)iters2 * 100));
-			accepts = 0;
-			iters2 = 0;
+			if (iter.get() > lastIter) {
+				double p = accepts.get() / (double) iters2.get() * 100;
+				logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, p));
+				accepts.set(0);
+				iters2.set(0);
+				lastIter = iter.get();
+			}
 		}
 
 		@Override
 		public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> original, boolean accepted) {
-			iter++;
-			iters2++;
-			if(accepted)
-				accepts++;
+			iter.incrementAndGet();
+			iters2.incrementAndGet();
+			if (accepted)
+				accepts.incrementAndGet();
 		}
 	}
 }

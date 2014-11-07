@@ -26,8 +26,16 @@ package playground.johannes.gsv.synPop;
 public interface ActivityType {
 
 	public static final String HOME = "home";
+
+	public static final String WORK = "work";
+	
+	public static final String BUISINESS = "buisiness";
 	
 	public static final String LEISURE = "leisure";
+	
+	public static final String EDUCATION = "edu";
+	
+	public static final String SHOP = "shop";
 	
 	public static final String MISC = "misc";
 	

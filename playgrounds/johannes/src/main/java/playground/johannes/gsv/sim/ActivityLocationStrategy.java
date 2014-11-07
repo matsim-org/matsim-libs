@@ -216,9 +216,9 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 				Coord coord = current.getCoord();
 				double min = Math.min(0, d * (1 - mutationError));
 				double max = d * (1 + mutationError);
-				Collection<ActivityFacility> candidates = quadtree.get(coord.getX(), coord.getY(), min, max);
+				List<ActivityFacility> list = (List<ActivityFacility>) quadtree.get(coord.getX(), coord.getY(), min, max);
 
-				List<ActivityFacility> list = new ArrayList<ActivityFacility>(candidates);
+//				List<ActivityFacility> list = new ArrayList<ActivityFacility>(candidates);
 //				Id<ActivityFacility> id = null;
 //				if(current.getId().toString().equals("2")) {
 //					id = Id.create("3", ActivityFacility.class);

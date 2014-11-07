@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 
@@ -41,13 +42,13 @@ public class CarLegSimEngine implements LegSimEngine {
 
 	private final TravelTime travelTime;
 	
-//	private final EventsManager events;
+	private final EventsManager events;
 	
 	private final Network network;
 	
-	public CarLegSimEngine(Network network, TravelTime travelTime) {
+	public CarLegSimEngine(Network network, TravelTime travelTime, EventsManager events) {
 		this.network = network;
-//		this.events = events;
+		this.events = events;
 		this.travelTime = travelTime;
 	}
 	
@@ -63,20 +64,20 @@ public class CarLegSimEngine implements LegSimEngine {
 			for (int i = 0; i < ids.size(); i++) {
 				link = network.getLinks().get(ids.get(i));
 				
-//				events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
-				eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+				events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+//				eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt += travelTime.getLinkTravelTime(link, departureTime + tt, null, null);
-//				events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
-				eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+				events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+//				eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt++;// 1 sec for each node
 			}
 			
 			link = network.getLinks().get(route.getEndLinkId());
-//			events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
-			eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+			events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+//			eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
 			tt += travelTime.getLinkTravelTime(link, departureTime + tt, null, null);
-//			events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
-			eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+			events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+//			eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
 		}
 
 		return tt;

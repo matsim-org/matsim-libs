@@ -60,7 +60,8 @@ public class TrajectoryAnalyzer {
 	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(filename, append));
 		
-		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
+//		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
+		writer.write("property\tmean\tmin\tmax\tN\tvar");
 		writer.newLine();
 		SortedMap<String, DescriptiveStatistics> sortedMap = new TreeMap<String, DescriptiveStatistics>(statsMap);
 		for(Entry<String, DescriptiveStatistics> entry : sortedMap.entrySet()) {
@@ -71,8 +72,9 @@ public class TrajectoryAnalyzer {
 			writer.write(String.valueOf(entry.getValue().getMin()));
 			writer.write("\t");
 			writer.write(String.valueOf(entry.getValue().getMax()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+//			Recently i faced situations where this methods appears to never return with large data sets. joh 11/2014
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
 			writer.write("\t");
 			writer.write(String.valueOf(entry.getValue().getN()));
 			writer.write("\t");

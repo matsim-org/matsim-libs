@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -125,7 +126,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		event.getControler().getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
+		Logger.getRootLogger().setLevel(Level.FATAL);
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/);
+		Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	
 	@Override

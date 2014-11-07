@@ -59,7 +59,7 @@ public class MergePopulations {
 		Set<ProxyPerson> persons2 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 
-		double w1 = 10;
+		double w1 = 100;
 		double w2 = 1;
 		
 		double proba1 = w1/(w1 + w2);
