@@ -180,7 +180,7 @@ public class NoiseSpatialInfo {
 			}
 		}
 		
-		log.info("number of receiver points: " + receiverPointId2Coord.size());
+		log.info("Total number of receiver points: " + receiverPointId2Coord.size());
 		writeReceiverPoints();
 	}
 	
@@ -191,8 +191,8 @@ public class NoiseSpatialInfo {
 		int c = 0;
 		for(Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
 			c++;
-			if(c%1000 == 0) {
-				log.info("receiver points "+c);
+			if(c % 1000 == 0) {
+				log.info("Writing out receiver point # "+ c);
 			}
 			id2xCoord.put(id, receiverPointId2Coord.get(id).getX());
 			id2yCoord.put(id, receiverPointId2Coord.get(id).getY());
@@ -214,7 +214,7 @@ public class NoiseSpatialInfo {
 		File file = new File(fileName);
 		file.mkdirs();
 		
-		File file2 = new File(fileName+"receiverPoints.csv");
+		File file2 = new File(fileName + "receiverPoints.csv");
 			
 		// For all maps, the number of keys should be the same
 		try {
@@ -234,7 +234,7 @@ public class NoiseSpatialInfo {
 			}
 				
 			bw.close();
-				log.info("Output written to " + fileName);
+				log.info("Receiver points written to " + fileName);
 				
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -247,7 +247,7 @@ public class NoiseSpatialInfo {
 		for (Coord coord : allActivityCoords) {
 			xi++;
 			if (xi % 20000 == 0) {
-				log.info("activity coordinates " + xi + " ...");
+				log.info("Setting activity coordinates to nearest receiver point. activity location # " + xi);
 			}
 			
 			if (!(activityCoord2receiverPointId.containsKey(coord))) {
@@ -257,12 +257,14 @@ public class NoiseSpatialInfo {
 			}
 		}
 				
-		for (Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
+		int xii = 0;
+
+		for (Id id : receiverPointId2Coord.keySet()) {
 			
-			xi++;
+			xii++;
 			
-			if (xi % 20000 == 0) {
-				log.info("receiver point " + xi + " ...");
+			if (xii % 20000 == 0) {
+				log.info("Setting receiver point to receiver point coordinates # " + xii);
 			}
 			coord2receiverPointId.put(receiverPointId2Coord.get(id), id);
 		}
@@ -290,7 +292,7 @@ public class NoiseSpatialInfo {
 		for (Id<ReceiverPoint> pointId : receiverPointId2Coord.keySet()) {
 			counter++;
 			if (counter % 1000. == 0.) {
-				log.info("receiver point ... " + counter);
+				log.info("Setting relevant links for receiver point # " + counter);
 			}
 			
 			double pointCoordX = receiverPointId2Coord.get(pointId).getX();

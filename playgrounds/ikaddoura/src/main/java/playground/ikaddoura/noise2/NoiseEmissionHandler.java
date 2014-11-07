@@ -165,8 +165,11 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	}
 
 	public void calculateNoiseEmission() {
+		log.info("Preprocessing data...");
 		preProcessData();
+		log.info("Preprocessing data... Done.");
 		
+		log.info("Calculating noise emission for each link and for each time interval...");
 		// link
 		for (Id linkId : scenario.getNetwork().getLinks().keySet()){
 			Map<Double,Double> timeInterval2NoiseEmission = new HashMap<Double, Double>();
@@ -199,6 +202,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			}
 			linkId2timeInterval2noiseEmission.put(linkId , timeInterval2NoiseEmission);
 		}
+		log.info("Calculating noise emission for each link and for each time interval... Done.");
 	}
 
 	private void preProcessData() {

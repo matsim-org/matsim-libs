@@ -36,8 +36,8 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 
-public class NoiseControlerListener implements AfterMobsimListener , IterationEndsListener , StartupListener {
-	private static final Logger log = Logger.getLogger(NoiseControlerListener.class);
+public class NoiseCalculationOnline implements AfterMobsimListener , IterationEndsListener , StartupListener {
+	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	final double annualCostRate = NoiseConfigParameters.getAnnualCostRate();
 
@@ -80,9 +80,9 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 		log.info("Calculating noise emission... Done.");
 		
 		// calculate activity durations for each agent
-		log.info("Calculating each agents activity durations...");
+		log.info("Calculating each agent's activity durations...");
 		this.personActivityTracker.calculateDurationOfStay();
-		log.info("Calculating each agents activity durations... Done.");
+		log.info("Calculating each agent's activity durations... Done.");
 		
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");

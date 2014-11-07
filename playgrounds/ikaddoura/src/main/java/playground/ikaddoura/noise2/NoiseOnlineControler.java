@@ -28,21 +28,19 @@ import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
- * 1) Calculate noise emissions for each link and time interval.
- * 2) Calculate noise immissions for each receiver point and save the contribution of each link to the receiver point's immission level.
  * 
  * @author lkroeger, ikaddoura
  *
  */
 
-public class NoiseImmissionControler {
+public class NoiseOnlineControler {
 	
 	private static String configFile;
 	public static void main(String[] args) throws IOException {
 		
 		configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/noiseTestScenario/input/config.xml";
 		
-		NoiseImmissionControler noiseImmissionControler = new NoiseImmissionControler();
+		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
 		noiseImmissionControler.run(configFile);
 	}
 
@@ -50,7 +48,7 @@ public class NoiseImmissionControler {
 		
 		Controler controler = new Controler(configFile);
 		
-		controler.addControlerListener(new NoiseControlerListener());
+		controler.addControlerListener(new NoiseCalculationOnline());
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);

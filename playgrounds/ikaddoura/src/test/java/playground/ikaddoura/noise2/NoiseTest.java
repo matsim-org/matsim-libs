@@ -131,7 +131,7 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config2.xml";
 
 		Controler controler = new Controler(configFile);
-		NoiseControlerListener noiseControlerListener = new NoiseControlerListener();
+		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline();
 		controler.addControlerListener(noiseControlerListener);
 		
 		controler.setOverwriteFiles(true);
