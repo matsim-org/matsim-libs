@@ -58,10 +58,13 @@ public class IKNetworkPopulationWriter {
 	private Scenario scenario;
 	private SimpleFeatureBuilder builder;
 	
-	private String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
-	private String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
-	
-	private String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
+//	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
+//	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
+//	private final String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
+
+	private final String networkFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_network.xml.gz";
+	private final String populationFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_plans.xml.gz";
+	private final String outputPath = "../../shared-svn/studies/ihab/noiseTestScenario/output/shapeFiles/";
 
 	public static void main(String[] args) {
 		
@@ -93,7 +96,8 @@ public class IKNetworkPopulationWriter {
 		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
 		tbuilder.setName("shape");
 		tbuilder.add("geometry", Point.class);
-		tbuilder.add("type", String.class);
+		tbuilder.add("actType", String.class);
+		tbuilder.add("personId", String.class);
 		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
 		builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
 		
@@ -112,7 +116,8 @@ public class IKNetworkPopulationWriter {
 					Activity act = (Activity)pe;
 					SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
 						gf.createPoint(MGC.coord2Coordinate(act.getCoord())),
-						act.getType()
+						act.getType(),
+						p.getId()						
 					});
 					i++;
 					features.add(feature);
