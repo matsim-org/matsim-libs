@@ -65,11 +65,7 @@ import com.vividsolutions.jts.geom.Point;
 public class NoiseSpatialInfo {
 	
 	private static final Logger log = Logger.getLogger(NoiseSpatialInfo.class);
-		
-	private final double receiverPointGap = 250.; // distance between two receiver points along x- and y-axes
-	private final double relevantRadius = 500.; // radius around a receiver point in which all links are considered as relevant
-	private final double gridCentroidGapDensity = 250.; // distance between two grid cell centroids along x- and y-axes (relevant for computation of activity density)
-	
+			
 	private Scenario scenario;
 	private Map<Id<Person>,List<Coord>> personId2listOfCoords = new HashMap<>();
 	private List <Coord> allActivityCoords = new ArrayList <Coord>();
@@ -174,8 +170,8 @@ public class NoiseSpatialInfo {
 		int counter = 0;
 		
 		// a grid of receiver points
-		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - receiverPointGap ; y = y - receiverPointGap) {
-			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + receiverPointGap ; x = x + receiverPointGap) {
+		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - NoiseConfigParameters.getReceiverPointGap() ; y = y - NoiseConfigParameters.getReceiverPointGap()) {
+			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + NoiseConfigParameters.getReceiverPointGap() ; x = x + NoiseConfigParameters.getReceiverPointGap()) {
 				Coord coord = new CoordImpl(x, y);
 				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
 				receiverPointId2Coord.put(rpId, coord);
@@ -315,8 +311,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (relevantRadius / 1.));	
-		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / relevantRadius / 1.);
+		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (NoiseConfigParameters.getRelevantRadius() / 1.));	
+		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / NoiseConfigParameters.getRelevantRadius() / 1.);
 		
 		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
@@ -449,7 +445,7 @@ public class NoiseSpatialInfo {
 						}
 					}
 					
-					if (distance < relevantRadius){
+					if (distance < NoiseConfigParameters.getRelevantRadius()){
 						
 						relevantLinkIds.add(linkId);
 						
@@ -496,7 +492,7 @@ public class NoiseSpatialInfo {
 		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			
 			// split up the link into link segments with the following length
-			double partLength = 0.25 * relevantRadius;
+			double partLength = 0.25 * NoiseConfigParameters.getRelevantRadius();
 			int parts = (int) ((scenario.getNetwork().getLinks().get(linkId).getLength())/(partLength));
 
 			double fromX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
@@ -618,8 +614,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMin) / (receiverPointGap/1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / receiverPointGap/1.);
+		int xDirection = (int) ((xCoord - xCoordMin) / (NoiseConfigParameters.getReceiverPointGap()/1.));	
+		int yDirection = (int) ((yCoordMax - yCoord) / NoiseConfigParameters.getReceiverPointGap()/1.);
 		
 		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
@@ -630,8 +626,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMin) / (gridCentroidGapDensity/1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / (gridCentroidGapDensity/1.));
+		int xDirection = (int) ((xCoord - xCoordMin) / (NoiseConfigParameters.getCentroidGap()/1.));	
+		int yDirection = (int) ((yCoordMax - yCoord) / (NoiseConfigParameters.getCentroidGap()/1.));
 		
 		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		

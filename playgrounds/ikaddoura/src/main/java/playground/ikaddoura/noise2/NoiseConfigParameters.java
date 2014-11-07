@@ -46,4 +46,21 @@ public class NoiseConfigParameters {
 		return scaleFactor;
 	}
 	
+	// distance between two receiver points along x- and y-axes
+	public static double getReceiverPointGap(){
+		final double receiverPointGap = 250.;
+		return receiverPointGap;
+	}
+	
+	// radius around a receiver point in which all links are considered as relevant
+	public static double getRelevantRadius(){
+		final double relevantRadius = 500.;
+		return relevantRadius;
+	}
+	
+	// distance between two grid cell centroids along x- and y-axes
+	public static double getCentroidGap(){
+		final double gridCentroidGap = 250.;
+		return gridCentroidGap;
+	}
 }
