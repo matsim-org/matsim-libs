@@ -95,6 +95,12 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	private HashMap<String, Double> currentSCD_morning;
 	private HashMap<String, Double> currentTTC_evening;
 	private HashMap<String, Double> currentSCD_evening;
+
+	HashMap<String, ArrayList<Double>> ttcMorningByMode;
+	HashMap<String, ArrayList<Double>> ttcEveningByMode;
+	HashMap<String, ArrayList<Double>> sdcMorningByMode;
+	HashMap<String, ArrayList<Double>> sdcEveningByMode;
+
 	private HashMap<String, ArrayList<Id<Person>>> person2mode = new HashMap<String, ArrayList<Id<Person>>>();
 
 
@@ -155,10 +161,10 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 		this.currentTTC_evening  =  new HashMap<String, Double>();
 		this.currentSCD_evening  =  new HashMap<String, Double>();
 
-		HashMap<String, ArrayList<Double>> ttcMorningByMode = new HashMap<String, ArrayList<Double>>();
-		HashMap<String, ArrayList<Double>> ttcEveningByMode = new HashMap<String, ArrayList<Double>>();
-		HashMap<String, ArrayList<Double>> sdcMorningByMode = new HashMap<String, ArrayList<Double>>();
-		HashMap<String, ArrayList<Double>> sdcEveningByMode = new HashMap<String, ArrayList<Double>>();
+		this.ttcMorningByMode = new HashMap<String, ArrayList<Double>>();
+		this.ttcEveningByMode = new HashMap<String, ArrayList<Double>>();
+		this.sdcMorningByMode = new HashMap<String, ArrayList<Double>>();
+		this.sdcEveningByMode = new HashMap<String, ArrayList<Double>>();
 
 		for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
 			ttcMorningByMode.put(mode, new ArrayList<Double>());
@@ -175,12 +181,12 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				sdcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getSDC_morning().get(id));
 				sdcEveningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(1)).add(this.scheduleDelayCostHandler.getSDC_evening().get(id));
 
-//				System.out.println(id.toString());
-//				System.out.println("ttc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getTTC_morning().get(id));
-//				System.out.println("ttc_evening: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getTTC_evening().get(id));
-//				System.out.println("sdc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getSDC_morning().get(id));
-//				System.out.println("sdc_eveningg: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getSDC_evening().get(id));
-//				System.out.println();
+				//				System.out.println(id.toString());
+				//				System.out.println("ttc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getTTC_morning().get(id));
+				//				System.out.println("ttc_evening: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getTTC_evening().get(id));
+				//				System.out.println("sdc_morning: "+this.scheduleDelayCostHandler.getModes().get(id).get(0)+","+this.scheduleDelayCostHandler.getSDC_morning().get(id));
+				//				System.out.println("sdc_eveningg: "+this.scheduleDelayCostHandler.getModes().get(id).get(1)+","+this.scheduleDelayCostHandler.getSDC_evening().get(id));
+				//				System.out.println();
 			}
 			else{
 				log.warn("Stucked Agents are not considered! Agent stucked: "+id.toString());
@@ -195,10 +201,10 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			this.currentSCD_evening.put(mode, meanCalculator.getMean(sdcEveningByMode.get(mode)));
 		}
 
-				this.ttc_morning.put(event.getIteration(), this.currentTTC_morning);
-				this.scd_morning.put(event.getIteration(), this.currentSCD_morning);
-				this.ttc_evening.put(event.getIteration(), this.currentTTC_evening);
-				this.scd_evening.put(event.getIteration(), this.currentSCD_evening);
+		this.ttc_morning.put(event.getIteration(), this.currentTTC_morning);
+		this.scd_morning.put(event.getIteration(), this.currentSCD_morning);
+		this.ttc_evening.put(event.getIteration(), this.currentTTC_evening);
+		this.scd_evening.put(event.getIteration(), this.currentSCD_evening);
 
 	}
 
@@ -293,7 +299,6 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			BufferedWriter timeCostWriter = new BufferedWriter(new FileWriter(timeCostFile));
 
 			String header="It;";
-
 			for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
 				header=header+"TTC_morning_"+mode+";";
 				header=header+"SCD_morning_"+mode+";";
@@ -303,7 +308,6 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				header=header+"TTC_evening_"+mode+";";
 				header=header+"SCD_evening_"+mode+";";
 			}
-
 
 			timeCostWriter.write(header);
 			timeCostWriter.newLine();
@@ -325,7 +329,90 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				timeCostWriter.newLine();
 			}
 			timeCostWriter.close();
-			log.info("Trip analysis Output written to " + timeCostFilePath);
+			log.info("Tinme cost analysis Output written to " + timeCostFilePath);
+
+
+			//Write Time Cost Summary File for the Last Iteration		
+			if(event.getIteration()==event.getControler().getScenario().getConfig().controler().getLastIteration()){
+				String timeCostSummaryFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostSumamry.it"+event.getIteration()+".csv";
+				File timeCostSummaryFile = new File( timeCostSummaryFilePath);
+
+				BufferedWriter timeCostSummaryWriter = new BufferedWriter(new FileWriter(timeCostSummaryFile));
+				timeCostSummaryWriter.write("Mode;TTC_Total;SDC_total;TTC_morning;TTC_evening;SDC_morning;SDC_evening;Total_Journeys");
+				timeCostSummaryWriter.newLine();
+
+				for(String mode:this.scheduleDelayCostHandler.getUsedModes()){
+					String data=mode+";";
+
+					double sumTTCMorning =0.0;
+					double sumTTCEvening =0.0;
+					double sumSDCMorning =0.0;
+					double sumSDCEvening =0.0;
+					double sumTTCTotal =0.0;
+					double sumSDCTotal = 0.0;
+					int sumModeJourneys = 0;
+
+					for(int i=0;i<ttcMorningByMode.get(mode).size();i++){
+						sumTTCMorning += ttcMorningByMode.get(mode).get(i);
+					}
+
+					for(int i=0;i<ttcEveningByMode.get(mode).size();i++){
+						sumTTCEvening += ttcEveningByMode.get(mode).get(i);
+					}
+					for(int i=0;i<sdcMorningByMode.get(mode).size();i++){
+						sumSDCMorning += sdcMorningByMode.get(mode).get(i);
+					}
+					for(int i=0;i<sdcEveningByMode.get(mode).size();i++){
+						sumSDCEvening += sdcEveningByMode.get(mode).get(i);
+					}
+					sumTTCTotal = sumTTCMorning + sumTTCEvening;
+					sumSDCTotal = sumSDCMorning + sumSDCEvening;
+					sumModeJourneys = ttcMorningByMode.get(mode).size() + ttcEveningByMode.get(mode).size();
+
+					data += sumTTCTotal+";"+sumSDCTotal+";"+sumTTCMorning+";"+sumTTCEvening+";"+sumSDCMorning+";"+sumSDCEvening+";"+sumModeJourneys +";";
+
+					timeCostSummaryWriter.write(data);
+					timeCostSummaryWriter.newLine();	
+				}
+				timeCostSummaryWriter.close();
+				log.info("Time cost summary for the last iteration was written to " + timeCostSummaryFilePath);
+
+			}
+
+
+			//Write Person Time Cost File for the last Iteration
+			if(event.getIteration()==event.getControler().getScenario().getConfig().controler().getLastIteration()){
+				String timeCostPersonFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostPerPerson.it"+event.getIteration()+".csv";
+				File timeCostPersonFile = new File(timeCostPersonFilePath);
+
+				BufferedWriter timeCostPersonWriter = new BufferedWriter(new FileWriter(timeCostPersonFile));
+				timeCostPersonWriter.write("Id;TTC_Total;SDC_total;TTC_morning;TTC_evening;SDC_morning;SDC_evening;");
+				timeCostPersonWriter.newLine();
+
+				double sumTTCTotal =0.0;
+				double sumSDCTotal = 0.0;
+
+				for(Id<Person> id:event.getControler().getPopulation().getPersons().keySet()){
+					if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
+						String data=id+";";
+						data+=this.scheduleDelayCostHandler.getTTC_morning().get(id)+";";
+						data+=this.scheduleDelayCostHandler.getTTC_morning().get(id)+";";
+						data+=this.scheduleDelayCostHandler.getSDC_morning().get(id)+";";
+						data+=this.scheduleDelayCostHandler.getSDC_evening().get(id)+";";
+
+						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_morning().get(id);;
+						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);
+
+						data+=sumTTCTotal+";";
+						data+=sumSDCTotal+";";
+						timeCostPersonWriter.write(data);
+						timeCostPersonWriter.newLine();
+					}
+				}
+				timeCostPersonWriter.close();
+				log.info("Time cost per person for the last iteration was written to " + timeCostPersonFilePath);
+			}
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
