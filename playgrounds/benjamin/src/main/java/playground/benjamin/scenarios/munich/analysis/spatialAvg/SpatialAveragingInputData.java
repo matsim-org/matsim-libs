@@ -199,4 +199,8 @@ public class SpatialAveragingInputData {
 		return (runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz");
 	}
 
+	public Double getScalingFactor() {
+		return this.scalingFactor;
+	}
+
 }
