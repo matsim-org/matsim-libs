@@ -29,10 +29,10 @@ import com.vividsolutions.jts.geom.Point;
 public class TripAnalyzer {
 	public static void main(String[] args) {
 	    // Parameters
-		boolean onlyCar = true; //car; new, should be used for runs with ChangeLedModes enabled
+		boolean onlyCar = false; //car; new, should be used for runs with ChangeLedModes enabled
 		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = false; // ber; usually varied for analysis
-		boolean distanceFilter = false; // dist; usually varied for analysis
+		boolean onlyBerlinBased = true; // ber; usually varied for analysis
+		boolean distanceFilter = true; // dist; usually varied for analysis
 		//double minDistance = 0;
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
@@ -42,8 +42,8 @@ public class TripAnalyzer {
 //		Integer maxAge = 119;	
 //		// --------------------------------------------------------------------------------------------------
 		
-		String runId = "run_171b";
-		String usedIteration = "100"; // most frequently used value: 150
+		String runId = "run_170c";
+		String usedIteration = "300"; // most frequently used value: 150
 	    
 	    int maxBinDuration = 120;
 	    int binWidthDuration = 1;

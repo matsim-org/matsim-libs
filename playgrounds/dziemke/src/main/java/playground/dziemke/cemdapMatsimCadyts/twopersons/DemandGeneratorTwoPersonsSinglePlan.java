@@ -45,7 +45,8 @@ public class DemandGeneratorTwoPersonsSinglePlan implements Runnable{
 	
 	
 	CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
-			carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId.toString());
+			//carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId.toString());
+			carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId);
 	List<CommuterRelation> commuterRelations = commuterFileReader.getCommuterRelations();
 //	private PendlerMatrixReader pendlerMatrixReader = new PendlerMatrixReader(shapeFileMunicipalities, commuterFileIn, 
 //			commuterFileOut, scalingFactor, carMarketShare, fullyEmployedShare);

@@ -74,7 +74,8 @@ public class HWHDemandGenerator {
 		Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileEvaluationArea, "NR");
 						
 		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
-				carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId.toString());
+				//carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId.toString());
+				carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId);
 		List<CommuterRelation> commuterRelations = commuterFileReader.getCommuterRelations();
 		
 		

@@ -47,23 +47,28 @@ public class CemdapStops2MatsimPlansConverter {
 	private static final Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	
 	// Parameters
-	private static int numberOfFirstFileLocation = 59;
+	private static int numberOfFirstFileLocation = 69;
 	private static int numberOfPlans = 3;
 	private static boolean addStayHomePlan = true;
 	
 	// Input and output
-	//private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/24n/";
-	private static String outputDirectory = "D:/Workspace/container/demand/input/cemdap2matsim/test/";
-	private static String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
-	private static String networkFile = "D:/Workspace/container/demand/input/iv_counts/network-base_ext.xml";
+	private static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/";
+	private static String tazShapeFile = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+	private static String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	
 	public static void main(String[] args) throws IOException {
 		// find respective stops file
-		Map<Integer, String> cemdapStopFilesMap = new HashMap<Integer, String>();
+		Map<Integer, String> cemdapStopsFilesMap = new HashMap<Integer, String>();
+		Map<Integer, String> cemdapToursFilesMap = new HashMap<Integer, String>();
+		Map<Integer, Map<String,String>> mapOfTourAttributesMaps = new HashMap<Integer, Map<String,String>>();
 		for (int i=0; i<numberOfPlans; i++) {
 			int numberOfCurrentInputFile = numberOfFirstFileLocation + i;
 			String cemdapStopsFile = "D:/Workspace/cemdap/Output/" + numberOfCurrentInputFile + "/stops.out1";
-			cemdapStopFilesMap.put(i, cemdapStopsFile);
+			String cemdapToursFile = "D:/Workspace/cemdap/Output/" + numberOfCurrentInputFile + "/tours.out1";
+			Map<String,String> tourAttributesMap = new HashMap<String,String>();
+			cemdapStopsFilesMap.put(i, cemdapStopsFile);
+			cemdapToursFilesMap.put(i, cemdapToursFile);
+			mapOfTourAttributesMaps.put(i, tourAttributesMap);
 		}
 	
 		// create ObjectAttrubutes for each agent
@@ -85,16 +90,23 @@ public class CemdapStops2MatsimPlansConverter {
 			combinedFeatures.put(id,feature);
 		}
 
+		// parse cemdap tours file
+		for (int i=0; i<numberOfPlans; i++) {
+			new CemdapToursParser().parse(cemdapToursFilesMap.get(i), mapOfTourAttributesMaps.get(i));
+		}
+		
 		// parse cemdap stops file
 		for (int i=0; i<numberOfPlans; i++) {
-			new CemdapStopsParser().parse(cemdapStopFilesMap.get(i), i, scenario, personObjectAttributesMap.get(i), false);
+			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(i), i, mapOfTourAttributesMaps.get(i), scenario,
+					personObjectAttributesMap.get(i), false);
 			new Feature2Coord().assignCoords(scenario, i, personObjectAttributesMap.get(i), combinedFeatures);
 		}
 				
 		// if applicable, add a stay-home plan
 		if (addStayHomePlan == true) {
-			int planNumber = numberOfPlans;
-			new CemdapStopsParser().parse(cemdapStopFilesMap.get(0), planNumber, scenario, personObjectAttributesMap.get(0), true);
+			int planNumber = numberOfPlans; // Thus, number of stay-home plan is one more than number of last plan.
+			new CemdapStopsParser().parse(cemdapStopsFilesMap.get(0), planNumber,mapOfTourAttributesMaps.get(0), scenario,
+					personObjectAttributesMap.get(0), true);
 			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributesMap.get(0), combinedFeatures);
 		}
 			

@@ -18,43 +18,57 @@ import playground.dziemke.cemdapMatsimCadyts.CommuterFileReader;
 import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
 import playground.dziemke.utils.TwoAttributeShapeReader;
 
-public class DemandGeneratorOnePersonV2 {
-	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV2.class);
+public class DemandGeneratorOnePersonV3 {
+	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV3.class);
 
 	public static void main(String[] args) {
-		// main parameters
+		
+		// Parameters
 		double scalingFactor = 0.01;
-		double carShareBE = 0.37;
-		double carShareBB = 0.55;
-		double allWorkersToSociallySecuredWorkersRatio = 1.52;
+		//double carShareInterior = 0.37;
+		double carShareInterior = 1.;
+		//double carShareExterior = xy;
+		double allWorkersToSociallySecuredWorkersRatio = 1.54;
 		double adultsToWorkersRatio = 1.9;
+		// The commuter file contains all commuter relations within the whole Bundesgebiet. We, however, only look
+		// at commuters within Berlin and Brandenburg. So, people commuting to locations outside of Berlin and
+		// Brandenburg are left out. This is done by checking for municipalities in shapefiles.
+		// Since traffic would, thus, be too low by these unconsidered commuting relations, a factor to balance this
+		// effect needs to be applied. By only looking at people living in Berlin (i.e. setting "commuterFileIn" to
+		// a dummy file that does not produce any relations) this factor has been determined as 1.06.
+		double factorToBalanceLeftOutRelations = 1.06;
+		double carShareExterior = 1/(allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio
+				* factorToBalanceLeftOutRelations);
 		double expansionFactor = 1.;
 		//int numberOfPlansPerPerson = 10;
-		int numberOfPlansPerPerson = 7;
-		// Gemeindeschluessel of Berlin is 11000000
+		int numberOfPlansPerPerson = 3;
+		// Gemeindeschluessel of Berlin is 11000000 (Gemeindeebene) and 11000 (Landkreisebene)
 		Integer planningAreaId = 11000000;
 		
 		
-		// input and output files
+		// Input and output files
 		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+		// Setting file of incoming commuters to "dummy" means that only interior traffic and traffic from interior
+		// to exterior, but not in the opposite direction will be considered.
+		//String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/dummy.txt";
 		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		
 		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test2/";
+		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/20/";
 		
 		initLogging(outputBase);
 		
 		
-		// create a PendlerMatrixReader and store its output to a list
-		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
-				//carShareBE, scalingFactor * socialSecurityFactor * adultsWorkersFactor * expansionFactor, planningAreaId.toString());
-				carShareBE, scalingFactor * allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio * expansionFactor, planningAreaId);
+		// Create a PendlerMatrixReader and store its output to a list
+		CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn,
+				carShareExterior, commuterFileOut, carShareInterior, scalingFactor * allWorkersToSociallySecuredWorkersRatio
+				* factorToBalanceLeftOutRelations * adultsToWorkersRatio * expansionFactor, planningAreaId);
 		List<CommuterRelation> commuterRelationList = commuterFileReader.getCommuterRelations();
 		
 		
-		// create storage objects
+		// Create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
 		Map<Integer, Household> householdMap = new HashMap<Integer, Household>();
 		Map<Integer, Map<String, SimplePerson>> mapOfPersonMaps = new HashMap<Integer, Map<String, SimplePerson>>();
@@ -64,11 +78,11 @@ public class DemandGeneratorOnePersonV2 {
 		}
 		
 		
-		// read in LORs	
+		// Read in LORs	
 		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
 		
 		
-		// create households and persons
+		// Create households and persons
 		int householdIdCounter = 1;
 		
 		
@@ -79,7 +93,7 @@ public class DemandGeneratorOnePersonV2 {
 			int sink = commuterRelationList.get(i).getTo();
 	        	
 			for (int j = 0; j<quantity; j++){
-				// create households
+				// Create households
 				int householdId = householdIdCounter;
 				int homeTSZLocation;
 					
@@ -92,30 +106,48 @@ public class DemandGeneratorOnePersonV2 {
 				householdMap.put(householdId, household);
 				
 				
-				// create persons
-				int sex = getSex();			
-				int age = getAge();
+				// Create persons
+				int sex = getSex();
+				int age;
+				if (source == planningAreaId){
+					// cf. p. 11 of statistic of 2012; population 18-... = 2932167;
+					age = getAge(2932167);
+				} else {
+					// cf. p. 11 of statistic of 2012; population 18-... = 2277234;
+					age = getAge(2277234);
+				}
 				String personId = householdId + "01";
 
 				int employed;
-				if (age > 65) {
-					employed = 0;
+				if (source == planningAreaId) {
+					if (age > 65) {
+						// TODO 64 or 65?
+						employed = 0;
+					} else {
+						employed = getEmployedWorkingAge();
+					}
 				} else {
-					employed = getEmployedWorkingAge();
+					employed = 1;
+					if (age > 65) {
+						throw new RuntimeException("In this implementation age for people living outside" +
+								"Berlin may not exceed 65 years, since only workers are cosnidered.");
+					}
 				}
 				
 				int student;
-				// we make the assumption that stundets are not employed at the same time and that students are
+				// We make the assumption that stundets are not employed at the same time and that students are
 				// aged less than 30 years
 				if (employed == 0 && age < 30) {
 					student = getStudent();
+					if (source != planningAreaId) {
+						throw new RuntimeException("In this implementation there are only students in Berlin.");
+					}
 				} else {
 					student = 0;
 				}
 				
 				for (int k=1; k<=numberOfPlansPerPerson; k++) {
 					int locationOfWork;
-					//if (sink == 11000000){
 					if (sink == planningAreaId){
 						locationOfWork = getRandomLor(lors);
 					} else {
@@ -124,10 +156,12 @@ public class DemandGeneratorOnePersonV2 {
 					
 					if (employed == 0) {
 						locationOfWork = -99;
+						if (source != planningAreaId) {
+							throw new RuntimeException("In this implementation there are only workers outside of Berlin.");
+						}
 					}
 					
 					int locationOfSchool;
-					//if (sink == 11000000){
 					if (sink == planningAreaId){
 						locationOfSchool = getRandomLor(lors);
 					} else {
@@ -138,7 +172,8 @@ public class DemandGeneratorOnePersonV2 {
 						locationOfSchool = -99;
 					}
 
-					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork, locationOfSchool, sex, age);
+					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork,
+							locationOfSchool, sex, age);
 					mapOfPersonMaps.get(k).put(personId, person);
 				}	
 				householdIdCounter++;
@@ -165,12 +200,13 @@ public class DemandGeneratorOnePersonV2 {
 	}
 	
 	
-	private static int getAge() {
-		int ageRange = getAgeRange();
+	private static int getAge(int maxAge) {
+		int ageRange = getAgeRange(maxAge);
 		
         // Es ist wichtig darauf zu achten, dass nach Ausführung einer Anweisung der Schleifendurchlauf mit "break"
         // unterbrochen wird, da die folgenden Sprungmarken sonst ebenfalls geprüft und ggf. ausgeführt werden.
-        // Trifft keine Übereinstimmung zu, kann optional mit der Sprungmarke default eine Standardanweisung ausgeführt werden. 
+        // Trifft keine Übereinstimmung zu, kann optional mit der Sprungmarke default eine Standardanweisung
+		// ausgeführt werden. 
         switch (ageRange) {
             case 1:	return getAgeInRange(18, 19);
             case 2:	return getAgeInRange(20, 24);
@@ -188,11 +224,9 @@ public class DemandGeneratorOnePersonV2 {
 	}
 	
 	
-	private static int getAgeRange() {
+	private static int getAgeRange(int maxAge) {
 		Random r = new Random();
-		// cf. p. 11 of statistic of 2012
-		int populationInWorkingAge = 2932167;
-		double randomNumber = r.nextDouble() * populationInWorkingAge;
+		double randomNumber = r.nextDouble() * maxAge;
 		if (randomNumber < 54469) {return 1;}
 		if (randomNumber < 54469+222434) {return 2;}
 		if (randomNumber < 54469+222434+284440) {return 3;}
@@ -235,7 +269,7 @@ public class DemandGeneratorOnePersonV2 {
 		// OLD: Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (266000)
 		// Number of  students in Berlin (150000) divided by non-employed population aged 18-29 (181000)
 		//TODO Correctly it has to be 150/181.
-		if (randomNumber < 150/266.) {
+		if (randomNumber < 150/181.) {
 			return 1;
 		} else {
 			return 0;
@@ -303,7 +337,8 @@ public class DemandGeneratorOnePersonV2 {
     }
 	
 
-	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households, String fileName) {
+	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households,
+			String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		
 		try {
@@ -313,9 +348,8 @@ public class DemandGeneratorOnePersonV2 {
 
     		int householdIdFromPersonBefore = 0;
     		
-    		// use map of persons to write a household for every person
-    		// under the condition that the household does not already exist (written from another persons)
-    		// this procedure is used to enable the potential use of multiple-person households
+    		// Use map of persons to write a household for every person under the condition that the household does not
+    		// already exist (written from another persons); used to enable the potential use of multiple-person households.
     		// TODO use proper household sizes
     		for (String key : persons.keySet()) {
     			int householdId = persons.get(key).getHouseholdId();
@@ -327,7 +361,7 @@ public class DemandGeneratorOnePersonV2 {
     				int numberOfChildren = households.get(householdId).getNumberOfChildren();
     				int householdStructure = households.get(householdId).getHouseholdStructure();
     				
-    				// altogether this creates 32 columns = number in query file
+    				// Altogether this creates 32 columns = number in query file
     				bufferedWriterHouseholds.write(householdId + "\t" + numberOfAdults + "\t" + totalNumberOfHouseholdVehicles
     						 + "\t" + homeTSZLocation + "\t" + numberOfChildren + "\t" + householdStructure + "\t" + 0
     						 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0

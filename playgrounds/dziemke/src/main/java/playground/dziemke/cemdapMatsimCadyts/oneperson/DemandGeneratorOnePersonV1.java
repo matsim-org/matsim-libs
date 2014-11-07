@@ -55,7 +55,8 @@ public class DemandGeneratorOnePersonV1 {
 	
 	// create a CommuterFileReader and store its output to a list
 	CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, carShareBB,	commuterFileOut, 
-			carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId.toString());
+			//carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId.toString());
+			carShareBE, scalingFactor * socialSecurityFactor * expansionFactor, planningAreaId);
 	List<CommuterRelation> commuterRelations = commuterFileReader.getCommuterRelations();
 //	CommuterFileReader commuterFileReader = new CommuterFileReader(shapeFileMunicipalities, commuterFileIn, 
 //			commuterFileOut, scalingFactor * carFactor * socialSecurityFactor, planningAreaId.toString());

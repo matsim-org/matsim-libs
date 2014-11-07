@@ -4,11 +4,13 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -22,19 +24,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class PlanFileModifier {
 	// Parameters
 	static double selectionProbability = 1.;
-	static boolean onlyTransferSelectedPlan = true;
+	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
-	static int maxNumberOfAgentsConsidered = 10000000;
+	static boolean onlyConsiderPeopleAlwaysGoingByCar = true;
+	static int maxNumberOfAgentsConsidered = 1000000;
 	static String runId = "run_171";
 	static int iteration = 300;
 	
 	
 	// Input and output files
-	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
+//	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans.xml.gz";
+//	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
+	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans_car.xml.gz";
 	
 	
 	public static void main(String[] args) {
@@ -67,6 +72,34 @@ public class PlanFileModifier {
 					}
 				}
 				
+				// ------------------------------------------------------------------------------------
+				int numberOfPlans = person.getPlans().size();
+				
+				if (onlyConsiderPeopleAlwaysGoingByCar == true) {
+					for (int i=0; i < numberOfPlans; i++) {
+						//boolean considerPlan = true;
+						
+						Plan plan = person.getPlans().get(i);
+						//int numberOfPlanElements = plan.getPlanElements().size();
+						
+						int numberOfPlanElements = plan.getPlanElements().size();
+						for (int j=0; j < numberOfPlanElements; j++) {
+							if (plan.getPlanElements().get(j) instanceof Leg) {
+								LegImpl leg = (LegImpl) plan.getPlanElements().get(j);
+								if (!leg.getMode().equals("car")) {
+									considerPerson = false;
+								}
+							}
+						}
+						
+					}
+				} else {
+					// do not switch "considerPerson"
+				}
+				
+				
+				// ------------------------------------------------------------------------------------
+				
 				if (randomNumber <= selectionProbability) {
 					if (considerPerson == true) {
 						Id<Person> id = person.getId();
@@ -78,7 +111,7 @@ public class PlanFileModifier {
 						} else {
 							Person person2 = population.getFactory().createPerson(id);
 							
-							int numberOfPlans = person.getPlans().size();
+							//int numberOfPlans = person.getPlans().size();
 							for (int i=0; i < numberOfPlans; i++) {
 								boolean considerPlan = true;
 								

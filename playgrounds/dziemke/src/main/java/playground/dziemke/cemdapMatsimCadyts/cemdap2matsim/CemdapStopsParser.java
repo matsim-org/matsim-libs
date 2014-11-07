@@ -23,6 +23,7 @@ package playground.dziemke.cemdapMatsimCadyts.cemdap2matsim;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -36,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -56,7 +58,7 @@ public class CemdapStopsParser {
 	// cemdap stop file columns
 	private static final int HH_ID = 0;
 	private static final int P_ID = 1;
-	//private static final int TOUR_ID = 2;
+	private static final int TOUR_ID = 2;
 	//private static final int STOP_ID = 3;
 	private static final int ACT_TYPE = 4;
 	private static final int START_TT_TO_STOP = 5;
@@ -76,13 +78,15 @@ public class CemdapStopsParser {
 
 	
 	// parse method
-	public final void parse(String cemdapStopsFile, int planNumber, Scenario scenario, ObjectAttributes personObjectAttributes, boolean stayHomePlan) {
+	public final void parse(String cemdapStopsFile, int planNumber, Map<String, String> tourAttributesMap,
+			Scenario scenario, ObjectAttributes personObjectAttributes, boolean stayHomePlan) {
 		Population population = scenario.getPopulation();
 		int lineCount = 0;
 
 		try {
 			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapStopsFile);
-			String currentLine = bufferedReader.readLine();
+			//String currentLine = bufferedReader.readLine();
+			String currentLine = null;
 
 			// data
 			while ((currentLine = bufferedReader.readLine()) != null) {
@@ -96,7 +100,19 @@ public class CemdapStopsParser {
 				
 				Integer householdId = Integer.parseInt(entries[HH_ID]);
 				Integer personId = Integer.parseInt(entries[P_ID]);
+				Integer tourId = Integer.parseInt(entries[TOUR_ID]);
+				
 				Id<Person> agentId = Id.create(householdId+"_"+personId, Person.class);
+				String combinedId = householdId.toString() + "_" + personId.toString() + "_" + tourId.toString();
+				
+				if (!tourAttributesMap.containsKey(combinedId)) {
+					throw new RuntimeException("Tour attributes map does not contain tour with ID: " + combinedId);
+				} else {
+//					if (tourAttributesMap.get(combinedId).equals("car")) {
+//					} else {
+//						continue;
+//					}
+				}
 		
 				// create a person if a person with that agentId does not already exist
 				Person person = population.getPersons().get(agentId);
@@ -132,6 +148,9 @@ public class CemdapStopsParser {
 					// add a leg to the plan
 					Leg leg = population.getFactory().createLeg(TransportMode.car);
 					leg.setDepartureTime(departureTime);
+					
+					leg.setMode(tourAttributesMap.get(combinedId));
+					
 					plan.addLeg(leg);
 					
 					// add an activity to the plan
