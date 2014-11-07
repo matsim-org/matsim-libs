@@ -26,6 +26,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author lkroeger
@@ -42,13 +45,13 @@ public final class NoiseEventCaused extends Event {
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
 	public final static String ATTRIBUTE_CARORHDV_ENUM = "vehicleType";
 	
-	private final Id causingAgentId;
-	private final Id causingVehicleId;
+	private final Id<Person> causingAgentId;
+	private final Id<Vehicle> causingVehicleId;
 	private double amount;
-	private final Id linkId;
+	private final Id<Link> linkId;
 	private NoiseVehicleType carOrHdv;
 	
-	public NoiseEventCaused(double time , Id causingAgentId , Id causingVehicleId , double amount , Id linkId , NoiseVehicleType carOrHdv) {
+	public NoiseEventCaused(double time , Id<Person> causingAgentId , Id<Vehicle> causingVehicleId , double amount , Id<Link> linkId , NoiseVehicleType carOrHdv) {
 		super(time);
 		this.causingAgentId = causingAgentId;
 		this.causingVehicleId = causingVehicleId;
@@ -57,15 +60,15 @@ public final class NoiseEventCaused extends Event {
 		this.carOrHdv = carOrHdv;
 	}
 	
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 	
-	public Id getCausingVehicleId() {
+	public Id<Vehicle> getCausingVehicleId() {
 		return causingVehicleId;
 	}
 	
-	public Id getCausingAgentId() {
+	public Id<Person> getCausingAgentId() {
 		return causingAgentId;
 	}
 	

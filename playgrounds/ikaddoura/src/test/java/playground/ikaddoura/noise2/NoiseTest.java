@@ -40,8 +40,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.ikaddoura.noise2.NoiseSpatialInfo.ReceiverPoint;
-
 /**
  * @author ikaddoura , lkroeger
  *

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author lkroeger, ikaddoura
@@ -41,12 +42,12 @@ public final class NoiseEventAffected extends Event {
 	public final static String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
 	public final static String ATTRIBUTE_ACTIVTITY_TYPE = "activityType";
 	
-	private final Id affectedAgentId;
+	private final Id<Person> affectedAgentId;
 	private double amount;
-	private final Id receiverPointId;
+	private final Id<ReceiverPoint> receiverPointId;
 	private String actType;
 	
-	public NoiseEventAffected(double time , Id affectedAgentId , double amount , Id receiverPointId , String actType) {
+	public NoiseEventAffected(double time , Id<Person> affectedAgentId , double amount , Id<ReceiverPoint> receiverPointId , String actType) {
 		super(time);
 		this.affectedAgentId = affectedAgentId;
 		this.amount = amount;
@@ -54,11 +55,11 @@ public final class NoiseEventAffected extends Event {
 		this.actType = actType;
 	}
 	
-	public Id getrReceiverPointId() {
+	public Id<ReceiverPoint> getrReceiverPointId() {
 		return receiverPointId;
 	}
 	
-	public Id getAffectedAgentId() {
+	public Id<Person> getAffectedAgentId() {
 		return affectedAgentId;
 	}
 	

@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -49,7 +51,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseEmissionHandler.class);
 	
-	private final List<Id> hdvVehicles = new ArrayList<Id>();
+	private final List<Id<Vehicle>> hdvVehicles = new ArrayList<Id<Vehicle>>();
 	
 	private Scenario scenario;
 	
@@ -57,15 +59,15 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	private List<LinkEnterEvent> linkEnterEventsCar = new ArrayList<LinkEnterEvent>();
 	private List<LinkEnterEvent> linkEnterEventsHdv = new ArrayList<LinkEnterEvent>();
 	
-	private Map<Id,List<LinkEnterEvent>> linkId2linkEnterEvents = new HashMap<Id, List<LinkEnterEvent>>();
-	private Map<Id,List<LinkEnterEvent>> linkId2linkEnterEventsCar = new HashMap<Id, List<LinkEnterEvent>>();
-	private Map<Id,List<LinkEnterEvent>> linkId2linkEnterEventsHdv = new HashMap<Id, List<LinkEnterEvent>>();
-	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEvents = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
-	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsCar = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
-	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsHdv = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
+	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEvents = new HashMap<Id<Link>, List<LinkEnterEvent>>();
+	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEventsCar = new HashMap<Id<Link>, List<LinkEnterEvent>>();
+	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEventsHdv = new HashMap<Id<Link>, List<LinkEnterEvent>>();
+	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEvents = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
+	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsCar = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
+	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsHdv = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
 	
 	// output
-	private Map<Id,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id, Map<Double,Double>>();
+	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id<Link>, Map<Double,Double>>();
 	
 	public NoiseEmissionHandler (Scenario scenario) {
 		this.scenario = scenario;
@@ -85,7 +87,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		linkId2timeInterval2noiseEmission.clear();
 	}
 	
-	public void setHdvVehicles(ArrayList<Id> hdvVehicles) {
+	public void setHdvVehicles(ArrayList<Id<Vehicle>> hdvVehicles) {
 		if (hdvVehicles == null){
 			log.warn("No HDV vehicle information provided. All vehicles are considered as cars and the HGV share is set to zero.");
 		} else {
@@ -144,23 +146,23 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		}
 	}
 	
-	public Map<Id, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
+	public Map<Id<Link>, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
 		return linkId2timeInterval2noiseEmission;
 	}
 	
-	public List<Id> getHdvVehicles() {
+	public List<Id<Vehicle>> getHdvVehicles() {
 		return hdvVehicles;
 	}
 	
-	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEvents() {
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEvents() {
 		return linkId2timeInterval2linkEnterEvents;
 	}
 
-	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsCar() {
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsCar() {
 		return linkId2timeInterval2linkEnterEventsCar;
 	}
 
-	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsHdv() {
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsHdv() {
 		return linkId2timeInterval2linkEnterEventsHdv;
 	}
 
@@ -171,7 +173,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		
 		log.info("Calculating noise emission for each link and for each time interval...");
 		// link
-		for (Id linkId : scenario.getNetwork().getLinks().keySet()){
+		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			Map<Double,Double> timeInterval2NoiseEmission = new HashMap<Double, Double>();
 			
 			double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -208,7 +210,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	private void preProcessData() {
 		
 		// link
-		for (Id linkId : scenario.getNetwork().getLinks().keySet()) {
+		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 
 			// initialize
 			Map<Double,List<LinkEnterEvent>> timeInterval2linkEnterEvents = new HashMap<Double, List<LinkEnterEvent>>();
@@ -357,7 +359,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				}
 			}
 			
-			for (Id linkId : this.linkId2timeInterval2noiseEmission.keySet()){
+			for (Id<Link> linkId : this.linkId2timeInterval2noiseEmission.keySet()){
 				double avgNoise = 0.;
 				double avgNoiseDay = 0.;
 				double avgNoiseNight = 0.;
@@ -436,7 +438,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			}
 			bw.newLine();
 			
-			for (Id linkId : this.linkId2timeInterval2noiseEmission.keySet()){
+			for (Id<Link> linkId : this.linkId2timeInterval2noiseEmission.keySet()){
 				bw.write(linkId.toString()+";"); 
 				for(int i = 0 ; i < 30 ; i++) {
 					bw.write(";hour_"+i+";"+linkId2timeInterval2linkEnterEvents.get(linkId).get((i+1)*3600.).size()+";"+linkId2timeInterval2noiseEmission.get(linkId).get((i+1)*3600.)+";");	

@@ -259,7 +259,7 @@ public class NoiseSpatialInfo {
 				
 		int xii = 0;
 
-		for (Id id : receiverPointId2Coord.keySet()) {
+		for (Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
 			
 			xii++;
 			
@@ -694,10 +694,4 @@ public class NoiseSpatialInfo {
 		return zoneTuple2listOfReceiverPointIds;
 	}
 
-	/**
-	 * only used for typed Ids
-	 */
-	public static interface ReceiverPoint {
-	}
-	
 }
