@@ -19,6 +19,9 @@
 
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -146,5 +149,30 @@ public class SpatialGrid {
 		int xGrid = (int) Math.floor((x-gridMinX)/cellWidth);
 		if(xGrid>=0 && xGrid<numberOfCellsX) return xGrid;
 		return -1;
+	}
+	
+	public void addWeightedValueToCell (int xCell, int yCell, double value){
+		this.grid[xCell][yCell].addWeightedValue(value);
+	}
+
+	public void addWeightedValueToCell(Cell cell, double d) {
+		this.addWeightedValueToCell(cell.getXNumber(), cell.getYNumber(), d);
+		
+	}
+	
+	public Cell[][] getGrid(){
+		return grid;
+	}
+
+	public List<Cell> getCells() {
+		List<Cell> listOfAllCells = new ArrayList<Cell>();
+		
+		for(int i=0; i<numberOfCellsX; i++){
+			for(int j=0; j<numberOfCellsY; j++){
+				listOfAllCells.add(grid[i][j]);
+			}
+		}
+		
+		return listOfAllCells;
 	}
 }
