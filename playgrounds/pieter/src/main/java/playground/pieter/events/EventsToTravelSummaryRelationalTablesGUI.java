@@ -47,8 +47,15 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 	private final JTextField eventsToSQLPropertiesFileComponent;
 	private final JTextField networkFileComponent;
 	private final JTextField eventsFileComponent;
+    private String transitScheduleFile = "transitschedule.xml";
+    private String networkFile = "multimodalnetwork.xml";
+    private String eventsFile = "events.xml.gz";
+    private String configFile = "config.xml";
+    private String outputPath = "./";
+    private String schemaName = "m_calibration";
+    private String postgresProperties = "matsim2postgres.properties";
 	private Properties defaultProperties;
-    private final String tableSuffix = "_ezlinksim";
+    private  String tableSuffix = "_ezlinksim";
     private final EventsToTravelSummaryRelationalTablesGUI self = this;
 	private String defaultpath = "";
 
@@ -448,24 +455,19 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 					e.printStackTrace();
 				}
             }
+            setComponentValues();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void setComponentValues() {
-        String schemaName = "u_fouriep";
         schemaNameComponent.setText(schemaName);
-        String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
         transitScheduleFileComponent.setText(transitScheduleFile);
-        String postgresProperties = "data/matsim2postgres.properties";
         postgresPropertiesComponent.setText(postgresProperties);
 		tableSuffixComponent.setText(tableSuffix);
-        String configFile = "examples/pt-tutorial/0.config.xml";
         configFileComponent.setText(configFile);
-        String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
         networkFileComponent.setText(networkFile);
-        String eventsFile = "output/pt-tutorial/ITERS/it.0/0.events.xml.gz";
         eventsFileComponent.setText(eventsFile);
 		// linkTrafficComponent.setSelected(Boolean.parseBoolean(linkTraffic));
 	}
