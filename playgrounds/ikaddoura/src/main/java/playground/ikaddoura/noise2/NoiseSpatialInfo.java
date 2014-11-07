@@ -28,12 +28,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +47,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.PtConstants;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Contains all spatial information for the RLS approach 'Lange gerade Fahrstreifen' to calculate noise immission.
@@ -186,6 +197,7 @@ public class NoiseSpatialInfo {
 	
 	private void writeReceiverPoints() {
 
+		// csv file
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
 		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
@@ -207,6 +219,34 @@ public class NoiseSpatialInfo {
 		values.add(id2yCoord);
 		
 		write(scenario.getConfig().controler().getOutputDirectory() + "/", 3, headers, values);
+		
+		// shape file		
+		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
+		tbuilder.setName("shape");
+		tbuilder.add("geometry", Point.class);
+		tbuilder.add("pointId", String.class);
+		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
+		
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		
+		GeometryFactory gf = new GeometryFactory();
+		int i = 0;
+		for(Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
+			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
+				gf.createPoint(MGC.coord2Coordinate(receiverPointId2Coord.get(id))),
+				id
+			});
+			features.add(feature);			
+			i++;
+		}
+		String filePath = scenario.getConfig().controler().getOutputDirectory() + "/receiverPoints/";
+		File file = new File(filePath);
+		file.mkdirs();
+		
+		log.info("Writing out receiver points to shapefile... ");
+		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
+		log.info("Writing out receiver points to shapefile... Done. ");
 	}
 	
 	private void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {

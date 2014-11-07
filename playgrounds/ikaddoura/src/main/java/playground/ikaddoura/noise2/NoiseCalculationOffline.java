@@ -51,7 +51,8 @@ public class NoiseCalculationOffline {
 			log.info("runDirectory: " + runDirectory);
 						
 		} else {
-			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+//			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -64,7 +65,8 @@ public class NoiseCalculationOffline {
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(100);
+//		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(5);
 		// Hopefully this is all information required from the config file... Alternatively, read in the output config.
 		
 		log.info("Loading scenario...");
@@ -77,8 +79,8 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-//		events.addHandler(eventWriter);
+		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario);
 		spatialInfo.setActivityCoords();
@@ -117,7 +119,7 @@ public class NoiseCalculationOffline {
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputDirectory + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 				
-//		eventWriter.closeFile();
+		eventWriter.closeFile();
 	}
 }
 		

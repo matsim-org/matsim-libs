@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -617,26 +618,46 @@ public class NoiseImmission {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\",\"Real\",\"Real\",\"Real\",\"Real\"");
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 				
 	}
 	
 	public void writeNoiseImmissionStatsPerHour(String fileName) {
 		File file = new File(fileName);
-		
+			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("receiver point;");
-		
+			
+			// column headers
+			bw.write("receiver point");
 			for(int i = 0; i < 30 ; i++) {
-				bw.write(";time;affected agent units;noise immission;");
+				String time = Time.writeTime( (i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				bw.write(";agent units " + time + ";noise immission " + time);
 			}
 			bw.newLine();
+
 			
 			for (Id<ReceiverPoint> rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
-				bw.write(rpId.toString() + ";");
-				for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(rpId).keySet()) {
+				bw.write(rpId.toString());
+				for(int i = 0 ; i < 30 ; i++) {
+					double timeInterval = (i+1) * NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 					double affectedAgentUnits = 0.;
 					double noiseImmission = 0.;
+					
 					if (receiverPointId2timeInterval2affectedAgentUnits.get(rpId) != null) {
 						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(rpId).get(timeInterval);
 					}
@@ -644,9 +665,10 @@ public class NoiseImmission {
 					if (receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval) != null) {
 						noiseImmission = receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval);
 					}
-
-					bw.write(";" + timeInterval + ";" + affectedAgentUnits + ";" + noiseImmission + ";");	
+					
+					bw.write(";"+ affectedAgentUnits + ";" + noiseImmission);	
 				}
+				
 				bw.newLine();
 			}
 			
@@ -657,6 +679,24 @@ public class NoiseImmission {
 			e.printStackTrace();
 		}
 		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\"");
+			
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(",\"Real\",\"Real\"");
+			}
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 	
 	// analysis

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -423,6 +424,21 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\",\"Real\",\"Real\",\"Real\",\"Real\"");
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 				
 	}
 	
@@ -431,23 +447,44 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("link;");
-		
+			
+			// column headers
+			bw.write("link");
 			for(int i = 0; i < 30 ; i++) {
-				bw.write(";hour"+i+";leaving agents (per hour);noiseEmission;");
+				String time = Time.writeTime( (i+1) * NoiseConfigParameters.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				bw.write(";demand " + time + ";noise emission " + time);
 			}
 			bw.newLine();
 			
 			for (Id<Link> linkId : this.linkId2timeInterval2noiseEmission.keySet()){
-				bw.write(linkId.toString()+";"); 
+				bw.write(linkId.toString()); 
 				for(int i = 0 ; i < 30 ; i++) {
-					bw.write(";hour_"+i+";"+linkId2timeInterval2linkEnterEvents.get(linkId).get((i+1)*3600.).size()+";"+linkId2timeInterval2noiseEmission.get(linkId).get((i+1)*3600.)+";");	
+					bw.write(";"+ ((linkId2timeInterval2linkEnterEvents.get(linkId).get((i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation()).size()) * NoiseConfigParameters.getScaleFactor()) + ";"+linkId2timeInterval2noiseEmission.get(linkId).get((i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation()));	
 				}
 				bw.newLine();
 			}
 			
 			bw.close();
 			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\"");
+			
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(",\"Real\",\"Real\"");
+			}
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
