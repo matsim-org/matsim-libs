@@ -1,5 +1,6 @@
 package matsimConnector.scenario;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -57,8 +58,14 @@ public class CAScenario {
 	}
 	
 	private void loadConfiguration(String path){
-		Context context = new Context(path);
-		addCAEnvironment(new CAEnvironment(""+0, context));
+		Context context;
+		try {
+			context = new Context(path);
+			addCAEnvironment(new CAEnvironment(""+0, context));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void connect(CAEnvironment environmentCA, Network scNet) {

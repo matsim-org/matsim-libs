@@ -16,7 +16,7 @@ public class EnvironmentGrid extends Grid<Integer>{
 		super(rows, cols);
 	}
 	
-	public EnvironmentGrid(String path){
+	public EnvironmentGrid(String path) throws IOException{
 		super(path+"/input/environment/environmentGrid.csv");
 	}
 	

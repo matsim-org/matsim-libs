@@ -1,5 +1,7 @@
 package pedCA.engine;
 
+import java.io.IOException;
+
 import pedCA.context.Context;
 import pedCA.output.Log;
 
@@ -20,7 +22,7 @@ public class SimulationEngine {
 		agentMover = new AgentMover(context);
 	}
 	
-	public SimulationEngine(int finalStep, String path){
+	public SimulationEngine(int finalStep, String path) throws IOException{
 		this(finalStep,new Context(path));
 	}
 	

@@ -17,10 +17,12 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QCALink;
 
 import pedCA.engine.SimulationEngine;
+import pedCA.output.Log;
 
 
 public class CAEngine implements MobsimEngine{
 	
+	private final QSim qSim;
 	private final Scenario scenario;
 	private final CAScenario scenarioCA;
 	private Map<Id<CAEnvironment>, SimulationEngine> enginesCA;
@@ -31,6 +33,7 @@ public class CAEngine implements MobsimEngine{
 	private double simCATime;
 	
 	public CAEngine(QSim qSim, CAAgentFactory agentFactoryCA){
+		this.qSim = qSim;
 		this.simCATime = 0.0;
 		this.scenario = qSim.getScenario();
 		this.scenarioCA = (CAScenario) scenario.getScenarioElement(Constants.CASCENARIO_NAME);
@@ -51,8 +54,8 @@ public class CAEngine implements MobsimEngine{
 	@Override
 	public void doSimStep(double time) {
 		double stepDuration = Constants.CA_STEP_DURATION;
-		//TODO FIX THIS
-		for (; simCATime < time + stepDuration; simCATime+=stepDuration) 
+		Log.log("------> BEGINNING STEPS AT "+time);
+		for (; simCATime < time; simCATime+=stepDuration) 
 			for (SimulationEngine engine : enginesCA.values()) 
 				engine.doSimStep(simCATime);		
 	}
@@ -77,7 +80,7 @@ public class CAEngine implements MobsimEngine{
 	
 	private void createAndAddEngine(CAEnvironment environmentCA){
 		SimulationEngine engine = new SimulationEngine(environmentCA.getContext());
-		engine.setAgentMover(new CAAgentMover(this, environmentCA.getContext()));
+		engine.setAgentMover(new CAAgentMover(this, environmentCA.getContext(),qSim.getEventsManager()));
 		enginesCA.put(environmentCA.getId(), engine);
 	}
 

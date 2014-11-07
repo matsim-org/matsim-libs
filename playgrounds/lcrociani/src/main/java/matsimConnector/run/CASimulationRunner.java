@@ -40,6 +40,19 @@ public class CASimulationRunner implements IterationStartsListener{
 		CAMobsimFactory factoryCA = new CAMobsimFactory();
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 		
+		//if (args.length > 0 && args[0].equals("true")) {
+			// VIS only
+
+			//EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(scenario);
+			//InfoBox iBox = new InfoBox(dbg, scenario);
+			//dbg.addAdditionalDrawer(iBox);
+			//controller.getEvents().addHandler(dbg);
+			//dbg.addAdditionalDrawer(new Branding());
+			//QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			//dbg.addAdditionalDrawer(qDbg);
+			//controller.getEvents().addHandler(qDbg);
+		//}
+		
 		controller.run();
 	}
 	

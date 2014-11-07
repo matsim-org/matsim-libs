@@ -10,7 +10,7 @@ public class CAAgentConstructEvent extends Event{
 
 	public static final String EVENT_TYPE = "CAAgentConstructEvent";
 	public static final String ATTRIBUTE_PERSON = "pedestrian";
-	private Pedestrian pedestrian;
+	private final Pedestrian pedestrian;
 	
 	public CAAgentConstructEvent(double time, Pedestrian pedestrian) {
 		super(time);
@@ -29,4 +29,7 @@ public class CAAgentConstructEvent extends Event{
 		return attr;
 	}
 
+	public Pedestrian getPedestrian(){
+		return pedestrian;
+	}
 }

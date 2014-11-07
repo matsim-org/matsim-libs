@@ -50,7 +50,7 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 			return hiResLink;
 		} 
 		else if (isCAQLink) {
-			createCAQLink(qLink);
+			createCAQLink(network, qLink);
 			return qLink;
 		}
 		else if (isCALink){
@@ -60,7 +60,7 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 		return qLink;
 	}
 
-	protected CAQLink createCAQLink(QLinkInternalI qLink) {
+	protected CAQLink createCAQLink(QNetwork network, QLinkInternalI qLink) {
 		CAEnvironment environmentCA = this.scenarioCA.getCAEnvironment(qLink.getLink());
 		Node borderNode = qLink.getLink().getFromNode();
 		TransitionArea transitionArea;
@@ -68,7 +68,7 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 			transitionArea = nodeToTransitionArea.get(borderNode);
 		else
 			transitionArea = createTransitionArea(borderNode, environmentCA);
-		CAQLink lowResLink = new CAQLink(qLink, transitionArea);
+		CAQLink lowResLink = new CAQLink(network, qLink, transitionArea);
 		this.engineCA.registerLowResLink(lowResLink);
 		return lowResLink;
 	}

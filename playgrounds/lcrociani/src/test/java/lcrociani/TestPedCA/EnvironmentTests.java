@@ -15,6 +15,7 @@ import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.MarkerConfiguration;
+import pedCA.output.Log;
 import scenarios.EnvironmentGenerator;
 
 public class EnvironmentTests extends MatsimTestCase {
@@ -118,11 +119,13 @@ public class EnvironmentTests extends MatsimTestCase {
 			e.printStackTrace();
 		}
 		
-		Context context2 = new Context(path);
+		Context context2 = null;
 		try {
+			context2 = new Context(path);
 			context2.saveConfiguration("c:/tmp/pedCATest2/corridor");
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			Log.error("Path not found!");
+			return;
 		}
 		
 		//CHECK MARKER CONFIGURATION
@@ -153,8 +156,14 @@ public class EnvironmentTests extends MatsimTestCase {
 	@Test
 	public void testNetwork(){
 		String path = "c:/tmp/pedCATest/corridor";
-		Context context = new Context(path);
-		System.out.println(context.getNetwork().toString());
+		Context context= null;
+		try {
+			context = new Context(path);
+			System.out.println(context.getNetwork().toString());
+		} catch (IOException e) {
+			Log.error("Path not found!");
+			return;
+		}
 	}
 		
 }

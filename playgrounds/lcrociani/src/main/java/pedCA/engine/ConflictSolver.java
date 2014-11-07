@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.jfree.util.Log;
+
 import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
@@ -90,7 +92,7 @@ public class ConflictSolver {
 			for(int j = i+1; j < listaCompletaPedoni.size(); j++)
 			{
 				if(listaCompletaPedoni.get(i).getNewPosition().equals(listaCompletaPedoni.get(j).getNewPosition())){
-					System.out.println("errur");
+					Log.error("Error in Conflict Solving!!");
 				}
 			}
 		}

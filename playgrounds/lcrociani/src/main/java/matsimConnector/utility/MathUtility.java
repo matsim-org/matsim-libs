@@ -24,4 +24,9 @@ public class MathUtility {
 		point.setX((int)x_res);
 	    point.setY((int)y_res);
 	}
+	
+	public static double convertGridCoordinate(int monodimCoord){
+		return (monodimCoord+0.5)*Constants.CA_CELL_SIDE;
+	}
+	
 }

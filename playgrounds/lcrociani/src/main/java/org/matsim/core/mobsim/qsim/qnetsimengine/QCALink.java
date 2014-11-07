@@ -10,6 +10,7 @@ import matsimConnector.scenario.CAEnvironment;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -18,7 +19,7 @@ public class QCALink extends AbstractQLink {
 
 	private final Link link;
 	private final QNetwork qNetwork;
-	private QLinkInternalI qLink;
+	//private QLinkInternalI qLink;
 	private final CAEnvironment environmentCA;
 	private final CAAgentFactory agentFactoryCA;
 	private final TransitionArea transitionArea;
@@ -26,7 +27,7 @@ public class QCALink extends AbstractQLink {
 	public QCALink(Link link, QNetwork network, QLinkInternalI qLink, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea) {
 		super(link, network);
 		this.link = link;
-		this.qLink = qLink;
+		//this.qLink = qLink;
 		this.qNetwork = network;
 		this.environmentCA = environmentCA;
 		this.agentFactoryCA = agentFactoryCA;
@@ -78,22 +79,30 @@ public class QCALink extends AbstractQLink {
 		Pedestrian pedestrian = this.agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
 				
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
-		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(now, pedestrian));
+		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+				now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(
+				now, pedestrian));
 	}
 
+	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
+		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+				now, vehicle.getDriver().getId(), this.link.getId(), vehicle.getId()));
+		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+				now, vehicle.getDriver().getId(), nextLinkId, vehicle.getId()));
+	}
+	
 	@Override
 	boolean isNotOfferingVehicle() {
 		// NOT NEEDED
 		throw new RuntimeException("Method not needed for the moment");
 	}
-
+	
 	@Override
-	public QVehicle popFirstVehicle() {
-		return qLink.popFirstVehicle();
-		
+	public QVehicle popFirstVehicle() {		
 		// NOT NEEDED
-		//throw new RuntimeException("Method not needed for the moment");
+		throw new RuntimeException("Method not needed for the moment");
 	}
 
 	@Override

@@ -10,13 +10,9 @@ public abstract class Grid <T>{
 		initGrid(rows, cols);
 	}
 	
-	public Grid(String fileName){
+	public Grid(String fileName) throws IOException{
 		initEmptyGrid();
-		try {
-			loadFromCSV(fileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		loadFromCSV(fileName);
 	}
 	
 	protected void initEmptyGrid(){
