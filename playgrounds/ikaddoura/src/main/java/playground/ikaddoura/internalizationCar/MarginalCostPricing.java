@@ -74,7 +74,6 @@ public class MarginalCostPricing implements StartupListener, IterationEndsListen
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
 		log.info("Set average tolls for each link Id and time bin...");
 		tollHandler.setLinkId2timeBin2avgToll();
 		log.info("Set average tolls for each link Id and time bin... Done.");
