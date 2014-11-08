@@ -394,17 +394,18 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 				for(Id<Person> id:event.getControler().getPopulation().getPersons().keySet()){
 					if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
+						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_evening().get(id);
+						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);
+
 						String data=id+";";
+						data+=sumTTCTotal+";";
+						data+=sumSDCTotal+";";
+						
 						data+=this.scheduleDelayCostHandler.getTTC_morning().get(id)+";";
-						data+=this.scheduleDelayCostHandler.getTTC_morning().get(id)+";";
+						data+=this.scheduleDelayCostHandler.getTTC_evening().get(id)+";";
 						data+=this.scheduleDelayCostHandler.getSDC_morning().get(id)+";";
 						data+=this.scheduleDelayCostHandler.getSDC_evening().get(id)+";";
 
-						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_morning().get(id);;
-						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);
-
-						data+=sumTTCTotal+";";
-						data+=sumSDCTotal+";";
 						timeCostPersonWriter.write(data);
 						timeCostPersonWriter.newLine();
 					}
