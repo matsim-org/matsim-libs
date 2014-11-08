@@ -39,7 +39,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 public class EmissionUtilsExtended extends EmissionUtils{
 	
 	
-	public  Map<Id<Person>, SortedMap<String, Double>> convertPerPersonColdEmissions2String (Population pop, Map<Id<Link>, Map<ColdPollutant, Double>> coldEmiss) {
+	public  Map<Id<Person>, SortedMap<String, Double>> convertPerPersonColdEmissions2String (Population pop, Map<Id<Person>, Map<ColdPollutant, Double>> coldEmiss) {
 		Map<Id<Person>, SortedMap<String, Double>> outColdEmiss = new HashMap<>() ;
 		for(Person person : pop.getPersons().values()) {
 			Id<Person> personId = person.getId();
