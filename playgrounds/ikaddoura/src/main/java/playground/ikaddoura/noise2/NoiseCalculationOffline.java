@@ -83,8 +83,8 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
+//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+//		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario);
 		spatialInfo.setActivityCoords();
@@ -123,7 +123,7 @@ public class NoiseCalculationOffline {
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputDirectory + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 				
-		eventWriter.closeFile();
+//		eventWriter.closeFile();
 	}
 }
 		
