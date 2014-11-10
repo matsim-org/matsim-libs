@@ -43,6 +43,7 @@ public class NoiseCalculationOffline {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
 	
 	static String runDirectory;
+	static String outputDirectory;
 	static int lastIteration;
 				
 	public static void main(String[] args) {
@@ -52,12 +53,15 @@ public class NoiseCalculationOffline {
 			log.info("run directory: " + runDirectory);
 			lastIteration = Integer.valueOf(args[1]);
 			log.info("last iteration: " + lastIteration);
+			outputDirectory = args[2];		
+			log.info("output directory: " + outputDirectory);
 			
 		} else {
 //			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
 //			lastIteration = 100;
 			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 			lastIteration = 5;
+			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -77,8 +81,8 @@ public class NoiseCalculationOffline {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		
-		String outputDirectory = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputDirectory);
+		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
+		File file = new File(outputFilePath);
 		file.mkdirs();
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -106,8 +110,8 @@ public class NoiseCalculationOffline {
 		
 		log.info("Calculating noise emission...");
 		noiseEmissionHandler.calculateNoiseEmission();
-		noiseEmissionHandler.writeNoiseEmissionStats(outputDirectory + config.controler().getLastIteration() + ".emissionStats.csv");
-		noiseEmissionHandler.writeNoiseEmissionStatsPerHour(outputDirectory + config.controler().getLastIteration() + ".emissionStatsPerHour.csv");
+		noiseEmissionHandler.writeNoiseEmissionStats(outputFilePath + config.controler().getLastIteration() + ".emissionStats.csv");
+		noiseEmissionHandler.writeNoiseEmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".emissionStatsPerHour.csv");
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
@@ -119,8 +123,8 @@ public class NoiseCalculationOffline {
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
-		noiseImmission.writeNoiseImmissionStats(outputDirectory + config.controler().getLastIteration() + ".immissionStats.csv");
-		noiseImmission.writeNoiseImmissionStatsPerHour(outputDirectory + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
+		noiseImmission.writeNoiseImmissionStats(outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
+		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 				
 //		eventWriter.closeFile();
