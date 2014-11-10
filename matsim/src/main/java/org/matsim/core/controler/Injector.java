@@ -26,10 +26,12 @@ import com.google.inject.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 class Injector {
@@ -74,6 +76,13 @@ class Injector {
     Set<ControlerListener> getControlerListenersDeclaredByModules() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Set<ControlerListener>>() {
+                }
+        ));
+    }
+
+    Map<String, PlanStrategy> getPlanStrategiesDeclaredByModules() {
+        return injector.getInstance(Key.get(
+                new TypeLiteral<Map<String, PlanStrategy>>() {
                 }
         ));
     }

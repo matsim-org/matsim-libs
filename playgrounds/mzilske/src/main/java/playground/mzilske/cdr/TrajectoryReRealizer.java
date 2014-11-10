@@ -32,23 +32,19 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.mzilske.clones.CloneService;
 
-import javax.inject.Inject;
-
 class TrajectoryReRealizer extends AbstractMultithreadedModule {
 
     private Sightings sightings;
     private Scenario scenario;
     private ZoneTracker.LinkToZoneResolver zones;
+    private CloneService cloneService;
 
-    @Inject
-    CloneService cloneService;
-
-    @Inject
-    public TrajectoryReRealizer(Sightings sightings, Scenario scenario, ZoneTracker.LinkToZoneResolver zones) {
+    TrajectoryReRealizer(Scenario scenario, Sightings sightings, ZoneTracker.LinkToZoneResolver zones, CloneService cloneService) {
         super(scenario.getConfig().global());
         this.sightings = sightings;
         this.scenario = scenario;
         this.zones = zones;
+        this.cloneService = cloneService;
     }
 
     @Override

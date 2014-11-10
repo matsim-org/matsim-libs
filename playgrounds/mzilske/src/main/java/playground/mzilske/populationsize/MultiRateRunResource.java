@@ -159,9 +159,9 @@ class MultiRateRunResource {
         controler.setModules(
                 new ControlerDefaultsModule(),
                 new CadytsModule(),
-                new ClonesModule());
+                new ClonesModule(),
+                new TrajectoryReRealizerModule());
         controler.setScoringFunctionFactory(new CadytsAndCloneScoringFunctionFactory());
-        controler.addPlanStrategyFactory("ReRealize", new TrajectoryReRealizerFactory());
     }
 
     public Sightings getSightings(String rate) {

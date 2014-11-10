@@ -50,6 +50,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -447,6 +448,14 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		// now about 20 locations.  kai, may'2013
 		// now about 15 locations.  kai, oct'14
+        for (final Map.Entry<String, PlanStrategy> entry : this.injector.getPlanStrategiesDeclaredByModules().entrySet()) {
+            this.planStrategyFactoryRegister.register(entry.getKey(), new PlanStrategyFactory() {
+                @Override
+                public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+                    return entry.getValue();
+                }
+            });
+        }
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister);
 		return manager;

@@ -26,10 +26,12 @@ import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Singleton;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.replanning.PlanStrategy;
 
 /**
  * "Designed for inheritance."
@@ -45,6 +47,7 @@ public abstract class AbstractModule {
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
     private Multibinder<ControlerListener> controlerListenerMultibinder;
+    private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
     @Inject
     com.google.inject.Injector bootstrapInjector;
@@ -62,6 +65,7 @@ public abstract class AbstractModule {
         this.binder = binder;
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
+        this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
         this.install();
     }
 
@@ -119,6 +123,10 @@ public abstract class AbstractModule {
 
     protected final void addControlerListener(ControlerListener instance) {
         controlerListenerMultibinder.addBinding().toInstance(instance);
+    }
+
+    protected final void addPlanStrategyByProvider(String strategyName, Class<? extends javax.inject.Provider<? extends PlanStrategy>> providerType) {
+        planStrategyMultibinder.addBinding(strategyName).toProvider(providerType);
     }
 
     protected final Object getDelegate() {

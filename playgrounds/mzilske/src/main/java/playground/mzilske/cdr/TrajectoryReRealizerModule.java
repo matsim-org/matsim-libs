@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TrajectoryReRealizerFactory.java
+ *  * TrajectoryReRealizerModules.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,29 +22,46 @@
 
 package playground.mzilske.cdr;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import playground.mzilske.clones.CloneService;
 
-public class TrajectoryReRealizerFactory implements PlanStrategyFactory {
+import javax.inject.Inject;
+import javax.inject.Provider;
 
-    @Inject
-    TrajectoryReRealizer trajectoryReRealizer;
+public class TrajectoryReRealizerModule extends AbstractModule {
 
     @Override
-    public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-        PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-        planStrategy.addStrategyModule(trajectoryReRealizer);
-        planStrategy.addStrategyModule(new ReRoute(scenario));
-        return planStrategy;
+    public void install() {
+        addPlanStrategyByProvider("ReRealize", TrajectoryReRealizerProvider.class);
     }
 
+    static class TrajectoryReRealizerProvider implements Provider<PlanStrategy> {
+        private Scenario scenario;
+        private Sightings sightings;
+        private ZoneTracker.LinkToZoneResolver zones;
+        private CloneService cloneService;
+
+        @Inject
+        TrajectoryReRealizerProvider(Scenario scenario, Sightings sightings, ZoneTracker.LinkToZoneResolver zones, CloneService cloneService) {
+            this.scenario = scenario;
+            this.sightings = sightings;
+            this.zones = zones;
+            this.cloneService = cloneService;
+        }
+
+        @Override
+        public PlanStrategy get() {
+            PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
+            planStrategy.addStrategyModule(new TrajectoryReRealizer(scenario, sightings, zones, cloneService));
+            planStrategy.addStrategyModule(new ReRoute(scenario));
+            return planStrategy;
+        }
+    }
 }
