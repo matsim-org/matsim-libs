@@ -374,7 +374,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         writer.writeDouble(totalIterationTime);
         writer.writeInt(matsimControler.getPopulation().getPersons().size());
         //send memory usage fraction of max to prevent being assigned more persons
-        writer.writeDouble(getMemoryUse());
+        writeMemoryStats();
 
     }
 
