@@ -388,48 +388,49 @@ public class KTFreight_ohne_Strategy {
 		}
 	}
 	
-	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final Controler controler) {
-		return new CarrierPlanStrategyManagerFactory() {
-			
-			
-			@Override
-			public GenericStrategyManager<CarrierPlan, I> createStrategyManager() {
-				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
-						travelTimes , scenario.getConfig().planCalcScore() );
-				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
-						travelDisutility, travelTimes) ;
-			
-				
-				GenericStrategyManager<CarrierPlan, I> mgr = new GenericStrategyManager<CarrierPlan, I>() ;
-				{	
-					GenericPlanStrategyImpl<CarrierPlan, I> strategy = new GenericPlanStrategyImpl<CarrierPlan, I>(new RandomPlanSelector<CarrierPlan>()) ;
-					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
-					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, 0.1);
-					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
-				}
-				{
-					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
-					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
-					strategy.addStrategyModule(module);
-					mgr.addStrategy(strategy, null, 0.9 );
-					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
-				}
-				{
-					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
-					mgr.addStrategy( strategy, null, 0.01 ) ;
-				}
-				return mgr ;
-			}
-
-			@Override
-			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
-	}
+	//Bedarf Überarbeitung (Anpassung an Matsim 0.7.0)
+//	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final Controler controler) {
+//		return new CarrierPlanStrategyManagerFactory() {
+//			
+//			
+//			@Override
+//			public GenericStrategyManager<CarrierPlan, I> createStrategyManager() {
+//				TravelTime travelTimes = controler.getLinkTravelTimes() ;
+//				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+//						travelTimes , scenario.getConfig().planCalcScore() );
+//				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
+//						travelDisutility, travelTimes) ;
+//			
+//				
+//				GenericStrategyManager<CarrierPlan, I> mgr = new GenericStrategyManager<CarrierPlan, I>() ;
+//				{	
+//					GenericPlanStrategyImpl<CarrierPlan, I> strategy = new GenericPlanStrategyImpl<CarrierPlan, I>(new RandomPlanSelector<CarrierPlan>()) ;
+//					GenericPlanStrategyModule<CarrierPlan> module = new ReRouteVehicles( router, scenario.getNetwork(), travelTimes ) ;
+//					strategy.addStrategyModule(module);
+//					mgr.addStrategy(strategy, null, 0.1);
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0.);
+//				}
+//				{
+//					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+//					GenericPlanStrategyModule<CarrierPlan> module = new TimeAllocationMutator() ;
+//					strategy.addStrategyModule(module);
+//					mgr.addStrategy(strategy, null, 0.9 );
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+//				}
+//				{
+//					GenericPlanStrategyImpl<CarrierPlan> strategy = new GenericPlanStrategyImpl<CarrierPlan>( new BestPlanSelector<CarrierPlan>() ) ;
+//					mgr.addStrategy( strategy, null, 0.01 ) ;
+//				}
+//				return mgr ;
+//			}
+//
+//			@Override
+//			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+//				// TODO Auto-generated method stub
+//				return null;
+//			}
+//		};
+//	}
 
 	private static CarrierScoringFunctionFactory createMyScoringFunction(final Scenario scenario) {
 		return new CarrierScoringFunctionFactory() {
