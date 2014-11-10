@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
@@ -154,6 +153,11 @@ public class MunichControler {
 		if(internalizeEmission==false && both==false){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
+		
+		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+		controler.addControlerListener(new MyTollAveragerControlerListner( (ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner((ScenarioImpl) controler.getScenario(), emissionCostModule));
+		
 		controler.run();	
 
 	}
