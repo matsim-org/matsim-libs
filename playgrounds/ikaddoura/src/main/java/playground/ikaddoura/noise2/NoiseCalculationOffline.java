@@ -43,16 +43,21 @@ public class NoiseCalculationOffline {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
 	
 	static String runDirectory;
+	static int lastIteration;
 				
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
 			runDirectory = args[0];		
-			log.info("runDirectory: " + runDirectory);
-						
+			log.info("run directory: " + runDirectory);
+			lastIteration = Integer.valueOf(args[1]);
+			log.info("last iteration: " + lastIteration);
+			
 		} else {
 //			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+//			lastIteration = 100;
 			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+			lastIteration = 5;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -65,8 +70,7 @@ public class NoiseCalculationOffline {
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-//		config.controler().setLastIteration(100);
-		config.controler().setLastIteration(5);
+		config.controler().setLastIteration(lastIteration);
 		// Hopefully this is all information required from the config file... Alternatively, read in the output config.
 		
 		log.info("Loading scenario...");
