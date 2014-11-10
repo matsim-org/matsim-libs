@@ -69,10 +69,11 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	
 	@Override
 	public void reset(int iteration) {
-		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd.clear();
 		this.personId2actNumber2receiverPointId2activityStartAndActivityEnd.clear();
 		this.personId2actNumber2actType.clear();
 		this.personId2actualActNumber.clear();
+		
+		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd.clear();		
 		this.receiverPointId2timeInterval2affectedAgentUnits.clear();
 		this.receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.clear();
 		this.receiverPointId2ListOfHomeAgents.clear();
@@ -244,87 +245,102 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	}
 
 	public void calculateDurationOfStay() {
+		
+		int counter = 0;
+		log.info("Calculating durations of stay for a total of " + receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet().size() + "receiver points.");
+		
+		// for each receiver point
 		for(Id<ReceiverPoint> receiverPointId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet()) {
+			
+			if (counter % 1000 == 0) {
+				log.info("Calculating duration of stay. Receiver Point # " + counter);
+			}
+			
+			// for each person that is allocated to this receiver point (through at least one activity)
 			for(Id<Person> personId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).keySet()) {
+				
+				// for each activity which is allocated to this receiver point
 				for(Integer actNumber : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).keySet()) {
+					
 					Tuple<Double,Double> actStartAndActEnd = receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).get(actNumber);
 					String actType = personId2actNumber2actType.get(personId).get(actNumber);
 					double actStart = Double.MAX_VALUE;
 					double actEnd = Double.MIN_VALUE;
-					if(actStartAndActEnd.getFirst() == 0.) {
+					if (actStartAndActEnd.getFirst() == 0.) {
 						// home activity (morning)
 						actStart = 0.;
 						actEnd = actStartAndActEnd.getSecond();
-					} else if(actStartAndActEnd.getSecond() == 30*3600) {
+					} else if (actStartAndActEnd.getSecond() == 30 * 3600) {
 						// home activity (evening)
 						actStart = actStartAndActEnd.getFirst();
-						actEnd = 30*3600;
+						actEnd = 30 * 3600;
 					} else {
 						// other activity
 						actStart = actStartAndActEnd.getFirst();
 						actEnd = actStartAndActEnd.getSecond();
 					}
+					
 					// now calculation for the time shares of the intervals
-					for(double intervalEnd = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; intervalEnd <= 30*3600 ; intervalEnd = intervalEnd + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
-						double intervalStart = intervalEnd - NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+					for (double time = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; time <= 30 * 3600 ; time = time + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+						double intervalStart = time - NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 //						
 						double durationOfStay = 0.;
 //						
-						if(actEnd <= intervalStart || actStart >= intervalEnd) {
+						if(actEnd <= intervalStart || actStart >= time) {
 							durationOfStay = 0.;
-						} else if(actStart <= intervalStart && actEnd >= intervalEnd) {
+						} else if (actStart <= intervalStart && actEnd >= time) {
 							durationOfStay = NoiseConfigParameters.getTimeBinSizeNoiseComputation();
-						} else if(actStart <= intervalStart && actEnd <= intervalEnd) {
+						} else if (actStart <= intervalStart && actEnd <= time) {
 							durationOfStay = actEnd - intervalStart;
-						} else if(actStart >= intervalStart && actEnd >= intervalEnd) {
-							durationOfStay = intervalEnd - actStart;
-						} else if(actStart >= intervalStart && actEnd <= intervalEnd) {
+						} else if (actStart >= intervalStart && actEnd >= time) {
+							durationOfStay = time - actStart;
+						} else if (actStart >= intervalStart && actEnd <= time) {
 							durationOfStay = actEnd - actStart;
 						}
 						
 						// calculation for the individual noiseEventsAffected
 						// list for all receiver points and all time intervals for each agent the time, ...
 						Map <Double , Map<Id<Person>,Map<Integer,Tuple<Double,String>>>> timeInterval2personId2actNumber2affectedAgentUnitsAndActType = new HashMap <Double , Map <Id<Person>,Map<Integer,Tuple<Double,String>>>>();
-						if(receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(receiverPointId)) {
+						if (receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(receiverPointId)) {
 							timeInterval2personId2actNumber2affectedAgentUnitsAndActType = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId);
-						} else {
 						}
+						
 						Map <Id<Person>,Map<Integer,Tuple<Double,String>>> personId2actNumber2affectedAgentUnitsAndActType = new HashMap <Id<Person>,Map<Integer,Tuple<Double,String>>>();
-						if(timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(intervalEnd)) {
-							personId2actNumber2affectedAgentUnitsAndActType = timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(intervalEnd);
-						} else {
+						if (timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(time)) {
+							personId2actNumber2affectedAgentUnitsAndActType = timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(time);
 						}
+						
 						Map<Integer,Tuple<Double,String>> actNumber2affectedAgentUnitsAndActType = new HashMap <Integer,Tuple<Double,String>>();
-						if(personId2actNumber2affectedAgentUnitsAndActType.containsKey(personId)) {
+						if (personId2actNumber2affectedAgentUnitsAndActType.containsKey(personId)) {
 							actNumber2affectedAgentUnitsAndActType = personId2actNumber2affectedAgentUnitsAndActType.get(personId);
-						} else {
 						}
-						Tuple <Double,String> affectedAgentUnitsAndActType = new Tuple<Double, String>((durationOfStay/3600.), actType);
-						actNumber2affectedAgentUnitsAndActType.put(actNumber,affectedAgentUnitsAndActType);
+						
+						Tuple <Double,String> affectedAgentUnitsAndActType = new Tuple<Double, String>((durationOfStay / NoiseConfigParameters.getTimeBinSizeNoiseComputation()), actType);
+						actNumber2affectedAgentUnitsAndActType.put(actNumber, affectedAgentUnitsAndActType);
 						personId2actNumber2affectedAgentUnitsAndActType.put(personId,actNumber2affectedAgentUnitsAndActType);
-						timeInterval2personId2actNumber2affectedAgentUnitsAndActType.put(intervalEnd,personId2actNumber2affectedAgentUnitsAndActType);
+						timeInterval2personId2actNumber2affectedAgentUnitsAndActType.put(time,personId2actNumber2affectedAgentUnitsAndActType);
 						receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.put(receiverPointId,timeInterval2personId2actNumber2affectedAgentUnitsAndActType);
 						
-						// calculation for the individual noiseEventsAffected (home-based-oriented)
-						
-						
+						// calculation for the individual noiseEventsAffected
 						// calculation for the damage
-						// the adaption of the intervalLength is considered here implicitly,
-						// a further correction is not necessary
-						double affectedAgentUnits = (NoiseConfigParameters.getScaleFactor())* (durationOfStay/3600.);
+						double affectedAgentUnits = (NoiseConfigParameters.getScaleFactor()) * (durationOfStay / NoiseConfigParameters.getTimeBinSizeNoiseComputation());
+						
 						if(receiverPointId2timeInterval2affectedAgentUnits.containsKey(receiverPointId)) {
-							if(receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(intervalEnd)) {
+						 
+							if(receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(time)) {
 								Map<Double,Double> timeInterval2affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId);
-								timeInterval2affectedAgentUnits.put(intervalEnd, timeInterval2affectedAgentUnits.get(intervalEnd)+affectedAgentUnits);
+								timeInterval2affectedAgentUnits.put(time, timeInterval2affectedAgentUnits.get(time)+affectedAgentUnits);
 								receiverPointId2timeInterval2affectedAgentUnits.put(receiverPointId, timeInterval2affectedAgentUnits);
+							
 							} else {
 								Map<Double,Double> timeInterval2affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId);
-								timeInterval2affectedAgentUnits.put(intervalEnd, affectedAgentUnits);
+								timeInterval2affectedAgentUnits.put(time, affectedAgentUnits);
 								receiverPointId2timeInterval2affectedAgentUnits.put(receiverPointId, timeInterval2affectedAgentUnits);
 							}
+							
 						} else {
 							Map<Double,Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
-							timeInterval2affectedAgentUnits.put(intervalEnd, affectedAgentUnits);
+							timeInterval2affectedAgentUnits.put(time, affectedAgentUnits);
 							receiverPointId2timeInterval2affectedAgentUnits.put(receiverPointId, timeInterval2affectedAgentUnits);
 						}	
 					}
@@ -333,8 +349,8 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		}
 	}
 	
-	public void calculateDurationOfStayOnlyHomeActivity() {
-		for(Id<ReceiverPoint> receiverPointId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet()) {
+	public void calculateDurationOfStayOnlyHomeActivity() {	
+		for(Id<ReceiverPoint> receiverPointId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet()) {			
 			for(Id<Person> personId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).keySet()) {
 				for(Integer actNumber : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).keySet()) {
 					Tuple<Double,Double> actStartAndActEnd = receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).get(actNumber);
