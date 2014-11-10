@@ -92,6 +92,8 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		log.info("Per person delays costs, cold and warm emissions costs and toll will be written to a file for each iteration.");
+		
 		this.pId2Tolls = this.moneyHandler.getPersonId2amount();
 		this.pId2CongestionCosts = this.congestionCostHandler.getCausingPerson2Cost();
 		this.pId2ColdEmissionsCosts = this.emissCostHandler.getPersonId2ColdEmissCosts();
@@ -99,11 +101,25 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 		try {
 			for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
-				double delaysCosts = this.pId2CongestionCosts.get(personId);
-				double coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId);
-				double warmEmissCosts = this.pId2WarmEmissionsCosts.get(personId);
+				double delaysCosts ;
+				double coldEmissCosts;
+				double warmEmissCosts;
+				double toll;
+				
+				if(!this.pId2CongestionCosts.containsKey(personId)) delaysCosts =0;
+				else delaysCosts = 	this.pId2CongestionCosts.get(personId);
+				
+				if(this.pId2ColdEmissionsCosts.containsKey(personId)) coldEmissCosts=0;
+				else coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId);
+
+				if(this.pId2WarmEmissionsCosts.containsKey(personId)) warmEmissCosts =0;
+				else warmEmissCosts  = this.pId2WarmEmissionsCosts.get(personId);
+				
+				if(this.pId2Tolls.containsKey(personId)) toll =0;
+				else toll = this.pId2Tolls.get(personId);
+				 
 				double totalEmissCosts = coldEmissCosts+warmEmissCosts;
-				double toll = this.pId2Tolls.get(personId);
+				 
 				this.writer.write(personId+"\t"+
 						delaysCosts+"\t"+
 						coldEmissCosts+"\t"+
