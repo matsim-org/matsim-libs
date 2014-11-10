@@ -112,14 +112,15 @@ ControlerListener {
 			factorSum = factorSum + incomeFactor;
 		}
 		
-		/*For simulation with homogeneous parameters but adjusted for income factor mean*/
-		if(simulationType.equals("homo")){
-			log.info("Homogeneuos simulation with parameter adjustments for income factor mean is enabled...");
-			factoreMean = factorSum / (double) incomeFactors.size();
-			for(Id<Person> personId:incomeFactors.keySet()){
-				incomeFactors.put(personId, factoreMean);
-			}
-		}
+//		It is more accurate to adjust the parameters in case of heterogeneous simulation, so that the mean still corresponds the original value -artemc nov '14		
+//		/*For simulation with homogeneous parameters but adjusted for income factor mean*/
+//		if(simulationType.equals("homo")){
+//			log.info("Homogeneuos simulation with parameter adjustments for income factor mean is enabled...");
+//			factoreMean = factorSum / (double) incomeFactors.size();
+//			for(Id<Person> personId:incomeFactors.keySet()){
+//				incomeFactors.put(personId, factoreMean);
+//			}
+//		}
 	}
 
 	public double getLambda_income() {

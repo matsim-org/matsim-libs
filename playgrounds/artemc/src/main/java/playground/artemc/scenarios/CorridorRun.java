@@ -23,8 +23,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.dwellTimeModel.QSimFactory;
-import playground.artemc.scoring.DisaggIncomeCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoring.DisaggIncomeScoreAnalyzer;
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutility;

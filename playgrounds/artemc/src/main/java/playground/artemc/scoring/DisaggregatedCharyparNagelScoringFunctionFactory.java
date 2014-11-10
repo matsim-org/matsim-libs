@@ -55,7 +55,7 @@ import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
  */
 public class DisaggregatedCharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private static final Logger log = Logger.getLogger(DisaggIncomeCharyparNagelScoringFunctionFactory.class);
+	private static final Logger log = Logger.getLogger(DisaggregatedCharyparNagelScoringFunctionFactory.class);
 
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;
@@ -111,13 +111,23 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 
 			if(this.simulationType.equals("hetero") || this.simulationType.equals("homo")){
 				if(incomeFactors!=null){
-					this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId()));
+					
+					/*Calculate the mean in order to adjust the utility parameters*/
+					Double factorSum=0.0;
+					Double factorMean = 0.0;
+					for(Double incomeFactor:this.incomeFactors.values()){
+						factorSum = factorSum + incomeFactor;
+					}
+					factorMean = factorSum / (double) incomeFactors.size();
+					
+					
+					this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/ factorMean));
 					
 					this.params.marginalUtilityOfLateArrival_s =  this.params.marginalUtilityOfLateArrival_s * this.params.marginalUtilityOfPerforming_s;
 					this.params.marginalUtilityOfEarlyDeparture_s= this.params.marginalUtilityOfEarlyDeparture_s * this.params.marginalUtilityOfPerforming_s;
 
 					for (Entry<String, Mode> mode : this.params.modeParams.entrySet()) {
-						mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId()));
+						mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
 					}
 				}
 			}
