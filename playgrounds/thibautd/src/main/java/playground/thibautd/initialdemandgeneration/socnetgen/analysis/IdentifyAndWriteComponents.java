@@ -21,17 +21,16 @@ package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.Collection;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
@@ -44,7 +43,7 @@ public class IdentifyAndWriteComponents {
 	private static final Logger log =
 		Logger.getLogger(IdentifyAndWriteComponents.class);
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final String inputSocialNetwork = args[ 0 ];
 		final String outputRawFile = args[ 1 ];
 
@@ -57,21 +56,28 @@ public class IdentifyAndWriteComponents {
 
 		log.info( components.size()+" components" );
 
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outputRawFile );
-		writer.write( "agentId\tcomponentId\tcomponentSize" );
+		writeComponents( outputRawFile, components );
+	}
 
-		int i = 0;
-		for ( Set<Id> component : components ) {
-			final int compNr = i++;
+	public static void writeComponents( final String outputRawFile , final Collection<Set<Id>> components ) {
+		try (final BufferedWriter writer = IOUtils.getBufferedWriter( outputRawFile )) {
+			writer.write( "agentId\tcomponentId\tcomponentSize" );
 
-			final int size = component.size();
+			int i = 0;
+			for ( Set<Id> component : components ) {
+				final int compNr = i++;
 
-			for ( Id id : component ) {
-				writer.newLine();
-				writer.write( id+"\t"+compNr+"\t"+size );
+				final int size = component.size();
+
+				for ( Id id : component ) {
+					writer.newLine();
+					writer.write( id+"\t"+compNr+"\t"+size );
+				}
 			}
 		}
-		writer.close();
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
 }
 

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
@@ -35,7 +36,7 @@ import playground.thibautd.socnetsim.population.SocialNetworkReader;
  * @author thibautd
  */
 public class WriteDegreeTable {
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final String socialNetworkFile = args[ 0 ];
 		final String outputRawFile = args[ 1 ];
 
@@ -43,15 +44,23 @@ public class WriteDegreeTable {
 		new SocialNetworkReader( sc ).parse( socialNetworkFile );
 	
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outputRawFile );
+		writeDegreeTable( outputRawFile, socialNetwork );
+	}
 
-		writer.write( "egoId\tnetSize" );
-		for ( Id ego : socialNetwork.getEgos() ) {
-			writer.newLine();
-			writer.write( ego+"\t"+socialNetwork.getAlters( ego ).size() );
+	public static void writeDegreeTable(
+			final String outputRawFile,
+			final SocialNetwork socialNetwork ) {
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputRawFile ) ) {
+
+			writer.write( "egoId\tnetSize" );
+			for ( Id ego : socialNetwork.getEgos() ) {
+				writer.newLine();
+				writer.write( ego + "\t" + socialNetwork.getAlters( ego ).size() );
+			}
 		}
-
-		writer.close();
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
 }
 

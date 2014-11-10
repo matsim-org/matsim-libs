@@ -139,7 +139,7 @@ public class RunTRBModel {
 		return b ? 1 : 0;
 	}
 
-	private static SocialPopulation<ArentzeAgent> parsePopulation(final String populationFile) {
+	public static SocialPopulation<ArentzeAgent> parsePopulation(final String populationFile) {
 		final SocialPopulation<ArentzeAgent> population = new SocialPopulation<ArentzeAgent>();
 
 		final Counter counter = new Counter( "convert person to agent # " );
@@ -202,7 +202,7 @@ public class RunTRBModel {
 		return population;
 	}
 
-	private static class ArentzeAgent implements Agent {
+	public static class ArentzeAgent implements Agent {
 		private final Id id;
 		private final int ageCategory;
 		private final boolean isMale;

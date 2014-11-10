@@ -41,6 +41,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
@@ -55,9 +56,7 @@ public class ComputeSocialDistanceBetweenRandomIndividuals {
 	private static final Logger log =
 		Logger.getLogger(ComputeSocialDistanceBetweenRandomIndividuals.class);
 
-	private static final int N_PAIRS = 10000;
-
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final String inputSocialNetwork = args[ 0 ];
 		final String outputDataFile = args[ 1 ];
 
@@ -65,6 +64,13 @@ public class ComputeSocialDistanceBetweenRandomIndividuals {
 		new SocialNetworkReader( sc ).parse( inputSocialNetwork );
 	
 		final SocialNetwork socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+		writeRandomDistances( outputDataFile, socialNetwork, 10000 );
+	}
+
+	public static void writeRandomDistances(
+			final String outputDataFile,
+			final SocialNetwork socialNetwork,
+			final int nPairs ) {
 		final Network matsimNetwork = SocialNetworkAsMatsimNetworkUtils.convertToNetwork( socialNetwork );
 
 		// Fast dijkstra is approx. twice as fast here.
@@ -103,34 +109,32 @@ public class ComputeSocialDistanceBetweenRandomIndividuals {
 		log.info( "ignoring "+( socialNetwork.getEgos().size() - biggestComponent.size() )+" agents ("+
 				( ( socialNetwork.getEgos().size() - biggestComponent.size() ) * 100d / socialNetwork.getEgos().size() )+"%)" );
 
-		final BufferedWriter writer = IOUtils.getBufferedWriter( outputDataFile );
-		writer.write( "ego\talter\tdistance" );
-		final Random random = new Random( 20140121 );
-		final List<Node> egos = new ArrayList<Node>( biggestComponent.size() );
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( outputDataFile ) ) {
+			writer.write( "ego\talter\tdistance" );
+			final Random random = new Random( 20140121 );
+			final List<Node> egos = new ArrayList<Node>( biggestComponent.size() );
 
-		for ( Id id : biggestComponent ) {
-			egos.add( matsimNetwork.getNodes().get( id ) );
+			for ( Id id : biggestComponent ) {
+				egos.add( matsimNetwork.getNodes().get( id ) );
+			}
+
+			final Counter counter = new Counter( "sampling pair # " );
+			for ( int i = 0; i < nPairs; i++ ) {
+				counter.incCounter();
+				final Node ego = egos.get( random.nextInt( egos.size() ) );
+				final Node alter = egos.get( random.nextInt( egos.size() ) );
+
+				final Path path = dijkstra.calcLeastCostPath( ego, alter, 0, null, null );
+
+				writer.newLine();
+				writer.write( ego.getId() + "\t" + alter.getId() + "\t" + path.travelCost );
+			}
+			counter.printCounter();
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
 		}
 
-		final Counter counter = new Counter( "sampling pair # " );
-		for ( int i=0; i < N_PAIRS; i++ ) {
-			counter.incCounter();
-			final Node ego = egos.get( random.nextInt( egos.size() ) );
-			final Node alter = egos.get( random.nextInt( egos.size() ) );
-
-			final Path path = 
-				dijkstra.calcLeastCostPath(
-					ego,
-					alter,
-					0,
-					null,
-					null );
-
-			writer.newLine();
-			writer.write( ego.getId()+"\t"+alter.getId()+"\t"+path.travelCost );
-		}
-		counter.printCounter();
-		writer.close();
 	}
 }
 
