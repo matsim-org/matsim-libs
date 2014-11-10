@@ -45,13 +45,13 @@ public class MunichControler {
 
 	public static void main(String[] args) {
 		
-//		String clusterFolder = "/Users/aagarwal/Desktop/ils4/agarwal/munich/";
+//		String clusterFolder = "/Users/amit/Documents/cluster/";
 //		args = new String [5];
 //		args[0] =String.valueOf("false");
-//		args[1] ="true";
+//		args[1] ="false";
 //		args[2] ="false";
-//		args[3] =clusterFolder+"input/config_munich_1pct_baseCase.xml";
-//		args[4] ="./output/baseCase/";
+//		args[3] =clusterFolder+"/ils4/agarwal/munich/outputTest/run5/run8/baseCaseCtd/config_subActivities_baseCaseCtd_msa.xml";
+//		args[4] ="/Users/amit/Documents/workspace/output/munich/baseCaseCtd/";
 		
 		boolean internalizeEmission = Boolean.valueOf(args [0]); 
 		boolean internalizeCongestion = Boolean.valueOf(args [1]);
@@ -65,9 +65,9 @@ public class MunichControler {
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.controler().setOutputDirectory(args[4]);
 		
-//		config.network().setInputFile(clusterFolder+"input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
-//		config.plans().setInputFile(clusterFolder+"input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz");
-//		config.counts().setCountsFileName(clusterFolder+"input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+//		config.network().setInputFile("/Users/amit/Documents/workspace/input/munich/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
+//		config.plans().setInputFile(clusterFolder+"/ils4/agarwal/munich/outputTest/run5/run7/baseCaseCtd/ITERS/it.1400/1400.plans.xml.gz");
+//		config.counts().setCountsFileName("/Users/amit/Documents/workspace/input/munich//counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
 
 		//===vsp defaults
 //		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
@@ -90,12 +90,12 @@ public class MunichControler {
 		ecg.setEmissionRoadTypeMappingFile("../../munich/input/roadTypeMapping.txt");
 		ecg.setEmissionVehicleFile("../../munich/input/emissionVehicles_1pct.xml.gz");
 	      
-//	      	ecg.setAverageColdEmissionFactorsFile("/Users/aagarwal/Desktop/ils4/agarwal/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
-//			ecg.setAverageWarmEmissionFactorsFile("/Users/aagarwal/Desktop/ils4/agarwal/matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
-//			ecg.setDetailedColdEmissionFactorsFile("/Users/aagarwal/Desktop/ils4/agarwal/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
-//			ecg.setDetailedWarmEmissionFactorsFile("/Users/aagarwal/Desktop/ils4/agarwal/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
-//			ecg.setEmissionRoadTypeMappingFile("/Users/aagarwal/Desktop/ils4/agarwal/munich/input/roadTypeMapping.txt");
-//			ecg.setEmissionVehicleFile("/Users/aagarwal/Desktop/ils4/agarwal/munich/input/emissionVehicles_1pct.xml.gz");
+//	      	ecg.setAverageColdEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_ColdStart_vehcat_2005average.txt");
+//			ecg.setAverageWarmEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_HOT_vehcat_2005average.txt");
+//			ecg.setDetailedColdEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_ColdStart_SubSegm_2005detailed.txt");
+//			ecg.setDetailedWarmEmissionFactorsFile("/Users/amit/Documents/workspace/input/matsimHBEFAStandardsFiles/EFA_HOT_SubSegm_2005detailed.txt");
+//			ecg.setEmissionRoadTypeMappingFile("/Users/amit/Documents/workspace/input/munich/roadTypeMapping.txt");
+//			ecg.setEmissionVehicleFile("/Users/amit/Documents/workspace/input/munich/emissionVehicles_1pct.xml.gz");
 	      
 		ecg.setUsingDetailedEmissionCalculation(true);
 		//===only emission events genertaion; used with all runs for comparisons
@@ -155,8 +155,8 @@ public class MunichControler {
 		}
 		
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-		controler.addControlerListener(new MyTollAveragerControlerListner( (ScenarioImpl) controler.getScenario()));
-		controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner((ScenarioImpl) controler.getScenario(), emissionCostModule));
+		controler.addControlerListener(new MyTollAveragerControlerListner());
+		controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner(emissionCostModule,emissionModule));
 		
 		controler.run();	
 

@@ -84,21 +84,21 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		this.personId2DelaysPerTimeBin.clear();
-		this.logger.info("Resetting person delays to   " + this.personId2DelaysPerTimeBin);
-		this.linkId2PersonIdLinkEnterTime.clear();
-		this.linkId2FreeSpeedLinkTravelTime.clear();
-		this.time2linkIdLeaveCount.clear();
-		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
+//		this.personId2DelaysPerTimeBin.clear();
+//		this.logger.info("Resetting person delays to   " + this.personId2DelaysPerTimeBin);
+//		this.linkId2PersonIdLinkEnterTime.clear();
+//		this.linkId2FreeSpeedLinkTravelTime.clear();
+//		this.time2linkIdLeaveCount.clear();
+//		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		Id<Link> linkId = event.getLinkId();
 		Id<Person> personId = event.getPersonId();
-		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-			throw new RuntimeException("Person is alread on link. Can not depart from the same link without leaving the link.");
-		} 
+//		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
+//			logger.warn("Person is departed on this link and now leaving again. This might happen if there is one teleport leg and one main mode leg on same link.");
+//		} 
 
 		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);

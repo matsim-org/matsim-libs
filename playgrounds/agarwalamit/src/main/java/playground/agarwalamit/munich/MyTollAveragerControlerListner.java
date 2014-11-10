@@ -44,8 +44,8 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
 
 public class MyTollAveragerControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener{
 
-	public MyTollAveragerControlerListner (ScenarioImpl sc){
-		this.scenario =sc;
+	public MyTollAveragerControlerListner (){
+
 	}
 
 	public static Logger log =Logger.getLogger(MyTollAveragerControlerListner.class);
@@ -62,7 +62,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.controler = event.getControler();
-
+			this.scenario = (ScenarioImpl) controler.getScenario();
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
 		int lastIt = this.scenario.getConfig().controler().getLastIteration();
 		double msaStarts = this.scenario.getConfig().vspExperimental().getFractionOfIterationsToStartScoreMSA();
