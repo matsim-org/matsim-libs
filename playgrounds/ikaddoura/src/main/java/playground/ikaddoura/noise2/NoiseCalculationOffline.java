@@ -114,19 +114,25 @@ public class NoiseCalculationOffline {
 		noiseEmissionHandler.writeNoiseEmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".emissionStatsPerHour.csv");
 		log.info("Calculating noise emission... Done.");
 		
-		log.info("Calculating each agent's activity durations...");
-		personActivityTracker.calculateDurationOfStay();
-		log.info("Calculating each agent's activity durations... Done.");
-		
 		log.info("Calculating noise immission...");
-		NoiseImmission noiseImmission = new NoiseImmission(scenario, events, spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker);
+		NoiseImmission noiseImmission = new NoiseImmission(spatialInfo, noiseEmissionHandler);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
 		noiseImmission.writeNoiseImmissionStats(outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
-				
+		
+		log.info("Calculating each agent's activity durations...");
+		personActivityTracker.calculateDurationOfStay();
+		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+		log.info("Calculating each agent's activity durations... Done.");
+		
+		log.info("Calculating noise damage costs and throwing noise events...");
+		NoiseDamageCosts noiseDamageCosts = new NoiseDamageCosts(scenario, events, spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		noiseDamageCosts.calculateNoiseDamageCosts();
+		log.info("Calculating noise damage costs and throwing noise events... Done.");
+
 //		eventWriter.closeFile();
 	}
 }

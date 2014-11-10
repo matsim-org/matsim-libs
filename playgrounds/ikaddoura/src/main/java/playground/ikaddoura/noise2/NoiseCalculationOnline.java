@@ -43,8 +43,9 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
-	private PersonActivityHandler personActivityTracker;
 	private NoiseImmission noiseImmission;
+	private PersonActivityHandler personActivityTracker;
+	private NoiseDamageCosts noiseDamageCosts;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
@@ -79,21 +80,26 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		this.noiseEmissionHandler.writeNoiseEmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStatsPerHour.csv");
 		log.info("Calculating noise emission... Done.");
 		
-		// calculate activity durations for each agent
-		log.info("Calculating each agent's activity durations...");
-		this.personActivityTracker.calculateDurationOfStay();
-		log.info("Calculating each agent's activity durations... Done.");
-		
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");
-		this.noiseImmission = new NoiseImmission(event.getControler().getScenario(), event.getControler().getEvents(), this.spatialInfo, this.annualCostRate, this.noiseEmissionHandler, this.personActivityTracker);
+		this.noiseImmission = new NoiseImmission(this.spatialInfo, this.noiseEmissionHandler);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
 		this.noiseImmission.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
 		this.noiseImmission.writeNoiseImmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
-	
+		
+		// calculate activity durations for each agent
+		log.info("Calculating each agent's activity durations...");
+		this.personActivityTracker.calculateDurationOfStay();
+		log.info("Calculating each agent's activity durations... Done.");
+				
+		log.info("Calculating noise damage costs and throwing noise events...");
+		this.noiseDamageCosts = new NoiseDamageCosts(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		this.noiseDamageCosts.calculateNoiseDamageCosts();
+		log.info("Calculating noise damage costs and throwing noise events... Done.");
+		
 	}
 	
 	@Override
@@ -104,8 +110,8 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 //		noiseImmissionHandler.setLinkId2timeBin2avgTollCar();
 //		noiseImmissionHandler.setLinkId2timeBin2avgTollHdv();
 		
-		log.info("Total Caused Noise Cost: " + noiseImmission.getTotalCausedNoiseCost());
-		log.info("Total Affected Noise Cost: " + noiseImmission.getTotalAffectedNoiseCost());
+		log.info("Total Caused Noise Cost: " + noiseDamageCosts.getTotalCausedNoiseCost());
+		log.info("Total Affected Noise Cost: " + noiseDamageCosts.getTotalAffectedNoiseCost());
 
 //		
 //		log.info("total toll (second approach L_den)"+(noiseImmissionHandler.getTotalTollAffectedAgentBasedCalculation()));
@@ -160,6 +166,10 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 
 	public NoiseImmission getNoiseImmission() {
 		return noiseImmission;
+	}
+
+	public NoiseDamageCosts getNoiseDamageCosts() {
+		return noiseDamageCosts;
 	}
 
 	public NoiseSpatialInfo getSpatialInfo() {

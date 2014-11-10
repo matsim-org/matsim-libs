@@ -22,6 +22,10 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +41,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * 
@@ -441,6 +446,63 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 				}
 			}
 		}
+	}
+	
+	public void writePersonActivityInfoPerHour(String fileName) {
+		File file = new File(fileName);
+			
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			// column headers
+			bw.write("receiver point");
+			for(int i = 0; i < 30 ; i++) {
+				String time = Time.writeTime( (i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				bw.write(";agent units " + time);
+			}
+			bw.newLine();
+
+			
+			for (Id<ReceiverPoint> rpId : this.receiverPointId2timeInterval2affectedAgentUnits.keySet()){
+				bw.write(rpId.toString());
+				for(int i = 0 ; i < 30 ; i++) {
+					double timeInterval = (i+1) * NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+					double affectedAgentUnits = 0.;
+					
+					if (receiverPointId2timeInterval2affectedAgentUnits.get(rpId) != null) {
+						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(rpId).get(timeInterval);
+					}					
+					bw.write(";"+ affectedAgentUnits);	
+				}
+				
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\"");
+			
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(",\"Real\"");
+			}
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 
 	public Map<Id<ReceiverPoint>, Map<Id<Person>, Map<Integer, Tuple<Double, Double>>>> getReceiverPointId2personId2actNumber2activityStartAndActivityEnd() {
