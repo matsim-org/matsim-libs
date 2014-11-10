@@ -20,8 +20,6 @@
 
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -29,6 +27,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
+
+import java.util.ArrayList;
 
 /**
  * A strategy defines how an agent can be modified during re-planning.
@@ -56,6 +56,11 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {
+        if (module == null) {
+            // Neccessary because the "firstModule == null" construction masks bugs. You could pass a null pointer
+            // here and nothing would happen.
+            throw new NullPointerException();
+        }
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
