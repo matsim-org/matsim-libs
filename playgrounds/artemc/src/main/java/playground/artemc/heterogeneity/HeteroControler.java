@@ -35,7 +35,7 @@ public class HeteroControler {
 	private static String input;
 	private static String output;
 	private static boolean heteroSwitch = false;
-	private static String  simulationType = null;
+	private static String  simulationType = "homo";
 
 
 	public static void main(String[] args){
@@ -49,7 +49,7 @@ public class HeteroControler {
 
 		if(args.length>2){
 			simulationType = args[2];
-			if(args[2].equals("hetero") || args[2].equals("homo"))
+			if(args[2].equals("hetero"))
 				heteroSwitch=true;
 		}
 
