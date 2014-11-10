@@ -109,7 +109,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			 */
 			this.params = new PersonalScoringParameters(this.config);
 
-			if(this.simulationType.equals("hetero") || this.simulationType.equals("homo")){
+			if(this.simulationType.equals("hetero")){
 				if(incomeFactors!=null){
 					
 					/*Calculate the mean in order to adjust the utility parameters*/
