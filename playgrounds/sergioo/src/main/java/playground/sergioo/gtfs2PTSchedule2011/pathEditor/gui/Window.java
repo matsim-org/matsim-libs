@@ -46,14 +46,13 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import others.sergioo.util.geometry.Point2D;
-
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
 import playground.sergioo.gtfs2PTSchedule2011.Trip;
 import playground.sergioo.gtfs2PTSchedule2011.pathEditor.kernel.RoutePath;
@@ -230,7 +229,7 @@ public class Window extends JFrame implements ActionListener {
 		else{
 			List<Link> links = new ArrayList<Link>();
 			for(String link:linksS)
-				links.add(network.getLinks().get(new IdImpl(link)));
+				links.add(network.getLinks().get(Id.createLinkId(link)));
 			routePath = new RoutePath(network, mode, trip, stops, links);
 		}
 		this.setLocation(0,0);

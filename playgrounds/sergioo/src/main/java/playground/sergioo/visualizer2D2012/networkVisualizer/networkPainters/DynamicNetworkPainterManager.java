@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -24,8 +23,8 @@ public class DynamicNetworkPainterManager {
 	
 	//Attributes
 	protected Network network;
-	protected Id selectedLinkId;
-	protected Id selectedNodeId;
+	protected Id<Link> selectedLinkId;
+	protected Id<Node> selectedNodeId;
 	protected SortedMap<Double, Set<Link>> selectedLinks = new TreeMap<Double, Set<Link>>();
 	protected SortedMap<Double, Set<Node>> selectedNodes = new TreeMap<Double, Set<Node>>();
 	private double time;
@@ -92,7 +91,7 @@ public class DynamicNetworkPainterManager {
 		return null;
 	}
 	public Link getOppositeToSelectedLink() {
-		Id id = getIdOppositeLink(getSelectedLink());
+		Id<Link> id = getIdOppositeLink(getSelectedLink());
 		if(id != null)
 			return network.getLinks().get(id);
 		return null;
@@ -105,7 +104,7 @@ public class DynamicNetworkPainterManager {
 	public Collection<? extends Link> getNetworkLinks() {
 		return network.getLinks().values();
 	}
-	protected Id getIdNearestLink(double x, double y) {
+	protected Id<Link> getIdNearestLink(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
@@ -118,14 +117,14 @@ public class DynamicNetworkPainterManager {
 		}
 		return nearest.getId();
 	}
-	public Id getIdOppositeLink(Link link) {
+	public Id<Link> getIdOppositeLink(Link link) {
 		for(Link nLink: network.getLinks().values()) {
 			if(nLink.getFromNode().equals(link.getToNode()) && nLink.getToNode().equals(link.getFromNode()))
 				return nLink.getId();
 		}
 		return null;
 	}
-	protected Id getIdNearestNode(double x, double y) {
+	protected Id<Node> getIdNearestNode(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
@@ -164,7 +163,7 @@ public class DynamicNetworkPainterManager {
 		return selectedNodeId==null?"":selectedNodeId.toString();
 	}
 	public Link selectLink(String id) {
-		Link link = network.getLinks().get(new IdImpl(id));
+		Link link = network.getLinks().get(Id.createLinkId(id));
 		if(link!=null)
 			selectedLinkId = link.getId();
 		else
@@ -172,7 +171,7 @@ public class DynamicNetworkPainterManager {
 		return link;
 	}
 	public Node selectNode(String id) {
-		Node node = network.getNodes().get(new IdImpl(id));
+		Node node = network.getNodes().get(Id.createNodeId(id));
 		if(node!=null)
 			selectedNodeId = node.getId();
 		else
@@ -199,16 +198,16 @@ public class DynamicNetworkPainterManager {
 			}
 		}
 	}
-	public void selectLinkIds(Collection<Id> linkIds, Collection<Double> startTimes, Collection<Double> endTimes) {
+	public void selectLinkIds(Collection<Id<Link>> linkIds, Collection<Double> startTimes, Collection<Double> endTimes) {
 		if(linkIds.size()==startTimes.size() && startTimes.size()==endTimes.size()) {
 			for(double time = 0; time<totalTime; time+=timeStep) {
 				Set<Link> links = new HashSet<Link>();
-				Iterator<Id> linkIdsI = linkIds.iterator();
+				Iterator<Id<Link>> linkIdsI = linkIds.iterator();
 				Iterator<Double> startTimesI = startTimes.iterator();
 				Iterator<Double> endTimesI = endTimes.iterator();
 				while(linkIdsI.hasNext()) {
 					double start = startTimesI.next(), end = endTimesI.next();
-					Id linkId = linkIdsI.next();
+					Id<Link> linkId = linkIdsI.next();
 					if(start<time && time<end)
 						links.add(network.getLinks().get(linkId));
 				}

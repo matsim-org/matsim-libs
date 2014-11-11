@@ -1,8 +1,8 @@
 package playground.sergioo.weeklySimulation.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -32,9 +32,9 @@ public class RouterTester {
 		preProcessDijkstra.run(scenario.getNetwork());
 		Dijkstra dijkstra = new Dijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes());
 		for(int i=0; i<6*24*3600; i+=1800) {
-			Path path = dijkstra.calcLeastCostPath(scenario.getNetwork().getNodes().get(new IdImpl(1380035722)), scenario.getNetwork().getNodes().get(new IdImpl(1380024014)), i, null, null);
+			Path path = dijkstra.calcLeastCostPath(scenario.getNetwork().getNodes().get(Id.createNodeId(1380035722)), scenario.getNetwork().getNodes().get(Id.createNodeId(1380024014)), i, null, null);
 			if(path==null)
-				path = dijkstra.calcLeastCostPath(scenario.getNetwork().getNodes().get(new IdImpl(1380035722)), scenario.getNetwork().getNodes().get(new IdImpl(1380024014)), i, null, null);
+				path = dijkstra.calcLeastCostPath(scenario.getNetwork().getNodes().get(Id.createNodeId(1380035722)), scenario.getNetwork().getNodes().get(Id.createNodeId(1380024014)), i, null, null);
 		}
 		/*NetworkLegRouter router = new NetworkLegRouter(scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes()), new ModeRouteFactory());
 		router.routeLeg(person, leg, fromAct, toAct, depTime);*/

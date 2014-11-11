@@ -32,11 +32,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -97,7 +96,7 @@ public class NetworksShpXmlMatcherMain {
 
 	public static Network getNetworkFromShapeFilePolyline(String fileName) {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		long nodeLongId=0, linkLongId=0;
 		for(SimpleFeature feature:features)
@@ -110,7 +109,7 @@ public class NetworksShpXmlMatcherMain {
 						if(node.getCoord().equals(coord))
 							nodes[n] = node;
 					if(nodes[n]==null) {
-						nodes[n] = networkFactory.createNode(new IdImpl(nodeLongId), coord);
+						nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 						nodeLongId++;
 						if(n==0)
 							((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("INODE").toString());
@@ -121,7 +120,7 @@ public class NetworksShpXmlMatcherMain {
 				for(int n=0; n<nodes.length-1; n++) {
 					if(network.getNodes().get(nodes[n].getId())==null)
 						network.addNode(nodes[n]);
-					Link link = network.getFactory().createLink(new IdImpl(linkLongId), nodes[n], nodes[n+1]);
+					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n], nodes[n+1]);
 					link.setCapacity((Double)feature.getAttribute("DATA2"));
 					link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 					((LinkImpl)link).setOrigId(feature.getID());
@@ -136,24 +135,24 @@ public class NetworksShpXmlMatcherMain {
 	
 	public static Network getNetworkFromShapeFileLength(String fileName) {
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		for(SimpleFeature feature:features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
 				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
-				Id idFromNode = new IdImpl((Long)feature.getAttribute("INODE"));
+				Id<Node> idFromNode = Id.createNodeId((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {
 					fromNode = networkFactory.createNode(idFromNode, new CoordImpl(coords[0].x, coords[0].y));
 					network.addNode(fromNode);
 				}
-				Id idToNode = new IdImpl((Long)feature.getAttribute("JNODE"));
+				Id<Node> idToNode = Id.createNodeId((Long)feature.getAttribute("JNODE"));
 				Node toNode = network.getNodes().get(idToNode);
 				if(toNode==null) {
 					toNode = networkFactory.createNode(idToNode, new CoordImpl(coords[coords.length-1].x, coords[coords.length-1].y));
 					network.addNode(toNode);
 				}
-				Link link = network.getFactory().createLink(new IdImpl(idFromNode+"-->"+idToNode), fromNode, toNode);
+				Link link = network.getFactory().createLink(Id.createLinkId(idFromNode+"-->"+idToNode), fromNode, toNode);
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));

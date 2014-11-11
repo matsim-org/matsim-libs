@@ -5,10 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -24,7 +24,7 @@ public class NetworkPropertiesChanger {
 		String line = reader.readLine();
 		while(line!=null) {
 			String[] parts = line.split(CSV_SEPARATOR);
-			LinkImpl link = (LinkImpl) network.getLinks().get(new IdImpl(parts[0]));
+			LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId(parts[0]));
 			if(!parts[1].equals(""))
 				link.setLength(Double.parseDouble(parts[1]));
 			if(!parts[2].equals(""))

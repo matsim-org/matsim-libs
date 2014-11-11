@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -20,8 +19,8 @@ public class NetworkPainterManager {
 	
 	//Attributes
 	protected Network network;
-	protected Id selectedLinkId;
-	protected Id selectedNodeId;
+	protected Id<Link> selectedLinkId;
+	protected Id<Node> selectedNodeId;
 	protected Collection<Link> selectedLinks = new ArrayList<Link>();
 	protected Collection<Node> selectedNodes = new ArrayList<Node>();
 	
@@ -79,7 +78,7 @@ public class NetworkPainterManager {
 		return null;
 	}
 	public Link getOppositeToSelectedLink() {
-		Id id = getIdOppositeLink(getSelectedLink());
+		Id<Link> id = getIdOppositeLink(getSelectedLink());
 		if(id != null)
 			return network.getLinks().get(id);
 		return null;
@@ -92,7 +91,7 @@ public class NetworkPainterManager {
 	public Collection<? extends Link> getNetworkLinks() {
 		return network.getLinks().values();
 	}
-	protected Id getIdNearestLink(double x, double y) {
+	protected Id<Link> getIdNearestLink(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;
@@ -105,14 +104,14 @@ public class NetworkPainterManager {
 		}
 		return nearest.getId();
 	}
-	public Id getIdOppositeLink(Link link) {
+	public Id<Link> getIdOppositeLink(Link link) {
 		for(Link nLink: network.getLinks().values()) {
 			if(nLink.getFromNode().equals(link.getToNode()) && nLink.getToNode().equals(link.getFromNode()))
 				return nLink.getId();
 		}
 		return null;
 	}
-	protected Id getIdNearestNode(double x, double y) {
+	protected Id<Node> getIdNearestNode(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
@@ -151,7 +150,7 @@ public class NetworkPainterManager {
 		return selectedNodeId==null?"":selectedNodeId.toString();
 	}
 	public Link selectLink(String id) {
-		Link link = network.getLinks().get(new IdImpl(id));
+		Link link = network.getLinks().get(Id.createLinkId(id));
 		if(link!=null)
 			selectedLinkId = link.getId();
 		else
@@ -159,7 +158,7 @@ public class NetworkPainterManager {
 		return link;
 	}
 	public Node selectNode(String id) {
-		Node node = network.getNodes().get(new IdImpl(id));
+		Node node = network.getNodes().get(Id.createNodeId(id));
 		if(node!=null)
 			selectedNodeId = node.getId();
 		else
@@ -169,8 +168,8 @@ public class NetworkPainterManager {
 	public void selectLinks(Collection<Link> links) {
 		selectedLinks.addAll(links);
 	}
-	public void selectLinkIds(Collection<Id> linkIds) {
-		for(Id linkId:linkIds)
+	public void selectLinkIds(Collection<Id<Link>> linkIds) {
+		for(Id<Link> linkId:linkIds)
 			selectedLinks.add(network.getLinks().get(linkId));
 	}
 	public void addLink(double x, double y) {

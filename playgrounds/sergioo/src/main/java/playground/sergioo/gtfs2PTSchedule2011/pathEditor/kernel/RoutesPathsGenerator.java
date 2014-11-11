@@ -16,9 +16,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.sergioo.gtfs2PTSchedule2011.Route;
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
@@ -232,7 +232,7 @@ public class RoutesPathsGenerator {
 		else {
 			links = new ArrayList<Link>();
 			for(String link:linksS)
-				links.add(network.getLinks().get(new IdImpl(link)));
+				links.add(network.getLinks().get(Id.createLinkId(link)));
 		}
 		for(Link link:links) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
@@ -293,7 +293,7 @@ public class RoutesPathsGenerator {
 		Set<Link> allStopLinks = new HashSet<Link>();
 		for(Stop stop:stops.values())
 			if(stop.isFixedLinkId())
-				allStopLinks.add(network.getLinks().get(new IdImpl(stop.getLinkId())));
+				allStopLinks.add(network.getLinks().get(Id.createLinkId(stop.getLinkId())));
 		return allStopLinks;
 	}
 	

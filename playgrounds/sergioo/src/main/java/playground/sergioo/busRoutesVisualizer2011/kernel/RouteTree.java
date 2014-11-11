@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -36,7 +36,7 @@ public class RouteTree {
 			activeStops[i]=new HashMap<String, Stop>();
 			links[i]=new HashSet<Link>();
 		}
-		links[0].add(network.getLinks().get(new IdImpl(stops.get(stop).getLinkId())));
+		links[0].add(network.getLinks().get(Id.createLinkId(stops.get(stop).getLinkId())));
 		this.root = new StopRoutes(network, null, stop, numTransfers,finishedTrips,stops,activeStops,links);
 	}
 	public Set<Link>[] getLinks() {

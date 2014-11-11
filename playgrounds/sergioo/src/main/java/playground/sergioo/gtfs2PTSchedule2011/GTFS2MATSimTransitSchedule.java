@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
@@ -43,6 +42,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -148,8 +148,7 @@ public class GTFS2MATSimTransitSchedule {
 			BufferedReader reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE));
 			String line = reader.readLine();
 			while(line!=null) {
-				Id id = new IdImpl(line);
-				network.addNode(network.getFactory().createNode(id, new CoordImpl(Double.parseDouble(reader.readLine()), Double.parseDouble(reader.readLine()))));
+				network.addNode(network.getFactory().createNode(Id.createNodeId(line), new CoordImpl(Double.parseDouble(reader.readLine()), Double.parseDouble(reader.readLine()))));
 				line = reader.readLine();
 			}
 			reader.close();
@@ -162,10 +161,10 @@ public class GTFS2MATSimTransitSchedule {
 			line = reader.readLine();
 			LinkFactory linkFactory = new LinkFactoryImpl();
 			while(line!=null) {
-				Node fromNode = network.getNodes().get(new IdImpl(reader.readLine()));
-				Node toNode = network.getNodes().get(new IdImpl(reader.readLine()));
+				Node fromNode = network.getNodes().get(Id.createNodeId(reader.readLine()));
+				Node toNode = network.getNodes().get(Id.createNodeId(reader.readLine()));
 				double length = CoordUtils.calcDistance(coordinateTransformation.transform(fromNode.getCoord()),coordinateTransformation.transform(toNode.getCoord()));
-				Link link = linkFactory.createLink(new IdImpl(line), fromNode, toNode, network, length, DEFAULT_FREE_SPEED, DEFAULT_CAPACITY, 1);
+				Link link = linkFactory.createLink(Id.createLinkId(line), fromNode, toNode, network, length, DEFAULT_FREE_SPEED, DEFAULT_CAPACITY, 1);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				modes.add(RouteTypes.BUS.name);
@@ -333,7 +332,7 @@ public class GTFS2MATSimTransitSchedule {
 			if(stop.getLinkId()!=null) {
 				LinkStops linkStops = linksStops.get(stop.getLinkId());
 				if(linkStops == null) {
-					linkStops = new LinkStops(network.getLinks().get(new IdImpl(stop.getLinkId())));
+					linkStops = new LinkStops(network.getLinks().get(Id.createLinkId(stop.getLinkId())));
 					linksStops.put(stop.getLinkId(), linkStops);
 				}
 				linkStops.addStop(stop);
@@ -387,14 +386,14 @@ public class GTFS2MATSimTransitSchedule {
 				for(Entry<String, Stop> stop: stops[publicSystemNumber].entrySet())
 					if(stop.getValue().getLinkId()!=null) {
 						Coord result = coordinateTransformation.transform(stop.getValue().getPoint());
-						TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(new IdImpl(stop.getKey()), result, stop.getValue().isBlocks());
-						transitStopFacility.setLinkId(new IdImpl(stop.getValue().getLinkId()));
+						TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(Id.create(stop.getKey(), TransitStopFacility.class), result, stop.getValue().isBlocks());
+						transitStopFacility.setLinkId(Id.createLinkId(stop.getValue().getLinkId()));
 						transitStopFacility.setName(stop.getValue().getName());
 						transitSchedule.addStopFacility(transitStopFacility);
 					}
 			for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++)
 				for(Entry<String,Route> route:routes[publicSystemNumber].entrySet()) {
-					TransitLine transitLine = transitScheduleFactory.createTransitLine(new IdImpl(route.getKey()));
+					TransitLine transitLine = transitScheduleFactory.createTransitLine(Id.create(route.getKey(), TransitLine.class));
 					transitSchedule.addTransitLine(transitLine);
 					for(Entry<String,Trip> trip:route.getValue().getTrips().entrySet()) {
 						boolean isService=false;
@@ -430,18 +429,18 @@ public class GTFS2MATSimTransitSchedule {
 										e.printStackTrace();
 									}
 								}
-								transitRouteStops.add(transitScheduleFactory.createTransitRouteStop(transitSchedule.getFacilities().get(new IdImpl(stopTime.getStopId())),arrival,departure));
+								transitRouteStops.add(transitScheduleFactory.createTransitRouteStop(transitSchedule.getFacilities().get(Id.create(stopTime.getStopId(), TransitStopFacility.class)),arrival,departure));
 							}
-							TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(new IdImpl(trip.getKey()), networkRoute, transitRouteStops, route.getValue().getRouteType().name);
+							TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(Id.create(trip.getKey(), TransitRoute.class), networkRoute, transitRouteStops, route.getValue().getRouteType().name);
 							transitLine.addRoute(transitRoute);
 							int id = 1;
 							for(Frequency frequency:trip.getValue().getFrequencies())
 								for(Date actualTime = (Date) frequency.getStartTime().clone(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime()+frequency.getSecondsPerDeparture()*1000)) {
-									transitRoute.addDeparture(transitScheduleFactory.createDeparture(new IdImpl(id), Time.parseTime(timeFormat.format(actualTime))));
+									transitRoute.addDeparture(transitScheduleFactory.createDeparture(Id.create(id, Departure.class), Time.parseTime(timeFormat.format(actualTime))));
 									id++;
 								}
 							if(id==1)
-								transitRoute.addDeparture(transitScheduleFactory.createDeparture(new IdImpl(id), Time.parseTime(timeFormat.format(trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getDepartureTime()))));
+								transitRoute.addDeparture(transitScheduleFactory.createDeparture(Id.create(id, Departure.class), Time.parseTime(timeFormat.format(trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getDepartureTime()))));
 						}
 					}
 				}

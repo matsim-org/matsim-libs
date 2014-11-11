@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.router.Dijkstra;
@@ -53,20 +52,20 @@ public class TestBestTravelTimeRouter {
 							for(String d:ds)
 								if(o.startsWith(r)&&d.startsWith(r)) {
 									if(p==null) {
-										Id id = new IdImpl(o);
+										Id<Node> id = Id.createNodeId(o);
 										p = scenario.getNetwork().getNodes().get(id); 
 										if(p==null) {
 											p = factory.createNode(id, scenario.getTransitSchedule().getFacilities().get(id).getCoord());
 											scenario.getNetwork().addNode(p);
 										}
 									}
-									Id id = new IdImpl(d);
+									Id<Node> id = Id.createNodeId(d);
 									c = scenario.getNetwork().getNodes().get(id); 
 									if(c==null) {
 										c = factory.createNode(id, scenario.getTransitSchedule().getFacilities().get(id).getCoord());
 										scenario.getNetwork().addNode(c);
 									}
-									scenario.getNetwork().addLink(factory.createLink(new IdImpl(o+"_"+d), p, c));
+									scenario.getNetwork().addLink(factory.createLink(Id.createLinkId(o+"_"+d), p, c));
 								}
 						p = c;
 					}
@@ -78,20 +77,20 @@ public class TestBestTravelTimeRouter {
 						for(String d:ds)
 							if(o.startsWith(r)&&d.startsWith(r)) {
 								if(p==null) {
-									Id id = new IdImpl(o);
+									Id<Node> id = Id.createNodeId(o);
 									p = scenario.getNetwork().getNodes().get(id); 
 									if(p==null) {
 										p = factory.createNode(id, scenario.getTransitSchedule().getFacilities().get(id).getCoord());
 										scenario.getNetwork().addNode(p);
 									}
 								}
-								Id id = new IdImpl(d);
+								Id<Node> id = Id.createNodeId(d);
 								c = scenario.getNetwork().getNodes().get(id); 
 								if(c==null) {
 									c = factory.createNode(id, scenario.getTransitSchedule().getFacilities().get(id).getCoord());
 									scenario.getNetwork().addNode(c);
 								}
-								scenario.getNetwork().addLink(factory.createLink(new IdImpl(o+"_"+d), p, c));
+								scenario.getNetwork().addLink(factory.createLink(Id.createLinkId(o+"_"+d), p, c));
 							}
 					p = c;
 				}
@@ -104,28 +103,28 @@ public class TestBestTravelTimeRouter {
 						String[] ds = od[1].split("/");
 						for(String d:ds)
 							for(String d2:ds)
-								if(d!=d2 && scenario.getNetwork().getLinks().get(new IdImpl(d+"T"+d2))==null)
-									scenario.getNetwork().addLink(factory.createLink(new IdImpl(d+"T"+d2), scenario.getNetwork().getNodes().get(new IdImpl(d)), scenario.getNetwork().getNodes().get(new IdImpl(d2))));
+								if(d!=d2 && scenario.getNetwork().getLinks().get(Id.createLinkId(d+"T"+d2))==null)
+									scenario.getNetwork().addLink(factory.createLink(Id.createLinkId(d+"T"+d2), scenario.getNetwork().getNodes().get(Id.createNodeId(d)), scenario.getNetwork().getNodes().get(Id.createNodeId(d2))));
 					}
 				}
 		//Add origin nodes and links
 		Collection<Node> newONodes = new ArrayList<Node>();
 		Collection<Node> newDNodes = new ArrayList<Node>();
 		for(Node n:scenario.getNetwork().getNodes().values()) {
-			Node o = factory.createNode(new IdImpl("o_"+n.getId().toString()), n.getCoord());
-			Node d = factory.createNode(new IdImpl(n.getId().toString()+"_d"), n.getCoord());
+			Node o = factory.createNode(Id.createNodeId("o_"+n.getId().toString()), n.getCoord());
+			Node d = factory.createNode(Id.createNodeId(n.getId().toString()+"_d"), n.getCoord());
 			newONodes.add(o);
 			newDNodes.add(d);
 		}
 		/*for(Node o:newONodes) {
-			Node n = scenario.getNetwork().getNodes().get(new IdImpl(o.getId().toString().split("_")[1])); 
+			Node n = scenario.getNetwork().getNodes().get(Id.createNodeId(o.getId().toString().split("_")[1])); 
 			scenario.getNetwork().addNode(o);
-			scenario.getNetwork().addLink(factory.createLink(new IdImpl("o_"+n.getId().toString()), o, n));
+			scenario.getNetwork().addLink(factory.createLink(Id.createLinkId("o_"+n.getId().toString()), o, n));
 		}
 		for(Node d:newDNodes) {
-			Node n = scenario.getNetwork().getNodes().get(new IdImpl(d.getId().toString().split("_")[0])); 
+			Node n = scenario.getNetwork().getNodes().get(Id.createNodeId(d.getId().toString().split("_")[0])); 
 			scenario.getNetwork().addNode(d);
-			scenario.getNetwork().addLink(factory.createLink(new IdImpl(n.getId().toString()+"_d"), n, d));
+			scenario.getNetwork().addLink(factory.createLink(Id.createLinkId(n.getId().toString()+"_d"), n, d));
 		}*/
 		//new SimpleNetworkWindow("MRT", scenario.getNetwork()).setVisible(true);
 		final TravelTime tt = new TravelTime() {
@@ -155,8 +154,8 @@ public class TestBestTravelTimeRouter {
 				return link.getLength()/link.getFreespeed();
 			}
 		};
-		Node o = scenario.getNetwork().getNodes().get(new IdImpl("NS2"));
-		Node d = scenario.getNetwork().getNodes().get(new IdImpl("NE15"));
+		Node o = scenario.getNetwork().getNodes().get(Id.createNodeId("NS2"));
+		Node d = scenario.getNetwork().getNodes().get(Id.createNodeId("NE15"));
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());
 		long time = System.currentTimeMillis();

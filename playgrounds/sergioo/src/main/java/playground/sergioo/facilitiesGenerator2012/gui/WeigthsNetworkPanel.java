@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.sergioo.facilitiesGenerator2012.gui.WeigthsNetworkWindow.Option;
 import playground.sergioo.visualizer2D2012.ArrowsPainter;
@@ -66,12 +67,12 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 	private boolean withNetwork = true;
 	
 	//Methods
-	public WeigthsNetworkPanel(WeigthsNetworkWindow window, NetworkPainter networkPainter, Map<Tuple<Id, Id>, Tuple<Boolean, Double>> ids, SortedMap<Id, ActivityFacility> mPAreas, SortedMap<String, Coord> stopsBase) {
+	public WeigthsNetworkPanel(WeigthsNetworkWindow window, NetworkPainter networkPainter, Map<Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>, Tuple<Boolean, Double>> ids, SortedMap<Id<ActivityFacility>, ActivityFacility> mPAreas, SortedMap<String, Coord> stopsBase) {
 		super();
 		this.window = window;
 		addLayer(new Layer(networkPainter));
 		ArrowsPainter arrowsPainter = new ArrowsPainter();
-		for(Entry<Tuple<Id, Id>, Tuple<Boolean, Double>> data:ids.entrySet()) {
+		for(Entry<Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>, Tuple<Boolean, Double>> data:ids.entrySet()) {
 			if(data.getValue().getSecond()>0.01) {
 				Coord coord = mPAreas.get(data.getKey().getSecond()).getCoord();
 				double[] point = new double[]{coord.getX(), coord.getY()};

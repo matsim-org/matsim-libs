@@ -9,15 +9,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -47,7 +47,7 @@ public class FacilitiesFileGenerator {
 	 * @throws NoConnectionException 
 	 */
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("Facilities Singapore");
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();
 		DataBaseAdmin dataBaseFacilities  = new DataBaseAdmin(new File("./data/facilities/DataBaseFacilities.properties"));
 		Map<Integer, Collection<Tuple<String,Double>>> activityOptions = new HashMap<Integer, Collection<Tuple<String,Double>>>();
 		ResultSet optionsResult = dataBaseFacilities.executeQuery("SELECT facility_id,type,capacity FROM Activity_options");
@@ -71,14 +71,14 @@ public class FacilitiesFileGenerator {
 		timesResult.close();
 		ResultSet facilitiesResult = dataBaseFacilities.executeQuery("SELECT external_id,x,y,id FROM Facilities");
 		while(facilitiesResult.next()) {
-			ActivityFacility facility = facilities.createAndAddFacility(new IdImpl(facilitiesResult.getInt(1)), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
+			ActivityFacility facility = facilities.createAndAddFacility(Id.create(facilitiesResult.getInt(1), ActivityFacility.class), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
 			int facilityId=facilitiesResult.getInt(4);
 			for(Tuple<String,Double> optionData:activityOptions.get(facilitiesResult.getInt(4))) {
 				ActivityOption option = ((ActivityFacilityImpl)facility).createActivityOption(optionData.getFirst());
 				option.setCapacity(optionData.getSecond());
 				Collection<Tuple<Double, Double>> times = openingTimes.get(optionData.getFirst()+"##"+facilityId);
 				for(Tuple<Double, Double> time:times)
-					option.addOpeningTime(new OpeningTimeImpl(DayType.wkday, time.getFirst(), time.getSecond()));
+					option.addOpeningTime(new OpeningTimeImpl(time.getFirst(), time.getSecond()));
 			}
 			optionsResult.close();
 		}
@@ -95,7 +95,7 @@ public class FacilitiesFileGenerator {
 		DataBaseAdmin dataBaseFacilities  = new DataBaseAdmin(new File("./data/facilities/DataBaseFacilities.properties"));
 		ResultSet facilitiesResult = dataBaseFacilities.executeQuery("SELECT external_id,x,y,id FROM Facilities");
 		while(facilitiesResult.next()) {
-			ActivityFacility facility = facilities.createFacility(new IdImpl(facilitiesResult.getInt(1)), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
+			ActivityFacility facility = facilities.createFacility(Id.create(facilitiesResult.getInt(1), ActivityFacility.class), new CoordImpl(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
 			int facilityId=facilitiesResult.getInt(4);
 			ResultSet optionsResult = dataBaseFacilities.executeQuery("SELECT type,capacity FROM Activity_options WHERE facility_id="+facilityId);
 			while(optionsResult.next()) {

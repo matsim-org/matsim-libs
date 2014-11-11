@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -46,12 +47,12 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 	private static final NumberFormat numberFormat = new DecimalFormat("00.0");
 	
 	//Attributes
-	private Map<Id, List<String>> activityChains;
+	private Map<Id<Person>, List<String>> activityChains;
 	private EventsManager eventsManager;
 
 	//Constructors
 	public ChainsAnalyzer(String networkFile, String plansFile, String eventsFile, String noHomeFileLocation) throws FileNotFoundException {
-		activityChains = new HashMap<Id, List<String>>();
+		activityChains = new HashMap<Id<Person>, List<String>>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
 		new MatsimPopulationReader(scenario).parse(plansFile);
@@ -65,7 +66,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 	private void reviewLastActivity(String noHomeFileLocation) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(noHomeFileLocation);
 		int noHome = 0;
-		for(Entry<Id,List<String>> activityChain:activityChains.entrySet()) {
+		for(Entry<Id<Person>, List<String>> activityChain:activityChains.entrySet()) {
 			if(!activityChain.getKey().toString().contains("pt_")) {
 				String lastActivity = activityChain.getValue().get(activityChain.getValue().size()-1);
 				if(!lastActivity.contains("home")) {
@@ -79,11 +80,11 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 	private void reviewActivities(String noHomeFileLocation, Population population) throws FileNotFoundException {
 		PrintWriter writer = new PrintWriter(noHomeFileLocation);
 		int noHome = 0;
-		for(Entry<Id,List<String>> activityChain:activityChains.entrySet()) {
+		for(Entry<Id<Person>, List<String>> activityChain:activityChains.entrySet()) {
 			if(!activityChain.getKey().toString().contains("pt_")) {
 				String lastActivity = activityChain.getValue().get(activityChain.getValue().size()-1);
 				if(!lastActivity.contains("home")) {
-					Id personId =  activityChain.getKey();
+					Id<Person> personId =  activityChain.getKey();
 					String plan = personId+": ";
 					for(PlanElement planElement:population.getPersons().get(personId).getSelectedPlan().getPlanElements())
 						plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";
@@ -96,6 +97,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 				}
 			}
 		}
+		writer.close();
 		System.out.println("No home: "+noHome);
 	}
 	@Override

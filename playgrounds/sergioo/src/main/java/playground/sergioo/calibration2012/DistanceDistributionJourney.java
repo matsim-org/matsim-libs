@@ -40,7 +40,7 @@ public class DistanceDistributionJourney {
 	}
 	
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, DistanceDistributionJourney.TravellerChain>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, DistanceDistributionJourney.TravellerChain>();
 	private Population population;
 	private Network network;
 	private TransitSchedule transitSchedule;
@@ -102,6 +102,7 @@ public class DistanceDistributionJourney {
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

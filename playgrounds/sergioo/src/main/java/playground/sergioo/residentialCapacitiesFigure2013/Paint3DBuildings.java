@@ -9,7 +9,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -44,11 +43,11 @@ public class Paint3DBuildings {
 		BufferedReader reader = new BufferedReader(new FileReader(args[1]));
 		reader.readLine();
 		String line = reader.readLine();
-		Map<Id, String> types = new HashMap<Id, String>();
+		Map<Id<ActivityFacility>, String> types = new HashMap<Id<ActivityFacility>, String>();
 		long i = 0;
 		while(line!=null) {
 			String[] parts = line.split(SEPARATOR);
-			Id id = new IdImpl(i);
+			Id<ActivityFacility> id = Id.create(i, ActivityFacility.class);
 			types.put(id, parts[0]);
 			ActivityFacility facility = factory.createActivityFacility(id, transformation.transform(new CoordImpl(parts[2], parts[1])));
 			ActivityOption option = factory.createActivityOption("home");

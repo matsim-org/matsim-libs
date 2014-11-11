@@ -35,11 +35,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,24 +77,24 @@ public class ApplyCapacities {
 		}
 		reader.close();
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(fileName);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		for(SimpleFeature feature : features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
 				Coordinate[] coords = ((Geometry) feature.getDefaultGeometry()).getCoordinates();
-				Id idFromNode = new IdImpl((Long)feature.getAttribute("INODE"));
+				Id<Node> idFromNode = Id.createNodeId((Long)feature.getAttribute("INODE"));
 				Node fromNode = network.getNodes().get(idFromNode);
 				if(fromNode==null) {
 					fromNode = networkFactory.createNode(idFromNode, new CoordImpl(coords[0].x, coords[0].y));
 					network.addNode(fromNode);
 				}
-				Id idToNode = new IdImpl((Long)feature.getAttribute("JNODE"));
+				Id<Node> idToNode = Id.createNodeId((Long)feature.getAttribute("JNODE"));
 				Node toNode = network.getNodes().get(idToNode);
 				if(toNode==null) {
 					toNode = networkFactory.createNode(idToNode, new CoordImpl(coords[coords.length-1].x, coords[coords.length-1].y));
 					network.addNode(toNode);
 				}
-				Link link = network.getFactory().createLink(new IdImpl(idFromNode+"-->"+idToNode), fromNode, toNode);
+				Link link = network.getFactory().createLink(Id.createLinkId(idFromNode+"-->"+idToNode), fromNode, toNode);
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
 				link.setFreespeed(freeSpeedsMap.get((Integer)feature.getAttribute("VDF"))/3.6);
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
@@ -113,9 +112,10 @@ public class ApplyCapacities {
 			String line = reader.readLine();
 			while(line!=null) {
 				String[] parts = line.split(":::");
-				linksChanged.put(networkB.getLinks().get(new IdImpl(parts[0])), new Tuple<Link,Double>(networkA.getLinks().get(new IdImpl(parts[1])), Double.parseDouble(parts[2])));
+				linksChanged.put(networkB.getLinks().get(Id.createLinkId(parts[0])), new Tuple<Link,Double>(networkA.getLinks().get(Id.createLinkId(parts[1])), Double.parseDouble(parts[2])));
 				line = reader.readLine();
 			}
+			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

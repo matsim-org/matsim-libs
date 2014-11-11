@@ -23,11 +23,11 @@ package playground.sergioo.ptsim2013.pt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
@@ -41,6 +41,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 public class TransitDriver extends AbstractTransitDriver {
 
@@ -59,7 +60,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
 			final TransitStopAgentTracker agentTracker, InternalInterface internalInterface) {
 		super(internalInterface, agentTracker);
-		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
+		PersonImpl driver = new PersonImpl(Id.createPersonId("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
 		Plan plan = new PlanImpl();
 		Leg leg = new LegImpl(TransportMode.car);
@@ -130,7 +131,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 	
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		return ((NetworkRoute)this.currentLeg.getRoute()).getVehicleId() ;
 	}
 
@@ -141,7 +142,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return this.currentLeg.getRoute().getEndLinkId();
 	}
 

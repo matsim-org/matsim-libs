@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 
@@ -56,7 +55,7 @@ public class StrategyPopsConfigGroup extends Module {
 	private String externalExeTmpFileRootDir = null;
 	private long externalExeTimeOut = 3600;
 
-	private final Map<String, LinkedHashMap<Id, StrategySettings>> settings = new HashMap<String, LinkedHashMap<Id, StrategySettings>>();
+	private final Map<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>> settings = new HashMap<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>>();
 	
 	private static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
 	private Map<String, String> planSelectorForRemoval = new HashMap<String, String>(); 
@@ -90,7 +89,7 @@ public class StrategyPopsConfigGroup extends Module {
 				throw new RuntimeException("please use direct getter") ;
 			else if(parts.length == 2)
 				parts = new String[]{parts[0],PersonImplPops.DEFAULT_POP,parts[1]};
-			StrategySettings settings = getStrategySettings(parts[1], new IdImpl(parts[2]), false);
+			StrategySettings settings = getStrategySettings(parts[1], Id.create(parts[2], StrategySettings.class), false);
 			if (settings == null)
 				return null;
 			else {
@@ -129,7 +128,7 @@ public class StrategyPopsConfigGroup extends Module {
 			else {
 				if(parts.length == 2)
 					parts = new String[]{parts[0],PersonImplPops.DEFAULT_POP,parts[1]};
-				StrategySettings settings = getStrategySettings(parts[1], new IdImpl(parts[2]), true);
+				StrategySettings settings = getStrategySettings(parts[1], Id.create(parts[2], StrategySettings.class), true);
 				if (settings != null) {
 					if(parts[0].equals(MODULE))
 						settings.setModuleName(value);
@@ -149,9 +148,9 @@ public class StrategyPopsConfigGroup extends Module {
 	@Override
 	public Map<String, String> getParams() {
 		Map<String, String> map = new LinkedHashMap<String, String>();
-		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet()) {
+		for(Entry<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>> popSettingsE:this.settings.entrySet()) {
 			map.put(MAX_AGENT_PLAN_MEMORY_SIZE+"_"+popSettingsE.getKey(), getValue(MAX_AGENT_PLAN_MEMORY_SIZE+"_"+popSettingsE.getKey()));
-			for (Map.Entry<Id, StrategySettings>  entry : popSettingsE.getValue().entrySet()) {
+			for (Map.Entry<Id<StrategySettings>, StrategySettings>  entry : popSettingsE.getValue().entrySet()) {
 				map.put(MODULE+"_"+popSettingsE.getKey()+"_"+entry.getKey().toString(), entry.getValue().getModuleName());
 				map.put(MODULE_PROBABILITY+"_"+popSettingsE.getKey()+"_"+entry.getKey().toString(), Double.toString(entry.getValue().getProbability()));
 				if (entry.getValue().getDisableAfter() == -1) {
@@ -173,11 +172,11 @@ public class StrategyPopsConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet()) {
+		for(Entry<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>> popSettingsE:this.settings.entrySet()) {
 			map.put(ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
 			map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 			int cnt = 0 ;
-			for (Map.Entry<Id, StrategySettings>  entry : popSettingsE.getValue().entrySet()) {
+			for (Map.Entry<Id<StrategySettings>, StrategySettings>  entry : popSettingsE.getValue().entrySet()) {
 				cnt++ ;
 				if ( cnt==1 ) {
 					// put comments only for the first strategy to improve readability
@@ -203,10 +202,10 @@ public class StrategyPopsConfigGroup extends Module {
 		super.checkConsistency();
 
 		// check that the strategies are numbered from 1 to n
-		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet()) {
+		for(Entry<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>> popSettingsE:this.settings.entrySet()) {
 			int nofStrategies = popSettingsE.getValue().size();
 			for (int i = 1; i <= nofStrategies; i++) {
-				StrategySettings settings = getStrategySettings(popSettingsE.getKey(), new IdImpl(Integer.toString(i)), false);
+				StrategySettings settings = getStrategySettings(popSettingsE.getKey(), Id.create(Integer.toString(i), StrategySettings.class), false);
 				if (settings == null) {
 					throw new RuntimeException("Loaded " + nofStrategies + " strategies which should be numbered from 1 to n, but could not find strategy " + i);
 				}
@@ -214,8 +213,8 @@ public class StrategyPopsConfigGroup extends Module {
 		}
 
 		// check that each strategy has moduleName set and probability >= 0.0
-		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet())
-			for (Map.Entry<Id, StrategySettings> settings : popSettingsE.getValue().entrySet()) {
+		for(Entry<String, LinkedHashMap<Id<StrategySettings>, StrategySettings>> popSettingsE:this.settings.entrySet())
+			for (Map.Entry<Id<StrategySettings>, StrategySettings> settings : popSettingsE.getValue().entrySet()) {
 				if (settings.getValue().getModuleName() == null) {
 					throw new RuntimeException("Strategy "+"_"+popSettingsE.getKey()+"_"+settings.getKey() + " has no module set (Missing 'Module_" + settings.getKey() + "').");
 				}
@@ -238,9 +237,9 @@ public class StrategyPopsConfigGroup extends Module {
 		if (this.settings.get(populationId)!=null && this.settings.get(populationId).containsKey(stratSets.getId())) {
 			throw new IllegalArgumentException("A strategy with id: " + stratSets.getId() + " is already configured!");
 		}
-		LinkedHashMap<Id, StrategySettings> popSettings = this.settings.get(populationId);
+		LinkedHashMap<Id<StrategySettings>, StrategySettings> popSettings = this.settings.get(populationId);
 		if(popSettings==null) {
-			popSettings = new LinkedHashMap<Id, StrategySettings>();
+			popSettings = new LinkedHashMap<Id<StrategySettings>, StrategySettings>();
 			this.settings.put(populationId, popSettings);
 		}
 		popSettings.put(stratSets.getId(), stratSets);
@@ -250,10 +249,10 @@ public class StrategyPopsConfigGroup extends Module {
 		return this.settings.get(populationId).values();
 	}
 
-	private StrategySettings getStrategySettings(String populationId, final Id index, final boolean createIfMissing) {
-		LinkedHashMap<Id, StrategySettings> popSettings = this.settings.get(populationId);
+	private StrategySettings getStrategySettings(String populationId, final Id<StrategySettings> index, final boolean createIfMissing) {
+		LinkedHashMap<Id<StrategySettings>, StrategySettings> popSettings = this.settings.get(populationId);
 		if(popSettings == null && createIfMissing) {
-			popSettings = new LinkedHashMap<Id, StrategySettings>();
+			popSettings = new LinkedHashMap<Id<StrategySettings>, StrategySettings>();
 			this.settings.put(populationId, popSettings);
 		}
 		else if(popSettings == null)
@@ -300,13 +299,13 @@ public class StrategyPopsConfigGroup extends Module {
 	}
 
 	public static class StrategySettings implements MatsimParameters {
-		private Id id;
+		private Id<StrategySettings> id;
 		private double probability = -1.0;
 		private String moduleName = null;
 		private int disableAfter = -1;
 		private String exePath = null;
 
-		public StrategySettings(final Id id) {
+		public StrategySettings(final Id<StrategySettings> id) {
 			this.id = id;
 		}
 
@@ -342,7 +341,7 @@ public class StrategyPopsConfigGroup extends Module {
 			return this.exePath;
 		}
 
-		public Id getId() {
+		public Id<StrategySettings> getId() {
 			return this.id;
 		}
 

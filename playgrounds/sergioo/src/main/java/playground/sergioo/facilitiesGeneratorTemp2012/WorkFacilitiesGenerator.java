@@ -21,16 +21,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -108,7 +107,7 @@ public class WorkFacilitiesGenerator {
 		}
 	}
 	private static void assignActivityOptions() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("Work facilities Singapore");
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("Work facilities Singapore");
 		BufferedReader reader = new BufferedReader(new FileReader("./data/facilities/postalCodes.txt"));
 		SortedMap<Integer, Integer> postalCodes = new TreeMap<Integer, Integer>();
 		String line = reader.readLine();
@@ -233,7 +232,7 @@ public class WorkFacilitiesGenerator {
 			int f=0;
 			while(facilityI.hasNext()) {
 				Entry<Integer, Tuple<String, Coord>> facilityE = facilityI.next();
-				ActivityFacilityImpl facility = facilities.createAndAddFacility(new IdImpl(facilityE.getKey()), coordinateTransformation.transform(facilityE.getValue().getSecond()));
+				ActivityFacilityImpl facility = facilities.createAndAddFacility(Id.create(facilityE.getKey(), ActivityFacility.class), coordinateTransformation.transform(facilityE.getValue().getSecond()));
 				ResultSet resultOccupations = dataBaseAuxiliar.executeQuery("SELECT occupation,quantity FROM Activity_types,Activity_types_X_Place_types,Place_types_X_RealEstate_place_types,RealEstate_place_types WHERE Activity_types.id=activity_type_id AND Activity_types_X_Place_types.place_type_id=Place_types_X_RealEstate_place_types.place_type_id AND realestate_place_type_id=RealEstate_place_types.id AND name='"+facilityE.getValue().getFirst()+"'");
 				Map<String,Integer> occupations = new HashMap<String, Integer>();
 				int totalQuantity=0;
@@ -265,7 +264,7 @@ public class WorkFacilitiesGenerator {
 											}
 											else if(startTime==endTime)
 												endTime+=28800;
-											((ActivityOptionImpl)facility.getActivityOptions().get(resultOccupations.getString(1))).addOpeningTime(new OpeningTimeImpl(DayType.wkday, startTime, endTime));
+											((ActivityOptionImpl)facility.getActivityOptions().get(resultOccupations.getString(1))).addOpeningTime(new OpeningTimeImpl(startTime, endTime));
 											break;
 										}
 									}
@@ -338,7 +337,7 @@ public class WorkFacilitiesGenerator {
 				capacity+=activityOption.getCapacity();
 			capEZLinkZones.put(zone, capEZLinkZones.get(zone)+capacity);
 		}
-		Set<Id> removeFacilities = new HashSet<Id>();
+		Set<Id<ActivityFacility>> removeFacilities = new HashSet<Id<ActivityFacility>>();
 		for(ActivityFacility facility:facilities.getFacilities().values()) {
 			int zone = getZone(allPostalCodes, allZones, facility.getCoord(), Integer.parseInt(facility.getId().toString()));
 			Set<String> removeOptions = new HashSet<String>();
@@ -354,7 +353,7 @@ public class WorkFacilitiesGenerator {
 			if(facility.getActivityOptions().size()==0)
 				removeFacilities.add(facility.getId());
 		}
-		for(Id key:removeFacilities)
+		for(Id<ActivityFacility> key:removeFacilities)
 			facilities.getFacilities().remove(key);
 		dataBasePostalCodes.close();
 		new FacilitiesWriter(facilities).write(WORK_FACILITIES_FILE);
@@ -384,7 +383,7 @@ public class WorkFacilitiesGenerator {
 				else
 					dataBaseFacilities.executeStatement("UPDATE Activity_options SET capacity=capacity+"+optionResult.getDouble(1)+" WHERE type='"+option.getType()+"' AND facility_id ="+idFacility);
 				for(OpeningTime openingTime:option.getOpeningTimes())
-					dataBaseFacilities.executeStatement("INSERT INTO Opening_times (day_type,start_time,end_time,type,facility_id) VALUES ('"+DayType.wkday+"',"+openingTime.getStartTime()+","+openingTime.getEndTime()+",'"+option.getType()+"',"+idFacility+")");
+					dataBaseFacilities.executeStatement("INSERT INTO Opening_times (day_type,start_time,end_time,type,facility_id) VALUES ('"+openingTime.getStartTime()+","+openingTime.getEndTime()+",'"+option.getType()+"',"+idFacility+")");
 			}
 		}
 	}
@@ -517,7 +516,7 @@ public class WorkFacilitiesGenerator {
 		dataBasePostalCodes.close();
 		//Buildings postal codes
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealEstate.properties"));
-		Map<Id,Integer> buildingsPostalCodes = new HashMap<Id, Integer>();
+		Map<Id<ActivityFacility>, Integer> buildingsPostalCodes = new HashMap<Id<ActivityFacility>, Integer>();
 		ResultSet resultFacilities = dataBaseBuildings.executeQuery("SELECT id_building_directory,longitude,latitude,post_code FROM building_directory");
 		while(resultFacilities.next()) {
 			boolean badPostalCode = false;
@@ -537,22 +536,22 @@ public class WorkFacilitiesGenerator {
 					if(CoordUtils.calcDistance(coord, postalCodeE.getValue())<CoordUtils.calcDistance(coord, postalCodes.get(postalCode)))
 						postalCode = postalCodeE.getKey();
 			}
-			buildingsPostalCodes.put(new IdImpl(resultFacilities.getInt(1)), postalCode);
+			buildingsPostalCodes.put(Id.create(resultFacilities.getInt(1), ActivityFacility.class), postalCode);
 			if(buildingsPostalCodes.size()%100==0)
 				System.out.println(buildingsPostalCodes.size());
 		}
 		resultFacilities.close();
 		dataBaseBuildings.close();
 		PrintWriter printWriter = new PrintWriter("./data/facilities/postalCodes.txt");
-		for(Entry<Id, Integer> postalCodeE:buildingsPostalCodes.entrySet())
+		for(Entry<Id<ActivityFacility>, Integer> postalCodeE:buildingsPostalCodes.entrySet())
 			printWriter.println(postalCodeE.getKey()+",,,"+postalCodeE.getValue());
 		printWriter.close();
 	}
 	private static ActivityFacilities createEmptyFacilities() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
-		ActivityFacilities facilities = new ActivityFacilitiesImpl("Singapore work capacities");
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("Work facilities Singapore");
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		Map<String,Id> postCodes = new HashMap<String,Id>();
-		Map<Coord,Id> centers = new HashMap<Coord,Id>();
+		Map<String, Id<ActivityFacility>> postCodes = new HashMap<String,Id<ActivityFacility>>();
+		Map<Coord, Id<ActivityFacility>> centers = new HashMap<Coord,Id<ActivityFacility>>();
 		int numFacilities = 0;
 		int numFacRepPosCode = 0;
 		int numFacRepLocation = 0;
@@ -563,7 +562,7 @@ public class WorkFacilitiesGenerator {
 			ActivityFacilityImpl facility;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {
-					facility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
+					facility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(Id.create(resultFacilities.getString(1), ActivityFacility.class), coordinateTransformation.transform(center));
 					postCodes.put(resultFacilities.getString(5),facility.getId());
 					centers.put(center,facility.getId());
 				}

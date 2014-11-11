@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -30,10 +29,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.artemc.networkTools.StopFacilityGenerator;
 import playground.sergioo.visualizer2D2012.Layer;
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.LayersWindow;
@@ -129,12 +131,12 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 			}
 			if(!backwards.isEmpty()) {
 				if(backwards.equals("A")) {
-					stationsPainterA.increaseSize(coords.get(new IdImpl(startStop)));
-					printWriter.println("G "+coords.get(new IdImpl(startStop)).getX()+" "+coords.get(new IdImpl(startStop)).getY());
+					stationsPainterA.increaseSize(coords.get(Id.create(startStop, TransitStopFacility.class)));
+					printWriter.println("G "+coords.get(Id.create(startStop, TransitStopFacility.class)).getX()+" "+coords.get(Id.create(startStop, TransitStopFacility.class)).getY());
 				}
 				else {
-					stationsPainterB.increaseSize(coords.get(new IdImpl(startStop)));
-					printWriter.println("H "+coords.get(new IdImpl(startStop)).getX()+" "+coords.get(new IdImpl(startStop)).getY());
+					stationsPainterB.increaseSize(coords.get(Id.create(startStop, TransitStopFacility.class)));
+					printWriter.println("H "+coords.get(Id.create(startStop, TransitStopFacility.class)).getX()+" "+coords.get(Id.create(startStop, TransitStopFacility.class)).getY());
 				}
 				backwards = "";
 				startStop = null;
@@ -154,14 +156,14 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
-		TransitRoute routeA = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("EW")).getRoutes().get(new IdImpl("EW_weeksatday_1"));
-		TransitRoute routeB = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("EW")).getRoutes().get(new IdImpl("EW_weeksatday_2"));
-		TransitRoute routeC = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("NS")).getRoutes().get(new IdImpl("NS_weeksatday_1"));
-		TransitRoute routeD = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("NS")).getRoutes().get(new IdImpl("NS_weeksatday_2"));
-		TransitRoute routeE = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("NE")).getRoutes().get(new IdImpl("NE_weeksatday_1"));
-		TransitRoute routeF = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("NE")).getRoutes().get(new IdImpl("NE_weeksatday_2"));
-		TransitRoute routeG = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("CC")).getRoutes().get(new IdImpl("CC_daily_new_1"));
-		TransitRoute routeH = scenario.getTransitSchedule().getTransitLines().get(new IdImpl("CC")).getRoutes().get(new IdImpl("CC_daily_new_2"));
+		TransitRoute routeA = scenario.getTransitSchedule().getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().get(Id.create("EW_weeksatday_1", TransitRoute.class));
+		TransitRoute routeB = scenario.getTransitSchedule().getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().get(Id.create("EW_weeksatday_2", TransitRoute.class));
+		TransitRoute routeC = scenario.getTransitSchedule().getTransitLines().get(Id.create("NS", TransitLine.class)).getRoutes().get(Id.create("NS_weeksatday_1", TransitRoute.class));
+		TransitRoute routeD = scenario.getTransitSchedule().getTransitLines().get(Id.create("NS", TransitLine.class)).getRoutes().get(Id.create("NS_weeksatday_2", TransitRoute.class));
+		TransitRoute routeE = scenario.getTransitSchedule().getTransitLines().get(Id.create("NE", TransitLine.class)).getRoutes().get(Id.create("NE_weeksatday_1", TransitRoute.class));
+		TransitRoute routeF = scenario.getTransitSchedule().getTransitLines().get(Id.create("NE", TransitLine.class)).getRoutes().get(Id.create("NE_weeksatday_2", TransitRoute.class));
+		TransitRoute routeG = scenario.getTransitSchedule().getTransitLines().get(Id.create("CC", TransitLine.class)).getRoutes().get(Id.create("CC_daily_new_1", TransitRoute.class));
+		TransitRoute routeH = scenario.getTransitSchedule().getTransitLines().get(Id.create("CC", TransitLine.class)).getRoutes().get(Id.create("CC_daily_new_2", TransitRoute.class));
 		final StationsPainter stationsPainterA = new StationsPainter(new Color(80,255,80,100), scale);
 		final StationsPainter stationsPainterB = new StationsPainter(new Color(0,135,0,100), scale);
 		final StationsPainter stationsPainterC = new StationsPainter(new Color(255,80,80,100), scale);

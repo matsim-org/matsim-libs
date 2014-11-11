@@ -129,7 +129,7 @@ public class WorkersBSPainter extends NetworkPainter {
 		colorsMap.put(1.0f, Color.ORANGE.darker().darker().darker());
 		//ScaleColor.paintLogScale(colorsMap, g2, layersPanel.getSize().width-330, layersPanel.getSize().height-60, 300, 30, new Font("Times New Roman", Font.PLAIN, 16), Color.BLACK, 1, maxCapacityTotal, 5);
 	}
-	public void setData(ActivityFacilities facilities, String[] schedules, Map<Id, String> types) {
+	public void setData(ActivityFacilities facilities, String[] schedules, Map<Id<ActivityFacility>, String> types) {
 		SortedMap<Float, Color> colorsMap = new TreeMap<Float, Color>();
 		colorsMap.put(0.0f, Color.ORANGE.darker());
 		colorsMap.put(0.25f, Color.RED.darker());

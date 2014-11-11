@@ -31,12 +31,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -58,8 +58,8 @@ public class SimpleMasterAreas {
 	private static final String BUILDINGS_FILE = "./data/facilities/auxiliar/buildings.xml";
 
 	private static HashMap<String, Double> workerAreas = new HashMap<String, Double>();
-	private static SortedMap<Id, MPAreaData> dataMPAreas = new TreeMap<Id, MPAreaData>();
-	private static SortedMap<Id, Double> mPAreasPlotRatio = new TreeMap<Id, Double>();
+	private static SortedMap<Id<ActivityFacility>, MPAreaData> dataMPAreas = new TreeMap<Id<ActivityFacility>, MPAreaData>();
+	private static SortedMap<Id<ActivityFacility>, Double> mPAreasPlotRatio = new TreeMap<Id<ActivityFacility>, Double>();
 
 	/**
 	 * @param args
@@ -77,14 +77,14 @@ public class SimpleMasterAreas {
 		while(mPAreasR.next()) {
 			ResultSet mPAreasR2 = dataBaseAux.executeQuery("SELECT ZoneID,`Pu/Pr` FROM DCM_mplan_zones_modeshares WHERE objectID="+mPAreasR.getInt(1));
 			mPAreasR2.next();
-			dataMPAreas.put(new IdImpl(mPAreasR.getString(1)), new MPAreaData(new IdImpl(mPAreasR.getString(1)), coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), new IdImpl(mPAreasR2.getInt(1)), mPAreasR2.getDouble(2)));
-			mPAreasPlotRatio.put(new IdImpl(mPAreasR.getString(1)), mPAreasR.getDouble(3));
+			dataMPAreas.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), new MPAreaData(Id.create(mPAreasR.getString(1), ActivityFacility.class), coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(6), mPAreasR.getDouble(7))), mPAreasR.getString(2), mPAreasR.getDouble(5), Id.create(mPAreasR2.getInt(1), ActivityFacility.class), mPAreasR2.getDouble(2)));
+			mPAreasPlotRatio.put(Id.create(mPAreasR.getString(1), ActivityFacility.class), mPAreasR.getDouble(3));
 		}
 		mPAreasR.close();
 		//Load polygons
 		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(POLYGONS_FILE);
 		for(SimpleFeature feature:features) {
-			MPAreaData area = dataMPAreas.get(new IdImpl((Integer) feature.getAttribute(1)));
+			MPAreaData area = dataMPAreas.get(Id.create((Integer) feature.getAttribute(1), ActivityFacility.class));
 			if(area!=null)
 				area.setPolygon((Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));
 		}
@@ -92,13 +92,13 @@ public class SimpleMasterAreas {
 		while(typesResult.next())
 			workerAreas.put(typesResult.getString(1), typesResult.getDouble(2));
 		typesResult.close();
-		ActivityFacilitiesImpl facilities= new ActivityFacilitiesImpl();
+		ActivityFacilitiesImpl facilities= (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();
 		ResultSet buildingsR = dataBaseAux.executeQuery("SELECT objectid, mpb.x as xcoord, mpb.y as ycoord, perc_surf as area_perc, fea_id AS id_building, postal_code as postal_code, st_area_sh FROM work_facilities_aux.masterplan_areas mpa LEFT JOIN work_facilities_aux.masterplan_building_perc mpb ON mpa.objectid = mpb.object_id  WHERE use_for_generation = 1");
 		Collection<Link> noCarLinks = new ArrayList<Link>();
 		while(buildingsR.next()) {
-			Id areaId =  new IdImpl(buildingsR.getString(1));
+			Id<ActivityFacility> areaId = Id.create(buildingsR.getString(1), ActivityFacility.class);
 			MPAreaData mPArea = dataMPAreas.get(areaId);
-			Id id = new IdImpl((int)(buildingsR.getFloat(5)));
+			Id<ActivityFacility> id = Id.create((int)(buildingsR.getFloat(5)), ActivityFacility.class);
 			if(facilities.getFacilities().get(id)!=null)
 				continue;
 			ActivityFacilityImpl building = facilities.createAndAddFacility(id, new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
@@ -108,7 +108,7 @@ public class SimpleMasterAreas {
 				ActivityOptionImpl activityOption = new ActivityOptionImpl("work");
 				activityOption.setFacility(building);
 				activityOption.setCapacity(capacity);
-				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 0, 24*3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(0, 24*3600));
 				building.getActivityOptions().put(activityOption.getType(), activityOption);
 			}
 		}

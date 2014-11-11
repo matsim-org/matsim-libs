@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
@@ -43,6 +44,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -56,17 +58,17 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 		
 		//Attributes
 		boolean in = false;
-		private Map<Id, Double> passengers = new HashMap<Id, Double>();
+		private Map<Id<Person>, Double> passengers = new HashMap<Id<Person>, Double>();
 		private double distance;
 		
 		//Methods
 		public void incDistance(double linkDistance) {
 			distance += linkDistance;
 		}
-		public void addPassenger(Id passengerId) {
+		public void addPassenger(Id<Person> passengerId) {
 			passengers.put(passengerId, distance);
 		}
-		public double removePassenger(Id passengerId) {
+		public double removePassenger(Id<Person> passengerId) {
 			return distance - passengers.remove(passengerId);
 		}
 		
@@ -81,11 +83,11 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 	}
 	
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, DistanceDistributionJourneyEvents.TravellerChain>();
-	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, DistanceDistributionJourneyEvents.PTVehicle>();
-	private Map<Id, Coord> locations = new HashMap<Id, Coord>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, DistanceDistributionJourneyEvents.TravellerChain>();
+	private Map<Id<Vehicle>, PTVehicle> ptVehicles = new HashMap<Id<Vehicle>, DistanceDistributionJourneyEvents.PTVehicle>();
+	private Map<Id<Person>, Coord> locations = new HashMap<Id<Person>, Coord>();
 	private Network network;
-	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
+	private Map<Id<Person>, Integer> acts = new HashMap<Id<Person>, Integer>();
 	private int stuck=0;
 	
 	//Constructors
@@ -231,6 +233,7 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

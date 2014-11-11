@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -19,8 +18,8 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -29,6 +28,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -37,7 +37,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 
 	//Classes
 	private class EWTrip {
-		public Id id;
+		public Id<Person> id;
 		public double arriveStationTime;
 		public double enterVehicleTime;
 		public String departureStation;
@@ -47,7 +47,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 	}
 	
 	//Attributes
-	public Map<Id, EWTrip> ewAgentsTravelling = new HashMap<Id, EWTrip>();
+	public Map<Id<Person>, EWTrip> ewAgentsTravelling = new HashMap<Id<Person>, EWTrip>();
 	public Set<EWTrip> ewAgents = new HashSet<EWTrip>();
 	private final TransitSchedule transitSchedule;
 	
@@ -79,7 +79,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 		EWTrip trip = ewAgentsTravelling.get(event.getPersonId());
 		if(trip!=null && event.getLegMode().equals("pt")) {
 			SEARCHING:
-			for(TransitRoute route:transitSchedule.getTransitLines().get(new IdImpl("EW")).getRoutes().values())
+			for(TransitRoute route:transitSchedule.getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().values())
 				for(TransitRouteStop stop:route.getStops())
 					if(stop.getStopFacility().getLinkId().equals(event.getLinkId())) {
 						trip.departureStation = stop.getStopFacility().getName();
@@ -97,7 +97,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 		if(trip!=null) {
 			trip.enterVehicleTime = event.getTime();
 			SEARCHING:
-			for(TransitRoute route:transitSchedule.getTransitLines().get(new IdImpl("EW")).getRoutes().values())
+			for(TransitRoute route:transitSchedule.getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().values())
 				for(Departure departure:route.getDepartures().values())
 					if(departure.getVehicleId().equals(event.getVehicleId())) {
 						trip.serviceDepartureTime = departure.getDepartureTime();
@@ -113,7 +113,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 		if(trip!=null) {
 			if(event.getLegMode().equals("pt")) {
 				SEARCHING:
-				for(TransitRoute route:transitSchedule.getTransitLines().get(new IdImpl("EW")).getRoutes().values())
+				for(TransitRoute route:transitSchedule.getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().values())
 					for(TransitRouteStop stop:route.getStops())
 						if(stop.getStopFacility().getLinkId().equals(event.getLinkId())) {
 							trip.arrivalStation = stop.getStopFacility().getName();

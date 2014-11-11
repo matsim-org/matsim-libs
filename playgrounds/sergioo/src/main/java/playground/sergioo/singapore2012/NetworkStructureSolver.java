@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -48,14 +47,14 @@ public class NetworkStructureSolver {
 			List<Link> path2 = new ArrayList<Link>();
 			Node node = null;
 			for(String part:parts) {
-				Link link = scenario.getNetwork().getLinks().get(new IdImpl(part));
+				Link link = scenario.getNetwork().getLinks().get(Id.createLinkId(part));
 				path.add(link);
 				if(!links.add(link))
 					throw new Exception("Error: "+part);
 				node = link.getToNode();
 				nodes.add(node);
 				if(n>5) {
-					link = scenario.getNetwork().getLinks().get(new IdImpl("cl"+part));
+					link = scenario.getNetwork().getLinks().get(Id.createLinkId("cl"+part));
 					path2.add(link);
 					if(!links.add(link))
 						throw new Exception("Error: "+part);
@@ -66,7 +65,7 @@ public class NetworkStructureSolver {
 			paths.add(path);
 			if(n>5) {
 				paths.add(path2);
-				Node node2 = scenario.getNetwork().getNodes().get(new IdImpl("cl"+node.getId().toString()));
+				Node node2 = scenario.getNetwork().getNodes().get(Id.createNodeId("cl"+node.getId().toString()));
 				if(node2!=null)
 					nodes.remove(node2);
 			}
@@ -74,13 +73,13 @@ public class NetworkStructureSolver {
 			n++;
 		}
 		reader.close();
-		Map<Id, Integer> nodesCount = new HashMap<Id, Integer>();
+		Map<Id<Node>, Integer> nodesCount = new HashMap<Id<Node>, Integer>();
 		NetworkFactory factory = new NetworkFactoryImpl(scenario.getNetwork());
 		Set<Node> specialNodes = new HashSet<Node>();
-		specialNodes.add(scenario.getNetwork().getNodes().get(new IdImpl("1380007282")));
-		specialNodes.add(scenario.getNetwork().getNodes().get(new IdImpl("1380001447")));
-		specialNodes.add(scenario.getNetwork().getNodes().get(new IdImpl("1380001450")));
-		specialNodes.add(scenario.getNetwork().getNodes().get(new IdImpl("1380001459")));
+		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380007282")));
+		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380001447")));
+		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380001450")));
+		specialNodes.add(scenario.getNetwork().getNodes().get(Id.createNodeId("1380001459")));
 		for(List<Link> path:paths) {
 			Node node = null;
 			for(Link link:path) {
@@ -120,7 +119,7 @@ public class NetworkStructureSolver {
 					if(c==null)
 						c = 0;
 					else if (c>1 || !specialNodes.contains(toNode)) {
-						node = factory.createNode(new IdImpl(toNode.getId()+"_"+c++), toNode.getCoord());
+						node = factory.createNode(Id.createNodeId(toNode.getId()+"_"+c++), toNode.getCoord());
 						scenario.getNetwork().addNode(node);
 						link.setToNode(node);
 					}
@@ -133,12 +132,12 @@ public class NetworkStructureSolver {
 		(new NetworkWriter(scenario.getNetwork())).write(args[3]);
 	}
 
-	private static boolean isInTransit(Id linkId, TransitSchedule transitSchedule) {
+	private static boolean isInTransit(Id<Link> linkId, TransitSchedule transitSchedule) {
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				if(linkId.equals(route.getRoute().getStartLinkId()) || linkId.equals(route.getRoute().getEndLinkId()))
 					return true;
-				for(Id id:route.getRoute().getLinkIds())
+				for(Id<Link> id:route.getRoute().getLinkIds())
 					if(linkId.equals(id))
 						return true;
 			}

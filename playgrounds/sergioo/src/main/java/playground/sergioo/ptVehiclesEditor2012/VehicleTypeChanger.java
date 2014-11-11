@@ -40,7 +40,7 @@ public class VehicleTypeChanger {
 				for(MODES_VEHICLES mode_vehicles:MODES_VEHICLES.values())
 					if(route.getTransportMode().trim().equals(mode_vehicles.name().toLowerCase()))
 						for (Departure departure : route.getDepartures().values())
-							((VehicleImpl)vehicles.getVehicles().get(departure.getVehicleId())).setType(vehicles.getVehicleTypes().get(new IdImpl(mode_vehicles.vehicleTypes[(int) (mode_vehicles.vehicleTypes.length*Math.random())])));*/
+							((VehicleImpl)vehicles.getVehicles().get(departure.getVehicleId())).setType(vehicles.getVehicleTypes().get(Id.create(mode_vehicles.vehicleTypes[(int) (mode_vehicles.vehicleTypes.length*Math.random())], VehicleType.class)));*/
 		VehicleWriterV1 writer2 = new VehicleWriterV1(vehicles);
 		writer2.writeFile(args[2]);
 	}

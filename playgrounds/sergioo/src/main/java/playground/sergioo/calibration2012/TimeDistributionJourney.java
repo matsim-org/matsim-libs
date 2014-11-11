@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -43,7 +44,7 @@ public class TimeDistributionJourney implements PersonDepartureEventHandler, Act
 	}
 
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, TimeDistributionJourney.TravellerChain>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, TimeDistributionJourney.TravellerChain>();
 	
 	//Methods
 	@Override
@@ -87,6 +88,7 @@ public class TimeDistributionJourney implements PersonDepartureEventHandler, Act
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

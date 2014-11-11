@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -53,12 +53,12 @@ public class MaximumNumberOfWorkers {
 	
 	//Main
 	public static void main(String[] args) throws SQLException, NoConnectionException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		Map<Id, Double> maximums = new HashMap<Id, Double>();
-		Map<Id, Polygon> masterAreas = new HashMap<Id, Polygon>();
+		Map<Id<ActivityFacility>, Double> maximums = new HashMap<Id<ActivityFacility>, Double>();
+		Map<Id<ActivityFacility>, Polygon> masterAreas = new HashMap<Id<ActivityFacility>, Polygon>();
 		ShapeFileReader shapeFileReader =  new ShapeFileReader();
 		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(POLYGONS_FILE);
 		for(SimpleFeature feature:features)
-			masterAreas.put(new IdImpl((Integer) feature.getAttribute(1)), (Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));
+			masterAreas.put(Id.create((Integer) feature.getAttribute(1), ActivityFacility.class), (Polygon) ((MultiPolygon)feature.getDefaultGeometry()).getGeometryN(0));
 		DataBaseAdmin dataBaseRealState  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealState.properties"));
 		ResultSet buildingsR = dataBaseRealState.executeQuery("SELECT type, longitude, latitude FROM building_directory");
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_TM);
@@ -66,7 +66,7 @@ public class MaximumNumberOfWorkers {
 		while(buildingsR.next()) {
 			Coord buildingCoord = coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(2), buildingsR.getDouble(3)));
 			Point p = factory.createPoint(new Coordinate(buildingCoord.getX(), buildingCoord.getY()));
-			for(Entry<Id, Polygon> polygon:masterAreas.entrySet())
+			for(Entry<Id<ActivityFacility>, Polygon> polygon:masterAreas.entrySet())
 				if(p.within(polygon.getValue())) {
 					Double maximum = maximums.get(polygon.getKey());
 					if(maximum==null)
@@ -77,7 +77,7 @@ public class MaximumNumberOfWorkers {
 		}
 		dataBaseRealState.close();
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		for(Entry<Id, Double> maximum:maximums.entrySet())
+		for(Entry<Id<ActivityFacility>, Double> maximum:maximums.entrySet())
 			dataBaseAux.executeUpdate("INSERT INTO buildings VALUES");
 		dataBaseAux.close();					
 	}

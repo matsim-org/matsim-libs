@@ -11,11 +11,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -77,13 +78,13 @@ public class FacilitiesGenerator {
 		if(args.length==5)
 			createBDTypeXActivityTypeTable();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl(args[0]);
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[1]));
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile(args[2]);
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBase.properties"));
-		Map<String,Id> postCodes = new HashMap<String,Id>();
-		Map<Coord,Id> centers = new HashMap<Coord,Id>();
+		Map<String, Id<ActivityFacility>> postCodes = new HashMap<String, Id<ActivityFacility>>();
+		Map<Coord, Id<ActivityFacility>> centers = new HashMap<Coord, Id<ActivityFacility>>();
 		ResultSet resultFacilities = dataBaseBuildings.executeQuery("SELECT id_building_directory,longitude,latitude,type,post_code FROM building_directory");
 		int numFacilities = 0;
 		int numFacRepPosCode = 0;
@@ -95,7 +96,7 @@ public class FacilitiesGenerator {
 			boolean newFacility = false;
 			if(!postCodes.containsKey(resultFacilities.getString(5))) {
 				if(!centers.containsKey(center)) {
-					facility = facilities.createAndAddFacility(new IdImpl(resultFacilities.getString(1)), coordinateTransformation.transform(center));
+					facility = facilities.createAndAddFacility(Id.create(resultFacilities.getString(1), ActivityFacility.class), coordinateTransformation.transform(center));
 					newFacility = true;
 				}
 				else {
@@ -117,11 +118,11 @@ public class FacilitiesGenerator {
 			resultBDTypeXActivityType.close();
 			if(facility.getActivityOptions().size()==0) {
 				numFacNoActivities++;
-				facilities.getFacilities().remove(new IdImpl(resultFacilities.getString(1)));
+				facilities.getFacilities().remove(Id.create(resultFacilities.getString(1), ActivityFacility.class));
 			}
 			else if(newFacility){
-				postCodes.put(resultFacilities.getString(5),facility.getId());
-				centers.put(center,facility.getId());
+				postCodes.put(resultFacilities.getString(5), facility.getId());
+				centers.put(center, facility.getId());
 			}
 			numFacilities++;
 		}

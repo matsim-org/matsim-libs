@@ -29,7 +29,7 @@ public class DynamicVariableSizeSelectionNetworkPainter extends DynamicNetworkPa
 	private Color selectedNodeColor = Color.MAGENTA;
 	private Stroke selectedStroke = new BasicStroke(2);
 	private boolean withSelected = true;
-	private SortedMap<Double, Map<Id, Double>> linkWeights = new TreeMap<Double, Map<Id, Double>>();
+	private SortedMap<Double, Map<Id<Link>, Double>> linkWeights = new TreeMap<Double, Map<Id<Link>, Double>>();
 	private double minLinkWeight;
 	private double maxLinkWeight;
 	
@@ -49,16 +49,16 @@ public class DynamicVariableSizeSelectionNetworkPainter extends DynamicNetworkPa
 		this.selectedNodeColor = selectedNodeColor;
 		this.selectedStroke = selectedStroke;
 	}
-	public void setlinkWeights(Collection<Id> linkIds, Collection<Double> startTimes, Collection<Double> endTimes) {
+	public void setlinkWeights(Collection<Id<Link>> linkIds, Collection<Double> startTimes, Collection<Double> endTimes) {
 		dynamicNetworkPainterManager.selectLinkIds(linkIds, startTimes, endTimes);
 		for(double time = 0; time<dynamicNetworkPainterManager.getTotalTime(); time+=dynamicNetworkPainterManager.getTimeStep()) {
-			Map<Id, Double> map = new HashMap<Id, Double>();
-			Iterator<Id> linkIdsI = linkIds.iterator();
+			Map<Id<Link>, Double> map = new HashMap<Id<Link>, Double>();
+			Iterator<Id<Link>> linkIdsI = linkIds.iterator();
 			Iterator<Double> startTimesI = startTimes.iterator();
 			Iterator<Double> endTimesI = endTimes.iterator();
 			while(linkIdsI.hasNext()) {
 				double start = startTimesI.next(), end = endTimesI.next();
-				Id linkId = linkIdsI.next();
+				Id<Link> linkId = linkIdsI.next();
 				if(start<time && time<end)
 					map.put(linkId, (map.get(linkId)==null?0:map.get(linkId))+1);
 			}
@@ -67,7 +67,7 @@ public class DynamicVariableSizeSelectionNetworkPainter extends DynamicNetworkPa
 		minLinkWeight = Double.MAX_VALUE;
 		maxLinkWeight = 0;
 		for(double time = 0; time<dynamicNetworkPainterManager.getTotalTime(); time+=dynamicNetworkPainterManager.getTimeStep()) {
-			for(Map<Id, Double> map:linkWeights.values())
+			for(Map<Id<Link>, Double> map:linkWeights.values())
 				for(Double value:map.values()) {
 					if(value<minLinkWeight)
 						minLinkWeight = value;
@@ -118,7 +118,7 @@ public class DynamicVariableSizeSelectionNetworkPainter extends DynamicNetworkPa
 			double min = 0;
 			float maxSize = 50;
 			paintSelected(g2, layersPanel);
-			Map<Id, Double> weights = linkWeights.get(dynamicNetworkPainterManager.getTime());
+			Map<Id<Link>, Double> weights = linkWeights.get(dynamicNetworkPainterManager.getTime());
 			for(Link link:dynamicNetworkPainterManager.getSelectedLinks()) {
 				Double weight = weights.get(link.getId());
 				if(weight!=null && weight>min) {

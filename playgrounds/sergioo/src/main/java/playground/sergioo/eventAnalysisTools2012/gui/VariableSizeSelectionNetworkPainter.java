@@ -25,7 +25,7 @@ public class VariableSizeSelectionNetworkPainter extends NetworkPainter {
 	private Color selectedNodeColor = Color.MAGENTA;
 	private Stroke selectedStroke = new BasicStroke(2);
 	private boolean withSelected = true;
-	private Map<Id, Double> linkWeights = new HashMap<Id, Double>();
+	private Map<Id<Link>, Double> linkWeights = new HashMap<Id<Link>, Double>();
 	private double minLinkWeight;
 	private double maxLinkWeight;
 	
@@ -45,7 +45,7 @@ public class VariableSizeSelectionNetworkPainter extends NetworkPainter {
 		this.selectedNodeColor = selectedNodeColor;
 		this.selectedStroke = selectedStroke;
 	}
-	public void setlinkWeights(Map<Id, Double> linkWeights) {
+	public void setlinkWeights(Map<Id<Link>, Double> linkWeights) {
 		networkPainterManager.selectLinkIds(linkWeights.keySet());
 		this.linkWeights = linkWeights;
 		minLinkWeight = Double.MAX_VALUE;

@@ -3,11 +3,11 @@ package playground.sergioo.networksMatcher2012.kernel;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 
 import playground.sergioo.networksMatcher2012.kernel.core.NetworksStep;
 import playground.sergioo.networksMatcher2012.kernel.core.NodesMatching;
@@ -30,8 +30,8 @@ public class NetworkSimplifyStep extends NetworksStep {
 
 	@Override
 	protected void process(Network oldNetworkA, Network oldNetworkB) {
-		networkA = NetworkImpl.createNetwork();
-		networkB = NetworkImpl.createNetwork();
+		networkA = NetworkUtils.createNetwork();
+		networkB = NetworkUtils.createNetwork();
 		for(Node node:oldNetworkA.getNodes().values())
 			if(isMatchedNode(node, true)) {
 				manageNode(networkA, null, node, new HashSet<Node>(), true);
@@ -54,8 +54,8 @@ public class NetworkSimplifyStep extends NetworksStep {
 			}
 		}
 		else if(isMatchedNode(actualNode, inA)) {
-			if(!beginningNode.getId().equals(actualNode.getId()) && !network.getLinks().containsKey(new IdImpl("M"+beginningNode.getId()+"<->"+actualNode.getId()))) {
-				network.addLink(network.getFactory().createLink(new IdImpl("M"+beginningNode.getId()+"<->"+actualNode.getId()), beginningNode, actualNode));
+			if(!beginningNode.getId().equals(actualNode.getId()) && !network.getLinks().containsKey(Id.createLinkId("M"+beginningNode.getId()+"<->"+actualNode.getId()))) {
+				network.addLink(network.getFactory().createLink(Id.createLinkId("M"+beginningNode.getId()+"<->"+actualNode.getId()), beginningNode, actualNode));
 				manageNode(network, null, actualNode, alreadyVisited, inA);
 			}
 		}

@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -29,8 +30,11 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -43,11 +47,11 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	private class PTVehicle {
 	
 		//Attributes
-		private Id lineId;
-		private Id routeId;
+		private Id<TransitLine> lineId;
+		private Id<TransitRoute> routeId;
 	
 		//Constructors
-		public PTVehicle(Id transitLineId, Id transitRouteId) {
+		public PTVehicle(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 			this.lineId = transitLineId;
 			this.routeId = transitRouteId;
 		}
@@ -59,16 +63,16 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 		private double lastTime = 0;
 		private boolean inPT = false;
 		private boolean walk = false;
-		private Id lineId;
-		private Id routeId;
+		private Id<TransitLine> lineId;
+		private Id<TransitRoute> routeId;
 		private List<String> modes = new ArrayList<String>();
 		private List<Double> times = new ArrayList<Double>();
 	
 	}
 
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, TimeDistributionStage.TravellerChain>();
-	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, TimeDistributionStage.PTVehicle>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, TimeDistributionStage.TravellerChain>();
+	private Map<Id<Vehicle>, PTVehicle> ptVehicles = new HashMap<Id<Vehicle>, TimeDistributionStage.PTVehicle>();
 	private TransitSchedule transitSchedule;
 	
 	public TimeDistributionStage(TransitSchedule transitSchedule) {
@@ -123,7 +127,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 		else
 			chain.walk = false;
 	}
-	private String getMode(String transportMode, Id line) {
+	private String getMode(String transportMode, Id<TransitLine> line) {
 		if(transportMode.contains("bus"))
 			return "bus";
 		else if(transportMode.contains("rail"))
@@ -140,6 +144,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

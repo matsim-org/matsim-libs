@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -101,7 +100,7 @@ public class MainEventAnalyzer {
 		double dist = 0;
 		for(int i=0; i<NODES.length-1; i++)
 			for(Link link:scenario.getNetwork().getLinks().values())
-				if(scenario.getNetwork().getNodes().get(new IdImpl(NODES[i])).equals(link.getFromNode()) && scenario.getNetwork().getNodes().get(new IdImpl(NODES[i+1])).equals(link.getToNode()))
+				if(scenario.getNetwork().getNodes().get(Id.createNodeId(NODES[i])).equals(link.getFromNode()) && scenario.getNetwork().getNodes().get(Id.createNodeId(NODES[i+1])).equals(link.getToNode()))
 					dist+=link.getLength();
 		System.out.println(dist);
 	}*/
@@ -213,7 +212,7 @@ public class MainEventAnalyzer {
 				String isCar = line.substring(lastOpen-3, lastOpen);
 				if(!isCar.equals("car")) {
 					String id = line.substring(lastOpen+1, line.lastIndexOf(")"));
-					Link link = scenario.getNetwork().getLinks().get(new IdImpl(id));
+					Link link = scenario.getNetwork().getLinks().get(Id.createLinkId(id));
 					if(link!=null) {
 						i++;
 						Double value = linkWeights.get(link.getId());
@@ -281,7 +280,7 @@ public class MainEventAnalyzer {
 										String[] description = ((GenericRoute)leg.getRoute()).getRouteDescription().split("===");
 										boolean inRoute=false;
 										ROUTE:
-										for(Id linkId:scenario.getTransitSchedule().getTransitLines().get(new IdImpl(description[2])).getRoutes().get(new IdImpl(description[3])).getRoute().getLinkIds()) {
+										for(Id linkId:scenario.getTransitSchedule().getTransitLines().get(Id.create(description[2], TransitLine.class)).getRoutes().get(Id.create(description[3], TransitRoute.class)).getRoute().getLinkIds()) {
 											if(linkId.toString().equals(description[1]))
 												inRoute=true;
 											if(inRoute)

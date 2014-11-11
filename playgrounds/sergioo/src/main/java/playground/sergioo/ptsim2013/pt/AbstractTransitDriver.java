@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -49,6 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanAgent {
 
@@ -133,7 +133,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	@Override
-	public final void notifyMoveOverNode(Id nextLinkId) {
+	public final void notifyMoveOverNode(Id<Link> nextLinkId) {
 		this.nextLinkIndex++;
 	}
 
@@ -173,7 +173,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		// check if "Wenden"
 		if(getTransitLine() == null){
 			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-					this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
+					this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class), Id.create("Wenden", Departure.class)));
 		} else {
 			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
@@ -181,7 +181,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
 	}
 
 	final Netsim getSimulation(){
@@ -308,7 +308,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.dummyPerson.getId() ;
 	}
 	
@@ -350,7 +350,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		}
 
 		@Override
-		public Id getVehicleId() {
+		public Id<Vehicle> getVehicleId() {
 			return AbstractTransitDriver.this.vehicle.getVehicle().getId();
 		}
 
@@ -365,7 +365,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		}
 
 		@Override
-		public void setVehicleId(final Id vehicleId) {
+		public void setVehicleId(final Id<Vehicle> vehicleId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 

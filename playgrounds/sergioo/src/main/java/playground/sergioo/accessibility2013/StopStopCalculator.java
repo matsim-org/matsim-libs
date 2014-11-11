@@ -129,8 +129,8 @@ public class StopStopCalculator extends Thread{
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
 				if(network.getNodes().get(stop.getId())!=null) {
 					System.out.println(s+++" "+time+" "+stop.getId()+": "+(System.currentTimeMillis()-milis));
-					Map<Id, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
-					for(Entry<Id, Path> entry:paths.entrySet()) {
+					Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
+					for(Entry<Id<Node>, Path> entry:paths.entrySet()) {
 						Path path = entry.getValue();
 						RouteInfo routeInfo = new RouteInfo();
 						if(path!=null) {
@@ -236,8 +236,8 @@ public class StopStopCalculator extends Thread{
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
 				if(network.getNodes().get(stop.getId())!=null) {
 					System.out.println(s+++" "+time+" "+stop.getId()+": "+(System.currentTimeMillis()-milis));
-					Map<Id, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
-					for(Entry<Id, Path> entry:paths.entrySet()) {
+					Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
+					for(Entry<Id<Node>, Path> entry:paths.entrySet()) {
 						Path path = entry.getValue();
 						if(path!=null) {
 							String origDest = ((TransitRouterNetworkNode)path.nodes.get(0)).getStop().getStopFacility().getName()+S+
@@ -523,10 +523,10 @@ public class StopStopCalculator extends Thread{
 				"last walking distance\n");
 		for(double time = start + binSize/2; time<end; time+=binSize) {
 			System.out.println(time+": "+(System.currentTimeMillis()-milis));
-			Map<Id, Set<Id>> remainingPaths = new HashMap<Id, Set<Id>>();
+			Map<Id<TransitStopFacility>, Set<Id<TransitStopFacility>>> remainingPaths = new HashMap<Id<TransitStopFacility>, Set<Id<TransitStopFacility>>>();
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
 				if(network.getNodes().get(stop.getId())!=null) {
-					Set<Id> stopIds = new HashSet<Id>();
+					Set<Id<TransitStopFacility>> stopIds = new HashSet<Id>();
 					for(TransitStopFacility stop2:scenario.getTransitSchedule().getFacilities().values())
 						if(network.getNodes().get(stop2.getId())!=null) {
 							stopIds.add(stop2.getId());
@@ -541,8 +541,8 @@ public class StopStopCalculator extends Thread{
 					for(Id stopId:remainingPaths.get(stop.getId()))
 						if(network.getNodes().get(stopId)!=null)
 							toNodes.add(network.getNodes().get(stopId));
-					Map<Id, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
-					for(Entry<Id, Path> entry:paths.entrySet()) {
+					Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
+					for(Entry<Id<Node>, Path> entry:paths.entrySet()) {
 						Path mainPath = entry.getValue();
 						if(mainPath!=null)
 							if(mainPath.links.size()>0) {

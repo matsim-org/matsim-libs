@@ -12,11 +12,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,7 +35,7 @@ public class TransitSheduleToNetwork {
 		(new MatsimNetworkReader(scenario)).readFile(args[0]);
 		scenario.getConfig().scenario().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[1]);
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory =  new NetworkFactoryImpl(network);
 		Set<String> modes = new HashSet<String>(Arrays.asList("pt"));
 		for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {
@@ -54,19 +53,20 @@ public class TransitSheduleToNetwork {
 		}
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
-				Id sId = null, id;
+				Id<Link> sId = null; 
+				Id<Link> id;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
 				double length = scenario.getNetwork().getLinks().get(route.getRoute().getStartLinkId()).getLength();
 				int linkPos = 0;
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Id idO = route.getStops().get(s).getStopFacility().getId();
-					Id idD = route.getStops().get(s+1).getStopFacility().getId();
-					Id linkId = route.getRoute().getLinkIds().get(linkPos);
-					id = new IdImpl(route.getStops().get(s).getStopFacility().getId()+SEPARATOR+route.getStops().get(s+1).getStopFacility().getId());
+					Id<TransitStopFacility> idO = route.getStops().get(s).getStopFacility().getId();
+					Id<TransitStopFacility> idD = route.getStops().get(s+1).getStopFacility().getId();
+					Id<Link> linkId = route.getRoute().getLinkIds().get(linkPos);
+					id = Id.createLinkId(route.getStops().get(s).getStopFacility().getId()+SEPARATOR+route.getStops().get(s+1).getStopFacility().getId());
 					if(sId==null)
-						sId = idO;
+						sId = Id.createLinkId(idO.toString());
 					else
-						ids.add(idO);
+						ids.add(Id.createLinkId(idO.toString()));
 					ids.add(id);
 					while(!linkId.equals(route.getStops().get(s+1).getStopFacility().getLinkId())) {
 						length += scenario.getNetwork().getLinks().get(linkId).getLength();
@@ -77,7 +77,7 @@ public class TransitSheduleToNetwork {
 					}
 					Link link = network.getLinks().get(id);
 					if(link==null) {
-						link = factory.createLink(id, network.getNodes().get(new IdImpl("e-"+idO)), network.getNodes().get(new IdImpl("s-"+idD)));
+						link = factory.createLink(id, network.getNodes().get(Id.createNodeId("e-"+idO)), network.getNodes().get(Id.createNodeId("s-"+idD)));
 						link.setLength(length);
 						link.setFreespeed(20);
 						link.setCapacity(10000);

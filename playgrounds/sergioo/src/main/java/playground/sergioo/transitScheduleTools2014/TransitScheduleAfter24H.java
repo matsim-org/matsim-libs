@@ -3,8 +3,8 @@ package playground.sergioo.transitScheduleTools2014;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -16,6 +16,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.Vehicle;
 
 public class TransitScheduleAfter24H {
 	
@@ -27,8 +28,8 @@ public class TransitScheduleAfter24H {
 				List<Departure> newDepartures = new ArrayList<Departure>();
 				for(Departure departure:transitRoute.getDepartures().values())
 					if(departure.getDepartureTime()<numSeconds) {
-						Departure newDeparture = transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime());
-						newDeparture.setVehicleId(new IdImpl(departure.getVehicleId().toString()+"_rep"));
+						Departure newDeparture = transitScheduleFactory.createDeparture(Id.create(departure.getId().toString()+"_rep", Departure.class), Time.MIDNIGHT+departure.getDepartureTime());
+						newDeparture.setVehicleId(Id.create(departure.getVehicleId().toString()+"_rep", Vehicle.class));
 						newDepartures.add(newDeparture);
 					}
 				for(Departure departure:newDepartures)

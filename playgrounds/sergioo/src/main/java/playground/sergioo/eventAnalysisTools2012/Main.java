@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -25,6 +26,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 public class Main {
@@ -43,7 +45,7 @@ public class Main {
 		double dist = 0;
 		for(int i=0; i<NODES.length-1; i++)
 			for(Link link:scenario.getNetwork().getLinks().values())
-				if(scenario.getNetwork().getNodes().get(new IdImpl(NODES[i])).equals(link.getFromNode()) && scenario.getNetwork().getNodes().get(new IdImpl(NODES[i+1])).equals(link.getToNode()))
+				if(scenario.getNetwork().getNodes().get(Id.createNodeId(NODES[i])).equals(link.getFromNode()) && scenario.getNetwork().getNodes().get(Id.createNodeId(NODES[i+1])).equals(link.getToNode()))
 					dist+=link.getLength();
 		System.out.println(dist);
 	}*/

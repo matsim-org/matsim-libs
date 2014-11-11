@@ -101,7 +101,7 @@ public class MultiDestinationDijkstra {
 	 */
 	final TravelTime timeFunction;
 
-	final Map<Id, DijkstraNodeData> nodeData;
+	final Map<Id<Node>, DijkstraNodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -169,7 +169,7 @@ public class MultiDestinationDijkstra {
 		this.timeFunction = timeFunction;
 		this.preProcessData = preProcessData;
 
-		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id<Node>, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 
 		if (preProcessData != null) {
 			if (preProcessData.containsData() == false) {
@@ -207,9 +207,9 @@ public class MultiDestinationDijkstra {
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
 	 */
-	public Map<Id, Path> calcLeastCostPath(final Node fromNode, final Set<Node> toNodes, final double startTime, final Person person, final Vehicle vehicle) {
+	public Map<Id<Node>, Path> calcLeastCostPath(final Node fromNode, final Set<Node> toNodes, final double startTime, final Person person, final Vehicle vehicle) {
 
-		Map<Id, Double> arrivalTimes = new HashMap<Id, Double>();
+		Map<Id<Node>, Double> arrivalTimes = new HashMap<Id<Node>, Double>();
 		boolean stillSearching = true;
 		int finishedNodes = 0;
 		augmentIterationId(); // this call makes the class not threadsafe
@@ -260,8 +260,8 @@ public class MultiDestinationDijkstra {
 	 * @param preProcessData
 	 *            The time when the trip ends.
 	 */
-	protected Map<Id, Path> constructPaths(Node fromNode, Set<Node> toNodes, double startTime, Map<Id, Double> arrivalTimes) {
-		Map<Id, Path> paths = new HashMap<Id, Path>();
+	protected Map<Id<Node>, Path> constructPaths(Node fromNode, Set<Node> toNodes, double startTime, Map<Id<Node>, Double> arrivalTimes) {
+		Map<Id<Node>, Path> paths = new HashMap<Id<Node>, Path>();
 		for(Node toNode:toNodes) {
 			Double arrivalTime = arrivalTimes.get(toNode.getId());
 			Path path = null;

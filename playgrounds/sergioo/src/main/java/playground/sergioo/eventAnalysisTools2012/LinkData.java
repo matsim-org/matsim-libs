@@ -7,11 +7,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class LinkData {
 	
 	private List<TimeIntervalData> timeIntervals;
-	private Map<Id,Double> insideTimesVehicles;
+	private Map<Id<Person>, Double> insideTimesVehicles;
 	private Link link;
 	private boolean used=false;
 	private double lastTime = 0;
@@ -19,7 +20,7 @@ public class LinkData {
 	public LinkData(Link link) {
 		super();
 		timeIntervals = new ArrayList<TimeIntervalData>();
-		insideTimesVehicles = new HashMap<Id, Double>();
+		insideTimesVehicles = new HashMap<Id<Person>, Double>();
 		this.link = link;
 		addTimeInterval();
 	}
@@ -29,12 +30,12 @@ public class LinkData {
 		timeIntervals.get(timeIntervals.size()-1).sumQuantity((time-lastTime)*insideTimesVehicles.size());
 		lastTime = time;
 	}
-	public void addEnterVehicle(Id personId, Double time) {
+	public void addEnterVehicle(Id<Person> personId, Double time) {
 		timeIntervals.get(timeIntervals.size()-1).sumQuantity((time-lastTime)*insideTimesVehicles.size());
 		lastTime = time;
 		insideTimesVehicles.put(personId, time);
 	}
-	public void addExitVehicle(Id personId, Double time) {
+	public void addExitVehicle(Id<Person> personId, Double time) {
 		used = true;
 		Double enterTime = insideTimesVehicles.get(personId);
 		if(enterTime!=null) {
@@ -46,12 +47,12 @@ public class LinkData {
 			insideTimesVehicles.remove(personId);
 		}
 	}
-	public void addStartActivity(Id personId, Double time) {
+	public void addStartActivity(Id<Person> personId, Double time) {
 		timeIntervals.get(timeIntervals.size()-1).sumQuantity((time-lastTime)*insideTimesVehicles.size());
 		lastTime = time;
 		insideTimesVehicles.remove(personId);
 	}
-	public void addEndActivity(Id personId, Double time) {
+	public void addEndActivity(Id<Person> personId, Double time) {
 		
 	}
 	public boolean isUsed() {

@@ -26,8 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -46,7 +46,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
+
 import playground.sergioo.ptsim2013.TransitSheduleToNetwork;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
 
@@ -107,16 +109,16 @@ public class PTQLink implements NetsimLink {
 	// joint implementation for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
 
-	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
+	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<Id<Vehicle>, QVehicle>(10);
 
-	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
+	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id<Person>, MobsimAgent>();
 
-	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<Id, Queue<MobsimDriverAgent>>();
+	private final Map<Id<Vehicle>, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<Id<Vehicle>, Queue<MobsimDriverAgent>>();
 	
-	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<Id, MobsimDriverAgent>();
+	private final Map<Id<Person>, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<Id<Person>, MobsimDriverAgent>();
 	
 	// vehicleId 
-	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<Id, Set<MobsimAgent>>();
+	private final Map<Id<Vehicle>, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<Id<Vehicle>, Set<MobsimAgent>>();
 
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
@@ -237,7 +239,7 @@ public class PTQLink implements NetsimLink {
 		 * Some agents might be present in multiple lists/maps.
 		 * Ensure that only one stuck event per agent is created.
 		 */
-		Set<Id> stuckAgents = new HashSet<Id>();
+		Set<Id<Person>> stuckAgents = new HashSet<Id<Person>>();
 		
 		for (QVehicle veh : this.parkedVehicles.values()) {
 			if (veh.getDriver() != null) {
@@ -402,7 +404,7 @@ public class PTQLink implements NetsimLink {
 
 				if (driver instanceof TransitDriverAgent) {
 					TransitDriverAgent trDriver = (TransitDriverAgent) driver;
-					Id nextLinkId = trDriver.chooseNextLinkId();
+					Id<Link> nextLinkId = trDriver.chooseNextLinkId();
 					if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
 						// special case: transit drivers can specify the next link being the current link
 						// this can happen when a transit-lines route leads over exactly one link
@@ -449,10 +451,10 @@ public class PTQLink implements NetsimLink {
 		this.parkedVehicles.put(qveh.getId(), qveh);
 		qveh.setCurrentLink(this.link);
 	}
-	/*package*/ final QVehicle removeParkedVehicle(Id vehicleId) {
+	/*package*/ final QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
-	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
+	/*package*/ QVehicle getParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 	
@@ -470,7 +472,7 @@ public class PTQLink implements NetsimLink {
 	 * create an enter event and return true. Otherwise add the agent to
 	 * the waiting list and return false.
 	 */
-	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId, double now) {
+	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now) {
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
 		
 		// if the vehicle is not parked at the link, mark the agent as passenger waiting for vehicle
@@ -521,7 +523,7 @@ public class PTQLink implements NetsimLink {
 		/*
 		 * Insert waiting passengers into vehicle.
 		 */
-		Id vehicleId = veh.getId();
+		Id<Vehicle> vehicleId = veh.getId();
 		Set<MobsimAgent> passengers = this.passengersWaitingForCars.get(vehicleId);
 		if (passengers != null) {
 			// Copy set of passengers since otherwise we would modify it concurrently.
@@ -583,7 +585,7 @@ public class PTQLink implements NetsimLink {
 
 				if (veh.getDriver() instanceof TransitDriverAgent) {
 					TransitDriverAgent trDriver = (TransitDriverAgent) veh.getDriver();
-					Id nextLinkId = trDriver.chooseNextLinkId();
+					Id<Link> nextLinkId = trDriver.chooseNextLinkId();
 					if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
 						// special case: transit drivers can specify the next link being the current link
 						// this can happen when a transit-lines route leads over exactly one link
@@ -816,7 +818,7 @@ public class PTQLink implements NetsimLink {
 		}
 	}
 
-	QVehicle getVehicle(Id vehicleId) {
+	QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -950,7 +952,7 @@ public class PTQLink implements NetsimLink {
 		return this.bufferLastMovedTime;
 	}
 
-	public boolean hasGreenForToLink(Id toLinkId){
+	public boolean hasGreenForToLink(Id<Link> toLinkId){
 		if (this.qSignalizedItem != null){
 			return this.qSignalizedItem.isLinkGreenForToLink(toLinkId);
 		}
@@ -964,7 +966,7 @@ public class PTQLink implements NetsimLink {
 		// (this is only for capacity accumulation)
 	}
 
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+	public void setSignalStateForTurningMove(SignalGroupState state, Id<Link> toLinkId) {
 		if (!this.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + this.getLink().getId());
 		}
@@ -1016,7 +1018,7 @@ public class PTQLink implements NetsimLink {
 	}
 	
 	/*package*/ void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
-		final Id vehicleId = agent.getPlannedVehicleId() ;
+		final Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
 
 		if ( queue == null ) {
@@ -1031,11 +1033,11 @@ public class PTQLink implements NetsimLink {
 		driversWaitingForPassengers.put(agent.getId(), agent);
 	}
 
-	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id agentId) {
+	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) {
 		return driversWaitingForPassengers.remove(agentId);
 	}
 	
-	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
+	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers == null) {
 			passengers = new LinkedHashSet<MobsimAgent>();
@@ -1044,13 +1046,13 @@ public class PTQLink implements NetsimLink {
 		passengers.add(agent);
 	}
 	
-	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
+	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers != null && passengers.remove(agent)) return agent;
 		else return null;
 	}
 	
-	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) {
+	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
@@ -1060,7 +1062,7 @@ public class PTQLink implements NetsimLink {
 		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
-	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
+	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 	
@@ -1100,17 +1102,17 @@ public class PTQLink implements NetsimLink {
 		double earliestExitTime = now;
 		if(stopStopTime!=null) {
 			if(parts.length==2) {
-				double variance = stopStopTime.getStopStopTimeVariance(new IdImpl(parts[0]), new IdImpl(parts[1]), now);
+				double variance = stopStopTime.getStopStopTimeVariance(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), now);
 				if(variance!=0) {
 					try {
 						double r = MatsimRandom.getRandom().nextDouble();
-						earliestExitTime += new NormalDistributionImpl(stopStopTime.getStopStopTime(new IdImpl(parts[0]), new IdImpl(parts[1]), now), Math.sqrt(variance)).inverseCumulativeProbability(r);
+						earliestExitTime += new NormalDistributionImpl(stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), now), Math.sqrt(variance)).inverseCumulativeProbability(r);
 					} catch (MathException e) {
 						e.printStackTrace();
 					}
 				}
 				else
-					earliestExitTime += stopStopTime.getStopStopTime(new IdImpl(parts[0]), new IdImpl(parts[1]), now);
+					earliestExitTime += stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), now);
 			}
 			else
 				earliestExitTime += link.getLength()/3.0;

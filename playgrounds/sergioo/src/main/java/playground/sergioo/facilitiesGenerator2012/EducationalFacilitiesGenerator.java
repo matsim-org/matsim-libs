@@ -9,8 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -56,14 +57,14 @@ public class EducationalFacilitiesGenerator {
 				Coord coord = null;
 				if(postalCode==0)
 					postalCode = getPostalCode(allPostalCodes, new CoordImpl(lon,lat));
-				ActivityFacility facility = facilities.getFacilities().get(new IdImpl(postalCode));
+				ActivityFacility facility = facilities.getFacilities().get(Id.create(postalCode, ActivityFacility.class));
 				if(facility==null) {
 					if(educationalFacilitiesResult.getDouble(4)!=0)
 						coord = new CoordImpl(lon,lat);
 					else
 						coord = allPostalCodes.get(postalCode);
 					if(coord!=null)
-						facility = facilities.createAndAddFacility(new IdImpl(postalCode), coordinateTransformation.transform(coord));
+						facility = facilities.createAndAddFacility(Id.create(postalCode, ActivityFacility.class), coordinateTransformation.transform(coord));
 					else
 						System.out.println(educationalFacilitiesResult.getInt(6));
 				}

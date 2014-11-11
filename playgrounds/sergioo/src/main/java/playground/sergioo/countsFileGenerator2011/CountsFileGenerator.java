@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -80,7 +80,7 @@ public class CountsFileGenerator {
 		while(line!=null) {
 			String[] parts = line.split(SEPARATOR);
 			for(String mode:MODES) {
-				Count count = allCounts.get(mode).createAndAddCount(new IdImpl(parts[2]), parts[0]+SEPARATOR+parts[1]);
+				Count count = allCounts.get(mode).createAndAddCount(Id.createLinkId(parts[2]), parts[0]+SEPARATOR+parts[1]);
 				count.setCoord(new CoordImpl(Double.parseDouble(parts[3]), Double.parseDouble(parts[4])));
 			}
 			line = readerLinks.readLine();

@@ -11,11 +11,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
@@ -23,11 +21,9 @@ import org.matsim.households.HouseholdImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.households.PersonHouseholdMapping;
 
 public class HouseholdsFromPlans {
 
-	private static final String CSV_SEPARATOR = ",";
 	/**
 	 * @param args
 	 * 0 - Population file
@@ -40,9 +36,8 @@ public class HouseholdsFromPlans {
 		final Population plans = scenario.getPopulation();
 		final PopulationReader matsimPlansReader = new MatsimPopulationReader(scenario);
 		matsimPlansReader.readFile(args[0]);
-		Map<Id, Household> facilityIdsHouseholds = new HashMap<Id, Household>();
+		Map<Id<ActivityFacility>, Household> facilityIdsHouseholds = new HashMap<Id<ActivityFacility>, Household>();
 		Households households = new HouseholdsImpl();
-		PersonHouseholdMapping personHouseholdMapping = new PersonHouseholdMapping(households);
 		for(Person person:plans.getPersons().values()) {
 			Activity homeActivity = null;
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
@@ -51,7 +46,7 @@ public class HouseholdsFromPlans {
 			if(homeActivity != null) {
 				Household household = facilityIdsHouseholds.get(homeActivity.getFacilityId());
 				if(household == null) {
-					household = new HouseholdImpl(new IdImpl(households.getHouseholds().size()));
+					household = new HouseholdImpl(Id.create(households.getHouseholds().size(), Household.class));
 					((HouseholdImpl)household).setMemberIds(new ArrayList<Id<Person>>());
 					households.getHouseholds().put(household.getId(), household);
 					facilityIdsHouseholds.put(homeActivity.getFacilityId(), household);

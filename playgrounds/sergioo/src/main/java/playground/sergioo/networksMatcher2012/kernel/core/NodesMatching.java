@@ -3,9 +3,9 @@ package playground.sergioo.networksMatcher2012.kernel.core;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 
@@ -60,10 +60,10 @@ public class NodesMatching {
 		String[] ab = line.split(SEPARATOR_AB);
 		for(String nodeId:ab[1].split(SEPARATOR_NODES))
 			if(!nodeId.equals(""))
-				nodesA.add(networkA.getNodes().get(new IdImpl(nodeId)));
+				nodesA.add(networkA.getNodes().get(Id.createNodeId(nodeId)));
 		for(String nodeId:ab[2].split(SEPARATOR_NODES))
 			if(!nodeId.equals(""))
-				nodesB.add(networkB.getNodes().get(new IdImpl(nodeId)));
+				nodesB.add(networkB.getNodes().get(Id.createNodeId(nodeId)));
 		return new NodesMatching(nodesA, nodesB, Boolean.parseBoolean(ab[0]));
 	}
 

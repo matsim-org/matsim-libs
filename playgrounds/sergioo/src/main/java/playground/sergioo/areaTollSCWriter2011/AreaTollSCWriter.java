@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 /*import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;*/
@@ -28,7 +27,7 @@ public class AreaTollSCWriter {
 		String line = reader.readLine();
 		while(line!=null) {
 			String[] parts = line.split(TXT_SEPARATOR);
-			Id linkId = new IdImpl(parts[0]);
+			Id<Link> linkId = Id.createLinkId(parts[0]);
 			roadPricingScheme.addLink(linkId);
 			double time = 0;
 			for(int i=1; i<parts.length; i++)

@@ -41,7 +41,7 @@ public class DistanceDistributionStage {
 	}
 	
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, DistanceDistributionStage.TravellerChain>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, DistanceDistributionStage.TravellerChain>();
 	private Population population;
 	private Network network;
 	private TransitSchedule transitSchedule;
@@ -87,7 +87,7 @@ public class DistanceDistributionStage {
 			}
 		}
 	}
-	private String getMode(String transportMode, Id line) {
+	private String getMode(String transportMode, Id<TransitLine> line) {
 		if(transportMode.contains("bus"))
 			return "bus";
 		else if(transportMode.contains("rail"))
@@ -104,6 +104,7 @@ public class DistanceDistributionStage {
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

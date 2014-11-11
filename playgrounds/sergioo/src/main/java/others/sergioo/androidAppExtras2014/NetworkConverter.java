@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -81,7 +81,7 @@ public class NetworkConverter {
 					if(node.getCoord().equals(coord))
 						nodes[n] = node;
 				if(nodes[n]==null) {
-					nodes[n] = networkFactory.createNode(new IdImpl(nodeLongId), coord);
+					nodes[n] = networkFactory.createNode(Id.createNodeId(nodeLongId), coord);
 					nodeLongId++;
 					((NodeImpl)nodes[n]).setOrigId(feature.getAttribute("OBJECTID").toString());
 				}
@@ -91,11 +91,11 @@ public class NetworkConverter {
 				if(network.getNodes().get(nodes[n].getId())==null) {
 					if(n+1==nodes.length-1 || CoordUtils.calcDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
 						network.addNode(nodes[n]);
-						Link link = network.getFactory().createLink(new IdImpl(linkLongId), prevNode, nodes[n+1]);
+						Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
 						((LinkImpl)link).setOrigId(feature.getID());
 						network.addLink(link);
 						linkLongId++;
-						link = network.getFactory().createLink(new IdImpl(linkLongId), nodes[n+1], prevNode);
+						link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
 						((LinkImpl)link).setOrigId(feature.getID());
 						network.addLink(link);
 						linkLongId++;
@@ -103,11 +103,11 @@ public class NetworkConverter {
 					}
 				}
 				else {
-					Link link = network.getFactory().createLink(new IdImpl(linkLongId), prevNode, nodes[n+1]);
+					Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
 					((LinkImpl)link).setOrigId(feature.getID());
 					network.addLink(link);
 					linkLongId++;
-					link = network.getFactory().createLink(new IdImpl(linkLongId), nodes[n+1], prevNode);
+					link = network.getFactory().createLink(Id.createLinkId(linkLongId), nodes[n+1], prevNode);
 					((LinkImpl)link).setOrigId(feature.getID());
 					network.addLink(link);
 					linkLongId++;

@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.ActivityImpl;
@@ -78,7 +77,7 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 			modes.add("pt");
 			if(carAvailability)
 				modes.add("car");
-			Id carLocation = ((Activity)plan.getPlanElements().get(0)).getFacilityId();
+			Id<ActivityFacility> carLocation = ((Activity)plan.getPlanElements().get(0)).getFacilityId();
 			boolean addFollowingActivities = false;
 			int emptyTimeIndex = -1;
 			for(int i=0; i<plan.getPlanElements().size(); i++) {
@@ -122,14 +121,14 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 		}
 	}
 	@Override
-	public List<? extends PlanElement> decideRoute(double time,	Id startFacilityId, Id endFacilityId, String mode,
+	public List<? extends PlanElement> decideRoute(double time,	Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, String mode,
 			TripRouter tripRouter) {
 		List<PlanElement> planElements = new ArrayList<PlanElement>();
 		List<SchedulingLink> path = new SchedulingNetwork().createNetwork(now, facilities, startFacilityId, endFacilityId,
 				futureActivityStartTime, PLAN_STEP, modes, this, agenda, previousActivities, followingActivities, mobsimStatus);
 		if(mobsimStatus.isMobsimEnds())
 			return null;
-		Id currentFacilityId = startFacilityId;
+		Id<ActivityFacility> currentFacilityId = startFacilityId;
 		if(path!=null) {
 			for(SchedulingLink link:path)
 				if(link instanceof ActivitySchedulingLink) {
@@ -151,11 +150,11 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 						else
 							throw new RuntimeException("Two consecutive activities can not be planned at different locations");
 					planElements.add(activity);
-					currentFacilityId = new IdImpl(link.getToNode().getId().toString().split("\\(")[0]);
+					currentFacilityId = Id.create(link.getToNode().getId().toString().split("\\(")[0], ActivityFacility.class);
 				}
 				else {
 					JourneySchedulingLink journeyLink = (JourneySchedulingLink)link;
-					Id nextFacilityId = new IdImpl(link.getToNode().getId().toString().split("\\(")[0]);
+					Id<ActivityFacility> nextFacilityId = Id.create(link.getToNode().getId().toString().split("\\(")[0], ActivityFacility.class);
 					if(facilities.getFacilities().get(currentFacilityId).getLinkId().equals(facilities.getFacilities().
 							get(nextFacilityId).getLinkId())) {
 						Leg leg = new LegImpl("transit_walk");

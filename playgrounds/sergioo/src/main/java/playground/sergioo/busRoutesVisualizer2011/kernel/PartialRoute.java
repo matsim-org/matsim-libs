@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
 
@@ -43,7 +43,7 @@ public class PartialRoute {
 	public LinkSequenceTree getLinkSequenceTree(Network network) {
 		List<Link> links = new ArrayList<Link>();
 		for(String link:path)
-			links.add(network.getLinks().get(new IdImpl(link)));
+			links.add(network.getLinks().get(Id.createLinkId(link)));
 		LinkSequenceTree linkSequenceTree = new LinkSequenceTree(links);
 		for(StopRoutes stopRoute:nextRoutes)
 			linkSequenceTree.getNextSequences().addAll(stopRoute.getLinkSequenceTree(network));

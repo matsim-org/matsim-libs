@@ -18,7 +18,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -41,7 +40,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 	private Color networkColor = Color.DARK_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.1f);
 	private Map<RouteTypes, Map<String, Color>> colors;
-	private Map<Id, LinkDrawInformation> linksDrawInformation;
+	private Map<Id<Link>, LinkDrawInformation> linksDrawInformation;
 	private float weight = 0.001f;
 	
 	//Methods
@@ -68,7 +67,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 		Map<String, Color> railColorsMap = new HashMap<String, Color>();
 		railColorsMap.put("other", Color.CYAN);
 		colors.put(RouteTypes.RAIL, railColorsMap);
-		linksDrawInformation = new HashMap<Id, LinkDrawInformation>();
+		linksDrawInformation = new HashMap<Id<Link>, LinkDrawInformation>();
 		File numTimesLinkRouteFile = new File(NUM_TIMES_LINK_ROUTE_FILE);
 		if(numTimesLinkRouteFile.exists()) {
 			try {
@@ -76,7 +75,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 				String line = reader.readLine();
 				while(line!=null) {
 					String[] parts = line.split(SEPARATOR);
-					linksDrawInformation.put(new IdImpl(parts[0]), new LinkDrawInformation(Float.parseFloat(parts[1]), Color.decode(parts[2])));
+					linksDrawInformation.put(Id.createLinkId(parts[0]), new LinkDrawInformation(Float.parseFloat(parts[1]), Color.decode(parts[2])));
 					line = reader.readLine();
 				}
 				reader.close();
@@ -119,7 +118,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 										}
 									}
 									else
-										for(Id linkId:transitRoute.getRoute().getLinkIds())
+										for(Id<Link> linkId:transitRoute.getRoute().getLinkIds())
 											if(linkId.equals(link.getId())) {
 												thickness+=transitRoute.getDepartures().size();
 												if(routeType.equals(RouteTypes.BUS))
@@ -141,7 +140,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 						if(thickness>0) {
 							if(routeType.equals(RouteTypes.SUBWAY)) {
 								String[] parts = link.getId().toString().split("_");
-								Id idOpposite = new IdImpl(parts[1]+"_"+parts[0]);
+								Id<Link> idOpposite = Id.createLinkId(parts[1]+"_"+parts[0]);
 								LinkDrawInformation linkDrawInformationO = linksDrawInformation.get(idOpposite);
 								if(linkDrawInformationO!=null)
 									linkDrawInformationO.increaseThickness(thickness);
@@ -155,7 +154,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 			}
 			try {
 				PrintWriter writer = new PrintWriter(numTimesLinkRouteFile);
-				for(Entry<Id,LinkDrawInformation> linkDrawInformationE:linksDrawInformation.entrySet())
+				for(Entry<Id<Link>, LinkDrawInformation> linkDrawInformationE:linksDrawInformation.entrySet())
 					writer.println(linkDrawInformationE.getKey()+SEPARATOR+linkDrawInformationE.getValue().getThickness()+SEPARATOR+linkDrawInformationE.getValue().getColor().getRGB());
 				writer.close();
 			} catch (FileNotFoundException e) {

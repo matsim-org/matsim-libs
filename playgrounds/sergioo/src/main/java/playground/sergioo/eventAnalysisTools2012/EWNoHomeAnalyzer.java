@@ -17,6 +17,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -35,7 +37,7 @@ public class EWNoHomeAnalyzer implements PersonDepartureEventHandler, PersonArri
 	private class PTStage {
 	
 		//Attributes
-		public Id linkId;
+		public Id<Link> linkId;
 		public double beginInstant = -1;
 		public double beginTravelInstant = -1;
 		public double finishTravelInstant = -1;
@@ -43,7 +45,7 @@ public class EWNoHomeAnalyzer implements PersonDepartureEventHandler, PersonArri
 	}
 	
 	//Attributes
-	public Map<Id, List<PTStage>> publicTransportStages = new HashMap<Id, List<PTStage>>();
+	public Map<Id<Person>, List<PTStage>> publicTransportStages = new HashMap<Id<Person>, List<PTStage>>();
 	
 	//Methods
 	@Override
@@ -92,8 +94,8 @@ public class EWNoHomeAnalyzer implements PersonDepartureEventHandler, PersonArri
 		new MatsimEventsReader(events).readFile("./data/EWService/0.eventsOptimal.xml.gz");
 		System.out.println("Events read");
 		int numPersons = 0, numPersonsNoHome = 0, numPtStages = 0, numPtNoHomeStages = 0;
-		Map<Id, Double> linkWeights = new HashMap<Id, Double>();
-		Collection<Id> linkIds = new ArrayList<Id>();
+		Map<Id<Link>, Double> linkWeights = new HashMap<Id<Link>, Double>();
+		Collection<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		Collection<Double> startTimes = new ArrayList<Double>();
 		Collection<Double> endTimes = new ArrayList<Double>();
 		for(List<PTStage> stages:publicTranportTeleportAnalizer.publicTransportStages.values()) {

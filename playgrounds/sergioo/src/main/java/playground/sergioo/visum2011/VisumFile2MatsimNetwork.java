@@ -18,11 +18,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -62,7 +61,7 @@ public class VisumFile2MatsimNetwork {
 	/**
 	 * Repeated nodes
 	 */
-	private Hashtable<Id, List<Id>> nodesRep =  new Hashtable<Id, List<Id>>();
+	private Hashtable<Id<Node>, List<Id<Node>>> nodesRep =  new Hashtable<Id<Node>, List<Id<Node>>>();
 	/**
 	 * Language of the VISUM file
 	 */
@@ -90,7 +89,7 @@ public class VisumFile2MatsimNetwork {
 	 * @throws IllegalArgumentException 
 	 */
 	public void createNetworkFromVISUMFile(File file) throws IOException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-		network = NetworkImpl.createNetwork();
+		network = NetworkUtils.createNetwork();
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = reader.readLine();
 		if (!"$VISION".equals(line))
@@ -175,7 +174,7 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=new NodeImpl(new IdImpl(parts[columnsIndices[0]]));
+			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new CoordImpl(Double.parseDouble(parts[columnsIndices[1]]),Double.parseDouble(parts[columnsIndices[2]])));
 			network.addNode(node);
 			line=reader.readLine();
@@ -191,16 +190,16 @@ public class VisumFile2MatsimNetwork {
 		String line = reader.readLine();
 		while (line!=null && line.length() > 0) {
 			final String[] parts = line.split(";");
-			NodeImpl node=new NodeImpl(new IdImpl(parts[columnsIndices[0]]));
+			NodeImpl node=new NodeImpl(Id.createNodeId(parts[columnsIndices[0]]));
 			node.setCoord(new CoordImpl(Double.parseDouble(parts[columnsIndices[1]]),Double.parseDouble(parts[columnsIndices[2]])));
-			Id repeated = null;
-			for(Id idB:nodesRep.keySet())
+			Id<Node> repeated = null;
+			for(Id<Node> idB:nodesRep.keySet())
 				if(network.getNodes().get(idB).getCoord().equals(node.getCoord()))
 					repeated=idB;
 			if(repeated!=null)
 				nodesRep.get(repeated).add(node.getId());
 			else {
-				List<Id> reps = new ArrayList<Id>();
+				List<Id<Node>> reps = new ArrayList<Id<Node>>();
 				reps.add(node.getId());
 				nodesRep.put(node.getId(), reps);
 				network.addNode(node);
@@ -235,14 +234,14 @@ public class VisumFile2MatsimNetwork {
 		while (line!=null && line.length()>0) {
 			final String[] parts = line.split(";");
 			String origId = parts[columnsIndices[0]];
-			Node from = network.getNodes().get(new IdImpl(parts[columnsIndices[1]]));
-			Node to = network.getNodes().get(new IdImpl(parts[columnsIndices[2]]));
+			Node from = network.getNodes().get(Id.createNodeId(parts[columnsIndices[1]]));
+			Node to = network.getNodes().get(Id.createNodeId(parts[columnsIndices[2]]));
 			double length = Double.parseDouble(parts[columnsIndices[3]]);
 			double freeSpeed = Double.parseDouble(parts[columnsIndices[4]]);
 			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
-				Link link = linkFactory.createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
+				Link link = linkFactory.createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
 				Set<String> modes = new HashSet<String>();
 				modes.add("Car");
@@ -279,14 +278,14 @@ public class VisumFile2MatsimNetwork {
 		while (line!=null && line.length()>0) {
 			final String[] parts = line.split(";");
 			String origId = parts[columnsIndices[0]];
-			Node from = network.getNodes().get(getPrincipalNode(new IdImpl(parts[columnsIndices[1]])));
-			Node to = network.getNodes().get(getPrincipalNode(new IdImpl(parts[columnsIndices[2]])));
+			Node from = network.getNodes().get(getPrincipalNode(Id.createNodeId(parts[columnsIndices[1]])));
+			Node to = network.getNodes().get(getPrincipalNode(Id.createNodeId(parts[columnsIndices[2]])));
 			double length = Double.parseDouble(parts[columnsIndices[3]]);
 			double freeSpeed = Double.parseDouble(parts[columnsIndices[4]]);
 			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
-				Link link = new LinkFactoryImpl().createLink(new IdImpl(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
+				Link link = new LinkFactoryImpl().createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				((LinkImpl)link).setOrigId(origId);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
@@ -309,9 +308,9 @@ public class VisumFile2MatsimNetwork {
 			pw.println(i);
 		pw.close();
 	}
-	private Id getPrincipalNode(Id idN) {
-		for(Entry<Id, List<Id>> idE:nodesRep.entrySet())
-			for(Id id:idE.getValue())
+	private Id<Node> getPrincipalNode(Id<Node> idN) {
+		for(Entry<Id<Node>, List<Id<Node>>> idE:nodesRep.entrySet())
+			for(Id<Node> id:idE.getValue())
 				if(id.equals(idN))
 					return idE.getKey();
 		return idN;

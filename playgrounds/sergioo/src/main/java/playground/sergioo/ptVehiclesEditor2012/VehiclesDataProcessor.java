@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -164,6 +164,7 @@ public class VehiclesDataProcessor {
 				dataBaseVehicles.executeStatement("INSERT INTO pt_systems.Companies_Vehicles VALUES ("+companyId+","+vehicleId+","+parts[10]+")");
 				line = reader.readLine();
 			}
+			reader.close();
 		}
 		dataBaseVehicles.close();
 	}
@@ -218,11 +219,11 @@ public class VehiclesDataProcessor {
 								for(Entry<Integer, Integer> current:vehicleIds.entrySet()) {
 									sum+=current.getValue();
 									if(random<sum) {
-										VehicleType vehicleType = vehicles.getVehicleTypes().get(new IdImpl(current.getKey()));
+										VehicleType vehicleType = vehicles.getVehicleTypes().get(Id.create(current.getKey(), VehicleType.class));
 										if(vehicleType==null) {
 											result = dataBaseVehicles.executeQuery("SELECT * FROM pt_systems.Vehicles WHERE id="+current.getKey());
 											if(result.next()) {
-												vehicleType = new VehicleTypeImpl(new IdImpl(result.getInt(1)));
+												vehicleType = new VehicleTypeImpl(Id.create(result.getInt(1), VehicleType.class));
 												vehicleType.setDescription(result.getString(2));
 												vehicleType.setWidth(result.getDouble(3));
 												vehicleType.setLength(result.getDouble(4));

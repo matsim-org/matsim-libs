@@ -15,12 +15,14 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHandler {
 
 	private TransitSchedule transitSchedule;
 	private EventsManager eventsManager;
-	private Map<Id, Id> lastStopsVehicle = new HashMap<Id, Id>(); 
+	private Map<Id<Vehicle>, Id<TransitStopFacility>> lastStopsVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>(); 
 	
 	public CompleteBusArrivalEvents(TransitSchedule transitSchedule, EventsManager outEventsManager) {
 		this.transitSchedule = transitSchedule;

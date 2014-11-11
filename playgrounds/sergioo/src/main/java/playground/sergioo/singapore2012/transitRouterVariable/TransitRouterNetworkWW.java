@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -42,6 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Transit router network with travel, transfer, and waiting links
@@ -256,9 +256,9 @@ public final class TransitRouterNetworkWW implements Network {
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 		Id<Node> id = null;
 		if(line==null && route==null)
-			id = Id.create(stop.getStopFacility().getId().toString(), Node.class);
+			id = Id.createNodeId(stop.getStopFacility().getId().toString());
 		else
-			id = new IdImpl("number:"+nextNodeId++);
+			id = Id.createNodeId("number:"+nextNodeId++);
 		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(id, stop, route, line);
 		if(this.nodes.get(node.getId())!=null)
 			throw new RuntimeException();
@@ -267,14 +267,14 @@ public final class TransitRouterNetworkWW implements Network {
 	}
 
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, null, null, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.createLinkId(this.nextLinkId++), fromNode, toNode, null, null, network);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
 		return link;
 	}
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.createLinkId(this.nextLinkId++), fromNode, toNode, route, line, network);
 		this.getLinks().put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
@@ -320,7 +320,7 @@ public final class TransitRouterNetworkWW implements Network {
 		final Counter linkCounter = new Counter(" link #");
 		final Counter nodeCounter = new Counter(" node #");
 		int numTravelLinks = 0, numWaitingLinks = 0, numInsideLinks = 0, numTransferLinks = 0;
-		Map<Id, TransitRouterNetworkNode> stops = new HashMap<Id, TransitRouterNetworkNode>();
+		Map<Id<TransitStopFacility>, TransitRouterNetworkNode> stops = new HashMap<Id<TransitStopFacility>, TransitRouterNetworkNode>();
 		TransitRouterNetworkNode nodeSR, nodeS;
 		// build stop nodes
 		for (TransitLine line : schedule.getTransitLines().values())
@@ -410,12 +410,12 @@ public final class TransitRouterNetworkWW implements Network {
 	}
 
 	@Override
-	public Link removeLink(Id linkId) {
+	public Link removeLink(Id<Link> linkId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Node removeNode(Id nodeId) {
+	public Node removeNode(Id<Node> nodeId) {
 		throw new UnsupportedOperationException();
 	}
 }

@@ -43,11 +43,11 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -222,10 +222,10 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 				if(i==links.size()-1 || oldNode.getInLinks().size()+oldNode.getOutLinks().size()>2)
 					node = oldNode;
 				else {
-					node = network.getFactory().createNode(new IdImpl("fl"+oldNode.getId().toString()), oldNode.getCoord());
+					node = network.getFactory().createNode(Id.createNodeId("fl"+oldNode.getId().toString()), oldNode.getCoord());
 					network.addNode(node);
 				}
-				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(new IdImpl("fl"+link.getId().toString()), prevNode, node);
+				LinkImpl newLink = (LinkImpl) network.getFactory().createLink(Id.createLinkId("fl"+link.getId().toString()), prevNode, node);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				newLink.setAllowedModes(modes);

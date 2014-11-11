@@ -11,6 +11,7 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -19,7 +20,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
 import others.sergioo.visUtils.JetColor;
-
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;
 import playground.sergioo.workplaceCapacities2012.MPAreaData;
@@ -41,7 +41,7 @@ public class WorkersAreaPainter extends NetworkPainter {
 	public WorkersAreaPainter(Network network, Color color) {
 		super(network);
 	}
-	public void setData(double[][] matrixCapacities, SortedMap<Id, MPAreaData> dataMPAreas, Collection<Coord> stops) {
+	public void setData(double[][] matrixCapacities, SortedMap<Id<ActivityFacility>, MPAreaData> dataMPAreas, Collection<Coord> stops) {
 		minCapacity = Double.MAX_VALUE;
 		maxCapacity = 0;
 		this.stops = stops;

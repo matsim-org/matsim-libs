@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.sergioo.visualizer2D2012.LayersWindow;
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;
@@ -81,7 +82,7 @@ public class WeigthsNetworkWindow extends LayersWindow implements ActionListener
 	private JButton readyButton;
 	
 	//Methods
-	public WeigthsNetworkWindow(String title, NetworkPainter networkPainter, Map<Tuple<Id, Id>, Tuple<Boolean, Double>> ids, SortedMap<Id, ActivityFacility> mPAreas, SortedMap<String, Coord> stopsBase) {
+	public WeigthsNetworkWindow(String title, NetworkPainter networkPainter, Map<Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>, Tuple<Boolean, Double>> ids, SortedMap<Id<ActivityFacility>, ActivityFacility> mPAreas, SortedMap<String, Coord> stopsBase) {
 		setTitle(title);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocation(0,0);

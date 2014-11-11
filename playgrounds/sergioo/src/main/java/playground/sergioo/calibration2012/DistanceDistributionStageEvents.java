@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
@@ -43,8 +44,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -58,13 +62,13 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	
 		//Attributes
 		boolean in = false;
-		private Map<Id, Double> passengers = new HashMap<Id, Double>();
+		private Map<Id<Person>, Double> passengers = new HashMap<Id<Person>, Double>();
 		private double distance;
-		private Id transitLineId;
-		private Id transitRouteId;
+		private Id<TransitLine> transitLineId;
+		private Id<TransitRoute> transitRouteId;
 	
 		//Constructors
-		public PTVehicle(Id transitLineId, Id transitRouteId) {
+		public PTVehicle(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
 			this.transitLineId = transitLineId;
 			this.transitRouteId = transitRouteId;
 		}
@@ -73,10 +77,10 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 		public void incDistance(double linkDistance) {
 			distance += linkDistance;
 		}
-		public void addPassenger(Id passengerId) {
+		public void addPassenger(Id<Person> passengerId) {
 			passengers.put(passengerId, distance);
 		}
-		public double removePassenger(Id passengerId) {
+		public double removePassenger(Id<Person> passengerId) {
 			return distance - passengers.remove(passengerId);
 		}
 	
@@ -92,12 +96,12 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	}
 	
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, DistanceDistributionStageEvents.TravellerChain>();
-	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, DistanceDistributionStageEvents.PTVehicle>();
-	private Map<Id, Coord> locations = new HashMap<Id, Coord>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, DistanceDistributionStageEvents.TravellerChain>();
+	private Map<Id<Vehicle>, PTVehicle> ptVehicles = new HashMap<Id<Vehicle>, DistanceDistributionStageEvents.PTVehicle>();
+	private Map<Id<Person>, Coord> locations = new HashMap<Id<Person>, Coord>();
 	private Network network;
 	private TransitSchedule transitSchedule;
-	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
+	private Map<Id<Person>, Integer> acts = new HashMap<Id<Person>, Integer>();
 	private int stuck=0;
 	
 	//Constructors
@@ -140,7 +144,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 			}
 		}
 	}
-	private String getMode(String transportMode, Id line) {
+	private String getMode(String transportMode, Id<TransitLine> line) {
 		if(transportMode.contains("bus"))
 			return "bus";
 		else if(transportMode.contains("rail"))
@@ -260,6 +264,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 		SortedMap<Integer, Integer[]> distribution = new TreeMap<Integer, Integer[]>();
 		BufferedReader reader = new BufferedReader(new FileReader(binsFile));
 		String[] binTexts = reader.readLine().split(",");
+		reader.close();
 		for(int i=0; i<binTexts.length; i++) {
 			Integer[] numbers = new Integer[modes.length];
 			for(int j=0; j<numbers.length; j++)

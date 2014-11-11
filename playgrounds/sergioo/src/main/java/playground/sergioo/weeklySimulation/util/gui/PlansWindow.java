@@ -1,7 +1,6 @@
 package playground.sergioo.weeklySimulation.util.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -15,11 +14,11 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -31,6 +30,11 @@ import playground.sergioo.visualizer2D2012.LayersPanel;
 
 public class PlansWindow extends JFrame implements ActionListener, KeyListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public enum Mode {
 		SELECTED_PLAN, BASE_PLAN, ALL_PLANS, FULL_PLANS;
 	}
@@ -44,7 +48,7 @@ public class PlansWindow extends JFrame implements ActionListener, KeyListener {
 	private ModeLayout modeLayout = ModeLayout.V_V;
 	private WeeklyPlanPanel[] panels;
 	private Population population;
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 	private JPanel jPanel;
 	
 	public PlansWindow(String filename) {
@@ -59,7 +63,7 @@ public class PlansWindow extends JFrame implements ActionListener, KeyListener {
 			population.addPerson(person);
 		}
 		jPanel = new JPanel();
-		comboBox = new JComboBox();
+		comboBox = new JComboBox<String>();
 		for(Person person:toBeAdded)
 			comboBox.addItem(person.getId().toString());
 		comboBox.addActionListener(this);
@@ -72,7 +76,7 @@ public class PlansWindow extends JFrame implements ActionListener, KeyListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	public void init() {
-		person = (BasePerson) population.getPersons().get(new IdImpl((String) comboBox.getSelectedItem()));
+		person = (BasePerson) population.getPersons().get(Id.createPersonId((String) comboBox.getSelectedItem()));
 		switch(mode) {
 		case SELECTED_PLAN:
 			paintSelectedPlan();

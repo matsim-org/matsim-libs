@@ -16,13 +16,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -40,7 +40,7 @@ public class EWTWindow extends LayersWindow {
 	}
 	private static double scale = 12;
 	
-	public EWTWindow(LayersPanel panel, Id line, TransitRoute route, StationsPainter stationsPainter, ExcessWaitingTimeCalculator eWTCalculator) {
+	public EWTWindow(LayersPanel panel, Id<TransitLine> line, TransitRoute route, StationsPainter stationsPainter, ExcessWaitingTimeCalculator eWTCalculator) {
 		for(TransitRouteStop stop:route.getStops()) {
 			Double[] values = new Double[3];
 			values[0] = eWTCalculator.getExcessWaitTime(line, route, stop.getStopFacility().getId(), Mode.TIME_WEIGHT);
@@ -75,9 +75,9 @@ public class EWTWindow extends LayersWindow {
 		oos.writeObject(eWTCalculator);
 		oos.close();*/
 		ois.close();
-		final TransitRoute route = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(args[3])).getRoutes().get(new IdImpl(args[4]));
+		final TransitRoute route = scenario.getTransitSchedule().getTransitLines().get(Id.create(args[3], TransitLine.class)).getRoutes().get(Id.create(args[4], TransitRoute.class));
 		final PrintWriter writer = new PrintWriter(args[6]+args[4]+".csv");
-		final Id lineId = new IdImpl(args[3]);
+		final Id<TransitLine> lineId = Id.create(args[3], TransitLine.class);
 		LayersPanel panel = new LayersPanel() {
 			{
 				addLayer(new Layer(new NetworkPainter(scenario.getNetwork())));
@@ -108,7 +108,7 @@ public class EWTWindow extends LayersWindow {
 			}
 		};
 		writer.close();
-		EWTWindow window = new EWTWindow(panel, new IdImpl(args[3]), route, stationsPainter, eWTCalculator);
+		EWTWindow window = new EWTWindow(panel, Id.create(args[3], TransitLine.class), route, stationsPainter, eWTCalculator);
 		window.setVisible(true);
 	}
 

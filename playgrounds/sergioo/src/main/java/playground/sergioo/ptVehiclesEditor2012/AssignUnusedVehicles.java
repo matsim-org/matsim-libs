@@ -1,12 +1,10 @@
 package playground.sergioo.ptVehiclesEditor2012;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -26,16 +24,16 @@ public class AssignUnusedVehicles {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new VehicleReaderV1(scenario.getVehicles()).readFile(args[1]);
-		Set<Id> vehicleIds = new HashSet<Id>();
+		Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
 		for(Vehicle vehicle:((ScenarioImpl)scenario).getVehicles().getVehicles().values())
 			vehicleIds.add(vehicle.getId());
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())
 				for(Departure departure:route.getDepartures().values())
 					vehicleIds.remove(departure.getVehicleId());
-		for(TransitRoute route:scenario.getTransitSchedule().getTransitLines().get(new IdImpl(args[2])).getRoutes().values())
+		for(TransitRoute route:scenario.getTransitSchedule().getTransitLines().get(Id.create(args[2], TransitLine.class)).getRoutes().values())
 			for(Departure departure:route.getDepartures().values()) {
-				Id id = vehicleIds.iterator().next();
+				Id<Vehicle> id = vehicleIds.iterator().next();
 				departure.setVehicleId(id);
 				vehicleIds.remove(id);
 			}

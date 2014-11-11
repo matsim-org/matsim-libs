@@ -21,14 +21,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -54,63 +52,63 @@ public class CrossingMatchingStep extends MatchingStep {
 	private static final double MAX_LENGTH_FRACTION = 0.9;
 	
 	@SuppressWarnings("unchecked")
-	public static final Tuple<Id, Id>[] NEAR_NODES_LOW = new Tuple[] {
-		new Tuple<Id, Id>(new IdImpl("17686"), new IdImpl("150029")),
-		new Tuple<Id, Id>(new IdImpl("153069"), new IdImpl("153061")),
-		new Tuple<Id, Id>(new IdImpl("110489"), new IdImpl("15098")),
-		new Tuple<Id, Id>(new IdImpl("198119"), new IdImpl("198111")),
-		new Tuple<Id, Id>(new IdImpl("176231"), new IdImpl("176239")),
-		new Tuple<Id, Id>(new IdImpl("121279"), new IdImpl("121271")),
-		new Tuple<Id, Id>(new IdImpl("128361"), new IdImpl("128369")),
-		new Tuple<Id, Id>(new IdImpl("113011"), new IdImpl("113019")),
-		new Tuple<Id, Id>(new IdImpl("176409"), new IdImpl("176401")),
-		new Tuple<Id, Id>(new IdImpl("144461"), new IdImpl("144469")),
-		new Tuple<Id, Id>(new IdImpl("133041"), new IdImpl("10796")),
-		new Tuple<Id, Id>(new IdImpl("13491"), new IdImpl("111279")),
-		new Tuple<Id, Id>(new IdImpl("184239"), new IdImpl("184231")),
-		new Tuple<Id, Id>(new IdImpl("123449"), new IdImpl("123441")),
-		new Tuple<Id, Id>(new IdImpl("120251"), new IdImpl("120259")),
-		new Tuple<Id, Id>(new IdImpl("167299"), new IdImpl("167291")),
-		new Tuple<Id, Id>(new IdImpl("143829"), new IdImpl("143821")),
-		new Tuple<Id, Id>(new IdImpl("168131"), new IdImpl("168139")),
-		new Tuple<Id, Id>(new IdImpl("127469"), new IdImpl("127461")),
-		new Tuple<Id, Id>(new IdImpl("166531"), new IdImpl("166539")),
-		new Tuple<Id, Id>(new IdImpl("154309"), new IdImpl("154301")),
-		new Tuple<Id, Id>(new IdImpl("10715"), new IdImpl("132079")),
-		new Tuple<Id, Id>(new IdImpl("192201"), new IdImpl("192209")),
-		new Tuple<Id, Id>(new IdImpl("171049"), new IdImpl("171041")),
-		new Tuple<Id, Id>(new IdImpl("154349"), new IdImpl("154341")),
-		new Tuple<Id, Id>(new IdImpl("148059"), new IdImpl("148051")),
-		new Tuple<Id, Id>(new IdImpl("191099"), new IdImpl("191091")),
-		new Tuple<Id, Id>(new IdImpl("165179"), new IdImpl("165171")),
-		new Tuple<Id, Id>(new IdImpl("144749"), new IdImpl("144741")),
-		new Tuple<Id, Id>(new IdImpl("149079"), new IdImpl("149071")),
-		new Tuple<Id, Id>(new IdImpl("128239"), new IdImpl("128231")),
-		new Tuple<Id, Id>(new IdImpl("158401"), new IdImpl("158409")),
-		new Tuple<Id, Id>(new IdImpl("131139"), new IdImpl("131121")),
-		new Tuple<Id, Id>(new IdImpl("159019"), new IdImpl("159011")),
-		new Tuple<Id, Id>(new IdImpl("146529"), new IdImpl("146521")),
-		new Tuple<Id, Id>(new IdImpl("144441"), new IdImpl("144449")),
-		new Tuple<Id, Id>(new IdImpl("153181"), new IdImpl("16927")),
-		new Tuple<Id, Id>(new IdImpl("196129"), new IdImpl("196121"))
+	public static final Tuple<Id<Node>, Id<Node>>[] NEAR_NODES_LOW = new Tuple[] {
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("17686"), Id.createNodeId("150029")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("153069"), Id.createNodeId("153061")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("110489"), Id.createNodeId("15098")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("198119"), Id.createNodeId("198111")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("176231"), Id.createNodeId("176239")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("121279"), Id.createNodeId("121271")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("128361"), Id.createNodeId("128369")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("113011"), Id.createNodeId("113019")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("176409"), Id.createNodeId("176401")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("144461"), Id.createNodeId("144469")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("133041"), Id.createNodeId("10796")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("13491"), Id.createNodeId("111279")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("184239"), Id.createNodeId("184231")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("123449"), Id.createNodeId("123441")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("120251"), Id.createNodeId("120259")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("167299"), Id.createNodeId("167291")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("143829"), Id.createNodeId("143821")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("168131"), Id.createNodeId("168139")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("127469"), Id.createNodeId("127461")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("166531"), Id.createNodeId("166539")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("154309"), Id.createNodeId("154301")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("10715"), Id.createNodeId("132079")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("192201"), Id.createNodeId("192209")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("171049"), Id.createNodeId("171041")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("154349"), Id.createNodeId("154341")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("148059"), Id.createNodeId("148051")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("191099"), Id.createNodeId("191091")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("165179"), Id.createNodeId("165171")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("144749"), Id.createNodeId("144741")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("149079"), Id.createNodeId("149071")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("128239"), Id.createNodeId("128231")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("158401"), Id.createNodeId("158409")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("131139"), Id.createNodeId("131121")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("159019"), Id.createNodeId("159011")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("146529"), Id.createNodeId("146521")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("144441"), Id.createNodeId("144449")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("153181"), Id.createNodeId("16927")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("196129"), Id.createNodeId("196121"))
 	};
 	
 	@SuppressWarnings("unchecked")
-	public static final Tuple<Id, Id>[] NEAR_NODES_HIGH = new Tuple[] {
-		new Tuple<Id, Id>(new IdImpl("12499_1380029209_0"), new IdImpl("12500_1380009607_0")),
-		new Tuple<Id, Id>(new IdImpl("1380019534"), new IdImpl("57073_1380019532_0")),
-		new Tuple<Id, Id>(new IdImpl("1380022856"), new IdImpl("71392_1380022854_0")),
-		new Tuple<Id, Id>(new IdImpl("1380023386"), new IdImpl("69854_1380023385_0")),
-		new Tuple<Id, Id>(new IdImpl("1380033194"), new IdImpl("28695_1380033195_0")),
-		new Tuple<Id, Id>(new IdImpl("1380034578"), new IdImpl("23989_1380034579_0")),
-		new Tuple<Id, Id>(new IdImpl("1380041933"), new IdImpl("76007_1380034709_0")),
-		new Tuple<Id, Id>(new IdImpl("1655_1380025784_0"), new IdImpl("1656_1380023078_0")),
-		new Tuple<Id, Id>(new IdImpl("19346_1380038781_0"), new IdImpl("19347_1380038244_0")),
-		new Tuple<Id, Id>(new IdImpl("25732_1380037754_1"), new IdImpl("25733_1380025451_0")),
-		new Tuple<Id, Id>(new IdImpl("74819_1380016402_0"), new IdImpl("74820_1380016401_0")),
-		new Tuple<Id, Id>(new IdImpl("BP1"), new IdImpl("NS4")),
-		new Tuple<Id, Id>(new IdImpl("EW16/NE3"), new IdImpl("NE3")),
-		new Tuple<Id, Id>(new IdImpl("NE17"), new IdImpl("PTC"))
+	public static final Tuple<Id<Node>, Id<Node>>[] NEAR_NODES_HIGH = new Tuple[] {
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("12499_1380029209_0"), Id.createNodeId("12500_1380009607_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380019534"), Id.createNodeId("57073_1380019532_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380022856"), Id.createNodeId("71392_1380022854_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380023386"), Id.createNodeId("69854_1380023385_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380033194"), Id.createNodeId("28695_1380033195_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380034578"), Id.createNodeId("23989_1380034579_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1380041933"), Id.createNodeId("76007_1380034709_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("1655_1380025784_0"), Id.createNodeId("1656_1380023078_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("19346_1380038781_0"), Id.createNodeId("19347_1380038244_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("25732_1380037754_1"), Id.createNodeId("25733_1380025451_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("74819_1380016402_0"), Id.createNodeId("74820_1380016401_0")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("BP1"), Id.createNodeId("NS4")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("EW16/NE3"), Id.createNodeId("NE3")),
+		new Tuple<Id<Node>, Id<Node>>(Id.createNodeId("NE17"), Id.createNodeId("PTC"))
 	};
 	
 	
@@ -180,11 +178,11 @@ public class CrossingMatchingStep extends MatchingStep {
 					if(region.isInside(node) && ((ComposedNode)node).getType().equals(Types.CROSSING) && !alreadyReducedA.contains(node)) {
 						Set<Node> nearestNodesToA = new HashSet<Node>();
 						for(Node nodeA:networkA.getNodes().values())
-							if(((ComposedNode)nodeA).getType().equals(Types.CROSSING) && ((CoordImpl)node.getCoord()).calcDistance(nodeA.getCoord())<radius && !alreadyReducedA.contains(nodeA))
+							if(((ComposedNode)nodeA).getType().equals(Types.CROSSING) && CoordUtils.calcDistance(node.getCoord(), nodeA.getCoord())<radius && !alreadyReducedA.contains(nodeA))
 								nearestNodesToA.add(nodeA);
 						Set<Node> nearestNodesToB = new HashSet<Node>();
 						for(Node nodeB:networkB.getNodes().values())
-							if(((ComposedNode)nodeB).getType().equals(Types.CROSSING) && ((CoordImpl)node.getCoord()).calcDistance(nodeB.getCoord())<radius && !alreadyReducedB.contains(nodeB))
+							if(((ComposedNode)nodeB).getType().equals(Types.CROSSING) && CoordUtils.calcDistance(node.getCoord(),nodeB.getCoord())<radius && !alreadyReducedB.contains(nodeB))
 								nearestNodesToB.add(nodeB);
 						for(int n=1; n<=nearestNodesToA.size(); n++) {
 							Set<Set<Node>> nodesSubsetsA = getSubsetsOfSize(nearestNodesToA, n);
@@ -267,14 +265,14 @@ public class CrossingMatchingStep extends MatchingStep {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader("./data/matching/capacities/simpleLinksA.txt"));
 			String line = bufferedReader.readLine();
 			while(line!=null) {
-				linksA.add(networkA.getLinks().get(new IdImpl(line)));
+				linksA.add(networkA.getLinks().get(Id.createLinkId(line)));
 				line = bufferedReader.readLine();
 			}
 			bufferedReader.close();
 			bufferedReader = new BufferedReader(new FileReader("./data/matching/capacities/simpleLinksB.txt"));
 			line = bufferedReader.readLine();
 			while(line!=null) {
-				linksB.add(networkB.getLinks().get(new IdImpl(line)));
+				linksB.add(networkB.getLinks().get(Id.createLinkId(line)));
 				line = bufferedReader.readLine();
 			}
 			bufferedReader.close();

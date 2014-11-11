@@ -24,12 +24,12 @@ import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
@@ -45,6 +45,7 @@ import org.matsim.pt.UmlaufStueckI;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author michaz
@@ -95,7 +96,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
-		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
+		PersonImpl driverPerson = new PersonImpl(Id.createPersonId("pt_"+umlauf.getId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
 			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);
@@ -189,7 +190,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 	
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		Route route = ((Leg)this.currentPlanElement).getRoute() ;
 		return ((NetworkRoute)route).getVehicleId() ; 
 	}
@@ -216,7 +217,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return getCurrentLeg().getRoute().getEndLinkId();
 	}
 

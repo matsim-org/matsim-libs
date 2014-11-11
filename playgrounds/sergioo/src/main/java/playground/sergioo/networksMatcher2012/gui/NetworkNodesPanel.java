@@ -89,9 +89,9 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption, colors), false));
 		addLayer(new Layer(new LinesPainter(), false));
 		PointsPainter pointsPainter = new PointsPainter();
-		Tuple<Id,Id>[] tuples = null;
+		Tuple<Id<Node>, Id<Node>>[] tuples = null;
 		tuples = matchingOption.equals(MatchingsPainter.MatchingOptions.A)?CrossingMatchingStep.NEAR_NODES_LOW:CrossingMatchingStep.NEAR_NODES_HIGH;
-		for(Tuple<Id,Id> ids:tuples) {
+		for(Tuple<Id<Node>, Id<Node>> ids:tuples) {
 			Node node = networkPainter.getNetwork().getNodes().get(ids.getFirst());
 			if(node!=null)
 				pointsPainter.addPoint(node.getCoord());

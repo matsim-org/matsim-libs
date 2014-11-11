@@ -9,7 +9,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -25,7 +24,7 @@ import java.util.TreeMap;
 
 public class EventsToPlans implements ActivityHandler, LegHandler {
 
-	private final Map<Id,  Plan> agentRecords = new TreeMap<Id,Plan>();
+	private final Map<Id<Person>, Plan> agentRecords = new TreeMap<Id<Person>, Plan>();
 	
 	private final Scenario scenario;
 	
@@ -35,21 +34,22 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 			this.agentRecords.put(person.getId(), new PlanImpl());
 	}
 	@Override
-	public void handleLeg(Id agentId, Leg leg) {
+	public void handleLeg(Id<Person> agentId, Leg leg) {
 		if(agentRecords.get(agentId)!=null)
 			agentRecords.get(agentId).addLeg(leg);
 	}
 
 	@Override
-	public void handleActivity(Id agentId, Activity activity) {
+	public void handleActivity(Id<Person> agentId, Activity activity) {
 		if(agentRecords.get(agentId)!=null)
 			agentRecords.get(agentId).addActivity(activity);
 	}
 	
 	public void writeExperiencedPlans(String iterationFilename) {
         Population population = PopulationUtils.createPopulation(((ScenarioImpl) scenario).getConfig(), ((ScenarioImpl) scenario).getNetwork());
-		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
-			Person person = new PersonImpl(entry.getKey());
+		PopulationFactory factory = population.getFactory();
+        for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
+			Person person = factory.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			person.addPlan(plan);
 			population.addPerson(person);

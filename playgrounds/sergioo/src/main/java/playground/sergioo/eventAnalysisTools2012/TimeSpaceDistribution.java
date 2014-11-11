@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -492,7 +491,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/ConcentrationAverage.png", 800, 600);
 	}
 	public void showFlowLinkGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Flow "+idString, "Time(h)", "Flow(veh/h)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -505,7 +504,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/flowLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensityLinkGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Density "+idString, "Time(h)", "Density(veh/Km)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -518,7 +517,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/densityLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showTTLinkGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Travel Time "+idString, "Time(h)", "Travel Time(s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -531,7 +530,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/ttLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showSpeedLinkGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Avg Speed "+idString, "Time(h)", "Speed(Km/h)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -544,7 +543,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/speedLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showKLinkGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Concentration", "Time(h)", "K(veh/Km)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -557,7 +556,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/kLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showFlowSpeedGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Flow Speed", "Flow(veh/s)", "Speed(m/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -570,7 +569,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/fSLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensityFlowGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Density Flow", "Density(veh/m)", "Flow(veh/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -583,7 +582,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/dFLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensitySpeedGraph(String idString) {
-		Id linkId = new IdImpl(idString);
+		Id linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Density Speed", "Density(veh/m)", "Speed(m/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];

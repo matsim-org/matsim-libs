@@ -19,9 +19,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
@@ -30,6 +31,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -45,8 +48,8 @@ public class MainRoutes {
 	static class Trip implements Comparable<Trip> {
 		final float travelTime;
 		final float distance;
-		final Id origin;
-		final Id destination;
+		final Id<ActivityFacility> origin;
+		final Id<ActivityFacility> destination;
 		final Time startTime;
 		final double startLat;
 		final double startLon;
@@ -57,8 +60,8 @@ public class MainRoutes {
 			super();
 			this.travelTime = travelTime;
 			this.distance = distance;
-			this.origin = new IdImpl(origin);
-			this.destination = new IdImpl(destination);
+			this.origin = Id.create(origin, ActivityFacility.class);
+			this.destination = Id.create(destination, ActivityFacility.class);
 			this.startTime = startTime;
 			this.startLat = startLat;
 			this.startLon = startLon;
@@ -177,9 +180,9 @@ public class MainRoutes {
 	}
 
 	protected static float getDistance(Network network, TransitSchedule transitSchedule, String[] parts) {
-		Id fromLinkId = transitSchedule.getFacilities().get(new IdImpl(parts[1])).getLinkId();
-		Id toLinkId = transitSchedule.getFacilities().get(new IdImpl(parts[4])).getLinkId();
-		return (float)RouteUtils.calcDistance(transitSchedule.getTransitLines().get(new IdImpl(parts[2])).getRoutes().get(new IdImpl(parts[3])).getRoute().getSubRoute(fromLinkId, toLinkId), network);
+		Id<Link> fromLinkId = transitSchedule.getFacilities().get(Id.create(parts[1], ActivityFacility.class)).getLinkId();
+		Id<Link> toLinkId = transitSchedule.getFacilities().get(Id.create(parts[4], ActivityFacility.class)).getLinkId();
+		return (float)RouteUtils.calcDistance(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
 	}
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
@@ -320,7 +323,7 @@ public class MainRoutes {
 		for(String stopA:stops)
 			for(String stopB:stops)
 				if(!stopA.equals(stopB)) {
-					OriginDestinationMeasurement od = new OriginDestinationMeasurement(new IdImpl(stopA), new IdImpl(stopB));
+					OriginDestinationMeasurement od = new OriginDestinationMeasurement(Id.create(stopA, TransitStopFacility.class), Id.create(stopB, TransitStopFacility.class));
 					int num = od.count(allJourneys);
 					if(num>moreJourneys) {
 						moreJourneys = num;

@@ -45,7 +45,7 @@ public class Location {
 		EAT_HIGH, EAT_LOW,
 		CIVIC,
 		HOME_OTHER,
-		PARK_HIGH,	PARK_LOW,
+		PARK_HIGH, PARK_LOW,
 		REC;
 	}
 	public static enum Column {
@@ -147,6 +147,16 @@ public class Location {
 				for(DetailedType detailedTypeL:this.detailedTypes)
 					if(detailedTypeT.equals(detailedTypeL))
 						return detailedTypeT;
+		return null;
+	}
+	public PlaceType getType(DetailedType detailedType) {
+		for(Entry<PlaceType, DetailedType[]> entry: DETAILED_TYPES.entrySet())
+			for(DetailedType detailedTypeI:entry.getValue())
+				if(detailedTypeI.equals(detailedType))
+					if(types.containsKey(entry.getKey().text))
+						return entry.getKey();
+					else
+						return null;
 		return null;
 	}
 	

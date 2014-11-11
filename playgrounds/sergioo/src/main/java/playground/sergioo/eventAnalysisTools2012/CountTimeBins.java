@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 public class CountTimeBins implements LinkEnterEventHandler {
 	
@@ -16,22 +17,22 @@ public class CountTimeBins implements LinkEnterEventHandler {
 	private static final int ONE_HOUR = 3600;
 	
 	//Attributes
-	private Map<String, SortedMap<Integer, Map<Id, Integer>>> numberOfVehicles = new HashMap<String, SortedMap<Integer, Map<Id, Integer>>>();
+	private Map<String, SortedMap<Integer, Map<Id<Link>, Integer>>> numberOfVehicles = new HashMap<String, SortedMap<Integer, Map<Id<Link>, Integer>>>();
 	
 	//Methods
-	public CountTimeBins(String[] modes, Collection<Id> linkIds, int totalTime) {
+	public CountTimeBins(String[] modes, Collection<Id<Link>> linkIds, int totalTime) {
 		for(String mode:modes) {
-			SortedMap<Integer, Map<Id, Integer>> modeMap = new TreeMap<Integer, Map<Id,Integer>>();
+			SortedMap<Integer, Map<Id<Link>, Integer>> modeMap = new TreeMap<Integer, Map<Id<Link>,Integer>>();
 			for(int interval = ONE_HOUR; interval<totalTime+ONE_HOUR-1; interval+=ONE_HOUR) {
-				Map<Id, Integer> binMap = new HashMap<Id, Integer>();
-				for(Id linkId:linkIds)
+				Map<Id<Link>, Integer> binMap = new HashMap<Id<Link>, Integer>();
+				for(Id<Link> linkId:linkIds)
 					binMap.put(linkId, 0);
 				modeMap.put(interval, binMap);
 			}
 			numberOfVehicles.put(mode, modeMap);
 		}
 	}
-	public Map<String, SortedMap<Integer, Map<Id, Integer>>> getNumberOfVehicles() {
+	public Map<String, SortedMap<Integer, Map<Id<Link>, Integer>>> getNumberOfVehicles() {
 		return numberOfVehicles;
 	}
 	@Override

@@ -10,7 +10,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRoute;
@@ -56,7 +57,7 @@ public class ShortestBusPathTree {
 		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental())).createTransitRouter();
 		ExperimentalTransitRouteFactory routesFactory = new ExperimentalTransitRouteFactory();
 		for(int i=0; i<numStops; i++) {
-			TransitStopFacility mainStop = scenario.getTransitSchedule().getFacilities().get(new IdImpl(args[4+i]));
+			TransitStopFacility mainStop = scenario.getTransitSchedule().getFacilities().get(Id.create(args[4+i], ActivityFacility.class));
 			Set<Coord>[] stopCoords = new Set[NUM_TRANSFERS+2];
 			for(int j=0; j<stopCoords.length; j++)
 				stopCoords[j] = new HashSet<Coord>();

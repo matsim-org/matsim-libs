@@ -8,6 +8,8 @@ import java.util.List;
 
 public class MainNeuralNetwork {
 
+	private static final double DATA_LEARN_FRAC = 0.75;
+
 	public static void main(String[] args) throws IOException {
 		int option = new Integer(args[0]);
 		switch(option) {
@@ -23,7 +25,8 @@ public class MainNeuralNetwork {
 		BufferedReader reader = new BufferedReader(new FileReader(args[4]));
 		reader.readLine();
 		String line = reader.readLine();
-		List<double[][]> data = new ArrayList<double[][]>();
+		List<double[][]> dataLearn = new ArrayList<double[][]>();
+		List<double[][]> dataValidate = new ArrayList<double[][]>();
 		double[] minOutput = new double[numOutputs];
 		for(int i=0; i<numOutputs; i++)
 			minOutput[i] = Double.MAX_VALUE;
@@ -46,37 +49,50 @@ public class MainNeuralNetwork {
 				if(output[i]>maxOutput[i])
 					maxOutput[i] = output[i];
 			}
-			double[] input = new double[parts.length-numOutputs];
-			for(int i=numOutputs+1; i<parts.length; i++) {
+			double[] input = new double[numInputs];
+			for(int i=numOutputs+1; i<numInputs+numOutputs+1; i++) {
 				input[i-numOutputs-1] = new Double(parts[i]);
 				if(input[i-numOutputs-1]<minInput[i-numOutputs-1])
 					minInput[i-numOutputs-1] = input[i-numOutputs-1];
 				if(input[i-numOutputs-1]>maxInput[i-numOutputs-1])
 					maxInput[i-numOutputs-1] = input[i-numOutputs-1];
 			}
-			data.add(new double[][]{input, output});
+			if(Math.random()<DATA_LEARN_FRAC)
+				dataLearn.add(new double[][]{input, output});
+			else
+				dataValidate.add(new double[][]{input, output});
 			line = reader.readLine();
 		}
 		System.out.println("rrrrrrrrrrrrrrrrrrrrrrr");
 		reader.close();
-		for(double[][] datum:data) {
+		for(double[][] datum:dataLearn) {
+			for(int i=0; i<numOutputs; i++)
+				datum[1][i] = (datum[1][i]-minOutput[i])/(maxOutput[i]-minOutput[i]);
+			for(int i=0; i<numInputs; i++)
+				datum[0][i] = (datum[0][i]-minInput[i])/(maxInput[i]-minInput[i]);
+		}
+		for(double[][] datum:dataValidate) {
 			for(int i=0; i<numOutputs; i++)
 				datum[1][i] = (datum[1][i]-minOutput[i])/(maxOutput[i]-minOutput[i]);
 			for(int i=0; i<numInputs; i++)
 				datum[0][i] = (datum[0][i]-minInput[i])/(maxInput[i]-minInput[i]);
 		}
 		for(int i=0; i<new Integer(args[5]);i++) {
-			for(double[][] datum:data)
+			for(double[][] datum:dataLearn)
 				network.learn(datum[0], datum[1], new Double(args[6]));
 			if(i%100==0) {
 				double error = 0;
-				for(double[][] datum:data)
+				for(double[][] datum:dataValidate)
 					error+=Math.pow(datum[1][0]-network.getOutput(datum[0])[0], 2);
-				System.out.println(i+"\t"+error);
+				System.out.println(i+"\t"+error/dataValidate.size());
+				error = 0;
+				for(double[][] datum:dataLearn)
+					error+=Math.pow(datum[1][0]-network.getOutput(datum[0])[0], 2);
+				System.out.println(i+"\t"+error/dataLearn.size());
 			}
 		}
 		int i=0;
-		for(double[][] datum:data)
+		for(double[][] datum:dataValidate)
 			if(i++<50)
 				System.out.println(network.getOutput(datum[0])[0]+" "+datum[1][0]);
 	}

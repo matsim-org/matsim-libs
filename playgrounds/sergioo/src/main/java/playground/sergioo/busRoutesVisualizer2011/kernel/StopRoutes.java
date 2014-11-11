@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.sergioo.gtfs2PTSchedule2011.Stop;
 
@@ -40,7 +40,7 @@ public class StopRoutes {
 						List<String> path = new ArrayList<String>();
 						for(;i<route.getValue().length;i++) {
 							path.add(route.getValue()[i]);
-							links[activeStops.length-numTransfers-1].add(network.getLinks().get(new IdImpl(route.getValue()[i])));
+							links[activeStops.length-numTransfers-1].add(network.getLinks().get(Id.createLinkId(route.getValue()[i])));
 						}
 						routes.add(new PartialRoute(network, route.getKey(), path, numTransfers, finishedTrips, stops, activeStops, links));
 					}
