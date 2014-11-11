@@ -58,9 +58,4 @@ public class NoiseConfigParameters {
 		return relevantRadius;
 	}
 	
-	// distance between two grid cell centroids along x- and y-axes
-	public static double getCentroidGap(){
-		final double gridCentroidGap = 250.;
-		return gridCentroidGap;
-	}
 }

@@ -67,7 +67,7 @@ public class NoiseSpatialInfo {
 	private static final Logger log = Logger.getLogger(NoiseSpatialInfo.class);
 			
 	private Scenario scenario;
-	private Map<Id<Person>,List<Coord>> personId2listOfCoords = new HashMap<>();
+	private Map<Id<Person>, List<Coord>> personId2listOfCoords = new HashMap<>();
 	private List <Coord> allActivityCoords = new ArrayList <Coord>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
@@ -75,8 +75,6 @@ public class NoiseSpatialInfo {
 	private double yCoordMin = Double.MAX_VALUE;
 	private double yCoordMax = Double.MIN_VALUE;
 	
-	private Map<Tuple<Integer,Integer>,List<Coord>> zoneTuple2listOfActivityCoords = new HashMap<Tuple<Integer,Integer>, List<Coord>>();
-
 	private Map<Id<ReceiverPoint>,Coord> receiverPointId2Coord = new HashMap<>();
 	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<>();
 
@@ -87,9 +85,9 @@ public class NoiseSpatialInfo {
 	private double xCoordMaxLinkNodes = Double.MIN_VALUE;
 	private double yCoordMinLinkNodes = Double.MAX_VALUE;
 	private double yCoordMaxLinkNodes = Double.MIN_VALUE;
-	private Map<Tuple<Integer,Integer>,List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
+	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
 	
-	private Map<Id<ReceiverPoint>,List<Id<Link>>> receiverPointId2relevantLinkIds = new HashMap<>();
+	private Map<Id<ReceiverPoint>, List<Id<Link>>> receiverPointId2relevantLinkIds = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermDs = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermAngle = new HashMap<>();
 				
@@ -134,6 +132,9 @@ public class NoiseSpatialInfo {
 				}
 			}
 		}
+	}
+	
+	public void setReceiverPoints() {
 		
 		for(Coord coord : allActivityCoords) {
 			if(coord.getX() < xCoordMin) {
@@ -149,23 +150,6 @@ public class NoiseSpatialInfo {
 				yCoordMax = coord.getY();
 			}
 		}
-			
-		//	classify the activityCoords on the basis of the density
-		for(Coord coord : allActivityCoords) {
-			Tuple<Integer,Integer> zoneTuple = getZoneTupleDensityZones(coord);
-			if(!(zoneTuple2listOfActivityCoords.containsKey(zoneTuple))) {
-				List<Coord> activityCoords = new ArrayList<Coord>();
-				activityCoords.add(coord);
-				zoneTuple2listOfActivityCoords.put(zoneTuple, activityCoords);
-			} else {
-				List<Coord> activityCoords = zoneTuple2listOfActivityCoords.get(zoneTuple);
-				activityCoords.add(coord);
-				zoneTuple2listOfActivityCoords.put(zoneTuple, activityCoords);
-			}
-		}
-	}
-	
-	public void setReceiverPoints() {
 		
 		int counter = 0;
 		
@@ -191,6 +175,11 @@ public class NoiseSpatialInfo {
 	}
 	
 	public void setReceiverPoints(double xMin, double yMin, double xMax, double yMax) {
+		
+		xCoordMin = xMin;
+		xCoordMax = xMax;
+		yCoordMin = yMin;
+		yCoordMax = yMax;
 		
 		int counter = 0;
 		
@@ -633,7 +622,7 @@ public class NoiseSpatialInfo {
 		return immissionCorrection;
 	}
 	
-	private Tuple<Integer,Integer> getZoneTuple(Coord coord) {
+	private Tuple<Integer, Integer> getZoneTuple(Coord coord) {
 		 
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
@@ -641,20 +630,7 @@ public class NoiseSpatialInfo {
 		int xDirection = (int) ((xCoord - xCoordMin) / (NoiseConfigParameters.getReceiverPointGap()/1.));	
 		int yDirection = (int) ((yCoordMax - yCoord) / NoiseConfigParameters.getReceiverPointGap()/1.);
 		
-		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
-	}
-	
-	private Tuple<Integer,Integer> getZoneTupleDensityZones(Coord coord) {
-		
-		double xCoord = coord.getX();
-		double yCoord = coord.getY();
-		
-		int xDirection = (int) ((xCoord - xCoordMin) / (NoiseConfigParameters.getCentroidGap()/1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / (NoiseConfigParameters.getCentroidGap()/1.));
-		
-		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		
+		Tuple<Integer, Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
 	}
 	
@@ -742,11 +718,6 @@ public class NoiseSpatialInfo {
 
 	public Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> getReceiverPointId2relevantLinkId2correctionTermDs() {
 		return receiverPointId2relevantLinkId2correctionTermDs;
-	}
-
-	// for testing purposes
-	public Map<Tuple<Integer, Integer>, List<Coord>> getZoneTuple2listOfActivityCoords() {
-		return zoneTuple2listOfActivityCoords;
 	}
 
 	// for testing purposes

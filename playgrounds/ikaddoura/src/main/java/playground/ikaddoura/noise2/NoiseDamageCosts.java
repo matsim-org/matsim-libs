@@ -62,9 +62,9 @@ public class NoiseDamageCosts {
 		
 	// from emission handler
 	private List<Id<Vehicle>> hdvVehicles;
-	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEvents;
-	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEventsCar;
-	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEventsHdv;
+	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
+	private Map<Id<Link>, Map<Double,Integer>> linkId2timeInterval2linkEnterVehicleIDsCar;
+	private Map<Id<Link>, Map<Double,Integer>> linkId2timeInterval2linkEnterVehicleIDsHdv;
 	
 	// from person activity tracker
 	private Map<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd;
@@ -102,9 +102,9 @@ public class NoiseDamageCosts {
 		this.noiseImmissionCalculator = new NoiseImmissionEquations();
 		
 		this.hdvVehicles = noiseEmissionHandler.getHdvVehicles();
-		this.linkId2timeInterval2linkEnterEvents = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
-		this.linkId2timeInterval2linkEnterEventsCar = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDsCar();
-		this.linkId2timeInterval2linkEnterEventsHdv = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDsHdv();
+		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
+		this.linkId2timeInterval2linkEnterVehicleIDsCar = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterCars();
+		this.linkId2timeInterval2linkEnterVehicleIDsHdv = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterHdv();
 		
 		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd = activityTracker.getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
 		this.receiverPointId2timeInterval2affectedAgentUnits = activityTracker.getReceiverPointId2timeInterval2affectedAgentUnits();
@@ -290,8 +290,8 @@ public class NoiseDamageCosts {
 					}
 				}
 				
-				int nCar = linkId2timeInterval2linkEnterEventsCar.get(linkId).get(timeInterval).size();
-				int nHdv = linkId2timeInterval2linkEnterEventsHdv.get(linkId).get(timeInterval).size();
+				int nCar = linkId2timeInterval2linkEnterVehicleIDsCar.get(linkId).get(timeInterval);
+				int nHdv = linkId2timeInterval2linkEnterVehicleIDsHdv.get(linkId).get(timeInterval);
 			
 				double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
 				double vHdv = vCar;
@@ -341,7 +341,7 @@ public class NoiseDamageCosts {
 				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 								
 				// calculate shares for the affected Agents
-				for(Id<Vehicle> id : linkId2timeInterval2linkEnterEvents.get(linkId).get(timeInterval)) {
+				for(Id<Vehicle> id : linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get(timeInterval)) {
 					
 					double amount = 0.;
 					boolean isHdv = false;
