@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -55,7 +56,7 @@ public class NoiseImmission {
 		
 	// from emission handler
 	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
-	private Map<Id <Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEvents;
+	private Map<Id <Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
 	
 	// optional information for a more detailed calculation of noise immission
 	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
@@ -70,7 +71,7 @@ public class NoiseImmission {
 		this.noiseImmissionCalculator = new NoiseImmissionEquations();
 		
 		this.linkId2timeInterval2noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
-		this.linkId2timeInterval2linkEnterEvents = noiseEmissionHandler.getLinkId2timeInterval2linkEnterEvents();
+		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
 	}
 	
 	public void setTunnelLinks(ArrayList<Id<Link>> tunnelLinks) {
@@ -143,7 +144,7 @@ public class NoiseImmission {
 				List<Double> noiseImmissions = new ArrayList<Double>();
 				if(!(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval)==null)) {
 					for(Id<Link> linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).keySet()) {
-						if(!(linkId2timeInterval2linkEnterEvents.get(linkId).get(timeInterval).size() == 0.)) {
+						if(!(linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get(timeInterval).size() == 0.)) {
 							noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).get(linkId));
 						}
 					}	

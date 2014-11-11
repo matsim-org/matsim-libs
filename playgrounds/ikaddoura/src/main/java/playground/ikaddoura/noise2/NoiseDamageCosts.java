@@ -64,9 +64,9 @@ public class NoiseDamageCosts {
 		
 	// from emission handler
 	private List<Id<Vehicle>> hdvVehicles;
-	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEvents;
-	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsCar;
-	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsHdv;
+	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEvents;
+	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEventsCar;
+	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterEventsHdv;
 	
 	// from person activity tracker
 	private Map<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd;
@@ -92,10 +92,9 @@ public class NoiseDamageCosts {
 	private double totalCausedNoiseCost = 0.;
 	private double totalAffectedNoiseCost = 0.;
 	
-	// to be filled during the computation of noise events
-	private List<NoiseEventCaused> noiseEvents = new ArrayList<NoiseEventCaused>();
-	private List<NoiseEventCaused> noiseEventsCar = new ArrayList<NoiseEventCaused>();
-	private List<NoiseEventCaused> noiseEventsHdv = new ArrayList<NoiseEventCaused>();
+//	 to be filled during the computation of noise events
+	private boolean collectNoiseEvents;
+	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
 	public NoiseDamageCosts (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, double annualCostRate, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmission noiseImmission) {
@@ -105,9 +104,9 @@ public class NoiseDamageCosts {
 		this.noiseImmissionCalculator = new NoiseImmissionEquations();
 		
 		this.hdvVehicles = noiseEmissionHandler.getHdvVehicles();
-		this.linkId2timeInterval2linkEnterEvents = noiseEmissionHandler.getLinkId2timeInterval2linkEnterEvents();
-		this.linkId2timeInterval2linkEnterEventsCar = noiseEmissionHandler.getLinkId2timeInterval2linkEnterEventsCar();
-		this.linkId2timeInterval2linkEnterEventsHdv = noiseEmissionHandler.getLinkId2timeInterval2linkEnterEventsHdv();
+		this.linkId2timeInterval2linkEnterEvents = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
+		this.linkId2timeInterval2linkEnterEventsCar = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDsCar();
+		this.linkId2timeInterval2linkEnterEventsHdv = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDsHdv();
 		
 		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd = activityTracker.getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
 		this.receiverPointId2timeInterval2affectedAgentUnits = activityTracker.getReceiverPointId2timeInterval2affectedAgentUnits();
@@ -124,8 +123,14 @@ public class NoiseDamageCosts {
 			log.info("Setting annual noise cost rate to " + annualCostRate);
 			this.annualCostRate = annualCostRate;
 		}
+		
+		this.collectNoiseEvents = true;
 	}
 	
+	public void setCollectNoiseEvents(boolean collectNoiseEvents) {
+		this.collectNoiseEvents = collectNoiseEvents;
+	}
+
 	public void calculateNoiseDamageCosts() {
 		
 		// calculate noise exposure (damage) for each receiver point
@@ -338,31 +343,32 @@ public class NoiseDamageCosts {
 				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 								
 				// calculate shares for the affected Agents
-				for(LinkEnterEvent event : linkId2timeInterval2linkEnterEvents.get(linkId).get(timeInterval)) {
+				for(Id<Vehicle> id : linkId2timeInterval2linkEnterEvents.get(linkId).get(timeInterval)) {
 					
 					double amount = 0.;
 					boolean isHdv = false;
 					
-					if(!(hdvVehicles.contains(event.getVehicleId()))) {
+					if(!(hdvVehicles.contains(id))) {
 						amount = amountCar;
 					} else {
 						amount = amountHdv;
 						isHdv = true;
 					}
 					double time = timeInterval - 1;
-					Id<Person> agentId = event.getPersonId();
+					
+					// The person Id is assumed to be equal to the vehicle Id.
+					Id<Person> agentId = Id.create(id, Person.class); 
+				
 					NoiseVehicleType carOrHdv = NoiseVehicleType.car;
 					if (isHdv == true) {
 						carOrHdv = NoiseVehicleType.hdv;
 					}
 
-					NoiseEventCaused noiseEvent = new NoiseEventCaused(time,agentId,event.getVehicleId(),amount,linkId,carOrHdv);
+					NoiseEventCaused noiseEvent = new NoiseEventCaused(time, agentId, id, amount, linkId, carOrHdv);
 					events.processEvent(noiseEvent);
-					this.noiseEvents.add(noiseEvent);
-					if(isHdv == true) {
-						this.noiseEventsHdv.add(noiseEvent);
-					} else {
-						this.noiseEventsCar.add(noiseEvent);
+					
+					if (this.collectNoiseEvents) {
+						this.noiseEventsCaused.add(noiseEvent);
 					}
 					
 					totalCausedNoiseCost = totalCausedNoiseCost + amount;
@@ -392,9 +398,13 @@ public class NoiseDamageCosts {
 							double costPerUnit = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).get(timeInterval);
 							double amount = factor * costPerUnit;
 							
-							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(timeInterval,personId,amount,receiverPointId,actType);
+							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(timeInterval, personId, amount, receiverPointId, actType);
 							events.processEvent(noiseEventAffected);
-							this.noiseEventsAffected.add(noiseEventAffected);
+							
+							if (this.collectNoiseEvents) {
+								this.noiseEventsAffected.add(noiseEventAffected);
+							}
+							
 							totalAffectedNoiseCost = totalAffectedNoiseCost + amount;
 						
 							if (personId2affectedNoiseCosts.containsKey(personId)) {
@@ -645,10 +655,6 @@ public class NoiseDamageCosts {
 	public Map<Id<ReceiverPoint>, Map<Double, Double>> getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit() {
 		return receiverPointId2timeInterval2damageCostPerAffectedAgentUnit;
 	}
-
-	public List<NoiseEventAffected> getNoiseEventsAffected() {
-		return noiseEventsAffected;
-	}
 	
 	public Map<Id<Link>, Map<Double, Double>> getLinkId2timeInterval2damageCost() {
 		return linkId2timeInterval2damageCost;
@@ -662,8 +668,12 @@ public class NoiseDamageCosts {
 		return linkId2timeInterval2damageCostPerHdvVehicle;
 	}
 
-	public List<NoiseEventCaused> getNoiseEvents() {
-		return noiseEvents;
+	public List<NoiseEventCaused> getNoiseEventsCaused() {
+		return noiseEventsCaused;
+	}
+
+	public List<NoiseEventAffected> getNoiseEventsAffected() {
+		return noiseEventsAffected;
 	}
 	
 }

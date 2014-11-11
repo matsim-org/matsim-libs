@@ -134,6 +134,7 @@ public class NoiseCalculationOffline {
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
 		NoiseDamageCosts noiseDamageCosts = new NoiseDamageCosts(scenario, events, spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
