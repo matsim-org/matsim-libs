@@ -36,9 +36,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 import GTFS2PTSchedule.Route;
 import GTFS2PTSchedule.Stop;
@@ -252,7 +252,7 @@ public class RoutesPathsGenerator {
 		else {
 			links = new ArrayList<Link>();
 			for(String link:linksS)
-				links.add(network.getLinks().get(new IdImpl(link)));
+				links.add(network.getLinks().get(Id.create(link, Link.class)));
 		}
 		for(Link link:links) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
@@ -313,7 +313,7 @@ public class RoutesPathsGenerator {
 		Set<Link> allStopLinks = new HashSet<Link>();
 		for(Stop stop:stops.values())
 			if(stop.isFixedLinkId())
-				allStopLinks.add(network.getLinks().get(new IdImpl(stop.getLinkId())));
+				allStopLinks.add(network.getLinks().get(Id.create(stop.getLinkId(), Link.class)));
 		return allStopLinks;
 	}
 	

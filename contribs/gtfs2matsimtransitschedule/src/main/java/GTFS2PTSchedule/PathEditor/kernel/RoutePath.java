@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -170,7 +169,7 @@ public class RoutePath {
 		for(StopTime stopTime:trip.getStopTimes().values()) {
 			String linkId = stops.get(stopTime.getStopId()).getLinkId();
 			if(linkId!=null)
-				links.add(network.getLinks().get(new IdImpl(linkId)));
+				links.add(network.getLinks().get(Id.create(linkId, Link.class)));
 		}
 		return links;
 	}
@@ -304,7 +303,7 @@ public class RoutePath {
 		}	
 	}
 	public void addLinkNetwork(Node fromNode, Node toNode) {
-		Id linkId = new IdImpl(network.getLinks().size()*2);
+		Id<Link> linkId = Id.create(network.getLinks().size()*2, Link.class);
 		network.addLink(network.getFactory().createLink(linkId, fromNode, toNode));
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE,true));
@@ -317,7 +316,7 @@ public class RoutePath {
 		}
 	}
 	public Node createNode(double x, double y) {
-		Node node = network.getFactory().createNode(new IdImpl("n"+network.getNodes().size()), new CoordImpl(x, y));
+		Node node = network.getFactory().createNode(Id.create("n"+network.getNodes().size(), Node.class), new CoordImpl(x, y));
 		network.addNode(node);
 		try {
 			PrintWriter writer = new PrintWriter(new FileWriter(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE,true));
@@ -367,13 +366,13 @@ public class RoutePath {
 			nextStop = stops.get(next.next().getStopId());
 			if(prevStop.getLinkId()!=null) {
 				prevLL=new ArrayList<Link>();
-				prevLL.add(network.getLinks().get(new IdImpl(prevStop.getLinkId())));
+				prevLL.add(network.getLinks().get(Id.create(prevStop.getLinkId(), Link.class)));
 			}
 			else
 				prevLL=getBestLinksMode(network, prevStop.getPoint(),trip.getShape());
 			if(nextStop.getLinkId()!=null) {
 				nextLL=new ArrayList<Link>();
-				nextLL.add(network.getLinks().get(new IdImpl(nextStop.getLinkId())));
+				nextLL.add(network.getLinks().get(Id.create(nextStop.getLinkId(), Link.class)));
 			}
 			else
 				nextLL=getBestLinksMode(network, nextStop.getPoint(),trip.getShape());
@@ -414,7 +413,7 @@ public class RoutePath {
 			Path bestPath=null;
 			nextStop = stops.get(next.next().getStopId());
 			if(nextStop.getLinkId()!=null) {
-				nextL = network.getLinks().get(new IdImpl(nextStop.getLinkId()));
+				nextL = network.getLinks().get(Id.create(nextStop.getLinkId(), Link.class));
 				if(prevL.equals(nextL))
 					bestPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 				else {
@@ -548,7 +547,7 @@ public class RoutePath {
 	public String allStopsWithCorrectLink() {
 		for(StopTime stopTime: trip.getStopTimes().values()) {
 			Stop stop = stops.get(stopTime.getStopId());
-			Link link = network.getLinks().get(new IdImpl(stop.getLinkId()));
+			Link link = network.getLinks().get(Id.create(stop.getLinkId(), Link.class));
 			Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 			Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			Line2D linkLine = new Line2D(fromPoint, toPoint);
@@ -572,7 +571,7 @@ public class RoutePath {
 	public String allStopsWithInRouteLink() {
 		for(StopTime stopTime: trip.getStopTimes().values()) {
 			Stop stop = stops.get(stopTime.getStopId());
-			Link link = network.getLinks().get(new IdImpl(stop.getLinkId()));
+			Link link = network.getLinks().get(stop.getLinkId());
 			if(!links.contains(link))
 				return stopTime.getStopId();
 		}

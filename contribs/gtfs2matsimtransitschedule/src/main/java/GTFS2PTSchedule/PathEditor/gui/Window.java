@@ -46,23 +46,20 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import util.geometry.Point2D;
+import GTFS2PTSchedule.Stop;
+import GTFS2PTSchedule.Trip;
 import GTFS2PTSchedule.PathEditor.kernel.RoutePath;
 import GTFS2PTSchedule.PathEditor.kernel.RoutesPathsGenerator;
 
-import GTFS2PTSchedule.Stop;
-import GTFS2PTSchedule.Trip;
-import util.geometry.Point2D;
-
 public class Window extends JFrame implements ActionListener {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 1L;
 	//Enumerations
 	public enum Option {
@@ -230,7 +227,7 @@ public class Window extends JFrame implements ActionListener {
 		else{
 			List<Link> links = new ArrayList<Link>();
 			for(String link:linksS)
-				links.add(network.getLinks().get(new IdImpl(link)));
+				links.add(network.getLinks().get(Id.create(link, Link.class)));
 			routePath = new RoutePath(network, mode, trip, stops, links);
 		}
 		this.setLocation(0,0);
