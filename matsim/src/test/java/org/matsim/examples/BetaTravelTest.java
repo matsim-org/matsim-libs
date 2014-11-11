@@ -20,11 +20,6 @@
 
 package org.matsim.examples;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,11 +31,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -62,6 +53,11 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * This TestCase should ensure the correct behavior of agents when different
@@ -277,25 +273,6 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 
 		@Override
-		protected void setUp() {
-			super.setUp();
-
-			// do some test to ensure the scenario is correct
-			double beta_travel = this.config.planCalcScore().getTraveling_utils_hr();
-			if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
-				throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
-			}
-
-			int lastIter = this.config.controler().getLastIteration();
-			if (lastIter < 100) {
-				throw new IllegalArgumentException("Controler.lastIteration must be at least 100. Current value is " + lastIter);
-			}
-			if (lastIter > 100) {
-				System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
-			}
-		}
-
-		@Override
 		protected StrategyManager loadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
@@ -333,7 +310,20 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getPopulation().getPersons().size());
+            // do some test to ensure the scenario is correct
+            double beta_travel = event.getControler().getConfig().planCalcScore().getTraveling_utils_hr();
+            if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
+                throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
+            }
+
+            int lastIter = event.getControler().getConfig().controler().getLastIteration();
+            if (lastIter < 100) {
+                throw new IllegalArgumentException("Controler.lastIteration must be at least 100. Current value is " + lastIter);
+            }
+            if (lastIter > 100) {
+                System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
+            }
+            this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getPopulation().getPersons().size());
 		}
 
 		@Override
