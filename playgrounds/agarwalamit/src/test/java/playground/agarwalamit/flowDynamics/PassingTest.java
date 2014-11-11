@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.passing;
+package playground.agarwalamit.flowDynamics;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +28,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -63,77 +62,62 @@ import org.matsim.vehicles.VehicleUtils;
 
 
 /**
- * Tests that minimum of speed on link and vehicle speed is used in the simulation.
+ * Tests that a faster vehicle can pass slower vehicle on the same link
  * 
  */
-public class VehVsNetworkSpeedTest {
+public class PassingTest {
+
+
+	/* a bike enters at t=0; and a car at t=5sec link length = 1000m
+	 *Assume car speed = 20 m/s, bike speed = 5 m/s
+	 *tt_car = 50 sec; tt_bike = 200 sec
+	 */
 
 	@Test 
-	public void testIfVehSpeedIsGreater(){
+	public void test4PassingInFreeFlowState(){
 
 		SimpleNetwork net = new SimpleNetwork();
-		Id<Person> id = Id.create(0, Person.class);
-		Person p = net.population.getFactory().createPerson(id);
-		PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
-		a1.setEndTime(8*3600);
-		LegImpl leg=plan.createAndAddLeg(TransportMode.car);
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
-		route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", net.link3.getId());
-		net.population.addPerson(p);
+
+		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
+		String transportModes [] = new String [] {"bike","car"};
+
+		for(int i=0;i<2;i++){
+			Id<Person> id = Id.create(i, Person.class);
+			Person p = net.population.getFactory().createPerson(id);
+			PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
+			ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
+			a1.setEndTime(8*3600+i*5);
+			LegImpl leg=plan.createAndAddLeg(transportModes[i]);
+			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
+			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
+			leg.setRoute(route);
+			plan.createAndAddActivity("w", net.link3.getId());
+			net.population.addPerson(p);
+		}
 
 		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
 
-		QSim qSim = createQSim(net,manager,30);
+
+		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
+		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
 
-		int carTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
+		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
+		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		Assert.assertEquals("Minimum speed is vehicle speed and it is not used.", 41, carTravelTime);
+		//		Assert.assertEquals("wrong number of links.", 3, net.network.getLinks().size());
+		//		Assert.assertEquals("wrong number of persons.", 2, net.population.getPersons().size());
+		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
+
 	}
 
-	@Test 
-	public void testIfVehSpeedIsSmaller(){
-
-		SimpleNetwork net = new SimpleNetwork();
-
-		Id<Person> id = Id.create(0, Person.class);
-		Person p = net.population.getFactory().createPerson(id);
-		PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
-		a1.setEndTime(8*3600);
-		LegImpl leg=plan.createAndAddLeg(TransportMode.car);
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
-		route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", net.link3.getId());
-		net.population.addPerson(p);
-
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
-
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
-
-		QSim qSim = createQSim(net,manager,20);
-		qSim.run();
-
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-
-		int carTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
-
-		Assert.assertEquals("Minimum speed is vehicle speed and it is not used.", 51, carTravelTime);
-	}
-
-	private QSim createQSim (SimpleNetwork net, EventsManager manager, double maxVelocity){
+	private QSim createQSim (SimpleNetwork net, EventsManager manager){
 		Scenario sc = net.scenario;
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
@@ -152,9 +136,14 @@ public class VehVsNetworkSpeedTest {
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(maxVelocity);
+		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
+
+		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+		bike.setMaximumVelocity(5);
+		bike.setPcuEquivalents(0.25);
+		modeVehicleTypes.put("bike", bike);
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 		return qSim;
@@ -162,6 +151,7 @@ public class VehVsNetworkSpeedTest {
 
 
 	private static final class SimpleNetwork{
+
 		final Config config;
 		final Scenario scenario ;
 		final NetworkImpl network;

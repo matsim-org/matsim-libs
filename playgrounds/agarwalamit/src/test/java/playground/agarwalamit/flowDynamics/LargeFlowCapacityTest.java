@@ -16,18 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.passing;
+package playground.agarwalamit.flowDynamics;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -57,37 +53,31 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
+import java.util.*;
 
 /**
- * Tests that a faster vehicle can pass slower vehicle on the same link
+ * Tests that two persons can leave a link at the same time if flow capacity permits
+ * In other words, test if qsim can handle capacity more than 3600 PCU/Hr.
+ * If the flow capacity is 3601 PCU/Hr it will allow the two vehicles.
  * 
  */
-public class PassingTest {
-
-
-	/* a bike enters at t=0; and a car at t=5sec link length = 1000m
-	 *Assume car speed = 20 m/s, bike speed = 5 m/s
-	 *tt_car = 50 sec; tt_bike = 200 sec
-	 */
+public class LargeFlowCapacityTest {
 
 	@Test 
 	public void test4PassingInFreeFlowState(){
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
-		String transportModes [] = new String [] {"bike","car"};
+		//=== build plans; two persons with cars enter and leaves one link at the same time and should have the same travel time.
 
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = net.population.getFactory().createPerson(id);
 			PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
 			ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
-			a1.setEndTime(8*3600+i*5);
-			LegImpl leg=plan.createAndAddLeg(transportModes[i]);
+			a1.setEndTime(8*3600);
+			LegImpl leg=plan.createAndAddLeg(TransportMode.car);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
 			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
@@ -96,25 +86,25 @@ public class PassingTest {
 			net.population.addPerson(p);
 		}
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
+		Map<Id<Person>, Map<Id<Link>, double[]>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, double[]>>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
 
-
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+		Map<Id<Link>, double[]> times1 = personLinkTravelTimes.get(Id.create("0", Person.class));
+		Map<Id<Link>, double[]> times2 = personLinkTravelTimes.get(Id.create("1", Person.class));
 
-		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
-		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
+		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0]; 
+		int linkEnterTime2 = (int)times2.get(Id.create("2", Link.class))[0];
 
-		//		Assert.assertEquals("wrong number of links.", 3, net.network.getLinks().size());
-		//		Assert.assertEquals("wrong number of persons.", 2, net.population.getPersons().size());
-		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
-
+		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1]; 
+		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
+		
+		Assert.assertEquals("Vehicles Entered at different time", 0, linkEnterTime1-linkEnterTime2);
+		Assert.assertEquals("Vehicles Entered at same time but not leaving the link at the same time.", 0, linkLeaveTime1-linkLeaveTime2);
 	}
 
 	private QSim createQSim (SimpleNetwork net, EventsManager manager){
@@ -123,8 +113,7 @@ public class PassingTest {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
@@ -132,19 +121,6 @@ public class PassingTest {
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-
-		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-		bike.setMaximumVelocity(5);
-		bike.setPcuEquivalents(0.25);
-		modeVehicleTypes.put("bike", bike);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
@@ -178,40 +154,49 @@ public class PassingTest {
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","bike"));
 
-			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per min.
-			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 60, 1, null, "22");	
-			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 25, 60, 1, null, "22");
+			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 3601, 1, null, "22"); //capacity is 1 PCU per min.
+			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 3601, 1, null, "22");	
+			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 25, 3600, 1, null, "22");
 
 			population = scenario.getPopulation();
 		}
 	}
+
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
+		private final Map<Id<Person>, Map<Id<Link>, double[]>> personLinkEnterLeaveTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
-			this.personLinkTravelTimes = agentTravelTimes;
+		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, double[]>> agentLinkEnterLeaveTimes) {
+			this.personLinkEnterLeaveTimes = agentLinkEnterLeaveTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
-			if (travelTimes == null) {
-				travelTimes = new HashMap<Id<Link>, Double>();
-				this.personLinkTravelTimes.put(event.getPersonId(), travelTimes);
+			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			if (times == null) {
+				times = new HashMap<Id<Link>, double[]>();
+				double [] linkEnterLeaveTime = {Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
+				times.put(event.getLinkId(), linkEnterLeaveTime);
+				this.personLinkEnterLeaveTimes.put(event.getPersonId(), times);
 			}
-			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
+			double linkLeaveTime;
+			if(times.get(event.getLinkId())!=null){
+				linkLeaveTime = times.get(event.getLinkId())[1];
+			} else linkLeaveTime = Double.POSITIVE_INFINITY;
+			
+			double [] linkEnterTime = {event.getTime(),linkLeaveTime};
+			times.put(event.getLinkId(), linkEnterTime);
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
-			if (travelTimes != null) {
-				Double d = travelTimes.get(event.getLinkId());
-				if (d != null) {
-					double time = event.getTime() - d.doubleValue();
-					travelTimes.put(event.getLinkId(), Double.valueOf(time));
-				}
+			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			if (times != null) {
+				double linkEnterTime = times.get(event.getLinkId())[0];
+				double [] linkEnterLeaveTime = {linkEnterTime,event.getTime()};
+				times.put(event.getLinkId(), linkEnterLeaveTime);
 			}
 		}
 
