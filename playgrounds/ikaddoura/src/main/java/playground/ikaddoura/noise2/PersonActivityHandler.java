@@ -252,7 +252,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	public void calculateDurationOfStay() {
 		
 		int counter = 0;
-		log.info("Calculating durations of stay for a total of " + receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet().size() + "receiver points.");
+		log.info("Calculating durations of stay for a total of " + receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet().size() + " receiver points.");
 		
 		// for each receiver point
 		for(Id<ReceiverPoint> receiverPointId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet()) {
@@ -351,6 +351,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 					}
 				}
 			}
+			counter++;
 		}
 	}
 	

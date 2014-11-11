@@ -57,6 +57,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		this.spatialInfo.setReceiverPoints();
 		this.spatialInfo.setActivityCoord2NearestReceiverPointId();
 		this.spatialInfo.setRelevantLinkIds();
+		this.spatialInfo.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario());
 		this.noiseEmissionHandler.setHdvVehicles(null);

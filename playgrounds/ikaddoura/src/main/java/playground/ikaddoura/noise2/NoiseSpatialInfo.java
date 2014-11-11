@@ -188,10 +188,34 @@ public class NoiseSpatialInfo {
 		}
 		
 		log.info("Total number of receiver points: " + receiverPointId2Coord.size());
-		writeReceiverPoints();
 	}
 	
-	private void writeReceiverPoints() {
+	public void setReceiverPoints(double xMin, double yMin, double xMax, double yMax) {
+		
+		int counter = 0;
+		
+		// a grid of receiver points
+		for (double y = yMax + 100. ; y > yMin - 100. - NoiseConfigParameters.getReceiverPointGap() ; y = y - NoiseConfigParameters.getReceiverPointGap()) {
+			for (double x = xMin - 100. ; x < xMax + 100. + NoiseConfigParameters.getReceiverPointGap() ; x = x + NoiseConfigParameters.getReceiverPointGap()) {
+				Coord coord = new CoordImpl(x, y);
+				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
+				receiverPointId2Coord.put(rpId, coord);
+				counter++;
+							
+				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
+				List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
+				if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
+					listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
+				}
+				listOfReceiverPointIDs.add(rpId);
+				zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
+			}
+		}
+		
+		log.info("Total number of receiver points: " + receiverPointId2Coord.size());
+	}
+		
+	public void writeReceiverPoints(String outputPath) {
 
 		// csv file
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
@@ -214,7 +238,7 @@ public class NoiseSpatialInfo {
 		values.add(id2xCoord);
 		values.add(id2yCoord);
 		
-		write(scenario.getConfig().controler().getOutputDirectory() + "/", 3, headers, values);
+		write(outputPath, 3, headers, values);
 		
 		// shape file		
 		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
@@ -236,7 +260,7 @@ public class NoiseSpatialInfo {
 			features.add(feature);			
 			i++;
 		}
-		String filePath = scenario.getConfig().controler().getOutputDirectory() + "/receiverPoints/";
+		String filePath = outputPath;
 		File file = new File(filePath);
 		file.mkdirs();
 		

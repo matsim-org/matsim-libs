@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * (1) Computes noise emissions and immissions based on a standard events file.
- * (2) Optionally throws noise immission events.
+ * (2) Optionally throws noise immission damage events.
  * (2) Writes out some analysis.
  * 
  * @author ikaddoura
@@ -57,11 +57,13 @@ public class NoiseCalculationOffline {
 			log.info("output directory: " + outputDirectory);
 			
 		} else {
-//			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-//			lastIteration = 100;
-			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-			lastIteration = 5;
-			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+			lastIteration = 100;
+			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
+			
+//			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+//			lastIteration = 5;
+//			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -87,14 +89,16 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-//		events.addHandler(eventWriter);
+		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario);
 		spatialInfo.setActivityCoords();
 		spatialInfo.setReceiverPoints();
+//		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
 		spatialInfo.setRelevantLinkIds();
+		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario);
 		noiseEmissionHandler.setHdvVehicles(null);
@@ -133,7 +137,7 @@ public class NoiseCalculationOffline {
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
-//		eventWriter.closeFile();
+		eventWriter.closeFile();
 	}
 }
 		
