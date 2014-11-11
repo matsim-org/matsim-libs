@@ -149,7 +149,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
 
         initialRouting = reader.readBoolean();
-        slaveLogger.warn("Performing initial routing.");
+        if(initialRouting)        slaveLogger.warn("Performing initial routing.");
 
         memoryUsageCalculator = new MemoryUsageCalculator();
         writeMemoryStats();
@@ -367,10 +367,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
     }
 
     public void transmitPerformance() throws IOException {
-        slaveLogger.warn("Spent a total of " + totalIterationTime +
-                " running " + plansCopyForSending.size() +
-                " person plans for " + numberOfPSimIterations +
-                " PSim iterations.");
+        if(totalIterationTime>0) {
+            slaveLogger.warn("Spent a total of " + totalIterationTime +
+                    " running " + plansCopyForSending.size() +
+                    " person plans for " + numberOfPSimIterations +
+                    " PSim iterations.");
+        }
         writer.writeDouble(totalIterationTime);
         writer.writeInt(matsimControler.getPopulation().getPersons().size());
         //send memory usage fraction of max to prevent being assigned more persons

@@ -37,26 +37,23 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener, IterationStartsListener {
-    private static final double MAX_MEMORY_USE = 0.5;
     public static final Logger masterLogger = Logger.getLogger(MasterControler.class);
     private final HashMap<String, Plan> newPlans = new HashMap<>();
+    private final long startMillis;
+    private final Hydra hydra;
     private long bytesPerPerson;
     private Scenario scenario;
     private long scenarioMemoryUse;
-    private MemoryUsageCalculator memoryUsageCalculator;
     private long bytesPerPlan;
-    private long usedMemory;
-    private long freeMemory;
-    private long currentPopulationMemoryUse;
-    private int numSlaves;
     private boolean initialRoutingOnSlaves = false;
     private int numberOfPSimIterations = 5;
     private Config config;
     private Controler matsimControler;
-    private Slave[] slaves;
+    private TreeMap<Integer, Slave> slaves;
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private SerializableLinkTravelTimes linkTravelTimes;
@@ -65,10 +62,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private int loadBalanceInterval;
     private boolean isLoadBalanceIteration;
     private boolean somethingWentWrong = false;
+    private int socketNumber = 12345;
     public static double planAllocationLimiter = 10.0;
     public static long bytesPerSlaveBuffer = (long) 2e8;
+    /**
+     * value between 0 and 1; increasing it increases the dampening effect of preventing
+     * large transfers of persons during load balance iterations
+     */
+    private static final double loadBalanceDampeningFactor = 0.4;
 
-    public MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
+    public MasterControler(String[] args) throws NumberFormatException, IOException, ParseException, InterruptedException {
+        startMillis = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption("c", true, "Config file location");
@@ -80,12 +84,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("l", true, "Number of iterations between load balancing. Default = 5");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
+        int numSlaves = 1;
         if (commandLine.hasOption("n"))
             numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
         else {
-            System.err.println("Unspecified number of slaves");
-            System.out.println(options.toString());
-            System.exit(1);
+            System.err.println("Unspecified number of slaves. Will start with the default of a single slave.");
         }
         if (commandLine.hasOption("i")) {
             numberOfPSimIterations = Integer.parseInt(commandLine.getOptionValue("i"));
@@ -94,8 +97,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterLogger.warn("Unspecified number of PSim iterations for every QSim iteration run on the master.");
             masterLogger.warn("Using default value of " + numberOfPSimIterations);
         }
-        slaves = new Slave[numSlaves];
-        int socketNumber = 12345;
+        slaves = new TreeMap<>();
         if (commandLine.hasOption("p"))
             try {
                 socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
@@ -131,29 +133,35 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             System.exit(1);
         }
 
+
 //        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
-            masterLogger.warn("Slave " + i + " out of " + numSlaves + " accepted.");
-            slaves[i] = new Slave(socket, i);
-
+            masterLogger.warn("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.");
+            int currSlaveNumber = assignSlaveNumber();
+            Slave slave = new Slave(socket, i);
+            slaves.put(currSlaveNumber, slave);
             //order is important
-            slaves[i].sendNumber(i);
-            slaves[i].sendNumber(numberOfPSimIterations);
-            slaves[i].sendBoolean(initialRoutingOnSlaves);
-            slaves[i].readMemoryStats();
-            slaves[i].readNumberOfThreadsOnSlave();
+            slave.sendNumber(currSlaveNumber);
+            slave.sendNumber(numberOfPSimIterations);
+            slave.sendBoolean(initialRoutingOnSlaves);
+            slave.readMemoryStats();
+            slave.readNumberOfThreadsOnSlave();
+            Thread.sleep(1000);
         }
         writeServer.close();
+        masterLogger.warn("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.");
+        hydra = new Hydra();
+        new Thread(hydra).start();
 
         scenario = ScenarioUtils.createScenario(config);
         loadScenario();
 //        determine the memory use of the population for some initial load balancing
-        memoryUsageCalculator = new MemoryUsageCalculator();
+        MemoryUsageCalculator memoryUsageCalculator = new MemoryUsageCalculator();
         scenarioMemoryUse = memoryUsageCalculator.getMemoryUse();
         loadPopulation();
-        currentPopulationMemoryUse = memoryUsageCalculator.getMemoryUse() - scenarioMemoryUse;
+        long currentPopulationMemoryUse = memoryUsageCalculator.getMemoryUse() - scenarioMemoryUse;
         bytesPerPlan = currentPopulationMemoryUse / getTotalNumberOfPlansOnMaster();
         bytesPerPerson = bytesPerPlan;
         masterLogger.warn("Estimated memory use per plan is " + bytesPerPlan + " bytes");
@@ -164,12 +172,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //split the population to be sent to the slaves
 
         List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getPopulation().getPersons().values(), numSlaves);
-        for (int i = 0; i < numSlaves; i++) {
+        int i = 0;
+        for (int j : slaves.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
             for (PersonImpl p : personSplit[i]) {
                 personsToSend.add(new PersonSerializable(p));
             }
-            slaves[i].slavePersonPool = personsToSend;
+            slaves.get(j).slavePersonPool = personsToSend;
+            i++;
         }
 
 
@@ -195,12 +205,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             matsimControler.setMobsimFactory(new PTQSimFactory());
         }
-        masterLogger.warn("MASTER inited");
+    }
+
+    public int assignSlaveNumber() {
+        return (int) (System.currentTimeMillis() - startMillis) / 1000;
     }
 
     private int getTotalNumberOfPlansFromSlaves() {
         int total = 0;
-        for (Slave slave : slaves) {
+        for (Slave slave : slaves.values()) {
             total += slave.numberOfPlans;
         }
         return total;
@@ -236,7 +249,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         MasterControler master = null;
         try {
             master = new MasterControler(args);
@@ -255,8 +268,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     public void startSlavesInMode(CommunicationsMode mode) {
         if (numThreads.get() > 0)
             masterLogger.warn("All slaves have not finished previous operation but they are being asked to " + mode.toString());
-        numThreads = new AtomicInteger(numSlaves);
-        for (Slave slave : slaves) {
+        numThreads = new AtomicInteger(slaves.size());
+        for (Slave slave : slaves.values()) {
             slave.communicationsMode = mode;
             new Thread(slave).start();
 
@@ -264,6 +277,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     public void waitForSlaveThreads() {
+        masterLogger.warn("Waiting for " + numThreads.get() +
+                " slaves");
         while (numThreads.get() > 0)
             try {
                 Thread.sleep(10);
@@ -275,6 +290,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterLogger.error("Something went wrong. Exiting.");
             throw new RuntimeException();
         }
+        masterLogger.warn("All slaves done.");
     }
 
     @Override
@@ -292,7 +308,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 person.addPlan(plan);
                 person.setSelectedPlan(plan);
             }
-            if (numSlaves > 1) loadBalance();
+            if (slaves.size() > 1) loadBalance();
             waitForSlaveThreads();
             startSlavesInMode(CommunicationsMode.CONTINUE);
         }
@@ -312,7 +328,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //wating for slaves to receive plans from notifyIterationStarts()
         waitForSlaveThreads();
         mergePlansFromSlaves();
-        isLoadBalanceIteration = numSlaves > 1 && event.getIteration() % loadBalanceInterval == 0;
+        isLoadBalanceIteration = event.getIteration() % loadBalanceInterval == 0;
         //do load balancing, if necessary
         if (isLoadBalanceIteration)
             loadBalance();
@@ -329,27 +345,34 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private void loadBalance() {
         waitForSlaveThreads();
+        //add any newly registered slaves
+        slaves.putAll(hydra.getNewSlaves());
+        if (slaves.size() < 2)
+            return;
         startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
         waitForSlaveThreads();
-        if(getTotalNumberOfPlansFromSlaves() >0)
+        if (getTotalNumberOfPlansFromSlaves() > 0) {
             bytesPerPlan = getTotalSlavePopulationMemoryUse() / getTotalNumberOfPlansFromSlaves();
-        bytesPerPerson = getTotalSlavePopulationMemoryUse()/scenario.getPopulation().getPersons().size();
+            bytesPerPerson = getTotalSlavePopulationMemoryUse() / scenario.getPopulation().getPersons().size();
+        }
         personPool = new ArrayList<>();
         masterLogger.warn("About to start load balancing.");
-        double[] totalIterationTime = new double[numSlaves];
-        int[] personsPerSlave = new int[numSlaves];
-        long[] usedMemoryPerSlave = new long[numSlaves];
-        long[] maxMemoryPerSlave = new long[numSlaves];
-        for (int i = 0; i < numSlaves; i++) {
-            totalIterationTime[i] = slaves[i].totalIterationTime;
-            personsPerSlave[i] = slaves[i].currentPopulationSize;
-            usedMemoryPerSlave[i] = slaves[i].usedMemory;
-            maxMemoryPerSlave[i] = slaves[i].maxMemory;
+        double[] totalIterationTime = new double[slaves.size()];
+        int[] personsPerSlave = new int[slaves.size()];
+        long[] usedMemoryPerSlave = new long[slaves.size()];
+        long[] maxMemoryPerSlave = new long[slaves.size()];
+        int j = 0;
+        for (int i : slaves.keySet()) {
+            totalIterationTime[j] = slaves.get(i).totalIterationTime;
+            personsPerSlave[j] = slaves.get(i).currentPopulationSize;
+            usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
+            maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
+            j++;
         }
 
         setSlaveTargetPopulationSizes(
-                getSlaveTargetPopulationSizes(totalIterationTime,personsPerSlave,maxMemoryPerSlave,usedMemoryPerSlave,
-                        bytesPerPlan,bytesPerPerson));
+                getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
+                        bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor));
         startSlavesInMode(CommunicationsMode.POOL_PERSONS);
         waitForSlaveThreads();
         mergePersonsFromSlaves();
@@ -359,23 +382,24 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private long getTotalSlavePopulationMemoryUse() {
         long total = 0;
-        for(Slave slave:slaves){
-            total += (slave.usedMemory-scenarioMemoryUse);
+        for (Slave slave : slaves.values()) {
+            total += (slave.usedMemory - scenarioMemoryUse);
         }
         return total;
     }
 
     private void setSlaveTargetPopulationSizes(int[] slaveTargetPopulationSizes) {
-        int i=0;
-        while(i<numSlaves){
-            slaves[i].targetPopulationSize=slaveTargetPopulationSizes[i];
+        Iterator<Entry<Integer, Slave>> iterator = slaves.entrySet().iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            iterator.next().getValue().targetPopulationSize = slaveTargetPopulationSizes[i];
             i++;
         }
     }
 
     private void mergePlansFromSlaves() {
         newPlans.clear();
-        for (Slave slave : slaves) {
+        for (Slave slave : slaves.values()) {
             newPlans.putAll(slave.plans);
         }
 
@@ -394,63 +418,64 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     private void mergePersonsFromSlaves() {
         personPool.clear();
-        for (Slave loadBalanceThread : slaves) {
+        for (Slave loadBalanceThread : slaves.values()) {
             personPool.addAll(loadBalanceThread.getPersons());
         }
     }
 
-    private static Map<Integer,Integer>  getOptimalNumbers(int popSize, double[] timesPerPlan, Set<Integer> validSlaveIndices){
-        Map<Integer,Integer> output = new HashMap<>();
+    private static Map<Integer, Integer> getOptimalNumbers(int popSize, double[] timesPerPlan, Set<Integer> validSlaveIndices) {
+        Map<Integer, Integer> output = new HashMap<>();
         double sumOfReciprocals = 0.0;
-        for (int i :validSlaveIndices) {
+        for (int i : validSlaveIndices) {
             sumOfReciprocals += 1 / timesPerPlan[i];
         }
         //        find number of persons that should be allocated to each slave
-        int total=0;
-        for (int i :validSlaveIndices) {
+        int total = 0;
+        for (int i : validSlaveIndices) {
             output.put(i, ((int) Math.ceil(popSize / timesPerPlan[i] / sumOfReciprocals)));
-            total += output.get(i) ;
+            total += output.get(i);
         }
-        int j=0;
-        while(total>popSize){
-            for (int i :validSlaveIndices) {
+        int j = 0;
+        while (total > popSize) {
+            for (int i : validSlaveIndices) {
                 output.put(i, output.get(i) - 1);
                 total--;
-                if(total == popSize)
+                if (total == popSize)
                     break;
             }
         }
         return output;
     }
-    public static int[] getSlaveTargetPopulationSizes(double[] totalIterationTime, int[] personsPerSlave,
-                                                      long[] maxMemory, long[] usedMemory, long bytesPerPlan, long bytesPerPerson) {
-        int numSlaves = totalIterationTime.length;
 
+    public static int[] getSlaveTargetPopulationSizes(double[] totalIterationTime, int[] personsPerSlave,
+                                                      long[] maxMemory, long[] usedMemory, long bytesPerPlan, long bytesPerPerson,
+                                                      double dampeningFactor) {
+        int numSlaves = totalIterationTime.length;
         StringBuffer sb = new StringBuffer();
         sb.append("\n");
-        sb.append(String.format("\t\t\t%20s:\t%20d\n","bytesPerPlan",bytesPerPlan));
-        sb.append(String.format("\t\t\t%20s:\t%20d\n","bytesPerPerson",bytesPerPerson));
+        sb.append(String.format("\t\t\t%20s:\t%20d\n", "bytesPerPlan", bytesPerPlan));
+        sb.append(String.format("\t\t\t%20s:\t%20d\n", "bytesPerPerson", bytesPerPerson));
         String[] lines = {"slave", "totalIterationTime", "personsPerSlave", "maxMemory", "usedMemory"};
         sb.append("\n");
         for (int j = 0; j < 5; j++) {
 
-            sb.append("\t\t\t" + String.format("%20s\t",lines[j]) );
+            sb.append("\t\t\t" + String.format("%20s\t", lines[j]));
             for (int i = 0; i < numSlaves; i++) {
                 switch (j) {
                     case 0:
-                        sb.append(String.format("%20s\t","slave_" + i) );
+                        sb.append(String.format("%20s\t", "slave_" + i));
                         break;
                     case 1:
-                        sb.append(String.format("%20.3f\t", totalIterationTime[i]) );
+                        sb.append(String.format("%20.3f\t", totalIterationTime[i]));
                         break;
                     case 2:
-                        sb.append(String.format("%20d\t", personsPerSlave[i]) );
+                        sb.append(String.format("%20d\t", personsPerSlave[i]));
                         break;
                     case 3:
-                        sb.append(String.format("%20d\t", maxMemory[i]) );
+                        sb.append(String.format("%20d\t", maxMemory[i]));
                         break;
                     case 4:
-                        sb.append(String.format("%20d\t", usedMemory[i]) );
+                        sb.append(String.format("%20d\t", usedMemory[i]));
                         break;
                 }
 
@@ -460,51 +485,66 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         masterLogger.warn(sb.toString());
 
 
-        Map<Integer,Integer> optimalNumberPerSlave = new HashMap<>();
+        Map<Integer, Integer> optimalNumberPerSlave = new HashMap<>();
         double[] timesPerPlan = new double[numSlaves];
         int[] allocation = new int[numSlaves];
         boolean[] fullyAllocated = new boolean[numSlaves];
         long[] overheadMemory = new long[numSlaves];
-        int popSize=0;
+        int popSize = 0;
 
         Set<Integer> validSlaveIndices = new HashSet<>();
+        Set<Integer> newSlaves = new HashSet<>();
+        double slowestTimePerPlan = 0.0;
+
         for (int i = 0; i < numSlaves; i++) {
-            timesPerPlan[i] = (totalIterationTime[i] / personsPerSlave[i]);
-            popSize+=personsPerSlave[i];
+            if (personsPerSlave[i] > 0) {
+                timesPerPlan[i] = (totalIterationTime[i] / personsPerSlave[i]);
+                if (timesPerPlan[i] > slowestTimePerPlan)
+                    slowestTimePerPlan = timesPerPlan[i];
+            } else
+                newSlaves.add(i);
+            popSize += personsPerSlave[i];
             validSlaveIndices.add(i);
-            maxMemory[i] = maxMemory[i]- bytesPerSlaveBuffer;
-            overheadMemory[i] =  usedMemory[i]  - (personsPerSlave[i] * bytesPerPerson);
+            maxMemory[i] = maxMemory[i] - bytesPerSlaveBuffer;
+            overheadMemory[i] = usedMemory[i] - (personsPerSlave[i] * bytesPerPerson);
         }
+        for(int i: newSlaves)
+                timesPerPlan[i] = slowestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaves
         boolean allGood = false;
         int remainder = popSize;
-        while (remainder > 0 && validSlaveIndices.size()>0) {
+        while (remainder > 0 && validSlaveIndices.size() > 0) {
             Set<Integer> valid = new HashSet<>();
             valid.addAll(validSlaveIndices);
-            optimalNumberPerSlave.putAll(getOptimalNumbers(remainder,timesPerPlan,valid));
-            for(int i:valid){
-                fullyAllocated[i]= false;
+            optimalNumberPerSlave.putAll(getOptimalNumbers(remainder, timesPerPlan, valid));
+            for (int i : valid) {
+                fullyAllocated[i] = false;
             }
-            while(!isAllTrue(fullyAllocated)) {
+            while (!isAllTrue(fullyAllocated)) {
                 for (int i : valid) {
                     if (fullyAllocated[i]) {
                         continue;
                     }
-                    long maxAvailMemory = (long) (maxMemory[i]- (planAllocationLimiter * (optimalNumberPerSlave.get(i) + allocation[i]) * bytesPerPlan));
-                    long memoryAvailableForPersons =  maxAvailMemory - overheadMemory[i];
-                    int maxPersonAllocation = (int) (memoryAvailableForPersons/bytesPerPerson);
+                    long maxAvailMemory = (long) (maxMemory[i] - (planAllocationLimiter * (optimalNumberPerSlave.get(i) + allocation[i]) * bytesPerPlan));
+                    long memoryAvailableForPersons = maxAvailMemory - overheadMemory[i];
+                    int maxPersonAllocation = (int) (memoryAvailableForPersons / bytesPerPerson);
 
-                    if(optimalNumberPerSlave.get(i) > maxPersonAllocation){
-                        optimalNumberPerSlave.put(i, optimalNumberPerSlave.get(i)-1);
+                    if (optimalNumberPerSlave.get(i) > maxPersonAllocation) {
+                        optimalNumberPerSlave.put(i, optimalNumberPerSlave.get(i) - 1);
                         validSlaveIndices.remove(i);
                         continue;
+                    }else {
+                        //dampen the difference
+                        if(optimalNumberPerSlave.get(i)>personsPerSlave[i] && optimalNumberPerSlave.get(i) > 10) {
+                            int dampenedNumber = (int) (((1 - dampeningFactor) * (double) optimalNumberPerSlave.get(i)) + (dampeningFactor * (double) Math.min(personsPerSlave[i], maxPersonAllocation))) ;
+                            optimalNumberPerSlave.put(i, dampenedNumber);
+                        }
                     }
-
                     remainder -= optimalNumberPerSlave.get(i);
                     fullyAllocated[i] = true;
                 }
             }
-            for(int i:valid){
+            for (int i : valid) {
                 allocation[i] += optimalNumberPerSlave.get(i);
             }
             if (validSlaveIndices.size() == 0 && remainder > 0) {
@@ -518,30 +558,30 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
 
         sb = new StringBuffer();
-        lines = new String[] {"slave", "time per plan", "pax per slave", "allocation",  "memUSED_MB","memAVAIL_MB"};
+        lines = new String[]{"slave", "time per plan", "pax per slave", "allocation", "memUSED_MB", "memAVAIL_MB"};
         sb.append("\n");
         for (int j = 0; j < 6; j++) {
 
-            sb.append("\t\t\t" + String.format("%20s",lines[j]) );
+            sb.append("\t\t\t" + String.format("%20s\t", lines[j]));
             for (int i = 0; i < numSlaves; i++) {
                 switch (j) {
                     case 0:
-                        sb.append(String.format("%20s\t","slave_" + i) );
+                        sb.append(String.format("%20s\t", "slave_" + i));
                         break;
                     case 1:
-                        sb.append(String.format("%20.3f\t", timesPerPlan[i]) );
+                        sb.append(String.format("%20.3f\t", timesPerPlan[i]));
                         break;
                     case 2:
-                        sb.append(String.format("%20d\t", personsPerSlave[i]) );
+                        sb.append(String.format("%20d\t", personsPerSlave[i]));
                         break;
                     case 3:
-                        sb.append(String.format("%20d\t", allocation[i]) );
+                        sb.append(String.format("%20d\t", allocation[i]));
                         break;
                     case 4:
-                        sb.append(String.format("%20d\t", usedMemory[i]) );
+                        sb.append(String.format("%20d\t", usedMemory[i]));
                         break;
                     case 5:
-                        sb.append(String.format("%20d\t", maxMemory[i]) );
+                        sb.append(String.format("%20d\t", maxMemory[i]));
                         break;
                 }
 
@@ -553,7 +593,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     }
 
     private static boolean isAllTrue(boolean[] fullyAllocated) {
-        for(boolean b:fullyAllocated) {
+        for (boolean b : fullyAllocated) {
             if (!b) {
                 return false;
             }
@@ -570,7 +610,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         double totalIterationTime;
         List<PersonSerializable> slavePersonPool;
         int targetPopulationSize = 0;
-        CommunicationsMode communicationsMode = CommunicationsMode.TRANSMIT_TRAVEL_TIMES;
+        CommunicationsMode communicationsMode = CommunicationsMode.TRANSMIT_SCENARIO;
         Collection<String> idStrings;
         private int myNumber;
         private int currentPopulationSize;
@@ -688,8 +728,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             return slavePersonPool;
         }
 
-        public void sendBoolean(boolean initialRouing) throws IOException {
-            writer.writeBoolean(initialRouing);
+        public void sendBoolean(boolean initialRouting) throws IOException {
+            writer.writeBoolean(initialRouting);
             writer.flush();
         }
 
@@ -705,6 +745,58 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
     }
 
+    private class Hydra implements Runnable {
+        TreeMap<Integer, Slave> hydraSlaves = new TreeMap<>();
+        AtomicBoolean accessingMap = new AtomicBoolean(false);
+
+        public void run() {
+            ServerSocket writeServer = null;
+            try {
+                writeServer = new ServerSocket(socketNumber);
+                while (true) {
+                    Socket socket = writeServer.accept();
+                    int i = assignSlaveNumber();
+                    masterLogger.warn("Slave accepted.");
+                    Slave slave = new Slave(socket, i);
+                    while (accessingMap.get()) {
+//                    wait for the other process to finish modifying the map
+                        Thread.sleep(10);
+                    }
+                    accessingMap.set(true);
+                    hydraSlaves.put(i, slave);
+                    //order is important
+                    slave.sendNumber(i);
+                    slave.sendNumber(numberOfPSimIterations);
+                    slave.sendBoolean(false);
+                    slave.readMemoryStats();
+                    slave.readNumberOfThreadsOnSlave();
+                    slave.slavePersonPool = new ArrayList<>();
+                    accessingMap.set(false);
+                    Thread.sleep(1000);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public TreeMap<Integer, Slave> getNewSlaves() {
+            TreeMap<Integer, Slave> slaveBatch;
+            while (accessingMap.get()) {
+                try {
+//                    wait for the other process to finish modifying the map
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            accessingMap.set(true);
+            slaveBatch = hydraSlaves;
+            accessingMap.set(false);
+            return slaveBatch;
+        }
+    }
 
 }
 
