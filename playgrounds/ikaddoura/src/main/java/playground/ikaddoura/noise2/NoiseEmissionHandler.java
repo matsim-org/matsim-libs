@@ -55,14 +55,11 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	private final List<Id<Vehicle>> hdvVehicles = new ArrayList<Id<Vehicle>>();
 	
 	private Scenario scenario;
-	
-	private List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
-	private List<LinkEnterEvent> linkEnterEventsCar = new ArrayList<LinkEnterEvent>();
-	private List<LinkEnterEvent> linkEnterEventsHdv = new ArrayList<LinkEnterEvent>();
-	
+		
 	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEvents = new HashMap<Id<Link>, List<LinkEnterEvent>>();
 	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEventsCar = new HashMap<Id<Link>, List<LinkEnterEvent>>();
 	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEventsHdv = new HashMap<Id<Link>, List<LinkEnterEvent>>();
+	
 	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEvents = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
 	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsCar = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
 	private Map<Id<Link>, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkEnterEventsHdv = new HashMap<Id<Link>, Map<Double,List<LinkEnterEvent>>>();
@@ -76,9 +73,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		linkEnterEvents.clear();
-		linkEnterEventsCar.clear();
-		linkEnterEventsHdv.clear();
 		linkId2linkEnterEvents.clear();
 		linkId2linkEnterEventsCar.clear();
 		linkId2linkEnterEventsHdv.clear();
@@ -104,67 +98,44 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			
 		} else {
 		
-		if (hdvVehicles.contains(event.getVehicleId())) {
+			if (hdvVehicles.contains(event.getVehicleId())) {
+				
+				// hdv
+				if (linkId2linkEnterEventsHdv.containsKey(event.getLinkId())) {
+					List<LinkEnterEvent> listTmp = linkId2linkEnterEventsHdv.get(event.getLinkId());
+					listTmp.add(event);
+					linkId2linkEnterEventsHdv.put(event.getLinkId(), listTmp);
+				} else {
+					List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
+					listTmp.add(event);
+					linkId2linkEnterEventsHdv.put(event.getLinkId(), listTmp);
+				}
+				
+			} else {
+				
+				// car
+				if (linkId2linkEnterEventsCar.containsKey(event.getLinkId())) {
+					List<LinkEnterEvent> listTmp = linkId2linkEnterEventsCar.get(event.getLinkId());
+					listTmp.add(event);
+					linkId2linkEnterEventsCar.put(event.getLinkId(), listTmp);
+				} else {
+					List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
+					listTmp.add(event);
+					linkId2linkEnterEventsCar.put(event.getLinkId(), listTmp);
+				}
+			}
 			
-			// hdv
-			if (linkId2linkEnterEventsHdv.containsKey(event.getLinkId())) {
-				List<LinkEnterEvent> listTmp = linkId2linkEnterEventsHdv.get(event.getLinkId());
+			// all vehicle types
+			if (linkId2linkEnterEvents.containsKey(event.getLinkId())) {
+				List<LinkEnterEvent> listTmp = linkId2linkEnterEvents.get(event.getLinkId());
 				listTmp.add(event);
-				linkId2linkEnterEventsHdv.put(event.getLinkId(), listTmp);
+				linkId2linkEnterEvents.put(event.getLinkId(), listTmp);
 			} else {
 				List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
 				listTmp.add(event);
-				linkId2linkEnterEventsHdv.put(event.getLinkId(), listTmp);
+				linkId2linkEnterEvents.put(event.getLinkId(), listTmp);
 			}
-			linkEnterEventsHdv.add(event);
-			
-		} else {
-			
-			// car
-			if (linkId2linkEnterEventsCar.containsKey(event.getLinkId())) {
-				List<LinkEnterEvent> listTmp = linkId2linkEnterEventsCar.get(event.getLinkId());
-				listTmp.add(event);
-				linkId2linkEnterEventsCar.put(event.getLinkId(), listTmp);
-			} else {
-				List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
-				listTmp.add(event);
-				linkId2linkEnterEventsCar.put(event.getLinkId(), listTmp);
-			}
-			linkEnterEventsCar.add(event);
 		}
-		
-		// all vehicle types
-		if (linkId2linkEnterEvents.containsKey(event.getLinkId())) {
-			List<LinkEnterEvent> listTmp = linkId2linkEnterEvents.get(event.getLinkId());
-			listTmp.add(event);
-			linkId2linkEnterEvents.put(event.getLinkId(), listTmp);
-		} else {
-			List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
-			listTmp.add(event);
-			linkId2linkEnterEvents.put(event.getLinkId(), listTmp);
-		}
-		linkEnterEvents.add(event);
-		}
-	}
-	
-	public Map<Id<Link>, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
-		return linkId2timeInterval2noiseEmission;
-	}
-	
-	public List<Id<Vehicle>> getHdvVehicles() {
-		return hdvVehicles;
-	}
-	
-	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEvents() {
-		return linkId2timeInterval2linkEnterEvents;
-	}
-
-	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsCar() {
-		return linkId2timeInterval2linkEnterEventsCar;
-	}
-
-	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsHdv() {
-		return linkId2timeInterval2linkEnterEventsHdv;
 	}
 
 	public void calculateNoiseEmission() {
@@ -294,6 +265,11 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			linkId2timeInterval2linkEnterEventsCar.put(linkId, timeInterval2linkEnterEventsCar);
 			linkId2timeInterval2linkEnterEventsHdv.put(linkId, timeInterval2linkEnterEventsHdv);
 		}
+		
+		// Deleting unnecessary information
+		this.linkId2linkEnterEvents.clear();
+		this.linkId2linkEnterEventsCar.clear();
+		this.linkId2linkEnterEventsHdv.clear();		
 	}
 	
 	private double calculateEmissionspegel(int M , double p , double vCar , double vHdv) {		
@@ -488,7 +464,26 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		
+		}	
+	}
+	
+	public Map<Id<Link>, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
+		return linkId2timeInterval2noiseEmission;
+	}
+	
+	public List<Id<Vehicle>> getHdvVehicles() {
+		return hdvVehicles;
+	}
+	
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEvents() {
+		return linkId2timeInterval2linkEnterEvents;
+	}
+
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsCar() {
+		return linkId2timeInterval2linkEnterEventsCar;
+	}
+
+	public Map<Id<Link>, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkEnterEventsHdv() {
+		return linkId2timeInterval2linkEnterEventsHdv;
 	}
 }

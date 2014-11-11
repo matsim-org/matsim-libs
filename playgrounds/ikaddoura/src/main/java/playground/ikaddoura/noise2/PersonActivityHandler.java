@@ -57,14 +57,15 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	
 	private Scenario scenario;
 	
-	private Map<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd = new HashMap<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>>();
 	private Map<Id<Person>,Map<Integer,Map<Id<ReceiverPoint>,Tuple<Double, Double>>>> personId2actNumber2receiverPointId2activityStartAndActivityEnd = new HashMap<Id<Person>,Map<Integer,Map<Id<ReceiverPoint>,Tuple<Double, Double>>>>();
 	private Map<Id<Person>,Map<Integer,String>> personId2actNumber2actType = new HashMap<Id<Person>, Map<Integer,String>>();
 	private Map<Id<Person>,Integer> personId2actualActNumber = new HashMap<Id<Person>, Integer>();
+	
+	private Map<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd = new HashMap<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>>();
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2affectedAgentUnits = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>> receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>>();
 	private Map<Id<ReceiverPoint>,List<Id<Person>>> receiverPointId2ListOfHomeAgents = new HashMap<Id<ReceiverPoint>, List<Id<Person>>>();
-				
+
 	private NoiseSpatialInfo spatialInfo;
 	
 	public PersonActivityHandler (Scenario scenario , NoiseSpatialInfo spatialInfo) {
@@ -250,6 +251,10 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	}
 
 	public void calculateDurationOfStay() {
+		
+//		// these maps are not required anymore
+//		this.personId2actualActNumber.clear();
+//		this.personId2actNumber2receiverPointId2activityStartAndActivityEnd.clear();
 		
 		int counter = 0;
 		log.info("Calculating durations of stay for a total of " + receiverPointId2personId2actNumber2activityStartAndActivityEnd.keySet().size() + " receiver points.");
