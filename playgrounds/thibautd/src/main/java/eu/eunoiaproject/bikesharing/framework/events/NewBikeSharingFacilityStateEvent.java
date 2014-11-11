@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 /**
  * @author thibautd
@@ -31,7 +31,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class NewBikeSharingFacilityStateEvent extends Event {
 	public static final String EVENT_TYPE = "newBikeSharingFacilityState";
 
-	private final Id facilityId;
+	private final Id<ActivityFacility> facilityId;
 	private final int newAmountOfBikes;
 
 	public NewBikeSharingFacilityStateEvent(
@@ -40,20 +40,20 @@ public class NewBikeSharingFacilityStateEvent extends Event {
 		if ( !event.getEventType().equals( EVENT_TYPE ) ) {
 			throw new IllegalArgumentException( ""+event );
 		}
-		this.facilityId = new IdImpl( event.getAttributes().get( "facilityId" ) );
+		this.facilityId = Id.create( event.getAttributes().get( "facilityId" ) , ActivityFacility.class);
 		this.newAmountOfBikes = Integer.parseInt( event.getAttributes().get( "newAmountOfBikes" ) ); 
 	}
 
 	public NewBikeSharingFacilityStateEvent(
 			final double time,
-			final Id facilityId,
+			final Id<ActivityFacility> facilityId,
 			final int newAmountOfBikes) {
 		super( time );
 		this.facilityId = facilityId;
 		this.newAmountOfBikes = newAmountOfBikes;
 	}
 
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return facilityId;
 	}
 

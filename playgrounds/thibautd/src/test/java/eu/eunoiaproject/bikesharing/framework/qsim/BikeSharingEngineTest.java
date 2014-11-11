@@ -20,17 +20,17 @@
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
 import org.apache.log4j.Logger;
-
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -44,8 +44,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
@@ -84,18 +82,18 @@ public class BikeSharingEngineTest {
 
 		final BikeSharingFacility departureFacility =
 			facilities.getFactory().createBikeSharingFacility(
-					new IdImpl( "departure" ),
+					Id.create( "departure" , ActivityFacility.class),
 					new CoordImpl( 0 , 0 ),
-					new IdImpl( "departure_link" ),
+					Id.create( "departure_link" , Link.class),
 					capacity,
 					initialNBikes );
 		facilities.addFacility( departureFacility );
 
 		final BikeSharingFacility arrivalFacility =
 			facilities.getFactory().createBikeSharingFacility(
-					new IdImpl( "arrival" ),
+					Id.create( "arrival" , ActivityFacility.class),
 					new CoordImpl( 10 , 10 ),
-					new IdImpl( "arrival_link" ),
+					Id.create( "arrival_link" , Link.class),
 					capacity,
 					initialNBikes );
 		facilities.addFacility( arrivalFacility );
@@ -219,7 +217,7 @@ public class BikeSharingEngineTest {
 
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(
-				Id agentId, Id linkId) {
+				Id<Person> agentId, Id<Link> linkId) {
 			log.info ( "call to unregisterAdditionalAgentOnLink on "+agentId+" on link "+linkId );
 			return null;
 		}
@@ -232,7 +230,7 @@ public class BikeSharingEngineTest {
 
 	private static class LegAgent implements MobsimAgent, PlanAgent {
 		private final Leg leg;
-		private Id linkId;
+		private Id<Link> linkId;
 
 		public LegAgent(final Leg leg) {
 			this.leg = leg;
@@ -240,18 +238,18 @@ public class BikeSharingEngineTest {
 		}
 
 		@Override
-		public Id getCurrentLinkId() {
+		public Id<Link> getCurrentLinkId() {
 			return linkId;
 		}
 
 		@Override
-		public Id getDestinationLinkId() {
+		public Id<Link> getDestinationLinkId() {
 			return leg.getRoute().getEndLinkId();
 		}
 
 		@Override
-		public Id getId() {
-			return new IdImpl( "tintin" );
+		public Id<Person> getId() {
+			return Id.create( "tintin" , Person.class);
 		}
 
 		@Override
@@ -303,7 +301,7 @@ public class BikeSharingEngineTest {
 		}
 
 		@Override
-		public void notifyArrivalOnLinkByNonNetworkMode(Id linkIdArg) {
+		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkIdArg) {
 			this.linkId = linkIdArg;
 		}
 	}

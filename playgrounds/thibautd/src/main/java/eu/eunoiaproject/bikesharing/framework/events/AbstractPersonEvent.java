@@ -23,40 +23,41 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author thibautd
  */
 abstract class AbstractPersonEvent extends Event implements HasPersonId {
-	private final Id personId;
-	private final Id facilityId;
+	private final Id<Person> personId;
+	private final Id<ActivityFacility> facilityId;
 
 	/*package*/ AbstractPersonEvent(
 			final Event event) {
 		this( event.getTime() ,
-				new IdImpl(
-					event.getAttributes().get( "person" ) ), 
-				new IdImpl(
-					event.getAttributes().get( "facility" ) ) );
+				Id.create(
+					event.getAttributes().get( "person" ) , Person.class), 
+				Id.create(
+					event.getAttributes().get( "facility" ) , ActivityFacility.class ));
 	}
 
 	public AbstractPersonEvent(
 			final double time,
-			final Id personId,
-			final Id facilityId) {
+			final Id<Person> personId,
+			final Id<ActivityFacility> facilityId) {
 		super( time );
 		this.personId = personId;
 		this.facilityId = facilityId;
 	}
 
 	@Override
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return personId;
 	}
 
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return facilityId;
 	}
 

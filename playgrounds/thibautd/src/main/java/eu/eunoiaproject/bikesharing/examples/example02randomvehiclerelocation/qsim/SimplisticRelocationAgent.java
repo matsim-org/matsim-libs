@@ -22,13 +22,15 @@ package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.q
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
@@ -41,12 +43,12 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	private static final Logger log =
 		Logger.getLogger(SimplisticRelocationAgent.class);
 
-	private final Id id;
+	private final Id<Person> id;
 
-	private Id currentLinkId = null;
-	private Id destinationLinkId = null;
-	private Id nextLinkId = null;
-	private Iterator<Id> currentRoute = null;
+	private Id<Link> currentLinkId = null;
+	private Id<Link> destinationLinkId = null;
+	private Id <Link>nextLinkId = null;
+	private Iterator<Id<Link>> currentRoute = null;
 	private int load = 0;
 
 	private State state = State.LEG;
@@ -55,8 +57,8 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 
 	public SimplisticRelocationAgent(
 			final EventsManager events,
-			final Id id,
-			final Id initialLinkId) {
+			final Id<Person> id,
+			final Id<Link> initialLinkId) {
 		this.events = events;
 		this.id = id;
 		this.currentLinkId = initialLinkId;
@@ -85,7 +87,7 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 
 	public void setNextDestination(
 			final BikeSharingFacility destination,
-			final Iterable<Id> route) {
+			final Iterable<Id<Link>> route) {
 		this.destinationLinkId = destination.getLinkId();
 		this.currentRoute = route.iterator();
 		this.nextLinkId = null;
@@ -95,17 +97,17 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	// ///////////////////////////////////////////////////////////////////////
 	// agent interface
 	@Override
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return currentLinkId;
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return destinationLinkId;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return id;
 	}
 
@@ -157,7 +159,7 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	}
 
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		throw new RuntimeException( getClass().getName()+" should not use non-network modes!" );
 	}
 
@@ -173,12 +175,12 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	}
 
 	@Override
-	public Id getPlannedVehicleId() {
-		return getId();
+	public Id<Vehicle> getPlannedVehicleId() {
+		return Id.create(getId(), Vehicle.class);
 	}
 
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 		assert destinationLinkId != null;
 		if ( currentLinkId.equals( destinationLinkId ) ) return null;
 		while ( nextLinkId == null || nextLinkId.equals( currentLinkId ) ) {
@@ -189,7 +191,7 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	}
 
 	@Override
-	public void notifyMoveOverNode(final Id newLinkId) {
+	public void notifyMoveOverNode(final Id<Link> newLinkId) {
 		if ( !newLinkId.equals( nextLinkId ) ) {
 			throw new RuntimeException( "unexpected next link "+newLinkId+": expected "+nextLinkId  );
 		}

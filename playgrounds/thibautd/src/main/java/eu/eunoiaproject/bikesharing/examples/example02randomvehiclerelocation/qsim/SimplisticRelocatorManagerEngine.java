@@ -27,22 +27,23 @@ import java.util.Random;
 import java.util.WeakHashMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -83,7 +84,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 	private InternalInterface internalInterface;
 
 	// this is a cache for shortest paths
-	private final Map< Tuple<Id,Id> , Iterable<Id> > cachedRoutes = new WeakHashMap< Tuple<Id, Id> , Iterable<Id> >();
+	private final Map< Tuple<Id<Node>,Id<Node>> , Iterable<Id<Link>> > cachedRoutes = new WeakHashMap<>();
 
 	public SimplisticRelocatorManagerEngine(
 			final int nAgents,
@@ -119,7 +120,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 		for ( SimplisticRelocationAgent agent : currentIdleAgents ) {
 			if ( log.isTraceEnabled() ) log.trace( "handling idle agent "+agent.getId()+" at time "+time );
 			// send somewhere
-			final Id linkId = agent.getCurrentLinkId();
+			final Id<Link> linkId = agent.getCurrentLinkId();
 			final Collection<? extends StatefulBikeSharingFacility> originFacilities =
 				facilities.getFacilitiesAtLinks().get( linkId );
 
@@ -164,12 +165,12 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 		}
 	}
 
-	private Iterable<Id> getRoute( final Id originLinkId , final Id destinationLinkId ) {
+	private Iterable<Id<Link>> getRoute( final Id<Link> originLinkId , final Id<Link> destinationLinkId ) {
 		final Link originLink = network.getLinks().get( originLinkId );
 		final Link destinationLink = network.getLinks().get( destinationLinkId );
-		final Tuple<Id, Id> key = new Tuple<Id, Id>( originLink.getToNode().getId() , destinationLink.getFromNode().getId() );
+		final Tuple<Id<Node>, Id<Node>> key = new Tuple<>( originLink.getToNode().getId() , destinationLink.getFromNode().getId() );
 
-		final Iterable<Id> cached = cachedRoutes.get( key );
+		final Iterable<Id<Link>> cached = cachedRoutes.get( key );
 		if ( cached != null ) return cached;
 
 		final Path path = dijkstra.calcLeastCostPath(
@@ -179,7 +180,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 				null,
 				null );
 
-		final List<Id> ids = new ArrayList<Id>();
+		final List<Id<Link>> ids = new ArrayList<>();
 		for ( Link l : path.links ) ids.add( l.getId() );
 
 		cachedRoutes.put( key , ids );
@@ -192,14 +193,14 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 		final QSim qSim = (QSim) internalInterface.getMobsim();
 
 		// could be done smarter by departing from a bike sharing station.
-		final Id[] linkIds =
+		final Id<Link>[] linkIds =
 				qSim.getNetsimNetwork().getNetwork().getLinks().keySet().toArray(
 						new Id[0] );
 
 		// create n agents, located on random links, and idle
 		for ( int i = 0; i < nAgents; i++ ) {
-			final Id agentId = new IdImpl( "relocation-truck-"+i );
-			final Id linkId = linkIds[ random.nextInt( linkIds.length ) ];
+			final Id<Person> agentId = Id.create( "relocation-truck-"+i , Person.class);
+			final Id<Link> linkId = linkIds[ random.nextInt( linkIds.length ) ];
 
 			final SimplisticRelocationAgent agent =
 				new SimplisticRelocationAgent(
@@ -213,7 +214,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 			// we need to create a vehicle at the departure point
 			qSim.createAndParkVehicleOnLink(
 					VehicleUtils.getFactory().createVehicle(
-						agentId,
+						Id.create(agentId, Vehicle.class),
 						vehicleType ),
 					linkId );
 

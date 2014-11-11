@@ -25,17 +25,14 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
-
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesReader;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
 /**
  * @author thibautd
@@ -113,9 +110,9 @@ public class BikeSharingFacilitiesIOTest {
 		for ( int i=0; i < 100 ; i++ ) {
 			fs.addFacility(
 					fs.getFactory().createBikeSharingFacility(
-						new IdImpl( i ),
+						Id.create( i , ActivityFacility.class),
 						new CoordImpl( r.nextDouble() , r.nextDouble() ),
-						new IdImpl( r.nextInt( 20 ) ),
+						Id.create( r.nextInt( 20 ) , Link.class),
 						r.nextInt( 2000 ),
 						r.nextInt( 2000 ) ) );
 		}
