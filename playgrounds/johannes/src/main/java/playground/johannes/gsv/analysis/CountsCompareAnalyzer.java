@@ -71,12 +71,16 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 		TDoubleArrayList caps = new TDoubleArrayList();
 
 		for (Count count : counts.getCounts().values()) {
-			double obsVal = count.getVolume(1).getValue();
+			double obsVal = 0;
+			for(int i = 1; i < 25; i++) {
+				obsVal += count.getVolume(i).getValue();
+			}
+			
 			if (obsVal > 0) {
 				double simVal = calculator.getOccupancy(count.getLocId());
 				simVal *= factor;
 
-				double err = (obsVal - simVal) / obsVal;
+				double err = (simVal - obsVal) / obsVal;
 
 				stats.addValue(err);
 

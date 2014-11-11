@@ -87,7 +87,7 @@ public class MatrixCompare {
 		}
 
 		if (zeros > 0) {
-			System.out.println(String.format("%s zero reference values.", zeros));
+			System.out.println(String.format("%s cells where either old or new is zero.", zeros));
 		}
 
 		return stats;
@@ -96,13 +96,20 @@ public class MatrixCompare {
 	private static double calcRelError(double d1, double d2, boolean absolute) {
 		double diff = d2 - d1;
 
-		if(absolute) diff = Math.abs(diff);
+		diff = Math.abs(diff);
+//		if(absolute) diff = Math.abs(diff);
 		
 		double err = diff/d1;
 		
+		if(d2 > d1) {
+			err = diff/d1;
+		} else {
+			err = - diff/d2;
+		}
 //		if(err < 0) {
 //			return - (1/(1-Math.abs(err)) - 1);
 //		} else return err;
+		if(absolute) err = Math.abs(err);
 		return err;
 	}
 
@@ -147,7 +154,7 @@ public class MatrixCompare {
 		}
 
 		if (zeros > 0) {
-			System.out.println(String.format("%s zero reference values.", zeros));
+			System.out.println(String.format("%s sums of m1 = 0.", zeros));
 		}
 
 		return values;
@@ -201,13 +208,17 @@ public class MatrixCompare {
 		return values;
 	}
 	
-	public static TDoubleDoubleHashMap distErrCorrelation(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zones, boolean absolute, boolean ignoreZeros) {
+	public static TDoubleDoubleHashMap distErrCorrelation(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zones,  boolean absolute, boolean ignoreZeros) {
 		Set<String> zoneIds = new HashSet<>();
 		zoneIds.addAll(m1.getFromLocations().keySet());
 		zoneIds.addAll(m1.getToLocations().keySet());
 		zoneIds.addAll(m2.getFromLocations().keySet());
 		zoneIds.addAll(m2.getToLocations().keySet());
-
+		
+		return distErrCorrelation(m1, m2, zones, zoneIds, absolute, ignoreZeros);
+	}
+	
+	public static TDoubleDoubleHashMap distErrCorrelation(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zones,  Set<String> zoneIds, boolean absolute, boolean ignoreZeros) {
 		int zeros = 0;
 
 		Map<String, Zone<?>> zoneMapping = new HashMap<>();
@@ -273,15 +284,19 @@ public class MatrixCompare {
 	public static void main(String[] args) throws IOException {
 		Matrix m1 = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m1);
-		reader.readFile("/home/johannes/gsv/matrices/IV_gesamt.O.fma");
-
+//		reader.readFile("/home/johannes/gsv/matrices/IV_gesamt.O.fma");
+		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
+		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.311.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
-		MatrixOperations.applyFactor(m2, 45);
+		MatrixOperations.applyFactor(m2, 15);
 
+		System.out.println(String.format("PSMobility - matrix sum: %s", MatrixOperations.sum(m1, false)));
+		System.out.println(String.format("Matsim - matrix sum: %s", MatrixOperations.sum(m2, false)));
+		
 		System.out.println(String.format("PSMobility: %s cells with zero value.", MatrixOperations.countEmptyCells(m1)));
 		System.out.println(String.format("Matsim: %s cells with zero value.", MatrixOperations.countEmptyCells(m2)));
 
@@ -320,19 +335,23 @@ public class MatrixCompare {
 		ids.put("9162", "MUN");
 		ids.put("8111", "STG");
 
+		zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+		distErrCorrelation = distErrCorrelation(m1, m2, zones, ids.keySet(), false, ignoreZeros);
+		TXTWriter.writeMap(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.sel.txt");
+		
 		Map<String, double[]> relErrs = relError(m1, m2, ids, false);
 		for(java.util.Map.Entry<String, double[]> entry : relErrs.entrySet()) {
 			System.out.println(String.format("%s: %.4f; old: %.4f, new; %.4f", entry.getKey(), entry.getValue()[0], entry.getValue()[1], entry.getValue()[2]));
 		}
 		
 		System.out.println("\nDestination errors:");
-		TObjectDoubleHashMap<String> destErrors = relErrorDestinations(m1, m2, false, false);
+		TObjectDoubleHashMap<String> destErrors = relErrorDestinations(m1, m2, false, ignoreZeros);
 		for(java.util.Map.Entry<String, String> entry : ids.entrySet()) {
 			System.out.println(String.format("%s: %.4f", entry.getValue(), destErrors.get(entry.getKey())));
 		}
 		
 		System.out.println("\nOrigin errors:");
-		TObjectDoubleHashMap<String> origErrors = relErrorOrigins(m1, m2, false, false);
+		TObjectDoubleHashMap<String> origErrors = relErrorOrigins(m1, m2, false, ignoreZeros);
 		for(java.util.Map.Entry<String, String> entry : ids.entrySet()) {
 			System.out.println(String.format("%s: %.4f", entry.getValue(), origErrors.get(entry.getKey())));
 		}

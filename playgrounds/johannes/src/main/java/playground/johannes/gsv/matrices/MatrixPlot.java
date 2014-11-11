@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.misc;
+package playground.johannes.gsv.matrices;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class MatrixPlot {
 	public static void main(String[] args) throws IOException {
 		Matrix m = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m);
-		reader.readFile("/home/johannes/gsv/matrices/miv.fma");
+		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
 
 		ZoneLayer<Map<String, Object>> zonelayer = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 		zonelayer.overwriteCRS(CRSUtils.getCRS(4326));
@@ -86,9 +86,9 @@ public class MatrixPlot {
 				sum = 0;
 				if (entries != null) {
 					for (Entry e : entries) {
-						if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
+//						if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
 							sum += e.getValue();
-						}
+//						}
 					}
 				}
 				minT = Math.min(minT, sum);
@@ -97,17 +97,17 @@ public class MatrixPlot {
 				newZone.getAttribute().put("TARGET_VOL", sum);
 			}
 		}
-		for(Zone<Map<String, Object>> zone : zones) {
-			double val = (Double) zone.getAttribute().get("SOURCE_VOL");
-			zone.getAttribute().put("SOURCE_VOL", val/maxS);
-			
-			val = (Double) zone.getAttribute().get("TARGET_VOL");
-			zone.getAttribute().put("TARGET_VOL", val/maxT);
-		}
+//		for(Zone<Map<String, Object>> zone : zones) {
+//			double val = (Double) zone.getAttribute().get("SOURCE_VOL");
+//			zone.getAttribute().put("SOURCE_VOL", val/maxS);
+//			
+//			val = (Double) zone.getAttribute().get("TARGET_VOL");
+//			zone.getAttribute().put("TARGET_VOL", val/maxT);
+//		}
 		
 		ZoneLayer<Map<String, Object>> newLayer = new ZoneLayer<>(zones);
 		newLayer.overwriteCRS(CRSUtils.getCRS(4326));
-		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/volumes.shp");
+		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/marginals.itp.shp");
 
 	}
 

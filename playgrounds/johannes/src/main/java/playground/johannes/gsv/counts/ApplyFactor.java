@@ -17,45 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.sim.cadyts;
+package playground.johannes.gsv.counts;
 
-import org.matsim.api.core.v01.network.Link;
-
-import playground.johannes.gsv.sim.LinkOccupancyCalculator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
+import org.matsim.counts.CountsWriter;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class SimResultsAdaptor implements SimResults<Link> {
+public class ApplyFactor {
 
-	private static final long serialVersionUID = -2999625283320618974L;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Counts counts = new Counts();
+		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+		reader.parse("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.xml");
 
-	private final LinkOccupancyCalculator occupancy;
-	
-	private final double scale;
-	
-	public SimResultsAdaptor(LinkOccupancyCalculator occupancy, double scale) {
-		this.occupancy = occupancy;
-		this.scale = scale;
-	}
-	
-	@Override
-	public double getSimValue(Link link, int startTime_s, int endTime_s, TYPE type) {
-	
-		double val = occupancy.getOccupancy(link.getId());
-	
-		if(type == TYPE.COUNT_VEH) {
-			return val * scale;
-		} else if(type == TYPE.FLOW_VEH_H) {
-			throw new RuntimeException();
-//			return val * scale / 86400.0;
-		} else {
-			throw new RuntimeException();
+		Counts newCounts = new Counts();
+		newCounts.setDescription(counts.getDescription());
+		newCounts.setName(counts.getName());
+		newCounts.setYear(counts.getYear());
+
+		for (Count count : counts.getCounts().values()) {
+			if (count.getVolume(1).getValue() != 0) {
+				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
+				for (int i = 1; i < 25; i++) {
+					newCount.createVolume(i, count.getVolume(i).getValue() / 24.0);
+				}
+			}
 		}
-		
+
+		CountsWriter writer = new CountsWriter(newCounts);
+		writer.write("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.24h.xml");
 	}
 
 }

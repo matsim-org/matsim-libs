@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.matrices;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import java.util.ArrayList;
 import java.util.Map.Entry;
-
-import gnu.trove.TObjectDoubleHashMap;
 
 import org.matsim.matrices.Matrix;
 
@@ -71,10 +71,20 @@ public class MatrixOperations {
 	}
 
 	public static double sum(Matrix m) {
+		return sum(m, false);
+	}
+	
+	public static double sum(Matrix m, boolean ingnoreIntraCell) {
 		double sum = 0;
 		for (Entry<String, ArrayList<org.matsim.matrices.Entry>> entries : m.getFromLocations().entrySet()) {
 			for (org.matsim.matrices.Entry entry : entries.getValue()) {
-				sum += entry.getValue();
+				if(ingnoreIntraCell) {
+					if(!entry.getFromLocation().equalsIgnoreCase(entry.getToLocation())) {
+						sum += entry.getValue();
+					}
+				} else {
+					sum += entry.getValue();
+				}
 			}
 		}
 

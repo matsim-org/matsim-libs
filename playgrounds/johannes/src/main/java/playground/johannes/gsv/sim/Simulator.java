@@ -114,7 +114,7 @@ public class Simulator {
 		settings.setModuleName("activityLocations");
 //		settings.setProbability(0.1);
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
-		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home"));
+		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home", controler));
 		
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setModuleName("doNothing");
