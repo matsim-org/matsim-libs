@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -68,21 +67,21 @@ public class GenerateFundametalDiagramData {
 
 	//CONFIGURATION: static variables used for aggregating configuration options
 
-	public static final boolean PASSING_ALLOWED = true;
-	private static final String OUTPUT_FOLDER = "seepage/carBikeSeepTrue/";
-	public static final boolean WITH_HOLES = false;
-	private static final String RUN_DIR = "../../runs-svn/mixedTraffic/";
+	public static final boolean PASSING_ALLOWED = false;
+	private static final String OUTPUT_FOLDER = "/run5/car/";
+	public static final boolean WITH_HOLES = true;
+	private static final String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/withHoles/";
 	private static final String OUTPUT_FILE = RUN_DIR+OUTPUT_FOLDER+"/data.txt"; //"pathto\\data.txt";
 	private static final String OUTPUT_EVENTS =RUN_DIR+OUTPUT_FOLDER+"/events.xml";// "pathto\\events.xml";
 	public static final boolean writeInputFiles = true; // includes config,network and plans
 
-	public final static String[] TRAVELMODES= {TransportMode.bike,TransportMode.car};	//identification of the different modes
-	public final static Double[] MODAL_SPLIT = {1./2.,1./2.}; //modal split in PCU 
+	public final static String[] TRAVELMODES= {"car"};	//identification of the different modes
+	public final static Double[] MODAL_SPLIT = {1.}; //modal split in PCU 
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 1;
+	private final int reduceDataPointsByFactor = 10;
 
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
@@ -161,6 +160,10 @@ public class GenerateFundametalDiagramData {
 		for (int i=0; i<TRAVELMODES.length; i++){
 			minSteps.set(i, minSteps.get(i)/pgcd);
 		}
+		
+		if(minSteps.size()==1){
+			minSteps.set(0, 1);
+		}
 
 		// for a faster simulation or to have less points on FD, minSteps is increased
 		if(reduceDataPointsByFactor!=1) {
@@ -174,7 +177,7 @@ public class GenerateFundametalDiagramData {
 		}
 		//set up number of Points to run.
 		double cellSizePerPCU = 7.5;
-		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU)*3;
+		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 		for(int index=0;index<TRAVELMODES.length;index++){
 			sumOfPCUInEachStep +=  minSteps.get(index) * MixedTrafficVehiclesUtils.getPCU(TRAVELMODES[index]);

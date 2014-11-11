@@ -68,10 +68,11 @@ public class InputsForFDTestSetUp {
 
 	public static final int SUBDIVISION_FACTOR=1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
+	public static final double NO_OF_LANES = 1;//in m, length of one the triangle sides.
 	private  final int LINK_CAPACITY = 2700;//in PCU/h
 	private  final double END_TIME = 14*3600;
 	private final  double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	private final  double STUCK_TIME = 14*3600;
+	private final  double STUCK_TIME = 60;
 	
 	private Scenario scenario;
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
@@ -165,7 +166,7 @@ public class InputsForFDTestSetUp {
 			link.setCapacity(LINK_CAPACITY);
 			link.setFreespeed(FREESPEED/3.6);
 			link.setLength(calculateLength(from,to));
-			link.setNumberOfLanes(1.0);
+			link.setNumberOfLanes(NO_OF_LANES);
 			Set<String> allowedModes = new HashSet<>();
 			for(String mode : GenerateFundametalDiagramData.TRAVELMODES){
 				allowedModes.add(mode);
