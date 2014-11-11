@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -44,6 +44,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles.InconsistentVehiculeSpecificationsException;
 
@@ -58,9 +59,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 
-		final Id node1 = new IdImpl( "node1" );
-		final Id node2 = new IdImpl( "node2" );
-		final Id link = new IdImpl( "the_link" );
+		final Id<Node> node1 = Id.create( "node1" , Node.class );
+		final Id<Node> node2 = Id.create( "node2" , Node.class );
+		final Id<Link> link = Id.create( "the_link" , Link.class );
 
 		scenario.getNetwork().addNode(
 				scenario.getNetwork().getFactory().createNode( node1 , new CoordImpl( 0 , 0 ) ));
@@ -74,7 +75,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 					scenario.getNetwork().getNodes().get( node1 ),
 					scenario.getNetwork().getNodes().get( node2 ) ) );
 
-		final Person withVeh = scenario.getPopulation().getFactory().createPerson( new IdImpl( "jojo" ) );
+		final Person withVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "jojo" , Person.class) );
 		scenario.getPopulation().addPerson( withVeh );
 		final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
 		planWithVeh.setPerson( withVeh );
@@ -82,11 +83,11 @@ public class PopulationAgentSourceWithVehiclesTest {
 		planWithVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
 		final NetworkRoute routeWithVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
-		routeWithVeh.setVehicleId( new IdImpl( "a_pink_pony" ) );
+		routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
 		legWithVeh.setRoute( routeWithVeh );
 		planWithVeh.addLeg( legWithVeh );
 
-		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( new IdImpl( "toto" ) );
+		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "toto" , Person.class) );
 		scenario.getPopulation().addPerson( withoutVeh );
 		final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
 		planWithoutVeh.setPerson( withoutVeh );
@@ -132,9 +133,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final Config config = ConfigUtils.createConfig();
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 
-		final Id node1 = new IdImpl( "node1" );
-		final Id node2 = new IdImpl( "node2" );
-		final Id link = new IdImpl( "the_link" );
+		final Id<Node> node1 = Id.create( "node1" , Node.class );
+		final Id<Node> node2 = Id.create( "node2" , Node.class );
+		final Id<Link> link = Id.create( "the_link" , Link.class );
 
 		scenario.getNetwork().addNode(
 				scenario.getNetwork().getFactory().createNode( node1 , new CoordImpl( 0 , 0 ) ));
@@ -148,7 +149,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 					scenario.getNetwork().getNodes().get( node1 ),
 					scenario.getNetwork().getNodes().get( node2 ) ) );
 
-		final Person withVeh = scenario.getPopulation().getFactory().createPerson( new IdImpl( "jojo" ) );
+		final Person withVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "jojo" , Person.class ) );
 		scenario.getPopulation().addPerson( withVeh );
 		final Plan planWithVeh = scenario.getPopulation().getFactory().createPlan();
 		planWithVeh.setPerson( withVeh );
@@ -159,11 +160,11 @@ public class PopulationAgentSourceWithVehiclesTest {
 		planWithVeh.addLeg( walkLegWithVeh );
 		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
 		final NetworkRoute routeWithVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
-		if (vehicles) routeWithVeh.setVehicleId( new IdImpl( "a_pink_pony" ) );
+		if (vehicles) routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
 		legWithVeh.setRoute( routeWithVeh );
 		planWithVeh.addLeg( legWithVeh );
 
-		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( new IdImpl( "toto" ) );
+		final Person withoutVeh = scenario.getPopulation().getFactory().createPerson( Id.create( "toto" , Person.class) );
 		scenario.getPopulation().addPerson( withoutVeh );
 		final Plan planWithoutVeh = scenario.getPopulation().getFactory().createPlan();
 		planWithoutVeh.setPerson( withoutVeh );
@@ -171,7 +172,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		planWithoutVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
 		final NetworkRoute routeWithoutVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
-		if (vehicles) routeWithoutVeh.setVehicleId( new IdImpl( "a_hummer" ) );
+		if (vehicles) routeWithoutVeh.setVehicleId( Id.create( "a_hummer" , Vehicle.class) );
 		legWithoutVeh.setRoute( routeWithoutVeh );
 		planWithoutVeh.addLeg( legWithoutVeh );
 

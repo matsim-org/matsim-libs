@@ -28,12 +28,13 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * @author thibautd
@@ -54,14 +55,14 @@ public class FilterCliquesBasedOnPopulation {
 	}
 
 	private static class PlansParser extends MatsimXmlParser {
-		private final List<Id> ids = new ArrayList<Id>();
+		private final List<Id<Person>> ids = new ArrayList<>();
 		private final Counter counter = new Counter( "reading person # " );
 
 		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
 			if (name.equals( "person" )) {
 				counter.incCounter();
-				ids.add( new IdImpl( atts.getValue( "id" ) ) );
+				ids.add( Id.create( atts.getValue( "id" ) , Person.class ) );
 			}
 		}
 
@@ -74,16 +75,16 @@ public class FilterCliquesBasedOnPopulation {
 	}
 
 	private static class CliquesParser extends MatsimXmlParser {
-		private final Map<Id, List<Id>> cliques = new HashMap<Id, List<Id>>();
-		private Id currentCliqueId;
-		private List<Id> currentClique;
+		private final Map<Id<Clique>, List<Id<Person>>> cliques = new HashMap<Id<Clique>, List<Id<Person>>>();
+		private Id<Clique> currentCliqueId;
+		private List<Id<Person>> currentClique;
 		private final Counter counter = new Counter( "reading clique # " );
-		private final Set<Id> agentsToKeep;
+		private final Set<Id<Person>> agentsToKeep;
 		private boolean isToKeep = false;
 
 		public CliquesParser(final PlansParser plans) {
 			super( false );
-			agentsToKeep = new TreeSet<Id>(plans.ids);
+			agentsToKeep = new TreeSet<>(plans.ids);
 		}
 
 		@Override
@@ -91,11 +92,11 @@ public class FilterCliquesBasedOnPopulation {
 			if (name.equals( "clique" )) {
 				counter.incCounter();
 				isToKeep = false;
-				currentClique = new ArrayList<Id>();
-				currentCliqueId = new IdImpl( atts.getValue( "id" ) );
+				currentClique = new ArrayList<>();
+				currentCliqueId = Id.create( atts.getValue( "id" ) , Clique.class );
 			}
 			else if (name.equals( "person" )) {
-				Id id = new IdImpl( atts.getValue( "id" ) );
+				Id<Person> id = Id.create( atts.getValue( "id" ) , Person.class );
 				currentClique.add( id );
 				if ( agentsToKeep.remove( id ) ) {
 					isToKeep = true;

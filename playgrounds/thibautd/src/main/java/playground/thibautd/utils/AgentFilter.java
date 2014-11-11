@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -39,15 +38,15 @@ public class AgentFilter {
 	private static long[] toGet = {2190001, 3173100, 3644280};
 
 	/**
-	 * "filters" the given population file and exports the filtered pupulation.
+	 * "filters" the given population file and exports the filtered population.
 	 */
 	public static void main(String[] args) {
 		String fileName = args[0];
 		String netFile = args[1];
-		IdImpl[] toGetIds = new IdImpl[toGet.length];
+		Id<Person>[] toGetIds = new Id[toGet.length];
 
 		for (int i=0; i < toGet.length; i++) {
-			toGetIds[i] = new IdImpl(toGet[i]);
+			toGetIds[i] = Id.create(toGet[i], Person.class);
 		}
 
 		Config config = ConfigUtils.createConfig();
@@ -59,7 +58,7 @@ public class AgentFilter {
 		Map<Id<Person>, ? extends Person> persons = population.getPersons();
 		Map<Id, Person> personsToKeep = new HashMap<Id, Person>(toGet.length);
 
-		for (Id id : toGetIds) {
+		for (Id<Person> id : toGetIds) {
 			personsToKeep.put(id, persons.get(id));
 		}
 

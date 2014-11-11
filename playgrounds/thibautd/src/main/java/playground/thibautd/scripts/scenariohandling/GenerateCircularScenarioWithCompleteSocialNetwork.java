@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -95,7 +94,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 		for ( int i = 0; i < nLinks; i++ ) {
 			final double angle = i * angleStep;
 			final Node newNode = net.getFactory().createNode(
-					new IdImpl( "node-"+angle ),
+					Id.create( "node-"+angle , Node.class),
 					new CoordImpl(
 						radius * Math.cos( Math.PI * angle / 180 ),
 						radius * Math.sin( Math.PI * angle / 180 ) ) );
@@ -129,7 +128,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 		desires.putActivityDuration( "leisure" , 10 * 3600 );
 		for ( ActivityFacility facility : facilities.getFacilities().values() ) {
 			for ( int i = 0; i < nAgentsPerLink; i++ ) {
-				final Person person = population.getFactory().createPerson( new IdImpl( facility.getId()+"-"+i ) );
+				final Person person = population.getFactory().createPerson( Id.create( facility.getId()+"-"+i , Person.class) );
 				population.addPerson( person );
 				final Plan plan = population.getFactory().createPlan();
 				plan.setPerson( person );
@@ -290,7 +289,7 @@ public class GenerateCircularScenarioWithCompleteSocialNetwork {
 			final Node to) {
 		final Link l =
 			net.getFactory().createLink(
-				new IdImpl( from.getId() +"^"+ to.getId() ),
+				Id.create( from.getId() +"^"+ to.getId() , Link.class),
 				from,
 				to );
 		l.setLength(

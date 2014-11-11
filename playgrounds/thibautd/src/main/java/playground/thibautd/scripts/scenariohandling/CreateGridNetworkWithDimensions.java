@@ -25,12 +25,12 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -178,7 +178,7 @@ public class CreateGridNetworkWithDimensions {
 			final Node o,
 			final Node d) {
 		final Link link = fact.createLink(
-				new IdImpl( o.getId() +"--"+ d.getId() ),
+				Id.create( o.getId() +"--"+ d.getId() , Link.class ),
 				o,
 				d );
 		link.setLength( length );
@@ -198,7 +198,7 @@ public class CreateGridNetworkWithDimensions {
 		for ( int i=0; i < width; i++ ) {
 			nodes.add(
 					factory.createNode(
-						nodeIdFactory.createNextId(),
+						nodeIdFactory.createNextId(Node.class),
 						new CoordImpl( i * length , y ) ) );
 		}
 		return nodes;

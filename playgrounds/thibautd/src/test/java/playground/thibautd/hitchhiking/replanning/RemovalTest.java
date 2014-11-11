@@ -31,10 +31,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -53,22 +54,22 @@ public class RemovalTest {
 	public void initPlans() {
 		plans = new ArrayList<Plan>();
 
-		Id link1 = new IdImpl( "link1" );
-		Id link2 = new IdImpl( "link2" );
+		Id<Link> link1 = Id.create( "link1" , Link.class );
+		Id<Link> link2 = Id.create( "link2" , Link.class );
 
-		PlanImpl plan = new PlanImpl( new PersonImpl( new IdImpl( "one passenger trip" ) ) );
+		PlanImpl plan = new PlanImpl( new PersonImpl( Id.create( "one passenger trip" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
 		plan.createAndAddActivity( "h" , link1 );
 
-		plan = new PlanImpl( new PersonImpl( new IdImpl( "one driver trip" ) ) );
+		plan = new PlanImpl( new PersonImpl( Id.create( "one driver trip" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
 		plan.createAndAddActivity( "h" , link1 );
 
-		plan = new PlanImpl( new PersonImpl( new IdImpl( "one tour with one passenger trip" ) ) );
+		plan = new PlanImpl( new PersonImpl( Id.create( "one tour with one passenger trip" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
@@ -76,7 +77,7 @@ public class RemovalTest {
 		plan.createAndAddLeg( TransportMode.pt );
 		plan.createAndAddActivity( "h" , link1 );
 
-		plan = new PlanImpl( new PersonImpl( new IdImpl( "one tour with one driver trip" ) ) );
+		plan = new PlanImpl( new PersonImpl( Id.create( "one tour with one driver trip" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.DRIVER_MODE );
@@ -84,7 +85,7 @@ public class RemovalTest {
 		plan.createAndAddLeg( TransportMode.car );
 		plan.createAndAddActivity( "h" , link1 );
 
-		plan = new PlanImpl( new PersonImpl( new IdImpl( "two tours with one passenger trip each" ) ) );
+		plan = new PlanImpl( new PersonImpl( Id.create( "two tours with one passenger trip each" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );
@@ -96,7 +97,7 @@ public class RemovalTest {
 		plan.createAndAddLeg( TransportMode.pt );
 		plan.createAndAddActivity( "h" , link1 );
 
-		plan = new PlanImpl( new PersonImpl( new IdImpl( "two tours with one and two passenger trips" ) ) );
+		plan = new PlanImpl( new PersonImpl( Id.create( "two tours with one and two passenger trips" , Person.class ) ) );
 		plans.add( plan );
 		plan.createAndAddActivity( "h" , link1 ).setEndTime( 1 );
 		plan.createAndAddLeg( HitchHikingConstants.PASSENGER_MODE );

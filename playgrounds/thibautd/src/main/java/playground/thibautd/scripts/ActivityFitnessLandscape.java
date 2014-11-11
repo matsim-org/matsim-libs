@@ -22,8 +22,9 @@ package playground.thibautd.scripts;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.ActivityImpl;
@@ -62,8 +63,8 @@ public class ActivityFitnessLandscape {
 					new CharyparNagelScoringParameters(
 						config ) );
 
-		final Activity shortAct = new ActivityImpl( SHORT_TYPE , new IdImpl( 1 ) );
-		final Activity longAct = new ActivityImpl( LONG_TYPE , new IdImpl( 1 ) );
+		final Activity shortAct = new ActivityImpl( SHORT_TYPE , Id.create( 1 , Link.class ) );
+		final Activity longAct = new ActivityImpl( LONG_TYPE , Id.create( 1 , Link.class ) );
 
 		double now = 0;
 		now += SHORT_DUR;

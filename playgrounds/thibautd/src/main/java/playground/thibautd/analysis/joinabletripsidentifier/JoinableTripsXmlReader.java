@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
@@ -71,17 +72,17 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 		else if ( name.equals(JoinableTripsXmlSchemaNames.TRIP_TAG) ) {
 			count.incCounter();
 			currentJoinableTrips = new ArrayList<JoinableTrips.JoinableTrip>();
-			currentPassengerTrip = IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID));
+			currentPassengerTrip = Id.create(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID), Trip.class );
 			trips.put(
 					currentPassengerTrip,
 					new JoinableTrips.TripRecord(
-							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID)),
-							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.AGENT_ID)),
+							Id.create(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID), Trip.class),
+							Id.create(atts.getValue(JoinableTripsXmlSchemaNames.AGENT_ID), Person.class),
 							atts.getValue(JoinableTripsXmlSchemaNames.MODE),
-							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN)),
+							Id.create(atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN), Link.class),
 							atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN_ACT),
 							atts.getValue(JoinableTripsXmlSchemaNames.DEPARTURE_TIME),
-							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION)),
+							Id.create(atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION), Link.class),
 							atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION_ACT),
 							atts.getValue(JoinableTripsXmlSchemaNames.ARRIVAL_TIME),
 							atts.getValue(JoinableTripsXmlSchemaNames.LEG_NR),
@@ -90,7 +91,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 		else if ( name.equals(JoinableTripsXmlSchemaNames.JOINABLE_TAG) ) {
 			currentJoinableTrip = new JoinableTrips.JoinableTrip(
 					currentPassengerTrip,
-					IdPool.getId( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) ) );
+					Id.create( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) , Trip.class ) );
 			currentJoinableTrips.add(currentJoinableTrip);
 		}
 		else if ( name.equals( JoinableTripsXmlSchemaNames.FULLFILLED_CONDITION_TAG ) ) {
@@ -135,20 +136,5 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 
 	public JoinableTrips getJoinableTrips() {
 		return new JoinableTrips(new ArrayList<AcceptabilityCondition>(conditions.values()), trips);
-	}
-}
-
-class IdPool {
-	private final static Map<String, Id> map = new HashMap<String, Id>();
-
-	public static Id getId(final String string) {
-		Id id = map.get(string);
-
-		if (id == null) {
-			id = new IdImpl(string);
-			map.put(string, id);
-		}
-
-		return id;
 	}
 }

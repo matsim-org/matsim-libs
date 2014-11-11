@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Represents an individual trip, as it appears in the events
@@ -37,7 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class Trip {
 	private static long idCount = 0;
 
-	private final Id tripId;
+	private final Id<Trip> tripId;
 	private final int tripNumber;
 	private final ActivityEndEvent originActivityEnd;
 	private final PersonDepartureEvent departure;
@@ -55,7 +55,7 @@ public class Trip {
 			final PersonArrivalEvent arrival,
 			final ActivityStartEvent actStart,
 			final List<Event> routeEvents2) {
-		this.tripId = new IdImpl(idCount++);
+		this.tripId = Id.create(idCount++, Trip.class);
 
 		this.tripNumber = tripNumber;
 		this.originActivityEnd = actEnd;
@@ -73,7 +73,7 @@ public class Trip {
 	 *
 	 * @return The Id.
 	 */
-	public Id getId() {
+	public Id<Trip> getId() {
 		return this.tripId;
 	}
 
@@ -82,7 +82,7 @@ public class Trip {
 	 *
 	 * @return The id of the agent.
 	 */
-	public Id getAgentId() {
+	public Id<Person> getAgentId() {
 		return this.departure.getPersonId();
 	}
 

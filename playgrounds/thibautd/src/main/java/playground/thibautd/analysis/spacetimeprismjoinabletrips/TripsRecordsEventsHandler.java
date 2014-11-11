@@ -32,8 +32,11 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
+
+import playground.thibautd.analysis.joinabletripsidentifier.Trip;
 
 /**
  * Parses events to get trip records.
@@ -42,8 +45,8 @@ import org.matsim.pt.PtConstants;
  */
 public class TripsRecordsEventsHandler implements
 		PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
-	private final Map<Id, RecordBuilder> personInfo = new HashMap<Id, RecordBuilder>();
-	private final Map<Id, TripCounter> personCounters = new HashMap<Id, TripCounter>();
+	private final Map<Id<Person>, RecordBuilder> personInfo = new HashMap<>();
+	private final Map<Id<Person>, TripCounter> personCounters = new HashMap<>();
 	private List<Record> records = new ArrayList<Record>();
 
 	@Override
@@ -93,7 +96,7 @@ public class TripsRecordsEventsHandler implements
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private int nextTripCount(final Id person) {
+	private int nextTripCount(final Id<Person> person) {
 		TripCounter c = personCounters.get( person );
 
 		if (c == null) {
@@ -118,12 +121,12 @@ public class TripsRecordsEventsHandler implements
 	private static class RecordBuilder {
 		private static long currentId = Long.MIN_VALUE;
 		private int tripNr;
-		private final Id agentId;
-		private Id originLink, destinationLink;
+		private final Id<Person> agentId;
+		private Id<Link> originLink, destinationLink;
 		private double departureTime, arrivalTime;
 		private String tripMode;
 
-		public RecordBuilder(final Id agentId) {
+		public RecordBuilder(final Id<Person> agentId) {
 			this.agentId = agentId;
 		}
 
@@ -131,11 +134,11 @@ public class TripsRecordsEventsHandler implements
 			this.tripNr = tripNr;
 		}
 
-		public void setOriginLink(Id originLink) {
+		public void setOriginLink(Id<Link> originLink) {
 			this.originLink = originLink;
 		}
 
-		public void setDestinationLink(Id destinationLink) {
+		public void setDestinationLink(Id<Link> destinationLink) {
 			this.destinationLink = destinationLink;
 		}
 
@@ -152,7 +155,7 @@ public class TripsRecordsEventsHandler implements
 		}
 
 		public synchronized Record build() {
-			return new Record( new IdImpl( currentId++ ), tripNr, tripMode,
+			return new Record( Id.create( currentId++ , Trip.class ), tripNr, tripMode,
 					agentId, originLink, destinationLink, departureTime, arrivalTime);
 		}
 	}

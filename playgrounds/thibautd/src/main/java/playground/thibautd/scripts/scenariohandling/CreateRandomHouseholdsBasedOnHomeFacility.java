@@ -27,12 +27,14 @@ import java.util.Random;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * @author thibautd
@@ -52,8 +54,8 @@ public class CreateRandomHouseholdsBasedOnHomeFacility {
 		Counter counter = new Counter( "creating clique # " );
 		Counter facilitycounter = new Counter( "examining facility # " );
 		long currentCliqueId = 0;
-		Map<Id, List<Id>> cliques = new HashMap<Id, List<Id>>();
-		for (List<Id> agentsAtFacility : parser.agentsAtFacility.values()) {
+		Map<Id<Clique>, List<Id<Person>>> cliques = new HashMap<>();
+		for (List<Id<Person>> agentsAtFacility : parser.agentsAtFacility.values()) {
 			facilitycounter.incCounter();
 			while (agentsAtFacility.size() > 0) {
 				counter.incCounter();
@@ -62,11 +64,11 @@ public class CreateRandomHouseholdsBasedOnHomeFacility {
 				int minSize = maxSize < HH_MIN_SIZE ? maxSize : HH_MIN_SIZE;
 				int size = minSize + (maxSize > minSize ? random.nextInt( maxSize - minSize) : 0);
 
-				List<Id> clique = new ArrayList<Id>();
+				List<Id<Person>> clique = new ArrayList<>();
 				for (int i=0; i < size; i++) {
 					clique.add( agentsAtFacility.remove( random.nextInt( agentsAtFacility.size() ) ) );
 				}
-				cliques.put( new IdImpl( currentCliqueId++ ) , clique );
+				cliques.put( Id.create( currentCliqueId++ , Clique.class ) , clique );
 			}
 		}
 		counter.printCounter();
@@ -77,9 +79,9 @@ public class CreateRandomHouseholdsBasedOnHomeFacility {
 	}
 
 	private static class PlansParser extends MatsimXmlParser {
-		private Map<Id, List<Id>> agentsAtFacility = new HashMap<Id, List<Id>>();
+		private Map<Id<ActivityFacility>, List<Id<Person>>> agentsAtFacility = new HashMap<>();
 		private boolean isHomeKnown = false;
-		private Id currentAgent = null;
+		private Id<Person> currentAgent = null;
 		private final Counter counter = new Counter( "reading person # " );
 		private final Counter homecounter = new Counter( "reading home location # " );
 
@@ -88,18 +90,18 @@ public class CreateRandomHouseholdsBasedOnHomeFacility {
 			if (name.equals( "person" )) {
 				counter.incCounter();
 				isHomeKnown = false;
-				currentAgent = new IdImpl( atts.getValue( "id" ) );
+				currentAgent = Id.create( atts.getValue( "id" ) , Person.class );
 			}
 			else if (name.equals( "act" ) &&
 					atts.getValue( "type" ).equals( "home" ) &&
 					context.contains( "plan" ) &&
 					!isHomeKnown) {
 				homecounter.incCounter();
-				Id facilityId = new IdImpl( atts.getValue( "facility" ) );
-				List<Id> agents = agentsAtFacility.get( facilityId );
+				Id<ActivityFacility> facilityId = Id.create( atts.getValue( "facility" ) , ActivityFacility.class );
+				List<Id<Person>> agents = agentsAtFacility.get( facilityId );
 
 				if (agents == null) {
-					agents = new ArrayList<Id>();
+					agents = new ArrayList<>();
 					agentsAtFacility.put( facilityId , agents );
 				}
 

@@ -19,13 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.analysis;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -85,16 +87,16 @@ public class ExtractHitchHikersFakeActivities {
 		public void handleEvent(final Event event) {
 			if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				writer.handleEvent(
-						new ActivityStartEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, WAIT_ACT_TYPE));
+						new ActivityStartEvent(event.getTime(), Id.create( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) , Person.class), Id.create( event.getAttributes().get( "link" ) , Link.class ), null, WAIT_ACT_TYPE));
 			}
 			else if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
 				writer.handleEvent(
-						new ActivityEndEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, WAIT_ACT_TYPE));
+						new ActivityEndEvent(event.getTime(), Id.create( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) , Person.class ), Id.create( event.getAttributes().get( "link" ) , Link.class ), null, WAIT_ACT_TYPE));
 
 				writer.handleEvent(
-						new ActivityStartEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, DEP_ACT_TYPE));
+						new ActivityStartEvent(event.getTime(), Id.create( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) , Person.class ), Id.create( event.getAttributes().get( "link" ) , Link.class ), null, DEP_ACT_TYPE));
 				writer.handleEvent(
-						new ActivityEndEvent(event.getTime() + DUR, new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, DEP_ACT_TYPE));
+						new ActivityEndEvent(event.getTime() + DUR, Id.create( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) , Person.class ), Id.create( event.getAttributes().get( "link" ) , Link.class ), null, DEP_ACT_TYPE));
 			}		
 		}
 	}

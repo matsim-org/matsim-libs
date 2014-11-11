@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * One vehicle per agent
@@ -31,8 +33,8 @@ import org.matsim.api.core.v01.Id;
 public class UnrestrictedVehicleRessources implements VehicleRessources {
 
 	@Override
-	public Set<Id> identifyVehiclesUsableForAgent(final Id person) {
-		return Collections.singleton( person );
+	public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
+		return Collections.singleton( Id.create( person , Vehicle.class ) );
 	}
 }
 

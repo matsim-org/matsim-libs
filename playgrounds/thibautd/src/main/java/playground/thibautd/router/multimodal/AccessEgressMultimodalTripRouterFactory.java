@@ -26,13 +26,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
@@ -51,7 +51,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 import playground.ivt.utils.MapUtils;
-
 import playground.thibautd.utils.SoftCache;
 
 /**
@@ -106,7 +105,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 									scenario.getConfig().planCalcScore());
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
-						private final Person dummy = new PersonImpl( new IdImpl( "dummy" ) );
+						private final Person dummy = new PersonImpl( Id.create( "dummy" , Person.class ) );
 						@Override
 						public double getLinkTravelDisutility(
 								final Link link,

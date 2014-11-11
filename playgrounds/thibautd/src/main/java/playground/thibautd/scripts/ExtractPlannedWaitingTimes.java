@@ -32,7 +32,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -99,7 +98,7 @@ public class ExtractPlannedWaitingTimes {
 			}
 			else if ( PERSON.equals( name ) ) {
 				counter.incCounter();
-				currentId = new IdImpl( atts.getValue( ID ).trim() );
+				currentId = Id.create( atts.getValue( ID ).trim() , Person.class );
 			}
 			else if ( PLAN.equals( name ) ) {
 				if ( SELECTED_IS_TRUE.equals( atts.getValue( SELECTED ).trim() ) ) {

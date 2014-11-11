@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -86,8 +86,8 @@ public class HitchHikingDistancesEventHandler implements BasicEventHandler {
 	}
 
 	private void handlePassengerEvent(final Event event) {
-		Id driver = new IdImpl( event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_DRIVER ) );
-		Id passenger = new IdImpl( event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_PERSON ) );
+		Id<Person> driver = Id.create( event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_DRIVER ) , Person.class );
+		Id<Person> passenger = Id.create( event.getAttributes().get( PassengerDepartsWithDriverEvent.ATTRIBUTE_PERSON ) , Person.class);
 
 		Distance val = tripDistances.get( driver );
 

@@ -38,12 +38,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
@@ -283,35 +283,35 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 	}
 
 	private static VehicleRessources createEnoughVehicles( final GroupPlans plans ) {
-		final Set<Id> vehs = new HashSet<Id>();
+		final Set<Id<Vehicle>> vehs = new HashSet<>();
 
 		for ( int i = 0; i < plans.getAllIndividualPlans().size() ; i++ ) {
-			vehs.add( new IdImpl( i ) );
+			vehs.add( Id.create( i , Vehicle.class ) );
 		}
 
 		log.trace( "created "+vehs.size()+" vehicles" );
 
 		return new VehicleRessources() {
 				@Override
-				public Set<Id> identifyVehiclesUsableForAgent(final Id person) {
+				public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
 					return vehs;
 				}
 			};
 	}
 
 	private static VehicleRessources createHalfVehicles( final GroupPlans plans ) {
-		final Set<Id> vehs = new HashSet<Id>();
+		final Set<Id<Vehicle>> vehs = new HashSet<Id<Vehicle>>();
 
 		// half the agents have no vehicular route: divide by 4
 		for ( int i = 0; i < plans.getAllIndividualPlans().size() / 4. ; i++ ) {
-			vehs.add( new IdImpl( i ) );
+			vehs.add( Id.create( i , Vehicle.class) );
 		}
 
 		log.trace( "created "+vehs.size()+" vehicles" );
 
 		return new VehicleRessources() {
 				@Override
-				public Set<Id> identifyVehiclesUsableForAgent(final Id person) {
+				public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
 					return vehs;
 				}
 			};

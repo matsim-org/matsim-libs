@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -83,8 +82,8 @@ public class GenerateScenarioForDetours {
 	private static final double X_HOME = 0;
 	private static final double X_WORK = 10000;
 
-	private static final Id homeLinkId = new IdImpl( "home_sweet_home" );
-	private static final Id driverWorkLinkId = new IdImpl( "work_bitter_work" );
+	private static final Id<Link> homeLinkId = Id.create( "home_sweet_home"  , Link.class);
+	private static final Id<Link> driverWorkLinkId = Id.create( "work_bitter_work"  , Link.class);
 
 	public static void main(final String[] args) {
 		final String outputNetwork = args[ 0 ];
@@ -208,10 +207,10 @@ public class GenerateScenarioForDetours {
 			for ( int nh = 0; nh < N_HH_PER_DEST; nh++ ) {
 				final Household household =
 					households.getFactory().createHousehold(
-							householdIdFactory.createNextId() );
+							householdIdFactory.createNextId(Household.class) );
 				((HouseholdsImpl) households).addHousehold( household );
 
-				final Id passengerWorkLinkId = new IdImpl( P_WORK_PREFIX + workPlaceCount );
+				final Id<Link> passengerWorkLinkId = Id.create( P_WORK_PREFIX + workPlaceCount , Link.class);
 
 				final List<Id<Person>> members = new ArrayList<Id<Person>>();
 				((HouseholdImpl) household).setMemberIds( members );
@@ -220,7 +219,7 @@ public class GenerateScenarioForDetours {
 					/* driver scope */ {
 						final Person driver =
 							population.getFactory().createPerson(
-									personIdFactory.createNextId() );
+									personIdFactory.createNextId(Person.class) );
 						((PersonImpl) driver).setCarAvail( "always" );
 						driver.addPlan(
 								createPlan(
@@ -235,7 +234,7 @@ public class GenerateScenarioForDetours {
 					/* passenger scope */ {
 						final Person passenger =
 							population.getFactory().createPerson(
-									personIdFactory.createNextId() );
+									personIdFactory.createNextId(Person.class) );
 						((PersonImpl) passenger).setCarAvail( "never" );
 						passenger.addPlan(
 								createPlan(
@@ -255,7 +254,7 @@ public class GenerateScenarioForDetours {
 			final Random random,
 			final PopulationFactory factory,
 			final String mode,
-			final Id workLinkId) {
+			final Id<Link> workLinkId) {
 		final Plan plan = factory.createPlan();
 
 		final Activity a1 =
@@ -294,22 +293,22 @@ public class GenerateScenarioForDetours {
 
 		final Node homeOriginNode =
 			network.getFactory().createNode(
-				nodeIdFactory.createNextId(),
+				nodeIdFactory.createNextId(Node.class),
 				new CoordImpl( X_HOME , 0 ) );
 		network.addNode( homeOriginNode );
 		final Node homeDestinationNode =
 			network.getFactory().createNode(
-				nodeIdFactory.createNextId(),
+				nodeIdFactory.createNextId(Node.class),
 				new CoordImpl( X_HOME , 0 ) );
 		network.addNode( homeDestinationNode );
 		final Node workOriginNode =
 			network.getFactory().createNode(
-				nodeIdFactory.createNextId(),
+				nodeIdFactory.createNextId(Node.class),
 				new CoordImpl( X_WORK , 0 ) );
 		network.addNode( workOriginNode );
 		final Node workDestinationNode =
 			network.getFactory().createNode(
-				nodeIdFactory.createNextId(),
+				nodeIdFactory.createNextId(Node.class),
 				new CoordImpl( X_WORK , 0 ) );
 		network.addNode( workDestinationNode );
 
@@ -326,20 +325,20 @@ public class GenerateScenarioForDetours {
 
 		network.addLink(
 				network.getFactory().createLink(
-					linkIdFactory.createNextId(),
+					linkIdFactory.createNextId(Link.class),
 					homeDestinationNode,
 					workOriginNode ) );
 
 		network.addLink(
 				network.getFactory().createLink(
-					linkIdFactory.createNextId(),
+					linkIdFactory.createNextId(Link.class),
 					workDestinationNode,
 					homeOriginNode ) );
 
 		for ( int i=1; i <= N_WORK; i++ ) {
 			final Node node =
 				network.getFactory().createNode(
-						nodeIdFactory.createNextId(),
+						nodeIdFactory.createNextId(Node.class),
 						new CoordImpl(
 							X_WORK,
 							i * LENGTH_DETOUR ) );
@@ -347,17 +346,17 @@ public class GenerateScenarioForDetours {
 
 			network.addLink(
 					network.getFactory().createLink(
-						linkIdFactory.createNextId(),
+						linkIdFactory.createNextId(Link.class),
 						homeDestinationNode,
 						node ) );
 			network.addLink(
 					network.getFactory().createLink(
-						new IdImpl( P_WORK_PREFIX + i ),
+						Id.create( P_WORK_PREFIX + i , Link.class ),
 						node,
 						workOriginNode ) );
 			network.addLink(
 					network.getFactory().createLink(
-						linkIdFactory.createNextId(),
+						linkIdFactory.createNextId(Link.class),
 						workDestinationNode,
 						node ) );
 		}

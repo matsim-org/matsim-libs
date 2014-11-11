@@ -21,11 +21,11 @@ package playground.thibautd.scripts;
 
 import java.util.Collections;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -58,7 +58,7 @@ public class GenerateFakeNetworkOfZonesAroundBellevue {
 		Node lastNode = null;
 		for ( double angle = 0 ; angle <= 360.1 ; angle += stepDeg ) {
 			final Node newNode = net.getFactory().createNode(
-					new IdImpl( (int)radius +"~"+ (int)angle ),
+					Id.create( (int)radius +"~"+ (int)angle , Node.class ),
 					new CoordImpl(
 						BELLEVUE_X + radius * Math.cos( Math.PI * angle / 180 ),
 						BELLEVUE_Y + radius * Math.sin( Math.PI * angle / 180 ) ) );
@@ -66,7 +66,7 @@ public class GenerateFakeNetworkOfZonesAroundBellevue {
 
 			if ( lastNode != null ) {
 				final Link l = net.getFactory().createLink(
-						new IdImpl( lastNode.getId() +"^"+ newNode.getId() ),
+						Id.create( lastNode.getId() +"^"+ newNode.getId() , Link.class ),
 						lastNode,
 						newNode );
 				net.addLink( l );

@@ -25,8 +25,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * Writes clique pertenancy information to an XML file.
@@ -37,12 +40,12 @@ public class CliquesWriter extends MatsimXmlWriter {
 		Logger.getLogger(CliquesWriter.class);
 
 
-	private final Map<Id, List<Id>> cliques;
+	private final Map<Id<Clique>, List<Id<Person>>> cliques;
 	private final List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
 	private int count = 0;
 	private int nextLog = 1;
 
-	public CliquesWriter(Map<Id, List<Id>> cliques) {
+	public CliquesWriter(Map<Id<Clique>, List<Id<Person>>> cliques) {
 		this.cliques = cliques;
 	}
 
@@ -63,13 +66,13 @@ public class CliquesWriter extends MatsimXmlWriter {
 		//this.atts.add(this.createTuple(XMLNS, MatsimXmlWriter.MATSIM_NAMESPACE));
 		this.writeStartTag(CliquesSchemaNames.CLIQUES, this.atts);
 
-		for (Id id: this.cliques.keySet()) {
+		for (Id<Clique> id: this.cliques.keySet()) {
 			this.writeClique(id);
 		}
 		this.writeEndTag(CliquesSchemaNames.CLIQUES);
 	}
 
-	private void writeClique(Id id) {
+	private void writeClique(Id<Clique> id) {
 		this.logCount();
 		this.atts.clear();
 		this.atts.add(this.createTuple(CliquesSchemaNames.CLIQUE_ID, id.toString()));
@@ -88,8 +91,8 @@ public class CliquesWriter extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeMembers(List<Id> clique) {
-		for (Id id : clique) {
+	private void writeMembers(List<Id<Person>> clique) {
+		for (Id<Person> id : clique) {
 			this.atts.clear();
 			this.atts.add(this.createTuple(CliquesSchemaNames.MEMBER_ID, id.toString()));
 			this.writeStartTag(CliquesSchemaNames.MEMBER, atts, true);

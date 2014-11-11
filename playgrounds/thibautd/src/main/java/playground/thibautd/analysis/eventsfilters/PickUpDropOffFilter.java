@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -87,7 +87,7 @@ public class PickUpDropOffFilter {
 			if (event instanceof PersonDepartureEvent) {
 				PersonDepartureEvent departure = (PersonDepartureEvent) event;
 				// to avoid artefacts due to overlaping activities.
-				Id fakeId = new IdImpl(departure.getPersonId()+"-"+(count++));
+				Id<Person> fakeId = Id.create(departure.getPersonId()+"-"+(count++), Person.class);
 
 				if ( departure.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
 					events.add( new ActivityStartEvent(
@@ -107,7 +107,7 @@ public class PickUpDropOffFilter {
 			else if (event instanceof PersonArrivalEvent) {
 				PersonArrivalEvent arrival = (PersonArrivalEvent) event;
 				// to avoid artefacts due to overlaping activities.
-				Id fakeId = new IdImpl(arrival.getPersonId()+"-"+(count++));
+				Id<Person> fakeId = Id.create(arrival.getPersonId()+"-"+(count++), Person.class);
 
 				if ( arrival.getLegMode().equals( JointActingTypes.PASSENGER ) ) {
 					events.add( new ActivityStartEvent(

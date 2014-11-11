@@ -27,12 +27,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -100,8 +100,8 @@ public class JointScenarioUtilsTest {
 						PassengerRoute.class,
 						loadedLeg.getRoute().getClass());
 
-				final Id dumpedDriver = ((PassengerRoute) dumpedLeg.getRoute()).getDriverId();
-				final Id loadedDriver = ((PassengerRoute) loadedLeg.getRoute()).getDriverId();
+				final Id<Person> dumpedDriver = ((PassengerRoute) dumpedLeg.getRoute()).getDriverId();
+				final Id<Person> loadedDriver = ((PassengerRoute) loadedLeg.getRoute()).getDriverId();
 
 				assertEquals(
 						"unexpected passenger ids",
@@ -115,37 +115,37 @@ public class JointScenarioUtilsTest {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final Population population = sc.getPopulation();
 
-		final Person driver = population.getFactory().createPerson( new IdImpl( "driver" ) );
+		final Person driver = population.getFactory().createPerson( Id.create( "driver" , Person.class ) );
 		population.addPerson( driver );
 		final Plan driverPlan = population.getFactory().createPlan();
 		driverPlan.setPerson( driver );
 		driver.addPlan( driverPlan );
 		
-		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
+		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class ) ) );
 		final Leg driverLeg = population.getFactory().createLeg( JointActingTypes.DRIVER );
-		final DriverRoute dRoute = new DriverRoute( new IdImpl( 1 ) , new IdImpl( 1 ) );
-		dRoute.addPassenger( new IdImpl( "random_hitch_hiker" ) );
+		final DriverRoute dRoute = new DriverRoute( Id.create( 1 , Link.class ) , Id.create( 1 , Link.class ) );
+		dRoute.addPassenger( Id.create( "random_hitch_hiker" , Person.class) );
 		dRoute.setDistance( 234 );
 		dRoute.setTravelTime( 234 );
 		driverLeg.setRoute( dRoute );
 		driverPlan.addLeg( driverLeg );
-		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
+		driverPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class ) ) );
 
-		final Person passenger = population.getFactory().createPerson( new IdImpl( "passenger" ) );
+		final Person passenger = population.getFactory().createPerson( Id.create( "passenger" , Person.class) );
 		population.addPerson( passenger );
 		final Plan passengerPlan = population.getFactory().createPlan();
 		passengerPlan.setPerson( passenger );
 		passenger.addPlan( passengerPlan );
 		
-		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
+		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class ) ) );
 		final Leg passengerLeg = population.getFactory().createLeg( JointActingTypes.PASSENGER );
-		final PassengerRoute pRoute = new PassengerRoute( new IdImpl( 1 ) , new IdImpl( 1 ) );
-		pRoute.setDriverId( new IdImpl( "lorrie driver" ) );
+		final PassengerRoute pRoute = new PassengerRoute( Id.create( 1 , Link.class ) , Id.create( 1 , Link.class ) );
+		pRoute.setDriverId( Id.create( "lorrie driver", Person.class ) );
 		pRoute.setDistance( 234 );
 		pRoute.setTravelTime( 234 );
 		passengerLeg.setRoute( pRoute );
 		passengerPlan.addLeg( passengerLeg );
-		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , new IdImpl( 1 ) ) );
+		passengerPlan.addActivity( population.getFactory().createActivityFromLinkId( "h" , Id.create( 1 , Link.class) ) );
 
 		return population;
 	}

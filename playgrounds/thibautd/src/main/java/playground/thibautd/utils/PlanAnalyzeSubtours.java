@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripStructureUtils;
 
@@ -45,7 +44,7 @@ import org.matsim.core.router.TripStructureUtils;
 public class PlanAnalyzeSubtours {
 
 	public static final int UNDEFINED = Integer.MIN_VALUE;
-	private static final Id INVALID_ID = new IdImpl(PlanAnalyzeSubtours.UNDEFINED);
+	private static final Id<Object> INVALID_ID = Id.create(PlanAnalyzeSubtours.UNDEFINED, Object.class);
 
 	// former fields. should become local variable in analysis.
 	private int[] subtourIndexation;

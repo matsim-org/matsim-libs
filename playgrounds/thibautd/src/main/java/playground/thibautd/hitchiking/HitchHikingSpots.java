@@ -37,7 +37,7 @@ public class HitchHikingSpots {
 	private final QuadTree<Link> quadTree;
 
 	public HitchHikingSpots(
-			final Collection<Id> hitchHikableLinks,
+			final Collection<Id<Link>> hitchHikableLinks,
 			final Network network) {
 		this( getHitchHikableLinks( hitchHikableLinks , network ) );
 	}
@@ -48,10 +48,10 @@ public class HitchHikingSpots {
 	}
 
 	private static Collection<Link> getHitchHikableLinks(
-			final Collection<Id> hitchHikableLinkIds,
+			final Collection<Id<Link>> hitchHikableLinkIds,
 			final Network network) {
 		List<Link> hitchHikableLinks = new ArrayList<Link>(); 
-		for (Id id : hitchHikableLinkIds) {
+		for (Id<Link> id : hitchHikableLinkIds) {
 			Link l = network.getLinks().get( id );
 			hitchHikableLinks.add( l );
 		}

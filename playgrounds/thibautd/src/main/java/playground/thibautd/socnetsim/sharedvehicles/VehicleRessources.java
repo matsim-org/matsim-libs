@@ -22,6 +22,8 @@ package playground.thibautd.socnetsim.sharedvehicles;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
@@ -32,6 +34,6 @@ public interface VehicleRessources {
 	/**
 	 * gives access to the ids of the vehicles the Person can use
 	 */
-	public Set<Id> identifyVehiclesUsableForAgent(Id person);
+	public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(Id<Person> person);
 }
 

@@ -21,7 +21,6 @@ package playground.thibautd.scripts.scenariohandling;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -29,11 +28,10 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -106,7 +104,7 @@ public class GenerateRandomFacilities {
 
 				final ActivityFacility facility =
 					sc.getActivityFacilities().getFactory().createActivityFacility(
-							new IdImpl( "fac-"+type+"-"+n ),
+							Id.create( "fac-"+type+"-"+n , ActivityFacility.class ),
 							l.getCoord() );
 				((ActivityFacilityImpl) facility).setLinkId( l.getId() );
 

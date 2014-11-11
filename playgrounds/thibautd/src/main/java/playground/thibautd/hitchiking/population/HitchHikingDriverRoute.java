@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
 
@@ -37,39 +37,39 @@ public class HitchHikingDriverRoute extends AbstractRoute implements GenericRout
 	private static final String PU_DO_SEP = "|";
 	private static final String DO_DO_SEP = ";";
 
-	private Id puLinkId = null;
-	private List<Id> doLinksIds = null;
+	private Id<Link> puLinkId = null;
+	private List<Id<Link>> doLinksIds = null;
 
 	public HitchHikingDriverRoute(
-			final Id startLinkId,
-			final Id endLinkId) {
+			final Id<Link> startLinkId,
+			final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 
 	public HitchHikingDriverRoute(
-			final Id startLinkId,
-			final Id endLinkId,
-			final Id puLinkId,
-			final List<Id> doLinksIds) {
+			final Id<Link> startLinkId,
+			final Id<Link> endLinkId,
+			final Id<Link> puLinkId,
+			final List<Id<Link>> doLinksIds) {
 		this( startLinkId , endLinkId );
 		this.puLinkId = puLinkId;
-		this.doLinksIds = new ArrayList<Id>( doLinksIds );
+		this.doLinksIds = new ArrayList<>( doLinksIds );
 	}
 
 	@Override
 	public void setRouteDescription(
-			final Id startLinkId,
+			final Id<Link> startLinkId,
 			final String routeDescription,
-			final Id endLinkId) {
+			final Id<Link> endLinkId) {
 		setStartLinkId( startLinkId );
 		setEndLinkId( endLinkId );
 
 		String[] puAndDos = routeDescription.trim().split( PU_DO_SEP );
-		puLinkId = new IdImpl( puAndDos[0].trim() );
+		puLinkId = Id.create( puAndDos[0].trim() , Link.class );
 
-		doLinksIds = new ArrayList<Id>();
+		doLinksIds = new ArrayList<>();
 		for (String id : puAndDos[1].split( DO_DO_SEP )) {
-			doLinksIds.add( new IdImpl( id ) );
+			doLinksIds.add( Id.create( id , Link.class ) );
 		}
 	}
 
@@ -80,7 +80,7 @@ public class HitchHikingDriverRoute extends AbstractRoute implements GenericRout
 		b.append( puLinkId );
 		b.append( PU_DO_SEP );
 		
-		Iterator<Id> ids = doLinksIds.iterator();
+		Iterator<Id<Link>> ids = doLinksIds.iterator();
 		b.append( ids.next() );
 		while (ids.hasNext()) {
 			b.append( DO_DO_SEP );
@@ -95,7 +95,7 @@ public class HitchHikingDriverRoute extends AbstractRoute implements GenericRout
 		return HitchHikingConstants.DRIVER_MODE;
 	}
 
-	public Id getPickUpLinkId() {
+	public Id<Link> getPickUpLinkId() {
 		return puLinkId;
 	}
 
@@ -103,7 +103,7 @@ public class HitchHikingDriverRoute extends AbstractRoute implements GenericRout
 	 * @return the list of drop-off points, ordered from
 	 * the prefered one to the worst one.
 	 */
-	public List<Id> getDropOffLinksIds() {
+	public List<Id<Link>> getDropOffLinksIds() {
 		return doLinksIds;
 	}
 

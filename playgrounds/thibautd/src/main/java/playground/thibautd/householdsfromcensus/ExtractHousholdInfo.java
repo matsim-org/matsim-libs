@@ -27,13 +27,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * @author thibautd
  */
 public class ExtractHousholdInfo {
-	private final Map<Id, List<Id>> cliques;
+	private final Map<Id<Clique>, List<Id<Person>>> cliques;
 	private static final String FIRST_LINE = "hh_id\tz_id\tf_id\thhtpw\thhtpz\tp_w_list\tp_z_list";
 	private static final String SPLIT_EXPR = "\t";
 	private static final String LIST_SPLIT_EXPR = ";";
@@ -61,14 +63,14 @@ public class ExtractHousholdInfo {
 		}
 	}
 
-	private static Map<Id, List<Id>> parse(BufferedReader buf) {
+	private static Map<Id<Clique>, List<Id<Person>>> parse(BufferedReader buf) {
 
 		String[] currentLine;
-		Id currentId;
+		Id<Clique> currentId;
 		String[] currentMembers;
-		List<Id> membersList;
+		List<Id<Person>> membersList;
 
-		Map<Id, List<Id>> map = new HashMap<Id, List<Id>>();
+		Map<Id<Clique>, List<Id<Person>>> map = new HashMap<Id<Clique>, List<Id<Person>>>();
 
 		try {
 			if (!buf.readLine().equals(FIRST_LINE)) {
@@ -81,13 +83,13 @@ public class ExtractHousholdInfo {
 						} catch (NullPointerException e) {
 							break;
 						}
-						currentId = new IdImpl(currentLine[HH_LOC]);
+						currentId = Id.create(currentLine[HH_LOC], Clique.class);
 						currentMembers = currentLine[MEMB_LOC].split(LIST_SPLIT_EXPR);
 			
 						// put info in the specified format
-						membersList = new ArrayList<Id>();
+						membersList = new ArrayList<>();
 						for (int i=0; i < currentMembers.length; i++) {
-							membersList.add(new IdImpl(currentMembers[i]));
+							membersList.add(Id.create(currentMembers[i], Person.class));
 						}
 						map.put(currentId, membersList);
 				}
@@ -98,7 +100,7 @@ public class ExtractHousholdInfo {
 		return map;
 	}
 
-	public Map<Id, List<Id>> getCliques() {
+	public Map<Id<Clique>, List<Id<Person>>> getCliques() {
 		return this.cliques;
 	}
 }

@@ -91,7 +91,7 @@ public class GenerateRandomHouseholdScenario {
 		final Random random = new Random( 1234 );
 		while ( population.getPersons().size() < popSize ) {
 			final int hhSize = hhSizes.nextSize();
-			final Id hhId = hhIdFactory.createNextId();
+			final Id<Household> hhId = hhIdFactory.createNextId(Household.class);
 			final Household hh = households.getFactory().createHousehold( hhId );
 			((HouseholdsImpl) households).addHousehold( hh );
 			// that's stupid. This has to be changed.
@@ -107,7 +107,7 @@ public class GenerateRandomHouseholdScenario {
 				final Link workLink = randomLinks.nextLink();
 				final Link leisureLink = randomLinks.nextLink();
 
-				final Person driver = popFactory.createPerson( personIdFactory.createNextId() );
+				final Person driver = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
 				((PersonImpl) driver).setCarAvail( "always" );
 				createPlan( random , popFactory , driver , homeLink , workLink , leisureLink , workThenLeisure );
 				members.add( driver.getId() );
@@ -115,7 +115,7 @@ public class GenerateRandomHouseholdScenario {
 
 				if ( doublePlans ) {
 					// generate twice the "same" plan, once with car, once without
-					final Person passenger = popFactory.createPerson( personIdFactory.createNextId() );
+					final Person passenger = popFactory.createPerson( personIdFactory.createNextId(Person.class) );
 					((PersonImpl) passenger).setCarAvail( "never" );
 					createPlan( random , popFactory , passenger , homeLink , workLink , leisureLink , workThenLeisure );
 					members.add( passenger.getId() );

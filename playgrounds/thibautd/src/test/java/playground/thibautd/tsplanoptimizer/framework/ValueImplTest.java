@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 
 /**
  * @author thibautd
@@ -34,9 +34,9 @@ import org.matsim.core.basic.v01.IdImpl;
 public class ValueImplTest {
 	private static List<ValueImpl> createValues() {
 		List<ValueImpl> values = new ArrayList<ValueImpl>();
-		values.add( new ValueImpl( new IdImpl( 1 ) ) );
-		values.add( new ValueImpl( new IdImpl( 2 ) ) );
-		values.add( new ValueImpl( new IdImpl( 1 ) ) );
+		values.add( new ValueImpl( Id.create( 1 , Object.class) ) );
+		values.add( new ValueImpl( Id.create( 2 , Object.class) ) );
+		values.add( new ValueImpl( Id.create( 1 , Object.class) ) );
 		values.add( new ValueImpl( "bla" ) );
 		values.add( new ValueImpl( "blou" ) );
 		values.add( new ValueImpl( "bla" ) );

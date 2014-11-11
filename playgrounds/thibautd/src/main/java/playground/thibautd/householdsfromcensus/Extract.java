@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * @author thibautd
@@ -32,7 +35,7 @@ public class Extract {
 	private static final String output = "testcases/equil/fakeHouseholds.XML";
 
 	public static void main(String[] args) {
-		Map<Id, List<Id>> cliques;
+		Map<Id<Clique>, List<Id<Person>>> cliques;
 		CliquesWriter householdWriter;
 
 		cliques = (new ExtractHousholdInfo(file).getCliques());

@@ -22,25 +22,28 @@ package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.thibautd.analysis.joinabletripsidentifier.Trip;
 
 /**
  * @author thibautd
  */
 public class Record {
-	private final Id tripId;
+	private final Id<Trip> tripId;
 	private final int tripNr;
-	private final Id agentId;
-	private final Id originLink, destinationLink;
+	private final Id<Person> agentId;
+	private final Id<Link> originLink, destinationLink;
 	private final double departureTime, arrivalTime;
 	private final String tripMode;
 
 	public Record(
-			final Id tripId,
+			final Id<Trip> tripId,
 			final int tripNr,
 			final String mode,
-			final Id agentId,
-			final Id originLink,
-			final Id destinationLink,
+			final Id<Person> agentId,
+			final Id<Link> originLink,
+			final Id<Link> destinationLink,
 			final double departureTime,
 			final double arrivalTime) {
 		this.tripId = tripId;
@@ -60,19 +63,19 @@ public class Record {
 		return this.tripNr;
 	}
 
-	public Id getTripId() {
+	public Id<Trip> getTripId() {
 		return this.tripId;
 	}
 
-	public Id getAgentId() {
+	public Id<Person> getAgentId() {
 		return this.agentId;
 	}
 
-	public Id getOriginLink() {
+	public Id<Link> getOriginLink() {
 		return this.originLink;
 	}
 
-	public Id getDestinationLink() {
+	public Id<Link> getDestinationLink() {
 		return this.destinationLink;
 	}
 

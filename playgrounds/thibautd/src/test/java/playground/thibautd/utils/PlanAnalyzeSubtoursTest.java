@@ -28,12 +28,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -205,12 +208,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	private PlanImpl createPlan(NetworkImpl network, String facString) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
 
 	private PlanImpl createPlan(ActivityFacilities facilities, String facString) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		return createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, TransportMode.car, facString);
 	}
 
@@ -227,7 +230,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getFacilities().get(new IdImpl(locationIdSequence[aa]));
+			BasicLocation location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
 			ActivityImpl act;
 			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());
@@ -243,7 +246,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getLinks().get(new IdImpl(locationIdSequence[aa]));
+			BasicLocation location = layer.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
 			ActivityImpl act;
 			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			act.setEndTime(10*3600);

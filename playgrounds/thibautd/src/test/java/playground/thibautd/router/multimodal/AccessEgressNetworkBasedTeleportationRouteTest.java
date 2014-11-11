@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -82,7 +81,7 @@ public class AccessEgressNetworkBasedTeleportationRouteTest {
 					"shloumpf",
 					new AccessEgressNetworkBasedTeleportationRouteFactory( ) );
 
-		final Person person = pop.getFactory().createPerson( new IdImpl( "jojo" ) );
+		final Person person = pop.getFactory().createPerson( Id.create( "jojo" , Person.class ) );
 		pop.addPerson( person );
 		final Plan plan = pop.getFactory().createPlan();
 		person.addPlan( plan );

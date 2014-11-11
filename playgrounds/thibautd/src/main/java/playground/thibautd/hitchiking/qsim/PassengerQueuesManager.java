@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -94,8 +95,8 @@ public class PassengerQueuesManager implements MobsimEngine, DepartureHandler {
 	 */
 	public Tuple<Id, Collection<MobsimAgent>> getPassengersFromFirstNonEmptyQueue(
 			final double now,
-			final Id pickUpLink,
-			final List<Id> possibleDestinations,
+			final Id<Link> pickUpLink,
+			final List<Id<Link>> possibleDestinations,
 			final int nPassengers) {
 		for (Id dest : possibleDestinations) {
 			Queue q = queues.getQueuesAtLink( pickUpLink ).getQueueForDestination( dest );

@@ -31,7 +31,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -108,10 +109,10 @@ public class ConvertXYToBikeSharingStations {
 					new CoordImpl(
 							Double.parseDouble( fields[ 0 ] ),
 							Double.parseDouble( fields[ 1 ] ) );
-				final Id link =
+				final Id<Link> link =
 					network.getNearestLink( coord ).getId();
 
-				final Id id = new IdImpl( prefix+filecount+"-"+(linecount++) );
+				final Id<ActivityFacility> id = Id.create( prefix+filecount+"-"+(linecount++) , ActivityFacility.class );
 
 				facilities.addFacility(
 						facilities.getFactory().createBikeSharingFacility(

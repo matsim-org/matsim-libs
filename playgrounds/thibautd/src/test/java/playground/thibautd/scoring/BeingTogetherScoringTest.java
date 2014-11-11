@@ -29,15 +29,16 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring;
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.AcceptAllFilter;
@@ -50,10 +51,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testOvelapsOfActivities() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 		
 		for ( OverlapSpec os : new OverlapSpec[]{
@@ -88,10 +89,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testWrapAround() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final BeingTogetherScoring testee =
@@ -120,10 +121,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testWrapAroundAfter24h() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final BeingTogetherScoring testee =
@@ -152,10 +153,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOverlapIfDifferentActTypes() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 		final String type2 = "type2";
 
@@ -185,11 +186,11 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOverlapIfDifferentLocations() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
-		final Id linkId2 = new IdImpl( 2 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
+		final Id<Link> linkId2 = Id.create( 2 , Link.class );
 		final String type = "type";
 
 		final BeingTogetherScoring testee =
@@ -218,10 +219,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOverlapIfRejectedActivity() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final BeingTogetherScoring testee =
@@ -252,10 +253,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOverlapIfPlanDoesNotComplete() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type1 = "type1";
 		final String type2 = "type2";
 
@@ -299,11 +300,11 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOverlapIfWrongAgent() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
-		final Id other = new IdImpl( "tonny montana" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
+		final Id<Person> other = Id.create( "tonny montana" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final BeingTogetherScoring testee =
@@ -334,10 +335,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testOvelapsOfLegs() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id vehId = new IdImpl( 1 );
+		final Id<Vehicle> vehId = Id.create( 1 , Vehicle.class );
 		
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
@@ -371,11 +372,11 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOvelapIfDifferentVehicles() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id vehId = new IdImpl( 1 );
-		final Id vehId2 = new IdImpl( 2 );
+		final Id<Vehicle> vehId = Id.create( 1 , Vehicle.class );
+		final Id<Vehicle> vehId2 = Id.create( 2 , Vehicle.class );
 		
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
@@ -409,10 +410,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testNoOvelapIfRejectedMode() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id vehId = new IdImpl( 1 );
+		final Id<Vehicle> vehId = Id.create( 1 , Vehicle.class);
 		
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
@@ -430,11 +431,11 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					new PersonDepartureEvent(0, ego, new IdImpl( 1 ), "mode") );
+					new PersonDepartureEvent(0, ego, Id.create( 1 , Link.class ), "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					new PersonDepartureEvent(0, alter, new IdImpl( 1 ), "mode") );
+					new PersonDepartureEvent(0, alter, Id.create( 1 , Link.class ), "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startAlter, alter, vehId) );
 			testee.handleEvent(
@@ -452,10 +453,10 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testOvelapsOfActivitiesInActiveTimeWindow() throws Exception {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final double startWindow = 10;
@@ -506,16 +507,16 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testOvelapsOfActivitiesWithOpeningTimes() {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final ActivityFacility facility =
 			facilities.getFactory().createActivityFacility(
-					new IdImpl( "facility" ),
+					Id.create( "facility" , ActivityFacility.class ),
 					new CoordImpl( 0 , 0 ) );
 		facilities.addActivityFacility( facility );
 		final ActivityOption option = facilities.getFactory().createActivityOption( type );
@@ -589,16 +590,16 @@ public class BeingTogetherScoringTest {
 
 	@Test
 	public void testOvelapsOfActivitiesWithUndefinedOpeningTime() {
-		final Id ego = new IdImpl( "ego" );
-		final Id<Person> alter = new IdImpl( "alter" );
+		final Id<Person> ego = Id.create( "ego", Person.class);
+		final Id<Person> alter = Id.create( "alter" , Person.class );
 		
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1 , Link.class );
 		final String type = "type";
 
 		final ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		final ActivityFacility facility =
 			facilities.getFactory().createActivityFacility(
-					new IdImpl( "facility" ),
+					Id.create( "facility" , ActivityFacility.class ),
 					new CoordImpl( 0 , 0 ) );
 		facilities.addActivityFacility( facility );
 		final ActivityOption option = facilities.getFactory().createActivityOption( type );

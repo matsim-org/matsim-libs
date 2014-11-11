@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -84,7 +84,7 @@ public class GenerateRandomPlansFromFacilities {
 
 		final Random random = new Random( 2345 );
 		for ( int i=0; i < popSize; i++ ) {
-			final Person person = sc.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i ) );
+			final Person person = sc.getPopulation().getFactory().createPerson( Id.create( "person-"+i , Person.class) );
 			sc.getPopulation().addPerson( person );
 
 			final Plan plan = sc.getPopulation().getFactory().createPlan();

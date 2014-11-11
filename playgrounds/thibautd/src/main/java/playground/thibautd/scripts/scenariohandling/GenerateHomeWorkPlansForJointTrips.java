@@ -29,6 +29,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,20 +37,20 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
+import playground.thibautd.socnetsim.cliques.Clique;
 
 /**
  * @author thibautd
  */
 public class GenerateHomeWorkPlansForJointTrips {
-	private static final Id HOME_LINK_ID = new IdImpl( 1 );
-	private static final Id WORK_LINK_ID = new IdImpl( 2 );
+	private static final Id<Link> HOME_LINK_ID = Id.create( 1 , Link.class );
+	private static final Id<Link> WORK_LINK_ID = Id.create( 2 , Link.class );
 
 	public static void main(final String[] args) {
 		final String outputCliquesFile = args[ 0 ];
@@ -64,7 +65,7 @@ public class GenerateHomeWorkPlansForJointTrips {
 		final Random random = new Random( 19239784 );
 		final SizeIterator sizes = new SizeIterator( maxCliqueSize );
 		final CliquesTracker cliques = new CliquesTracker();
-		final IdIterator ids = new IdIterator( "person-" );
+		final IdIterator<Person> ids = new IdIterator<>( "person-" , Person.class);
 		final Counter counter = new Counter( "generating clique # ");
 		while ( population.getPersons().size() < popSize ) {
 			counter.incCounter();
@@ -87,7 +88,7 @@ public class GenerateHomeWorkPlansForJointTrips {
 	private static Collection<Person> createClique(
 			final PopulationFactory factory,
 			final Random random,
-			final IdIterator ids,
+			final IdIterator<Person> ids,
 			final int size) {
 		if (size % 2 != 0) throw new IllegalArgumentException( ""+size );
 
@@ -146,25 +147,27 @@ public class GenerateHomeWorkPlansForJointTrips {
 		}
 	}
 
-	private static class IdIterator {
+	private static class IdIterator<T> {
 		private int count = 0;
 		private final String prefix;
+		private final Class<T> idType;
 
-		public IdIterator( final String prefix ) {
+		public IdIterator( final String prefix , final Class<T> idType) {
 			this.prefix = prefix;
+			this.idType = idType;
 		}
 
-		public Id next() {
-			return new IdImpl( prefix+(count++) );
+		public Id<T> next() {
+			return Id.create( prefix+(count++) , this.idType);
 		}
 	}
 
 	private static class CliquesTracker {
-		private final IdIterator ids = new IdIterator( "clique-" );
-		private final Map<Id, List<Id>> cliques = new HashMap<Id, List<Id>>();
+		private final IdIterator<Clique> ids = new IdIterator<>( "clique-" , Clique.class );
+		private final Map<Id<Clique>, List<Id<Person>>> cliques = new HashMap<>();
 
 		public void addClique( final Collection<Person> persons ) {
-			final List<Id> memberIds = new ArrayList<Id>();
+			final List<Id<Person>> memberIds = new ArrayList<>();
 
 			for (Person p : persons) {
 				memberIds.add( p.getId() );
@@ -173,7 +176,7 @@ public class GenerateHomeWorkPlansForJointTrips {
 			cliques.put( ids.next() , memberIds );
 		}
 
-		public Map<Id, List<Id>> getCliques() {
+		public Map<Id<Clique>, List<Id<Person>>> getCliques() {
 			return cliques;
 		}
 	}

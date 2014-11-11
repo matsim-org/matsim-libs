@@ -40,6 +40,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -306,12 +307,12 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	}
 
 	private static class VehicleRecordFactory {
-		private final Map<Id, VehicleRecord> records = new HashMap<Id, VehicleRecord>();
+		private final Map<Id<Vehicle>, VehicleRecord> records = new HashMap<>();
 
-		public List<VehicleRecord> getRecords(final Collection<Id> ids) {
+		public List<VehicleRecord> getRecords(final Collection<Id<Vehicle>> ids) {
 			final List<VehicleRecord> list = new ArrayList<VehicleRecord>();
 
-			for ( Id id : ids ) {
+			for ( Id<Vehicle> id : ids ) {
 				VehicleRecord r = records.get( id );
 
 				if ( r == null ) {

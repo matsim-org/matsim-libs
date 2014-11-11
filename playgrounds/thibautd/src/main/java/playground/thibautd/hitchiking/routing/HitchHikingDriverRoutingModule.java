@@ -90,7 +90,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 			return carRoutingModule.calcRoute( fromFacility , toFacility , departureTime , person );
 		}
 
-		List<Id> doSpots = getDoSpots(
+		List<Id<Link>> doSpots = getDoSpots(
 				puSpot,
 				d,
 				closeSpots,
@@ -115,7 +115,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 		return Arrays.asList( leg );
 	}
 
-	private static List<Id> getDoSpots(
+	private static List<Id<Link>> getDoSpots(
 			final Link puSpot,
 			final Coord destination,
 			final Collection<Link> closeSpots,
@@ -145,7 +145,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 					}
 				});
 
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<Link>> ids = new ArrayList<>();
 		for (IdWithDistance id : doSpots) {
 			ids.add( id.id );
 		}
@@ -205,10 +205,10 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 	}
 
 	private static class IdWithDistance {
-		private final Id id;
+		private final Id<Link> id;
 		private final double distance;
 
-		private IdWithDistance(final Id id, final double distance) {
+		private IdWithDistance(final Id<Link> id, final double distance) {
 			this.id = id;
 			this.distance = distance;
 		}

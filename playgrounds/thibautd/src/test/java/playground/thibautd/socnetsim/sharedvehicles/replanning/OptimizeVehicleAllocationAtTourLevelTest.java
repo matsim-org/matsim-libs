@@ -30,11 +30,12 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -43,6 +44,7 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -68,7 +70,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 		// create plans
 		int currentId = 0;
 		for (int j=0; j < nMembers; j++) {
-			final Id id = new IdImpl( currentId++ );
+			final Id<Person> id = Id.create( currentId++ , Person.class );
 			final PersonImpl person = new PersonImpl( id );
 
 			final Plan plan = new PlanImpl( person );
@@ -87,14 +89,14 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 			final Plan plan,
 			final Random random) {
 		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
-		final Id homeLinkId = new IdImpl( "versailles" );
+		final Id<Link> homeLinkId = Id.create( "versailles" , Link.class );
 
 		final Activity firstAct = popFact.createActivityFromLinkId( "h" , homeLinkId );
 		firstAct.setEndTime( random.nextDouble() * 24 * 3600d );
 		plan.addActivity( firstAct );
 
 		final Leg l = popFact.createLeg( MODE );
-		l.setRoute( new LinkNetworkRouteImpl( new IdImpl( 1 ) , new IdImpl( 12 ) ) );
+		l.setRoute( new LinkNetworkRouteImpl( Id.create( 1 , Link.class ) , Id.create( 12 , Link.class ) ) );
 		l.setTravelTime( random.nextDouble() * 36000 );
 		plan.addLeg( l );
 
@@ -143,18 +145,18 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 	}
 
 	private VehicleRessources createRessources(final GroupPlans optimized) {
-		final Set<Id> ids = new HashSet<Id>();
+		final Set<Id<Vehicle>> ids = new HashSet<>();
 		final int nVehicles = optimized.getAllIndividualPlans().size() / 2;
 
 		int i = 0;
 		for ( Plan p : optimized.getAllIndividualPlans() ) {
 			if ( i++ == nVehicles ) break;
-			ids.add( p.getPerson().getId() );
+			ids.add( Id.create( p.getPerson().getId() , Vehicle.class ) );
 		}
 
 		return new VehicleRessources() {
 			@Override
-			public Set<Id> identifyVehiclesUsableForAgent(final Id person) {
+			public Set<Id<Vehicle>> identifyVehiclesUsableForAgent(final Id<Person> person) {
 				return ids;
 			}
 		};

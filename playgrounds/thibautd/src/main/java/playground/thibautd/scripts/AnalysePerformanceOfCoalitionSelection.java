@@ -21,7 +21,6 @@ package playground.thibautd.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,7 +31,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -105,7 +103,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i = 0; i < groupSize; i++ ) {
-			group.addPerson( new PersonImpl( new IdImpl( i ) ) );
+			group.addPerson( new PersonImpl( Id.create( i , Person.class ) ) );
 		}
 
 		for ( Person person : group.getPersons() ) {

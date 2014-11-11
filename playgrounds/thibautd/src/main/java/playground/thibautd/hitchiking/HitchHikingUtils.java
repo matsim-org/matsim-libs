@@ -29,7 +29,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,9 +43,9 @@ import org.matsim.core.utils.misc.Counter;
 public class HitchHikingUtils {
 	private HitchHikingUtils() {}
 
-	public static Collection<Id> readFile( final String fileName ) {
+	public static Collection<Id<Link>> readFile( final String fileName ) {
 		BufferedReader reader = IOUtils.getBufferedReader( fileName );
-		List<Id> spots = new ArrayList<Id>();
+		List<Id<Link>> spots = new ArrayList<>();
 
 		try {
 			Counter counter = new Counter( "reading hitch hiking spot # " );
@@ -54,7 +53,7 @@ public class HitchHikingUtils {
 					line != null;
 					line = reader.readLine()) {
 				counter.incCounter();
-				spots.add( new IdImpl( line.trim() ) );
+				spots.add( Id.create( line.trim() , Link.class ) );
 			}
 			counter.printCounter();
 		}

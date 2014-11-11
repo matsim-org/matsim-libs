@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -48,6 +47,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
@@ -58,9 +58,9 @@ public class PlanRouterWithVehicleRessourcesTest {
 	public void testVehicleIdsAreKeptIfSomething() throws Exception {
         final PopulationFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 
-		final Id linkId = new IdImpl( "the_link" );
-		final Id personId = new IdImpl( "somebody" );
-		final Id vehicleId = new IdImpl( "stolen_car" );
+		final Id<Link> linkId = Id.create( "the_link" , Link.class );
+		final Id<Person> personId = Id.create( "somebody" , Person.class );
+		final Id<Vehicle> vehicleId = Id.create( "stolen_car" , Vehicle.class );
 		final Person person = factory.createPerson( personId );
 		final Plan plan = factory.createPlan();
 		person.addPlan( plan );

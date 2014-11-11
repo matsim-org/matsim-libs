@@ -30,7 +30,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -83,12 +82,12 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 						final Attributes atts,
 						final Stack<String> context) {
 					if ( name.equals( "clique" ) ) {
-						currentHousehold = new HouseholdImpl( new IdImpl( atts.getValue( "id" ) ) );
+						currentHousehold = new HouseholdImpl( Id.create( atts.getValue( "id" ) , Household.class ) );
 						currentHousehold.setMemberIds( new ArrayList<Id<Person>>() );
 						((HouseholdsImpl) households).addHousehold( currentHousehold );
 					}
 					if ( name.equals( "person" ) ) {
-						currentHousehold.getMemberIds().add( new IdImpl( atts.getValue( "id" ) ) );
+						currentHousehold.getMemberIds().add( Id.create( atts.getValue( "id" ) , Person.class ) );
 					}
 				}
 
@@ -140,7 +139,7 @@ public class GenerateHouseholdVehiclesBasedOnCarAvailability {
 		for ( Household hh : households.getHouseholds().values() ) {
 			if ( hhsWithSometimes.contains( hh.getId() ) && hh.getVehicleIds().isEmpty() ) {
 				c++;
-				hh.getVehicleIds().add( new IdImpl( "corr-"+hh.getId() ) );
+				hh.getVehicleIds().add( Id.create ( "corr-"+hh.getId() , Vehicle.class ) );
 			}
 		}
 		log.info( "created "+c+" correction vehicles" );
