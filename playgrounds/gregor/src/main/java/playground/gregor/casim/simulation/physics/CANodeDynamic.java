@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -65,7 +66,15 @@ public class CANodeDynamic implements CANode {
 
 	private final double epsilon;
 
+	final ReentrantLock lock = new ReentrantLock();
+
+	private final int threadNR;
+
 	public CANodeDynamic(Node node, CANetworkDynamic net) {
+
+		this.threadNR = MatsimRandom.getRandom().nextInt(
+				CANetworkDynamic.NR_THREADS);
+
 		double width = 0;
 		for (Link l : node.getInLinks().values()) {
 			if (l.getCapacity() > width) {
@@ -470,4 +479,63 @@ public class CANodeDynamic implements CANode {
 		return this.links;
 	}
 
+	@Override
+	public void lock() {
+		this.lock.lock();
+		for (CALinkDynamic l : this.links) {
+			l.lock.lock();
+		}
+
+	}
+
+	@Override
+	public void unlock() {
+		for (CALinkDynamic l : this.links) {
+			l.lock.unlock();
+		}
+		this.lock.unlock();
+
+	}
+
+	@Override
+	public boolean tryLock() {
+		if (!this.lock.tryLock()) {
+			return false;
+		}
+		int locked = 0;
+		for (; locked < this.links.size(); locked++) {
+			CALinkDynamic l = this.links.get(locked);
+			if (!l.lock.tryLock()) {
+				break;
+			}
+		}
+		if (locked < this.links.size()) {
+			for (int i = 0; i < locked; i++) {
+				CALinkDynamic l = this.links.get(i);
+				l.lock.unlock();
+			}
+			this.lock.unlock();
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean isLocked() {
+		if (this.lock.isLocked()) {
+			return true;
+		}
+		for (CALinkDynamic l : this.links) {
+			if (l.isLocked()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int threadNR() {
+		return this.threadNR;
+	}
 }

@@ -21,7 +21,17 @@
 package playground.gregor.casim.simulation.physics;
 
 public interface CANetworkEntity {
-	
+
 	public void handleEvent(CAEvent e);
+
+	public void lock();
+
+	public void unlock();
+
+	public boolean tryLock();
+
+	public boolean isLocked();
+
+	public int threadNR();
 
 }

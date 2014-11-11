@@ -34,11 +34,13 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 	private Id<Vehicle> id;
 	private MobsimDriverAgent agent;
 	private CANetworkEntity currentCANetorkEntity;
+	private final int hash;
 
 	public CAVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent, CALink link) {
 		this.id = vehicleId;
 		this.agent = agent;
 		this.currentCANetorkEntity = link;
+		this.hash = (vehicleId.toString() + "CAVehicle").hashCode();
 	}
 
 	@Override
@@ -90,6 +92,11 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 	public Link getCurrentLink() {
 		return null;
 	}
+
+	// @Override
+	// public int hashCode() {
+	// return hash;
+	// }
 
 	// /////////////////////////////////////
 

@@ -174,8 +174,8 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		parts[pos + 5] = createAgent(links, "8", pos + 5, dir, caLink);
 		parts[pos + 10] = createAgent(links, "9", pos + 10, dir, caLink);
 		parts[pos + 11] = createAgent(links, "10", pos + 11, dir, caLink);
-		parts[pos + CANetworkDynamic.MX_TRAVERSE + 1] = createAgent(links,
-				"11", pos + CANetworkDynamic.MX_TRAVERSE + 1, dir, caLink);
+		parts[pos + CASimDensityEstimator.MX_TRAVERSE + 1] = createAgent(links,
+				"11", pos + CASimDensityEstimator.MX_TRAVERSE + 1, dir, caLink);
 		for (int i = 0; i < parts.length; i++) {
 			if (parts[i] != null) {
 				caNet.registerAgent(parts[i]);
@@ -379,13 +379,12 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		em.addHandler(m);
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em, null);
 
-		//
-		// //DEBUG
-		// //VIS only
-		// CASimDynamicExperiment_ZhangJ2011.VIS = true;
+		// // DEBUG
+		// // VIS only
+		// CANetworkDynamic.EMIT_VIS_EVENTS = true;
 		// Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
 		// Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-		// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+		// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
 		// sc.getConfig().global().setCoordinateSystem("EPSG:3395");
 		// EventBasedVisDebuggerEngine vis = new
 		// EventBasedVisDebuggerEngine(sc);

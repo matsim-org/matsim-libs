@@ -20,6 +20,8 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -27,6 +29,8 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.simulation.CANetsimEngine;
@@ -75,12 +79,22 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 	private double ratio;
 	private final double epsilon;
 
+	final ReentrantLock lock = new ReentrantLock();
+
+	private final int threadNr;
+
+	private static int EXP_WARN_CNT = 0;
+
 	public CALinkDynamic(Link dsl, Link usl, CANodeDynamic ds,
 			CANodeDynamic us, CANetworkDynamic net) {
+
+		this.threadNr = MatsimRandom.getRandom().nextInt(
+				CANetworkDynamic.NR_THREADS);
 
 		this.width = dsl.getCapacity();// TODO this is a misuse of the link's
 										// capacity attribute. Needs to be
 										// fixed!
+
 		this.ratio = CANetworkDynamic.PED_WIDTH / this.width;
 		this.cellLength = this.ratio
 				/ (CANetworkDynamic.RHO_HAT * CANetworkDynamic.PED_WIDTH);
@@ -735,8 +749,13 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 			}
 		}
 		if (pos == -1) {
-			log.warn("could not find a free spot for agent: " + veh
-					+ ". Dropping it!");
+			if (EXP_WARN_CNT++ < 10) {
+				log.warn("could not find a free spot for agent: " + veh
+						+ ". Dropping it!");
+				if (EXP_WARN_CNT == 10) {
+					log.info(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
 
 			this.net.getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(),
@@ -758,11 +777,12 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 			fireDownstreamEntered(veh, now);
 		}
 
+		double rnd = MatsimRandom.getRandom().nextDouble() / 100.;
 		if (this.particles[pos + dir] == null) {
-			triggerTTA(veh, this, now + tFree);
+			triggerTTA(veh, this, now + tFree + rnd);
 		} else if (this.particles[pos + dir].getDir() != dir) {
 			triggerSWAP(veh, this, now + getD(this.particles[pos + dir])
-					+ tFree);
+					+ tFree + rnd);
 		}
 
 		// VIS only
@@ -811,4 +831,54 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 
 	}
 
+	@Override
+	public void lock() {
+		this.ds.lock.lock();
+		this.us.lock.lock();
+		this.lock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		this.ds.lock.unlock();
+		this.us.lock.unlock();
+		this.lock.unlock();
+	}
+
+	@Override
+	public boolean tryLock() {
+		if (!this.ds.lock.tryLock()) {
+			return false;
+		}
+		if (!this.us.lock.tryLock()) {
+			this.ds.lock.unlock();
+			return false;
+		}
+
+		if (!this.lock.tryLock()) {
+			this.ds.lock.unlock();
+			this.us.lock.unlock();
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isLocked() {
+		if (this.ds.lock.isLocked()) {
+			return true;
+		}
+		if (this.us.lock.isLocked()) {
+			return true;
+		}
+		if (this.lock.isLocked()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int threadNR() {
+		return this.threadNr;
+	}
 }

@@ -29,7 +29,7 @@ package playground.gregor.casim.simulation.physics;
 public class CAEvent implements Comparable<CAEvent> {
 
 	public enum CAEventType {
-		SWAP, TTA, TTE
+		SWAP, TTA, TTE, END_OF_FRAME, END_OF_SIM
 	};
 
 	private final double time;
@@ -38,12 +38,10 @@ public class CAEvent implements Comparable<CAEvent> {
 	private final CAEventType type;
 	public long cnt;
 	private boolean isObsolete = false;
+	private boolean innerLockOnly;
 
 	public CAEvent(double time, CAMoveableEntity agent, CANetworkEntity entity,
 			CAEventType type) {
-		if (Double.isNaN(time)) {
-			throw new RuntimeException("NaN");
-		}
 		this.time = time;
 		this.agent = agent;
 		this.entity = entity;
@@ -118,5 +116,27 @@ public class CAEvent implements Comparable<CAEvent> {
 
 	public boolean isObsolete() {
 		return this.isObsolete;
+	}
+
+	public boolean tryLock() {
+		if (this.entity instanceof CALinkDynamic) {
+			if (this.agent.getPos() > 1
+					&& this.agent.getPos() < ((CALinkDynamic) this.entity)
+							.getSize() - 2) {
+				this.innerLockOnly = true;
+				return ((CALinkDynamic) this.entity).lock.tryLock();
+			}
+
+		}
+		return this.entity.tryLock();
+	}
+
+	public void unlock() {
+		if (this.innerLockOnly) {
+			((CALinkDynamic) this.entity).lock.unlock();
+
+		} else {
+			this.entity.unlock();
+		}
 	}
 }

@@ -100,11 +100,10 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 	}
 
 	public static void main(String[] args) throws IOException {
-
 		double timeOffset = 0;
 
 		for (int R = 6; R <= 6; R++) {
-			CANetworkDynamic.LOOK_AHEAD = R;
+			CASimDensityEstimator.LOOK_AHEAD = R;
 			try {
 				bw2 = new BufferedWriter(new FileWriter(new File(
 						"/Users/laemmel/devel/bipedca/plot_dynamicIII/sp_avg_zhangJ2012"

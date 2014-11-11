@@ -29,7 +29,6 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.gregor.casim.simulation.physics.CALink;
 import playground.gregor.casim.simulation.physics.CANetworkDynamic;
 import playground.gregor.casim.simulation.physics.CAVehicle;
 
@@ -71,9 +70,8 @@ public class CANetsimEngine implements MobsimEngine {
 	@Override
 	public void afterSim() {
 		log.info("after sim");
-		for (CALink caLink : this.caNet.getLinks().values()) {
-			caLink.reset();
-		}
+
+		this.caNet.afterSim();
 
 	}
 
