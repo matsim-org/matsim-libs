@@ -55,6 +55,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	private final List<Id<Vehicle>> hdvVehicles = new ArrayList<Id<Vehicle>>();
 	
 	private Scenario scenario;
+	private NoiseParameters noiseParams;
 		
 	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEvents = new HashMap<Id<Link>, List<LinkEnterEvent>>();
 	private Map<Id<Link>,List<LinkEnterEvent>> linkId2linkEnterEventsCar = new HashMap<Id<Link>, List<LinkEnterEvent>>();
@@ -67,8 +68,9 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	// output
 	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id<Link>, Map<Double,Double>>();
 	
-	public NoiseEmissionHandler (Scenario scenario) {
+	public NoiseEmissionHandler (Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
+		this.noiseParams = noiseParams;
 	}
 
 	@Override
@@ -152,7 +154,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			double vHdv = vCar;
 			
 			// time interval
-			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				double noiseEmission = 0.;
 
 				int n_car = linkId2timeInterval2numberOfLinkEnterCars.get(linkId).get(timeInterval);
@@ -167,10 +169,10 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				if(!(n == 0)) {
 					
 					// correction for a sample, multiplicate the scale factor
-					n = (int) (n * (NoiseConfigParameters.getScaleFactor()));
+					n = (int) (n * (noiseParams.getScaleFactor()));
 					
 					// correction for intervals unequal to 3600 seconds (= one hour)
-					n = (int) (n * (3600. / NoiseConfigParameters.getTimeBinSizeNoiseComputation()));
+					n = (int) (n * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
 					
 					double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 					double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
@@ -193,7 +195,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			Map<Double, Integer> timeInterval2linkEnterVehicleIDsHdv = new HashMap<Double, Integer>();
 			
 			// time interval
-			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
 				
 				// initialize			
 				timeInterval2linkEnterVehicleIDs.put(timeInterval, new ArrayList<Id<Vehicle>>());
@@ -210,10 +212,10 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 					double time = event.getTime();
 					double timeInterval = 0.;
 					
-					if ( (time % NoiseConfigParameters.getTimeBinSizeNoiseComputation()) == 0) {
+					if ( (time % noiseParams.getTimeBinSizeNoiseComputation()) == 0) {
 						timeInterval = time;
 					} else {
-						timeInterval = (( (int) ( time / NoiseConfigParameters.getTimeBinSizeNoiseComputation()) ) * NoiseConfigParameters.getTimeBinSizeNoiseComputation() ) + NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+						timeInterval = (( (int) ( time / noiseParams.getTimeBinSizeNoiseComputation()) ) * noiseParams.getTimeBinSizeNoiseComputation() ) + noiseParams.getTimeBinSizeNoiseComputation();
 					}
 					
 					List<Id<Vehicle>> linkEnterVehicleIDs = timeInterval2linkEnterVehicleIDs.get(timeInterval);
@@ -230,10 +232,10 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 					double time = event.getTime();
 					double timeInterval = 0.;
 					
-					if ( (time % NoiseConfigParameters.getTimeBinSizeNoiseComputation() ) == 0) {
+					if ( (time % noiseParams.getTimeBinSizeNoiseComputation() ) == 0) {
 						timeInterval = time;
 					} else {
-						timeInterval = (( (int) ( time / NoiseConfigParameters.getTimeBinSizeNoiseComputation()) ) * NoiseConfigParameters.getTimeBinSizeNoiseComputation() ) + NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+						timeInterval = (( (int) ( time / noiseParams.getTimeBinSizeNoiseComputation()) ) * noiseParams.getTimeBinSizeNoiseComputation() ) + noiseParams.getTimeBinSizeNoiseComputation();
 					}
 					
 					int newNumberOfLinkEnterCars = timeInterval2linkEnterVehicleIDsCar.get(timeInterval) + 1;
@@ -249,10 +251,10 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 					double time = event.getTime();
 					double timeInterval = 0.;
 					
-					if ((time % NoiseConfigParameters.getTimeBinSizeNoiseComputation()) == 0) {
+					if ((time % noiseParams.getTimeBinSizeNoiseComputation()) == 0) {
 						timeInterval = time;
 					} else {
-						timeInterval = (( (int)(time/NoiseConfigParameters.getTimeBinSizeNoiseComputation()) ) * NoiseConfigParameters.getTimeBinSizeNoiseComputation() ) + NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+						timeInterval = (( (int)(time/noiseParams.getTimeBinSizeNoiseComputation()) ) * noiseParams.getTimeBinSizeNoiseComputation() ) + noiseParams.getTimeBinSizeNoiseComputation();
 					}
 					int newNumberOfLinkEnterCars = timeInterval2linkEnterVehicleIDsHdv.get(timeInterval) + 1;
 					timeInterval2linkEnterVehicleIDsHdv.put(timeInterval, newNumberOfLinkEnterCars);
@@ -276,25 +278,25 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			bw.newLine();
 			
 			List<Double> day = new ArrayList<Double>();
-			for(double timeInterval = 6 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 6 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				day.add(timeInterval);
 			}
 			List<Double> night = new ArrayList<Double>();
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				if(!(day.contains(timeInterval))) {
 					night.add(timeInterval);
 				}
 			}
 			
 			List<Double> peak = new ArrayList<Double>();
-			for(double timeInterval = 7 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 7 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
-			for(double timeInterval = 15 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 15 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
 			List<Double> offPeak = new ArrayList<Double>();
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
 				if(!(peak.contains(timeInterval))) {
 					offPeak.add(timeInterval);
 				}
@@ -391,7 +393,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			// column headers
 			bw.write("link");
 			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1) * NoiseConfigParameters.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
 				bw.write(";demand " + time + ";noise emission " + time);
 			}
 			bw.newLine();
@@ -399,7 +401,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			for (Id<Link> linkId : this.linkId2timeInterval2noiseEmission.keySet()){
 				bw.write(linkId.toString()); 
 				for(int i = 0 ; i < 30 ; i++) {
-					bw.write(";"+ ((linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get((i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation()).size()) * NoiseConfigParameters.getScaleFactor()) + ";"+linkId2timeInterval2noiseEmission.get(linkId).get((i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation()));	
+					bw.write(";"+ ((linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get((i+1) * noiseParams.getTimeBinSizeNoiseComputation()).size()) * noiseParams.getScaleFactor()) + ";" + linkId2timeInterval2noiseEmission.get(linkId).get((i+1) * noiseParams.getTimeBinSizeNoiseComputation()));	
 				}
 				bw.newLine();
 			}

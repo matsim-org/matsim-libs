@@ -58,7 +58,7 @@ public class NoiseDamageCalculation {
 	
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEquations noiseImmissionCalculator;
-	private double annualCostRate;
+	private NoiseParameters noiseParams;
 		
 	// from emission handler
 	private List<Id<Vehicle>> hdvVehicles;
@@ -93,10 +93,11 @@ public class NoiseDamageCalculation {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, double annualCostRate, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;
+		this.noiseParams = noiseParams;
 		this.noiseImmissionCalculator = new NoiseEquations();
 		
 		this.hdvVehicles = noiseEmissionHandler.getHdvVehicles();
@@ -110,15 +111,7 @@ public class NoiseDamageCalculation {
 		
 		this.receiverPointId2timeInterval2noiseImmission = noiseImmission.getReceiverPointId2timeInterval2noiseImmission();
 		this.receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = noiseImmission.getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
-				
-		if (annualCostRate == 0.) {
-			throw new RuntimeException("Annual cost rate is zero. Aborting...");
-
-		} else {
-			log.info("Setting annual noise cost rate to " + annualCostRate);
-			this.annualCostRate = annualCostRate;
-		}
-		
+						
 		this.collectNoiseEvents = true;
 	}
 	
@@ -210,11 +203,11 @@ public class NoiseDamageCalculation {
 		
 		double damageCosts = 0.;
 		if (dayOrNight == "DAY"){
-			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
 		} else if (dayOrNight == "EVENING"){
-			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
 		} else if (dayOrNight == "NIGHT"){
-			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
 		} else {
 			throw new RuntimeException("Neither day nor night. Aborting...");
 		}
@@ -260,7 +253,7 @@ public class NoiseDamageCalculation {
 			
 			Map<Double,Map<Id<Link>,Double>> timeIntervals2noiseLinks2costShare = new HashMap<Double, Map<Id<Link>,Double>>();
 			
-			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+			for (double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 				
 				Map<Id<Link>,Double> noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval);
 				Map<Id<Link>,Double> noiseLinks2costShare = new HashMap<Id<Link>, Double>();
@@ -290,7 +283,7 @@ public class NoiseDamageCalculation {
 		//summing up the link-based-costs
 		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 				timeInterval2damageCost.put(timeInterval, 0.);
 			}
 			linkId2timeInterval2damageCost.put(linkId, timeInterval2damageCost);
@@ -303,7 +296,7 @@ public class NoiseDamageCalculation {
 				log.info("receiver point # " + counter);
 			}
 			for(Id<Link> linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
-				for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+				for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 					if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
 						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
 						linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
@@ -328,7 +321,7 @@ public class NoiseDamageCalculation {
 			Map<Double,Double> timeInterval2damageCostPerCar = new HashMap<Double, Double>();
 			Map<Double,Double> timeInterval2damageCostPerHdvVehicle = new HashMap<Double, Double>();
 			
-			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+			for (double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 				
 				double damageCostSum = 0.;
 				
@@ -388,9 +381,9 @@ public class NoiseDamageCalculation {
 	private void throwNoiseEventsCaused() {
 		
 		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
-				double amountCar = (linkId2timeInterval2damageCostPerCar.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
-				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
+			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
+				double amountCar = (linkId2timeInterval2damageCostPerCar.get(linkId).get(timeInterval))/(this.noiseParams.getScaleFactor());
+				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(this.noiseParams.getScaleFactor());
 								
 				// calculate shares for the affected Agents
 				for(Id<Vehicle> id : linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get(timeInterval)) {
@@ -439,7 +432,7 @@ public class NoiseDamageCalculation {
 			for (Id<Person> personId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).keySet()) {
 				for (int actNumber : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).keySet()) {
 					
-					for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+					for (double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 						double factor = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst();
 						if (!(factor == 0.)) {
 							
@@ -481,25 +474,25 @@ public class NoiseDamageCalculation {
 			bw.newLine();
 			
 			List<Double> day = new ArrayList<Double>();
-			for(double timeInterval = 6 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 6 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
 				day.add(timeInterval);
 			}
 			List<Double> night = new ArrayList<Double>();
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
 				if(!(day.contains(timeInterval))) {
 					night.add(timeInterval);
 				}
 			}
 			
 			List<Double> peak = new ArrayList<Double>();
-			for(double timeInterval = 7 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 7 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
-			for(double timeInterval = 15 * 3600 + NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 15 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
 			List<Double> offPeak = new ArrayList<Double>();
-			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
 				if(!(peak.contains(timeInterval))) {
 					offPeak.add(timeInterval);
 				}
@@ -596,7 +589,7 @@ public class NoiseDamageCalculation {
 			// column headers
 			bw.write("receiver point");
 			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1)*NoiseConfigParameters.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				String time = Time.writeTime( (i+1) * this.noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
 				bw.write(";agent units " + time + ";noise immission " + time);
 			}
 			bw.newLine();
@@ -605,7 +598,7 @@ public class NoiseDamageCalculation {
 			for (Id<ReceiverPoint> rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
 				bw.write(rpId.toString());
 				for(int i = 0 ; i < 30 ; i++) {
-					double timeInterval = (i+1) * NoiseConfigParameters.getTimeBinSizeNoiseComputation();
+					double timeInterval = (i+1) * this.noiseParams.getTimeBinSizeNoiseComputation();
 					double affectedAgentUnits = 0.;
 					double noiseImmission = 0.;
 					

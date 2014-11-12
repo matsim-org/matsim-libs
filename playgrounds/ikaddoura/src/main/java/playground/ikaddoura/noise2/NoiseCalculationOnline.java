@@ -39,30 +39,33 @@ import org.matsim.core.controler.listener.StartupListener;
 public class NoiseCalculationOnline implements AfterMobsimListener , IterationEndsListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
-	final double annualCostRate = NoiseConfigParameters.getAnnualCostRate();
-
+	private NoiseParameters noiseParameters;
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
 	private NoiseDamageCalculation noiseDamageCosts;
 	
+	public NoiseCalculationOnline(NoiseParameters noiseParameters) {
+		this.noiseParameters = noiseParameters;
+	}
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
 		log.info("Initialization...");
 		
-		this.spatialInfo = new NoiseSpatialInfo(event.getControler().getScenario());
+		this.spatialInfo = new NoiseSpatialInfo(event.getControler().getScenario(), noiseParameters);
 		this.spatialInfo.setActivityCoords();
 		this.spatialInfo.setReceiverPoints();
 		this.spatialInfo.setActivityCoord2NearestReceiverPointId();
 		this.spatialInfo.setRelevantLinkIds();
 		this.spatialInfo.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
-		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario());
+		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		this.noiseEmissionHandler.setHdvVehicles(null);
 		
-		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.spatialInfo);
+		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.spatialInfo, noiseParameters);
 
 		log.info("Initialization... Done.");
 		
@@ -83,7 +86,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");
-		this.noiseImmission = new NoiseImmissionCalculation(this.spatialInfo, this.noiseEmissionHandler);
+		this.noiseImmission = new NoiseImmissionCalculation(this.spatialInfo, this.noiseEmissionHandler, noiseParameters);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -97,7 +100,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		log.info("Calculating each agent's activity durations... Done.");
 				
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		

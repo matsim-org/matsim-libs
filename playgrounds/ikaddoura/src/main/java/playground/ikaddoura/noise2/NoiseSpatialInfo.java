@@ -67,6 +67,7 @@ public class NoiseSpatialInfo {
 	private static final Logger log = Logger.getLogger(NoiseSpatialInfo.class);
 			
 	private Scenario scenario;
+	private NoiseParameters noiseParams;
 	private Map<Id<Person>, List<Coord>> personId2listOfCoords = new HashMap<>();
 	private List <Coord> allActivityCoords = new ArrayList <Coord>();
 	
@@ -91,8 +92,9 @@ public class NoiseSpatialInfo {
 	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermDs = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermAngle = new HashMap<>();
 				
-	public NoiseSpatialInfo(Scenario scenario) {
+	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
+		this.noiseParams = noiseParams;
 	}	
 	
 	public void setActivityCoords () {
@@ -154,8 +156,8 @@ public class NoiseSpatialInfo {
 		int counter = 0;
 		
 		// a grid of receiver points
-		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - NoiseConfigParameters.getReceiverPointGap() ; y = y - NoiseConfigParameters.getReceiverPointGap()) {
-			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + NoiseConfigParameters.getReceiverPointGap() ; x = x + NoiseConfigParameters.getReceiverPointGap()) {
+		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
+			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
 				Coord coord = new CoordImpl(x, y);
 				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
 				receiverPointId2Coord.put(rpId, coord);
@@ -184,8 +186,8 @@ public class NoiseSpatialInfo {
 		int counter = 0;
 		
 		// a grid of receiver points
-		for (double y = yMax + 100. ; y > yMin - 100. - NoiseConfigParameters.getReceiverPointGap() ; y = y - NoiseConfigParameters.getReceiverPointGap()) {
-			for (double x = xMin - 100. ; x < xMax + 100. + NoiseConfigParameters.getReceiverPointGap() ; x = x + NoiseConfigParameters.getReceiverPointGap()) {
+		for (double y = yMax + 100. ; y > yMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
+			for (double x = xMin - 100. ; x < xMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
 				Coord coord = new CoordImpl(x, y);
 				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
 				receiverPointId2Coord.put(rpId, coord);
@@ -324,8 +326,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (NoiseConfigParameters.getRelevantRadius() / 1.));	
-		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / NoiseConfigParameters.getRelevantRadius() / 1.);
+		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (noiseParams.getRelevantRadius() / 1.));	
+		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / noiseParams.getRelevantRadius() / 1.);
 		
 		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
@@ -458,7 +460,7 @@ public class NoiseSpatialInfo {
 						}
 					}
 					
-					if (distance < NoiseConfigParameters.getRelevantRadius()){
+					if (distance < noiseParams.getRelevantRadius()){
 						
 						relevantLinkIds.add(linkId);
 						
@@ -505,7 +507,7 @@ public class NoiseSpatialInfo {
 		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			
 			// split up the link into link segments with the following length
-			double partLength = 0.25 * NoiseConfigParameters.getRelevantRadius();
+			double partLength = 0.25 * noiseParams.getRelevantRadius();
 			int parts = (int) ((scenario.getNetwork().getLinks().get(linkId).getLength())/(partLength));
 
 			double fromX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
@@ -627,8 +629,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMin) / (NoiseConfigParameters.getReceiverPointGap()/1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / NoiseConfigParameters.getReceiverPointGap()/1.);
+		int xDirection = (int) ((xCoord - xCoordMin) / (noiseParams.getReceiverPointGap() / 1.));	
+		int yDirection = (int) ((yCoordMax - yCoord) / noiseParams.getReceiverPointGap() / 1.);
 		
 		Tuple<Integer, Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;

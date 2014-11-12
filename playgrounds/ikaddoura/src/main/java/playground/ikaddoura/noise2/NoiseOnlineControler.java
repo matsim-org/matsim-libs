@@ -24,6 +24,7 @@ package playground.ikaddoura.noise2;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -34,21 +35,45 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
  */
 
 public class NoiseOnlineControler {
-	
+	private static final Logger log = Logger.getLogger(NoiseOnlineControler.class);
+
 	private static String configFile;
+	private static double receiverPointGap;
+	private static double scaleFactor;
+	
 	public static void main(String[] args) throws IOException {
 		
-		configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/noiseTestScenario/input/config.xml";
-		
+		if (args.length > 0) {
+			
+			configFile = args[0];
+			log.info("Config file: " + configFile);
+			
+			receiverPointGap = Double.valueOf(args[1]);		
+			log.info("Receiver point gap: " + receiverPointGap);
+			
+			scaleFactor = Double.valueOf(args[2]);		
+			log.info("Population scale factor: " + scaleFactor);
+			
+		} else {
+			
+			configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/noiseTestScenario/input/config.xml";
+			receiverPointGap = 250.;
+			scaleFactor = 1.;
+		}
+				
 		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
 		noiseImmissionControler.run(configFile);
 	}
 
 	private void run(String configFile) {
 		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setReceiverPointGap(receiverPointGap);
+		noiseParameters.setScaleFactor(scaleFactor);
+		
 		Controler controler = new Controler(configFile);
 		
-		controler.addControlerListener(new NoiseCalculationOnline());
+		controler.addControlerListener(new NoiseCalculationOnline(noiseParameters));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);

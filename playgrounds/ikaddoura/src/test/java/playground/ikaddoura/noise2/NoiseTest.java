@@ -56,7 +56,7 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		NoiseSpatialInfo noiseSpatialInfo = new NoiseSpatialInfo(scenario);
+		NoiseSpatialInfo noiseSpatialInfo = new NoiseSpatialInfo(scenario, new NoiseParameters());
 		
 		noiseSpatialInfo.setActivityCoords();
 		
@@ -128,7 +128,7 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config2.xml";
 
 		Controler controler = new Controler(configFile);
-		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline();
+		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline(new NoiseParameters());
 		controler.addControlerListener(noiseControlerListener);
 		
 		controler.setOverwriteFiles(true);
