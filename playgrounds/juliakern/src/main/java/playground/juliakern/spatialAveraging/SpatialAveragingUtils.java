@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.juliakern.spatialAveraging;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -27,6 +30,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 
 import com.vividsolutions.jts.util.Assert;
 
@@ -48,6 +54,19 @@ public class SpatialAveragingUtils {
 	double area_in_smoothing_circle_sqkm;
 	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
+	
+	public SpatialAveragingUtils(SpatialAveragingInputData said, SpatialAveragingParameters sap){
+		xMin = said.getMinX();
+		xMax = said.getMaxX();
+		yMin = said.getMinY();
+		yMax = said.getMaxY();
+		noOfXbins = sap.getNoOfXbins();
+		noOfYbins = sap.getNoOfYbins();
+		smoothinRadiusSquared_m = sap.getSmoothingRadiusSquared_m();
+		area_in_smoothing_circle_sqkm = sap.getAreaInSmoothingCirleSqKM();
+		featuresInVisBoundary = ShapeFileReader.getAllFeatures(sap.getVisBoundaryShapeFile());
+		targetCRS = sap.getTargetCRS();
+	}
 	
 	public SpatialAveragingUtils(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
 		this.xMin = xMin;
@@ -127,5 +146,41 @@ public class SpatialAveragingUtils {
 	
 	public int getYbin(double y){
 		return this.mapYCoordToBin(y);
+	}
+	void writeRoutput(Double[][] normalizedUserBenefitsBaseCase, String outputPathForR) {
+		try {
+			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
+			String valueString = new String();
+			valueString = "\t";
+
+			//x-coordinates as first row
+			for(int xIndex = 0; xIndex < normalizedUserBenefitsBaseCase.length; xIndex++){
+				valueString += findBinCenterX(xIndex) + "\t";
+			}
+			buffW.write(valueString);
+			buffW.newLine();
+			valueString = new String();
+
+			for(int yIndex = 0; yIndex < normalizedUserBenefitsBaseCase[0].length; yIndex++){
+				//y-coordinates as first column
+				valueString += findBinCenterY(yIndex) + "\t";
+				//table contents
+				for(int xIndex = 0; xIndex < normalizedUserBenefitsBaseCase.length; xIndex++){ 
+					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+//					if(isInVisBoundary(cellCentroid)){
+						valueString += Double.toString(normalizedUserBenefitsBaseCase[xIndex][yIndex]) + "\t"; 
+//					} else {
+//						valueString += "NA" + "\t";
+//					}
+				}
+				buffW.write(valueString);
+				buffW.newLine();
+				valueString = new String();
+			}
+			buffW.close();	
+		} catch (IOException e) {
+			throw new RuntimeException("Failed writing output for R. Reason: " + e);
+		}	
+		logger.info("Finished writing output for R to " + outputPathForR);
 	}
 }
