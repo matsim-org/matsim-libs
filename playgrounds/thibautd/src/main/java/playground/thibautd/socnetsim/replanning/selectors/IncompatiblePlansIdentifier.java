@@ -37,24 +37,24 @@ import playground.thibautd.socnetsim.population.JointPlans;
  *
  * @author thibautd
  */
-public abstract class IncompatiblePlansIdentifier {
+public abstract class IncompatiblePlansIdentifier<T> {
 	/**
 	 * @param plan the plan for which the incompatible plans are to identify
 	 * @return a collection containing ids of "incompatibility groups".
 	 * Two plans are considered incompatible if they have at least one group
 	 * in common.
 	 */
-	public abstract Set<Id> identifyIncompatibilityGroups(Plan plan);
+	public abstract Set<Id<T>> identifyIncompatibilityGroups(Plan plan);
 
-	public Set<Id> identifyIncompatibilityGroups(final JointPlan jp) {
-		final Set<Id> groups = new HashSet<Id>();
+	public Set<Id<T>> identifyIncompatibilityGroups(final JointPlan jp) {
+		final Set<Id<T>> groups = new HashSet<>();
 		for ( Plan p : jp.getIndividualPlans().values() ) {
 			groups.addAll( identifyIncompatibilityGroups( p ) );
 		}
 		return groups;
 	}
 
-	public Set<Id> identifyIncompatibilityGroups(final JointPlans jointPlans, final Plan plan) {
+	public Set<Id<T>> identifyIncompatibilityGroups(final JointPlans jointPlans, final Plan plan) {
 		final JointPlan jp = jointPlans.getJointPlan( plan );
 		return jp == null ?
 			identifyIncompatibilityGroups( plan ) :

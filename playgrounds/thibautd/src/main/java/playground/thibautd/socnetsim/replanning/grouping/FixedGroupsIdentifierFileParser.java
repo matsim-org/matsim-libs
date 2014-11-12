@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.utils.AbstractParsePullXmlReader;
@@ -45,9 +45,9 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 	protected  FixedGroupsIdentifier parse(
 			final XMLStreamReader streamReader) throws XMLStreamException {
 		final Counter counter = new Counter( "parsing group # " );
-		final List<Collection<Id>> groups = new ArrayList<Collection<Id>>();
+		final List<Collection<Id<Person>>> groups = new ArrayList<>();
 
-		List<Id> currentGroup = new ArrayList<Id>();
+		List<Id<Person>> currentGroup = new ArrayList<>();
 		groups.add( currentGroup );
 		while ( streamReader.hasNext() ) {
 			if ( streamReader.next() != XMLStreamConstants.START_ELEMENT ) continue;
@@ -55,12 +55,12 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 			if ( streamReader.getLocalName().equals( "clique" ) && 
 					currentGroup.size() > 0 ) {
 				counter.incCounter();
-				currentGroup = new ArrayList<Id>();
+				currentGroup = new ArrayList<>();
 				groups.add( currentGroup );
 			}
 
 			if ( streamReader.getLocalName().equals( "person" ) ) {
-				currentGroup.add( parseId( streamReader ) );
+				currentGroup.add( parseId( streamReader , Person.class ) );
 			}
 		}
 		counter.printCounter();
@@ -68,7 +68,7 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 		return new FixedGroupsIdentifier( groups );
 	}
 
-	private static Id parseId(final XMLStreamReader streamReader) {
+	private static <T> Id<T> parseId(final XMLStreamReader streamReader, Class<T> idType ) {
 		if ( streamReader.getAttributeCount() != 1 ) {
 			throw new ParsingException( "unexpected attribute count "+streamReader.getAttributeCount() );
 		}
@@ -77,7 +77,7 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 			throw new ParsingException( "unexpected attribute name "+streamReader.getAttributeLocalName( 0 ) );
 		}
 
-		return new IdImpl( streamReader.getAttributeValue( 0 ).intern() );
+		return Id.create( streamReader.getAttributeValue( 0 ).intern() , idType);
 	}
 }
 

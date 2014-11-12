@@ -30,10 +30,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -113,8 +113,8 @@ public class FixedGroupsTest {
 		for (int i=0; i < 100; i++) {
 			scenario.getPopulation().addPerson(
 					new PersonImpl(
-						new IdImpl(
-							"garbage-"+random.nextInt(999999)+"-"+i )));
+						Id.create(
+							"garbage-"+random.nextInt(999999)+"-"+i , Person.class )));
 		}
 		return scenario.getPopulation();
 	}

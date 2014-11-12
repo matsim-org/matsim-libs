@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -112,7 +111,7 @@ public class SocialNetworkIOTest {
 		final List<Id> ids = new ArrayList<Id>( nEgos );
 
 		for ( int i=0; i < nEgos; i++ ) {
-			final Id id = new IdImpl( i );
+			final Id<Person> id = Id.create( i , Person.class );
 			sn.addEgo( id );
 			ids.add( id );
 		}

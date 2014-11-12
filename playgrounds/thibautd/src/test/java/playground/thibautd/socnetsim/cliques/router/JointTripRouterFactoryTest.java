@@ -30,13 +30,13 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
@@ -76,14 +76,14 @@ public class JointTripRouterFactoryTest {
 	}
 
 	private static Scenario createScenario() {
-		Id node1 = new IdImpl( "node1" );
-		Id node2 = new IdImpl( "node2" );
-		Id node3 = new IdImpl( "node3" );
-		Id node4 = new IdImpl( "node4" );
+		Id<Node> node1 = Id.create( "node1" , Node.class );
+		Id<Node> node2 = Id.create( "node2" , Node.class );
+		Id<Node> node3 = Id.create( "node3" , Node.class );
+		Id<Node> node4 = Id.create( "node4" , Node.class );
 
-		Id link1 = new IdImpl( "link1" );
-		Id link2 = new IdImpl( "link2" );
-		Id link3 = new IdImpl( "link3" );
+		Id<Link> link1 = Id.create( "link1" , Link.class );
+		Id<Link> link2 = Id.create( "link2" , Link.class );
+		Id<Link> link3 = Id.create( "link3" , Link.class );
 
 		Scenario sc = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig() );
@@ -98,8 +98,8 @@ public class JointTripRouterFactoryTest {
 		net.createAndAddLink( link3 , node3inst , node4inst , 1 , 1 , 1 , 1 );
 
 		Population pop = sc.getPopulation();
-		Id driverId = new IdImpl( "driver" );
-		Id passengerId = new IdImpl( "passenger" );
+		Id<Person> driverId = Id.create( "driver" , Person.class );
+		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
 		PersonImpl pers = new PersonImpl( driverId );

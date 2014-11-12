@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -70,9 +70,9 @@ public class DumpSizeOfSelectedJointPlans {
 				}
 				if ( name.equals( "individualPlan" ) ) {
 					size++;
-					final Id id = new IdImpl(
+					final Id id = Id.create(
 									atts.getValue(
-										"personId" ).trim() );
+										"personId" ).trim() , Person.class );
 					final Integer selectedIndex = selectedIndices.get( id );
 					persons.add( id );
 					if ( selectedIndex.equals(
@@ -120,7 +120,7 @@ public class DumpSizeOfSelectedJointPlans {
 
 		final Counter counter = new Counter( "parse person # " );
 		new MatsimXmlParser() {
-			private Id currentAgent = null;
+			private Id<Person> currentAgent = null;
 			private int currIndex = -1;
 
 			@Override
@@ -130,7 +130,7 @@ public class DumpSizeOfSelectedJointPlans {
 					final Stack<String> context) {
 				if ( name.equals( "person" ) ) {
 					counter.incCounter();
-					currentAgent = new IdImpl( atts.getValue( "id" ).trim() );
+					currentAgent = Id.create( atts.getValue( "id" ).trim() , Person.class );
 					currIndex = -1;
 				}
 				if ( name.equals( "plan" ) ) {

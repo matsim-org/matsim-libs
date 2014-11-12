@@ -25,18 +25,16 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 
 /**
  * @author thibautd
@@ -54,7 +52,7 @@ public class DynamicGroupIdentifierTest {
 		final int nPersons = 100;
 
 		for ( int i=0; i < nPersons; i++ ) {
-			final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i ) );
+			final Person p = scenario.getPopulation().getFactory().createPerson( Id.create( "person-"+i , Person.class ) );
 			scenario.getPopulation().addPerson( p );
 		}
 
@@ -75,7 +73,7 @@ public class DynamicGroupIdentifierTest {
 		final int nPersons = 100;
 
 		for ( int i=0; i < nPersons; i++ ) {
-			final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i ) );
+			final Person p = scenario.getPopulation().getFactory().createPerson( Id.create( "person-"+i , Person.class ) );
 			scenario.getPopulation().addPerson( p );
 		}
 

@@ -31,10 +31,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -48,9 +48,6 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
-import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
-import playground.thibautd.socnetsim.replanning.modules.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -106,21 +103,21 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
 		for (int i=0; i < 100; i++) {
-			Id driverId = new IdImpl( "driver"+i );
+			Id driverId = Id.create( "driver"+i , Person.class );
 			Person person = new PersonImpl( driverId );
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
-			plan.createAndAddActivity( "first_act_d"+i , new IdImpl( "some_link" ) ).setEndTime( 10 );
+			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( "second_act_d"+i , new IdImpl( "nowhere" ) );
+			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
-			Id passengerId = new IdImpl( "passenger"+i );
+			Id passengerId = Id.create( "passenger"+i , Person.class );
 			person = new PersonImpl( passengerId );
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
-			plan.createAndAddActivity( "first_act_p"+i , new IdImpl( "earth" ) ).setEndTime( 10 );
+			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
+			plan.createAndAddActivity( "second_act_p"+i , Id.create( "space" , Link.class ) );
 		}
 
 		return new JointPlanFactory().createJointPlan( individualPlans );
@@ -129,33 +126,33 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	private JointPlan createPlanWithJointTrips() {
 		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
-		Id puLink = new IdImpl( "pu" );
-		Id doLink = new IdImpl( "do" );
+		Id puLink = Id.create( "pu" , Link.class );
+		Id doLink = Id.create( "do" , Link.class );
 
 		for (int i=0; i < 100; i++) {
-			Id driverId = new IdImpl( "driver"+i );
+			Id driverId = Id.create( "driver"+i , Person.class );
 			Person person = new PersonImpl( driverId );
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
-			plan.createAndAddActivity( "first_act_d"+i , new IdImpl( "some_link" ) ).setEndTime( 10 );
+			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.car );
 			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg driverLeg1 = plan.createAndAddLeg( JointActingTypes.DRIVER );
 			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.car );
-			plan.createAndAddActivity( "second_act_d"+i , new IdImpl( "nowhere" ) );
+			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
-			Id passengerId = new IdImpl( "passenger"+i );
+			Id passengerId = Id.create( "passenger"+i , Person.class );
 			person = new PersonImpl( passengerId );
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
-			plan.createAndAddActivity( "first_act_p"+i , new IdImpl( "earth" ) ).setEndTime( 10 );
+			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
 			plan.createAndAddLeg( TransportMode.walk );
 			plan.createAndAddActivity( JointActingTypes.INTERACTION , puLink ).setMaximumDuration( 0 );
 			Leg passengerLeg1 = plan.createAndAddLeg( JointActingTypes.PASSENGER );
 			plan.createAndAddActivity( JointActingTypes.INTERACTION , doLink ).setMaximumDuration( 0 );
 			plan.createAndAddLeg( TransportMode.walk );
-			plan.createAndAddActivity( "second_act_p"+i , new IdImpl( "space" ) );
+			plan.createAndAddActivity( "second_act_p"+i , Id.create( "space" , Link.class ) );
 
 			DriverRoute driverRoute = new DriverRoute( puLink , doLink );
 			driverRoute.addPassenger( passengerId );

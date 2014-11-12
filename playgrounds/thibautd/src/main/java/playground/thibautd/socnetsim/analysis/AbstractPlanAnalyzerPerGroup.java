@@ -38,6 +38,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.thibautd.socnetsim.cliques.Clique;
+
 /**
  * @author thibautd
  */
@@ -52,7 +54,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	 * An agent can pertain to any number of groups
 	 */
 	public static interface GroupIdentifier {
-		public Iterable<Id> getGroups(Person person);
+		public Iterable<Id<Clique>> getGroups(Person person);
 	}
 
 	private final int graphWriteInterval;
@@ -95,7 +97,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			for (Id groupId : groupIdentifier.getGroups( person )) {
+			for (Id<Clique> groupId : groupIdentifier.getGroups( person )) {
 				final History history = historyPerGroup.getHistoryForGroup( groupId );
 
 				history.notifyIteration( event.getIteration() );

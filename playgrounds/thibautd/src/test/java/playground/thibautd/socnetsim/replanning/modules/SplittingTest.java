@@ -31,10 +31,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -100,11 +100,11 @@ public class SplittingTest {
 	public void fromOneToNoneNotEmpty() {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final Id origin = new IdImpl( "origin" );
-		final Id destination = new IdImpl( "destination" );
+		final Id<Link> origin = Id.create( "origin" , Link.class );
+		final Id<Link> destination = Id.create( "destination" , Link.class );
 
 		for (int i=0; i < 10; i++) {
-			Id id = new IdImpl( i );
+			Id<Person> id = Id.create( i , Person.class );
 			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
 			plans.put( id , p );
 			p.createAndAddActivity( "orig" , origin );
@@ -126,8 +126,8 @@ public class SplittingTest {
 	public void fromOneToOne() {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final Id origin = new IdImpl( "origin" );
-		final Id destination = new IdImpl( "destination" );
+		final Id<Link> origin = Id.create( "origin" , Link.class );
+		final Id<Link> destination = Id.create( "destination" , Link.class );
 
 		final Id<Person> driverId = Id.createPersonId( "driver" );
 		final DriverRoute driverRoute = new DriverRoute( origin , destination );
@@ -165,8 +165,8 @@ public class SplittingTest {
 	public void fromOneToOneTwoJointTrips() {
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 
-		final Id origin = new IdImpl( "origin" );
-		final Id destination = new IdImpl( "destination" );
+		final Id<Link> origin = Id.create( "origin" , Link.class );
+		final Id<Link> destination = Id.create( "destination" , Link.class );
 
 		final Id<Person> driverId = Id.createPersonId( "driver" );
 		final DriverRoute driverRoute1 = new DriverRoute( origin , destination );

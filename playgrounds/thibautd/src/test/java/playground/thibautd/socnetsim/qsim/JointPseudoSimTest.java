@@ -25,26 +25,23 @@ import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -170,8 +167,8 @@ public class JointPseudoSimTest {
 						random.nextInt(
 							linkIds.size() ) );
 
-			final Id driverId = new IdImpl( "driver-"+i );
-			final Id passengerId = new IdImpl( "passenger-"+i );
+			final Id<Person> driverId = Id.create( "driver-"+i , Person.class );
+			final Id<Person> passengerId = Id.create( "passenger-"+i , Person.class );
 			/* driver plan */ {
 				final Person driver = sc.getPopulation().getFactory().createPerson( driverId );
 				sc.getPopulation().addPerson( driver );

@@ -32,21 +32,21 @@ import org.matsim.api.core.v01.population.Plan;
  * It doesn't check the consistency of the data it is fed.
  * @author thibautd
  */
-public final class IncompatiblePlansIdentifierImpl extends IncompatiblePlansIdentifier {
-	private final Map<Plan, Set<Id>> incompatiblePlansPerPlans =
-		new HashMap<Plan, Set<Id>>();
+public final class IncompatiblePlansIdentifierImpl<T> extends IncompatiblePlansIdentifier<T> {
+	private final Map<Plan, Set<Id<T>>> incompatiblePlansPerPlans =
+		new HashMap<Plan, Set<Id<T>>>();
 
 	@Override
-	public Set<Id> identifyIncompatibilityGroups(final Plan plan) {
-		final Set<Id> plans = incompatiblePlansPerPlans.get( plan );
-		return plans != null ? plans : Collections.<Id>emptySet();
+	public Set<Id<T>> identifyIncompatibilityGroups(final Plan plan) {
+		final Set<Id<T>> plans = incompatiblePlansPerPlans.get( plan );
+		return plans != null ? plans : Collections.<Id<T>>emptySet();
 	}
 
-	public void put( final Plan plan , final Set<Id> incompatiblePlans ) {
+	public void put( final Plan plan , final Set<Id<T>> incompatiblePlans ) {
 		incompatiblePlansPerPlans.put( plan , incompatiblePlans );
 	}
 	
-	public void putAll( final Map<Plan, Set<Id>> incompatiblePlans ) {
+	public void putAll( final Map<Plan, Set<Id<T>>> incompatiblePlans ) {
 		incompatiblePlansPerPlans.putAll( incompatiblePlans );
 	}
 }

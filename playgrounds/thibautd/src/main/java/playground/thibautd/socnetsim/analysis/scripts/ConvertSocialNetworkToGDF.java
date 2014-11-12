@@ -46,7 +46,7 @@ public class ConvertSocialNetworkToGDF {
 		final String outNetwork = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final Map<Id, Coord> coords = ConvertSocialNetworkToLocatedMatsimNetwork.parsePopulation( popFile );
+		final Map<Id<Person>, Coord> coords = ConvertSocialNetworkToLocatedMatsimNetwork.parsePopulation( popFile );
 		new SocialNetworkReader( sc ).parse( socNetFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outNetwork );
@@ -60,7 +60,7 @@ public class ConvertSocialNetworkToGDF {
 
 	private static void writeEgos(
 			final SocialNetwork sn,
-			final Map<Id, Coord> coords,
+			final Map<Id<Person>, Coord> coords,
 			final BufferedWriter writer) throws IOException {
 		writer.write( "nodedef>name VARCHAR,x DOUBLE,y DOUBLE" );
 		for ( Id<Person> ego : sn.getEgos() ) {

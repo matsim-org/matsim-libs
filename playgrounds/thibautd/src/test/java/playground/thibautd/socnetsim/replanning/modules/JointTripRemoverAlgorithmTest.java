@@ -36,12 +36,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -55,7 +55,6 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.replanning.modules.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
 
 /**
@@ -90,9 +89,9 @@ public class JointTripRemoverAlgorithmTest {
 		Person driver = new PersonImpl( Id.createPersonId( "Schumacher" ) );
 		Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 
-		Id link1 = Id.createLinkId( 1 );
-		Id link2 = Id.createLinkId( 2 );
-		Id link3 = Id.createLinkId( 3 );
+		Id<Link> link1 = Id.createLinkId( 1 );
+		Id<Link> link2 = Id.createLinkId( 2 );
+		Id<Link> link3 = Id.createLinkId( 3 );
 
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -156,9 +155,9 @@ public class JointTripRemoverAlgorithmTest {
 		Person passenger1 = new PersonImpl( Id.createPersonId( "Boule" ) );
 		Person passenger2 = new PersonImpl( Id.createPersonId( "Bill" ) );
 
-		Id link1 = new IdImpl( 1 );
-		Id link2 = new IdImpl( 2 );
-		Id link3 = new IdImpl( 3 );
+		Id<Link> link1 = Id.create( 1 , Link.class );
+		Id<Link> link2 = Id.create( 2 , Link.class );
+		Id<Link> link3 = Id.create( 3 , Link.class );
 
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -241,11 +240,11 @@ public class JointTripRemoverAlgorithmTest {
 		Person passenger1 = new PersonImpl( Id.createPersonId( "Joe" ) );
 		Person passenger2 = new PersonImpl( Id.createPersonId( "Avrell" ) );
 
-		Id link1 = new IdImpl( 1 );
-		Id link2 = new IdImpl( 2 );
-		Id link3 = new IdImpl( 3 );
-		Id link4 = new IdImpl( 4 );
-		Id link5 = new IdImpl( 5 );
+		Id<Link> link1 = Id.create( 1 , Link.class );
+		Id<Link> link2 = Id.create( 2 , Link.class );
+		Id<Link> link3 = Id.create( 3 , Link.class );
+		Id<Link> link4 = Id.create( 4 , Link.class );
+		Id<Link> link5 = Id.create( 5 , Link.class );
 
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -341,11 +340,11 @@ public class JointTripRemoverAlgorithmTest {
 		Person passenger1 = new PersonImpl( Id.createPersonId( "Pif" ) );
 		Person passenger2 = new PersonImpl( Id.createPersonId( "Paf" ) );
 
-		Id link1 = new IdImpl( 1 );
-		Id link2 = new IdImpl( 2 );
-		Id link3 = new IdImpl( 3 );
-		Id link4 = new IdImpl( 4 );
-		Id link5 = new IdImpl( 5 );
+		Id<Link> link1 = Id.create( 1 , Link.class );
+		Id<Link> link2 = Id.create( 2 , Link.class );
+		Id<Link> link3 = Id.create( 3 , Link.class );
+		Id<Link> link4 = Id.create( 4 , Link.class );
+		Id<Link> link5 = Id.create( 5 , Link.class );
 
 		Map<Id<Person>, Plan> plans = new HashMap< >();
 		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -441,9 +440,9 @@ public class JointTripRemoverAlgorithmTest {
 		final Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 		final String stageType = "drinkACoffee";
 
-		final Id link1 = new IdImpl( 1 );
-		final Id link2 = new IdImpl( 2 );
-		final Id link3 = new IdImpl( 3 );
+		final Id<Link> link1 = Id.create( 1 , Link.class );
+		final Id<Link> link2 = Id.create( 2 , Link.class );
+		final Id<Link> link3 = Id.create( 3 , Link.class );
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -512,9 +511,9 @@ public class JointTripRemoverAlgorithmTest {
 		final Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 		final String stageType = "drinkACoffee";
 
-		final Id link1 = new IdImpl( 1 );
-		final Id link2 = new IdImpl( 2 );
-		final Id link3 = new IdImpl( 3 );
+		final Id<Link> link1 = Id.create( 1 , Link.class );
+		final Id<Link> link2 = Id.create( 2 , Link.class );
+		final Id<Link> link3 = Id.create( 3 , Link.class );
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
@@ -583,9 +582,9 @@ public class JointTripRemoverAlgorithmTest {
 		final Person passenger1 = new PersonImpl( Id.createPersonId( "Boule" ) );
 		final Person passenger2 = new PersonImpl( Id.createPersonId( "Bill" ) );
 
-		final Id link1 = new IdImpl( 1 );
-		final Id link2 = new IdImpl( 2 );
-		final Id link3 = new IdImpl( 3 );
+		final Id<Link> link1 = Id.create( 1 , Link.class );
+		final Id<Link> link2 = Id.create( 2 , Link.class );
+		final Id<Link> link3 = Id.create( 3 , Link.class );
 
 		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();

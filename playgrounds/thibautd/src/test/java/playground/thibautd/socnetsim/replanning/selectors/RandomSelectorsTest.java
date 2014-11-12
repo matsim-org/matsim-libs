@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -65,21 +64,21 @@ public class RandomSelectorsTest {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
 
-		PersonImpl person = new PersonImpl( new IdImpl( "tintin" ) );
+		PersonImpl person = new PersonImpl( Id.create( "tintin" , Person.class ) );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 1d );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		person = new PersonImpl( new IdImpl( "milou" ) );
+		person = new PersonImpl( Id.create( "milou" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5000d );
 
-		person = new PersonImpl( new IdImpl( "tim" ) );
+		person = new PersonImpl( Id.create( "tim" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
@@ -88,7 +87,7 @@ public class RandomSelectorsTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		person = new PersonImpl( new IdImpl( "struppy" ) );
+		person = new PersonImpl( Id.create( "struppy" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -10d );

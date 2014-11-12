@@ -26,9 +26,8 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
@@ -38,8 +37,8 @@ public class SocialNetworkTest {
 	public void testAddTie() {
 		final LockedSocialNetwork testee = new LockedSocialNetwork( false );
 
-		final Id id1 = new IdImpl( 1 );
-		final Id id2 = new IdImpl( 2 );
+		final Id<Person> id1 = Id.create( 1 , Person.class );
+		final Id<Person> id2 = Id.create( 2 , Person.class );
 
 		testee.addTie( id1 , id2 );
 
@@ -77,10 +76,10 @@ public class SocialNetworkTest {
 	}
 
 	private static LockedSocialNetwork createRandomNetwork(final Random random) {
-		final List<Id> ids = new ArrayList<Id>();
+		final List<Id<Person>> ids = new ArrayList<Id<Person>>();
 
 		for ( int i=0; i < 100 ; i++ ) {
-			ids.add( new IdImpl( i ) );
+			ids.add( Id.create( i , Person.class ) );
 		}
 
 		final LockedSocialNetwork net = new LockedSocialNetwork();

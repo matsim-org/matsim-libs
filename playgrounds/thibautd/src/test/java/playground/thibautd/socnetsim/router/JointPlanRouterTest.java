@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -67,7 +67,7 @@ public class JointPlanRouterTest {
 						populationFactory),
 					null);
 
-		final Id linkId = new IdImpl( "some_link" );
+		final Id<Link> linkId = Id.create( "some_link" , Link.class );
 		final Plan plan = populationFactory.createPlan();
 		final Activity act1 =
 			populationFactory.createActivityFromLinkId(
@@ -82,7 +82,7 @@ public class JointPlanRouterTest {
 					"say goodbye",
 					linkId));
 
-		final Id driverId = new IdImpl( "the_driver" );
+		final Id<Person> driverId = Id.create( "the_driver" , Person.class );
 		final PassengerRoute route = new PassengerRoute( linkId , linkId );
 		route.setDriverId( driverId );
 		leg.setRoute( route );
@@ -118,7 +118,7 @@ public class JointPlanRouterTest {
 						populationFactory),
 					null);
 
-		final Id linkId = new IdImpl( "some_link" );
+		final Id<Link> linkId = Id.create( "some_link" , Link.class );
 		final Plan plan = populationFactory.createPlan();
 		final Activity act1 =
 			populationFactory.createActivityFromLinkId(
@@ -133,8 +133,8 @@ public class JointPlanRouterTest {
 					"say goodbye",
 					linkId));
 
-		final Id passengerId1 = new IdImpl( "the_passenger_1" );
-		final Id passengerId2 = new IdImpl( "the_passenger_2" );
+		final Id<Person> passengerId1 = Id.create( "the_passenger_1" , Person.class );
+		final Id<Person> passengerId2 = Id.create( "the_passenger_2" , Person.class );
 		final DriverRoute route = new DriverRoute( linkId , linkId );
 		route.addPassenger( passengerId1 );
 		route.addPassenger( passengerId2 );
@@ -153,7 +153,7 @@ public class JointPlanRouterTest {
 				"new driver route is null",
 				newRoute);
 
-		final Collection<Id> passengers = Arrays.asList( passengerId1 , passengerId2 );
+		final Collection<Id<Person>> passengers = Arrays.asList( passengerId1 , passengerId2 );
 		assertEquals(
 				"not the right number of passenger ids in "+newRoute.getPassengersIds(),
 				passengers.size(),

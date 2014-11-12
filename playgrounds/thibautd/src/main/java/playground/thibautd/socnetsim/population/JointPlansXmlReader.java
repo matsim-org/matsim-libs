@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.utils.io.MatsimXmlParser;
-
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.JOINT_PLAN_TAG;
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PERSON_ATT;
 import static playground.thibautd.socnetsim.population.JointPlansXmlSchemaNames.PLAN_NR_ATT;
@@ -32,9 +29,10 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
@@ -66,8 +64,8 @@ public class JointPlansXmlReader extends MatsimXmlParser {
 			counter.incCounter();
 		}
 		if ( name.equals( PLAN_TAG ) ) {
-			final Id id = new IdImpl(
-						atts.getValue( PERSON_ATT ) );
+			final Id<Person> id = Id.create(
+						atts.getValue( PERSON_ATT ) , Person.class );
 
 			final int planIndex = Integer.parseInt(
 						atts.getValue( PLAN_NR_ATT ) );

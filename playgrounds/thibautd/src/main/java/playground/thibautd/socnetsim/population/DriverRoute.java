@@ -30,7 +30,6 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -174,12 +173,12 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 		String[] ps = info[0].split( "," );
 
 		for (String p : ps) {
-			passengers.add( new IdImpl( p ) );
+			passengers.add( Id.create( p , Person.class ) );
 		}
 
 		List<Id<Link>> ls = new ArrayList<Id<Link>>();
 		for (int i=1; i < info.length; i++) {
-			ls.add( new IdImpl( info[i] ) );
+			ls.add( Id.create( info[i] , Link.class ) );
 		}
 		setLinkIds( startLinkId , ls , endLinkId );
 	}

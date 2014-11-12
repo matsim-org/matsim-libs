@@ -26,13 +26,11 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -58,25 +56,25 @@ public class RandomJointLocationChoiceTest {
 				activities,
 				facilities,
 				"type",
-				new IdImpl( random.nextLong() ),
+				Id.create( random.nextLong() , ActivityFacility.class ),
 				new CoordImpl( 0 , 0 ) );
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
-				new IdImpl( random.nextLong() ),
+				Id.create( random.nextLong() , ActivityFacility.class ),
 				new CoordImpl( 1 , 0 ) );
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
-				new IdImpl( random.nextLong() ),
+				Id.create( random.nextLong() , ActivityFacility.class ),
 				new CoordImpl( 0 , 1 ) );
 		addActivityAndFacility(
 				activities,
 				facilities,
 				"type",
-				new IdImpl( random.nextLong() ),
+				Id.create( random.nextLong() , ActivityFacility.class ),
 				new CoordImpl( 1 , 1 ) );
 
 		final RandomJointLocationChoiceConfigGroup config =
@@ -97,7 +95,7 @@ public class RandomJointLocationChoiceTest {
 			final List<Activity> activities,
 			final ActivityFacilities facilities,
 			final String type,
-			final Id facilityId,
+			final Id<ActivityFacility> facilityId,
 			final Coord coord) {
 		final ActivityImpl act = new ActivityImpl( type , coord );
 
@@ -115,7 +113,7 @@ public class RandomJointLocationChoiceTest {
 		final List<Activity> activities = new ArrayList<Activity>();
 
 
-		final Id sw = new IdImpl( "sw" );
+		final Id<ActivityFacility> sw = Id.create( "sw" , ActivityFacility.class );
 		addActivityAndFacility(
 				activities,
 				facilities,
@@ -123,7 +121,7 @@ public class RandomJointLocationChoiceTest {
 				sw,
 				new CoordImpl( -1 , -1 ) );
 
-		final Id se = new IdImpl( "se" );
+		final Id<ActivityFacility> se = Id.create( "se" , ActivityFacility.class );
 		addActivityAndFacility(
 				activities,
 				facilities,
@@ -131,7 +129,7 @@ public class RandomJointLocationChoiceTest {
 				se,
 				new CoordImpl( 1 , -1 ) );
 
-		final Id nw = new IdImpl( "nw" );
+		final Id<ActivityFacility> nw = Id.create( "nw" , ActivityFacility.class );
 		addActivityAndFacility(
 				activities,
 				facilities,
@@ -139,7 +137,7 @@ public class RandomJointLocationChoiceTest {
 				nw,
 				new CoordImpl( -1 , 1 ) );
 
-		final Id ne = new IdImpl( "ne" );
+		final Id<ActivityFacility> ne = Id.create( "ne" , ActivityFacility.class );
 		addActivityAndFacility(
 				activities,
 				facilities,
@@ -147,7 +145,7 @@ public class RandomJointLocationChoiceTest {
 				ne,
 				new CoordImpl( 1 , 1 ) );
 
-		final Id other_ne = new IdImpl( "other_ne" );
+		final Id<ActivityFacility> other_ne = Id.create( "other_ne" , ActivityFacility.class );
 		addActivityAndFacility(
 				activities,
 				facilities,
@@ -225,7 +223,7 @@ public class RandomJointLocationChoiceTest {
 	private static class FacilityFixture {
 		public double angle;
 		public double distance;
-		public Id expectedFacility;
+		public Id<ActivityFacility> expectedFacility;
 		
 		public FacilityFixture(
 				final double angle,

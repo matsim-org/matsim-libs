@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -106,11 +106,11 @@ public class TestScoringFunctionState {
 		network = scenario.getNetwork();
 
 		
-		Node node1 = network.getFactory().createNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
-		Node node2 = network.getFactory().createNode( new IdImpl( 2 ) , new CoordImpl( 2 , 2 ) );
+		Node node1 = network.getFactory().createNode( Id.create( 1 , Node.class ) , new CoordImpl( 0 , 0 ) );
+		Node node2 = network.getFactory().createNode( Id.create( 2 , Node.class ) , new CoordImpl( 2 , 2 ) );
 		network.addNode( node1 );
 		network.addNode( node2 );
-		uniqueLink = network.getFactory().createLink( new IdImpl( "toto" ) , node1 , node2 );
+		uniqueLink = network.getFactory().createLink( Id.create( "toto" , Link.class ) , node1 , node2 );
 		network.addLink( uniqueLink );
 	}
 

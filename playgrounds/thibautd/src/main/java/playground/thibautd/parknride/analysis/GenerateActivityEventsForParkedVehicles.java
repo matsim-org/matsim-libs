@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -93,7 +93,7 @@ public class GenerateActivityEventsForParkedVehicles {
 					eventWriter.handleEvent(
 							new ActivityEndEvent(useTime ? event.getTime() : 100, useTime ?
 							event.getPersonId() :
-							new IdImpl( event.getPersonId()+"->"+c ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
+							Id.create( event.getPersonId()+"->"+c , Person.class ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
 				}
 				else {
 					// the agent was not parked
@@ -104,7 +104,7 @@ public class GenerateActivityEventsForParkedVehicles {
 					eventWriter.handleEvent(
 							new ActivityStartEvent(useTime ? event.getTime() : 0, useTime ?
 							event.getPersonId() :
-							new IdImpl( event.getPersonId()+"->"+c ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
+							Id.create( event.getPersonId()+"->"+c , Person.class ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
 					parkedAgents.add( event.getPersonId() );
 
 				}

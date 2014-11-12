@@ -26,9 +26,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -65,15 +64,15 @@ public class SnaUtilsClusteringTest {
 		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
-		final Id id1 = new IdImpl( 1 );
-		final Id id2 = new IdImpl( 2 );
-		final Id id3 = new IdImpl( 3 );
-		final Id id4 = new IdImpl( 4 );
-		final Id id5 = new IdImpl( 5 );
-		final Id id6 = new IdImpl( 6 );
-		final Id id7 = new IdImpl( 7 );
-		final Id id8 = new IdImpl( 8 );
-		final Id id9 = new IdImpl( 9 );
+		final Id<Person> id1 = Id.create( 1, Person.class );
+		final Id<Person> id2 = Id.create( 2, Person.class );
+		final Id<Person> id3 = Id.create( 3, Person.class );
+		final Id<Person> id4 = Id.create( 4, Person.class );
+		final Id<Person> id5 = Id.create( 5, Person.class );
+		final Id<Person> id6 = Id.create( 6, Person.class );
+		final Id<Person> id7 = Id.create( 7, Person.class );
+		final Id<Person> id8 = Id.create( 8, Person.class );
+		final Id<Person> id9 = Id.create( 9, Person.class );
 
 		net.addTie( id1 , id2 );
 		net.addTie( id1 , id3 );
@@ -110,14 +109,14 @@ public class SnaUtilsClusteringTest {
 		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
-		final Id id1 = new IdImpl( 1 );
-		final Id id2 = new IdImpl( 2 );
-		final Id id3 = new IdImpl( 3 );
-		final Id id4 = new IdImpl( 4 );
-		final Id id5 = new IdImpl( 5 );
-		final Id id6 = new IdImpl( 6 );
-		final Id id7 = new IdImpl( 7 );
-		final Id id8 = new IdImpl( 8 );
+		final Id<Person> id1 = Id.create( 1, Person.class );
+		final Id<Person> id2 = Id.create( 2, Person.class );
+		final Id<Person> id3 = Id.create( 3, Person.class );
+		final Id<Person> id4 = Id.create( 4, Person.class );
+		final Id<Person> id5 = Id.create( 5, Person.class );
+		final Id<Person> id6 = Id.create( 6, Person.class );
+		final Id<Person> id7 = Id.create( 7, Person.class );
+		final Id<Person> id8 = Id.create( 8, Person.class );
 
 		// horizontal
 		net.addTie( id1 , id2 );
@@ -148,14 +147,14 @@ public class SnaUtilsClusteringTest {
 		final LockedSocialNetwork net = new LockedSocialNetwork( false );
 
 		// ids
-		final Id id1 = new IdImpl( 1 );
-		final Id id2 = new IdImpl( 2 );
-		final Id id3 = new IdImpl( 3 );
-		final Id id4 = new IdImpl( 4 );
-		final Id id5 = new IdImpl( 5 );
-		final Id id6 = new IdImpl( 6 );
-		final Id id7 = new IdImpl( 7 );
-		final Id id8 = new IdImpl( 8 );
+		final Id<Person> id1 = Id.create( 1, Person.class );
+		final Id<Person> id2 = Id.create( 2, Person.class );
+		final Id<Person> id3 = Id.create( 3, Person.class );
+		final Id<Person> id4 = Id.create( 4, Person.class );
+		final Id<Person> id5 = Id.create( 5, Person.class );
+		final Id<Person> id6 = Id.create( 6, Person.class );
+		final Id<Person> id7 = Id.create( 7, Person.class );
+		final Id<Person> id8 = Id.create( 8, Person.class );
 
 		net.addTie( id1 , id2 );
 		net.addTie( id4 , id3 );

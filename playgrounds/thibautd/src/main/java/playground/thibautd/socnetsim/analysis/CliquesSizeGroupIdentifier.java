@@ -26,30 +26,30 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 
+import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.utils.ObjectPool;
 
 /**
  * @author thibautd
  */
 public class CliquesSizeGroupIdentifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {
-	private final Map<Id, Id> personIdToGroupId = new LinkedHashMap<Id, Id>();
-	private final Id fullGroupId = new IdImpl( "all" );
+	private final Map<Id<Person>, Id<Clique>> personIdToGroupId = new LinkedHashMap<Id<Person>, Id<Clique>>();
+	private final Id<Clique> fullGroupId = Id.create( "all" , Clique.class);
 
-	public CliquesSizeGroupIdentifier(final Collection<? extends Collection<Id>> groups) {
-		final ObjectPool<Id> idPool = new ObjectPool<Id>();
+	public CliquesSizeGroupIdentifier(final Collection<? extends Collection<Id<Person>>> groups) {
+		final ObjectPool<Id<Clique>> idPool = new ObjectPool<>();
 
-		for (Collection<Id> group : groups) {
-			final Id groupId = idPool.getPooledInstance( new IdImpl( "cliques of size "+group.size() ) );
-			for (Id personId : group) {
+		for (Collection<Id<Person>> group : groups) {
+			final Id<Clique> groupId = idPool.getPooledInstance( Id.create( "cliques of size "+group.size() , Clique.class ) );
+			for (Id<Person> personId : group) {
 				personIdToGroupId.put( personId , groupId );
 			}
 		}
 	}
 
 	@Override
-	public Iterable<Id> getGroups(final Person person) {
+	public Iterable<Id<Clique>> getGroups(final Person person) {
 		return Arrays.asList(
 				personIdToGroupId.get( person.getId() ),
 				fullGroupId);

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -58,6 +57,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -154,7 +154,7 @@ public class PSeudoQSimCompareEventsTest {
 		final List<Id> linkIds = new ArrayList<Id>( sc.getNetwork().getLinks().keySet() );
 		for ( String mode : new String[]{ TransportMode.car , TransportMode.pt } ) {
 			for ( int i = 0; i < 2000; i++ ) {
-				final Person person = sc.getPopulation().getFactory().createPerson( new IdImpl( mode+"."+i ) );
+				final Person person = sc.getPopulation().getFactory().createPerson( Id.create( mode+"."+i , Person.class ) );
 				sc.getPopulation().addPerson( person );
 
 				final Plan plan = sc.getPopulation().getFactory().createPlan();
@@ -185,7 +185,7 @@ public class PSeudoQSimCompareEventsTest {
 			}
 
 			/* make sure at least one agent has a zero-length trip */ {
-				final Person person = sc.getPopulation().getFactory().createPerson( new IdImpl( mode+".jojo" ) );
+				final Person person = sc.getPopulation().getFactory().createPerson( Id.create( mode+".jojo" , Person.class ) );
 				sc.getPopulation().addPerson( person );
 
 				final Plan plan = sc.getPopulation().getFactory().createPlan();
@@ -239,7 +239,7 @@ public class PSeudoQSimCompareEventsTest {
 
 		final VehicleType vehicleType =
 			vehicles.getFactory().createVehicleType(
-					new IdImpl( "vehicle" ) );
+					Id.create( "vehicle" , VehicleType.class ) );
 		{
 			final VehicleCapacity cap = vehicles.getFactory().createVehicleCapacity();
 			cap.setSeats( 100 );
@@ -274,12 +274,12 @@ public class PSeudoQSimCompareEventsTest {
 							ids,
 							destinationLinkId );
 
-			final TransitLine line = factory.createTransitLine( new IdImpl( "line-"+i ) );
+			final TransitLine line = factory.createTransitLine( Id.create( "line-"+i , TransitLine.class ) );
 			final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add( factory.createTransitRouteStop(
 						createStop(
 							factory,
-							new IdImpl( "line-"+i+"-o" ),
+							Id.create( "line-"+i+"-o" , TransitStopFacility.class ),
 							sc.getNetwork().getLinks().get( originLinkId ) ),
 						0,
 						0));
@@ -292,7 +292,7 @@ public class PSeudoQSimCompareEventsTest {
 				stops.add( factory.createTransitRouteStop(
 							createStop(
 								factory,
-								new IdImpl( "line-"+i+"-"+l.getId() ),
+								Id.create( "line-"+i+"-"+l.getId() , TransitStopFacility.class ),
 								l),
 							time,
 							0));
@@ -305,7 +305,7 @@ public class PSeudoQSimCompareEventsTest {
 			stops.add( factory.createTransitRouteStop(
 						createStop(
 							factory,
-							new IdImpl( "line-"+i+"-d" ),
+							Id.create( "line-"+i+"-d" , TransitStopFacility.class ),
 							sc.getNetwork().getLinks().get( destinationLinkId ) ),
 						time,
 						0));
@@ -316,7 +316,7 @@ public class PSeudoQSimCompareEventsTest {
 
 			final TransitRoute transitRoute =
 					factory.createTransitRoute(
-						new IdImpl( "line-"+i+"-route" ),
+						Id.create( "line-"+i+"-route" , TransitRoute.class ),
 						route,
 						stops,
 						"pt" );
@@ -326,9 +326,9 @@ public class PSeudoQSimCompareEventsTest {
 			for ( double depTime = 0 ; depTime <= 12 * 3600; depTime += 20 * 60 ) {
 				final Departure dep =
 						factory.createDeparture(
-							new IdImpl( "line-"+i+"-"+depTime ),
+							Id.create( "line-"+i+"-"+depTime , Departure.class ),
 							depTime );
-				dep.setVehicleId( new IdImpl( "veh-"+dep.getId() ) );
+				dep.setVehicleId( Id.create( "veh-"+dep.getId() , Vehicle.class ) );
 				vehicles.addVehicle(
 						vehicles.getFactory().createVehicle(
 							dep.getVehicleId(),
@@ -342,7 +342,7 @@ public class PSeudoQSimCompareEventsTest {
 
 	private TransitStopFacility createStop(
 			final TransitScheduleFactory factory,
-			final Id id,
+			final Id<TransitStopFacility> id,
 			final Link link) {
 		final TransitStopFacility f =
 						factory.createTransitStopFacility(

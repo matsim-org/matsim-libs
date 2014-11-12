@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -72,6 +71,7 @@ import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
+import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
@@ -226,10 +226,10 @@ public class RunUtils {
 				new CliquesSizeGroupIdentifier(
 						cliques.getGroupInfo() ) :
 				new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
-					private final Iterable<Id> groups = Collections.<Id>singleton( new IdImpl( "all" ) );
+					private final Iterable<Id<Clique>> groups = Collections.<Id<Clique>>singleton( Id.create( "all" , Clique.class ) );
 
 					@Override
-					public Iterable<Id> getGroups(final Person person) {
+					public Iterable<Id<Clique>> getGroups(final Person person) {
 						return groups;
 					}
 				};

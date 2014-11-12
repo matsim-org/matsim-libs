@@ -26,7 +26,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -48,9 +47,9 @@ class FewGroupsIncompatibilityFactory implements IncompatiblePlansIdentifierFact
 				final int groupNr =  i++ % 3;
 
 				if ( groupNr == 0 ) continue;
-				final Set<Id> groups =
-						Collections.<Id>singleton(
-							new IdImpl( groupNr ) );
+				final Set<Id<Person>> groups =
+						Collections.<Id<Person>>singleton(
+							Id.create( groupNr , Person.class ) );
 				if ( jp == null ) {
 					identifier.put(
 							plan,

@@ -30,13 +30,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -80,14 +80,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	public void createSimpleFixture() {
 		final FixtureBuilder builder = new FixtureBuilder();
 
-		final Id driverId = new IdImpl( "driver" );
-		final Id passengerId1 = new IdImpl( "p1" );
-		final Id passengerId2 = new IdImpl( "p2" );
+		final Id<Person> driverId = Id.create( "driver" , Person.class );
+		final Id<Person> passengerId1 = Id.create( "p1" , Person.class );
+		final Id<Person> passengerId2 = Id.create( "p2" , Person.class );
 
-		final Id link1 = new IdImpl( "link1" );
-		final Id link2 = new IdImpl( "link2" );
-		final Id link3 = new IdImpl( "link3" );
-		final Id link4 = new IdImpl( "link4" );
+		final Id<Link> link1 = Id.create( "link1" , Link.class );
+		final Id<Link> link2 = Id.create( "link2" , Link.class );
+		final Id<Link> link3 = Id.create( "link3" , Link.class );
+		final Id<Link> link4 = Id.create( "link4" , Link.class );
 
 		// DRIVER
 		builder.startPerson( driverId );
@@ -173,14 +173,14 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	public void createFixtureWithPotentiallyNegativeEndTimes() {
 		final FixtureBuilder builder = new FixtureBuilder();
 
-		final Id driverId = new IdImpl( "driver" );
-		final Id passengerId1 = new IdImpl( "p1" );
-		final Id passengerId2 = new IdImpl( "p2" );
+		final Id<Person> driverId = Id.create( "driver" , Person.class );
+		final Id<Person> passengerId1 = Id.create( "p1" , Person.class );
+		final Id<Person> passengerId2 = Id.create( "p2" , Person.class );
 
-		final Id link1 = new IdImpl( "link1" );
-		final Id link2 = new IdImpl( "link2" );
-		final Id link3 = new IdImpl( "link3" );
-		final Id link4 = new IdImpl( "link4" );
+		final Id<Link> link1 = Id.create( "link1" , Link.class );
+		final Id<Link> link2 = Id.create( "link2" , Link.class );
+		final Id<Link> link3 = Id.create( "link3" , Link.class );
+		final Id<Link> link4 = Id.create( "link4" , Link.class );
 
 		// DRIVER
 		builder.startPerson( driverId );

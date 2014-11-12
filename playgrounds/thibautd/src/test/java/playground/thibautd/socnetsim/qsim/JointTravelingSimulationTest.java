@@ -52,7 +52,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -424,9 +423,9 @@ public class JointTravelingSimulationTest {
 
 		createNetwork( sc.getNetwork() );
 
-		final Id driverId = new IdImpl( "driver" );
-		final Id passengerId1 = new IdImpl( "passenger_1" );
-		final Id passengerId2 = new IdImpl( "passenger_2" );
+		final Id<Person> driverId = Id.create( "driver" , Person.class );
+		final Id<Person> passengerId1 = Id.create( "passenger_1" , Person.class);
+		final Id<Person> passengerId2 = Id.create( "passenger_2" , Person.class);
 
 		final PopulationFactory factory = sc.getPopulation().getFactory();
 
@@ -580,17 +579,17 @@ public class JointTravelingSimulationTest {
 		int c = 0;
 		int d = 0;
 
-		final Node firstNode = network.getFactory().createNode( new IdImpl( c++ ) , new CoordImpl( 0 , d++ ) );
+		final Node firstNode = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
 		Node node1 = firstNode;
-		Node node2 = network.getFactory().createNode( new IdImpl( c++ ) , new CoordImpl( 0 , d++ ) );
+		Node node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
 
 		network.addNode( node1 );
 		network.addNode( node2 );
 		network.addLink( network.getFactory().createLink( ORIGIN_LINK , node1 , node2 ) );
 
-		for (Id linkId : new Id[]{ TO_PU_LINK , PU_LINK , TRAVEL_LINK_1 , TRAVEL_LINK_2 , DO_LINK , TO_DESTINATION_LINK , DESTINATION_LINK }) {
+		for (Id<Link> linkId : new Id[]{ TO_PU_LINK , PU_LINK , TRAVEL_LINK_1 , TRAVEL_LINK_2 , DO_LINK , TO_DESTINATION_LINK , DESTINATION_LINK }) {
 			node1 = node2;
-			node2 = network.getFactory().createNode( new IdImpl( c++ ) , new CoordImpl( 0 , d++ ) );
+			node2 = network.getFactory().createNode( Id.create( c++ , Node.class ) , new CoordImpl( 0 , d++ ) );
 			network.addNode( node2 );
 			network.addLink( network.getFactory().createLink( linkId , node1 , node2 ) );
 		}

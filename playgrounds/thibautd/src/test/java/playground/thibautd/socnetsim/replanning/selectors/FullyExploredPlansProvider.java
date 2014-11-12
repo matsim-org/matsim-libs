@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -45,6 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.cliques.population.CliquesWriter;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -319,7 +319,7 @@ public class FullyExploredPlansProvider {
 		cliquesWriter.openAndStartFile( paths.cliquesFilePath );
 		for ( Tuple<ReplanningGroup, GroupPlans> info : toDump.getGroupInfos() ) {
 			cliquesWriter.writeClique(
-					new IdImpl( id++ ),
+					Id.create( id++ , Clique.class ),
 					info.getFirst().getPersons() );
 
 			for ( Person p : info.getFirst().getPersons() ) {

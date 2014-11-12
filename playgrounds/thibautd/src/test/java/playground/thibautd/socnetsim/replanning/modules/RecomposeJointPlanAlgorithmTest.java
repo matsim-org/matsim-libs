@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -105,7 +104,7 @@ public class RecomposeJointPlanAlgorithmTest {
 		jointPlansToExpect.add( currentJointPlan );
 
 		for (int i=0; i < 100; i++) {
-			final Id id = new IdImpl( i );
+			final Id<Person> id = Id.create( i , Person.class );
 			final Person person = new PersonImpl( id );
 			final Plan plan = new PlanImpl( person );
 			plans.add( plan );
@@ -214,7 +213,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		Plan lastPlan = null;
 		for (int i=0; i < 100; i++) {
-			final Id id = new IdImpl( i );
+			final Id<Person> id = Id.create( i , Person.class );
 			final Person person = new PersonImpl( id );
 			final Plan plan = new PlanImpl( person );
 			if ( random.nextDouble() < 0.2 ) {

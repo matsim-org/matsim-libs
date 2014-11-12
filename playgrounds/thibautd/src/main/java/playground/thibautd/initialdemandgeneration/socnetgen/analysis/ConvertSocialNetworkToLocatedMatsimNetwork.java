@@ -25,16 +25,15 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
-
 import org.xml.sax.Attributes;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
@@ -51,7 +50,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 		final String outNetwork = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		final Map<Id, Coord> coords = parsePopulation( popFile );
+		final Map<Id<Person>, Coord> coords = parsePopulation( popFile );
 		new SocialNetworkReader( sc ).parse( socNetFile );
 
 		final Network network =
@@ -63,14 +62,14 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 		new NetworkWriter( network ).write( outNetwork );
 	}
 
-	public static Map<Id, Coord> parsePopulation(final String populationFile) {
+	public static Map<Id<Person>, Coord> parsePopulation(final String populationFile) {
 		final Counter counter = new Counter( "read person # " );
 		final ObjectPool<Coord> coordPool = new ObjectPool<Coord>();
 
-		final Map<Id, Coord> map = new HashMap<Id, Coord>();
+		final Map<Id<Person>, Coord> map = new HashMap<>();
 
 		new MatsimXmlParser() {
-			Id id = null;
+			Id<Person> id = null;
 
 			@Override
 			public void startTag(
@@ -85,7 +84,7 @@ public class ConvertSocialNetworkToLocatedMatsimNetwork {
 					counter.incCounter();
 
 					try {
-						this.id = new IdImpl( atts.getValue( "id" ) );
+						this.id = Id.create( atts.getValue( "id" ) , Person.class );
 					}
 					catch (Exception e) {
 						throw new RuntimeException( "exception when processing person "+atts , e );

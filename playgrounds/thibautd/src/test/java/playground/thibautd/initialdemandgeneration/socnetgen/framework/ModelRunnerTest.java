@@ -32,9 +32,8 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
@@ -136,15 +135,15 @@ public class ModelRunnerTest {
 		final TestSocialNetwork net = new TestSocialNetwork();
 
 		// ids
-		final Id id1 = new IdImpl( 1 );
-		final Id id2 = new IdImpl( 2 );
-		final Id id3 = new IdImpl( 3 );
-		final Id id4 = new IdImpl( 4 );
-		final Id id5 = new IdImpl( 5 );
-		final Id id6 = new IdImpl( 6 );
-		final Id id7 = new IdImpl( 7 );
-		final Id id8 = new IdImpl( 8 );
-		final Id id9 = new IdImpl( 9 );
+		final Id<Person> id1 = Id.create( 1, Person.class );
+		final Id<Person> id2 = Id.create( 2, Person.class );
+		final Id<Person> id3 = Id.create( 3, Person.class );
+		final Id<Person> id4 = Id.create( 4, Person.class );
+		final Id<Person> id5 = Id.create( 5, Person.class );
+		final Id<Person> id6 = Id.create( 6, Person.class );
+		final Id<Person> id7 = Id.create( 7, Person.class );
+		final Id<Person> id8 = Id.create( 8, Person.class );
+		final Id<Person> id9 = Id.create( 9, Person.class );
 
 		// horizontal
 		net.socialNetwork.addTie( id1 , id2 );
@@ -200,18 +199,18 @@ public class ModelRunnerTest {
 
 	private static class TestSocialNetwork {
 		public final LockedSocialNetwork socialNetwork = new LockedSocialNetwork( false );
-		public final Map<Id, Collection<Id>> unkownFriendsOfFriends = new LinkedHashMap<Id, Collection<Id>>();
+		public final Map<Id<Person>, Collection<Id<Person>>> unkownFriendsOfFriends = new LinkedHashMap<>();
 	}
 	
 	private static class AgentImpl implements Agent {
-		private final Id id;
+		private final Id<Person> id;
 
-		public AgentImpl(final Id id) {
+		public AgentImpl(final Id<Person> id) {
 			this.id = id;
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			return id;
 		}
 	}

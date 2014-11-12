@@ -23,7 +23,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -61,18 +61,18 @@ public class SocialNetworkReader extends MatsimXmlParser {
 			this.scenario.addScenarioElement( elementName , this.socialNetwork );
 		}
 		else if ( name.equals( SocialNetworkWriter.EGO_TAG ) ) {
-			final Id ego = new IdImpl(
+			final Id<Person> ego = Id.create(
 						atts.getValue(
-							SocialNetworkWriter.EGO_ATT ) );
+							SocialNetworkWriter.EGO_ATT ) , Person.class );
 			this.socialNetwork.addEgo( ego );
 		}
 		else if ( name.equals( SocialNetworkWriter.TIE_TAG ) ) {
-			final Id ego = new IdImpl(
+			final Id<Person> ego = Id.create(
 						atts.getValue(
-							SocialNetworkWriter.EGO_ATT ) );
-			final Id alter = new IdImpl(
+							SocialNetworkWriter.EGO_ATT ) , Person.class );
+			final Id<Person> alter = Id.create(
 						atts.getValue(
-							SocialNetworkWriter.ALTER_ATT ) );
+							SocialNetworkWriter.ALTER_ATT ) , Person.class );
 			if ( this.isReflective ) this.socialNetwork.addBidirectionalTie( ego , alter );
 			else this.socialNetwork.addMonodirectionalTie( ego , alter );
 		}

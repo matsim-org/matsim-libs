@@ -25,9 +25,8 @@ import java.util.HashSet;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
@@ -36,13 +35,13 @@ public class SocialNetworkTest {
 	@Test( expected=IllegalStateException.class )
 	public void testFailsIfAddingDirectedTieInReflectiveNetwork() {
 		final SocialNetwork sn = new SocialNetworkImpl( true );
-		sn.addMonodirectionalTie( new IdImpl( 1 ) , new IdImpl( 2 ) );
+		sn.addMonodirectionalTie( Id.create( 1 , Person.class ) , Id.create( 2 , Person.class ) );
 	}
 
 	@Test
 	public void testMonodirectionalTie() {
-		final Id ego = new IdImpl( 1 );
-		final Id alter = new IdImpl( 2 );
+		final Id<Person> ego = Id.create( 1 , Person.class );
+		final Id<Person> alter = Id.create( 2 , Person.class );
 
 		final SocialNetwork sn = new SocialNetworkImpl( false );
 		sn.addEgo( ego );
@@ -51,7 +50,7 @@ public class SocialNetworkTest {
 
 		Assert.assertEquals(
 				"unexpected egos",
-				new HashSet<Id>( Arrays.asList( ego , alter ) ),
+				new HashSet<Id<Person>>( Arrays.asList( ego , alter ) ),
 				sn.getEgos() );
 
 		Assert.assertEquals(
@@ -61,14 +60,14 @@ public class SocialNetworkTest {
 		
 		Assert.assertEquals(
 				"unexpected alters of alter",
-				Collections.<Id>emptySet(),
+				Collections.<Id<Person>>emptySet(),
 				sn.getAlters( alter ) );
 	}
 
 	@Test
 	public void testBidirectionalTie() {
-		final Id ego = new IdImpl( 1 );
-		final Id alter = new IdImpl( 2 );
+		final Id<Person> ego = Id.create( 1 , Person.class );
+		final Id<Person> alter = Id.create( 2 , Person.class );
 
 		final SocialNetwork sn = new SocialNetworkImpl( false );
 		sn.addEgo( ego );
@@ -77,7 +76,7 @@ public class SocialNetworkTest {
 
 		Assert.assertEquals(
 				"unexpected egos",
-				new HashSet<Id>( Arrays.asList( ego , alter ) ),
+				new HashSet<Id<Person>>( Arrays.asList( ego , alter ) ),
 				sn.getEgos() );
 
 		Assert.assertEquals(
@@ -95,18 +94,18 @@ public class SocialNetworkTest {
 	public void testRemoveEgo() {
 		final SocialNetworkImpl sn = new SocialNetworkImpl( true );
 
-		final Id ego = new IdImpl( "ego" );
-		final Id a1 = new IdImpl( "alter1" );
-		final Id a2 = new IdImpl( "alter2" );
-		final Id a3 = new IdImpl( "alter3" );
-		final Id a4 = new IdImpl( "alter4" );
-		final Id a5 = new IdImpl( "alter5" );
-		final Id a6 = new IdImpl( "alter6" );
+		final Id<Person> ego = Id.create( "ego" , Person.class );
+		final Id<Person> a1 = Id.create( "alter1" , Person.class );
+		final Id<Person> a2 = Id.create( "alter2" , Person.class );
+		final Id<Person> a3 = Id.create( "alter3" , Person.class );
+		final Id<Person> a4 = Id.create( "alter4" , Person.class );
+		final Id<Person> a5 = Id.create( "alter5" , Person.class );
+		final Id<Person> a6 = Id.create( "alter6" , Person.class );
 
-		final Id a7 = new IdImpl( "alter7" );
-		final Id a8 = new IdImpl( "alter8" );
-		final Id a9 = new IdImpl( "alter9" );
-		final Id a10 = new IdImpl( "alter10" );
+		final Id<Person> a7 = Id.create( "alter7" , Person.class );
+		final Id<Person> a8 = Id.create( "alter8" , Person.class );
+		final Id<Person> a9 = Id.create( "alter9" , Person.class );
+		final Id<Person> a10 = Id.create( "alter10" , Person.class);
 
 		sn.addEgo( ego );
 		sn.addEgo( a1 );
@@ -128,7 +127,7 @@ public class SocialNetworkTest {
 		sn.addBidirectionalTie( ego , a6 );
 
 		// add some agents not directly connected to ego 
-		for ( Id external : new Id[]{ a7 , a8 , a9 , a10 } ) {
+		for ( Id<Person> external : new Id[]{ a7 , a8 , a9 , a10 } ) {
 			sn.addBidirectionalTie( a6 , external );
 		}
 
@@ -137,20 +136,20 @@ public class SocialNetworkTest {
 				"ego still in social network",
 				sn.getEgos().contains( ego ) );
 
-		for ( Id alter : new Id[]{ a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 } ) {
+		for ( Id<Person> alter : new Id[]{ a1 , a2 , a3 , a4 , a5 , a6 , a7 , a8 , a9 , a10 } ) {
 			Assert.assertFalse(
 					"ego still in network of agent "+alter,
 					sn.getAlters( alter ).contains( ego ) );
 		}
 
-		for ( Id alter : new Id[]{ a1 , a2 , a3 , a4 , a5 } ) {
+		for ( Id<Person> alter : new Id[]{ a1 , a2 , a3 , a4 , a5 } ) {
 			Assert.assertEquals(
 					"wrong network size for "+alter,
 					0,
 					sn.getAlters( alter ).size() );
 		}
 
-		for ( Id alter : new Id[]{ a7 , a8 , a9 , a10 } ) {
+		for ( Id<Person> alter : new Id[]{ a7 , a8 , a9 , a10 } ) {
 			Assert.assertEquals(
 					"wrong network size for "+alter,
 					1,

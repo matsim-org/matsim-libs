@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -36,14 +38,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class ParkAndRideFacility implements Facility {
 	private final Map<String, Object> customAttributes = new HashMap<String, Object>();
 	private final Coord coord;
-	private final Id linkId;
-	private final Id id;
+	private final Id<Link> linkId;
+	private final Id<ActivityFacility> id;
 	private final List<Id<TransitStopFacility>> stopsIds;
 
 	public ParkAndRideFacility(
-			final Id id,
+			final Id<ActivityFacility> id,
 			final Coord coord,
-			final Id linkId,
+			final Id<Link> linkId,
 			final List<Id<TransitStopFacility>> stopsIds) {
 		this.coord = coord;
 		this.id = id;
@@ -57,7 +59,7 @@ public class ParkAndRideFacility implements Facility {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<ActivityFacility> getId() {
 		return id;
 	}
 
@@ -67,7 +69,7 @@ public class ParkAndRideFacility implements Facility {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 

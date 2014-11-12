@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -162,14 +162,14 @@ public class IdentifyParkAndRideFacilities {
 	private static class PnrIds {
 		private long count = Long.MIN_VALUE;
 
-		public Id next() {
+		public Id<ActivityFacility> next() {
 			count++;
 
 			if (count == Long.MAX_VALUE) {
 				throw new RuntimeException( "overflow" );
 			}
 
-			return new IdImpl( "pnr-"+count );
+			return Id.create( "pnr-"+count , ActivityFacility.class );
 		}
 	}
 }

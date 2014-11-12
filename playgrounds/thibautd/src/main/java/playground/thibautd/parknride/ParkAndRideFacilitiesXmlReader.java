@@ -34,7 +34,8 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -68,11 +69,11 @@ public class ParkAndRideFacilitiesXmlReader extends MatsimXmlParser {
 			counter.incCounter();
 			currentBuilder = new FacilityBuilder();
 			currentBuilder.coord = getCoord( atts );
-			currentBuilder.id = getId( atts , ID_ATT );
-			currentBuilder.linkId = getId( atts , LINK_ID_ATT );
+			currentBuilder.id = getId( atts , ID_ATT , ActivityFacility.class );
+			currentBuilder.linkId = getId( atts , LINK_ID_ATT , Link.class );
 		}
 		else if (name.equals( STOP_TAG )) {
-			currentBuilder.stops.add( getId( atts , ID_ATT ) );
+			currentBuilder.stops.add( getId( atts , ID_ATT , TransitStopFacility.class ) );
 		}
 	}
 
@@ -85,8 +86,8 @@ public class ParkAndRideFacilitiesXmlReader extends MatsimXmlParser {
 				Double.parseDouble( y ));
 	}
 
-	private static final Id getId( final Attributes atts , final String qName ) {
-		return new IdImpl( atts.getValue( qName ) );
+	private static final <T> Id<T> getId( final Attributes atts , final String qName , final Class<T> idType ) {
+		return Id.create( atts.getValue( qName ) , idType );
 	}
 
 	@Override
@@ -111,8 +112,8 @@ public class ParkAndRideFacilitiesXmlReader extends MatsimXmlParser {
 
 class FacilityBuilder {
 	public Coord coord = null;
-	public Id id = null;
-	public Id linkId = null;
+	public Id<ActivityFacility> id = null;
+	public Id<Link> linkId = null;
 	public final List<Id<TransitStopFacility>> stops = new ArrayList<Id<TransitStopFacility>>();
 
 	public ParkAndRideFacility create() {

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -57,7 +56,7 @@ public class GroupPlansTest {
 		final List<Plan> plans = new ArrayList<Plan>();
 
 		for (int i=0; i < 5; i++) {
-			plans.add( new PlanImpl( new PersonImpl( new IdImpl( i ) ) ) );
+			plans.add( new PlanImpl( new PersonImpl( Id.create( i , Person.class ) ) ) );
 		}
 
 		testPlans.add( new GroupPlans( Collections.EMPTY_LIST , plans ) );
@@ -95,7 +94,7 @@ public class GroupPlansTest {
 
 		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 		for ( int i = 0; i < 5; i++ ) {
-			final Person person = popFact.createPerson( new IdImpl( "indiv-"+i ) );
+			final Person person = popFact.createPerson( Id.create( "indiv-"+i , Person.class ) );
 			final Plan plan = popFact.createPlan();
 			person.addPlan( plan );
 			plan.setPerson( person );
@@ -108,7 +107,7 @@ public class GroupPlansTest {
 			final Map<Id<Person>, Plan> plans = new HashMap< >();
 			for ( int j = 0; j < i; j++ ) {
 				nIndivInJoints++;
-				final Person person = popFact.createPerson( new IdImpl( "joint-"+i+"-"+j ) );
+				final Person person = popFact.createPerson( Id.create( "joint-"+i+"-"+j , Person.class ) );
 				final Plan plan = popFact.createPlan();
 				person.addPlan( plan );
 				plan.setPerson( person );

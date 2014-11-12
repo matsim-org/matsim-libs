@@ -39,9 +39,9 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 	private static final Logger log =
 		Logger.getLogger(FixedGroupsIdentifier.class);
 
-	private final Collection<? extends Collection<Id>> groupsInfo;
+	private final Collection<? extends Collection<Id<Person>>> groupsInfo;
 
-	public FixedGroupsIdentifier(final Collection<? extends Collection<Id>> groups) {
+	public FixedGroupsIdentifier(final Collection<? extends Collection<Id<Person>>> groups) {
 		this.groupsInfo = groups;
 	}
 
@@ -56,18 +56,18 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 		this( extractGroups( households ) );
 	}
 
-	private static Collection<? extends Collection<Id>> extractGroups(
+	private static Collection<? extends Collection<Id<Person>>> extractGroups(
 			final Households households) {
-		final List<List<Id>> groups = new ArrayList<List<Id>>();
+		final List<List<Id<Person>>> groups = new ArrayList<>();
 
 		for ( Household hh : households.getHouseholds().values() ) {
-			groups.add( new ArrayList<Id>( hh.getMemberIds() ) );
+			groups.add( hh.getMemberIds() );
 		}
 
 		return groups;
 	}
 
-	public Collection<? extends Collection<Id>> getGroupInfo() {
+	public Collection<? extends Collection<Id<Person>>> getGroupInfo() {
 		return groupsInfo;
 	}
 
@@ -78,11 +78,11 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 
 		int countGroups = 0;
 		int countPersonsExplicit = 0;
-		for (Collection<Id> groupIds : groupsInfo) {
+		for (Collection<Id<Person>> groupIds : groupsInfo) {
 			final ReplanningGroup g = new ReplanningGroup();
 			countGroups++;
 
-			for (Id id : groupIds) {
+			for (Id<Person> id : groupIds) {
 				countPersonsExplicit++;
 				final Person p = persons.remove( id );
 				if ( p == null ) {

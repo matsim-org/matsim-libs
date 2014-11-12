@@ -24,13 +24,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
@@ -40,8 +41,8 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 public class VehicularPlanLinkIdentifierTest {
 	@Test
 	public void testNotLinkedWhenNoVehicleDefined() {
-		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , null );
-		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , null );
+		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , null );
+		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , null );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 
@@ -52,8 +53,8 @@ public class VehicularPlanLinkIdentifierTest {
 
 	@Test
 	public void testDifferentVehiclesAreNotLinked() {
-		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , new IdImpl( 1 ) );
-		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , new IdImpl( 2 ) );
+		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , Id.create( 1 , Vehicle.class ) );
+		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , Id.create( 2 , Vehicle.class ) );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 		Assert.assertFalse(
@@ -63,8 +64,8 @@ public class VehicularPlanLinkIdentifierTest {
 
 	@Test
 	public void testSameVehiclesAreLinked() {
-		final Plan plan1 = createVehicularPlan( new IdImpl( 1 ) , new IdImpl( "car" ) );
-		final Plan plan2 = createVehicularPlan( new IdImpl( 2 ) , new IdImpl( "car" ) );
+		final Plan plan1 = createVehicularPlan( Id.create( 1 , Person.class ) , Id.create( "car" , Vehicle.class ) );
+		final Plan plan2 = createVehicularPlan( Id.create( 2 , Person.class ) , Id.create( "car" , Vehicle.class ) );
 
 		final PlanLinkIdentifier testee = new VehicularPlanBasedIdentifier();
 		Assert.assertTrue(
@@ -75,8 +76,8 @@ public class VehicularPlanLinkIdentifierTest {
 	// TODO test joint trips
 
 	private static Plan createVehicularPlan(
-			final Id personId,
-			final Id vehicleId) {
+			final Id<Person> personId,
+			final Id<Vehicle> vehicleId) {
 		final PopulationFactory fact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
 		final Plan plan1 = fact.createPlan();

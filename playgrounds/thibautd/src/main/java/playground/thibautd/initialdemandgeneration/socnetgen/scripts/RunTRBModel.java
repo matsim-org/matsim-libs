@@ -26,7 +26,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
@@ -170,7 +170,7 @@ public class RunTRBModel {
 
 						agentWithoutCoord =
 								new ArentzeAgent(
-									new IdImpl( atts.getValue( "id" ) ),
+									Id.create( atts.getValue( "id" ) , Person.class ),
 									ageCategory,
 									male );
 
@@ -203,13 +203,13 @@ public class RunTRBModel {
 	}
 
 	public static class ArentzeAgent implements Agent {
-		private final Id id;
+		private final Id<Person> id;
 		private final int ageCategory;
 		private final boolean isMale;
 		private Coord coord = null;
 
 		public ArentzeAgent(
-				final Id id,
+				final Id<Person> id,
 				final int ageCategory,
 				final boolean male) {
 			this.id = id;
@@ -218,7 +218,7 @@ public class RunTRBModel {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			return id;
 		}
 

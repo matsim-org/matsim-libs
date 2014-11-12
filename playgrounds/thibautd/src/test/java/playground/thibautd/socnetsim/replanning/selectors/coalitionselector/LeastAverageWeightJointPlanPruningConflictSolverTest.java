@@ -24,11 +24,9 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -51,7 +49,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		final ReplanningGroup group = new ReplanningGroup();
 
-		Id id = new IdImpl( 1 );
+		Id<Person> id = Id.create( 1 , Person.class );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );
@@ -69,7 +67,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 			}
 		}
 
-		id = new IdImpl( 2 );
+		id = Id.create( 2 , Person.class );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );
@@ -87,7 +85,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 			}
 		}
 
-		id = new IdImpl( 3 );
+		id = Id.create( 3 , Person.class );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );

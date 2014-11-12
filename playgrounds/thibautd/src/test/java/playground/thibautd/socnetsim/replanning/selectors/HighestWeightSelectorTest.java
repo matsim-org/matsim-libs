@@ -38,10 +38,10 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
@@ -119,7 +119,7 @@ public class HighestWeightSelectorTest {
 		List<Plan> toBeSelected = new ArrayList<Plan>();
 		List<Plan> toBeSelectedIfForbid = new ArrayList<Plan>();
 
-		PersonImpl person = new PersonImpl( new IdImpl( "tintin" ) );
+		PersonImpl person = new PersonImpl( Id.create( "tintin" , Person.class ) );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 1d );
@@ -129,7 +129,7 @@ public class HighestWeightSelectorTest {
 		final Plan forbiddenPlan = plan;
 		toBeSelected.add( plan );
 
-		person = new PersonImpl( new IdImpl( "milou" ) );
+		person = new PersonImpl( Id.create( "milou" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
@@ -138,7 +138,7 @@ public class HighestWeightSelectorTest {
 		toBeSelected.add( plan );
 		toBeSelectedIfForbid.add( plan );
 
-		person = new PersonImpl( new IdImpl( "tim" ) );
+		person = new PersonImpl( Id.create( "tim" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
@@ -149,7 +149,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -5000d );
 
-		person = new PersonImpl( new IdImpl( "struppy" ) );
+		person = new PersonImpl( Id.create( "struppy" , Person.class ) );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( -10d );
@@ -1015,7 +1015,7 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Id id = new IdImpl( "tintin" );
+		Id id = Id.create( "tintin" , Person.class );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p11 = person.createAndAddPlan( false );
@@ -1023,7 +1023,7 @@ public class HighestWeightSelectorTest {
 		final PlanImpl p12 = person.createAndAddPlan( false );
 		p12.setScore( 1d );
 
-		id = new IdImpl( "milou" );
+		id = Id.create( "milou" , Person.class );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p21 = person.createAndAddPlan( false );
@@ -1031,7 +1031,7 @@ public class HighestWeightSelectorTest {
 		final PlanImpl p22 = person.createAndAddPlan( false );
 		p22.setScore( 0d );
 
-		id = new IdImpl( "tim" );
+		id = Id.create( "tim" , Person.class );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p31 = person.createAndAddPlan( false );
@@ -1039,7 +1039,7 @@ public class HighestWeightSelectorTest {
 		final PlanImpl p32 = person.createAndAddPlan( false );
 		p32.setScore( 1d );
 
-		id = new IdImpl( "struppy" );
+		id = Id.create( "struppy" , Person.class );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p41 = person.createAndAddPlan( false );
@@ -1047,15 +1047,15 @@ public class HighestWeightSelectorTest {
 		final PlanImpl p42 = person.createAndAddPlan( false );
 		p42.setScore( 0d );
 
-		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
-		identifier.put( p11 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
-		identifier.put( p21 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
-		identifier.put( p12 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
-		identifier.put( p22 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
-		identifier.put( p31 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
-		identifier.put( p41 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
-		identifier.put( p32 , Collections.<Id>singleton( new IdImpl( 4 ) ) );
-		identifier.put( p42 , Collections.<Id>singleton( new IdImpl( 4 ) ) );
+		final IncompatiblePlansIdentifierImpl<Clique> identifier = new IncompatiblePlansIdentifierImpl<>();
+		identifier.put( p11 , Collections.<Id<Clique>>singleton( Id.create( 1 , Clique.class ) ) );
+		identifier.put( p21 , Collections.<Id<Clique>>singleton( Id.create( 1 , Clique.class ) ) );
+		identifier.put( p12 , Collections.<Id<Clique>>singleton( Id.create( 2 , Clique.class ) ) );
+		identifier.put( p22 , Collections.<Id<Clique>>singleton( Id.create( 2 , Clique.class ) ) );
+		identifier.put( p31 , Collections.<Id<Clique>>singleton( Id.create( 3 , Clique.class ) ) );
+		identifier.put( p41 , Collections.<Id<Clique>>singleton( Id.create( 3 , Clique.class ) ) );
+		identifier.put( p32 , Collections.<Id<Clique>>singleton( Id.create( 4 , Clique.class ) ) );
+		identifier.put( p42 , Collections.<Id<Clique>>singleton( Id.create( 4 , Clique.class ) ) );
 
 		GroupPlans expected = new GroupPlans(
 					Collections.EMPTY_LIST,
@@ -1130,13 +1130,13 @@ public class HighestWeightSelectorTest {
 		p42.setScore( 1d );
 		jp4.put( id , p42 );
 
-		final IncompatiblePlansIdentifierImpl identifier = new IncompatiblePlansIdentifierImpl();
-		identifier.put( p11 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
-		identifier.put( p12 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
-		identifier.put( p31 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
-		identifier.put( p32 , Collections.<Id>singleton( new IdImpl( 3 ) ) );
-		identifier.put( p41 , Collections.<Id>singleton( new IdImpl( 1 ) ) );
-		identifier.put( p42 , Collections.<Id>singleton( new IdImpl( 2 ) ) );
+		final IncompatiblePlansIdentifierImpl<Clique> identifier = new IncompatiblePlansIdentifierImpl<>();
+		identifier.put( p11 , Collections.<Id<Clique>>singleton( Id.create( 1 , Clique.class ) ) );
+		identifier.put( p12 , Collections.<Id<Clique>>singleton( Id.create( 2 , Clique.class ) ) );
+		identifier.put( p31 , Collections.<Id<Clique>>singleton( Id.create( 3 , Clique.class ) ) );
+		identifier.put( p32 , Collections.<Id<Clique>>singleton( Id.create( 3 , Clique.class ) ) );
+		identifier.put( p41 , Collections.<Id<Clique>>singleton( Id.create( 1 , Clique.class ) ) );
+		identifier.put( p42 , Collections.<Id<Clique>>singleton( Id.create( 2 , Clique.class ) ) );
 
 		final JointPlan jointPlan1 = jointPlans.getFactory().createJointPlan( jp1 );
 		jointPlans.addJointPlan( jointPlan1 );
@@ -1263,14 +1263,14 @@ public class HighestWeightSelectorTest {
 	}
 
 	private static class CollectionBasedPlanForbidderFactory implements IncompatiblePlansIdentifierFactory {
-		private final Map<Plan, Set<Id>> map = new HashMap<Plan, Set<Id>>();
+		private final Map<Plan, Set<Id<Clique>>> map = new HashMap<>();
 
 		public CollectionBasedPlanForbidderFactory(
 				final ReplanningGroup group,
 				final JointPlans jointPlans,
 				final Set<Plan> forbiddenPlans) {
 			int id = 0;
-			final Set<Id> allGroups = new HashSet<Id>();
+			final Set<Id<Clique>> allGroups = new HashSet<>();
 			for ( Person person : group.getPersons() ) {
 				for ( Plan plan : person.getPlans() ) {
 					if ( map.containsKey( plan ) ) continue;
@@ -1280,7 +1280,7 @@ public class HighestWeightSelectorTest {
 						Collections.singleton( plan ) :
 						jp.getIndividualPlans().values();
 
-					final Id groupId = new IdImpl( id++ );
+					final Id<Clique> groupId = Id.create( id++ , Clique.class );
 					allGroups.add( groupId );
 					for ( Plan toAdd : plansToAdd ) {
 						map.put( toAdd , Collections.singleton( groupId ) );
@@ -1297,7 +1297,7 @@ public class HighestWeightSelectorTest {
 				final ReplanningGroup group) {
 			return new IncompatiblePlansIdentifier() {
 				@Override
-				public Set<Id> identifyIncompatibilityGroups(
+				public Set<Id<Clique>> identifyIncompatibilityGroups(
 						final Plan plan) {
 					return map.get( plan );
 				}

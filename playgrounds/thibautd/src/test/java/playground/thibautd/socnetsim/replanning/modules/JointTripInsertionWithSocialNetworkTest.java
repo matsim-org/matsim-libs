@@ -26,18 +26,17 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.TripRouter;
@@ -47,10 +46,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.replanning.modules.ActedUponInformation;
-import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 
 /**
  * @author thibautd
@@ -116,10 +113,10 @@ public class JointTripInsertionWithSocialNetworkTest {
 		final PopulationFactory factory = population.getFactory();
 
 		final Coord coordHome = new CoordImpl( 0 , 0 );
-		final Id linkHome = new IdImpl( "link" );
+		final Id linkHome = Id.create( "link" , Link.class );
 		final int nAgents = 100;
 		for ( int i = 0; i < nAgents; i++ ) {
-			final Person person = factory.createPerson( new IdImpl( i ) );
+			final Person person = factory.createPerson( Id.create( i , Person.class ) );
 			final Plan plan = factory.createPlan();
 
 			final ActivityImpl firstAct = (ActivityImpl) factory.createActivityFromCoord( "h" , coordHome );
@@ -140,9 +137,9 @@ public class JointTripInsertionWithSocialNetworkTest {
 		final SocialNetwork sn = new SocialNetworkImpl( true );
 		sc.addScenarioElement( SocialNetwork.ELEMENT_NAME , sn );
 
-		for ( int i=0; i < nAgents; i++ ) sn.addEgo( new IdImpl( i ) );
+		for ( int i=0; i < nAgents; i++ ) sn.addEgo( Id.create( i , Person.class ) );
 		for ( int i=0; i < nAgents - 1; i++ ) {
-			sn.addBidirectionalTie( new IdImpl( i ) , new IdImpl( i + 1 ) );
+			sn.addBidirectionalTie( Id.create( i , Person.class ) , Id.create( i + 1 , Person.class ) );
 		}
 
 		return sc;

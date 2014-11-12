@@ -25,11 +25,9 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -50,7 +48,7 @@ public class LexicographicRemoverTest {
 		final JointPlans jointPlans = new JointPlans();
 
 		for ( int i=0; i < 4; i++ ) {
-			final Person person = new PersonImpl( new IdImpl( i ) );
+			final Person person = new PersonImpl( Id.create( i , Person.class ) );
 			group.addPerson( person );
 
 			for ( double score = 0; score < 3; score++ ) {
@@ -74,7 +72,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson( new PersonImpl( new IdImpl( i ) ) );
+			group.addPerson( new PersonImpl( Id.create( i , Person.class ) ) );
 		}
 		
 		final JointPlans jointPlans = new JointPlans();
@@ -108,7 +106,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson( new PersonImpl( new IdImpl( i ) ) );
+			group.addPerson( new PersonImpl( Id.create( i , Person.class ) ) );
 		}
 		
 		final JointPlans jointPlans = new JointPlans();
