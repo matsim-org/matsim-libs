@@ -17,14 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
+package playground.michalm.taxi.optimizer.filter;
 
+import java.util.List;
+
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.util.DistanceUtils;
 
+import pl.poznan.put.util.collect.PartialSort;
 import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
-public interface VehicleFinder
+public class KStraightLineNearestRequestFilter
+    implements RequestFilter
 {
-    public Vehicle findVehicleForRequest(Iterable<Vehicle> vehicles, TaxiRequest request);
+    private final TaxiScheduler scheduler;
+    private final int k;
+
+
+    public KStraightLineNearestRequestFilter(TaxiScheduler scheduler, int k)
+    {
+        this.scheduler = scheduler;
+        this.k = k;
+    }
+
+
+    @Override
+    public List<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
+            Vehicle vehicle)
+    {
+        Link fromLink = scheduler.getEarliestIdleness(vehicle).link;
+        PartialSort<TaxiRequest> nearestRequestSort = new PartialSort<TaxiRequest>(k);
+
+        for (TaxiRequest req : requests) {
+            Link toLink = req.getFromLink();
+            double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
+            nearestRequestSort.add(req, squaredDistance);
+        }
+
+        return nearestRequestSort.retriveKSmallestElements();
+    }
 }

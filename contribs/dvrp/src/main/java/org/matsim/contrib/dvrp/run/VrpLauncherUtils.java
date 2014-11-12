@@ -19,45 +19,28 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import org.matsim.analysis.LegHistogram;
-import org.matsim.analysis.LegHistogramChart;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import java.io.File;
+import java.util.*;
+
+import org.matsim.analysis.*;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.router.TravelTimeCalculators;
+import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.mobsim.qsim.agents.*;
+import org.matsim.core.network.*;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import org.matsim.core.trafficmonitoring.*;
 
 
 public class VrpLauncherUtils
@@ -85,13 +68,10 @@ public class VrpLauncherUtils
 
     public enum TravelDisutilitySource
     {
-        STRAIGHT_LINE, // however, Dijkstra's algo will use DISTANCE cost
-        DISTANCE, // travel distance
-        TIME; // travel time
+        DISTANCE, TIME;
     }
 
 
-    //TODO: Make Scenario Loading Matsim Standard (e.g. use a config file)
     public static Scenario initScenario(String netFileName, String plansFileName)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
@@ -194,7 +174,6 @@ public class VrpLauncherUtils
             TravelTime travelTime)
     {
         switch (tdisSource) {
-            case STRAIGHT_LINE:
             case DISTANCE:
                 return new DistanceAsTravelDisutility();
 
@@ -242,8 +221,8 @@ public class VrpLauncherUtils
         legHistogram.write(histogramOutDirName + "legHistogram_all.txt");
         LegHistogramChart.writeGraphic(legHistogram, histogramOutDirName + "legHistogram_all.png");
         for (String legMode : legHistogram.getLegModes()) {
-            LegHistogramChart.writeGraphic(legHistogram, histogramOutDirName + "legHistogram_" + legMode + ".png",
-                    legMode);
+            LegHistogramChart.writeGraphic(legHistogram, histogramOutDirName + "legHistogram_"
+                    + legMode + ".png", legMode);
         }
     }
 

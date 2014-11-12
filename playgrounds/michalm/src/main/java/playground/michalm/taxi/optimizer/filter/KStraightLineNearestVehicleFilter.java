@@ -17,56 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
-
-import java.util.Collections;
+package playground.michalm.taxi.optimizer.filter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
 
+import pl.poznan.put.util.collect.PartialSort;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
-public class StraightLineNearestRequestFinder
-    implements RequestFinder, RequestFilter
+public class KStraightLineNearestVehicleFilter
+    implements VehicleFilter
 {
     private final TaxiScheduler scheduler;
+    private final int k;
 
 
-    public StraightLineNearestRequestFinder(TaxiScheduler scheduler)
+    public KStraightLineNearestVehicleFilter(TaxiScheduler scheduler, int k)
     {
         this.scheduler = scheduler;
+        this.k = k;
     }
 
 
     @Override
-    public TaxiRequest findRequestForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle)
+    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
+            TaxiRequest request)
     {
-        Link fromLink = scheduler.getEarliestIdleness(vehicle).link;
-        TaxiRequest bestReq = null;
-        double bestSquaredDistance = Double.MAX_VALUE;
+        Link toLink = request.getFromLink();
+        PartialSort<Vehicle> nearestVehicleSort = new PartialSort<Vehicle>(k);
 
-        for (TaxiRequest req : requests) {
-            Link toLink = req.getFromLink();
-
+        for (Vehicle veh : vehicles) {
+            Link fromLink = scheduler.getEarliestIdleness(veh).link;
             double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
-
-            if (squaredDistance < bestSquaredDistance) {
-                bestReq = req;
-                bestSquaredDistance = squaredDistance;
-            }
+            nearestVehicleSort.add(veh, squaredDistance);
         }
 
-        return bestReq;
-    }
-
-
-    @Override
-    public Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
-            Vehicle vehicle)
-    {
-        return Collections.singletonList(findRequestForVehicle(requests, vehicle));
+        return nearestVehicleSort.retriveKSmallestElements();
     }
 }

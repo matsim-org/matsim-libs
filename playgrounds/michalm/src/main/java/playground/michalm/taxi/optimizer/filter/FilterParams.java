@@ -17,20 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
+package playground.michalm.taxi.optimizer.filter;
 
-import java.util.Collections;
-
-
-public class QueryUtils
+public class FilterParams
 {
-    public static <V> Iterable<V> toIterableExcludingNull(V elem)
+    public final Integer nearestRequestsLimit;//null ==> no filtration
+    public final Integer nearestVehiclesLimit;//null ==> no filtration
+
+
+    public FilterParams(Integer nearestRequestsLimit, Integer nearestVehiclesLimit)
     {
-        if (elem == null) {
-            return Collections.emptySet();
-        }
-        else {
-            return Collections.singleton(elem);
-        }
+        this.nearestRequestsLimit = nearestRequestsLimit;
+        this.nearestVehiclesLimit = nearestVehiclesLimit;
     }
 }

@@ -36,8 +36,6 @@ import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 
 enum AlgorithmConfig
 {
-    NOS_TW_SL(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, STRAIGHT_LINE),
-
     NOS_TW_TD(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
 
     NOS_TW_FF(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
@@ -46,8 +44,6 @@ enum AlgorithmConfig
 
     NOS_TW_15M(NO_SCHEDULING, MIN_WAIT_TIME, EVENTS_15_MIN, TIME),
 
-    NOS_TP_SL(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, STRAIGHT_LINE),
-
     NOS_TP_TD(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, DISTANCE),
 
     NOS_TP_FF(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
@@ -55,8 +51,6 @@ enum AlgorithmConfig
     NOS_TP_24H(NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS_24_H, TIME),
 
     NOS_TP_15M(NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS_15_MIN, TIME),
-
-    NOS_DSE_SL(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, STRAIGHT_LINE),
 
     NOS_DSE_TD(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, DISTANCE),
 
@@ -140,7 +134,7 @@ enum AlgorithmConfig
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return NOSTaxiOptimizer.createNOS(optimConfig, tdisSource);
+                return new NOSTaxiOptimizer(optimConfig);
 
             case ONE_TIME_SCHEDULING:
                 return new OTSTaxiOptimizer(optimConfig);

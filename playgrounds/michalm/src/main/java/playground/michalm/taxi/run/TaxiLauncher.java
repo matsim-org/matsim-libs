@@ -41,13 +41,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import pl.poznan.put.util.file.ParameterFileReader;
-import pl.poznan.put.util.jfreechart.ChartUtils;
+import pl.poznan.put.util.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.filter.FilterParams;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
@@ -87,6 +87,9 @@ class TaxiLauncher
     Double pickupDuration;
     Double dropoffDuration;
 
+    Integer nearestRequestsLimit;//null ==> no filtration
+    Integer nearestVehiclesLimit;//null ==> no filtration
+
     LegHistogram legHistogram;
     MatsimVrpContext context;
     TaxiDelaySpeedupStats delaySpeedupStats;
@@ -119,6 +122,9 @@ class TaxiLauncher
         params.put("destinationKnown", "!true");
         params.put("pickupDuration", "120");
         params.put("dropoffDuration", "60");
+
+        params.put("nearestRequestsLimit", "20");
+        params.put("nearestVehiclesLimit", "20");
 
         params.put("otfVis", "!true");
         params.put("vrpOutFiles", "!true");
@@ -156,6 +162,9 @@ class TaxiLauncher
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
         pickupDuration = Double.valueOf(params.get("pickupDuration"));
         dropoffDuration = Double.valueOf(params.get("dropoffDuration"));
+
+        nearestRequestsLimit = Integer.valueOf(params.get("nearestRequestsLimit"));
+        nearestVehiclesLimit = Integer.valueOf(params.get("nearestVehiclesLimit"));
 
         otfVis = Boolean.valueOf(params.get("otfVis"));
         vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
@@ -306,8 +315,10 @@ class TaxiLauncher
 
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
 
+        FilterParams filterParams = new FilterParams(nearestRequestsLimit, nearestVehiclesLimit);
+
         return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
-                algorithmConfig.goal, dir);
+                filterParams, algorithmConfig.goal, dir);
     }
 
 

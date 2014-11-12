@@ -17,23 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
+package playground.michalm.taxi.run;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import playground.michalm.taxi.data.TaxiRequest;
-
-
-public interface RequestFilter
+public class BerlinTaxiLauncher
 {
-    RequestFilter NO_FILTER = new RequestFilter() {
-        public Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
-                Vehicle vehicle)
-        {
-            return requests;
-        }
-    };
-
-
-    Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
+    public static void main(String[] args)
+    {
+        String file = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/scenarios/2014_10_basic_scenario_v4/params.in";
+        TaxiLauncher launcher = new TaxiLauncher(TaxiLauncher.readParams(file));
+        launcher.initVrpPathCalculator();
+        launcher.go(false);
+        launcher.generateOutput();
+    }
 }

@@ -19,17 +19,14 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.STRAIGHT_LINE;
-
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.query.*;
+import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.*;
@@ -42,32 +39,10 @@ public class NOSTaxiOptimizer
     private final RequestFilter requestFilter;
 
 
-    public static NOSTaxiOptimizer createNOS(TaxiOptimizerConfiguration optimConfig,
-            TravelDisutilitySource tdisSource)
+    public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        return tdisSource == STRAIGHT_LINE ? //
-                NOSTaxiOptimizer.createNOSWithStraightLineDistance(optimConfig) : //
-                NOSTaxiOptimizer.createNOSWithoutStraightLineDistance(optimConfig);
-    }
-
-
-    public static NOSTaxiOptimizer createNOSWithStraightLineDistance(
-            TaxiOptimizerConfiguration optimConfig)
-    {
-        VehicleFilter vehFilter = new StraightLineNearestVehicleFinder(optimConfig.scheduler);
-        RequestFilter reqFilter = new StraightLineNearestRequestFinder(optimConfig.scheduler);
-
-        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter);
-    }
-
-
-    public static NOSTaxiOptimizer createNOSWithoutStraightLineDistance(
-            TaxiOptimizerConfiguration optimConfig)
-    {
-        VehicleFilter vehFilter = VehicleFilter.NO_FILTER;
-        RequestFilter reqFilter = RequestFilter.NO_FILTER;
-
-        return new NOSTaxiOptimizer(optimConfig, vehFilter, reqFilter);
+        this(optimConfig, createDefaultVehicleFilter(optimConfig),
+                createDefaultRequestFilter(optimConfig));
     }
 
 
@@ -75,8 +50,23 @@ public class NOSTaxiOptimizer
             RequestFilter requestFilter)
     {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
+
         this.vehicleFilter = vehicleFilter;
         this.requestFilter = requestFilter;
+    }
+
+
+    private static VehicleFilter createDefaultVehicleFilter(TaxiOptimizerConfiguration optimConfig)
+    {
+        return new KStraightLineNearestVehicleFilter(optimConfig.scheduler,
+                optimConfig.filterParams.nearestVehiclesLimit);
+    }
+
+
+    private static RequestFilter createDefaultRequestFilter(TaxiOptimizerConfiguration optimConfig)
+    {
+        return new KStraightLineNearestRequestFilter(optimConfig.scheduler,
+                optimConfig.filterParams.nearestRequestsLimit);
     }
 
 
@@ -90,7 +80,7 @@ public class NOSTaxiOptimizer
     {
         initIdleVehicles();
 
-        if (doReduceTP()) {
+        if (isReduceTP()) {
             scheduleIdleVehiclesImpl();//reduce T_P to increase throughput (demand > supply)
         }
         else {
@@ -111,7 +101,7 @@ public class NOSTaxiOptimizer
     }
 
 
-    private boolean doReduceTP()
+    private boolean isReduceTP()
     {
         switch (optimConfig.goal) {
             case MIN_PICKUP_TIME:

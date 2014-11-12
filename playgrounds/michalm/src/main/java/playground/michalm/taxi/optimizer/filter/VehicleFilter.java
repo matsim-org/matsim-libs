@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
+package playground.michalm.taxi.optimizer.filter;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.query;
+package playground.michalm.taxi.optimizer.filter;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.data.TaxiRequest;
 
 
-public interface RequestFinder
+public interface RequestFilter
 {
-    public TaxiRequest findRequestForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
+    RequestFilter NO_FILTER = new RequestFilter() {
+        public Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
+                Vehicle vehicle)
+        {
+            return requests;
+        }
+    };
+
+
+    Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
 }

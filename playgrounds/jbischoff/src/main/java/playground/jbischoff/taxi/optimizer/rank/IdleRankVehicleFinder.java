@@ -27,13 +27,13 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
 
-import playground.jbischoff.energy.charging.taxi.*;
+import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.query.*;
+import playground.michalm.taxi.optimizer.filter.VehicleFilter;
 import playground.michalm.taxi.scheduler.*;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.*;
 
 
 /**
@@ -75,7 +75,6 @@ public class IdleRankVehicleFinder
     {
         this.useChargeOverTime = useChargeOverDistance;
     }
-    
 
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
@@ -86,7 +85,7 @@ public class IdleRankVehicleFinder
 
     private double getVehicleSoc(Vehicle veh)
     {
-        return this.ecabHandler.getRelativeTaxiSoC(Id.create(veh.getId(),ElectricTaxi.class));
+        return this.ecabHandler.getRelativeTaxiSoC(Id.create(veh.getId(), ElectricTaxi.class));
     }
 
 
@@ -108,7 +107,7 @@ public class IdleRankVehicleFinder
     public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
             TaxiRequest request)
     {
-        return QueryUtils.toIterableExcludingNull(findVehicleForRequest(vehicles, request));
+        return Lists.newArrayList(findVehicleForRequest(vehicles, request));
     }
 
 
@@ -234,7 +233,7 @@ public class IdleRankVehicleFinder
                 if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule()
                         .getCurrentTask().getBeginTime())
                     bestVeh = veh;
-                
+
                 //FIFO, if distance is equal	
             }
         }
@@ -242,7 +241,7 @@ public class IdleRankVehicleFinder
         return bestVeh;
     }
 
-    
+
     private Vehicle findClosestWillingVehicle(TaxiRequest req)
     {
         List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
@@ -255,13 +254,14 @@ public class IdleRankVehicleFinder
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
-            if (! vehicleWillingToServeRequest(veh,req)) continue;
+            if (!vehicleWillingToServeRequest(veh, req))
+                continue;
             double distance = calculateSquaredDistance(req, veh);
             if (distance < bestDistance) {
-                
+
                 bestDistance = distance;
                 bestVeh = veh;
-                
+
             }
             else if (distance == bestDistance) {
 
@@ -272,21 +272,23 @@ public class IdleRankVehicleFinder
                 if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule()
                         .getCurrentTask().getBeginTime())
                     bestVeh = veh;
-                
+
                 //FIFO, if distance is equal    
             }
         }
 
         return bestVeh;
     }
+
+
     /**
      * 
      */
     private boolean vehicleWillingToServeRequest(Vehicle veh, TaxiRequest req)
     {
-        
+
         return true;
-        
+
     }
 
 

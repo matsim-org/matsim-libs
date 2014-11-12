@@ -98,18 +98,18 @@
 		
 		
   		<!-- ============== standard option ============== -->
-		<dependency>
+		<!--dependency>
 			<groupId>pl.poznan.put.michalm</groupId>
 			<artifactId>util</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/util-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
+		</dependency-->
 
 		<!-- ============== alternative option ============== -->
 		<!-- only when the UTIL (maven) project is created -->
 		<!-- exclusions used to simulate the SYSTEM scope --> 
-		<!--dependency>
+		<dependency>
 			<groupId>pl.poznan.put.michalm</groupId>
 			<artifactId>util</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
@@ -120,7 +120,7 @@
 					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency-->
+		</dependency>
 		
 	</dependencies>
 
