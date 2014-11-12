@@ -57,7 +57,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * Contains all spatial information for the RLS approach 'Lange gerade Fahrstreifen' to calculate noise immission.
+ * Contains all spatial information for the RLS approach 'Lange gerade Fahrstreifen' to calculate noise immissions.
  * 
  * @author lkroeger, ikaddoura
  *
