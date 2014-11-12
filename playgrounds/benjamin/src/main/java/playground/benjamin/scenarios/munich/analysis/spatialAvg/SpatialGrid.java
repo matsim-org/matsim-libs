@@ -175,4 +175,32 @@ public class SpatialGrid {
 		
 		return listOfAllCells;
 	}
+
+	public void distributeAndAddWelfare(Coord homeCoord, Double utilityValue, LinkWeightUtil linkWeightUtil, Double scalingFactor) {
+		for(int i=0; i<numberOfCellsX; i++){
+			for(int j=0; j<numberOfCellsY; j++){
+				Cell currentCell = grid[i][j];
+				Double weight = linkWeightUtil.getWeightFromCoord(homeCoord, currentCell.getCentroid());
+				Double weightedUtilityValue = utilityValue * weight * scalingFactor;
+				Double weightedCount = 1.0 * weight * scalingFactor;
+				currentCell.addWeightedValue(weightedUtilityValue);
+				currentCell.addWeight(weightedCount);
+			}
+		}
+		
+	}
+
+	public SpatialGrid getDifferencesAAverages(SpatialGrid baseCaseGrid) {
+		SpatialGrid differences = new SpatialGrid(numberOfCellsX, numberOfCellsY, gridMinX, gridMaxX, gridMinY, gridMaxY);
+		for(int i=0; i<numberOfCellsX; i++){
+			for(int j=0; j<numberOfCellsY; j++){
+				double weightedValueDifference = this.grid[i][j].getWeightedValue()-baseCaseGrid.grid[i][j].getWeightedValue();
+				double averageDifference = this.grid[i][j].getAverageValue() - baseCaseGrid.grid[i][j].getAverageValue();
+				double weightDifference = weightedValueDifference/averageDifference;
+				differences.grid[i][j].addWeightedValue(weightedValueDifference);
+				differences.grid[i][j].addWeight(weightDifference);
+			}
+		}
+		return differences;
+	}
 }

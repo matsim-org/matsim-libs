@@ -97,5 +97,12 @@ public class LinkLineWeightUtil implements LinkWeightUtil {
 		if(smoothingRadius_m>0.0) return (cellsize_m/smoothingRadiusSquared_m);
 		return 1.0;
 	}
+	
+	@Override
+	public Double getWeightFromCoord(Coord emittingCoord, Coord receivingCoord) {
+		logger.warn("line weight util is not supposed to work with a pair of coordinates. Return 0.0 as weight.");
+		return 0.0;
+		
+	}
 
 }

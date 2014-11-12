@@ -74,6 +74,11 @@ public class SpatialAveragingWriter {
 									inputData.getMunichShapeFile(), inputData.getTargetCRS(), useVisBoundary);
 	}
 
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
+			SpatialAveragingParameters parameters) {
+		this(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins(), parameters.getSmoothingRadius_m(), parameters.IsUsingVisBoundary());
+	}
+
 	public void writeRoutput(Double[][] doubles, String outputPathForR) {
 		try {
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));

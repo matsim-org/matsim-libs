@@ -45,7 +45,7 @@ public class SpatialAveragingInputData {
 	private String configFile1;
 	private String emissionFile1, emissionFile2;
 	private Integer lastIteration1;
-	private String plansfile;
+	private String plansfile, plansfile2;
 	
 	public SpatialAveragingInputData(String baseCase, String compareCase) {
 		setFieldsForBaseCase(baseCase);
@@ -98,6 +98,7 @@ public class SpatialAveragingInputData {
 				runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_exposurePricing/";
 			}
 			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+			plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".plans.xml.gz";
 		}
 		
 		if(baseCase.equals("latsis")){
@@ -110,6 +111,7 @@ public class SpatialAveragingInputData {
 				runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 			}
 			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+			plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".plans.xml.gz";
 		}
 		
 		if(baseCase.equals("981")){
@@ -117,6 +119,7 @@ public class SpatialAveragingInputData {
 				runNumber2 = "983";
 				runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
 				emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".emission.events.xml.gz";
+				plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".plans.xml.gz";
 			}
 		}
 	}
@@ -190,7 +193,7 @@ public class SpatialAveragingInputData {
 		return ((xMax-xMin)*(yMax-yMin));
 	}
 
-	public String getPlansFile() {
+	public String getPlansFileBaseCase() {
 		return plansfile;
 	}
 
@@ -201,6 +204,10 @@ public class SpatialAveragingInputData {
 
 	public Double getScalingFactor() {
 		return this.scalingFactor;
+	}
+
+	public String getPlansFileCompareCase() {
+		return plansfile2;
 	}
 
 }

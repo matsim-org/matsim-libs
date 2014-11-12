@@ -88,4 +88,10 @@ public class CellWeightUtil implements LinkWeightUtil {
 	public Double getNormalizationFactor() {
 		return 1.0;
 	}
+	@Override
+	public Double getWeightFromCoord(Coord emittingCoord, Coord receivingCoord) {
+		Cell emittingCell = grid.getCellForCoordinate(emittingCoord);
+		Cell receivingCell = grid.getCellForCoordinate(receivingCoord);
+		return calcDistanceFactorFromCells(emittingCell, receivingCell);
+	}
 }

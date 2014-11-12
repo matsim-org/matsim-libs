@@ -46,19 +46,36 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class SpatialAveragingWelfare {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingWelfare.class);
 
+//	final double scalingFactor = 100.;
+//	private final static String runNumber1 = "baseCase";
+//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+////	private final static String runNumber2 = "pricing";
+////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
+//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+////
+//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
+//	private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
+//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+//	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
+//	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
+	
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
+	private final static String runNumber2 = "pricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_pricing/";
 //	private final static String runNumber2 = "pricing";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
-	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
+	private static String configFile1 = runDirectory1 + "output_config.xml";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
+	private static String configFile2 = runDirectory1 + "output_config.xml";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
 	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
 	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
@@ -92,7 +109,7 @@ public class SpatialAveragingWelfare {
 	LocationFilter lf;
 	Network network;
 
-	String outPathStub = runDirectory1 + "analysis/spatialAveraging/welfare/";
+	String outPathStub = runDirectory1 + "analysis/spatialAveraging/data/";
 
 	private void run() throws IOException{
 		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, null);

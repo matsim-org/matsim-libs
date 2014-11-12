@@ -19,15 +19,51 @@
 
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-public interface LinkWeightUtil {
+public class SpatialAveragingParameters {
 
-	Double getWeightFromLink(Link link, Coord cellCentroid);
+	private int numberOfXBins = 160;
+	private int numberOfYBins = 120;
+	private double smoothingRadius_m = 1000.;
+	private double smoothingRadiusSquared_m;
+	private double areaInSmoothingCirleSqkm;
+	private String visBoundaryShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private CoordinateReferenceSystem targetCRS = null;
+	private boolean isUsingVisBoundary = false;
 
-	Double getNormalizationFactor();
+	public SpatialAveragingParameters(){
+		smoothingRadiusSquared_m = smoothingRadius_m*smoothingRadius_m;
+		areaInSmoothingCirleSqkm = Math.PI * smoothingRadiusSquared_m /1000. /1000.;
+	}
+	public int getNoOfXbins() {
+		return numberOfXBins;
+	}
 
-	Double getWeightFromCoord(Coord emittingCoord, Coord receivingCoord);
+	public int getNoOfYbins() {
+		return numberOfYBins;
+	}
 
+	public double getSmoothingRadiusSquared_m() {
+		return smoothingRadiusSquared_m;
+	}
+
+	public double getAreaInSmoothingCirleSqKM() {
+		return areaInSmoothingCirleSqkm;
+	}
+
+	public String getVisBoundaryShapeFile() {
+		return visBoundaryShapeFile;
+	}
+
+	public CoordinateReferenceSystem getTargetCRS() {
+		return targetCRS;
+	}
+	public Double getSmoothingRadius_m() {
+		// TODO Auto-generated method stub
+		return this.smoothingRadius_m;
+	}
+	public boolean IsUsingVisBoundary() {
+		return isUsingVisBoundary ;
+	}
 }

@@ -73,6 +73,12 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	}
 
 
+	public LinkPointWeightUtil(SpatialAveragingInputData inputData,
+			SpatialAveragingParameters parameters) {
+		this(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins(), parameters.getSmoothingRadius_m());
+	}
+
+
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
 		double linkcenterx = link.getCoord().getX();
@@ -102,6 +108,12 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 			}
 		}
 		return false;
+	}
+
+
+	@Override
+	public Double getWeightFromCoord(Coord emittingCoord, Coord receivingCoord) {
+		return calculateWeightOfPointForCell(emittingCoord.getX(), emittingCoord.getY(), receivingCoord.getX(), receivingCoord.getY());
 	}
 
 	
