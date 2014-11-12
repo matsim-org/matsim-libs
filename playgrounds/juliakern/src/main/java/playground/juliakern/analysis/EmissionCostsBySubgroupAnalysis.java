@@ -87,7 +87,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputData.getNetworkFile());
-		config.plans().setInputFile(inputData.getPlansFile());
+		config.plans().setInputFile(inputData.getPlansFileBaseCase());
 		scenario = ScenarioUtils.loadScenario(config);
 		
 		sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
