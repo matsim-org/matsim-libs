@@ -522,9 +522,5 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	public Map<Id<ReceiverPoint>, Map<Double, Map<Id<Person>, Map<Integer, Tuple<Double, String>>>>> getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType() {
 		return receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType;
 	}
-
-	public Map<Id<ReceiverPoint>, List<Id<Person>>> getReceiverPointId2ListOfHomeAgents() {
-		return receiverPointId2ListOfHomeAgents;
-	}
 	
 }

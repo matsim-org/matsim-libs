@@ -70,7 +70,6 @@ public class NoiseDamageCosts {
 	private Map<Id<ReceiverPoint>,Map<Id<Person>,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd;
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2affectedAgentUnits;
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>> receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType;
-	private Map<Id<ReceiverPoint>,List<Id<Person>>> receiverPointId2ListOfHomeAgents;
 		
 	// noise damage cost
 	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2damageCost = new HashMap<Id<Link>, Map<Double,Double>>();
@@ -108,7 +107,6 @@ public class NoiseDamageCosts {
 		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd = activityTracker.getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
 		this.receiverPointId2timeInterval2affectedAgentUnits = activityTracker.getReceiverPointId2timeInterval2affectedAgentUnits();
 		this.receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType = activityTracker.getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
-		this.receiverPointId2ListOfHomeAgents = activityTracker.getReceiverPointId2ListOfHomeAgents();
 		
 		this.receiverPointId2timeInterval2noiseImmission = noiseImmission.getReceiverPointId2timeInterval2noiseImmission();
 		this.receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = noiseImmission.getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();

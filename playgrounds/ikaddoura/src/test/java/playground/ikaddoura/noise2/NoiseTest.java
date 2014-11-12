@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
@@ -166,8 +165,6 @@ public class NoiseTest {
 		// test the right allocation to the nearest receiver point
 		// homeCoord: x="500.0" y="5.0" --> nearest receiver point: 0 (400/105)
 		// workCoord: x="4500" y="5.0" --> nearest receiver point: 16 (4400/105)
-		Assert.assertEquals("wrong allocation of home activity location to receiver point", 2, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents().size());
-		Assert.assertEquals("wrong allocation of home activity location to receiver point", 2, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents().get(Id.create("0", ReceiverPoint.class)).size());
 		
 		// test the right tracking of person, activity number, start and end time
 		Assert.assertEquals("wrong activity performing time", 0., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("0", ReceiverPoint.class)).get(Id.create("person_car_test2", Person.class)).get(1).getFirst(), MatsimTestUtils.EPSILON);

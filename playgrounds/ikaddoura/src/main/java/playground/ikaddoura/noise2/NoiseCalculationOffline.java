@@ -89,13 +89,15 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-//		events.addHandler(eventWriter);
+		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario);
 		spatialInfo.setActivityCoords();
 		spatialInfo.setReceiverPoints();
 //		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
+//		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
 		spatialInfo.setRelevantLinkIds();
 		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
@@ -138,7 +140,7 @@ public class NoiseCalculationOffline {
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
-//		eventWriter.closeFile();
+		eventWriter.closeFile();
 	}
 }
 		
