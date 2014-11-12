@@ -165,12 +165,16 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				}
 				
 				if(!(n == 0)) {
-//					// correction for a sample, multiplicate the scale factor
-					n = (int) (n * (NoiseConfigParameters.getScaleFactor()));
-					// correction for intervals unequal to 3600 seconds (= one hour)
-					n = (int) (n * (3600./NoiseConfigParameters.getTimeBinSizeNoiseComputation()));
 					
-					noiseEmission = NoiseEquations.calculateEmissionspegel(n, p, vCar, vHdv);
+					// correction for a sample, multiplicate the scale factor
+					n = (int) (n * (NoiseConfigParameters.getScaleFactor()));
+					
+					// correction for intervals unequal to 3600 seconds (= one hour)
+					n = (int) (n * (3600. / NoiseConfigParameters.getTimeBinSizeNoiseComputation()));
+					
+					double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+					double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
+					noiseEmission = mittelungspegel + Dv;					
 				}	
 				timeInterval2NoiseEmission.put(timeInterval, noiseEmission);
 			}

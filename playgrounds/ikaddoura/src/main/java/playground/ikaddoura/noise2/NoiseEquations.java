@@ -34,33 +34,34 @@ import java.util.List;
 
 public class NoiseEquations {
 	
-	public static double calculateEmissionspegel(int M , double p , double vCar , double vHdv) {		
+	public static double calculateMittelungspegelLm(int n, double p) {
+
 		//	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
-		//	L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
+		//  L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
 		//	L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
-		
+				
 		// 	M ... traffic volume
 		// 	p ... share of hdv in %
-		
+				
 		double pInPercentagePoints = p * 100.;	
-		double emissionspegel = 0.0;
-		double mittelungspegel = 37.3 + 10* Math.log10(M * (1 + (0.082 * pInPercentagePoints)));
+		double mittelungspegel = 37.3 + 10* Math.log10(n * (1 + (0.082 * pInPercentagePoints)));
 		
-		emissionspegel = mittelungspegel + calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pInPercentagePoints);
-		
-		return emissionspegel;
+		return mittelungspegel;
 	}
 	
-	public static double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double pInPercentagePoints) {
-		// 	basically the speed is 100 km/h
-		// 	p ... share of hdv, in percentage points (see above)
+	public static double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double p) {
 		
-		double geschwindigkeitskorrekturDv = 0.0;
+		// 	basically the speed is 100 km/h
+		// 	p ... share of hdv, in percentage points
+		
+		double pInPercentagePoints = p * 100.;	
+
 		double lCar = calculateLCar(vCar);
 		double lHdv = calculateLHdv(vHdv);
+
 		double d = lHdv - lCar; 
 		
-		geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
+		double geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
 		
 		return geschwindigkeitskorrekturDv;
 	}
@@ -89,22 +90,21 @@ public class NoiseEquations {
 	}
 
 	public static double calculateLCar(double vCar) {
+		
 		double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
 		return lCar;
 	}
 
 	public static double calculateLHdv(double vHdv) {
+		
 		double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
 		return lHdv;
 	}
 
 	public static double calculateShare(int nVehicleType1, double lVehicleType1, int nVehicleType2, double lVehicleType2) {
+		
 		double share = ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
 		return share;
-	}
-
-
-
-	
+	}	
 	
 }
