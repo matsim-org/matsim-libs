@@ -170,7 +170,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 					// correction for intervals unequal to 3600 seconds (= one hour)
 					n = (int) (n * (3600./NoiseConfigParameters.getTimeBinSizeNoiseComputation()));
 					
-					noiseEmission = calculateEmissionspegel(n, p, vCar, vHdv);
+					noiseEmission = NoiseEquations.calculateEmissionspegel(n, p, vCar, vHdv);
 				}	
 				timeInterval2NoiseEmission.put(timeInterval, noiseEmission);
 			}
@@ -261,37 +261,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		this.linkId2linkEnterEvents.clear();
 		this.linkId2linkEnterEventsCar.clear();
 		this.linkId2linkEnterEventsHdv.clear();		
-	}
-	
-	private double calculateEmissionspegel(int M , double p , double vCar , double vHdv) {		
-		//	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
-		//	L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
-		//	L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
-		
-		// 	M ... traffic volume
-		// 	p ... share of hdv in %
-		
-		double pInPercentagePoints = p * 100.;	
-		double emissionspegel = 0.0;
-		double mittelungspegel = 37.3 + 10* Math.log10(M * (1 + (0.082 * pInPercentagePoints)));
-		
-		emissionspegel = mittelungspegel + calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pInPercentagePoints);
-		// other correction factors are considered when calculating the immission
-		
-		return emissionspegel;
-	}
-	
-	private double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double pInPercentagePoints) {
-		// 	basically the speed is 100 km/h
-		// 	p ... share of hdv, in percentage points (see above)
-		
-		double geschwindigkeitskorrekturDv = 0.0;
-		double lCar = 27.7 + (10.0 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
-		double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
-		double d = lHdv - lCar; 
-		
-		geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
-		return geschwindigkeitskorrekturDv;
 	}
 	
 	public void writeNoiseEmissionStats(String fileName) {

@@ -345,19 +345,19 @@ public class NoiseDamageCalculation {
 			
 				double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
 				double vHdv = vCar;
+				
 				// If different speeds for different vehicle types have to be considered, adapt the calculation here.
 				// For example, a maximum speed for hdv-vehicles could be set here (for instance for German highways) 
 				
-				double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
-				double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
+				double lCar = NoiseEquations.calculateLCar(vCar);
+				double lHdv = NoiseEquations.calculateLHdv(vHdv);
 				
 				double shareCar = 0.;
 				double shareHdv = 0.;
 				
 				if ((nCar > 0) || (nHdv > 0)) {
-					
-					shareCar = ((nCar * Math.pow(10, 0.1 * lCar)) / ((nCar * Math.pow(10, 0.1 * lCar)) + (nHdv * Math.pow(10, 0.1 * lHdv))));
-					shareHdv = ((nHdv * Math.pow(10, 0.1 * lHdv)) / ((nCar * Math.pow(10, 0.1 * lCar)) + (nHdv * Math.pow(10, 0.1 * lHdv))));
+					shareCar = NoiseEquations.calculateShare(nCar, lCar, nHdv, lHdv);
+					shareHdv = NoiseEquations.calculateShare(nHdv, lHdv, nCar, lCar);
 					
 					if ((!(((shareCar + shareHdv) > 0.999) && ((shareCar + shareHdv) < 1.001)))) {
 						log.warn("The sum of the car share and hdv share is not equal to 1.0! The value is " + (shareCar + shareHdv));
