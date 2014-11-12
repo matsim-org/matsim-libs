@@ -1,19 +1,8 @@
 package playground.mzilske.cdr;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -26,9 +15,12 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import playground.mzilske.d4d.NetworkRoutingModule;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 
 public class PopulationFromSightings {
@@ -296,18 +288,34 @@ public class PopulationFromSightings {
         return true;
     }
 
-    public static void createPopulationWithRandomRealization(Scenario scenario, playground.mzilske.cdr.Sightings sightings, final LinkToZoneResolver zones) {
-        for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
-            Id personId = sightingsPerPerson.getKey();
-            Person person = scenario.getPopulation().getFactory().createPerson(personId);
-            Plan plan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(personId));
-            for (PlanElement pe : plan.getPlanElements()) {
-                if (pe instanceof Leg) {
-                    ((Leg) pe).setMode("car");
+    public static void createPopulationWithRandomRealization(final Scenario scenario, final playground.mzilske.cdr.Sightings sightings, final LinkToZoneResolver zones) {
+        ExecutorService executorService = Executors.newFixedThreadPool(8);
+        List<Callable<Person>> jobs = new ArrayList<>();
+        for (final Entry<Id, List<Sighting>> sightingsPerPerson : sightings.getSightingsPerPerson().entrySet()) {
+            jobs.add(new Callable<Person>() {
+
+                @Override
+                public Person call() throws Exception {
+                    Id<Person> personId = sightingsPerPerson.getKey();
+                    Person person = scenario.getPopulation().getFactory().createPerson(personId);
+                    Plan plan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(personId));
+                    for (PlanElement pe : plan.getPlanElements()) {
+                        if (pe instanceof Leg) {
+                            ((Leg) pe).setMode("car");
+                        }
+                    }
+                    person.addPlan(plan);
+                    return person;
                 }
-            }
-            person.addPlan(plan);
-            scenario.getPopulation().addPerson(person);
+            });
         }
+        try {
+            for (Future<Person> person : executorService.invokeAll(jobs)) {
+                scenario.getPopulation().addPerson(person.get());
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+        executorService.shutdown();
     }
 }

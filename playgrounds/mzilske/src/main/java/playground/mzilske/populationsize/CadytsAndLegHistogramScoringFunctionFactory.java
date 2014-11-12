@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * CharyparNagelCadytsScoringFunctionFactory.java
+ *  * CadytsAndCloneAndLegHistogramScoringFunctionFactory.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -23,8 +23,10 @@
 package playground.mzilske.populationsize;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
@@ -32,11 +34,10 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import playground.mzilske.cadyts.CadytsScoring;
-import playground.mzilske.clones.CloneService;
 
 import javax.inject.Inject;
 
-class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
+class CadytsAndLegHistogramScoringFunctionFactory implements ScoringFunctionFactory {
 
     @Inject
     Config config;
@@ -50,9 +51,6 @@ class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
     @Inject
     PlansTranslator ptStep;
 
-    @Inject
-    CloneService cloneService;
-
     private double cadytsweight = 1.0;
 
     @Override
@@ -63,9 +61,11 @@ class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
         scoringFunction.setWeight(cadytsweight);
         sumScoringFunction.addScoringFunction(scoringFunction);
 
-        // prior
-        sumScoringFunction.addScoringFunction(cloneService.createNewScoringFunction(person));
 
+
+        final TripLengthDistribution expectedTripLengthDistribution = (TripLengthDistribution) scenario.getScenarioElement("expectedTripLengthDistribution");
+        final TripLengthDistribution actualTripLengthDistribution = (TripLengthDistribution) scenario.getScenarioElement("actualTripLengthDistribution");
+        sumScoringFunction.addScoringFunction(new TripLengthScoring(actualTripLengthDistribution, expectedTripLengthDistribution));
 
         return sumScoringFunction;
     }
@@ -74,5 +74,38 @@ class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
         this.cadytsweight = cadytsweight;
     }
 
+    private static class TripLengthScoring implements SumScoringFunction.LegScoring {
+        private final TripLengthDistribution actualTripLengthDistribution;
+        private final TripLengthDistribution expectedTripLengthDistribution;
+        public double offsetSum;
+
+        public TripLengthScoring(TripLengthDistribution actualTripLengthDistribution, TripLengthDistribution expectedTripLengthDistribution) {
+            this.actualTripLengthDistribution = actualTripLengthDistribution;
+            this.expectedTripLengthDistribution = expectedTripLengthDistribution;
+        }
+
+        @Override
+        public void handleLeg(Leg leg) {
+            int bin = CalcLegTimes.getTimeslotIndex(leg.getTravelTime());
+            int measured = 0;
+            for (int[] bins : actualTripLengthDistribution.getDistribution().values()) {
+                measured += bins[bin];
+            }
+            int expected = 0;
+            for (int[] bins : expectedTripLengthDistribution.getDistribution().values()) {
+                expected += bins[bin];
+            }
+            double offset = (double) (expected - measured) / (double) expected;
+            offsetSum += offset;
+        }
+
+        @Override
+        public void finish() {}
+
+        @Override
+        public double getScore() {
+            return offsetSum;
+        }
+    }
 
 }

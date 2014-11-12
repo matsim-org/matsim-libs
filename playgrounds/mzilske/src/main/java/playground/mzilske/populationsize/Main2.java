@@ -42,7 +42,7 @@ public class Main2 {
 
 //        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
 //        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
-        uncongested.getMultiRateRun("brute").simulateRate("5", 2, 100.0);
+        uncongested.getMultiRateRun("cadyts").simulateRate("5", 3, 1.0);
 
 
 //        uncongested.getMultiRateRun("random").persodisthisto();

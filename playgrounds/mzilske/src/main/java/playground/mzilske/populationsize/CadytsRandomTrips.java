@@ -22,12 +22,6 @@
 
 package playground.mzilske.populationsize;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -47,40 +41,34 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.counts.CountsWriter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
+import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.CompareMain;
-import playground.mzilske.controller.Controller;
-import playground.mzilske.controller.ControllerModule;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.*;
+
 
 public class CadytsRandomTrips {
 
     public static final String USERS_MICHAELZILSKE_RUNS_SVN_SYNTHETIC_CDR_TRANSPORTATION_BERLIN_REGIMES_UNCONGESTED = "/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested";
-    static String rateDir = "/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested/alternatives/only-cadyts";
+    static String rateDir = "/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested/alternatives/only-histogram";
 
     public static void main(String[] args) {
         // filterCounts();
@@ -93,7 +81,7 @@ public class CadytsRandomTrips {
         config.controler().setLastIteration(1000);
         PlanCalcScoreConfigGroup.ActivityParams sightingParam = new PlanCalcScoreConfigGroup.ActivityParams("sighting");
         sightingParam.setTypicalDuration(30.0 * 60);
-        config.controler().setMobsim("my-qsim");
+        // config.controler().setMobsim("my-qsim");
         config.controler().setWritePlansInterval(10);
         config.counts().setWriteCountsInterval(10);
         config.global().setNumberOfThreads(8);
@@ -113,11 +101,11 @@ public class CadytsRandomTrips {
         cadytsConfig.setPreparatoryIterations(1);
 
 
-        // config.qsim().setMainModes(Collections.<String>emptyList());
         config.qsim().setMainModes(Arrays.asList("car"));
         config.qsim().setFlowCapFactor(100);
         config.qsim().setStorageCapFactor(100);
         config.qsim().setRemoveStuckVehicles(false);
+        config.qsim().setNumberOfThreads(1);
 
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
@@ -177,51 +165,26 @@ public class CadytsRandomTrips {
             stringbuilder.append("\t" + n);
         }
         Logger.getLogger(CadytsRandomTrips.class).info(stringbuilder.toString());
-        List<Module> modules = new ArrayList<>();
-        modules.add(new ControllerModule());
-        // modules.add(new CadytsModule());
-        modules.add(new AbstractModule() {
-            @Override
-            protected void configure() {
-                bind(Config.class).toInstance(scenario.getConfig());
-                bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CadytsAndCloneScoringFunctionFactory.class);
-                bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
-                bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(1.0);
-                bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
-                Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
-                controlerListenerBinder.addBinding().to(LegTimesHistogramControlerListener.class);
-                MapBinder<String, MobsimFactory> mobsimFactoryMapBinder = MapBinder.newMapBinder(binder(), String.class, MobsimFactory.class);
-                mobsimFactoryMapBinder.addBinding("my-qsim").to(MyQSimFactory.class);
-                MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
-                        = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
-                planStrategyFactoryBinder.addBinding("NewRandomTrip").toInstance(new PlanStrategyFactory() {
-                    @Override
-                    public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
-                        final RandomLinkGetter random = new RandomLinkGetter(scenario.getNetwork());
-                        PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-                        planStrategy.addStrategyModule(new AbstractMultithreadedModule(Runtime.getRuntime().availableProcessors()) {
 
-                            @Override
-                            public PlanAlgorithm getPlanAlgoInstance() {
-                                return new PlanAlgorithm() {
-                                    @Override
-                                    public void run(Plan plan) {
-                                        randomTrip(scenario, random, plan);
-                                        new PlanRouter(getReplanningContext().getTripRouter()).run(plan);
-                                    }
-                                };
-                            }
-                        });
-                        return planStrategy;
+        scenario.addScenarioElement(Counts.ELEMENT_NAME, allCounts);
+        scenario.addScenarioElement("calibrationCounts", someCounts);
+
+
+        Controler controler = new Controler(scenario);
+        controler.setOverwriteFiles(true);
+        controler.setModules(
+                new ControlerDefaultsModule(),
+                new CadytsModule(),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        addControlerListener(LegTimesHistogramControlerListener.class);
+                        addPlanStrategyByProvider("NewRandomTrip", RandomTripProvider.class);
                     }
                 });
-            }
-        });
+        controler.setScoringFunctionFactory(new CadytsAndLegHistogramScoringFunctionFactory());
+        controler.run();
 
-        Injector injector2 = Guice.createInjector(modules);
-        Controller controler2 = injector2.getInstance(Controller.class);
-        controler2.run();
     }
 
     private static void initialDemand(Scenario scenario) {
@@ -285,4 +248,29 @@ public class CadytsRandomTrips {
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
     }
 
+    private static class RandomTripProvider implements Provider<PlanStrategy> {
+
+        @Inject
+        Scenario scenario;
+
+        @Override
+        public PlanStrategy get() {
+            final RandomLinkGetter random = new RandomLinkGetter(scenario.getNetwork());
+            PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
+            planStrategy.addStrategyModule(new AbstractMultithreadedModule(Runtime.getRuntime().availableProcessors()) {
+
+                @Override
+                public PlanAlgorithm getPlanAlgoInstance() {
+                    return new PlanAlgorithm() {
+                        @Override
+                        public void run(Plan plan) {
+                            randomTrip(scenario, random, plan);
+                            new PlanRouter(getReplanningContext().getTripRouter()).run(plan);
+                        }
+                    };
+                }
+            });
+            return planStrategy;
+        }
+    }
 }

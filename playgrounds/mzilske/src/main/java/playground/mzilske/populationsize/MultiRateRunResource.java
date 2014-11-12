@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.ReplayEvents;
@@ -54,6 +55,7 @@ import playground.mzilske.ant2014.IterationResource;
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.cadyts.CadytsModule;
 import playground.mzilske.cdr.*;
+import playground.mzilske.clones.ClonesConfigGroup;
 import playground.mzilske.clones.ClonesModule;
 
 import java.io.File;
@@ -87,7 +89,7 @@ class MultiRateRunResource {
             rates.add("90-10");
             rates.add("100-0");
             return rates;
-        } else if (alternative.equals("random") || alternative.equals("brute")) {
+        } else if (alternative.equals("random") || alternative.equals("brute") || alternative.equals("cadyts")) {
             final List<String> rates = new ArrayList<>();
             rates.add("0");
             rates.add("5");
@@ -146,7 +148,7 @@ class MultiRateRunResource {
         scenario.setNetwork(baseScenario.getNetwork());
 
         final Sightings allSightings = getSightings(rate);
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        final ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
 
         PopulationFromSightings.createPopulationWithRandomRealization(scenario, allSightings, linkToZoneResolver);
 
@@ -155,13 +157,30 @@ class MultiRateRunResource {
         final Counts someCounts = new Counts();
         new CountsReaderMatsimV1(someCounts).parse(WD + "/rates/" + rate + "/calibration_counts.xml.gz");
 
+        scenario.addScenarioElement(Counts.ELEMENT_NAME, allCounts);
+        scenario.addScenarioElement("calibrationCounts", someCounts);
+
+        ClonesConfigGroup clonesConfig = ConfigUtils.addOrGetModule(config, ClonesConfigGroup.NAME, ClonesConfigGroup.class);
+        clonesConfig.setCloneFactor(cloneFactor);
+
         Controler controler = new Controler(scenario);
+        controler.setOverwriteFiles(true);
         controler.setModules(
                 new ControlerDefaultsModule(),
                 new CadytsModule(),
                 new ClonesModule(),
-                new TrajectoryReRealizerModule());
-        controler.setScoringFunctionFactory(new CadytsAndCloneScoringFunctionFactory());
+                new TrajectoryReRealizerModule(),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        bindToInstance(ZoneTracker.LinkToZoneResolver.class, linkToZoneResolver);
+                        bindToInstance(Sightings.class, allSightings);
+                    }
+                });
+        CadytsAndCloneScoringFunctionFactory factory = new CadytsAndCloneScoringFunctionFactory();
+        factory.setCadytsweight(cadytsWeight);
+        controler.setScoringFunctionFactory(factory);
+        controler.run();
     }
 
     public Sightings getSightings(String rate) {
