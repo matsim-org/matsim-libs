@@ -90,7 +90,6 @@ public class NoiseCalculationOffline {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
-		// Hopefully this is all information required from the config file... Alternatively, read in the output config.
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setReceiverPointGap(receiverPointGap);
@@ -106,14 +105,16 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
+//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+//		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario, noiseParameters);
 		spatialInfo.setActivityCoords();
-		spatialInfo.setReceiverPoints();
+		
+//		spatialInfo.setReceiverPoints();
 //		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
-//		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+		
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
 		spatialInfo.setRelevantLinkIds();
 		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
@@ -145,18 +146,18 @@ public class NoiseCalculationOffline {
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 		
-		log.info("Calculating each agent's activity durations...");
-		personActivityTracker.calculateDurationOfStay();
-		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
-		log.info("Calculating each agent's activity durations... Done.");
-		
-		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
-		noiseDamageCosts.setCollectNoiseEvents(false);
-		noiseDamageCosts.calculateNoiseDamageCosts();
-		log.info("Calculating noise damage costs and throwing noise events... Done.");
-
-		eventWriter.closeFile();
+//		log.info("Calculating each agent's activity durations...");
+//		personActivityTracker.calculateDurationOfStay();
+//		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+//		log.info("Calculating each agent's activity durations... Done.");
+//		
+//		log.info("Calculating noise damage costs and throwing noise events...");
+//		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
+//		noiseDamageCosts.setCollectNoiseEvents(false);
+//		noiseDamageCosts.calculateNoiseDamageCosts();
+//		log.info("Calculating noise damage costs and throwing noise events... Done.");
+//
+//		eventWriter.closeFile();
 	}
 }
 		
