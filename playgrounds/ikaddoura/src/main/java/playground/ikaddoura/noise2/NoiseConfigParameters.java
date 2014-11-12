@@ -42,7 +42,7 @@ public class NoiseConfigParameters {
 	}
 	
 	public static double getScaleFactor(){
-		final double scaleFactor = 1.;
+		final double scaleFactor = 10.;
 		return scaleFactor;
 	}
 	

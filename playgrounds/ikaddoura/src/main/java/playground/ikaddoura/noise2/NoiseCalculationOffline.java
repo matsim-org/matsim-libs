@@ -57,13 +57,13 @@ public class NoiseCalculationOffline {
 			log.info("output directory: " + outputDirectory);
 			
 		} else {
-			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-			lastIteration = 100;
-			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
+//			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+//			lastIteration = 100;
+//			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
 			
-//			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-//			lastIteration = 5;
-//			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+			lastIteration = 5;
+			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -89,8 +89,8 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
+//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+//		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario);
 		spatialInfo.setActivityCoords();
@@ -138,7 +138,7 @@ public class NoiseCalculationOffline {
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
-		eventWriter.closeFile();
+//		eventWriter.closeFile();
 	}
 }
 		
