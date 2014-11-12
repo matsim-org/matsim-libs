@@ -5,6 +5,8 @@ import matsimConnector.network.HybridNetworkBuilder;
 import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
+import matsimConnector.visualizer.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import matsimConnector.visualizer.debugger.eventsbaseddebugger.InfoBox;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,12 +17,19 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import pedCA.output.OutputManager;
+
 public class CASimulationRunner implements IterationStartsListener{
 
 	private Controler controller;
 	
 	public static void main(String [] args) {
-		String inputPath = Constants.INPUT_PATH;
+		String inputPath= Constants.INPUT_PATH;
+		String outputPath = Constants.OUTPUT_PATH;
+		if (args.length>0){
+			 inputPath = Constants.FD_TEST_PATH+args[0]+"/input";
+			 outputPath = Constants.FD_TEST_PATH+args[0]+"/output";
+		}
 		Config c = ConfigUtils.loadConfig(inputPath+"/config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(c);
 		CAScenario scenarioCA = new CAScenario(inputPath+"/CAScenario");
@@ -29,29 +38,28 @@ public class CASimulationRunner implements IterationStartsListener{
 		
 		//new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
 		
-		
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setLastIteration(0);
-		c.qsim().setEndTime(60);
+		c.qsim().setEndTime(Constants.CA_TEST_END_TIME+100);
 		
 		Controler controller = new Controler(scenario);
-		//controller.setOverwriteFiles(true);
+		try{
+			org.matsim.core.utils.io.IOUtils.deleteDirectory(new java.io.File(outputPath));
+		}catch(IllegalArgumentException e){
+			
+		}
 		
 		CAMobsimFactory factoryCA = new CAMobsimFactory();
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 		
-		//if (args.length > 0 && args[0].equals("true")) {
-			// VIS only
-
-			//EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(scenario);
-			//InfoBox iBox = new InfoBox(dbg, scenario);
-			//dbg.addAdditionalDrawer(iBox);
-			//controller.getEvents().addHandler(dbg);
-			//dbg.addAdditionalDrawer(new Branding());
-			//QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-			//dbg.addAdditionalDrawer(qDbg);
-			//controller.getEvents().addHandler(qDbg);
-		//}
+		if (args.length==0){
+		EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(scenario);
+		InfoBox iBox = new InfoBox(dbg, scenario);
+		dbg.addAdditionalDrawer(iBox);
+		controller.getEvents().addHandler(dbg);
+		}else{
+			controller.getEvents().addHandler(new OutputManager(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size()));
+		}
 		
 		controller.run();
 	}

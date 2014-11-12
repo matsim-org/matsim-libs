@@ -76,7 +76,7 @@ public abstract class Grid <T>{
 		int col_gp = gp.getX();
 		for(int row=row_gp-radius;row<=row_gp+radius;row++)
 			for (int col=col_gp-radius;col<=col_gp+radius;col++)
-				if (neighbourCondition(row,col))
+				if (neighbourCondition(row,col)) //add &&(row==row_gp||col==col_gp) for the Von Neumann neighbourhood
 					neighbourhood.add(new GridPoint(col,row));
 		return neighbourhood;
 	}

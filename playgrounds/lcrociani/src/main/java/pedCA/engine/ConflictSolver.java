@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.jfree.util.Log;
-
+import matsimConnector.agents.Pedestrian;
 import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
+import pedCA.output.Log;
 import pedCA.utility.Constants;
 import pedCA.utility.Lottery;
 import pedCA.utility.RandomExtractor;
@@ -45,17 +45,18 @@ public class ConflictSolver {
 //      Inizializzo la lista di pedoni che avranno un conflitto (anche la lista della destinazioni con conflitti)
 		for(Agent p:pedsIt){
 			oldSize = uniqueGP.size();
-			uniqueGP.add(p.getNewPosition());
+			GridPoint agentNewPosition = getNewAgentPosition(p);
+			uniqueGP.add(agentNewPosition);
 			
 			listaCompletaPedoni.add(p);
 			if(oldSize == uniqueGP.size()){
 				pedsList.add(p);
-				if(!nextPosList.contains(p.getNewPosition())){
-					nextPosList.add(p.getNewPosition());
+				if(!nextPosList.contains(agentNewPosition)){
+					nextPosList.add(agentNewPosition);
 				}
 			}
 			else{
-				multipleGP.put(p.getNewPosition(), p);
+				multipleGP.put(agentNewPosition, p);
 			}
 		}
 		
@@ -70,7 +71,7 @@ public class ConflictSolver {
         	ArrayList<Agent> sameGPPedList = new ArrayList<Agent>();
         	
         	for(Agent p:pedsList){
-        		if(p.getNewPosition().equals(gp)){
+        		if(getNewAgentPosition(p).equals(gp)){
         			sameGPPedList.add(p);
         		}
         	}
@@ -90,12 +91,14 @@ public class ConflictSolver {
 		
 		for(int i = 0; i < listaCompletaPedoni.size(); i++){
 			for(int j = i+1; j < listaCompletaPedoni.size(); j++)
-			{
-				if(listaCompletaPedoni.get(i).getNewPosition().equals(listaCompletaPedoni.get(j).getNewPosition())){
+				if(getNewAgentPosition(listaCompletaPedoni.get(i)).equals(getNewAgentPosition(listaCompletaPedoni.get(j)))){
 					Log.error("Error in Conflict Solving!!");
-				}
 			}
 		}
+	}
+
+	public GridPoint getNewAgentPosition(Agent p) {
+		return ((Pedestrian)p).getRealNewPosition();
 	}
 
 	private boolean frictionCondition() {

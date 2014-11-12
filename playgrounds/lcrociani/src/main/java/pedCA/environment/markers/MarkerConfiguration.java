@@ -8,13 +8,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+import pedCA.environment.grid.GridPoint;
+
 public class MarkerConfiguration {
 	private ArrayList<Start> starts;
 	private ArrayList<Destination> destinations;
+	private ArrayList<GridPoint> destinationsCells;
 	
 	public MarkerConfiguration(){
 		starts = new ArrayList<Start>();
 		destinations = new ArrayList<Destination>();
+		destinationsCells = new ArrayList<GridPoint>();
 	}
 	
 	public MarkerConfiguration(ArrayList<Start> starts, ArrayList<Destination> destinations){
@@ -38,6 +42,7 @@ public class MarkerConfiguration {
 	
 	public void addDestination(Destination destination){
 		destinations.add(destination);
+		destinationsCells.addAll(destination.getCells());
 	}
 	
 	public void addStart(Start start){
@@ -94,7 +99,7 @@ public class MarkerConfiguration {
 		for (int i = 0; i < countFiles; i++) {			
 			streamIn = new FileInputStream(path+"/starts/start_"+i+".ser");
 			ois = new ObjectInputStream(streamIn);
-            starts.add((Start) ois.readObject());
+            addStart((Start) ois.readObject());
             ois.close();
         }
 		
@@ -103,13 +108,17 @@ public class MarkerConfiguration {
 			try{
 				streamIn = new FileInputStream(path+"/destinations/destination_"+i+".ser");
 				ois = new ObjectInputStream(streamIn);
-				destinations.add((Destination) ois.readObject());
+				addDestination((Destination) ois.readObject());
 			}catch(IOException e){
 				streamIn = new FileInputStream(path+"/destinations/tacticalDestination_"+i+".ser");
 				ois = new ObjectInputStream(streamIn);
-				destinations.add((TacticalDestination) ois.readObject());
+				addDestination((TacticalDestination) ois.readObject());
 			}
 			ois.close();
         }
+	}
+
+	public ArrayList<GridPoint> getBorderCells() {
+		return destinationsCells;
 	}
 }

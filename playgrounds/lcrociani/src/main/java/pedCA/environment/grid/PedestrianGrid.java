@@ -28,7 +28,16 @@ public class PedestrianGrid extends Grid <Agent>{
 		return get(p).size()>0;
 	}
 	
-	public ArrayList<GridPoint> freePositions(ArrayList<GridPoint> cells){
+	public ArrayList<GridPoint> getAllFreePositions(){
+		ArrayList<GridPoint> result = new ArrayList<GridPoint>();
+		for (int i=0;i<cells.size();i++)
+			for (int j=0;j<cells.get(i).size();j++)
+				if (get(i,j).size()==0)
+					result.add(new GridPoint(j,i));
+		return result;
+	}
+	
+	public ArrayList<GridPoint> getFreePositions(ArrayList<GridPoint> cells){
 		ArrayList<GridPoint> result = new ArrayList<GridPoint>();
 		for (GridPoint p : cells)
 			if (!isOccupied(p))

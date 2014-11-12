@@ -9,6 +9,10 @@ public class Neighbourhood {
 		neighbourhood = new ArrayList<GridPoint>();
 	}
 	
+	public Neighbourhood(ArrayList<GridPoint> neighbourhood){
+		this.neighbourhood = neighbourhood;
+	}
+	
 	public void add(GridPoint gp){
 		neighbourhood.add(gp);
 	}

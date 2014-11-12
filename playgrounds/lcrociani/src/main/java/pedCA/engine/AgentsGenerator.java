@@ -32,7 +32,7 @@ public class AgentsGenerator {
 
 	private void generateFromStart(Start start){
 		int howMany = start.toBeGenerated();
-		ArrayList<GridPoint> usedCells = getPedestrianGrid().freePositions(start.getCells());
+		ArrayList<GridPoint> usedCells = getPedestrianGrid().getFreePositions(start.getCells());
 		if (howMany>usedCells.size()){
 			Log.warning("not enough space in start "+start.toString());
 		}
@@ -72,7 +72,7 @@ public class AgentsGenerator {
 	//FOR MATSIM CONNECTOR
 	public GridPoint getFreePosition(int destinationId){
 		ArrayList<GridPoint> cells = getContext().getMarkerConfiguration().getDestination(destinationId).getCells();
- 		ArrayList<GridPoint> usedCells = getPedestrianGrid().freePositions(cells); 
+ 		ArrayList<GridPoint> usedCells = getPedestrianGrid().getFreePositions(cells); 
  		return Lottery.extractObjects(usedCells,1).get(0);
 	}
 	

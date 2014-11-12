@@ -9,9 +9,8 @@ import pedCA.environment.grid.Neighbourhood;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.grid.WeightedCell;
 import pedCA.environment.markers.Destination;
-import pedCA.output.Log;
-import pedCA.utility.Lottery;
 import pedCA.utility.Constants;
+import pedCA.utility.Lottery;
 
 enum Heading{
 	N, NE, NO, S, SE, SO, E, O, X
@@ -71,7 +70,7 @@ public class Agent{
 			neighbourValue = getStaticFFValue(neighbour);
 			
 			occupation = 0.0;
-			if((!neighbour.equals(position)) && getPedestrianGrid().isOccupied(neighbour))
+			if((!neighbour.equals(position)) && checkOccupancy(neighbour))
 				occupation = 1.0;
 			
 			double p = utilityFunction(myPositionValue, neighbourValue,	occupation);
@@ -81,6 +80,10 @@ public class Agent{
 		}
 		Lottery.normalizeProbabilities(probabilityValues, probabilitySum);
 		return probabilityValues;
+	}
+
+	public boolean checkOccupancy(GridPoint neighbour) {
+		return getPedestrianGrid().isOccupied(neighbour);
 	}
 
 	private double utilityFunction(double myPositionValue, double neighbourValue, double occupation) {
@@ -95,13 +98,13 @@ public class Agent{
 			nextpos = position;
 		else
 			nextpos = new GridPoint(winningCell.x, winningCell.y);
-		Log.log("Pedestrian "+getID()+" chose "+nextpos.toString());
+		//Log.log("Pedestrian "+getID()+" chose "+nextpos.toString());
 	}
 	
 	public void move(){
 		if(!position.equals(nextpos)){
 			getPedestrianGrid().moveTo(this, nextpos);
-			Log.log("MOVED FROM "+position.toString()+" TO "+nextpos.toString());
+			//Log.log("MOVED FROM "+position.toString()+" TO "+nextpos.toString());
 			setPosition(nextpos);
 		}
 	}
@@ -110,11 +113,14 @@ public class Agent{
 		this.position = position;
 	}
 	
+	protected void setNewPosition(GridPoint position){
+		this.nextpos = position;
+	}
+	
 	public void exit(){
 		arrived = true;
 	}
 	
-	//TODO REFACTOR USING THESE WITH AGENT GENERATOR AND MOVER 
 	public void enterPedestrianGrid(GridPoint position){
 		getPedestrianGrid().addPedestrian(position, this);
 		setPosition(position);
@@ -145,7 +151,7 @@ public class Agent{
 		return context.getPedestrianGrid();
 	}
 	
-	private Neighbourhood getNeighbourhood(){
+	public Neighbourhood getNeighbourhood(){
 		return getStaticFF().getNeighbourhood(position);
 	}
 	

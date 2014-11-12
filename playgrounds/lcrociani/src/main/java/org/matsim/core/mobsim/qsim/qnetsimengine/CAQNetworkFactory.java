@@ -92,7 +92,8 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 		int columns = Constants.TRANSITION_AREA_COLUMNS;
 		int destinationId = IdUtility.nodeIdToDestinationId(borderNode.getId());
 		TacticalDestination destination = environmentCA.getDestination(destinationId);
-		TransitionArea transitionArea = new TransitionArea(rows,columns,destination.getRotation(),destination.getEnvironmentRef());
+		TransitionArea transitionArea = new TransitionArea(rows,columns,destination);
+		destination.setTransitionArea(transitionArea);
 		registerTransitionArea(borderNode, transitionArea);
 		return transitionArea;
 	}

@@ -2,6 +2,7 @@ package pedCA.environment.markers;
 
 import java.util.ArrayList;
 
+import matsimConnector.environment.TransitionArea;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.network.Coordinates;
 import pedCA.utility.Constants;
@@ -14,6 +15,7 @@ public class TacticalDestination extends Destination  {
 	//for the transition area
 	private int rotation = -1;
 	private GridPoint environmentRef;
+	private TransitionArea transitionArea;
 	
 	public TacticalDestination(Coordinates coordinates, ArrayList<GridPoint> cells) {
 		super(cells);
@@ -72,5 +74,14 @@ public class TacticalDestination extends Destination  {
 	
 	public int getRotation(){
 		return rotation;
+	}
+
+	//TODO CLEAN THIS
+	public TransitionArea getTransitionArea() {
+		return transitionArea;
+	}
+
+	public void setTransitionArea(TransitionArea transitionArea) {
+		this.transitionArea = transitionArea;
 	}
 }

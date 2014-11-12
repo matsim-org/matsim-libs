@@ -11,13 +11,16 @@ import pedCA.environment.grid.GridPoint;
 
 public class CAAgentMoveEvent extends Event {
 	public static final String EVENT_TYPE = "CAAgentMoveEvent";
+	public static final String ATTRIBUTE_REAL_TIME = "real_time";
 	public static final String ATTRIBUTE_PERSON = "pedestrian";
 	public static final String ATTRIBUTE_FROM_X = "from_x";
 	public static final String ATTRIBUTE_FROM_Y = "from_y";
 	public static final String ATTRIBUTE_TO_X = "to_x";
 	public static final String ATTRIBUTE_TO_Y = "to_y";
-	private Pedestrian pedestrian;
 	
+	
+	private Pedestrian pedestrian;
+	private final double realTime;	
 	private final int from_x;
 	private final int from_y;
 	private final int to_x;
@@ -28,7 +31,8 @@ public class CAAgentMoveEvent extends Event {
 	}
 
 	public CAAgentMoveEvent(double time, Pedestrian pedestrian, GridPoint position, GridPoint nextPosition) {
-		super(time);
+		super((int)time+1);
+		this.realTime = time;
 		this.pedestrian = pedestrian;
 		this.from_x = position.getX();
 		this.from_y = position.getY();
@@ -45,6 +49,7 @@ public class CAAgentMoveEvent extends Event {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_PERSON, pedestrian.getId().toString());
+		attr.put(ATTRIBUTE_REAL_TIME, Double.toString(this.realTime));
 		attr.put(ATTRIBUTE_FROM_X, Double.toString(this.from_x));
 		attr.put(ATTRIBUTE_FROM_Y, Double.toString(this.from_y));
 		attr.put(ATTRIBUTE_TO_X, Double.toString(this.to_x));
@@ -67,5 +72,9 @@ public class CAAgentMoveEvent extends Event {
 
 	public int getTo_y() {
 		return to_y;
+	}
+
+	public double getRealTime() {
+		return realTime;
 	}
 }

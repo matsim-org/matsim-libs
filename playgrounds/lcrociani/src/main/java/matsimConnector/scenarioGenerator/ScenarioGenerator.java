@@ -33,16 +33,24 @@ import pedCA.output.Log;
 import scenarios.ContextGenerator;
 
 public class ScenarioGenerator {
-	private static String inputDir = "C:/Users/Luca/Documents/uni/Dottorato/Juelich/developing_stuff/Test/input";
-	private static String outputDir = "C:/Users/Luca/Documents/uni/Dottorato/Juelich/developing_stuff/Test/output";
+	private static String inputDir = Constants.INPUT_PATH;
+	private static String outputDir = Constants.OUTPUT_PATH;
 
 	private static final Double DOOR_WIDTH = 2.4;
 	private static final Double CA_LENGTH = 10.;
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
-	private static final int POPULATION_SIZE = 1;
+	private static Double TOTAL_DENSITY = 5.75;
+	private static int POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);;
 	
 	public static void main(String [] args) {
+		if (args.length>0){
+			TOTAL_DENSITY = Double.parseDouble(args[0]);
+			inputDir = Constants.FD_TEST_PATH+args[0]+"/input";
+			outputDir = Constants.FD_TEST_PATH+args[0]+"/output";
+			POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+		}
+		
 		Config c = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(c);
 		
@@ -89,7 +97,7 @@ public class ScenarioGenerator {
 		QSimConfigGroup qsim = scenario.getConfig().qsim();
 		qsim.setEndTime(20*60);
 		c.controler().setMobsim(Constants.CA_MOBSIM_MODE);
-		c.global().setCoordinateSystem("EPSG:3395");
+		c.global().setCoordinateSystem(Constants.COORDINATE_SYSTEM);
 		c.qsim().setEndTime(60*10);
 
 		createCAScenario();
@@ -208,7 +216,9 @@ public class ScenarioGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		for (int i = 0; i < POPULATION_SIZE/2; i++) {
+		int leftFlowProportion = 1;
+		int limit = POPULATION_SIZE/leftFlowProportion;
+		for (int i = 0; i < limit; i++) {
 			Person pers = factory.createPerson(Id.create("b"+i,Person.class));
 			Plan plan = factory.createPlan();
 			pers.addPlan(plan);
@@ -222,7 +232,7 @@ public class ScenarioGenerator {
 			plan.addActivity(act1);
 			population.addPerson(pers);
 		}
-		for (int i = POPULATION_SIZE/2; i < POPULATION_SIZE; i++) {
+		for (int i = limit; i < POPULATION_SIZE; i++) {
 			Person pers = factory.createPerson(Id.create("a"+i,Person.class));
 			Plan plan = factory.createPlan();
 			pers.addPlan(plan);
