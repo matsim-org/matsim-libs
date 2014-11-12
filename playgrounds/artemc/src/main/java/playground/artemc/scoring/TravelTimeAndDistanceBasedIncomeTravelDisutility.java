@@ -58,7 +58,7 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 		for(Double incomeFactor:this.incomeFactors.values()){
 			factorSum = factorSum + incomeFactor;
 		}
-		factorMean = factorSum / (double) incomeFactors.size();
+		this.factorMean = factorSum / (double) incomeFactors.size();
 		
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
@@ -74,7 +74,6 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 				"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
 			}
 		}
-		
 	}
 
 	@Override
