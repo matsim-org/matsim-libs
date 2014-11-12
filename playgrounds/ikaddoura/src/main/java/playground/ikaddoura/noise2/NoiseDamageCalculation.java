@@ -49,9 +49,9 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 
-public class NoiseDamageCosts {
+public class NoiseDamageCalculation {
 
-	private static final Logger log = Logger.getLogger(NoiseDamageCosts.class);
+	private static final Logger log = Logger.getLogger(NoiseDamageCalculation.class);
 		
 	private Scenario scenario;
 	private EventsManager events;
@@ -93,7 +93,7 @@ public class NoiseDamageCosts {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCosts (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, double annualCostRate, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmission noiseImmission) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, double annualCostRate, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;

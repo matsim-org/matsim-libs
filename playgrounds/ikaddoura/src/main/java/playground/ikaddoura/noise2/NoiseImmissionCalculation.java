@@ -46,9 +46,9 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 
-public class NoiseImmission {
+public class NoiseImmissionCalculation {
 
-	private static final Logger log = Logger.getLogger(NoiseImmission.class);
+	private static final Logger log = Logger.getLogger(NoiseImmissionCalculation.class);
 	
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEquations noiseImmissionCalculator;
@@ -65,7 +65,7 @@ public class NoiseImmission {
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Link>,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Link>,Double>>>();
 		
-	public NoiseImmission (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler) {
+	public NoiseImmissionCalculation (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler) {
 		this.spatialInfo = spatialInfo;
 		this.noiseImmissionCalculator = new NoiseEquations();
 		

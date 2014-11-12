@@ -121,7 +121,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
-		NoiseImmission noiseImmission = new NoiseImmission(spatialInfo, noiseEmissionHandler);
+		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(spatialInfo, noiseEmissionHandler);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -135,7 +135,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCosts noiseDamageCosts = new NoiseDamageCosts(scenario, events, spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");

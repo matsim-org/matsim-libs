@@ -43,9 +43,9 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
-	private NoiseImmission noiseImmission;
+	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
-	private NoiseDamageCosts noiseDamageCosts;
+	private NoiseDamageCalculation noiseDamageCosts;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
@@ -83,7 +83,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");
-		this.noiseImmission = new NoiseImmission(this.spatialInfo, this.noiseEmissionHandler);
+		this.noiseImmission = new NoiseImmissionCalculation(this.spatialInfo, this.noiseEmissionHandler);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -97,7 +97,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		log.info("Calculating each agent's activity durations... Done.");
 				
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCosts(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, NoiseConfigParameters.getAnnualCostRate(), noiseEmissionHandler, personActivityTracker, noiseImmission);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
@@ -165,11 +165,11 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		return personActivityTracker;
 	}
 
-	public NoiseImmission getNoiseImmission() {
+	public NoiseImmissionCalculation getNoiseImmission() {
 		return noiseImmission;
 	}
 
-	public NoiseDamageCosts getNoiseDamageCosts() {
+	public NoiseDamageCalculation getNoiseDamageCosts() {
 		return noiseDamageCosts;
 	}
 
