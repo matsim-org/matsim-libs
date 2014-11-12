@@ -22,13 +22,39 @@
  */
 package playground.ikaddoura.noise2;
 
-import org.matsim.core.events.handler.EventHandler;
+import java.util.List;
 
 /**
- * @author lkroeger
+ * 
+ * Contains general equations that are relevant to compute noise immission levels, basically based on the German EWS approach.
+ * 
+ * @author lkroeger, ikaddoura
  *
  */
 
-public interface NoiseEventHandler extends EventHandler{
-	public void handleEvent (NoiseEventCaused event);
+public class NoiseEquations {
+			
+	public double calculateResultingNoiseImmission (List<Double> noiseImmissions){
+		
+		double resultingNoiseImmission = 0.;
+		
+		if (noiseImmissions.size() > 0) {
+			double sumTmp = 0.;
+			for(double noiseImmission : noiseImmissions){
+				sumTmp = sumTmp + (Math.pow(10, (0.1 * noiseImmission)));
+			}
+			resultingNoiseImmission = 10 * Math.log10(sumTmp);
+			if(resultingNoiseImmission < 0) {
+				resultingNoiseImmission = 0.;
+			}
+		}
+		return resultingNoiseImmission;
+	}
+	
+	public double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
+		
+		double shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05 * noiseImmission))) / (Math.pow(10, (0.05 * resultingNoiseImmission)))), 2);
+		return shareOfResultingNoiseImmission;	
+	}
+	
 }

@@ -51,7 +51,7 @@ public class NoiseImmission {
 	private static final Logger log = Logger.getLogger(NoiseImmission.class);
 	
 	private NoiseSpatialInfo spatialInfo;
-	private NoiseImmissionEquations noiseImmissionCalculator;
+	private NoiseEquations noiseImmissionCalculator;
 		
 	// from emission handler
 	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
@@ -67,7 +67,7 @@ public class NoiseImmission {
 		
 	public NoiseImmission (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler) {
 		this.spatialInfo = spatialInfo;
-		this.noiseImmissionCalculator = new NoiseImmissionEquations();
+		this.noiseImmissionCalculator = new NoiseEquations();
 		
 		this.linkId2timeInterval2noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();

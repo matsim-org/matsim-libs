@@ -57,7 +57,7 @@ public class NoiseDamageCosts {
 	private EventsManager events;
 	
 	private NoiseSpatialInfo spatialInfo;
-	private NoiseImmissionEquations noiseImmissionCalculator;
+	private NoiseEquations noiseImmissionCalculator;
 	private double annualCostRate;
 		
 	// from emission handler
@@ -97,7 +97,7 @@ public class NoiseDamageCosts {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;
-		this.noiseImmissionCalculator = new NoiseImmissionEquations();
+		this.noiseImmissionCalculator = new NoiseEquations();
 		
 		this.hdvVehicles = noiseEmissionHandler.getHdvVehicles();
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
