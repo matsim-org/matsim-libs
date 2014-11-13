@@ -69,7 +69,7 @@ ControlerListener {
 		log.info("Reading heterogeneity paramters... ");
 
 		if (l_inc!= null){
-			lambda_income = Double.parseDouble(l_inc);
+			this.lambda_income = Double.parseDouble(l_inc);
 			boolean fileProvided = new File(this.inputPath + "/incomes.xml").exists();
 			if(fileProvided){
 				this.loadIncomes();
@@ -101,7 +101,6 @@ ControlerListener {
 			mean = (double) sum / (double) this.scenario.getPopulation().getPersons().size();
 		}
 
-		
 		/*Create map of personal income factors*/
 		Double factorSum=0.0;
 		Double factoreMean = 0.0;
