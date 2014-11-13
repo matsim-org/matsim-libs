@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
@@ -39,6 +36,10 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Uses network routing to create teleportation routes, taking into acount
@@ -81,11 +82,11 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		final Link fromLink =
 			accessibleNetwork.getLinks().containsKey( fromFacility.getLinkId() ) ?
 				accessibleNetwork.getLinks().get( fromFacility.getLinkId() ) :
-				accessibleNetwork.getNearestLink( fromFacility.getCoord() );
+				NetworkUtils.getNearestLink(accessibleNetwork, fromFacility.getCoord());
 		final Link toLink =
 			accessibleNetwork.getLinks().containsKey( toFacility.getLinkId() ) ?
 				accessibleNetwork.getLinks().get( toFacility.getLinkId() ) :
-				accessibleNetwork.getNearestLink( toFacility.getCoord() );
+				NetworkUtils.getNearestLink(accessibleNetwork, toFacility.getCoord());
 		
 		if ( fromLink == null || toLink == null ) {
 			log.error( "  ==>  null from/to link for person " + person.getId().toString() );

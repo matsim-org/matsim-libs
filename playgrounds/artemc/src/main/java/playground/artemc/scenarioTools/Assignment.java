@@ -1,18 +1,5 @@
 package playground.artemc.scenarioTools;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -23,15 +10,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.artemc.utils.SortEntriesByValueDesc;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class Assignment {
 
@@ -310,8 +297,8 @@ public class Assignment {
 			while(workAtSameLinkFromHome){
 				Integer randomWorkFacility = generator.nextInt((zoneWorkFacilities.get(workZone).size()));
 				workFacilityId = zoneWorkFacilities.get(workZone).get(randomWorkFacility);
-				Link workLink = network.getNearestLink(facilities.get(workFacilityId).getCoord());
-				Link homeLink = network.getNearestLink(facilities.get(homeFacilityId).getCoord());
+				Link workLink = NetworkUtils.getNearestLink(network, facilities.get(workFacilityId).getCoord());
+				Link homeLink = NetworkUtils.getNearestLink(network, facilities.get(homeFacilityId).getCoord());
 				if(workLink.getId().equals(homeLink.getId())){
 					System.out.println("   Work and Home on the same link! Looking for new facility...");
 				}

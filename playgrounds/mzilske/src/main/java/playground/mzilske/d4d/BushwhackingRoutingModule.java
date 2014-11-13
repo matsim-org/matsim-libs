@@ -1,9 +1,5 @@
 package playground.mzilske.d4d;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,19 +9,19 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BushwhackingRoutingModule implements RoutingModule {
 
@@ -48,8 +44,8 @@ public class BushwhackingRoutingModule implements RoutingModule {
 	@Override
 	public List<PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
 		
-		final Link fromLink = network.getNearestLink(fromFacility.getCoord());
-		final Link toLink = network.getNearestLink(toFacility.getCoord());
+		final Link fromLink = NetworkUtils.getNearestLink(network, fromFacility.getCoord());
+		final Link toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
 		
 		Facility linkEnterFacility = new Facility() {
 

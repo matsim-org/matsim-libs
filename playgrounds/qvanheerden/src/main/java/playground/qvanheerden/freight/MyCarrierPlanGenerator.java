@@ -1,57 +1,42 @@
 package playground.qvanheerden.freight;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
 import playground.jjoubert.Utilities.FileSampler.MyFileSampler;
 import playground.southafrica.utilities.Header;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class MyCarrierPlanGenerator {
 	private final static Logger log = Logger.getLogger(MyCarrierPlanGenerator.class);
@@ -100,7 +85,7 @@ public class MyCarrierPlanGenerator {
 		/* Set coordinate and linkId of depot */
 		depotCoord = new CoordImpl(depotLong, depotLat);
 		//		depotLink = ((NetworkImpl) network).getNearestLink((Coord) depotCoord).getId();
-		depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(depotCoord).getId();
+		depotLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), depotCoord).getId();
 
 		MyFileSampler mfs = new MyFileSampler(demandInputDir);
 		List<File> files = mfs.sampleFiles(Integer.MAX_VALUE, new MyFileFilter(".csv"));
@@ -288,7 +273,7 @@ public class MyCarrierPlanGenerator {
 				double end = Double.parseDouble(array[8]);
 
 				Coord coord = new CoordImpl(longi, lati);
-				Id<Link> linkId = ((NetworkImpl)network).getNearestLink(coord).getId();
+				Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) network), coord).getId();
 
 				CarrierService serv = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), linkId).
 						setCapacityDemand((int) mass).

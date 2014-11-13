@@ -20,20 +20,6 @@
 
 package playground.christoph.agglobern;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -42,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -52,6 +39,14 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 
 public class CalculateTravelTimes {
@@ -124,7 +119,7 @@ public class CalculateTravelTimes {
 			int fromId = fromEntry.getKey();
 			Data fromData = fromEntry.getValue();
 			
-			Link fromLink = ((NetworkImpl)scenario.getNetwork()).getNearestLink(fromData.coord1903);
+			Link fromLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), fromData.coord1903);
 			double fromDistance = ((CoordImpl)fromLink.getCoord()).calcDistance(fromData.coord1903);
 
 			travelTimes[from] = new double[dataLines.size()];
@@ -143,7 +138,7 @@ public class CalculateTravelTimes {
 					continue;
 				}
 				
-				Link toLink = ((NetworkImpl)scenario.getNetwork()).getNearestLink(toData.coord1903);
+				Link toLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), toData.coord1903);
 				double toDistance = ((CoordImpl)toLink.getCoord()).calcDistance(toData.coord1903);
 				
 				/*

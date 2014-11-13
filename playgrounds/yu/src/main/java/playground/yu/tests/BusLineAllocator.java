@@ -23,15 +23,6 @@
  */
 package playground.yu.tests;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,10 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.*;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -60,15 +48,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
-
 import playground.yu.utils.io.SimpleWriter;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * tries to allocate bus stop coordinates to links in MATSim "car" network
@@ -790,9 +775,9 @@ public class BusLineAllocator {
 							&& linkId.toString().startsWith("tr_")) {
 						Link actLink = this.carNet.getLinks().get(linkId);
 						if (actLink == null)
-							act.setLinkId(this.carNet.getNearestLink(
-									this.multiModalNetwork.getLinks().get(linkId)
-											.getCoord()).getId());
+							act.setLinkId(NetworkUtils.getNearestLink(
+                                    this.carNet, this.multiModalNetwork.getLinks().get(linkId)
+                                            .getCoord()).getId());
 					}
 				}
 			}

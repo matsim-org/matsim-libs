@@ -19,9 +19,6 @@
 
 package playground.wrashid.parkingSearch.planLevel.linkFacilityMapping;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -30,10 +27,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class LinkFacilityAssociation {
 
@@ -87,7 +87,7 @@ public class LinkFacilityAssociation {
 	 */
 	protected Id<Link> getClosestLink(ActivityFacilityImpl facility) {
 		if (facility.getLinkId() == null) {
-			return network.getNearestLink(facility.getCoord()).getId();
+			return NetworkUtils.getNearestLink(network, facility.getCoord()).getId();
 		} else {
 			return facility.getLinkId();
 		}

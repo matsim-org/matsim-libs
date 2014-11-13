@@ -21,16 +21,6 @@ package playground.ivt.matsim2030;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -56,12 +46,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -71,7 +56,6 @@ import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
@@ -79,6 +63,10 @@ import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.ivt.utils.MapUtils;
 import playground.ivt.utils.TripModeShares;
+
+import java.io.File;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author thibautd
@@ -343,7 +331,7 @@ public class Matsim2030Utils {
 		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
 			if ( fac.getLinkId() == null ) {
 				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
-				((ActivityFacilityImpl) fac).setLinkId( net.getNearestLink( fac.getCoord() ).getId() );
+				((ActivityFacilityImpl) fac).setLinkId( NetworkUtils.getNearestLink(net, fac.getCoord()).getId() );
 			}
 		}
 

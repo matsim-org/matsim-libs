@@ -1,7 +1,5 @@
 package playground.sergioo.facilitiesGenerator2012;
 
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -11,9 +9,12 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.HashSet;
 
 public class FacilitiesLinkLinker {
 
@@ -30,7 +31,7 @@ public class FacilitiesLinkLinker {
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
 		for(ActivityFacility facility:((ScenarioImpl)scenario).getActivityFacilities().getFacilities().values())
-			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLink(facility.getCoord()).getId());
+			((ActivityFacilityImpl)facility).setLinkId(NetworkUtils.getNearestLink(net, facility.getCoord()).getId());
 		new FacilitiesWriter(((ScenarioImpl)scenario).getActivityFacilities()).write(args[2]);
 	}
 

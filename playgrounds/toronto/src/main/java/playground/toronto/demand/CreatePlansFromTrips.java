@@ -1,22 +1,5 @@
 package playground.toronto.demand;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.util.Random;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
@@ -29,20 +12,23 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-
 import playground.balmermi.world.WorldUtils;
 import playground.balmermi.world.Zone;
 import playground.balmermi.world.ZoneLayer;
 import playground.toronto.demand.util.TableReader;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * <p>A new class for creating MATSim plans from a record of trips,
@@ -548,7 +534,7 @@ public class CreatePlansFromTrips {
 			PlanImpl plan = (PlanImpl) P.getSelectedPlan();
 			
 			ActivityImpl a = (ActivityImpl) plan.getFirstActivity();
-			Link nearestLink = network.getNearestLink(a.getCoord());
+			Link nearestLink = NetworkUtils.getNearestLink(network, a.getCoord());
 			
 			a.setLinkId(nearestLink.getId());
 		}

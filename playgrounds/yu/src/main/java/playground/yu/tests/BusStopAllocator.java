@@ -23,10 +23,6 @@
  */
 package playground.yu.tests;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,13 +32,17 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.yu.utils.io.SimpleWriter;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * tries to allocate bus stop coordinations to links in MATSim "car" network
@@ -85,7 +85,7 @@ public class BusStopAllocator {
 	private void allocateStop1(TransitStopFacility stop) {
 		Coord stopCoord = stop.getCoord();
 		Id stopId = stop.getId();
-		Link link = network.getNearestLink(stopCoord);
+		Link link = NetworkUtils.getNearestLink(network, stopCoord);
 		resultIds.put(stopId, link.getId());
 		if (link != null) {
 			Node node = network.getNearestNode(stopCoord);
@@ -103,7 +103,7 @@ public class BusStopAllocator {
 	private void allocateStop2(TransitStopFacility stop) {
 		Coord stopCoord = stop.getCoord();
 		Id stopId = stop.getId();
-		Link link = network.getNearestRightEntryLink(stopCoord);
+		Link link = NetworkUtils.getNearestRightEntryLink(network, stopCoord);
 		resultIds.put(stopId, link.getId());
 		if (link != null) {
 			Collection<Node> nodes = network.getNearestNodes(stopCoord, 25);

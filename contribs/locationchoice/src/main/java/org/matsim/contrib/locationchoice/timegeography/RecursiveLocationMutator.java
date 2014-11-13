@@ -20,12 +20,6 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,10 +31,13 @@ import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
+
+import java.util.*;
 
 public class RecursiveLocationMutator extends LocationMutator {
 
@@ -173,7 +170,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 			final ActivityFacility facility = choiceSet.get(super.random.nextInt(choiceSet.size()));
 
 			act.setFacilityId(facility.getId());
-       		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
+       		act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
        		act.setCoord(facility.getCoord());
        		return true;
 		}

@@ -1,17 +1,9 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
-import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
-import org.matsim.contrib.parking.PC2.simulation.ParkingChoiceSimulation;
-import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
@@ -24,10 +16,13 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
-
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 //TODO: move this to my playground and rename to Zurich
 public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
@@ -78,7 +73,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		}
 		
 
-		return new ParkingLinkInfo(vehicleId, network.getNearestLink(parking.getCoordinate())
+		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
 				.getId());
 	}
 
@@ -98,7 +93,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		currentVehicleLocation.put(vehicleId, parking);
 		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
-		return new ParkingLinkInfo(vehicleId, network.getNearestLink(parking.getCoordinate())
+		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
 				.getId());
 	}
 

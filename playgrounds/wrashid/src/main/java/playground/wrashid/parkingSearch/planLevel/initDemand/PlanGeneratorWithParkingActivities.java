@@ -19,27 +19,23 @@
 
 package playground.wrashid.parkingSearch.planLevel.initDemand;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.wrashid.parkingSearch.planLevel.ranking.ClosestParkingMatrix;
+
+import java.util.List;
 
 public class PlanGeneratorWithParkingActivities {
 
@@ -110,7 +106,7 @@ public class PlanGeneratorWithParkingActivities {
 
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", parkingFacility.getCoord());
 		newParkingActivity.setFacilityId(parkingFacility.getId());
-		newParkingActivity.setLinkId(network.getNearestLink(parkingFacility.getCoord()).getId());
+		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, parkingFacility.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);
 
 		planElements.add(index, newParkingActivity);

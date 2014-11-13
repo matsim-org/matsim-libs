@@ -19,29 +19,24 @@
 
 package playground.wdoering.grips.scenariogeneratorpt;
 
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.grips.scenariogenerator.PopulationFromESRIShapeFileGenerator;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.List;
 
 public class PopulationFromESRIShapeFielGeneratorPT extends
 		PopulationFromESRIShapeFileGenerator {
@@ -91,7 +86,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-		Link l = net.getNearestLink(c);
+		Link l = NetworkUtils.getNearestLink(net, c);
 		Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 		((ActivityImpl)act).setCoord(c);
 		act.setEndTime(0);
@@ -126,7 +121,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 		
 		
 		NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-		Link l = net.getNearestLink(c);
+		Link l = NetworkUtils.getNearestLink(net, c);
 		Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 		((ActivityImpl)act).setCoord(c);
 		act.setEndTime(0);

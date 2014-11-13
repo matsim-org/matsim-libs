@@ -19,9 +19,6 @@
 
 package playground.wrashid.artemis.parkingPostprocessing;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import org.geotools.math.Statistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,11 +27,14 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.scoring.ParkingInfo;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class AssignParkingLinkIds {
 
@@ -138,7 +138,7 @@ public class AssignParkingLinkIds {
 	}
 
 	private static Id<Link> getClosestLinkFromParking(Parking parking) {
-		return network.getNearestLink(parking.getCoord()).getId();
+		return NetworkUtils.getNearestLink(network, parking.getCoord()).getId();
 	}
 
 	private static HashMap<Id<Parking>, Parking> readParkings() {

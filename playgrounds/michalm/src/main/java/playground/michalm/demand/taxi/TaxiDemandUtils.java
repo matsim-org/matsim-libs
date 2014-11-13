@@ -19,14 +19,17 @@
 
 package playground.michalm.demand.taxi;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+
+import java.util.List;
 
 
 public class TaxiDemandUtils
@@ -38,11 +41,11 @@ public class TaxiDemandUtils
             List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
 
             ActivityImpl fromActivity = (ActivityImpl)planElements.get(0);
-            Link fromLink = network.getNearestLink(fromActivity.getCoord());
+            Link fromLink = NetworkUtils.getNearestLink(network, fromActivity.getCoord());
             fromActivity.setLinkId(fromLink.getId());
 
             ActivityImpl toActivity = (ActivityImpl)planElements.get(2);
-            Link toLink = network.getNearestLink(toActivity.getCoord());
+            Link toLink = NetworkUtils.getNearestLink(network, toActivity.getCoord());
             toActivity.setLinkId(toLink.getId());
 
             Leg leg = (Leg)p.getSelectedPlan().getPlanElements().get(1);

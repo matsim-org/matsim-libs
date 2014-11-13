@@ -20,30 +20,18 @@
 
 package playground.gregor.grips.complexscenariogenerator;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -52,8 +40,9 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ComplexPopulationFromESRIShapeFileGenerator {
 
@@ -133,7 +122,7 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 			Plan plan = pb.createPlan();
 			Coord c = getRandomCoordInsideFeature(this.rnd, e.getValue().o);
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-			Link l = net.getNearestLink(c);
+			Link l = NetworkUtils.getNearestLink(net, c);
 			Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 			((ActivityImpl)act).setCoord(c);
 			double departureTime = getDepartureTime();
@@ -143,7 +132,7 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 			Leg leg = pb.createLeg("car");
 			plan.addLeg(leg);
 			Coord c2 = getRandomCoordInsideFeature(this.rnd, e.getValue().d);
-			Link l2 = net.getNearestLink(c2);
+			Link l2 = NetworkUtils.getNearestLink(net, c2);
 			Activity act2 = pb.createActivityFromLinkId("post-evac", l2.getId());
 			act2.setEndTime(0);
 			((ActivityImpl)act2).setCoord(c2);

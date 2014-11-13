@@ -4,23 +4,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-
 import playground.southafrica.utilities.Header;
 
 public class MyCarrierCapabilityGenerator {
@@ -39,7 +31,7 @@ public class MyCarrierCapabilityGenerator {
 		config.network().setInputFile(networkFile);
 		config.network().setTimeVariantNetwork(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Id<Link> depotLink = ((NetworkImpl) scenario.getNetwork()).getNearestLink(depotCoord).getId();
+		Id<Link> depotLink = NetworkUtils.getNearestLink(((NetworkImpl) scenario.getNetwork()), depotCoord).getId();
 
 		MyCarrierCapabilityGenerator mccg = new MyCarrierCapabilityGenerator();
 		CarrierVehicleTypes carrierVehicleTypesTotal = mccg.buildAndWriteVehicleTypes(outputDir + "/vehicleTypes_total.xml", true);

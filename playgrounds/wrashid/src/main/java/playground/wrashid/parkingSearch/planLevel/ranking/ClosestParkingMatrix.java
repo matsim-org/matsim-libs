@@ -1,9 +1,5 @@
 package playground.wrashid.parkingSearch.planLevel.ranking;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -11,10 +7,14 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.parkingSearch.planLevel.linkFacilityMapping.LinkParkingFacilityAssociation;
 import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 import playground.wrashid.parkingSearch.planLevel.scoring.OrderedFacility;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 /**
  * TODO: The performance could be improved by perform caching here.
@@ -95,7 +95,7 @@ public class ClosestParkingMatrix {
 	 * @param maxDistance
 	 */
 	public LinkedList<Link> getClosestLinks(Coord coord, double maxDistance) {
-		Link initialLink = network.getNearestLink(coord);
+		Link initialLink = NetworkUtils.getNearestLink(network, coord);
 
 		LinkedList<Link> untestedLinks = new LinkedList<Link>();
 		LinkedList<Link> resultLinks = new LinkedList<Link>();

@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.PC2.scoring;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,7 +29,10 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonImpl;
+
+import java.util.Map;
 
 public class ParkingScoreManager {
 
@@ -55,7 +56,7 @@ public class ParkingScoreManager {
 
 		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
 
-		Link link = ((NetworkImpl) controler.getNetwork()).getNearestLink(destCoord);
+		Link link = NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), destCoord);
 		double length = link.getLength();
 		double walkTime = walkTravelTime.getLinkTravelTime(link, 0, person, null);
 		double walkSpeed = length / walkTime;

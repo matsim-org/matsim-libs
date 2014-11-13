@@ -19,15 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.generation;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,16 +29,19 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author thibautd
@@ -110,7 +106,7 @@ public class ConvertXYToBikeSharingStations {
 							Double.parseDouble( fields[ 0 ] ),
 							Double.parseDouble( fields[ 1 ] ) );
 				final Id<Link> link =
-					network.getNearestLink( coord ).getId();
+					NetworkUtils.getNearestLink(network, coord).getId();
 
 				final Id<ActivityFacility> id = Id.create( prefix+filecount+"-"+(linecount++) , ActivityFacility.class );
 

@@ -19,16 +19,16 @@
 
 package playground.wrashid.lib.tools.network;
 
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
+
+import java.util.LinkedList;
 
 public class MapCoordinateListToLinks {
 
@@ -58,7 +58,7 @@ public class MapCoordinateListToLinks {
 		LinkedList<Link> selectedLinks=new LinkedList<Link>();
 		
 		for (Coord coordinate:linkCoordinates){
-				Link nearestLink = network.getNearestLink(coordinate);
+				Link nearestLink = NetworkUtils.getNearestLink(network, coordinate);
 				System.out.println(nearestLink.getId());
 				selectedLinks.add(nearestLink);
 		}

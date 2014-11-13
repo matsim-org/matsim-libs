@@ -3,18 +3,12 @@ package playground.sergioo.ptsim2013;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,9 +38,9 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if(planElement instanceof ActivityImpl && !((ActivityImpl)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				if(act!=null) {
-					act.setLinkId(((NetworkImpl)network).getNearestLink(act.getCoord()).getId());
-					ptAct.setLinkId(((NetworkImpl)network).getNearestLink(act.getCoord()).getId());
-					((ActivityImpl) planElement).setLinkId(((NetworkImpl)network).getNearestLink(act.getCoord()).getId());
+					act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
+					ptAct.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
+					((ActivityImpl) planElement).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
 				}
 				act = (ActivityImpl) planElement;
 				if(eStopId2!=null) {
@@ -74,7 +68,7 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 					ptAct.setLinkId(aStopId);
 				}
 				else if(act!=null)
-					act.setLinkId(((NetworkImpl)network).getNearestLink(act.getCoord()).getId());
+					act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());
 				act = null;
 			}
 		}

@@ -20,14 +20,6 @@
 
 package org.matsim.facilities.algorithms;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +29,11 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+
+import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WorldConnectLocations {
 
@@ -114,7 +111,7 @@ public class WorldConnectLocations {
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
 		for (Id<ActivityFacility> fid : remainingFacilities) {
 			ActivityFacility f = facilities.getFacilities().get(fid);
-			Link l = network.getNearestRightEntryLink(f.getCoord());
+			Link l = NetworkUtils.getNearestRightEntryLink(network, f.getCoord());
 			l = network.getLinks().get(l.getId());
 			mapFacilityToLink(f,l);
 		}

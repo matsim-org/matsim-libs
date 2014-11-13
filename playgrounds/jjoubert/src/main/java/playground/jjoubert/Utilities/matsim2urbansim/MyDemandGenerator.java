@@ -20,30 +20,19 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,7 +40,11 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Class to generate a synthetic population of agents from data extracted from UrbanSim.
@@ -140,7 +133,7 @@ public class MyDemandGenerator {
 					}
 					Point pHome = homeZone.getInteriorPoint();
 					Coord cHome = new CoordImpl(pHome.getX(), pHome.getY());
-					Link lHome = ni.getNearestRightEntryLink(cHome);
+					Link lHome = NetworkUtils.getNearestRightEntryLink(ni, cHome);
 					Activity homeStart = new ActivityImpl("home", cHome, lHome.getId());
 					homeStart.setStartTime(0);
 					homeStart.setEndTime(21595 + Math.random()*10.0);
@@ -175,7 +168,7 @@ public class MyDemandGenerator {
 					MyZone workZone = zones.get(Id.create(workId, MyZone.class));
 					Point pWork = workZone.getInteriorPoint();
 					Coord cWork = new CoordImpl(pWork.getX(), pWork.getY());
-					Link lWork = ni.getNearestRightEntryLink(cWork);
+					Link lWork = NetworkUtils.getNearestRightEntryLink(ni, cWork);
 					Activity work = new ActivityImpl("work", cWork, lWork.getId());
 					work.setStartTime(25200);
 					work.setEndTime(work.getStartTime() + 32400);

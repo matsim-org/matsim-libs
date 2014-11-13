@@ -20,15 +20,10 @@
 
 package playground.christoph.strc2014;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +35,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -48,15 +44,14 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.mobsim.ParkingFacility;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.*;
 
 public class CreateParkingFacilities {
 	
@@ -114,7 +109,7 @@ public class CreateParkingFacilities {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			if (facility.getLinkId() == null) {
-				Link link = network.getNearestRightEntryLink(facility.getCoord());
+				Link link = NetworkUtils.getNearestRightEntryLink(network, facility.getCoord());
 				((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			}
 		}
@@ -170,7 +165,7 @@ public class CreateParkingFacilities {
 			
 			if (capacity <= 0) continue;
 			
-			Link link = network.getNearestRightEntryLink(coord);
+			Link link = NetworkUtils.getNearestRightEntryLink(network, coord);
 			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.PRIVATEINSIDEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
@@ -205,7 +200,7 @@ public class CreateParkingFacilities {
 			
 			if (capacity <= 0) continue;
 			
-			Link link = network.getNearestRightEntryLink(coord);
+			Link link = NetworkUtils.getNearestRightEntryLink(network, coord);
 			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.PRIVATEOUTSIDEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
@@ -248,7 +243,7 @@ public class CreateParkingFacilities {
 			
 			if (capacity <= 0) continue;
 						
-			Link link = network.getNearestRightEntryLink(coord);
+			Link link = NetworkUtils.getNearestRightEntryLink(network, coord);
 			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.GARAGEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
@@ -290,7 +285,7 @@ public class CreateParkingFacilities {
 			// check whether coordinate is inside the area covered by the network
 			if (coord.getX() < minX || coord.getX() > maxX || coord.getY() < minY || coord.getY() > maxY) continue;
 						
-			Link link = network.getNearestRightEntryLink(coord);
+			Link link = NetworkUtils.getNearestRightEntryLink(network, coord);
 			
 			ActivityFacility parkingFacility = linkParkingFacilities.get(link.getId());
 			if (parkingFacility == null) {

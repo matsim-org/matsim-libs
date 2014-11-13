@@ -1,20 +1,19 @@
 package playground.mzilske.cdr;
 
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.util.Random;
 
 public final class CellularCoverageLinkToZoneResolver implements
 		LinkToZoneResolver {
@@ -38,7 +37,7 @@ public final class CellularCoverageLinkToZoneResolver implements
 		Geometry cell = cellTower.cell;
 		Point p = getRandomPointInFeature(MatsimRandom.getRandom(), cell);
 		Coord coord = new CoordImpl(p.getX(), p.getY());
-		Link link = ((NetworkImpl) network).getNearestLink(coord);
+		Link link = NetworkUtils.getNearestLink(((NetworkImpl) network), coord);
 		return link.getId();
 	}
 	

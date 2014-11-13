@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -56,10 +57,10 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 
-		Link link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
+		Link link0 = NetworkUtils.getNearestLink(network, new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new ActivityImpl("home", link0.getId());
 
-		Link link1 = network.getNearestLink(new CoordImpl(695278.8125, 257607.125));
+		Link link1 = NetworkUtils.getNearestLink(network, new CoordImpl(695278.8125, 257607.125));
 		ActivityImpl toAct = new ActivityImpl("shop", link1.getId());
 		fromAct.setEndTime(0.0);
 

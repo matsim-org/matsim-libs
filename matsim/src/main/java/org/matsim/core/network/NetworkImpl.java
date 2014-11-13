@@ -20,14 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
+
+import java.util.*;
 
 /**
  * Design thoughts:<ul>
@@ -74,7 +68,7 @@ public final class NetworkImpl implements Network {
 
 	private NetworkFactoryImpl factory;
 
-	private Collection<NetworkChangeEvent> networkChangeEvents = null;
+	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 
 	private String name = null;
 
@@ -231,20 +225,14 @@ public final class NetworkImpl implements Network {
 	 * @param events a list of events.
 	 */
 	public void setNetworkChangeEvents(final List<NetworkChangeEvent> events) {
-		if (!this.factory.isTimeVariant()) {
-			throw new RuntimeException(
-					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
+        this.networkChangeEvents.clear();
+        for(Link link : getLinks().values()) {
+            if (link instanceof TimeVariantLinkImpl) {
+                ((TimeVariantLinkImpl)link).clearEvents();
+            }
 		}
-
-		for(Link link : getLinks().values()) {
-			((TimeVariantLinkImpl)link).clearEvents();
-		}
-
-		this.networkChangeEvents = events;
 		for (NetworkChangeEvent event : events) {
-			for (Link link : event.getLinks()) {
-				((TimeVariantLinkImpl)link).applyEvent(event);
-			}
+			this.addNetworkChangeEvent(event);
 		}
 	}
 
@@ -256,19 +244,14 @@ public final class NetworkImpl implements Network {
 	 *            a network change event.
 	 */
 	public void addNetworkChangeEvent(final NetworkChangeEvent event) {
-		if (!this.factory.isTimeVariant()) {
-			throw new RuntimeException(
-					"Trying to set NetworkChangeEvents but NetworkFactory is not time variant");
-		}
-
-		if (this.networkChangeEvents == null) {
-			this.networkChangeEvents = new ArrayList<>();
-		}
-
 		this.networkChangeEvents.add(event);
-		for (Link link : event.getLinks()) {
-			((TimeVariantLinkImpl)link).applyEvent(event);
-		}
+        for (Link link : event.getLinks()) {
+            if (link instanceof TimeVariantLinkImpl) {
+                ((TimeVariantLinkImpl)link).applyEvent(event);
+            } else {
+                throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
+            }
+        }
 	}
 
 	@Override
@@ -290,165 +273,14 @@ public final class NetworkImpl implements Network {
 		return this.nodes;
 	}
 
-	/**
-	 * Finds the (approx.) nearest link to a given point on the map.<br />
-	 * It searches first for the nearest node, and then for the nearest link
-	 * originating or ending at that node.
-	 *
-	 * @param coord
-	 *          the coordinate for which the closest link should be found
-	 * @return the link found closest to coord
-	 */
-	public Link getNearestLink(final Coord coord) {
-		Link nearestLink = null;
-		Node nearestNode;
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
-		if ( nearestNode == null ) {
-			log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + this ) ;
-			return null ;
-		}
-
-		if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-			log.warn(this + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
-		}
-
-		// now find nearest link from the nearest node
-		// [balmermi] it checks now ALL incident links, not only the outgoing ones.
-		// TODO [balmermi] Now it finds the first of the typically two nearest links (same nodes, other direction)
-		// It would be nicer to find the nearest link on the "right" side of the coordinate.
-		// (For Great Britain it would be the "left" side. Could be a global config param...)
-		double shortestDistance = Double.MAX_VALUE;
-		for (Link link : NetworkUtils.getIncidentLinks(nearestNode).values()) {
-			double dist = ((LinkImpl) link).calcDistance(coord);
-			if (dist < shortestDistance) {
-				shortestDistance = dist;
-				nearestLink = link;
-			}
-		}
-		if ( nearestLink == null ) {
-			log.warn(this + "[nearestLink not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
-		}
-		return nearestLink;
-	}
-	
-	public Link getNearestLinkExactly(final Coord coord) {
+    public Link getNearestLinkExactly(final Coord coord) {
 		if (this.linkQuadTree == null) {
 			buildLinkQuadTree();
 		}
 		return this.linkQuadTree.getNearest(coord.getX(), coord.getY());
 	}
 
-	/**
-	 * Finds the (approx.) nearest link to a given point on the map,
-	 * such that the point lies on the right side of the directed link,
-	 * if such a link exists.<br />
-	 * It searches first for the nearest node, and then for the nearest link
-	 * originating or ending at that node and fulfilling the above constraint.
-	 * <p>
-	 * <b>Special cases:</b> <tt>nodes:o ; links:<-- ; coord:x</tt><br/>
-	 * <i>No right entry link exists</i><br/>
-	 * <tt>
-	 * o<-1--o returning<br/>
-	 * | . . ^ nearest left<br/>
-	 * |2 . 4| entry link<br/>
-	 * v .x. | (link.id=3)<br/>
-	 * o--3->o<br/>
-	 * </tt>
-	 * <br/>
-	 * <i>No right entry link exists but more than one nearest left entry link exist</i><br/>
-	 * <tt>
-	 * o<-1--o returning<br/>
-	 * | . . ^ nearest left<br/>
-	 * |2 x 4| entry link with the<br/>
-	 * v . . | lowest link id<br/>
-	 * o--3->o (link.id=1)<br/>
-	 * </tt>
-	 * <br/>
-	 * <i>More than one nearest right entry link exist</i><br/>
-	 * <tt>
-	 * o--1->o returning<br/>
-	 * ^ . . | nearest right<br/>
-	 * |2 x 4| entry link with the<br/>
-	 * | . . v lowest link id<br/>
-	 * o<-3--o (link.id=1)<br/>
-	 * <br/>
-	 * o<----7&8--x->o (link.id=7)<br/>
-	 * </tt>
-	 * </p>
-	 *
-	 * @param coord
-	 *          the coordinate for which the closest link should be found
-	 * @return the link found closest to <code>coord</code> and oriented such that the
-	 * point lies on the right of the link.
-	 */
-	// TODO [balmermi] there should be only one 'getNearestLink' method
-	// which returns either the nearest 'left' or 'right' entry link, based on a global
-	// config param.
-	public Link getNearestRightEntryLink(final Coord coord) {
-		Link nearestRightLink = null;
-		Link nearestOverallLink = null;
-		Node nearestNode;
-		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
-
-		double[] coordVector = new double[2];
-		coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
-		coordVector[1] = nearestNode.getCoord().getY() - coord.getY();
-
-		// now find nearest link from the nearest node
-		double shortestRightDistance = Double.MAX_VALUE; // reset the value
-		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
-		incidentLinks.addAll(nearestNode.getOutLinks().values());
-		for (Link link : incidentLinks) {
-			double dist = ((LinkImpl) link).calcDistance(coord);
-			if (dist <= shortestRightDistance) {
-				// Generate a vector representing the link
-				double[] linkVector = new double[2];
-				linkVector[0] = link.getToNode().getCoord().getX()
-						- link.getFromNode().getCoord().getX();
-				linkVector[1] = link.getToNode().getCoord().getY()
-						- link.getFromNode().getCoord().getY();
-
-				// Calculate the z component of cross product of coordVector and the link
-				double crossProductZ = coordVector[0]*linkVector[1] - coordVector[1]*linkVector[0];
-				// If coord lies to the right of the directed link, i.e. if the z component
-				// of the cross product is negative, set it as new nearest link
-				if (crossProductZ < 0) {
-					if (dist < shortestRightDistance) {
-						shortestRightDistance = dist;
-						nearestRightLink = link;
-					}
-					else { // dist == shortestRightDistance
-						if (link.getId().compareTo(nearestRightLink.getId()) < 0) {
-							shortestRightDistance = dist;
-							nearestRightLink = link;
-						}
-					}
-				}
-			}
-			if (dist < shortestOverallDistance) {
-				shortestOverallDistance = dist;
-				nearestOverallLink = link;
-			}
-			else if (dist == shortestOverallDistance) {
-				if (link.getId().compareTo(nearestOverallLink.getId()) < 0) {
-					shortestOverallDistance = dist;
-					nearestOverallLink = link;
-				}
-			}
-		}
-
-		// Return the nearest overall link if there is no nearest link
-		// such that the given coord is on the right side of it
-		if (nearestRightLink == null) {
-			return nearestOverallLink;
-		}
-		return nearestRightLink;
-	}
-
-	/**
+    /**
 	 * finds the node nearest to <code>coord</code>
 	 *
 	 * @param coord the coordinate to which the closest node should be found

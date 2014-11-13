@@ -1,5 +1,26 @@
 package playground.artemc.scenarioTools;
 
+import com.mysql.jdbc.Statement;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.*;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import playground.artemc.utils.DataBaseAdmin;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,33 +28,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.Property;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.artemc.utils.DataBaseAdmin;
-
-import com.mysql.jdbc.Statement;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 
 
 public class StructuresToFacilities {
@@ -173,7 +167,7 @@ public class StructuresToFacilities {
 			if(nodeZoneId>0){	
 				facilities.createAndAddFacility(facilityID, new CoordImpl(x,y));
 				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(facilityID);
-				facility.setLinkId(network.getNearestLink(facility.getCoord()).getId());	
+				facility.setLinkId(NetworkUtils.getNearestLink(network, facility.getCoord()).getId());
 				ArrayList<ActivityOptionImpl> activities = getActivity(structure, capacity);		
 				String activityOptions = "";
 				for(ActivityOption act:activities){

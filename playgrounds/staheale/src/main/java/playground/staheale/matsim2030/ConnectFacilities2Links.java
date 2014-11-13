@@ -1,11 +1,5 @@
 package playground.staheale.matsim2030;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -17,8 +11,15 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConnectFacilities2Links {
 	
@@ -59,7 +60,7 @@ public class ConnectFacilities2Links {
 		log.info("Connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
 		for (Id fid : remainingFacilities) {
 			ActivityFacility f = facilities.getFacilities().get(fid);
-			Link l = ((NetworkImpl) network).getNearestRightEntryLink(f.getCoord());
+			Link l = NetworkUtils.getNearestRightEntryLink(((NetworkImpl) network), f.getCoord());
 			l = network.getLinks().get(l.getId());
 			((ActivityFacilityImpl) f).setLinkId(l.getId());
 		}

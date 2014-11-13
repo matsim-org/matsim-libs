@@ -19,12 +19,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +36,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
@@ -54,6 +49,12 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
@@ -87,7 +88,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
 		this.nearestLinks = new HashMap<>();
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			this.nearestLinks.put(facility.getId(), ((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
+			this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
 		}
 		
 		initLocal();

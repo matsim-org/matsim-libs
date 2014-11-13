@@ -1,13 +1,14 @@
 package org.matsim.contrib.parking.parkingChoice.carsharing;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class DummyParkingModuleWithFreeFloatingCarSharing implements
 		ParkingModuleWithFreeFloatingCarSharing {
@@ -39,7 +40,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 
-		return new ParkingLinkInfo(vehicleId, network.getNearestLink(coord)
+		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, coord)
 				.getId());
 	}
 
@@ -47,7 +48,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personI, double time) {
 		availableVehicles.add(vehicleId);
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		return new ParkingLinkInfo(vehicleId, network.getNearestLink(destCoord)
+		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, destCoord)
 				.getId());
 	}
 

@@ -19,15 +19,6 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,14 +31,14 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.core.router.ImaginaryNode;
-import org.matsim.core.router.InitialNode;
-import org.matsim.core.router.MultiNodeDijkstra;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.*;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class ChoiceSet {
 	
@@ -236,7 +227,7 @@ public class ChoiceSet {
 				Link destinationLink;
 				if (linkId != null) {
 					destinationLink = this.network.getLinks().get(linkId);				
-				} else destinationLink = ((NetworkImpl) this.network).getNearestLink(destinationFacility.getCoord());
+				} else destinationLink = NetworkUtils.getNearestLink(((NetworkImpl) this.network), destinationFacility.getCoord());
 				
 				Node toNode = destinationLink.getToNode();
 				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);

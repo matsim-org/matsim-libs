@@ -1,13 +1,5 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -18,28 +10,26 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
-
 import playground.sergioo.passivePlanning2012.core.network.ComposedLink;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.EndTimeDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.StartTimeDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityFacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
+
+import java.util.*;
 
 public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
 
@@ -228,7 +218,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 			simpleTravelTime.setMode(mode);
 			LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
 			LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getSimplerNetwork(mode), simpleTravelDisutility, simpleTravelTime); 
-			Path path = leastCostPathCalculator.calcLeastCostPath(((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(startLink.getCoord()).getFromNode(), ((NetworkImpl)scenario.getSimplerNetwork(mode)).getNearestLink(endLink.getCoord()).getToNode(), time, null, null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), startLink.getCoord()).getFromNode(), NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), endLink.getCoord()).getToNode(), time, null, null);
 			if(path.travelTime<minTime) {
 				minTime = path.travelTime;
 				bestPath = path.links;

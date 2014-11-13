@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 
 
@@ -49,7 +50,7 @@ public class PrintInfoAboutFacilitiesOnALink {
 				
 		for (Id<ActivityFacility> facilityId:facilities.getFacilities().keySet()){
 			ActivityFacilityImpl facility=(ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
-			Id<Link> linkOfFacility=network.getNearestLink(facility.getCoord()).getId();
+			Id<Link> linkOfFacility= NetworkUtils.getNearestLink(network, facility.getCoord()).getId();
 			
 			if (linkOfFacility.equals(idOfLinkForWhichFacilitiesShouldBePrinted)){
 				FacilityLib.printActivityFacilityImpl(facility);

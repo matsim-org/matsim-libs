@@ -20,20 +20,9 @@
 
 package playground.mrieser.pt.application;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -57,14 +46,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class VisualizeTransitPlans {
@@ -109,7 +97,7 @@ public class VisualizeTransitPlans {
 						visAct.setStartTime(act.getStartTime());
 						visAct.setMaximumDuration((act).getMaximumDuration());
 						visAct.setEndTime(act.getEndTime());
-						visAct.setLinkId(((NetworkImpl) this.visScenario.getNetwork()).getNearestLink(act.getCoord()).getId());
+						visAct.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.visScenario.getNetwork()), act.getCoord()).getId());
 						visPlan.addActivity(visAct);
 					} else if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;

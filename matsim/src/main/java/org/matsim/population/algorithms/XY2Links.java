@@ -20,8 +20,6 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +29,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
+
+import java.util.List;
 
 /**
  * Assigns each activity in a plan a link where the activity takes place
@@ -105,7 +106,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 				// If the linkId is still null get nearest link from the network
 //				Link link = this.network.getNearestLinkExactly(act.getCoord());
-				Link link = this.network.getNearestLink(act.getCoord());
+				Link link = NetworkUtils.getNearestLink(this.network, act.getCoord());
 				// getNearestLinkExactly not necessarily better than getNearestLink.  E.g.
 				// n--n-----------------------------n
 				// A home location slightly to the right of the middle node will take:

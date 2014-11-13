@@ -19,12 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.herbiespecific;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,15 +35,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
+import org.matsim.pt.transitSchedule.api.*;
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideFacilitiesXmlWriter;
 import playground.thibautd.parknride.ParkAndRideFacility;
+
+import java.util.*;
 
 /**
  * @author thibautd
@@ -98,7 +90,7 @@ public class IdentifyParkAndRideFacilities {
 					new ParkAndRideFacility(
 						ids.next(),
 						stop.getCoord(),
-						network.getNearestLink( stop.getCoord() ).getId(),
+						NetworkUtils.getNearestLink(network, stop.getCoord()).getId(),
 						Arrays.asList( stop.getId() ) ));
 		}
 		count.printCounter();

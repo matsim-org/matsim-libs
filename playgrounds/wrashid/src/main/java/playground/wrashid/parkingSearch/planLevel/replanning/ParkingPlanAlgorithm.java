@@ -20,23 +20,23 @@
 
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
@@ -224,7 +224,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 			double parkingActivityDuration) {
 		ActivityImpl newParkingActivity = new ActivityImpl("parking", newParking.getCoord());
 		newParkingActivity.setFacilityId(newParking.getId());
-		newParkingActivity.setLinkId(network.getNearestLink(newParking.getCoord()).getId());
+		newParkingActivity.setLinkId(NetworkUtils.getNearestLink(network, newParking.getCoord()).getId());
 		newParkingActivity.setMaximumDuration(parkingActivityDuration);
 
 		return newParkingActivity;

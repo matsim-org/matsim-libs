@@ -19,12 +19,6 @@
 
 package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,10 +37,10 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
@@ -55,13 +49,11 @@ import playground.wrashid.parkingSearch.withindayFW.impl.ParkingStrategyActivity
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingAnalysisHandlerZH;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostCalculatorZH;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingCostOptimizerZH;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
+import playground.wrashid.parkingSearch.withindayFW.zhCity.*;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCReplannerFactory;
+
+import java.util.*;
 
 public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	private LinkedList<Parking> parkings;
@@ -274,7 +266,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 			
 			ActivityFacility parkingFacility = factory.createActivityFacility(Id.create(parking.getId(), ActivityFacility.class), parking.getCoord());
 			facilities.addActivityFacility(parkingFacility);
-			Link nearestLink = ((NetworkImpl)this.scenarioData.getNetwork()).getNearestLink(parking.getCoord());
+			Link nearestLink = NetworkUtils.getNearestLink(((NetworkImpl) this.scenarioData.getNetwork()), parking.getCoord());
 			
 			((ActivityFacilityImpl)parkingFacility).setLinkId(nearestLink.getId());
 			

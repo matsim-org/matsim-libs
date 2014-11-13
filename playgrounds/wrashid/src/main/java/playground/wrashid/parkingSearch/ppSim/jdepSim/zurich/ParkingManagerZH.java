@@ -18,14 +18,6 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.zurich;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,11 +36,11 @@ import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.tools.network.obj.RectangularArea;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
@@ -61,6 +53,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
+
+import java.util.*;
 
 public class ParkingManagerZH {
 
@@ -145,7 +139,7 @@ public class ParkingManagerZH {
 		parkingFacilitiesOnLinkMapping = new HashMap<>();
 
 		for (Parking parking : this.getParkings()) {
-			Id<Link> linkId = ((NetworkImpl) this.network).getNearestLink(parking.getCoord()).getId();
+			Id<Link> linkId = NetworkUtils.getNearestLink(((NetworkImpl) this.network), parking.getCoord()).getId();
 			assignFacilityToLink(linkId, parking.getId());
 
 			parkingIdToLinkIdMapping.put(parking.getId(), linkId);

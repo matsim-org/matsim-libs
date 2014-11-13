@@ -1,24 +1,19 @@
 package playground.artemc.plansTools;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -27,12 +22,11 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.gis.matsim2esri.plans.SelectedPlans2ESRIShape;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.artemc.networkTools.ShapeArea;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Random;
 
 public class PopulationGenerator {
 
@@ -108,7 +102,7 @@ public class PopulationGenerator {
 			System.out.println("Home: "+homePoint.getX()+","+homePoint.getY()+"   Work: "+workPoint.getX()+","+workPoint.getY());
 					
 			Plan plan = populationFactory.createPlan();
-			Link link = net.getNearestLink(new CoordImpl(homePoint.getX(),homePoint.getY()));
+			Link link = NetworkUtils.getNearestLink(net, new CoordImpl(homePoint.getX(), homePoint.getY()));
 			Activity activity = populationFactory.createActivityFromLinkId("home", link.getId());
 			activity.setEndTime(3600.0*8);
 			plan.addActivity(activity);
@@ -116,7 +110,7 @@ public class PopulationGenerator {
 			
 			plan.addLeg(leg);
 			
-			link = net.getNearestLink(new CoordImpl(workPoint.getX(),workPoint.getY()));
+			link = NetworkUtils.getNearestLink(net, new CoordImpl(workPoint.getX(), workPoint.getY()));
 			activity = populationFactory.createActivityFromLinkId("work", link.getId());
 			activity.setStartTime(3600.0*9);
 			activity.setEndTime(3600.0*18);

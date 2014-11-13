@@ -19,22 +19,16 @@
  * *********************************************************************** */
 package playground.ivt.kticompatibility;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -45,7 +39,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.pt.PtConstants;
-
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
 import playground.balmermi.world.Zone;
@@ -53,6 +46,9 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
 import playground.meisterk.kti.router.SwissHaltestellen;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -85,8 +81,8 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		final Link linkStartPt = network.getNearestLink( stop1.getCoord() );
-		final Link linkEndPt = network.getNearestLink( stop2.getCoord() );
+		final Link linkStartPt = NetworkUtils.getNearestLink(network, stop1.getCoord());
+		final Link linkEndPt = NetworkUtils.getNearestLink(network, stop2.getCoord());
 
 		// access
 		// ---------------------------------------------------------------------

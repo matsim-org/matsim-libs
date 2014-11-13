@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
@@ -47,7 +47,7 @@ public class FacilityValidator {
 		 */
 		for(ActivityFacility facility : facilities.getFacilities().values()) {
 			Coord coord = facility.getCoord();
-			Link link = network.getNearestLink(coord);
+			Link link = NetworkUtils.getNearestLink(network, coord);
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 		}
 		/*
@@ -59,7 +59,7 @@ public class FacilityValidator {
 			Id<ActivityFacility> id = Id.create(HOME_PREFIX + person.getId().toString(), ActivityFacility.class);
 			ActivityFacilityImpl homeFac = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
 			homeFac.createActivityOption("visit");
-			Link link = network.getNearestLink(homeFac.getCoord());
+			Link link = NetworkUtils.getNearestLink(network, homeFac.getCoord());
 			homeFac.setLinkId(link.getId());
 		}
 	}

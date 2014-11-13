@@ -31,6 +31,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -86,10 +87,10 @@ public class Main {
 		Leg leg = new LegImpl(TransportMode.car);
 		CoordImpl fromCoord = new CoordImpl(xFromAct, yFromAct);
 		Activity fromAct = new ActivityImpl("h", fromCoord);
-		((ActivityImpl) fromAct).setLinkId(((NetworkImpl) network).getNearestLink(fromCoord).getId());
+		((ActivityImpl) fromAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), fromCoord).getId());
 		CoordImpl toCoord = new CoordImpl(xToAct, yToAct);
 		Activity toAct = new ActivityImpl("h", toCoord);
-		((ActivityImpl) toAct).setLinkId(((NetworkImpl) network).getNearestLink(toCoord).getId());
+		((ActivityImpl) toAct).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), toCoord).getId());
 
 		for (int i = 0; i < 1000; i++) {
 			double tt = new NetworkLegRouter(network, routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct,

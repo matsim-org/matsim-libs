@@ -19,8 +19,6 @@
 
 package playground.balac.retailers.utils;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,12 +30,14 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.balac.retailers.data.PersonPrimaryActivity;
+
+import java.util.Map;
 
 
 public abstract class Utils
@@ -138,7 +138,7 @@ public abstract class Utils
 
     QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
     for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-      ((ActivityFacilityImpl) f).setLinkId(((NetworkImpl) controler.getNetwork()).getNearestLink(f.getCoord()).getId());
+      ((ActivityFacilityImpl) f).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), f.getCoord()).getId());
       Coord c = f.getCoord();
       facilityQuadTree.put(c.getX(), c.getY(), f);
     }
@@ -357,7 +357,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             if (act.getType().equals("home")) {
               if (!(hasHome)) {
                 c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
+                activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), act.getCoord())).getId();
                 //activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
@@ -443,7 +443,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             	if (!previousActivity.getType().startsWith("shopgrocery")) {
             		
             		 c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                     activityLink = (((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
+                     activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), act.getCoord())).getId();
                      ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                      ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
                      personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);                    
@@ -453,7 +453,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
             }
             else if (previousActivity != null && previousActivity.getType().equals("shopgrocery")) {
             	 	c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-            	 	activityLink = (((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
+            	 	activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), act.getCoord())).getId();
             	 	ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
             	 	ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
             	 	personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);                    

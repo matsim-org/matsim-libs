@@ -1,11 +1,5 @@
 package playground.pbouman.agentproperties.population;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -14,12 +8,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-
 import playground.pbouman.agentproperties.ActivityProperties;
 import playground.pbouman.agentproperties.AgentProperties;
 import playground.pbouman.agentproperties.LocationDescription;
 import playground.pbouman.agentproperties.TimePreferences;
+
+import java.util.*;
 
 public class PopulationGenerator
 {
@@ -76,7 +72,7 @@ public class PopulationGenerator
 					else
 					{
 						act = (ActivityImpl) factory.createActivityFromCoord("home", scen.createCoord(home.getX(), home.getY()));
-						act.setLinkId(network.getNearestLink(act.getCoord()).getId());
+						act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 					}
 			
 					if (timepref.getStartDevUtility() != 0)
@@ -101,7 +97,7 @@ public class PopulationGenerator
 				else
 				{
 					act = (ActivityImpl) factory.createActivityFromCoord(ap.getName(), scen.createCoord(loc.getX(), loc.getY()));
-					act.setLinkId(network.getNearestLink(act.getCoord()).getId());
+					act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 				}
 				
 				if (timepref.getStartDevUtility() != 0)
@@ -123,7 +119,7 @@ public class PopulationGenerator
 			else
 			{
 				act = (ActivityImpl) factory.createActivityFromCoord("home", scen.createCoord(home.getX(), home.getY()));
-				act.setLinkId(network.getNearestLink(act.getCoord()).getId());
+				act.setLinkId(NetworkUtils.getNearestLink(network, act.getCoord()).getId());
 			}
 			plan.addActivity(act);
 			

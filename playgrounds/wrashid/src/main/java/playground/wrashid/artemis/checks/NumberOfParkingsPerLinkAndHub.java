@@ -19,17 +19,17 @@
 
 package playground.wrashid.artemis.checks;
 
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+
+import java.util.LinkedList;
 
 public class NumberOfParkingsPerLinkAndHub {
 
@@ -75,7 +75,7 @@ public class NumberOfParkingsPerLinkAndHub {
 		IntegerValueHashMap<Id> numberOfParkingsAttachedToLinks=new IntegerValueHashMap<Id>();
 		
 		for (Parking parking:privateParkingCityZH){
-			Id closestLinkId = network.getNearestLink(parking.getCoord()).getId();
+			Id closestLinkId = NetworkUtils.getNearestLink(network, parking.getCoord()).getId();
 			numberOfParkingsAttachedToLinks.incrementBy(closestLinkId, (int) Math.round(parking.getCapacity()));
 		}
 		return numberOfParkingsAttachedToLinks;

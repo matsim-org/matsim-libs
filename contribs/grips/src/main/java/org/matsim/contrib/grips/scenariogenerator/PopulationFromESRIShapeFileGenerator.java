@@ -19,12 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.scenariogenerator;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -32,17 +28,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.io.DepartureTimeDistribution;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -51,8 +43,11 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 //this implementation is only a proof of concept
 @Deprecated
@@ -184,7 +179,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			Plan plan = pb.createPlan();
 			Coord c = getRandomCoordInsideFeature(this.rnd, ft);
 			NetworkImpl net = (NetworkImpl) this.scenario.getNetwork();
-			Link l = net.getNearestLink(c);
+			Link l = NetworkUtils.getNearestLink(net, c);
 			Activity act = pb.createActivityFromLinkId("pre-evac", l.getId());
 			((ActivityImpl)act).setCoord(c);
 			double departureTime = getDepartureTime();

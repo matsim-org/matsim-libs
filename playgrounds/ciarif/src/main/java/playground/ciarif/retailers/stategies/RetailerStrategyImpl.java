@@ -1,16 +1,16 @@
 package playground.ciarif.retailers.stategies;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-
+import org.matsim.core.network.NetworkUtils;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 public class RetailerStrategyImpl
   implements RetailerStrategy
@@ -36,7 +36,7 @@ public class RetailerStrategyImpl
 	    int intCount = 0;
 	    for (ActivityFacility af : this.retailerFacilities.values())
 	    {
-	      locations.put(Integer.valueOf(intCount), ((NetworkImpl) this.controler.getNetwork()).getNearestLink(af.getCoord()).getId().toString());
+	      locations.put(Integer.valueOf(intCount), NetworkUtils.getNearestLink(((NetworkImpl) this.controler.getNetwork()), af.getCoord()).getId().toString());
 	      ++intCount;
 	      log.info("The facility with Id: " + af.getId() + " has been added, this is located on the link: " + af.getLinkId());
 	    }

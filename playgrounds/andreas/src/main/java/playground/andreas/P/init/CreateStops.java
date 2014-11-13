@@ -23,11 +23,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.andreas.osmBB.extended.TransitScheduleImpl;
 
 @Deprecated
@@ -61,7 +61,7 @@ public class CreateStops {
 			for (int j = (int) this.minXY.getY(); j < this.maxXY.getY(); j += this.gridDistance) {
 
 				// point to add a stop
-				Link link = this.net.getNearestLink(new CoordImpl(i, j));
+				Link link = NetworkUtils.getNearestLink(this.net, new CoordImpl(i, j));
 				Link backLink = getBackLink(link);
 				
 				stopsAdded += addStopOnLink(link);

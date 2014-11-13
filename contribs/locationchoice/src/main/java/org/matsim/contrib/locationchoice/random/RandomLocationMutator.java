@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.locationchoice.random;
 
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +29,11 @@ import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
+
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * @author anhorni
@@ -81,7 +82,7 @@ public class RandomLocationMutator extends LocationMutator {
 	private void setNewLocationForAct(ActivityImpl act, int length) {
 		ActivityFacilityImpl facility = this.facilitiesOfType.get(act.getType())[super.random.nextInt(length)];
 		act.setFacilityId(facility.getId());
-		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
+		act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
 		act.setCoord(facility.getCoord());
 	}
 }

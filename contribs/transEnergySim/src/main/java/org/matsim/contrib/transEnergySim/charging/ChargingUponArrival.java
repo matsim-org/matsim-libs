@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.transEnergySim.charging;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,14 +31,11 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
-import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.StationaryChargingOutputLog;
-import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtActivity;
-import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPowerAtLink;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
-import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -49,6 +44,9 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+
+import java.util.HashMap;
 
 /**
  * This module is not compatible with parking search, but should be with parking
@@ -177,7 +175,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 				Id linkId = controller.getFacilities().getFacilities().get(facilityId).getLinkId();
 				
 				if (linkId==null){
-					linkId = ((NetworkImpl) controller.getNetwork()).getNearestLink(controller.getFacilities().getFacilities().get(facilityId).getCoord()).getId();
+					linkId = NetworkUtils.getNearestLink(((NetworkImpl) controller.getNetwork()), controller.getFacilities().getFacilities().get(facilityId).getCoord()).getId();
 				}
 				
 				ChargingLogRowFacilityLevel chargingLogRow = new ChargingLogRowFacilityLevel(personId, linkId,facilityId,

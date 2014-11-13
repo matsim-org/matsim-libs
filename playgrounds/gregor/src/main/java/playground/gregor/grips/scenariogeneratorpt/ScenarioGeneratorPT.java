@@ -19,14 +19,7 @@
 
 package playground.gregor.grips.scenariogeneratorpt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,6 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -60,22 +54,11 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
 
 
 public class ScenarioGeneratorPT extends ScenarioGenerator {
@@ -223,7 +206,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		});
 		List<Link> allLinks = new ArrayList<Link>();
 		TransitRouteStop f = stops.get(0);
-		Link l1 = ((NetworkImpl)network).getNearestLink(f.getStopFacility().getCoord());
+		Link l1 = NetworkUtils.getNearestLink(((NetworkImpl) network), f.getStopFacility().getCoord());
 		f.getStopFacility().setLinkId(l1.getId());
 		allLinks.add(l1);
 		for (int i = 1; i < stops.size(); i++) { 
@@ -231,7 +214,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 			l1 = allLinks.get(allLinks.size()-1);
 			
 			TransitRouteStop curr = stops.get(i);
-			Link l2 = ((NetworkImpl)network).getNearestLink(curr.getStopFacility().getCoord());
+			Link l2 = NetworkUtils.getNearestLink(((NetworkImpl) network), curr.getStopFacility().getCoord());
 			
 			Node start = l1.getToNode();
 			Node end = l2.getFromNode();

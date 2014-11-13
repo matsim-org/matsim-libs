@@ -19,17 +19,20 @@
 
 package playground.michalm.demand;
 
-import org.matsim.api.core.v01.*;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-
 import pl.poznan.put.util.random.*;
 import playground.michalm.zone.Zone;
-
-import com.vividsolutions.jts.geom.*;
 
 
 public class DefaultActivityCreator
@@ -81,7 +84,7 @@ public class DefaultActivityCreator
         while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
 
         Coord coord = scenario.createCoord(p.getX(), p.getY());
-        Link link = network.getNearestLink(coord);
+        Link link = NetworkUtils.getNearestLink(network, coord);
 
         ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coord);
         activity.setLinkId(link.getId());
