@@ -20,10 +20,6 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -41,28 +37,24 @@ import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 public class EventsHandling implements BeforeMobsimListener, 
 	AfterMobsimListener, IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(EventsHandling.class);
 	
 	private final EventsManager eventsManager;
-	private List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+	private List<EventWriter> eventWriters = new LinkedList<>();
 
 	private int writeEventsInterval;
     
 	private Set<EventsFileFormat> eventsFileFormats ;
 	
 	private OutputDirectoryHierarchy controlerIO ;
-	
-	private boolean calledViaOldConstructor = false ;
-	
-	/**
-	 * @param eventsManager
-	 * @param writeEventsInterval
-	 * @param eventsFileFormats
-	 * @param controlerIO
-	 */
+
 	public EventsHandling(EventsManager eventsManager, int writeEventsInterval, Set<EventsFileFormat> eventsFileFormats,
 			OutputDirectoryHierarchy controlerIO ) {
 		this.eventsManager = eventsManager ;
@@ -70,24 +62,10 @@ public class EventsHandling implements BeforeMobsimListener,
 		this.eventsFileFormats = eventsFileFormats ;
 		this.controlerIO = controlerIO ;
 	}
-	
-	@Deprecated // use other constructor instead; do not assume that material can be retrieved from the Controler object.  
-	// kai, jun'12
-	public EventsHandling( EventsManager eventsManager ) {
-		this.eventsManager = eventsManager ;
-		this.calledViaOldConstructor = true ;
-	}
-	
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		if ( calledViaOldConstructor ) {
-			this.writeEventsInterval = event.getControler().getConfig().controler().getWriteEventsInterval() ;
-			this.eventsFileFormats = event.getControler().getConfig().controler().getEventsFileFormats() ;
-			this.controlerIO = event.getControler().getControlerIO() ;
-		}
-		
-		eventsManager.resetHandlers(event.getIteration());
 
+    @Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        eventsManager.resetHandlers(event.getIteration());
 		if ((this.writeEventsInterval > 0) && (event.getIteration() % writeEventsInterval == 0)) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
