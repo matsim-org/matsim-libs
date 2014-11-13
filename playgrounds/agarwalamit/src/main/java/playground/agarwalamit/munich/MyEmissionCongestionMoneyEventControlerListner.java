@@ -24,10 +24,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -75,24 +73,23 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 		this.controler = event.getControler();
 		this.scenario = (ScenarioImpl) controler.getScenario();
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+
+		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
+
+		event.getControler().getEvents().addHandler(emissionModule.getWarmEmissionHandler());
+		event.getControler().getEvents().addHandler(emissionModule.getColdEmissionHandler());
+		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
+
+		this.moneyHandler = new MoneyEventHandler();
+		event.getControler().getEvents().addHandler(moneyHandler);
 		
+		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
+		event.getControler().getEvents().addHandler(congestionCostHandler);
+
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-
-		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
-//		event.getControler().getEvents().addHandler(emissCostHandler);
-		
-		event.getControler().getEvents().addHandler(emissionModule.getWarmEmissionHandler());
-		event.getControler().getEvents().addHandler(emissionModule.getColdEmissionHandler());
-		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
-		
-		this.moneyHandler = new MoneyEventHandler();
-		event.getControler().getEvents().addHandler(moneyHandler);
-
-		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
-		event.getControler().getEvents().addHandler(congestionCostHandler);
 
 		String outputFile = controler.getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
 		this.writer =IOUtils.getBufferedWriter(outputFile);
@@ -120,21 +117,21 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 				double coldEmissCosts;
 				double warmEmissCosts;
 				double toll;
-				
+
 				if(!this.pId2CongestionCosts.containsKey(personId)) delaysCosts =0;
 				else delaysCosts = 	this.pId2CongestionCosts.get(personId) / 3600 * vtts_car;
-				
+
 				if(!this.pId2ColdEmissionsCosts.containsKey(personId)) coldEmissCosts=0;
 				else coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId);
 
 				if(!this.pId2WarmEmissionsCosts.containsKey(personId)) warmEmissCosts =0;
 				else warmEmissCosts  = this.pId2WarmEmissionsCosts.get(personId);
-				
+
 				if(!this.pId2Tolls.containsKey(personId)) toll =0;
 				else toll = this.pId2Tolls.get(personId);
-				 
+
 				double totalEmissCosts = coldEmissCosts+warmEmissCosts;
-				 
+
 				this.writer.write(personId+"\t"+
 						delaysCosts+"\t"+
 						coldEmissCosts+"\t"+
