@@ -5,7 +5,7 @@ import matsimConnector.environment.TransitionArea;
 import matsimConnector.events.CAAgentEnterEnvironmentEvent;
 import matsimConnector.events.CAAgentLeaveEnvironmentEvent;
 import matsimConnector.events.CAAgentMoveEvent;
-import matsimConnector.run.CAAgentMoveToOrigin;
+import matsimConnector.events.CAAgentMoveToOrigin;
 import matsimConnector.utility.Constants;
 
 import org.matsim.api.core.v01.Id;

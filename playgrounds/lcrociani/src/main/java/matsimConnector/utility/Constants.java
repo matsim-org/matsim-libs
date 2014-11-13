@@ -8,7 +8,7 @@ public class Constants {
 	public static final String TO_CA_LINK_MODE = "Q->CA";
 	
 	public static final double CA_CELL_SIDE = 0.4;
-	public static final double CA_STEP_DURATION = 0.3;
+	public static final double CA_STEP_DURATION = .3;
 	public static final Double PEDESTRIAN_SPEED = CA_CELL_SIDE/CA_STEP_DURATION;
 	public static final Double CA_TEST_END_TIME = 1200.;
 	
@@ -17,8 +17,8 @@ public class Constants {
 	
 	public static Double FLOPW_CAP_PER_METER_WIDTH = 1.2;
 	
-	public static final Double TRANSITION_AREA_LENGTH = 2.;
-	public static final Double FAKE_LINK_WIDTH = 5.;
+	public static final Double TRANSITION_AREA_LENGTH = CA_CELL_SIDE*5;
+	public static final Double FAKE_LINK_WIDTH = 2.5;
 	public static final Double TRANSITION_LINK_LENGTH = 5.;//TRANSITION_AREA_LENGTH/2.;
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);
 	

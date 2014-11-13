@@ -31,6 +31,7 @@ import matsimConnector.events.CAAgentEnterEnvironmentEvent;
 import matsimConnector.events.CAAgentExitEvent;
 import matsimConnector.events.CAAgentLeaveEnvironmentEvent;
 import matsimConnector.events.CAAgentMoveEvent;
+import matsimConnector.events.CAAgentMoveToOrigin;
 import matsimConnector.events.CAEventHandler;
 import matsimConnector.events.debug.ForceReDrawEvent;
 import matsimConnector.events.debug.ForceReDrawEventHandler;
@@ -38,7 +39,6 @@ import matsimConnector.events.debug.LineEvent;
 import matsimConnector.events.debug.LineEventHandler;
 import matsimConnector.events.debug.RectEvent;
 import matsimConnector.events.debug.RectEventHandler;
-import matsimConnector.run.CAAgentMoveToOrigin;
 import matsimConnector.utility.Constants;
 import matsimConnector.utility.MathUtility;
 

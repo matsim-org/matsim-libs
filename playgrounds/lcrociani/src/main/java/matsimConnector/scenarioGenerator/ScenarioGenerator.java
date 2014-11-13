@@ -36,12 +36,12 @@ public class ScenarioGenerator {
 	private static String inputDir = Constants.INPUT_PATH;
 	private static String outputDir = Constants.OUTPUT_PATH;
 
-	private static final Double DOOR_WIDTH = 2.4;
+	private static final Double DOOR_WIDTH = Constants.FAKE_LINK_WIDTH;
 	private static final Double CA_LENGTH = 10.;
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
-	private static Double TOTAL_DENSITY = 5.75;
-	private static int POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);;
+	private static Double TOTAL_DENSITY = 2.;
+	private static int POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
 	
 	public static void main(String [] args) {
 		if (args.length>0){

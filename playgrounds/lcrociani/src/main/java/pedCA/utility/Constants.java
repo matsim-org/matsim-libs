@@ -15,7 +15,7 @@ public class Constants {
 	//Constants for Conflict Management
 	public static final double FRICTION_PROBABILITY = 0.7;
 
-	public static final double CELL_SIZE = 0.4;
+	public static final double CELL_SIZE = matsimConnector.utility.Constants.CA_CELL_SIDE;
 	
 	//Constants for Pedestrian Model
 	public static Double KS = 6.0;
