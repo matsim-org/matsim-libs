@@ -22,7 +22,9 @@ package playground.johannes.gsv.matrices;
 import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.matsim.matrices.Matrix;
 
@@ -66,6 +68,18 @@ public class MatrixOperations {
 		for (Entry<String, ArrayList<org.matsim.matrices.Entry>> entries : m.getFromLocations().entrySet()) {
 			for (org.matsim.matrices.Entry entry : entries.getValue()) {
 				entry.setValue(entry.getValue() * factor);
+			}
+		}
+	}
+	
+	public static void applyIntracellFactor(Matrix m, double factor) {
+		Set<String> ids = new HashSet<>(m.getFromLocations().keySet());
+		ids.addAll(m.getToLocations().keySet());
+		
+		for(String id : ids) {
+			org.matsim.matrices.Entry e = m.getEntry(id, id);
+			if(e != null) {
+				e.setValue(e.getValue() * factor);
 			}
 		}
 	}

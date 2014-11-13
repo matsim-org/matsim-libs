@@ -96,20 +96,20 @@ public class MatrixCompare {
 	private static double calcRelError(double d1, double d2, boolean absolute) {
 		double diff = d2 - d1;
 
-		diff = Math.abs(diff);
-//		if(absolute) diff = Math.abs(diff);
+//		diff = Math.abs(diff);
+		if(absolute) diff = Math.abs(diff);
 		
 		double err = diff/d1;
 		
-		if(d2 > d1) {
-			err = diff/d1;
-		} else {
-			err = - diff/d2;
-		}
+//		if(d2 > d1) {
+//			err = diff/d1;
+//		} else {
+//			err = - diff/d2;
+//		}
 //		if(err < 0) {
 //			return - (1/(1-Math.abs(err)) - 1);
 //		} else return err;
-		if(absolute) err = Math.abs(err);
+//		if(absolute) err = Math.abs(err);
 		return err;
 	}
 
@@ -289,11 +289,12 @@ public class MatrixCompare {
 		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.324.fma");
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
-		MatrixOperations.applyFactor(m2, 15);
-
+		MatrixOperations.applyFactor(m2, 40);
+		MatrixOperations.applyIntracellFactor(m2, 1.3);
+		
 		System.out.println(String.format("PSMobility - matrix sum: %s", MatrixOperations.sum(m1, false)));
 		System.out.println(String.format("Matsim - matrix sum: %s", MatrixOperations.sum(m2, false)));
 		

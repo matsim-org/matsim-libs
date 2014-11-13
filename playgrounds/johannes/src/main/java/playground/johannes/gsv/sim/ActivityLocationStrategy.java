@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.sim;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +33,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Leg;
@@ -78,6 +76,8 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 	private List<Future<?>> futures;
 
 	private final Queue<TripRouter> routers = new ConcurrentLinkedQueue<TripRouter>();
+
+	private final Map<Person, double[]> targetDistances = new ConcurrentHashMap<>();
 
 	public ActivityLocationStrategy(ActivityFacilities facilities, Random random, int numThreads, String blacklist) {
 		this.random = random;
@@ -183,63 +183,86 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 		 */
 		@Override
 		public void run() {
-			TripRouter router = pollTripRoute();
 			/*
 			 * need to ensure that there is only one plan
 			 */
-			// Plan template = person.getPlans().get(0);
-			Plan plan = person.createCopyOfSelectedPlanAndMakeSelected();
-
+			Plan plan = person.getSelectedPlan();
+			/*
+			 * select activity to change
+			 */
 			int n = (int) Math.floor(plan.getPlanElements().size() / 2.0);
 			int idx = random.nextInt(n) * 2;
-//			int idx = 2;
 			ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(idx);
-
+			/*
+			 * check if not blacklisted activity
+			 */
 			if (!act.getType().equalsIgnoreCase(blacklist)) {
-				ActivityFacility ref = null;
-				if (idx == 0) {
-					ActivityImpl next = (ActivityImpl) plan.getPlanElements().get(idx + 2);
-					ref = facilities.getFacilities().get(next.getFacilityId());
-				} else {
-					ActivityImpl prev = (ActivityImpl) plan.getPlanElements().get(idx - 2);
-					ref = facilities.getFacilities().get(prev.getFacilityId());
+				/*
+				 * use the target distance of the from-trip as reference, except
+				 * when it is the first activity. This needs to be done before
+				 * the plan is copied, otherwise initializing target distance
+				 * will fail
+				 */
+				int legIdx = 0;
+				if (idx > 0) {
+					legIdx = idx / 2 - 1;
 				}
+				double d = getTargetDistances(person)[legIdx];
+				/*
+				 * create copy of plan an set new references
+				 */
+				plan = person.createCopyOfSelectedPlanAndMakeSelected();
+				act = (ActivityImpl) plan.getPlanElements().get(idx);
 
+				// ActivityFacility ref = null;
+				// if (idx == 0) {
+				// ActivityImpl next = (ActivityImpl)
+				// plan.getPlanElements().get(idx + 2);
+				// ref = facilities.getFacilities().get(next.getFacilityId());
+				// } else {
+				// ActivityImpl prev = (ActivityImpl)
+				// plan.getPlanElements().get(idx - 2);
+				// ref = facilities.getFacilities().get(prev.getFacilityId());
+				// }
+				//
 				ActivityFacility current = facilities.getFacilities().get(act.getFacilityId());
+				//
+				// double dx = current.getCoord().getX() -
+				// ref.getCoord().getX();
+				// double dy = current.getCoord().getY() -
+				// ref.getCoord().getY();
+				// double d = Math.sqrt(dx * dx + dy * dy);
 
-				double dx = current.getCoord().getX() - ref.getCoord().getX();
-				double dy = current.getCoord().getY() - ref.getCoord().getY();
-				double d = Math.sqrt(dx * dx + dy * dy);
-
+				/*
+				 * get quadtree for activity type
+				 */
 				QuadTree<ActivityFacility> quadtree = quadTrees.get(act.getType());
-
+				/*
+				 * get all facility candidates in target distance +/- mutation
+				 * range
+				 */
 				Coord coord = current.getCoord();
-				double min = Math.min(0, d * (1 - mutationError));
+				double min = Math.max(0, d * (1 - mutationError));
 				double max = d * (1 + mutationError);
-				List<ActivityFacility> list = (List<ActivityFacility>) quadtree.get(coord.getX(), coord.getY(), min, max);
+				List<ActivityFacility> candidates = (List<ActivityFacility>) quadtree.get(coord.getX(), coord.getY(), min, max);
 
-//				List<ActivityFacility> list = new ArrayList<ActivityFacility>(candidates);
-//				Id<ActivityFacility> id = null;
-//				if(current.getId().toString().equals("2")) {
-//					id = Id.create("3", ActivityFacility.class);
-//				} else if(current.getId().toString().equals("3")) {
-//					id = Id.create("2", ActivityFacility.class);
-//				}
-//				list.add(facilities.getFacilities().get(id));
-				
-				if (!list.isEmpty()) {
-					ActivityFacility newFac = list.get(random.nextInt(list.size()));
+				if (!candidates.isEmpty()) {
+					/*
+					 * draw random facility from candidates
+					 */
+					ActivityFacility newFac = candidates.get(random.nextInt(candidates.size()));
 
 					act.setFacilityId(newFac.getId());
 					act.setLinkId(newFac.getLinkId());
 					/*
 					 * route outward trip
 					 */
+					TripRouter router = pollTripRoute();
 					if (idx > 1) {
 						Activity prev = (Activity) plan.getPlanElements().get(idx - 2);
 						ActivityFacility source = facilities.getFacilities().get(prev.getFacilityId());
 						ActivityFacility target = newFac;
-						// does this always instantiate a new trip router?
+
 						Leg toLeg = (Leg) plan.getPlanElements().get(idx - 1);
 						List<? extends PlanElement> stages = router.calcRoute(toLeg.getMode(), source, target, prev.getEndTime(), person);
 						if (stages.size() > 1) {
@@ -254,6 +277,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 						Activity next = (Activity) plan.getPlanElements().get(idx + 2);
 						ActivityFacility target = facilities.getFacilities().get(next.getFacilityId());
 						ActivityFacility source = newFac;
+
 						Leg fromLeg = (Leg) plan.getPlanElements().get(idx + 1);
 						List<? extends PlanElement> stages = router.calcRoute(fromLeg.getMode(), source, target, act.getEndTime(), person);
 						if (stages.size() > 1) {
@@ -261,10 +285,40 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 						}
 						plan.getPlanElements().set(idx + 1, stages.get(0));
 					}
+					releaseTripRouter(router);
 				}
 			}
+		}
 
-			releaseTripRouter(router);
+		private double[] getTargetDistances(Person person) {
+			double[] distances = targetDistances.get(person);
+
+			if (distances == null) {
+				if (person.getPlans().size() > 1) {
+					throw new RuntimeException("Only one plan is allowed!");
+				}
+
+				Plan plan = person.getSelectedPlan();
+				distances = new double[(plan.getPlanElements().size() - 1) / 2];
+				for (int i = 1; i < plan.getPlanElements().size(); i+=2) {
+					Activity prev = (Activity) plan.getPlanElements().get(i - 1);
+					Activity next = (Activity) plan.getPlanElements().get(i + 1);
+
+					ActivityFacility origin = facilities.getFacilities().get(prev.getFacilityId());
+					ActivityFacility target = facilities.getFacilities().get(next.getFacilityId());
+
+					double dx = origin.getCoord().getX() - target.getCoord().getX();
+					double dy = origin.getCoord().getY() - target.getCoord().getY();
+
+					double d = Math.sqrt(dx * dx + dy * dy);
+
+					distances[(i - 1)/2] = d;
+				}
+
+				targetDistances.put(person, distances);
+			}
+
+			return distances;
 		}
 
 	}
