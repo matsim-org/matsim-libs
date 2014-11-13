@@ -80,9 +80,6 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 		event.getControler().getEvents().addHandler(emissionModule.getColdEmissionHandler());
 		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
 
-		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
-		event.getControler().getEvents().addHandler(congestionCostHandler);
-
 	}
 
 	@Override
@@ -90,6 +87,9 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 		
 		this.moneyHandler = new MoneyEventHandler();
 		event.getControler().getEvents().addHandler(moneyHandler);
+		
+		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
+		event.getControler().getEvents().addHandler(congestionCostHandler);
 		
 		String outputFile = controler.getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
 		this.writer =IOUtils.getBufferedWriter(outputFile);
@@ -145,5 +145,6 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 					+ e);
 		}
 	event.getControler().getEvents().removeHandler(moneyHandler);
+	event.getControler().getEvents().removeHandler(congestionCostHandler);
 	}
 }

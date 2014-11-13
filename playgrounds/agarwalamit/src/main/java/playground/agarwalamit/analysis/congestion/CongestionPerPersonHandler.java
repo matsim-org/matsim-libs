@@ -50,8 +50,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private double totalDelay;
 
 	private final double timeBinSize;
-	private double noOfTimeBin;
-	private Scenario sc;
 
 	/**
 	 * @param noOfTimeBins
@@ -61,9 +59,28 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public CongestionPerPersonHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
 
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
-		this.noOfTimeBin = noOfTimeBin;
-		this.sc= scenario;
-		init();
+		
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
+			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
+			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
+		}
+
+		for(int i =0;i<noOfTimeBins;i++){
+			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
+			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
+			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
+
+			for(Person person : scenario.getPopulation().getPersons().values()){
+				Map<Id<Person>, Double>	delayForPerson = this.personId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
+				delayForPerson.put(person.getId(), Double.valueOf(0.));
+			}
+			
+			for(Link link : scenario.getNetwork().getLinks().values()) {
+				Map<Id<Link>, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
+				countOnLink.put(link.getId(), Double.valueOf(0.));
+			}
+		}
 	}
 
 	@Override
@@ -75,32 +92,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		this.linkId2FreeSpeedLinkTravelTime.clear();
 		this.time2linkIdLeaveCount.clear();
 		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
-		
-		init();
-	}
-
-	private void init() {
-		for (Link link : sc.getNetwork().getLinks().values()) {
-			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
-			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
-			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
-		}
-
-		for(int i =0;i<noOfTimeBin;i++){
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
-			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
-
-			for(Person person : sc.getPopulation().getPersons().values()){
-				Map<Id<Person>, Double>	delayForPerson = this.personId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
-				delayForPerson.put(person.getId(), Double.valueOf(0.));
-			}
-			
-			for(Link link : sc.getNetwork().getLinks().values()) {
-				Map<Id<Link>, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
-				countOnLink.put(link.getId(), Double.valueOf(0.));
-			}
-		}
 	}
 
 	@Override

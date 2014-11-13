@@ -98,6 +98,8 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		this.pId2NowTolls = this.moneyHandler.getPersonId2amount();
+		
+		event.getControler().getEvents().removeHandler(moneyHandler);
 
 		if(event.getIteration() >= averagingStartIteration){
 			counter++;
