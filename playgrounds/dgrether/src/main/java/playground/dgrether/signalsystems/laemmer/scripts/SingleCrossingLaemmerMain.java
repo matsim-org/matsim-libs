@@ -21,7 +21,6 @@ package playground.dgrether.signalsystems.laemmer.scripts;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-
 import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListenerFactory;
 import playground.dgrether.signalsystems.laemmer.testsinglecrossing.SingleCrossingScenario;
 
@@ -43,8 +42,9 @@ public class SingleCrossingLaemmerMain {
 		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast, false);
 		
 		Controler controler = new Controler(scenario);
-		controler.setSignalsControllerListenerFactory(new LaemmerControlerListenerFactory());
-		controler.setOverwriteFiles(true);
+        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
+        controler.addControlerListener(new LaemmerControlerListenerFactory().createSignalsControllerListener());
+        controler.setOverwriteFiles(true);
 		controler.run();
 
 	}

@@ -35,7 +35,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
@@ -80,8 +79,9 @@ public class DgController {
 		// (fixed time) signal controller will be used.  kai & theresa, oct'14
 		
 		signalsFactory.setAlwaysSameMobsimSeed(false);
-		c.setSignalsControllerListenerFactory(signalsFactory);
-		c.setOverwriteFiles(true);
+        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
+        c.addControlerListener(signalsFactory.createSignalsControllerListener());
+        c.setOverwriteFiles(true);
 		
 		if ( false ) {
 			IterationStartsListener strategyWeightsManager = new IterationStartsListener() {

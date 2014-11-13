@@ -66,8 +66,6 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
-import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
@@ -140,8 +138,6 @@ public class Controler extends AbstractController {
 	private TravelDisutilityFactory travelCostCalculatorFactory ; 
 
 	private MobsimFactory thisMobsimFactory = null;
-
-	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 
 	private TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
 	private TripRouterFactory tripRouterFactory = null;
@@ -366,10 +362,6 @@ public class Controler extends AbstractController {
 		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
-
-		if (this.config.scenario().isUseSignalSystems()) {
-			addControlerListener(this.signalsFactory.createSignalsControllerListener());
-		}
 
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
@@ -818,13 +810,8 @@ public class Controler extends AbstractController {
         this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
     }
 
-	public final void setSignalsControllerListenerFactory(
-			final SignalsControllerListenerFactory signalsFactory) {
-		this.signalsFactory = signalsFactory;
-	}
 
-
-	// ******** --------- *******
+    // ******** --------- *******
 	// The following are methods which should not be used at all,
 	// or where I am not sure when it is allowed to call them.
 	// ******** --------- *******

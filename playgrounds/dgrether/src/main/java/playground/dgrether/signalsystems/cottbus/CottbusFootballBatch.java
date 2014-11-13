@@ -19,16 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -39,12 +29,21 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
 import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -101,8 +100,9 @@ public class CottbusFootballBatch {
 			controler.addControlerListener(cbfbControllerListener);
 			// enable sylvia
 			if (baseConfig.scenario().isUseSignalSystems()){
-				controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(new DgSylviaConfig()));
-			}
+                //FIXME: Take care that the normal SignalsControllerListener is NOT added.
+                controler.addControlerListener(new DgSylviaControlerListenerFactory(new DgSylviaConfig()).createSignalsControllerListener());
+            }
 			controler.run();
 			if (cbfbControllerListener.getAverageTraveltime() != null){
 				percentageOfFans2AverageTTMap.put(numberOfFootballFans, cbfbControllerListener.getAverageTraveltime());

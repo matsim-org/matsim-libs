@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.daganzo2012;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
@@ -36,13 +31,17 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalSystem;
-
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -71,8 +70,9 @@ public class Daganzo2012Run {
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
 		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
-		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory(sylviaConfig));
-		controler.setOverwriteFiles(true);
+        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
+        controler.addControlerListener(new DgSylviaControlerListenerFactory(sylviaConfig).createSignalsControllerListener());
+        controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		addControlerListener(controler);
 		controler.run();

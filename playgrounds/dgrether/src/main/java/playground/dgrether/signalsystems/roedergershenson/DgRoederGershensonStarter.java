@@ -34,8 +34,9 @@ public class DgRoederGershensonStarter {
 	public static void main(String[] args) {
 		Controler controler = new Controler(args);
 		DgRoederGershensonSignalsControllerListenerFactory signalsFactory = new DgRoederGershensonSignalsControllerListenerFactory();
-		controler.setSignalsControllerListenerFactory(signalsFactory);
-		controler.run();
+        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
+        controler.addControlerListener(signalsFactory.createSignalsControllerListener());
+        controler.run();
 	}
 
 }
