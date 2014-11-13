@@ -84,8 +84,9 @@ public class M2KS2010Zones2Commodities  {
 		DgCommodities coms = new DgCommodities();
 		for (DgZone fromZone : this.zones.values()){
 			for (DgZoneFromLink fromLink : fromZone.getFromLinks().values()){
-				// uses the up-stream node of the fromLink as fromNode for the commodity
-				Id<Node> fromNodeId = fromLink.getLink().getFromNode().getId(); // the matsim from node id
+				// use the down-stream node of the fromLink as fromNode for the commodity
+				// Note: until nov'14 we used the up-stream node here. problem: cplex considers the travel time of the first link while matsim don't do so.
+				Id<Node> fromNodeId = fromLink.getLink().getToNode().getId(); // the matsim from node id
 				Id<DgCrossing> fromCrossingId = this.idConverter.convertNodeId2CrossingId(fromNodeId); // the ks-model crossing id
 				Id<Node> fromCrossingNodeId; // the ks-model crossing node id
 				// check whether the from crossing is expanded or not to determine the from crossing node id
