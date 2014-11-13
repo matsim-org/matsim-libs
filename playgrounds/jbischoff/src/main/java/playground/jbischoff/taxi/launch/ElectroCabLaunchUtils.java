@@ -19,7 +19,7 @@
 
 package playground.jbischoff.taxi.launch;
 
-import java.util.*;
+import java.util.HashMap;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -34,11 +34,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
-import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
-import playground.jbischoff.energy.charging.taxi.TaxiCharger;
+import playground.jbischoff.energy.charging.taxi.*;
 import playground.jbischoff.taxi.evaluation.*;
-import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
-import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
+import playground.jbischoff.taxi.optimizer.rank.*;
 //import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
@@ -83,11 +81,13 @@ public class ElectroCabLaunchUtils
             Id aid = v.getId();
             rankhandler.addVehicle(v);
             if (aid.toString().startsWith("et")) {
-                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm,
-                        20 * 1000 * 3600,Id.create(aid,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class));
+                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(
+                        ecm,
+                        20 * 1000 * 3600,
+                        Id.create(aid, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class));
                 bevs.put(bev.getId(), bev);
                 ecabhandler.addVehicle(new ElectricTaxi(bev, v));
-                
+
             }
 
         }
@@ -110,9 +110,11 @@ public class ElectroCabLaunchUtils
 
         for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
             rankhandler.addRank(r);
-//            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
-            if (r.getId().toString().equals("249")) ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
-            if (r.getId().toString().equals("246")) ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
+            //            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
+            if (r.getId().toString().equals("249"))
+                ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
+            if (r.getId().toString().equals("246"))
+                ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
 
         }
 

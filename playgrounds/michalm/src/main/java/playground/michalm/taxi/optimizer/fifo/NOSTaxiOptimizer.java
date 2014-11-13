@@ -37,42 +37,15 @@ public class NOSTaxiOptimizer
 {
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
+    private Set<Vehicle> idleVehicles;
 
 
     public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        this(optimConfig, createDefaultVehicleFilter(optimConfig),
-                createDefaultRequestFilter(optimConfig));
-    }
-
-
-    public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig, VehicleFilter vehicleFilter,
-            RequestFilter requestFilter)
-    {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
-
-        this.vehicleFilter = vehicleFilter;
-        this.requestFilter = requestFilter;
+        this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
+        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
     }
-
-
-    private static VehicleFilter createDefaultVehicleFilter(TaxiOptimizerConfiguration optimConfig)
-    {
-        return new KStraightLineNearestVehicleFilter(optimConfig.scheduler,
-                optimConfig.filterParams.nearestVehiclesLimit);
-    }
-
-
-    private static RequestFilter createDefaultRequestFilter(TaxiOptimizerConfiguration optimConfig)
-    {
-        return new KStraightLineNearestRequestFilter(optimConfig.scheduler,
-                optimConfig.filterParams.nearestRequestsLimit);
-    }
-
-
-    //==============================
-
-    private Set<Vehicle> idleVehicles;
 
 
     @Override

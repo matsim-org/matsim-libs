@@ -19,15 +19,10 @@
 
 package playground.michalm.taxi.optimizer.filter;
 
-public class FilterParams
+public interface FilterFactory
 {
-    public final Integer nearestRequestsLimit;//null ==> no filtration
-    public final Integer nearestVehiclesLimit;//null ==> no filtration
+    VehicleFilter createVehicleFilter();
 
 
-    public FilterParams(Integer nearestRequestsLimit, Integer nearestVehiclesLimit)
-    {
-        this.nearestRequestsLimit = nearestRequestsLimit;
-        this.nearestVehiclesLimit = nearestVehiclesLimit;
-    }
+    RequestFilter createRequestFilter();
 }

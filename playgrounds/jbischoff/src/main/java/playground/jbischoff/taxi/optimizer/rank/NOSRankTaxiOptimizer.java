@@ -38,6 +38,7 @@ import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;
+import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
@@ -70,20 +71,33 @@ public class NOSRankTaxiOptimizer
             TravelDisutilitySource tdisSource, String workingDir)
     {
         TaxiScheduler scheduler = new RankModeTaxiScheduler(context, calculator, params);
-
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(calculator, scheduler);
+        final IdleRankVehicleFinder idleVehicleFinder = new IdleRankVehicleFinder(context, scheduler);
 
+        FilterFactory filterFactory = new FilterFactory() {
+            @Override
+            public RequestFilter createRequestFilter()
+            {
+                return RequestFilter.NO_FILTER;
+            }
+            @Override
+            public VehicleFilter createVehicleFilter()
+            {
+                return idleVehicleFinder;
+            }
+        };
+        
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, null, Goal.MIN_WAIT_TIME, workingDir);
+                calculator, scheduler, vrpFinder, filterFactory, Goal.MIN_WAIT_TIME, workingDir);
 
-        return new NOSRankTaxiOptimizer(optimConfig, new IdleRankVehicleFinder(context, scheduler));
+        return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
     }
 
 
     protected NOSRankTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
             IdleRankVehicleFinder vehicleFinder)
     {
-        super(optimConfig, vehicleFinder, null);
+        super(optimConfig);
         this.optimConfig = optimConfig;
         this.idleVehicleFinder = vehicleFinder;
 

@@ -6,11 +6,15 @@ taxiCustomersFileName  taxiCustomers_40_pc.txt
 taxisFileName          taxis-25.xml
 ranksFileName          taxi_ranks-0.xml
 
-algorithmConfig        NOS_DSE_SL
+algorithmConfig        NOS_DSE_TD
 
-destinationKnown       !true
+nearestRequestsLimit    5
+nearestVehiclesLimit    5
+
 onlineVehicleTracker   true
 advanceRequestSubmission !true
+
+destinationKnown       !true
 pickupDuration         120
 dropoffDuration        60
 

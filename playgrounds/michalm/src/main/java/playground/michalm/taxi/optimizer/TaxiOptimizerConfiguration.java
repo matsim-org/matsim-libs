@@ -3,7 +3,7 @@ package playground.michalm.taxi.optimizer;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
-import playground.michalm.taxi.optimizer.filter.FilterParams;
+import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.vehreqpath.*;
 
@@ -15,7 +15,7 @@ public class TaxiOptimizerConfiguration
     public final VrpPathCalculator calculator;
     public final TaxiScheduler scheduler;
     public final VehicleRequestPathFinder vrpFinder;
-    public final FilterParams filterParams;
+    public final FilterFactory filterFactory;
 
     public final Goal goal;
 
@@ -29,7 +29,7 @@ public class TaxiOptimizerConfiguration
 
 
     public TaxiOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
-            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder, FilterParams filterParams,
+            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder, FilterFactory filterFactory,
             Goal goal, String workingDirectory)
     {
         this.context = context;
@@ -37,7 +37,7 @@ public class TaxiOptimizerConfiguration
         this.calculator = calculator;
         this.scheduler = scheduler;
         this.vrpFinder = vrpFinder;
-        this.filterParams = filterParams;
+        this.filterFactory = filterFactory;
 
         this.goal = goal;
 
