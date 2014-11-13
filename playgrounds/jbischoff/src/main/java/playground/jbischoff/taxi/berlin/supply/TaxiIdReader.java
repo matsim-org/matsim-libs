@@ -48,7 +48,8 @@ public class TaxiIdReader {
 //		this.read("C:/local_jb/data/taxi_berlin/2014/vehicles/status_congegrated.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("C:/local_jb/data/taxi_berlin/2013/vehicles/taxisweekly.csv");
+		this.write("C:/local_jb/data/taxi_berlin/2013/vehicles/2013_taxisweekly1.csv");
+		this.writeRollingAverage("C:/local_jb/data/taxi_berlin/2013/vehicles/2013_taxisWeekly_15min.csv", 15*60);
 		
 	}
 	
@@ -58,9 +59,9 @@ public class TaxiIdReader {
 		
 		try {
 			for (Entry<Date,Integer> sec : this.inSystem.entrySet()){
-			    if (sec.getKey().getHours() == 23 && sec.getKey().getMinutes() == 59) continue;
-			    if (sec.getKey().getHours() == 0 && sec.getKey().getMinutes() == 0) continue;
-				// something weird happens in those two seconds, therefore we are filtering them out.
+			    if (sec.getKey().getHours() == 23 && sec.getKey().getMinutes() > 35) continue;
+			    if (sec.getKey().getHours() == 0 && sec.getKey().getMinutes() < 25) continue;
+				// something weird happens in those minutes, therefore we are filtering them out, esp. in 2014 data.
 			    bw.append(SDF.format(sec.getKey())+"\t"+sec.getValue()+"\n");
 			}
 			bw.flush();
@@ -71,6 +72,37 @@ public class TaxiIdReader {
 		}
 		
 	}
+	
+	private void writeRollingAverage(String string, int average) {
+        BufferedWriter bw = IOUtils.getBufferedWriter(string);
+        int i = 0;
+        long value = 0;
+        
+        try {
+            for (Entry<Date,Integer> sec : this.inSystem.entrySet()){
+                
+                if (sec.getKey().getHours() == 23 && sec.getKey().getMinutes() > 35) continue;
+                if (sec.getKey().getHours() == 0 && sec.getKey().getMinutes() < 25) continue;
+                // something weird happens in those minutes, therefore we are filtering them out, esp. in 2014 data.
+                value += sec.getValue();
+                i ++;
+                
+                if (i == average){
+                    log.info("aa");
+                bw.append(SDF.format(sec.getKey())+"\t"+value/average+"\n");
+                i = 0;
+                value = 0;
+                }
+            }
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+    }
+	
 	private void analyse() {
 		for (TaxiIdData td: this.taxiIdData){
 			this.addTaxi(td.getStartDate());

@@ -10,7 +10,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,13 +49,14 @@ public class BerlinTaxiDemandEvaluator
         Date start = filenameformat.parse("20140407000000");
 //        Date end = filenameformat.parse("20130421230000");
         Date end = filenameformat.parse("20140413230000");
-        bte.read(fileprefix+"demandMatrices.xml",start, end);
+//        bte.read(fileprefix+"demandMatrices.xml",start, end);
+        bte.dumpSym(fileprefix+"demandMatrices.xml",start, end);
 //        Id alex = Id.create("01011303");
 //        Id friedrichshain = Id.create("02040701");
 //        Id zoo = Id.create("04030931");
 //        Id txl = Id.create("12214125");
         
-        bte.analyse(fileprefix+"demandMatrices.xml", start, end, bte.initZones());
+//        bte.analyse(fileprefix+"demandMatrices.xml", start, end, bte.initZones());
         
 //        bte.read(fileprefix+"demandMatrices.xml",start, end, alex,friedrichshain);
 //        bte.read(fileprefix+"demandMatrices.xml",start, end, friedrichshain, alex);
@@ -124,12 +127,70 @@ public class BerlinTaxiDemandEvaluator
             e1.printStackTrace();
         }
     }
+    
+    
+    private void dumpSym(String filename, Date start, Date end)
+    {
+        Matrices matrices = MatrixUtils.readMatrices(filename);
+        BeelineDistanceExractor bde = new BeelineDistanceExractor();
+        Map<Id<Zone>,Double> fromDemand = new TreeMap<>();
+        Map<Id<Zone>,Double> toDemand = new TreeMap<>();
+        Date currentHr = start;
+        
+        do {
+            Matrix currentMatrix = matrices.getMatrix(filenameformat.format(currentHr));
+            for (ArrayList<Entry> l :currentMatrix.getFromLocations().values()){
+                for (Entry e: l){
+                    addToMap(fromDemand,Id.create(e.getFromLocation(), Zone.class),e.getValue());
+                    addToMap(toDemand,Id.create(e.getToLocation(), Zone.class),e.getValue());
+                }
+            }
+            currentHr = getNextTime(currentHr);
 
+        }
+        while (currentHr.before(end));
+        
+        Set<Id<Zone>> allZones = new TreeSet<>();
+        allZones.addAll(fromDemand.keySet());
+        allZones.addAll(toDemand.keySet());
+        
+        try {
+            BufferedWriter bw = IOUtils.getBufferedWriter(fileprefix+"symdemand.txt");
+            for (Id<Zone> zid : allZones){
+                double from = 0;
+                double to = 0;
+                if (fromDemand.containsKey(zid)) from = fromDemand.get(zid);
+                if (toDemand.containsKey(zid)) to= toDemand.get(zid);
+                bw.append(zid.toString()+"\t"+from+"\t"+to+"\n");
+            }
+            bw.flush();
+            bw.close();
+        }
+
+        catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        
+    }
+    
+    private void addToMap(Map<Id<Zone>,Double> map, Id<Zone> zone, double value){
+        double newValue = 0;
+        if (map.containsKey(zone)) newValue = map.get(zone);
+        newValue+=value;
+        map.put(zone, newValue);
+        
+    }
+    
+    
     private void read(String filename, Date start, Date end)
     {
         Matrices matrices = MatrixUtils.readMatrices(filename);
         BeelineDistanceExractor bde = new BeelineDistanceExractor();
         Date currentHr = start;
+        int[] distances = new int[100]; 
+        for (int i = 0;i<100;i++){
+            distances[i] = 0;
+        }
         do {
             int currentDemand = 0;
             double currentPkm = 0.;
@@ -137,7 +198,10 @@ public class BerlinTaxiDemandEvaluator
             for (ArrayList<Entry> l :currentMatrix.getFromLocations().values()){
                 for (Entry e: l){
                     currentDemand += e.getValue();
-                    currentPkm += bde.calcDistance(Id.create(e.getFromLocation(), Zone.class), Id.create(e.getToLocation(), Zone.class)) * e.getValue();
+                    double distance = bde.calcDistance(Id.create(e.getFromLocation(), Zone.class), Id.create(e.getToLocation(), Zone.class));
+                    int distClass = (int)Math.ceil(distance);
+                    distances[distClass]++;
+                    currentPkm += distance * e.getValue();
                 }
             }
             this.hourlyFromDemand.put(currentHr, currentDemand);
@@ -146,6 +210,18 @@ public class BerlinTaxiDemandEvaluator
         }
         while (currentHr.before(end));
         
+        try {
+            BufferedWriter bw = IOUtils.getBufferedWriter(fileprefix+"distances.txt");
+            for (int i = 0;i<100;i++){
+                bw.append(i+"\t"+distances[i]+"\n");
+            }
+            bw.flush();
+            bw.close();
+        }
+
+        catch (IOException e1) {
+            e1.printStackTrace();
+        }
         
     }
     
