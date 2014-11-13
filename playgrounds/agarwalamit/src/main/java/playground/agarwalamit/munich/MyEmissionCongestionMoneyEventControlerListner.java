@@ -80,9 +80,6 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 		event.getControler().getEvents().addHandler(emissionModule.getColdEmissionHandler());
 		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
 
-		this.moneyHandler = new MoneyEventHandler();
-		event.getControler().getEvents().addHandler(moneyHandler);
-		
 		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
 		event.getControler().getEvents().addHandler(congestionCostHandler);
 
@@ -90,7 +87,10 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-
+		
+		this.moneyHandler = new MoneyEventHandler();
+		event.getControler().getEvents().addHandler(moneyHandler);
+		
 		String outputFile = controler.getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
 		this.writer =IOUtils.getBufferedWriter(outputFile);
 		try {
@@ -144,5 +144,6 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
+	event.getControler().getEvents().removeHandler(moneyHandler);
 	}
 }
