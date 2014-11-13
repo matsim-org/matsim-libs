@@ -10,14 +10,14 @@
 	<artifactId>gicentreutils</artifactId>
 	<scope>system</scope>
 	<version>3.3.0</version>
-	<systemPath>${basedir}/lib/gicentreutils/gicentreUtils.jar</systemPath>
+	<systemPath>${basedir}/libraries/gicentreutils/gicentreUtils.jar</systemPath>
 </dependency>
 <dependency>
 	<groupId>processing</groupId>
 	<artifactId>core</artifactId>
 	<scope>system</scope>
 	<version>2.2.1</version>
-	<systemPath>${basedir}/lib/processing-2.2.1/core.jar</systemPath>
+	<systemPath>${basedir}/libraries/processing-2.2.1/core.jar</systemPath>
 </dependency>
   </dependencies>
   <modelVersion>4.0.0</modelVersion>
