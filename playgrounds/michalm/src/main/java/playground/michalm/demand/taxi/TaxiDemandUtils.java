@@ -19,24 +19,21 @@
 
 package playground.michalm.demand.taxi;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-
-import java.util.List;
 
 
 public class TaxiDemandUtils
 {
     public static void preprocessPlansBasedOnCoordsOnly(Scenario scenario)
     {
-        NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+        Network network = scenario.getNetwork();
         for (Person p : scenario.getPopulation().getPersons().values()) {
             List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
 

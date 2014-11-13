@@ -19,20 +19,17 @@
 
 package playground.michalm.demand;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+
 import pl.poznan.put.util.random.*;
 import playground.michalm.zone.Zone;
+
+import com.vividsolutions.jts.geom.*;
 
 
 public class DefaultActivityCreator
@@ -40,7 +37,7 @@ public class DefaultActivityCreator
 {
     protected final UniformRandom uniform = RandomUtils.getGlobalUniform();
     protected final Scenario scenario;
-    protected final NetworkImpl network;
+    protected final Network network;
     protected final PopulationFactory pf;
 
     protected final GeometryProvider geometryProvider;
@@ -57,7 +54,7 @@ public class DefaultActivityCreator
             PointAcceptor pointAcceptor)
     {
         this.scenario = scenario;
-        this.network = (NetworkImpl)scenario.getNetwork();
+        this.network = scenario.getNetwork();
         this.pf = scenario.getPopulation().getFactory();
         this.geometryProvider = geometryProvider;
         this.pointAcceptor = pointAcceptor;

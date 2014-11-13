@@ -29,8 +29,8 @@ public class TaxiOptimizerConfiguration
 
 
     public TaxiOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
-            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder, FilterFactory filterFactory,
-            Goal goal, String workingDirectory)
+            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder,
+            FilterFactory filterFactory, Goal goal, String workingDirectory)
     {
         this.context = context;
 
