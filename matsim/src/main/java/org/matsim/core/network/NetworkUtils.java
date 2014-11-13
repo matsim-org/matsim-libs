@@ -340,10 +340,13 @@ public class NetworkUtils {
     // TODO [balmermi] there should be only one 'getNearestLink' method
     // which returns either the nearest 'left' or 'right' entry link, based on a global
     // config param.
-    public static Link getNearestRightEntryLink(NetworkImpl network, final Coord coord) {
+    public static Link getNearestRightEntryLink(Network network, final Coord coord) {
+        if (!(network instanceof NetworkImpl)) {
+            throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
+        }
         Link nearestRightLink = null;
         Link nearestOverallLink = null;
-        Node nearestNode = network.getNearestNode(coord);
+        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
 
         double[] coordVector = new double[2];
         coordVector[0] = nearestNode.getCoord().getX() - coord.getX();
@@ -410,9 +413,12 @@ public class NetworkUtils {
      *          the coordinate for which the closest link should be found
      * @return the link found closest to coord
      */
-    public static Link getNearestLink(NetworkImpl network, final Coord coord) {
+    public static Link getNearestLink(Network network, final Coord coord) {
+        if (!(network instanceof NetworkImpl)) {
+            throw new IllegalArgumentException("Only NetworkImpl can be queried like this.");
+        }
         Link nearestLink = null;
-        Node nearestNode = network.getNearestNode(coord);
+        Node nearestNode = ((NetworkImpl) network).getNearestNode(coord);
         if ( nearestNode == null ) {
             log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
             return null ;
