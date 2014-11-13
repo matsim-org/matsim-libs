@@ -96,35 +96,14 @@ public class PatnaQSimFactory implements MobsimFactory {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 		
-		//===
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+
 		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
-		reader.readFile("./patnaOutput/vehiclesPatna.xml");
+		reader.readFile("/Users/amit/Documents/repos/runs-svn/patnaIndia/inputs/vehiclesPatna.xml");
 		vehicles.getVehicleTypes();
 		for(Id<VehicleType> id:vehicles.getVehicleTypes().keySet()){
 			modeVehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
 		}
-		//===
-
-//		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
-//		car.setMaximumVelocity(60.0/3.6);
-//		car.setPcuEquivalents(1.0);
-//		modeVehicleTypes.put("car", car);
-//
-//		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("motorbike"));
-//		motorcycle.setMaximumVelocity(60.0/3.6);
-//		motorcycle.setPcuEquivalents(0.25);
-//		modeVehicleTypes.put("motorbike", motorcycle);
-//
-//		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("bike"));
-//		bicycle.setMaximumVelocity(15.0/3.6);
-//		bicycle.setPcuEquivalents(0.25);
-//		modeVehicleTypes.put("bike", bicycle);
-//
-//		VehicleType walk = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
-//		walk.setMaximumVelocity(1.5);
-//		walk.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
-//		modeVehicleTypes.put("walk", walk);
 
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 

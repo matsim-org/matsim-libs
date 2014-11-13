@@ -10,10 +10,10 @@ import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 
 public class MyFirstControler {
 	
-	static final String  outputDir ="../../runs-svn/mixedTraffic/seepage/patnaSeepage_true_noStorage/";
+	static final String  outputDir ="/Users/amit/Documents/repos/runs-svn/patnaIndia/run103/";
 
 	public static void main(String[] args) {
-		String configFile = outputDir+"/configPatnaSeepage_true.xml";
+		String configFile = outputDir+"/configCarMotorbikeBike.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
 		final Controler myController = new Controler(config);		
 		myController.setOverwriteFiles(true) ;
