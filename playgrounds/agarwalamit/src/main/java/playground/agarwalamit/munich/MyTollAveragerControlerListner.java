@@ -26,7 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -67,7 +66,8 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.controler = event.getControler();
-			this.scenario = (ScenarioImpl) controler.getScenario();
+		this.scenario = (ScenarioImpl) controler.getScenario();
+
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
 		int lastIt = this.scenario.getConfig().controler().getLastIteration();
 		double msaStarts = this.scenario.getConfig().vspExperimental().getFractionOfIterationsToStartScoreMSA();
@@ -76,7 +76,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 		for(Id personId:scenario.getPopulation().getPersons().keySet()){
 			pId2Tolls.put(personId, 0.0);
 		}
-		
+
 		String outputFile = controler.getControlerIO().getOutputPath()+"/analysis/simpleAverageToll.txt";
 		this.writer =IOUtils.getBufferedWriter(outputFile);
 		try {
@@ -98,17 +98,15 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		this.pId2NowTolls = this.moneyHandler.getPersonId2amount();
-		
+
 		event.getControler().getEvents().removeHandler(moneyHandler);
 
 		if(event.getIteration() >= averagingStartIteration){
 			counter++;
-			for(Id personId:pId2Tolls.keySet()){
-				if(pId2NowTolls.containsKey(personId)){
-					double nowToll = pId2NowTolls.get(personId);
-					double tollSoFar = pId2Tolls.get(personId);
-					this.pId2Tolls.put(personId, nowToll+tollSoFar);
-				}
+			for(Id personId:pId2NowTolls.keySet()){
+				double nowToll = pId2NowTolls.get(personId);
+				double tollSoFar = pId2Tolls.get(personId);
+				this.pId2Tolls.put(personId, nowToll+tollSoFar);
 			}
 		}
 	}
@@ -129,7 +127,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 		SortedMap<UserGroup, Double> userGrpToToll = new TreeMap<UserGroup, Double>();
 		PersonFilter pf = new PersonFilter();
 		double totalToll =0;
-		
+
 		for(UserGroup ug : UserGroup.values()){
 			userGrpToToll.put(ug, 0.);
 		}
@@ -143,10 +141,10 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 				}
 			}
 		}
-		
+
 		String outputFile = controler.getControlerIO().getOutputPath()+"/analysis/avgTollData.txt";
 		writer = IOUtils.getBufferedWriter(outputFile);
-		
+
 		try {
 			writer.write("UserGroup \t toll \n");
 
@@ -159,6 +157,6 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-	
+
 	}
 }
