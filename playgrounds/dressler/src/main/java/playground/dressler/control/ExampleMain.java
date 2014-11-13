@@ -2,12 +2,9 @@ package playground.dressler.control;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationWriter;
 
 import playground.dressler.ea_flow.Flow;
 import playground.dressler.network.IndexedNodeI;

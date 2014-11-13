@@ -2,12 +2,8 @@ package playground.wrashid.artemis.checks;
 
 import java.util.HashMap;
 
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
-
-import playground.wrashid.lib.MathLib;
 
 // check, if charging is happening even if vehicle not parked
 public class CheckUncontrolledCharging {

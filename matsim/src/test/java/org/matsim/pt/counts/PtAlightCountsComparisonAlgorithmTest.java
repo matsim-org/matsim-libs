@@ -23,13 +23,8 @@ package org.matsim.pt.counts;
 import java.util.List;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 
 

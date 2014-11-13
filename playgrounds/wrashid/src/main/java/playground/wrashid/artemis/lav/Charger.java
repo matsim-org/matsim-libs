@@ -2,27 +2,23 @@ package playground.wrashid.artemis.lav;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
-import playground.wrashid.lib.MathLib;
-import playground.wrashid.artemis.output.*;
+import playground.wrashid.artemis.output.ChargingLog;
 import playground.wrashid.artemis.smartCharging.ChargingTime;
 import playground.wrashid.artemis.smartCharging.SmartCharger;
+import playground.wrashid.lib.MathLib;
 
 /**
  * Start charging immediatly, if arrive at a location. -> The charging starts at
@@ -269,6 +265,7 @@ class CharingPowerScenario1 implements ChargingPowerInterface {
 		chargingLocationFilter.put("home", 3500.0);
 	}
 
+	@Override
 	public boolean isCharingPossibleAtLocation(String actLocationType) {
 		if (chargingLocationFilter.containsKey(actLocationType)) {
 			return true;

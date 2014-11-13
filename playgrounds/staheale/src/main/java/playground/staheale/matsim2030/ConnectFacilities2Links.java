@@ -1,8 +1,6 @@
 package playground.staheale.matsim2030;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
@@ -14,7 +12,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -45,7 +42,7 @@ public class ConnectFacilities2Links {
 		/////////////////////////////////////////////////////////////////////
 		//read in facilities
 
-		MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) sc);  
+		MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader(sc);  
 		log.info("Reading facilities xml file... ");
 		FacReader.readFile("./input/facilities2012secondary.xml.gz");
 		log.info("Reading facilities xml file...done.");

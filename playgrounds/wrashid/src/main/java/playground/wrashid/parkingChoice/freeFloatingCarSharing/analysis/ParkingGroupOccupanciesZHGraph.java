@@ -18,16 +18,7 @@
  * *********************************************************************** */
 package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 
-import java.util.HashMap;
-
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.PC2.analysis.ParkingGroupOccupancies;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -36,7 +27,7 @@ public class ParkingGroupOccupanciesZHGraph {
 	public static void main(String[] args) {
 		String eventsFile = "C:/data/FreeFloatingParking/output/ITERS/it.1/run1.1.events.xml.gz";
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingGroupOccupanciesZH parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH();
 
