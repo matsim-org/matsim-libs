@@ -587,7 +587,7 @@ public class GfipQueuePassingControler extends Controler{
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			log.info(" ====> Assigning vehicles to routes.");
 			if(event.getIteration() == getConfig().controler().getFirstIteration()){
-				for(Person p : getPopulation().getPersons().values()){
+                for(Person p : getScenario().getPopulation().getPersons().values()){
 					for(Plan plan : p. getPlans()){
 						new SetVehicleInAllNetworkRoutes().handlePlan(plan);
 					}

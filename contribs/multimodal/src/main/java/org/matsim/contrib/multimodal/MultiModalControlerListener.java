@@ -71,8 +71,8 @@ public class MultiModalControlerListener implements StartupListener {
 		}
 		
 		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(), MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-		
-		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
+
+        Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getScenario().getNetwork());
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes, 
 				this.additionalTravelTimeFactories);
 		this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	

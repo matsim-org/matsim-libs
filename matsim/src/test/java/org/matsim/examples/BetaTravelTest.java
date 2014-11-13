@@ -323,7 +323,7 @@ public class BetaTravelTest extends MatsimTestCase {
             if (lastIter > 100) {
                 System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
             }
-            this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getPopulation().getPersons().size());
+            this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getScenario().getPopulation().getPersons().size());
 		}
 
 		@Override

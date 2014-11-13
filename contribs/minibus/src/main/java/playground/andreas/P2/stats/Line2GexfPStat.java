@@ -89,7 +89,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 				if (this.lineId2GexfPStat.get(lineId) == null) {
 					// new line - create new gexf
 					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, gexfOutputDir);
-					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.vehHandler);
+                    gexf.notifyStartup(event.getControler().getScenario().getNetwork(), this.globalPaxHandler, this.vehHandler);
 					this.lineId2GexfPStat.put(lineId, gexf);
 				}
 

@@ -19,7 +19,7 @@ public class AgentAnalysisShutdownListener implements ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		Population population = event.getControler().getPopulation();
+        Population population = event.getControler().getScenario().getPopulation();
 		
 		ObjectAttributes oa = new ObjectAttributes();			
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(oa);

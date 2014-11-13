@@ -38,7 +38,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 			DebugLib.stopSystemAndReportInconsistency("no vehicle available");
 		}
 
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, coord)
 				.getId());
@@ -47,7 +47,7 @@ public class DummyParkingModuleWithFreeFloatingCarSharing implements
 	@Override
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personI, double time) {
 		availableVehicles.add(vehicleId);
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, destCoord)
 				.getId());
 	}

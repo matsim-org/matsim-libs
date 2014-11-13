@@ -1,9 +1,7 @@
 package playground.ciarif.retailers.stategies;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-
+import cern.colt.matrix.impl.DenseDoubleMatrix1D;
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -16,7 +14,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PlanImpl;
-
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -24,8 +21,10 @@ import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
 import playground.ciarif.retailers.models.GravityModel;
 import playground.ciarif.retailers.utils.Utils;
-import cern.colt.matrix.impl.DenseDoubleMatrix1D;
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class GravityModelRetailerStrategy extends RetailerStrategyImpl
 {
@@ -83,7 +82,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     int count = 0;
     for (ActivityFacility af : this.retailerFacilities.values()) {
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
-        Utils.moveFacility((ActivityFacilityImpl) af, this.controler.getNetwork().getLinks().get(Id.create(first.get(solution.get(count)), Link.class)));
+          Utils.moveFacility((ActivityFacilityImpl) af, this.controler.getScenario().getNetwork().getLinks().get(Id.create(first.get(solution.get(count)), Link.class)));
         log.info("The facility " + af.getId() + " has been moved");
         this.movedFacilities.put(af.getId(), af);
         log.info("Link Id after = " + af.getLinkId());

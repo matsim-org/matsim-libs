@@ -20,8 +20,6 @@
 
 package playground.christoph.controler;
 
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -30,12 +28,8 @@ import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.christoph.energyflows.controller.EnergyFlowsController;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
@@ -45,11 +39,12 @@ import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
-import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.kti.scoring.KTIYear3ScoringFunctionFactory;
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
+
+import java.util.Map.Entry;
 
 public class KTIEnergyFlowsController extends EnergyFlowsController {
 
@@ -93,8 +88,8 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			/*
 			 * Use KTI route factories.
 			 */
-			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
-			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 			
 			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
@@ -102,13 +97,11 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			if (this.config.scenario().isUseHouseholds()) {
 				this.loadHouseholds();
 			}
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
 		}
 		
 		// connect facilities to links
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
+        new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
 	}
 	
 	private void loadHouseholds() {
@@ -126,11 +119,11 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	@Override
 	protected void setUp() {
 
-		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				this.scenarioData,
 				this.ktiConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-				this.getFacilities());
+                getScenario().getActivityFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);

@@ -14,7 +14,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouterFactory;
@@ -24,7 +23,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
-
 import playground.ivt.utils.TripModeShares;
 
 
@@ -57,10 +55,10 @@ public class RunControlerMATSim2030 extends Controler {
 	}
 	
 	private void init() {
-		
-		ActivityFacilities facilities = this.getFacilities();
+
+        ActivityFacilities facilities = getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
-		NetworkImpl network = (NetworkImpl) this.getNetwork();
+        NetworkImpl network = (NetworkImpl) getScenario().getNetwork();
 		//log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(this.getConfig());

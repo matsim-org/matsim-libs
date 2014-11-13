@@ -1,5 +1,16 @@
 package playground.artemc.scoring;
 
+import org.apache.log4j.Logger;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.charts.XYLineChart;
+import playground.artemc.analysis.TripAnalysisHandler;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,20 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.charts.XYLineChart;
-
-import playground.artemc.analysis.TripAnalysisHandler;
 
 
 public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
@@ -66,7 +63,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 		this.stuckUtility2it.put(event.getIteration(),0.0);
 		this.sumUtility2it.put(event.getIteration(),0.0);
 
-		for(Person person:event.getControler().getPopulation().getPersons().values()) {
+        for(Person person: event.getControler().getScenario().getPopulation().getPersons().values()) {
 			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
 			DisaggregatedCharyparNagelScoringFunctionFactory disScoringFactory = (DisaggregatedCharyparNagelScoringFunctionFactory) event.getControler().getScoringFunctionFactory();
 			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
@@ -90,7 +87,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/disaggregatedScore.csv";
 		File file = new File(fileName);
-		Integer persons = event.getControler().getPopulation().getPersons().size();
+        Integer persons = event.getControler().getScenario().getPopulation().getPersons().size();
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));

@@ -172,10 +172,10 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 			if (loggingEnabled) {
 				Id facilityId = firstFacilityIdAfterCarArrival.get(personId);
-				Id linkId = controller.getFacilities().getFacilities().get(facilityId).getLinkId();
+                Id linkId = controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getLinkId();
 				
 				if (linkId==null){
-					linkId = NetworkUtils.getNearestLink(((NetworkImpl) controller.getNetwork()), controller.getFacilities().getFacilities().get(facilityId).getCoord()).getId();
+                    linkId = NetworkUtils.getNearestLink(((NetworkImpl) controller.getScenario().getNetwork()), controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord()).getId();
 				}
 				
 				ChargingLogRowFacilityLevel chargingLogRow = new ChargingLogRowFacilityLevel(personId, linkId,facilityId,

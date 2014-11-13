@@ -22,10 +22,6 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -43,18 +39,16 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.gsv.analysis.KMLRailCountsWriter;
-import playground.johannes.gsv.analysis.LineSwitchTask;
-import playground.johannes.gsv.analysis.ModeShareTask;
-import playground.johannes.gsv.analysis.PKmAnalyzer;
-import playground.johannes.gsv.analysis.RailCounts;
-import playground.johannes.gsv.analysis.TransitLineAttributes;
+import playground.johannes.gsv.analysis.*;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -74,7 +68,7 @@ public class RailSimulator {
 		controler.setMobsimFactory(new MobsimConnectorFactory());
 		
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-		task.addTask(new TripDistanceTask(controler.getFacilities()));
+        task.addTask(new TripDistanceTask(controler.getScenario().getActivityFacilities()));
 		task.addTask(new ModeShareTask());
 		task.addTask(new LineSwitchTask());
 		
@@ -97,7 +91,7 @@ public class RailSimulator {
 
 	private static void generateFacilities(Controler controler) {
 		Population pop = controler.getScenario().getPopulation();
-		ActivityFacilities facilities = controler.getFacilities();
+        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		
 		for(Person person : pop.getPersons().values()) {
 			for(Plan plan : person.getPlans()) {
@@ -147,8 +141,8 @@ public class RailSimulator {
 				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
 //				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
 				RailCounts simCounts = countsCollector.getRailCounts();
-				
-				railCountsWriter.write(simCounts, obsCounts, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule(), lineAttribs, file, 5);
+
+                railCountsWriter.write(simCounts, obsCounts, event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(), lineAttribs, file, 5);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -170,8 +164,8 @@ public class RailSimulator {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 			generateFacilities(controler);
-			
-			Set<Person> person = new HashSet<Person>(controler.getPopulation().getPersons().values());
+
+            Set<Person> person = new HashSet<Person>(controler.getScenario().getPopulation().getPersons().values());
 			builder = new TrajectoryEventsBuilder(person);
 			controler.getEvents().addHandler(builder);
 			
@@ -181,7 +175,7 @@ public class RailSimulator {
 //			controler.getEvents().addHandler(volAnalyzer);
 			
 			String file = event.getControler().getConfig().getParam("gsv", "counts");
-			obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule());
+            obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule());
 			
 //			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
 //			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());

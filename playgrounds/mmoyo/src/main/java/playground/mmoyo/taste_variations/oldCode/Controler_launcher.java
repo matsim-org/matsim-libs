@@ -43,7 +43,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.taste_variations.CadytsUtlCorrectionsCollecter;
 
@@ -69,7 +68,7 @@ public class Controler_launcher {
 		final Config config = ConfigUtils.loadConfig(configFile);
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		final Network net = controler.getNetwork();
+        final Network net = controler.getScenario().getNetwork();
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 		final boolean doStopZoneConversion = Boolean.parseBoolean(strDoStzopZoneConversion);
 		strDoStzopZoneConversion= null;

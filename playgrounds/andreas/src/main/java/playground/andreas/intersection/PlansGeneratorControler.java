@@ -20,8 +20,6 @@
 
 package playground.andreas.intersection;
 
-import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,6 +35,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import java.util.LinkedList;
 
 public class PlansGeneratorControler extends Controler {
 
@@ -66,55 +66,55 @@ public class PlansGeneratorControler extends Controler {
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(20, Link.class)), this.network.getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 948; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(20, Link.class)), this.network.getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 196; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(20, Link.class)), this.network.getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 56; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(40, Link.class)), this.network.getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 192; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(40, Link.class)), this.network.getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 185; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(40, Link.class)), this.network.getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 170; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(60, Link.class)), this.network.getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 799; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(60, Link.class)), this.network.getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 147; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(60, Link.class)), this.network.getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 150; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(80, Link.class)), this.network.getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 166; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(80, Link.class)), this.network.getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 341; i++) {
-			generatePerson(numberOfPlans, this.network.getLinks().get(Id.create(80, Link.class)), this.network.getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 
@@ -132,10 +132,10 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 
-		fromLinks.add(this.network.getLinks().get(Id.create("1", Link.class)));
-		fromLinks.add(this.network.getLinks().get(Id.create("2", Link.class)));
+        fromLinks.add(getScenario().getNetwork().getLinks().get(Id.create("1", Link.class)));
+        fromLinks.add(getScenario().getNetwork().getLinks().get(Id.create("2", Link.class)));
 
-		toLinks.add(this.network.getLinks().get(Id.create("6", Link.class)));
+        toLinks.add(getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
 
 
 		for(int i=0; i < 1000; i++){

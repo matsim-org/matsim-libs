@@ -30,7 +30,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.QuadTree;
-
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
 
 public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
@@ -48,7 +47,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
 	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
-		super(config, controler.getNetwork());
+        super(config, controler.getScenario().getNetwork());
 		this.controler = controler;
 		this.config = config;
 		this.init();
@@ -70,13 +69,13 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 					this.controler.getConfig().getModule("trb_scoring").getValue("shoppingCentersScore"));
 			log.info("Shopping center scoring: " + this.shoppingCentersScore);
 
-			this.shoppingScoreAdditionals = new ShoppingScoreAdditionals(this.controler.getFacilities());
+        this.shoppingScoreAdditionals = new ShoppingScoreAdditionals(this.controler.getScenario().getActivityFacilities());
 	}
 
 	private void initQuadTree() {
 		// trees
 		FacilityQuadTreeBuilder treeBuilder = new FacilityQuadTreeBuilder();
-		this.shopQuadTree = treeBuilder.buildFacilityQuadTree("shop", (ActivityFacilitiesImpl)controler.getFacilities());
+        this.shopQuadTree = treeBuilder.buildFacilityQuadTree("shop", (ActivityFacilitiesImpl) controler.getScenario().getActivityFacilities());
 		this.shoppingScoreAdditionals.setShopQuadTree(shopQuadTree);
 	}
 
@@ -88,7 +87,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		this.scoringFunction = new ActivityScoringFunction(plan, new CharyparNagelScoringParameters(config), this.controler.getFacilities());
+        this.scoringFunction = new ActivityScoringFunction(plan, new CharyparNagelScoringParameters(config), this.controler.getScenario().getActivityFacilities());
 		this.scoringFunction.setSign(this.sign);
 		this.scoringFunction.setSizeScore(this.sizeScore);
 		this.scoringFunction.setDensityScore(this.densityScore);
@@ -96,8 +95,8 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 		this.scoringFunction.setShoppingScoreAdditionals(this.shoppingScoreAdditionals);
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(new CharyparNagelScoringParameters(config), controler.getNetwork()));
+        scoringFunctionAccumulator.addScoringFunction(
+				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(new CharyparNagelScoringParameters(config), controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config)));
 		scoringFunctionAccumulator.addScoringFunction(

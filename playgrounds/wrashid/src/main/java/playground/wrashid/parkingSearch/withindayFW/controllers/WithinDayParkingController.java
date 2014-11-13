@@ -20,9 +20,6 @@
 
 package playground.wrashid.parkingSearch.withindayFW.controllers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -42,13 +39,15 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.withinday.controller.WithinDayController;
-
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.LegModeChecker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 public abstract class WithinDayParkingController extends WithinDayController implements ReplanningListener  {
 
@@ -152,7 +151,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(this);
 		
 		// connect facilities to network
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
+        new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
 
 		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();

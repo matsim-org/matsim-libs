@@ -46,8 +46,8 @@ public class ControlerWS {
 		// CalibrationStatsListener(controler.getEvents(), new String[]{args[1],
 		// args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new
 		// HashSet<Id>()));
-		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
-				controler.getPopulation(),
+        WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
+                controler.getScenario().getPopulation(),
 				controler.getScenario().getTransitSchedule(),
 				controler.getConfig().travelTimeCalculator()
 						.getTraveltimeBinSize(),

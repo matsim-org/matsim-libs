@@ -1,23 +1,19 @@
 package playground.wrashid.parkingChoice;
 
-import java.util.LinkedList;
-
+import junit.framework.TestCase;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
-import junit.framework.TestCase;
+import java.util.LinkedList;
 
 public class IntegrationTest  extends TestCase {
 
@@ -44,7 +40,7 @@ public class IntegrationTest  extends TestCase {
 			
 			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				for (Person p: event.getControler().getPopulation().getPersons().values()){
+                for (Person p: event.getControler().getScenario().getPopulation().getPersons().values()){
 					Plan plan=p.getSelectedPlan();
 					if (isPlanCarTripFree(plan)){
 						if (parkingModule.getParkingManager().getNumberOfParkedVehicles()>0){

@@ -1,10 +1,5 @@
 package playground.wrashid.parkingChoice.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -24,12 +19,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
+import org.matsim.core.scoring.functions.*;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingChoice.ParkingManager;
@@ -38,6 +28,11 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Set;
 
 
 public class ParkingScoreAccumulator implements StartupListener, AfterMobsimListener {
@@ -73,7 +68,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
                 public ScoringFunction createNewScoringFunction(Person person) {
                     SumScoringFunction sumScoringFunction = new SumScoringFunction();
                     sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(this.params));
-                    sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, event.getControler().getNetwork()));
+                    sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(this.params, event.getControler().getScenario().getNetwork()));
                     sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(this.params));
                     sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(this.params));
                     sumScoringFunction.addScoringFunction(new ParkingScoring(event.getControler().getConfig(), this.params, person.getId()));

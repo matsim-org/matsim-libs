@@ -12,7 +12,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
@@ -37,7 +36,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		Plan plan = GlobalRegistry.controler.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
+        Plan plan = GlobalRegistry.controler.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 
 		// confirm the parking before the change (and compare it after the change)
 
@@ -46,11 +45,11 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 
 		// change the parking for the work activity to facility 35, instead of 36
 
-		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
+        ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getScenario().getActivityFacilities().getFacilities()
 				.get(Id.create("35", ActivityFacility.class));
 
-		ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking,
-				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getNetwork());
+        ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking,
+				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
 
 		assertEquals("35", ((Activity) plan.getPlanElements().get(4)).getFacilityId().toString());
 		assertEquals("35", ((Activity) plan.getPlanElements().get(8)).getFacilityId().toString());
@@ -60,8 +59,8 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 
 		// change the parking for the home activity to facility 35, instead of 36
 
-		ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(0), newParking,
-				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getNetwork());
+        ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(0), newParking,
+				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
 
 		assertEquals("35", ((Activity) plan.getPlanElements().get(2)).getFacilityId().toString());
 		assertEquals("35", ((Activity) plan.getPlanElements().get(10)).getFacilityId().toString());

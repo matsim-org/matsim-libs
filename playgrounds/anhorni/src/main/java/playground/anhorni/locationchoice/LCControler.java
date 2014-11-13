@@ -20,12 +20,12 @@
 
 package playground.anhorni.locationchoice;
 
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.controler.Controler;
+
+import java.util.TreeMap;
 
 
 public class LCControler extends Controler {
@@ -42,7 +42,7 @@ public class LCControler extends Controler {
     @Override
     protected void setUp() {
       super.setUp();
-      this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory(this.config.planCalcScore(), this.facilityPenalties, this.getFacilities(), network);
+        this.scoringFunctionFactory = new LocationChoiceScoringFunctionFactory(this.config.planCalcScore(), this.facilityPenalties, getScenario().getActivityFacilities(), getScenario().getNetwork());
     }
  
     public static void main (final String[] args) { 

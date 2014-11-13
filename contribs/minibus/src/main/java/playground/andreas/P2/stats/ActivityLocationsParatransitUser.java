@@ -73,8 +73,8 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
-		parsePopulation(event.getControler().getPopulation());
+
+        parsePopulation(event.getControler().getScenario().getPopulation());
 
         String outNameIdentifier = "actsFromParatransitUsers.txt";
         if (this.firstIteration) {

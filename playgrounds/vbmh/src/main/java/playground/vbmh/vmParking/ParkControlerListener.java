@@ -1,8 +1,5 @@
 package playground.vbmh.vmParking;
 
-import java.io.File;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -11,8 +8,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-
 import playground.vbmh.util.VMCharts;
+
+import java.io.File;
+import java.util.Map;
 
 /**
  * Sets up event handlers and does some resets before and after each iteration.
@@ -111,7 +110,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 			//EVs Zaehlen
 		if(getParkHandler().getParkControl().evUsage){
 			int i = 0;
-			for(Person person : getParkHandler().getParkControl().controller.getPopulation().getPersons().values()){
+            for(Person person : getParkHandler().getParkControl().controller.getScenario().getPopulation().getPersons().values()){
 				if(getParkHandler().getParkControl().evControl.hasEV(person.getId())){
 					i++;
 				}
@@ -133,7 +132,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:
-		Map<Id<Person>, ? extends Person> population = event.getControler().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> population = event.getControler().getScenario().getPopulation().getPersons();
 		for (Person person : population.values()){
 			//person.getCustomAttributes().put("VMScoreKeeper", null);
 			person.getCustomAttributes().remove("VMScoreKeeper");

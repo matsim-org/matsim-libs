@@ -20,13 +20,6 @@
 
 package playground.anhorni.locationchoice.analysis.plans;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.List;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -40,8 +33,14 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.anhorni.utils.Utils;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Vector;
 
 /**
  *
@@ -107,7 +106,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 			}
 			this.history = new double[5][iterations+1];
 		}
-		this.population = event.getControler().getPopulation();
+        this.population = event.getControler().getScenario().getPopulation();
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {

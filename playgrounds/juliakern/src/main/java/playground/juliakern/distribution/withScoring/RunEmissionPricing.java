@@ -19,28 +19,21 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoring;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.juliakern.distribution.ResDisFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author benjamin
@@ -165,9 +158,9 @@ public class RunEmissionPricing {
 		vcg.setWritingOutputEvents(false) ;
 		
 		EmissionControlerListener ecl = new EmissionControlerListener(controler);
-		System.out.println("network at run - no of links " + controler.getNetwork().getLinks().size());
+        System.out.println("network at run - no of links " + controler.getScenario().getNetwork().getLinks().size());
 		controler.addControlerListener(ecl);
-		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
+        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getScenario().getNetwork(), ecl));
 		
 		
 		EmissionModule emissionModule = ecl.emissionModule;

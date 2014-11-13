@@ -62,8 +62,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		parkingInfrastructureManager.unParkVehicle(parking, departureTime, personId);
 		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
-		
-		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
+
+        NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
 		
 		try{
 			double walkScore = parkingInfrastructureManager.getParkingScoreManager().calcWalkScore(coord, parking, personId, getAverageActDuration());
@@ -85,7 +85,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 
 	@Override
 	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double arrivalTime) {
-		NetworkImpl network = (NetworkImpl) getControler().getNetwork();
+        NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
 		
@@ -111,8 +111,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());
 		}
-		
-		vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getNetwork());
+
+        vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getScenario().getNetwork());
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
 			Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());

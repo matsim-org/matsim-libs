@@ -295,8 +295,8 @@ public class EvacuationControler extends WithinDayController implements
 		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
-		if (!NetworkUtils.isMultimodal(this.getNetwork())) {
-			new MultiModalNetworkCreator(multiModalConfigGroup).run(this.getNetwork());
+        if (!NetworkUtils.isMultimodal(getScenario().getNetwork())) {
+            new MultiModalNetworkCreator(multiModalConfigGroup).run(getScenario().getNetwork());
 		}
 		
 		// ensure that NetworkRoutes are created for legs using one of the simulated modes
@@ -357,8 +357,8 @@ public class EvacuationControler extends WithinDayController implements
 		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
 
-		
-		LegModeChecker legModeChecker = new LegModeChecker(this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), this.getNetwork());
+
+        LegModeChecker legModeChecker = new LegModeChecker(this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), getScenario().getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
@@ -396,8 +396,8 @@ public class EvacuationControler extends WithinDayController implements
 		}
 		affectedArea = util.mergeGeometries(features);
 		log.info("Size of affected area: " + affectedArea.getArea());
-		
-		this.penaltyCalculator = new AffectedAreaPenaltyCalculator(this.getNetwork(), affectedArea, 
+
+        this.penaltyCalculator = new AffectedAreaPenaltyCalculator(getScenario().getNetwork(), affectedArea,
 				EvacuationConfig.affectedAreaDistanceBuffer, EvacuationConfig.affectedAreaTimePenaltyFactor);
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);	
@@ -723,8 +723,8 @@ public class EvacuationControler extends WithinDayController implements
 		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
-		
-		LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+
+        LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(getScenario().getNetwork(), new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, EvacuationConfig.compassProbability);
 		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.decisionDataProvider);
 		

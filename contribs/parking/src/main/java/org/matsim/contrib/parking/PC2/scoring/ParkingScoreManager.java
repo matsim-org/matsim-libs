@@ -51,12 +51,12 @@ public class ParkingScoreManager {
 	}
 
 	public double calcWalkScore(Coord destCoord, Parking parking, Id personId, double parkingDurationInSeconds) {
-		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 
 		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
 
-		Link link = NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), destCoord);
+        Link link = NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), destCoord);
 		double length = link.getLength();
 		double walkTime = walkTravelTime.getLinkTravelTime(link, 0, person, null);
 		double walkSpeed = length / walkTime;
@@ -76,7 +76,7 @@ public class ParkingScoreManager {
 	}
 
 	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
-		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
 

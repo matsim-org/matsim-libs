@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich;
 
-import java.util.Collection;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,9 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.Collection;
 
 /**
  * @author benjamin
@@ -58,7 +57,7 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Network network = event.getControler().getNetwork();
+        Network network = event.getControler().getScenario().getNetwork();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl zone30Links = (NetworkImpl) sc.getNetwork();

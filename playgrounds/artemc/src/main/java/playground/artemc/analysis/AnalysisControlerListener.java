@@ -24,15 +24,6 @@
 
 package playground.artemc.analysis;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -44,10 +35,18 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
-
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Ihab
@@ -130,12 +129,12 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 	private void runCalculation(IterationEndsEvent  event){
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
-		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
+        this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
-		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);		
-		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getPopulation()));
+		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);
+        this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 
@@ -173,7 +172,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			sdcEveningByMode.put(mode, new ArrayList<Double>());
 		}
 
-		for(Id<Person> id:event.getControler().getPopulation().getPersons().keySet()){
+        for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
 
 			if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 				ttcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getTTC_morning().get(id));
@@ -392,7 +391,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				double sumTTCTotal =0.0;
 				double sumSDCTotal = 0.0;
 
-				for(Id<Person> id:event.getControler().getPopulation().getPersons().keySet()){
+                for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
 					if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_evening().get(id);
 						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);

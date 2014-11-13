@@ -28,7 +28,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 
 /**
@@ -56,7 +55,7 @@ public class RunIndivSimulation {
 	}
 
 	private static void setScoringFunction(final Controler controler) {
-		ActivityFacilities facilities = controler.getFacilities();
+        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		int nFacilities = facilities.getFacilities().size();
 
 		if (nFacilities > 0) {

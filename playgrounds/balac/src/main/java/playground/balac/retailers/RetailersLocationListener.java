@@ -19,9 +19,6 @@
 
 package playground.balac.retailers;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -34,11 +31,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.population.algorithms.PersonAlgorithm;
-
 import playground.balac.retailers.IO.FileRetailerReader;
-import playground.balac.retailers.IO.LinksRetailerReader;
 import playground.balac.retailers.IO.LinksRetailerReaderV2;
 import playground.balac.retailers.IO.RetailersSummaryWriter;
 import playground.balac.retailers.data.Retailer;
@@ -46,6 +40,9 @@ import playground.balac.retailers.data.Retailers;
 import playground.balac.retailers.utils.CountFacilityCustomers;
 import playground.balac.retailers.utils.ReRoutePersons;
 import playground.balac.retailers.utils.Utils;
+
+import java.util.Iterator;
+import java.util.Map;
 
 
 
@@ -72,14 +69,14 @@ public class RetailersLocationListener
   {
     this.controler = event.getControler();
     FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(this.controler.getConfig().planCalcScore());
-    ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
+      ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 
     this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");
     if (this.facilityIdFile == null) throw new RuntimeException("In config file, param = retailers in module = Retailers not defined!");
 
-    this.retailers = new FileRetailerReader(this.controler.getFacilities().getFacilities(), this.facilityIdFile).readRetailers(this.controler);
+      this.retailers = new FileRetailerReader(this.controler.getScenario().getActivityFacilities().getFacilities(), this.facilityIdFile).readRetailers(this.controler);
 
-    this.cfc = new CountFacilityCustomers(this.controler.getPopulation().getPersons());
+      this.cfc = new CountFacilityCustomers(this.controler.getScenario().getPopulation().getPersons());
     Utils.setFacilityQuadTree(Utils.createFacilityQuadTree(this.controler));
     log.info("Creating PersonQuadTree");
     Utils.setPersonQuadTree(Utils.createPersonQuadTree(this.controler));    
@@ -132,13 +129,13 @@ public class RetailersLocationListener
         	this.rsw.write(r, event.getIteration(), this.cfc);
         	r.runStrategy(this.lrr.getFreeLinks());
         	this.lrr.updateFreeLinks();
-        	Map persons = this.controler.getPopulation().getPersons();
-        	new ReRoutePersons().run(
+            Map persons = this.controler.getScenario().getPopulation().getPersons();
+            new ReRoutePersons().run(
         		r.getMovedFacilities(),
-        		this.controler.getNetwork(),
+                    this.controler.getScenario().getNetwork(),
         		persons,
         		router,
-        		this.controler.getFacilities());
+                    this.controler.getScenario().getActivityFacilities());
      	}
     }
     if ((event.getIteration() != 0) && (event.getIteration() % analysisFrequency == 0) 

@@ -23,23 +23,18 @@
  */
 package playground.yu.replanning;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.ControlerEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.yu.utils.io.SimpleWriter;
+
+import java.util.Random;
 
 /**
  * @author yu
@@ -50,7 +45,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	private SimpleWriter writer = null;
 
 	private void writeFirstPlans(ControlerEvent event) {
-		for (Plan plan : event.getControler().getPopulation().getPersons()
+        for (Plan plan : event.getControler().getScenario().getPopulation().getPersons()
 				.values().iterator().next().getPlans()) {
 			writer.write("\t" + plan.getScore().toString());
 		}
@@ -59,7 +54,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 	}
 
 	private void writeOnePersonPlans(ControlerEvent event, int id) {
-		for (Plan plan : event.getControler().getPopulation().getPersons().get(
+        for (Plan plan : event.getControler().getScenario().getPopulation().getPersons().get(
 				Id.create(id, Person.class)).getPlans()) {
 			writer.write("\t" + plan.getScore().toString());
 		}
@@ -72,7 +67,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 		r.setSeed(4711);
 		for (int i = 0; i < 10; i++) {
 			int id = r.nextInt(100);
-			Plan plan = event.getControler().getPopulation().getPersons().get(
+            Plan plan = event.getControler().getScenario().getPopulation().getPersons().get(
 					Id.create(id, Person.class)).getSelectedPlan();
 			writer.write("\t" + id);
 			writer.write("\t" + plan.getScore().toString());

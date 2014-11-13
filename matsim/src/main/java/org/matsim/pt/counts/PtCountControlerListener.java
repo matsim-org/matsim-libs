@@ -20,11 +20,6 @@
 
 package org.matsim.pt.counts;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -46,6 +41,11 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {
@@ -121,7 +121,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 			controler.stopwatch.beginOperation(OPERATION_COMPAREPTCOUNTS);
 
 			double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
-			Network network = controler.getNetwork();
+            Network network = controler.getScenario().getNetwork();
 
 			Map<CountType,CountsComparisonAlgorithm> cca = new HashMap<CountType,CountsComparisonAlgorithm>();
 			cca.put( CountType.Boarding, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {

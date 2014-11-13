@@ -86,12 +86,12 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 		@Override
 		public void notifyStartup(final StartupEvent event) {
 			Controler controler = event.getControler();
-			controler.setScoringFunctionFactory(
+            controler.setScoringFunctionFactory(
 					new ParkAndRideScoringFunctionFactory(
 						controler.getScoringFunctionFactory(),
 						parkingPenaltyFactory,
 						((ScenarioImpl) controler.getScenario()).getActivityFacilities(),
-						controler.getNetwork()) );
+                            controler.getScenario().getNetwork()) );
 		}
 	}
 }

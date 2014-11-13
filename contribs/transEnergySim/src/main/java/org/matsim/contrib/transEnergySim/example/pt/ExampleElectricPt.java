@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.transEnergySim.example.pt;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,6 +31,8 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 /*
  * This uses the input files from the following tutorial:
@@ -56,7 +56,7 @@ public class ExampleElectricPt {
 		chargingPowerAtStops.put(Id.create("2a", TransitStopFacility.class), 10.0);
 		chargingPowerAtStops.put(Id.create("2b", TransitStopFacility.class), 5.0);
 		chargingPowerAtStops.put(Id.create("3", TransitStopFacility.class), 1.0);
-		PtVehicleEnergyControlImpl ptVehicleEnergyControl = new PtVehicleEnergyControlImpl(controler.getNetwork(),chargingPowerAtStops);
+        PtVehicleEnergyControlImpl ptVehicleEnergyControl = new PtVehicleEnergyControlImpl(controler.getScenario().getNetwork(),chargingPowerAtStops);
 		
 		new ElectricPtSimModule(controler, ptEnergyMangementModels,ptVehicleEnergyControl);
 		controler.setOverwriteFiles(true);

@@ -1,20 +1,11 @@
 package playground.wrashid.parkingChoice;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
@@ -23,16 +14,18 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.util.ActDurationEstimationContainer;
 import playground.wrashid.parkingChoice.util.ActivityDurationEstimator;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 public class ParkingSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	// key: personId, value: parking
@@ -71,7 +64,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 		// where it parked at the evening
 
 		if (iteration > 0) {
-			for (Person person : controler.getPopulation().getPersons().values()) {
+            for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 				Plan currentPlan=person.getSelectedPlan();
 				Plan previousPlan=parkingManager.getPlanUsedInPreviousIteration().get(person.getId());
 				
@@ -121,7 +114,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 			// given activity location (not only according to the best walking
 			// distance).
 
-			Person person = controler.getPopulation().getPersons().get(personId);
+            Person person = controler.getScenario().getPopulation().getPersons().get(personId);
 
 			Plan selectedPlan = person.getSelectedPlan();
 			double estimatedActduration = 0;
@@ -164,7 +157,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 	}
 
 	private ActivityFacility getTargetFacility(ActivityStartEvent event) {
-		return parkingManager.getControler().getFacilities().getFacilities().get(event.getFacilityId());
+        return parkingManager.getControler().getScenario().getActivityFacilities().getFacilities().get(event.getFacilityId());
 	}
 
 	@Override
@@ -221,7 +214,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 	// TODO: remove method after debugging is over.
 	public void handleEvent(PersonStuckEvent event) {
 		//DebugLib.traceAgent(event.getPersonId());
-		Person person = controler.getPopulation().getPersons().get(event.getPersonId());
+        Person person = controler.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		if (parkingManager.considerForParking(event.getPersonId())){
 			parkingManager.initializePersonForParking(person);
 		}

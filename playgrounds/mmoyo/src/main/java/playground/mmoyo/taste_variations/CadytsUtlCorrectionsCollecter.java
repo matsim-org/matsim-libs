@@ -19,8 +19,6 @@
 
 package playground.mmoyo.taste_variations;
 
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -32,8 +30,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.mmoyo.io.TextFileWriter;
+
+import java.util.Map.Entry;
 
 
 /**
@@ -70,7 +69,7 @@ public class CadytsUtlCorrectionsCollecter implements IterationEndsListener{
 			System.err.println("calculating svd values.........");
 
 			ObjectAttributes attrs = new ObjectAttributes();
-			Population pop = event.getControler().getPopulation();
+            Population pop = event.getControler().getScenario().getPopulation();
 			
 			String STR_UTLCORR = "UtlCorr";
 			

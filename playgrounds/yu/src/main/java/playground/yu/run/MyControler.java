@@ -39,12 +39,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.*;
 
 /**
  * temporarily solves the route.getDistance() NaN problem of
@@ -209,8 +204,8 @@ public final class MyControler extends Controler {
 		Controler controler = new MyControler(args[0]);
 		controler.setCreateGraphs(false);
 		controler.setOverwriteFiles(true);
-		
-		controler.setScoringFunctionFactory( new MyCharyparNagelScoringFunctionFactory( controler.getConfig().planCalcScore(), controler.getNetwork() ) ) ;
+
+        controler.setScoringFunctionFactory( new MyCharyparNagelScoringFunctionFactory( controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()) ) ;
 		
 		controler.run();
 	}

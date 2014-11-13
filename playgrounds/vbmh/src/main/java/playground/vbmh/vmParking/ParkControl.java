@@ -1,13 +1,5 @@
 package playground.vbmh.vmParking;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-
-import javax.xml.bind.JAXB;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -21,13 +13,19 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.vbmh.controler.VMConfig;
 import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.RemoveDuplicate;
 import playground.vbmh.util.VMCharts;
 import playground.vbmh.vmEV.EVControl;
 import playground.vbmh.vmParking.AdvancedParkingChoice.Option;
+
+import javax.xml.bind.JAXB;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 
 /**
@@ -154,7 +152,7 @@ public class ParkControl {
 		
 		// FACILITY UND KOORDINATEN LADEN
 		Id<ActivityFacility> facilityid = Id.create(event.getAttributes().get("facility"), ActivityFacility.class);
-		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilitymap = controller.getFacilities().getFacilities();
+        Map<Id<ActivityFacility>, ? extends ActivityFacility> facilitymap = controller.getScenario().getActivityFacilities().getFacilities();
 		ActivityFacility facility = facilitymap.get(facilityid);
 		this.cordinate = facility.getCoord();
 		
@@ -259,7 +257,7 @@ public class ParkControl {
 		//System.err.println("Nicht geparkt");
 		
 		// Wer nicht umkreis von 5km parken kann bekommt massiv disutil
-		Map<String, Object> personAttributes = controller.getPopulation().getPersons().get(personId).getCustomAttributes();
+        Map<String, Object> personAttributes = controller.getScenario().getPopulation().getPersons().get(personId).getCustomAttributes();
 		VMScoreKeeper scorekeeper;
 		if (personAttributes.get("VMScoreKeeper")!= null){
 			scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");
@@ -591,7 +589,7 @@ public class ParkControl {
 		Id personId = event.getPersonId();
 		ParkingSpot selectedSpot = null;
 		VMScoreKeeper scorekeeper = null;
-		Person person = controller.getPopulation().getPersons().get(personId);
+        Person person = controller.getScenario().getPopulation().getPersons().get(personId);
 		
 		ev=false;
 		if(evUsage){
@@ -674,7 +672,7 @@ public class ParkControl {
 	
 	//--------------------------- P A R K   O N   S P O T ---------------------------------------------
 	int parkOnSpot(ParkingSpot selectedSpot, double score, Id personId) {
-		Person person = controller.getPopulation().getPersons().get(personId);
+        Person person = controller.getScenario().getPopulation().getPersons().get(personId);
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		personAttributes.put("selectedParkingspot", selectedSpot);
 		ParkingSpot selectedSpotToSet = (ParkingSpot) personAttributes.get("selectedParkingspot");
@@ -841,9 +839,9 @@ public class ParkControl {
 		//System.out.println("Get estimated duration:");
 		//[0]: Estimated duration of parking
 		//[1]: Estimated distance to travel during rest of day
-		
-		
-		PersonImpl person = (PersonImpl) controller.getPopulation().getPersons().get(event.getPersonId());
+
+
+        PersonImpl person = (PersonImpl) controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		double endTime=0;
 		int actCount = (Integer) person.getCustomAttributes().get("ActCounter");
@@ -962,7 +960,7 @@ public class ParkControl {
 	
 	
 	public void clearAgents(){
-		for (Person person : controller.getPopulation().getPersons().values()){
+        for (Person person : controller.getScenario().getPopulation().getPersons().values()){
 			person.getCustomAttributes().remove("selectedParkingspot");
 		}
 	}

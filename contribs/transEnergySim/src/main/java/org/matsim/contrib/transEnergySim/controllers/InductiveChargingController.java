@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.transEnergySim.controllers;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
@@ -28,6 +26,8 @@ import org.matsim.contrib.transEnergySim.vehicles.VehicleUtils;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
+
+import java.util.HashMap;
 
 /**
  * Controller for starting a scenario, which includes the options for stationary
@@ -57,8 +57,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
-		setInductiveCharger(new InductiveStreetCharger(vehicles, network, this));
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
+        setInductiveCharger(new InductiveStreetCharger(vehicles, getScenario().getNetwork(), this));
 		setChargingUponArrival(new ChargingUponArrival(vehicles, this));
 
 		handlerGroup.addHandler(getEnergyConsumptionTracker());

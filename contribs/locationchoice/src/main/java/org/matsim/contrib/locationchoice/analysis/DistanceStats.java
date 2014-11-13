@@ -53,8 +53,8 @@ public class DistanceStats implements IterationEndsListener {
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
 		this.bins.clear();
-		
-		for (Person p : event.getControler().getPopulation().getPersons().values()) {
+
+        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
 			if (this.config.locationchoice().getIdExclusion() == null || !this.isLong(p.getId().toString()) ||

@@ -19,8 +19,6 @@
 
 package playground.anhorni.rc;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +39,8 @@ import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionF
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
+
+import java.util.Set;
 
 public class WithindayListener implements StartupListener {
 	
@@ -94,7 +94,7 @@ public class WithindayListener implements StartupListener {
 	}
 	
 	public void addNetworkChange(Controler controler, Set<Id<Link>> links) {
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		NetworkChangeEvent networkChangeEvent0;
 		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.49 * 3600.0);		
 		

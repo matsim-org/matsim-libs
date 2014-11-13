@@ -1,18 +1,10 @@
 package org.matsim.contrib.matsim4urbansim.matsim4urbansim;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
@@ -23,6 +15,8 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import java.util.Iterator;
 
 /**
  * implements agent-based performance feedback for UrbanSim population (time spent traveling, money spent traveling, etc.)
@@ -67,9 +61,9 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		// get network
-		Network network = controler.getNetwork();
+        Network network = controler.getScenario().getNetwork();
 		// get persons
-		Population population = controler.getPopulation();
+        Population population = controler.getScenario().getPopulation();
 		Iterator<? extends Person> persons = population.getPersons().values().iterator();
 		
 		while(persons.hasNext()){

@@ -26,7 +26,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
-
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.HitchHikingSpots;
@@ -59,12 +58,12 @@ public class HitchHikingTripRouterFactory extends DefaultTripRouterFactoryImpl {
 			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
 		TripRouter instance = super.instantiateAndConfigureTripRouter(iterationContext);
 
-		instance.setRoutingModule(
+        instance.setRoutingModule(
 				HitchHikingConstants.PASSENGER_MODE,
 				new HitchHikingPassengerRoutingModule(
 					instance.getRoutingModule( TransportMode.pt ),
 					spots,
-					((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory(),
+					((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory(),
 					spotWeighter,
 					config,
 					// XXX here or higher level?

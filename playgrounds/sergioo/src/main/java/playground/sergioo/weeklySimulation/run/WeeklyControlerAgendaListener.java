@@ -90,7 +90,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		controler.setTransitRouterFactory(transitRouterFactory);
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getNetwork());
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
@@ -102,13 +102,13 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
 		if(controler.getConfig().scenario().isUseTransit())
 			modes.add("pt");
-		if(createPersons) {
+        if(createPersons) {
 			boolean fixedTypes = controler.getConfig().locationchoice().getFlexibleTypes()==null ||controler.getConfig().locationchoice().getFlexibleTypes().equals("");
 			String[] types = fixedTypes?new String[]{"home", "work"}:controler.getConfig().locationchoice().getFlexibleTypes().split(", ");
 			TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilderWithDefaults = new TripRouterFactoryBuilderWithDefaults();
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = tripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
 			TripRouterFactory tripRouterFactory = new DefaultTripRouterFactoryImpl(controler.getScenario(), leastCostPathCalculatorFactory, transitRouterFactory);
-			final TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(controler.getNetwork(), controler.getConfig().travelTimeCalculator()).getLinkTravelTimes();
+            final TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(controler.getScenario().getNetwork(), controler.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
 
 				@Override
@@ -122,15 +122,15 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 				}
 
 			});
-			for(Person person: controler.getPopulation().getPersons().values())
+            for(Person person: controler.getScenario().getPopulation().getPersons().values())
 				toBeAdded.add(AgendaBasePersonImpl.createAgendaBasePerson(fixedTypes, types, (PersonImpl) person, tripRouter, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
 		}
 		else
-			for(Person person: controler.getPopulation().getPersons().values())
+			for(Person person: controler.getScenario().getPopulation().getPersons().values())
 				toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson((PersonImpl) person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));	
 		for(Person person:toBeAdded) {
-			controler.getPopulation().getPersons().remove(person.getId());
-			controler.getPopulation().addPerson(person);
+            controler.getScenario().getPopulation().getPersons().remove(person.getId());
+            controler.getScenario().getPopulation().addPerson(person);
 		}
 	}
 	@Override

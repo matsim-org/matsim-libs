@@ -20,9 +20,6 @@
 
 package playground.wrashid.swenger;
 
-import java.util.HashMap;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +31,9 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import java.util.HashMap;
+import java.util.Random;
 
 public class NewStrategyModule implements PlanStrategyModule {
 
@@ -143,7 +143,7 @@ public class NewStrategyModule implements PlanStrategyModule {
 	}
 
 	public void finishReplanning() {
-		double populationSize=controler.getPopulation().getPersons().size();
+        double populationSize= controler.getScenario().getPopulation().getPersons().size();
 		log.info("number of betaExpCount: " + this.betaExpCount + " - " + this.betaExpCount/populationSize + "  prob : " + (1-this.probabilityOfTimeMutator-this.probabilityOfRouting));
 		log.info("number of timeMutatorCount: " + this.timeMutatorCount  + " - " + this.timeMutatorCount/populationSize + "  prob : " + this.probabilityOfTimeMutator);
 		log.info("number of reRouteCount: " + this.reRouteCount  + " - " + this.reRouteCount/populationSize + "  prob : " + this.probabilityOfRouting);

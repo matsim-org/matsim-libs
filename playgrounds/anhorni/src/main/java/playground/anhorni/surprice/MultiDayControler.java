@@ -25,7 +25,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.anhorni.surprice.analysis.Analyzer;
 
 public class MultiDayControler {
@@ -66,7 +65,7 @@ public class MultiDayControler {
 				populationPreviousDay = null;
 			}
 			else {
-				populationPreviousDay = controler.getPopulation();
+                populationPreviousDay = controler.getScenario().getPopulation();
 			}
 			log.info("storing final iteration: " + controler.getFinalIteration());
 			finalIterations[Surprice.days.indexOf(day)] = controler.getFinalIteration();

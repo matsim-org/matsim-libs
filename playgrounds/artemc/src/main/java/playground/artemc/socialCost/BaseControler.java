@@ -1,8 +1,5 @@
 package playground.artemc.socialCost;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -13,11 +10,13 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class BaseControler {
@@ -47,7 +46,7 @@ public class BaseControler {
 
 		// Additional analysis
 		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
-		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
+        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 		controler.addControlerListener(new SimpleAnnealer());
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());

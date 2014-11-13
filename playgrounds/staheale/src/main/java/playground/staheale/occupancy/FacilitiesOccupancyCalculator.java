@@ -20,10 +20,6 @@
 
 package playground.staheale.occupancy;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -36,8 +32,11 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.TreeMap;
 //import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 //import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
@@ -90,7 +89,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy(event.getControler().getFacilities(), this.numberOfTimeBins, this.scaleNumberOfPersons,
+        this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy(event.getControler().getScenario().getActivityFacilities(), this.numberOfTimeBins, this.scaleNumberOfPersons,
 				facilityOccupancies, event.getControler().getConfig().locationchoice());
 		event.getControler().getEvents().addHandler(this.eventsToFacilityOccupancy);
 	}
@@ -111,7 +110,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		ActivityFacilities facilities = controler.getFacilities();
+        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
 		if (event.getIteration() % 10 == 0) {
 			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),

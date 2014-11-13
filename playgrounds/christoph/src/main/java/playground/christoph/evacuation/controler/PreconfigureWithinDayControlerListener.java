@@ -20,8 +20,6 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
@@ -31,6 +29,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.withinday.controller.WithinDayControlerListener;
+
+import java.util.Map;
 
 /**
  * Configures the WithinDayControlerListener with objects from the MultiModalControlerListener.
@@ -64,7 +64,7 @@ public class PreconfigureWithinDayControlerListener implements StartupListener {
 		// workaround until PT is fully implemented
 		TravelTime ptTravelTime = multiModalTravelTimes.get(TransportMode.pt);
 		if (ptTravelTime instanceof PersonalizedTravelTime) {
-			for (Id personId : event.getControler().getPopulation().getPersons().keySet()) {
+            for (Id personId : event.getControler().getScenario().getPopulation().getPersons().keySet()) {
 				((PersonalizedTravelTime) ptTravelTime).setPersonSpeed(personId, 15.0);
 			}
 		}

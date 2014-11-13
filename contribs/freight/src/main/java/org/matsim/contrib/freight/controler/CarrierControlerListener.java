@@ -28,10 +28,6 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -43,21 +39,13 @@ import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.replanning.GenericStrategyManager;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Controls the workflow of the simulation.
@@ -121,7 +109,7 @@ public class CarrierControlerListener implements StartupListener, ShutdownListen
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         Controler controler = event.getControler();
-        carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getNetwork(), carrierScoringFunctionFactory);
+        carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getScenario().getNetwork(), carrierScoringFunctionFactory);
         FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
         mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
         event.getControler().setMobsimFactory(mobsimFactory);

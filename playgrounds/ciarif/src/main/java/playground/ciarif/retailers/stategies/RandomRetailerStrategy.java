@@ -19,9 +19,6 @@
 
 package playground.ciarif.retailers.stategies;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,9 +26,11 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 public class RandomRetailerStrategy extends RetailerStrategyImpl
 {
@@ -54,7 +53,7 @@ public class RandomRetailerStrategy extends RetailerStrategyImpl
 		{
 			int rd = MatsimRandom.getRandom().nextInt(freeLinks.size());
 			LinkRetailersImpl newLink =(LinkRetailersImpl) freeLinks.values().toArray()[rd];
-			LinkRetailersImpl oldLink = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(f.getLinkId()), controler.getNetwork(), 0.0, 0.0);
+            LinkRetailersImpl oldLink = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(f.getLinkId()), controler.getScenario().getNetwork(), 0.0, 0.0);
 			Utils.moveFacility((ActivityFacilityImpl) f,newLink);
 			freeLinks.put(oldLink.getId(),oldLink );
 			this.movedFacilities.put(f.getId(),f);

@@ -1,10 +1,5 @@
 package playground.balac.allcsmodestest.controler;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,13 +7,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
 import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
@@ -32,6 +22,11 @@ import playground.balac.taxiservice.config.TaxiserviceConfigGroup;
 import playground.balac.taxiservice.router.TaxiserviceRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class CarsharingWithTaxiControler extends Controler{
 
@@ -60,10 +55,10 @@ public class CarsharingWithTaxiControler extends Controler{
 	    modes.add("pt");
 	    modes.add("bike");
 	    modes.add("taxi");
-	    TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile", 
+        TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
 	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
 	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
-	    		modes, true, this.getNetwork());
+	    		modes, true, getScenario().getNetwork());
 	    this.addControlerListener(tripsAnalyzer);
 	    
 	    this.addControlerListener(new AllCSModesTestListener(this,

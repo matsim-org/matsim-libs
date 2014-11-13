@@ -20,10 +20,9 @@
 
 package org.matsim.contrib.cadyts.car;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,9 +60,9 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
@@ -192,12 +191,12 @@ public class CadytsCarIntegrationTest {
 		
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+        Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
+        Assert.assertEquals("Different number of nodes in network.", controler.getScenario().getNetwork().getNodes().size() , 15 );
 		
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-		
-		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size(), 5);
+
+        Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size(), 5);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().counts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		
 		//counts

@@ -230,8 +230,8 @@ public class MultiModalControlerListenerTest {
 		// controler listener that initializes the multi-modal simulation
 		MultiModalControlerListener listener = new MultiModalControlerListener();
 		controler.addControlerListener(listener);
-		
-		LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getNetwork());
+
+        LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
 		
 		controler.run();

@@ -67,7 +67,7 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
 
         GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan =
                 new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new BestPlanSelector<CarrierPlan, Carrier>());
-        planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, controler.getNetwork(), controler.getLinkTravelTimes()));
+        planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, controler.getScenario().getNetwork(), controler.getLinkTravelTimes()));
 
 
         GenericStrategyManager<CarrierPlan, Carrier> stratManager = new GenericStrategyManager<CarrierPlan, Carrier>();

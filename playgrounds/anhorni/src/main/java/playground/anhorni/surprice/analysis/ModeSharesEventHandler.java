@@ -18,13 +18,7 @@
  * *********************************************************************** */
 package playground.anhorni.surprice.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
@@ -45,9 +39,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import utils.Utils;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Collects and processes data on the mode shares, based on the traveled
@@ -72,7 +71,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		
 
 	public ModeSharesEventHandler(final Controler controler, String xy) {
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.xy = xy;
 		
 		if (this.xy.equals("times")) {

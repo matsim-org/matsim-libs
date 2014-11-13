@@ -28,7 +28,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.anhorni.surprice.AgentMemories;
 import playground.anhorni.surprice.Surprice;
 
@@ -53,14 +52,14 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 		
 	public ScoringFunction createNewScoringFunction(Person person) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-						
-		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getFacilities(), 
+
+        scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
+				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getScenario().getActivityFacilities(),
 				this.day));
-		
-		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
-				new CharyparNagelScoringParameters(config), 
-				this.controler.getNetwork(), 
+
+        scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
+				new CharyparNagelScoringParameters(config),
+                this.controler.getScenario().getNetwork(),
 				this.memories.getMemory(person.getId()),
 				this.day, (PersonImpl)person, 
 				(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));

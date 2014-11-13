@@ -1,8 +1,5 @@
 package playground.staheale.run;
 
-import java.util.TreeMap;
-
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
@@ -10,16 +7,16 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.staheale.miniscenario.AgentInteraction;
 import playground.staheale.occupancy.FacilitiesOccupancyCalculator;
 import playground.staheale.occupancy.FacilityOccupancy;
 import playground.staheale.scoring.AgentInteractionScoringFunctionFactory;
+
+import java.util.TreeMap;
 
 public class RunControler extends Controler {
 	private TreeMap<Id, FacilityOccupancy> facilityOccupancies = new TreeMap<Id, FacilityOccupancy>();;
@@ -59,8 +56,8 @@ public class RunControler extends Controler {
 		// get objects that are required as parameter for the AgentInteractionScoringFunctionFactory 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.getConfig().planCalcScore();
 
-		ActivityFacilities facilities = this.getFacilities();
-		Network network = this.getNetwork();
+        ActivityFacilities facilities = getScenario().getActivityFacilities();
+        Network network = getScenario().getNetwork();
 
 		// create the AgentInteractionScoringFunctionFactory
 		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(this, this.config, planCalcScoreConfigGroup,

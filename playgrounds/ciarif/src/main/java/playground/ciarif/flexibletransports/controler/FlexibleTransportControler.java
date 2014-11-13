@@ -25,17 +25,12 @@ import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.controler.listeners.CarSharingListener;
 import playground.ciarif.flexibletransports.controler.listeners.FtPopulationPreparation;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.router.FtCarSharingRouteFactory;
 import playground.ciarif.flexibletransports.router.FtTravelCostCalculatorFactory;
-import playground.ciarif.flexibletransports.router.PlansCalcRouteFT;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFtInfo;
 import playground.ciarif.flexibletransports.scenario.FtScenarioLoaderImpl;
 import playground.ciarif.flexibletransports.scoring.FtScoringFunctionFactory;
@@ -63,10 +58,10 @@ public final class FlexibleTransportControler extends Controler
    //super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
    super.config.addModule(this.ftConfigGroup);
 //
-    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), new PlanomatConfigGroup()));
-    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
-    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
-    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+      ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+      ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+      ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+      ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
 	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
   }
 
@@ -75,8 +70,6 @@ public final class FlexibleTransportControler extends Controler
 	if (!this.scenarioLoaded) {
 			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteFtInfo, this.ftConfigGroup);
 			loader.loadScenario();
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
 	}
   }
@@ -88,12 +81,12 @@ public final class FlexibleTransportControler extends Controler
 //      log.info("Using ftRouter");
 //      this.plansCalcRouteFtInfo.prepare(getNetwork());
 //    }
-	
-    FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
+
+      FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
       this.config, 
       this.ftConfigGroup, 
-      ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(), 
-      this.getFacilities(), network);
+      ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+              getScenario().getActivityFacilities(), getScenario().getNetwork());
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 
     FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);

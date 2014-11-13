@@ -71,8 +71,8 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		// create all analyzes
 		this.pAnalyzesList.add(new CountTripsPerMode());
 		this.pAnalyzesList.add(new CountVehPerMode());
-		this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getControler().getNetwork()));
-		this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getControler().getNetwork()));
+        this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getControler().getScenario().getNetwork()));
+        this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getControler().getScenario().getNetwork()));
 		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
 		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
 		this.pAnalyzesList.add(new AverageNumberOfStopsPerMode());
@@ -81,10 +81,10 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		this.pAnalyzesList.add(new AverageLoadPerDeparturePerMode());
 		this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
 		this.pAnalyzesList.add(new CountDeparturesPerMode());
-		
-		CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getControler().getNetwork());
+
+        CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getControler().getScenario().getNetwork());
 		this.pAnalyzesList.add(countPassengerMeterPerMode);
-		CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getControler().getNetwork());
+        CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getControler().getScenario().getNetwork());
 		this.pAnalyzesList.add(countCapacityMeterPerMode);
 		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
 		

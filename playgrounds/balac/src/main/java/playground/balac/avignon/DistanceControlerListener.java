@@ -1,8 +1,5 @@
 package playground.balac.avignon;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -17,6 +14,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 
 public class DistanceControlerListener implements StartupListener, IterationEndsListener {
@@ -182,7 +182,7 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 		
 		int number = 0;
 		int number1 = 0;
-		for (ActivityFacility f:controler.getFacilities().getFacilities().values()) {
+        for (ActivityFacility f: controler.getScenario().getActivityFacilities().getFacilities().values()) {
 			if (f.getActivityOptions().containsKey("shopgrocery") || f.getActivityOptions().containsKey("nongrocery")) number1++;
 			if (f.getActivityOptions().containsKey("shopgrocery"))
 				number++;

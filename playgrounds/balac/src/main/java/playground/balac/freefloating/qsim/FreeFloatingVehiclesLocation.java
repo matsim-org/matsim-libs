@@ -1,15 +1,15 @@
 package playground.balac.freefloating.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class FreeFloatingVehiclesLocation {
 	
@@ -21,7 +21,7 @@ public class FreeFloatingVehiclesLocation {
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
 
-	    for (Link l : controler.getNetwork().getLinks().values()) {
+        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
@@ -48,7 +48,7 @@ public class FreeFloatingVehiclesLocation {
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
 
-	    for (Link l : controler.getNetwork().getLinks().values()) {
+        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
@@ -64,8 +64,8 @@ public class FreeFloatingVehiclesLocation {
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
-	    
-	    	Link l = controler.getNetwork().getLinks().get(Id.create(arr[0], Link.class));
+
+            Link l = controler.getScenario().getNetwork().getLinks().get(Id.create(arr[0], Link.class));
 	    	ArrayList<String> vehIDs = new ArrayList<String>();
 	    	
 	    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {

@@ -20,14 +20,10 @@
 
 package playground.wrashid.PSF2;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
-
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.chargingSchemes.ActivityIntervalTracker_NonParallelizableHandler;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
@@ -35,6 +31,9 @@ import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMainta
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.GeneralLogObject;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public class ParametersPSF2 {
 
@@ -69,7 +68,7 @@ public class ParametersPSF2 {
 	public static boolean isEventsFileBasedControler=false;
 	
 	public static void initVehicleFleet(Controler controler){
-		ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
+        ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getScenario().getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
 	};
 	
 	public static void setAllowedChargingLocations(LinkedList<String> allowedChargingLocations){

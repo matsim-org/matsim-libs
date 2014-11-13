@@ -25,10 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.KTIControler;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
@@ -38,7 +34,6 @@ import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
-import playground.meisterk.kti.router.PlansCalcRouteKti;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
@@ -60,8 +55,8 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 
 		super.config.addModule(this.ktiConfigGroup);
 
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
@@ -71,20 +66,18 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 		if (!this.scenarioLoaded) {
 			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
 			loader.loadScenario();
-			this.network = this.scenarioData.getNetwork();
-			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
 		}
 	}
 
 	@Override
 	protected void setUp() {
-		
-		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+
+        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
 				getScenario(),
 				this.ktiConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-				this.getFacilities());
+                getScenario().getActivityFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
 		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);

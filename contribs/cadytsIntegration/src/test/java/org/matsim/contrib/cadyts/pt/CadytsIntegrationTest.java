@@ -20,10 +20,9 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,9 +63,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CadytsIntegrationTest {
 
@@ -178,13 +177,13 @@ public class CadytsIntegrationTest {
 
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+        Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
+        Assert.assertEquals("Different number of nodes in network.", controler.getScenario().getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
 		Assert.assertEquals("Num. of trLines is wrong.", 2, controler.getScenario().getTransitSchedule().getTransitLines().size() );
 		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
+        Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
@@ -317,13 +316,13 @@ public class CadytsIntegrationTest {
 
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+        Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
+        Assert.assertEquals("Different number of nodes in network.", controler.getScenario().getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
 		Assert.assertEquals("Num. of trLines is wrong.", 2, controler.getScenario().getTransitSchedule().getTransitLines().size()  );
 		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
+        Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
@@ -468,13 +467,13 @@ public class CadytsIntegrationTest {
 
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
-		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
-		Assert.assertEquals("Different number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
+        Assert.assertEquals("Different number of links in network.", controler.getScenario().getNetwork().getLinks().size() , 23 );
+        Assert.assertEquals("Different number of nodes in network.", controler.getScenario().getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
 		Assert.assertEquals("Num. of trLines is wrong.", 2, controler.getScenario().getTransitSchedule().getTransitLines().size() );
 		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
-		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
+        Assert.assertEquals("Num. of persons in population is wrong.", controler.getScenario().getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
 		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");

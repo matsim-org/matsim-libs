@@ -20,11 +20,6 @@
 
 package playground.yu.analysis;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -41,10 +36,14 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.counts.Counts;
-
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.io.SimpleWriter;
 import playground.yu.utils.math.SimpleStatistics;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class QVProfilControlerListener implements StartupListener,
 		AfterMobsimListener, ShutdownListener {
@@ -105,7 +104,7 @@ public class QVProfilControlerListener implements StartupListener,
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		Controler ctl = event.getControler();
 		VolumesAnalyzer va = ctl.getVolumes();/* default timeBin = 3600 */
-		Network net = ctl.getNetwork();
+        Network net = ctl.getScenario().getNetwork();
 
 		for (Id linkId : interestedLinkIds) {
 			// updates q, v
@@ -157,7 +156,7 @@ public class QVProfilControlerListener implements StartupListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler ctl = event.getControler();
-		Network net = ctl.getNetwork();
+        Network net = ctl.getScenario().getNetwork();
         Counts counts = (Counts) ctl.getScenario().getScenarioElement(Counts.ELEMENT_NAME);
 
 		// defines links, for which qv-diagrams will be created

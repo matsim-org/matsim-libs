@@ -20,9 +20,7 @@
 
 package playground.anhorni.locationchoice.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
@@ -40,7 +38,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrintShopAndLeisureLocations implements StartupListener, IterationEndsListener, ShutdownListener {
 
@@ -61,8 +60,8 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		
 		ArrayList<SimpleFeature> featuresShop = new ArrayList<SimpleFeature>();
 		ArrayList<SimpleFeature> featuresLeisure = new ArrayList<SimpleFeature>();
-		
-		Population plans = event.getControler().getPopulation();		
+
+        Population plans = event.getControler().getScenario().getPopulation();
 		for (Person person : plans.getPersons().values()) {
 			
 			Plan plan = person.getSelectedPlan();

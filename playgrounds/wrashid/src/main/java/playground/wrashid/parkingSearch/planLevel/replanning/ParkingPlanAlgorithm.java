@@ -134,9 +134,9 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		// =============================replaceParking===============		
 		
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
-		
-		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
-				(NetworkImpl) GlobalRegistry.controler.getNetwork());
+
+        replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
+				(NetworkImpl) GlobalRegistry.controler.getScenario().getNetwork());
 		
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		

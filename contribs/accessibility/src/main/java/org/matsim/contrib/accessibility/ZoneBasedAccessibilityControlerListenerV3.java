@@ -1,7 +1,5 @@
 package org.matsim.contrib.accessibility;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -20,6 +18,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
+
+import java.util.Map;
 
 /**
  *  improvements feb'12
@@ -130,7 +130,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 

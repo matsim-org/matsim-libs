@@ -1,7 +1,5 @@
 package playground.vbmh.vmParking;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -11,8 +9,9 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
+
+import java.util.Map;
 
 /**
  * Handles the AktivityStartEvent and starts the parking process; Same for the ActivityEndEvent; Additionally all the events of
@@ -46,8 +45,8 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// TODO Auto-generated method stub
 	
 		//Activitys zaehlen:
-		
-		Person person = parkControl.controller.getPopulation().getPersons().get(event.getPersonId());
+
+        Person person = parkControl.controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		
 		String legMode = null;
@@ -76,8 +75,8 @@ public class ParkHandler implements ActivityEndEventHandler, ActivityStartEventH
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
-		
-		Person person = parkControl.controller.getPopulation().getPersons().get(event.getPersonId());
+
+        Person person = parkControl.controller.getScenario().getPopulation().getPersons().get(event.getPersonId());
 		Map<String, Object> personAttributes = person.getCustomAttributes();
 		
 		

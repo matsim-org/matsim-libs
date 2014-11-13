@@ -1,29 +1,18 @@
 package playground.wrashid.parkingChoice;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.wrashid.lib.tools.network.obj.RectangularArea;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
@@ -31,10 +20,10 @@ import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.apiDefImpl.ShortestWalkingDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
-import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
-import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 public class ParkingManager implements StartupListener {
 
@@ -185,7 +174,7 @@ public class ParkingManager implements StartupListener {
 		parkingCollection = null;
 
 		// initialize parking occupations
-		for (Person person : controler.getPopulation().getPersons().values()) {
+        for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			initializePersonForParking(person);
 		}
 	}
@@ -204,8 +193,8 @@ public class ParkingManager implements StartupListener {
 		if (agentHasNoCarLeg(lastActivityInfo)){
 			return;
 		}
-		
-		ActivityFacility activityFacility = controler.getFacilities().getFacilities().get(lastActivityInfo.getFacilityId());
+
+        ActivityFacility activityFacility = controler.getScenario().getActivityFacilities().getFacilities().get(lastActivityInfo.getFacilityId());
 
 		Coord activityCoord = activityFacility.getCoord();
 

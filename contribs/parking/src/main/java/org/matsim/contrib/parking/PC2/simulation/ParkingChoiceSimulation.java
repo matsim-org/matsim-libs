@@ -19,10 +19,6 @@
 
 package org.matsim.contrib.parking.PC2.simulation;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -47,6 +43,9 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class ParkingChoiceSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler, BeforeMobsimListener {
 
@@ -164,7 +163,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	}
 
 	private boolean isFirstCarDepartureOfDay(Id personId) {
-		Person person = controler.getPopulation().getPersons().get(personId);
+        Person person = controler.getScenario().getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		for (int i=currentPlanElementIndex.get(personId)-1;i>=0;i--){
 			if (planElements.get(i) instanceof LegImpl){
@@ -189,7 +188,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 		Id personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
 			ParkingOperationRequestAttributes parkingAttributes =new ParkingOperationRequestAttributes();
-			Link link = controler.getNetwork().getLinks().get(event.getLinkId());
+            Link link = controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
 			ActivityImpl nextActivity = getNextActivity(personId);
 			
 			parkingAttributes.destCoordinate=link.getCoord();
@@ -225,7 +224,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	
 	// TODO: operation could be made faster through caching.
 	private boolean isLastCarLegOfDay(Id personId){
-		Person person = controler.getPopulation().getPersons().get(personId);
+        Person person = controler.getScenario().getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
 			if (planElements.get(i) instanceof LegImpl){
@@ -241,7 +240,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	}
 	
 	private ActivityImpl getActivityBeforeNextCarLeg(Id personId){
-		Person person = controler.getPopulation().getPersons().get(personId);
+        Person person = controler.getScenario().getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		int indexOfNextCarLeg=-1;
 		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
@@ -266,7 +265,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 	}
 	
 	private ActivityImpl getNextActivity(Id personId){
-		Person person = controler.getPopulation().getPersons().get(personId);
+        Person person = controler.getScenario().getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
 		for (int i=currentPlanElementIndex.get(personId);i<planElements.size();i++){
 			if (planElements.get(i) instanceof ActivityImpl){
@@ -280,8 +279,8 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 		currentPlanElementIndex=new IntegerValueHashMap<Id>();
 		parkingOperationRequestAttributes=new HashMap<Id, ParkingOperationRequestAttributes>();
 		firstDepartureTimeOfDay=new DoubleValueHashMap<Id>();
-		
-		for (Person person:controler.getPopulation().getPersons().values()){
+
+        for (Person person: controler.getScenario().getPopulation().getPersons().values()){
 			if (hasCarLeg(person.getSelectedPlan())){
 				DebugLib.traceAgent(person.getId());
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();

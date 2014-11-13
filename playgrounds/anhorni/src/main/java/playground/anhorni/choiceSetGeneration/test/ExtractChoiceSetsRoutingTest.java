@@ -55,7 +55,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 
 	protected void computeChoiceSet(Controler controler) {
 
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		Link link0 = NetworkUtils.getNearestLink(network, new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new ActivityImpl("home", link0.getId());

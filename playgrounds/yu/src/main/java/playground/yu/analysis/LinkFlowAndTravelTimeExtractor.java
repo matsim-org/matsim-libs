@@ -31,7 +31,6 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
 import playground.yu.utils.io.SimpleWriter;
 
 public class LinkFlowAndTravelTimeExtractor implements AfterMobsimListener,
@@ -123,8 +122,8 @@ public class LinkFlowAndTravelTimeExtractor implements AfterMobsimListener,
 
 	public static void main(String[] args) {
 		Controler controler = new Controler(args[0]);
-		controler.addControlerListener(new LinkFlowAndTravelTimeExtractor(3600,
-				30 * 3600, controler.getNetwork(), controler.getConfig()
+        controler.addControlerListener(new LinkFlowAndTravelTimeExtractor(3600,
+				30 * 3600, controler.getScenario().getNetwork(), controler.getConfig()
 						.travelTimeCalculator()));
 		controler.setOverwriteFiles(true);
 		controler.run();

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.ivt.teaching;
 
-import java.io.File;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,9 +35,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+
+import java.io.File;
 
 /**
  * @author thibautd
@@ -93,9 +92,9 @@ public class RunZurichScenario {
 	}
 
 	private static void connectFacilitiesWithNetwork(Controler controler) {
-		ActivityFacilities facilities = controler.getFacilities();
+        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		//log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

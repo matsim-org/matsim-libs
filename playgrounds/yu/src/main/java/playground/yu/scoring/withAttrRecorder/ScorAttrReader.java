@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.yu.scoring.withAttrRecorder;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,8 +29,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-
 import playground.yu.integration.cadyts.CalibrationConfig;
+
+import java.util.Map;
 
 /**
  * reads scoring function attributes from scorAttr file, and saves them in
@@ -91,7 +90,7 @@ public class ScorAttrReader implements TabularFileHandler {
 			if (scorAttrFilename != null) {
 				System.out
 						.println("BEGINNING of loading scoring function attributes for each plan.");
-				new ScorAttrReader(scorAttrFilename, ctl.getPopulation())
+                new ScorAttrReader(scorAttrFilename, ctl.getScenario().getPopulation())
 						.parser();
 				System.out
 						.println("ENDING of loading scoring function attributes.");

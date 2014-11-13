@@ -41,8 +41,8 @@ public class Memorizer implements ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		Controler controler = event.getControler();		
-		Population population = controler.getPopulation();
+		Controler controler = event.getControler();
+        Population population = controler.getScenario().getPopulation();
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			if (this.memories.getMemory(person.getId()) == null) {

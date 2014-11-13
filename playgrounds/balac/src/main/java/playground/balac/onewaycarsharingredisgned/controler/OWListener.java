@@ -1,9 +1,5 @@
 package playground.balac.onewaycarsharingredisgned.controler;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -11,8 +7,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.onewaycarsharingredisgned.controler.OWEventsHandler.RentalInfoFF;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class OWListener implements StartupListener, IterationEndsListener, IterationStartsListener{
@@ -61,8 +60,8 @@ public class OWListener implements StartupListener, IterationEndsListener, Itera
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-		
-		owhandler = new OWEventsHandler(event.getControler().getNetwork());
+
+        owhandler = new OWEventsHandler(event.getControler().getScenario().getNetwork());
 
 		
 	}

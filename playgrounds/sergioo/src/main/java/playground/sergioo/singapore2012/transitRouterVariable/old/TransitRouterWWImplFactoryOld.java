@@ -44,7 +44,7 @@ public class TransitRouterWWImplFactoryOld implements TransitRouterFactory, Afte
 	
 	public TransitRouterWWImplFactoryOld(final TransitRouterConfig config, final Controler controler, final WaitTimeOld waitTime) {
 		this.config = config;
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 		this.waitTime = waitTime;
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);

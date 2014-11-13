@@ -20,13 +20,7 @@
 
 package playground.anhorni.locationchoice.analysis;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -34,8 +28,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.anhorni.locationchoice.preprocess.plans.modifications.DistanceBins;
+
+import java.util.List;
 
 /**
  * @author anhorni
@@ -48,7 +43,7 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		this.population = event.getControler().getPopulation();
+        this.population = event.getControler().getScenario().getPopulation();
 	}
 
 	@Override

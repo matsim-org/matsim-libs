@@ -1,21 +1,17 @@
 package playground.vbmh.vmEV;
 
-import java.io.File;
-import java.util.Map;
-
-import javax.xml.bind.JAXB;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
-
 import playground.vbmh.controler.VMConfig;
 import playground.vbmh.vmParking.ParkHistoryWriter;
-import playground.vbmh.vmParking.ParkingMap;
 import playground.vbmh.vmParking.VMScoreKeeper;
+
+import javax.xml.bind.JAXB;
+import java.io.File;
+import java.util.Map;
 /**
  * 
  * Manages charging and energy Consumption of EVs etc.
@@ -50,10 +46,10 @@ public class EVControl {
 		} else{
 			return;
 		}
-		
-		Link link = controler.getNetwork().getLinks().get(event.getLinkId());
+
+        Link link = controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
 		double time = event.getTime();
-		Map<String, Object> personAttributes = controler.getPopulation().getPersons().get(personID).getCustomAttributes();
+        Map<String, Object> personAttributes = controler.getScenario().getPopulation().getPersons().get(personID).getCustomAttributes();
 		VMScoreKeeper scorekeeper;
 		if (personAttributes.get("VMScoreKeeper")!= null){
 			scorekeeper = (VMScoreKeeper) personAttributes.get("VMScoreKeeper");

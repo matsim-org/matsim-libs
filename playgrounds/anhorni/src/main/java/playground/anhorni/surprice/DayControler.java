@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
@@ -44,10 +43,10 @@ public class DayControler extends Controler {
 		this.day = day;
 		this.preferences = preferences;
 		this.populationPreviousDay = populationPreviousDay;
-		
-		this.setScoringFunctionFactory(
+
+        this.setScoringFunctionFactory(
 				new SurpriceScoringFunctionFactory(
-			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences)
+			  			this, this.config.planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
 				);
 	} 
 				

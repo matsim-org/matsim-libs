@@ -1,9 +1,5 @@
 package playground.andreas.aas.modules.cellBasedAccessibility;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -17,7 +13,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
-
 import playground.andreas.aas.modules.cellBasedAccessibility.constants.InternalConstants;
 import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelDistanceCalculator;
@@ -33,6 +28,10 @@ import playground.andreas.aas.modules.cellBasedAccessibility.utils.io.writer.Ana
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.io.writer.UrbanSimParcelCSVWriter;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.misc.ProgressBar;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.network.NetworkUtil;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * improvements sep'11:
@@ -164,8 +163,8 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		LeastCostPathTree lcptCongestedCarTravelTime = new LeastCostPathTree( ttc, new TravelTimeCostCalculator(ttc) );
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttc, new TravelDistanceCalculator());
-		
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");

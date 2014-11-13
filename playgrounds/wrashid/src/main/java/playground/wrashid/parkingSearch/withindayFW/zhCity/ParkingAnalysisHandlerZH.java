@@ -19,12 +19,6 @@
 
 package playground.wrashid.parkingSearch.withindayFW.zhCity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,7 +32,6 @@ import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.controler.Controler;
-
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -48,6 +41,8 @@ import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHand
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
+
+import java.util.*;
 
 public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
@@ -554,7 +549,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	@Override
 	public void printShareOfCarUsers() {
-		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		int numberOfPerson = persons.size();
 		int numberOfCarUsers = 0;
 		for (Person person : persons.values()) {

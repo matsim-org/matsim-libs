@@ -32,7 +32,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-
 import playground.dgrether.linkanalysis.InOutGraphWriter;
 import playground.dgrether.linkanalysis.TTGraphWriter;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
@@ -116,7 +115,7 @@ public class CMCFRunnerNoReroute {
 			
 			
 			controler.run();
-			Network net = controler.getNetwork();
+            Network net = controler.getScenario().getNetwork();
 			Link link2 = net.getLinks().get(Id.create("2", Link.class));
 			Link link3 = net.getLinks().get(Id.create("3", Link.class));
 			Link link4 = net.getLinks().get(Id.create("4", Link.class));

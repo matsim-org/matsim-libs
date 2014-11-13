@@ -19,24 +19,12 @@
 
 package playground.yu.tests;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -48,20 +36,14 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.yu.utils.io.SimpleWriter;
+
+import java.util.*;
 
 /**
  * this class contains some codes from ChangeLegMode
@@ -721,7 +703,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			// int itr = event.getIteration();
 
 			// get the leg modes of the selected plan of the first Person
-			for (Person p : ctl.getPopulation().getPersons().values()) {
+            for (Person p : ctl.getScenario().getPopulation().getPersons().values()) {
 				StringBuilder legChainModes = new StringBuilder("|");
 				for (PlanElement pe : p.getSelectedPlan()
 						.getPlanElements()) {

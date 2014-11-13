@@ -19,18 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether.designdrafts.activityendtimes;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Iterator;
 
 
 /**
@@ -44,7 +40,7 @@ public class CalculateActivityEndTimesControllerListener implements StartupListe
 
 	public void notifyStartup(StartupEvent event) {
 		log.info("calculating missing end times of Activities...");
-		Population pop = event.getControler().getPopulation();
+        Population pop = event.getControler().getScenario().getPopulation();
 		for (Person person : pop.getPersons().values()){
 			for (Plan plan : person.getPlans()) {
 				Iterator<PlanElement> it  = plan.getPlanElements().iterator();

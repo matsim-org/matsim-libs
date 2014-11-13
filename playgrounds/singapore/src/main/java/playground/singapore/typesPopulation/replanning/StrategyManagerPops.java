@@ -1,10 +1,5 @@
 package playground.singapore.typesPopulation.replanning;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -19,8 +14,12 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-
 import playground.singapore.typesPopulation.population.PersonImplPops;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class StrategyManagerPops extends StrategyManager implements BeforeMobsimListener {
 	
@@ -187,7 +186,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			int max = getMaxPlansPerAgent(((PersonImplPops)person).getPopulationId());
 			if (max>0 && person.getPlans().size()>max)
 				removePlans((PersonImplPops) person, max);

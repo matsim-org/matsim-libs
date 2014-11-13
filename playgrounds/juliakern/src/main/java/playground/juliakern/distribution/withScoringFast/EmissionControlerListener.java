@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoringFast;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,12 +38,14 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
 import playground.juliakern.distribution.EmActivity;
 import playground.juliakern.distribution.EmPerCell;
 import playground.juliakern.distribution.GridTools;
 import playground.juliakern.newInternalization.IntervalHandler;
 import playground.juliakern.responsibilityOffline.EmCarTrip;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author benjamin
@@ -95,8 +94,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	public EmissionControlerListener(Controler controler) {
 		this.controler = controler;
-		setMinMax(controler.getNetwork());
-		this.gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+        setMinMax(controler.getScenario().getNetwork());
+        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);

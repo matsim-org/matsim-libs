@@ -34,8 +34,8 @@ public class TimeModeChooserModule extends AbstractMultithreadedModule {
 	public TimeModeChooserModule(final Controler controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
-		delay = new DepartureDelayAverageCalculator(
-				controler.getNetwork(),
+        delay = new DepartureDelayAverageCalculator(
+                controler.getScenario().getNetwork(),
 				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 	}
 

@@ -10,20 +10,10 @@
 
 package playground.qvanheerden.freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
@@ -55,10 +45,12 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.southafrica.utilities.Header;
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class MyCarrierSimulation {
@@ -248,7 +240,7 @@ public class MyCarrierSimulation {
 	//freight part from sschroeder/usecases/chessboard/RunPassengerAlongWithCarrier
 	public void prepareFreightOutput(Controler controler, final Carriers carriers) {
 		final LegHistogram freightOnly = new LegHistogram(900);
-		freightOnly.setPopulation(controler.getPopulation());
+        freightOnly.setPopulation(controler.getScenario().getPopulation());
 		freightOnly.setInclPop(false);
 
 		CarrierScoreStats scores = new CarrierScoreStats(carriers, "output/carrier_scores", true);

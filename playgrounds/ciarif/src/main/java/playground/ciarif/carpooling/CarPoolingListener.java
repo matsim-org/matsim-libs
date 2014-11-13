@@ -1,16 +1,11 @@
 package playground.ciarif.carpooling;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
-
 import playground.ciarif.retailers.stategies.GravityModelRetailerStrategy;
 
 public class CarPoolingListener implements IterationEndsListener {
@@ -42,7 +37,7 @@ public class CarPoolingListener implements IterationEndsListener {
 
 	private void plansAnalyzer() {
 		CarPoolingTripsWriter cptw = new CarPoolingTripsWriter(this.outputTripsFile);
-		for (Person p:controler.getPopulation().getPersons().values()){
+        for (Person p: controler.getScenario().getPopulation().getPersons().values()){
 			log.info("PERSON " + p.getId() );
 			Plan plan = p.getSelectedPlan();
 			int tripNumber = 0;

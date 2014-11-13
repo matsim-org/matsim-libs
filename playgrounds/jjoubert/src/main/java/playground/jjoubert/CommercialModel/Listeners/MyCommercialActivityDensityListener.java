@@ -20,16 +20,16 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class MyCommercialActivityDensityListener implements IterationStartsListener, IterationEndsListener{
 	
@@ -56,8 +56,8 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		Network nw = event.getControler().getNetwork();
+
+        Network nw = event.getControler().getScenario().getNetwork();
 		this.cs = new MyCommercialActivityDensityWriter(this.outputCommercialActivityDensity, nw);
 		event.getControler().getEvents().addHandler(this.cs);
 	}	

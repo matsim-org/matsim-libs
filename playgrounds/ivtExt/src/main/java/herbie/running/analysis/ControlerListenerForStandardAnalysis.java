@@ -1,19 +1,8 @@
 package herbie.running.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -26,8 +15,14 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
-
 import utils.Bins;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -209,11 +204,11 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 	 * @param controler
 	 */
 	private void calculateTravelDistanceDistributionByMode(Controler controler) {
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		
 		travelDistanceDistributionByMode = new TreeMap<String, Bins>();
-		
-		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
+
+        Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		
 		for (Id<Person> id : persons.keySet()) {
 			run(persons.get(id).getSelectedPlan());

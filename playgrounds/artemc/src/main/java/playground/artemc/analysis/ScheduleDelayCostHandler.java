@@ -1,32 +1,13 @@
 package playground.artemc.analysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
@@ -36,12 +17,16 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoring.DisaggregatedSumScoringFunction;
 import playground.artemc.scoring.functions.ActivityUtilityParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 
 
@@ -125,7 +110,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 
 			//Calcualte free flow travel time for the corresponding Leg from the selected plan 
 			int numberOfActivities = personActivities.get(personId).size();
-			PlanElement planElement = controler.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2*numberOfActivities-1);
+            PlanElement planElement = controler.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2*numberOfActivities-1);
 			if(planElement instanceof Leg){
 				journeys.get(personId).currentLegFromPlan = (Leg) planElement;	
 				journeys.get(personId).currentLegFromPlan.setTravelTime(getFreeSpeedTravelTime((Leg) planElement));
@@ -419,7 +404,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		if(leg.getMode().equals(TransportMode.car)){
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			for(Id<Link> link:route.getLinkIds()){
-				freeSpeedTravelTime += (controler.getNetwork().getLinks().get(link).getLength() / controler.getNetwork().getLinks().get(link).getFreespeed());
+                freeSpeedTravelTime += (controler.getScenario().getNetwork().getLinks().get(link).getLength() / controler.getScenario().getNetwork().getLinks().get(link).getFreespeed());
 			}
 		}
 		else if(leg.getMode().equals(TransportMode.pt)){

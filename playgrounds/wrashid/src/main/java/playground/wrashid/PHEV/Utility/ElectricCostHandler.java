@@ -1,24 +1,15 @@
 package playground.wrashid.PHEV.Utility;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 
 //TODO: write tests for this class
 
@@ -108,7 +99,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		// for some strange reason, the links, person are not set using the DES
 		// controller
-		Link link = controler2.getNetwork().getLinks().get(event.getLinkId());
+        Link link = controler2.getScenario().getNetwork().getLinks().get(event.getLinkId());
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
 ////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));

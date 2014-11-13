@@ -1,18 +1,17 @@
 package playground.balac.retailers.strategies;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.balac.retailers.data.FacilityRetailersImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 
@@ -41,7 +40,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		for (ActivityFacility f : facilities.values()) {
 			
 			double[] utils = new double[alternatives];
-			Link[] links = controler.getNetwork().getLinks().values().toArray(new Link[controler.getNetwork().getLinks().size()]);
+            Link[] links = controler.getScenario().getNetwork().getLinks().values().toArray(new Link[controler.getScenario().getNetwork().getLinks().size()]);
 			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
 			double[] currentlink_volumes = controler.getLinkStats().getAvgLinkVolumes(f.getLinkId());
 			ArrayList<Id> newLinkIds = new ArrayList<Id>(); 
@@ -68,7 +67,7 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 			double [] probs = calcLogitProbability(utils);
 			for (int k=0;k<probs.length;k++) {
 				if (r<=probs [k]) {
-					Link l = this.controler.getNetwork().getLinks().get(newLinkIds.get(k));
+                    Link l = this.controler.getScenario().getNetwork().getLinks().get(newLinkIds.get(k));
 					((ActivityFacilityImpl) f).setCoord(l.getCoord());
 					this.movedFacilities.put(f.getId(),f);
 				}

@@ -1,10 +1,5 @@
 package playground.balac.retailers.models;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -14,11 +9,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.PersonPrimaryActivity;
 import playground.balac.retailers.data.PersonRetailersImpl;
 import playground.balac.retailers.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class MaxActivityModel extends RetailerModelImpl
@@ -31,10 +30,10 @@ public class MaxActivityModel extends RetailerModelImpl
   {
     this.controler = controler;
     this.retailerFacilities = retailerFacilities;
-    this.controlerFacilities = this.controler.getFacilities();
+      this.controlerFacilities = this.controler.getScenario().getActivityFacilities();
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
-    for (Person p : controler.getPopulation().getPersons().values()) {
+      for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
       PersonImpl pi = (PersonImpl)p;
       this.persons.put(pi.getId(), pi);
     }
@@ -58,7 +57,7 @@ public class MaxActivityModel extends RetailerModelImpl
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
       String linkId = this.first.get(i);
 
-      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
       Collection<ActivityFacility> shops = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 1000.0D);
 

@@ -18,19 +18,6 @@
  * *********************************************************************** */
 package playground.vsp.buildingEnergy;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,10 +33,16 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzer;
 import playground.vsp.analysis.modules.simpleTripAnalyzer.Traveller;
 import playground.vsp.analysis.modules.simpleTripAnalyzer.Trip;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 /**
@@ -160,7 +153,7 @@ public abstract class BuildingEnergyRunnerMain {
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			if(event.getIteration() == event.getControler().getConfig().controler().getLastIteration()){
-				analyzer.run(event.getControler().getPopulation());
+                analyzer.run(event.getControler().getScenario().getPopulation());
 				String path = event.getControler().getControlerIO().getOutputPath() + System.getProperty("file.separator");
 				String prefix = event.getControler().getConfig().controler().getRunId() + ".";
 				analyzer.dumpData(path, prefix);

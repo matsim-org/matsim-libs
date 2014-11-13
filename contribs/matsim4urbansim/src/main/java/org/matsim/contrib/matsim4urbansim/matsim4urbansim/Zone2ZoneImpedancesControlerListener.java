@@ -19,12 +19,6 @@
 
 package org.matsim.contrib.matsim4urbansim.matsim4urbansim;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,6 +53,12 @@ import org.matsim.matrices.Matrix;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).
@@ -146,8 +146,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
-		
-		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
+
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double depatureTime = 8.*3600;
 		
 		// od-trip matrix (zonal based)

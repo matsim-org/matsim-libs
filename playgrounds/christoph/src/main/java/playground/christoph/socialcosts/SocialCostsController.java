@@ -20,18 +20,11 @@
 
 package playground.christoph.socialcosts;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -43,6 +36,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * E
@@ -132,7 +128,7 @@ public class SocialCostsController {
 			Controler controler = event.getControler();
 			
 			// initialize the social costs calculator
-			SocialCostCalculator scc = new SocialCostCalculator(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes());
+            SocialCostCalculator scc = new SocialCostCalculator(controler.getScenario().getNetwork(), controler.getEvents(), controler.getLinkTravelTimes());
 			controler.addControlerListener(scc);
 			controler.getEvents().addHandler(scc);
 			

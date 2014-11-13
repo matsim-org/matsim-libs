@@ -19,21 +19,20 @@
 
 package playground.balac.retailers.strategies;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-
 import playground.balac.retailers.RetailerGA.RunRetailerGA;
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.models.MaxActivityModel;
 import playground.balac.retailers.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
@@ -72,7 +71,7 @@ public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
     for (ActivityFacilityImpl af : this.retailerFacilities.values())
     {
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
-        Utils.moveFacility(af, this.controler.getNetwork().getLinks().get(Id.create(first.get(solution.get(count)), Link.class)));
+          Utils.moveFacility(af, this.controler.getScenario().getNetwork().getLinks().get(Id.create(first.get(solution.get(count)), Link.class)));
         log.info("The facility " + af.getId() + " has been moved");
         this.movedFacilities.put(af.getId(), af);
         log.info("Link Id after = " + af.getLinkId());

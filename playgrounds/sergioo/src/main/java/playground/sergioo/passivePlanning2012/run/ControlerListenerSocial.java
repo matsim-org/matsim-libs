@@ -65,14 +65,14 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 	//@Override
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getControler().getNetwork());
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getControler().getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
 		for(ActivityFacility facility:((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
-		Map<Id<Person>, ? extends Person> persons = event.getControler().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		/*boolean fixedTypes = event.getControler().getConfig().locationchoice().getFlexibleTypes()==null ||event.getControler().getConfig().locationchoice().getFlexibleTypes().equals("");
 		String[] types = fixedTypes?new String[]{"home", "work"}:event.getControler().getConfig().locationchoice().getFlexibleTypes().split(", ");
@@ -93,8 +93,8 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 			toBeAdded.add(BasePersonImpl.convertToBasePerson((PersonImpl) person));
 			//toBeAdded.add(BasePersonImpl.getBasePerson(fixedTypes, types, (PersonImpl)person, tripRouterFactory.createTripRouter(), ((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities()));
 		for(Person person:toBeAdded) {
-			event.getControler().getPopulation().getPersons().remove(person.getId());
-			event.getControler().getPopulation().addPerson(person);
+            event.getControler().getScenario().getPopulation().getPersons().remove(person.getId());
+            event.getControler().getScenario().getPopulation().addPerson(person);
 		}
 	}
 	@Override

@@ -113,7 +113,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.globalPaxHandler = new CountPPaxHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.globalPaxHandler);

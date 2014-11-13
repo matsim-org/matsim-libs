@@ -1,7 +1,5 @@
 package playground.wrashid.ABMT.vehicleShare;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,11 +12,12 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import java.util.HashMap;
 
 public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 
@@ -32,7 +31,7 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 	private Controler controler;
 
 	public TollsManager(Controler controler) {
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 	}
 
@@ -51,7 +50,7 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 //				Plan plan=controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 //				System.out.println(VehicleInitializer.hasElectricVehicle.containsKey(event.getPersonId()));
 //			}
-			Person person=controler.getPopulation().getPersons().get(event.getPersonId());
+            Person person= controler.getScenario().getPopulation().getPersons().get(event.getPersonId());
 			
 			if (!VehicleInitializer.hasElectricVehicle.containsKey(person.getSelectedPlan())){
 				VehicleInitializer.initialize(person.getSelectedPlan());

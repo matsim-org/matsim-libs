@@ -1,9 +1,5 @@
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -15,11 +11,14 @@ import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
-
 import playground.wrashid.lib.obj.list.ListElementMarkForRemoval;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.scoring.ParkingTimeInfo;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class ParkingOccupancyMaintainer {
 
@@ -140,7 +139,7 @@ public class ParkingOccupancyMaintainer {
 	}
 
 	public void performInitializationsAfterLoadingControlerData() {
-		for (Person person : controler.getPopulation().getPersons().values()) {
+        for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			Id<ActivityFacility> firstParkingFacilityId = ParkingGeneralLib.getFirstParkingFacilityId(person.getSelectedPlan());
 			if (firstParkingFacilityId != null) {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
@@ -148,8 +147,8 @@ public class ParkingOccupancyMaintainer {
 			lastSelectedPlan.put(person.getId(), person.getSelectedPlan());
 			
 			// update parkingRelatedWalkDistance
-			
-			parkingRelatedWalkDistance.put(person.getId(), ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(person.getSelectedPlan(),controler.getFacilities()));
+
+            parkingRelatedWalkDistance.put(person.getId(), ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(person.getSelectedPlan(), controler.getScenario().getActivityFacilities()));
 		}
 	}
 

@@ -20,14 +20,7 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
@@ -68,35 +61,17 @@ import org.matsim.withinday.replanning.identifiers.filter.ActivityStartingFilter
 import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.*;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.christoph.analysis.PassengerVolumesAnalyzer;
-import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
-import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
-import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.analysis.DetailedAgentsTracker;
-import playground.christoph.evacuation.analysis.EvacuationTimePicture;
-import playground.christoph.evacuation.analysis.LinkVolumesWriter;
+import playground.christoph.evacuation.analysis.*;
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
-import playground.christoph.evacuation.mobsim.HouseholdDepartureManager;
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.ReplanningTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.*;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataWriter;
@@ -110,27 +85,18 @@ import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFacto
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.EvacuationPTTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeEvacuationCalculator;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JointDepartureCoordinator;
+import playground.christoph.evacuation.withinday.replanning.identifiers.*;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.*;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class EvacuationControlerListener implements StartupListener {
 
@@ -269,8 +235,8 @@ public class EvacuationControlerListener implements StartupListener {
 		this.jointDepartureCoordinator = new JointDepartureCoordinator(this.withinDayControlerListener.getMobsimDataProvider());
 		this.missedJointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.fixedOrderControlerListener.addControlerListener(this.missedJointDepartureWriter);
-		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(controler.getPopulation(),
+
+        this.informedHouseholdsTracker = new InformedHouseholdsTracker(controler.getScenario().getPopulation(),
 				((ScenarioImpl) controler.getScenario()).getHouseholds());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		controler.getEvents().addHandler(this.informedHouseholdsTracker);

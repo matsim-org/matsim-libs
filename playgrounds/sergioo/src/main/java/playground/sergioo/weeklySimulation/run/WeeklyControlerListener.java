@@ -25,7 +25,6 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -53,7 +52,7 @@ public class WeeklyControlerListener {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 		Controler controler = new Controler(scenario);
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getNetwork());
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);

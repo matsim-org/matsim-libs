@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.jbischoff.energy.controlers;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
+
+import java.util.HashMap;
 
 public class DisChargingControler extends AddHandlerAtStartupControler {
 
@@ -52,7 +52,7 @@ public class DisChargingControler extends AddHandlerAtStartupControler {
 	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles2) {
 		this.vehicles = vehicles2;
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
-		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
 		handlerGroup.addHandler(getEnergyConsumptionTracker());
 		addHandler(handlerGroup);		
 	}

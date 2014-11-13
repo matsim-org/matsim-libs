@@ -30,7 +30,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-
 import playground.yu.replanning.ControlerWithRemoveOldestPlan;
 
 /**
@@ -75,8 +74,8 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 			PlanCalcScoreConfigGroup scoringCfg = ctl.getConfig()
 					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.000245);
-			ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-					scoringCfg, event.getControler().getNetwork()));
+            ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
+					scoringCfg, event.getControler().getScenario().getNetwork()));
 		}
 	}
 

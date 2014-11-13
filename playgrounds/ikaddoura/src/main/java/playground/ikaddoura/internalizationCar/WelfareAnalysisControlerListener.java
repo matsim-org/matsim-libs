@@ -24,31 +24,25 @@
 
 package playground.ikaddoura.internalizationCar;
 
+import org.apache.log4j.Logger;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.charts.XYLineChart;
+import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
+import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.charts.XYLineChart;
-
-import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
-import playground.ikaddoura.analysis.extCost.TripInfoWriter;
-import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
-import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
-import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 
 /**
@@ -99,12 +93,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private void writeAnalysis(IterationEndsEvent event) {
 		
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, true);
-		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
+        this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
-		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, true);		
-		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getPopulation()));
+		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, true);
+        this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 

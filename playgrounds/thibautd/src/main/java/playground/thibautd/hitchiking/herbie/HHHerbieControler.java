@@ -25,7 +25,6 @@ import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -34,7 +33,6 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.router.TransitRouterConfig;
-
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
@@ -61,8 +59,6 @@ public class HHHerbieControler extends HitchHikingControler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.network = this.scenarioData.getNetwork();
-		this.population = this.scenarioData.getPopulation();
 		this.scenarioLoaded = true;
 	}
 
@@ -76,13 +72,13 @@ public class HHHerbieControler extends HitchHikingControler {
 			getScenario().addScenarioElement( FacilityPenalties.ELEMENT_NAME, facPenalties );
 		}
 
-		HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
+        HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
 				facPenalties.getFacilityPenalties(),
-				this.getFacilities(),
-				this.getNetwork());
+                    getScenario().getActivityFacilities(),
+                    getScenario().getNetwork());
 
 		this.setScoringFunctionFactory( herbieScoringFunctionFactory );
 				

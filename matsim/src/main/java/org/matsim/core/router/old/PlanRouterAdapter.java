@@ -93,9 +93,9 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 					controler.getConfig().planCalcScore());
 
         LeastCostPathCalculatorFactory factory = controler.getLeastCostPathCalculatorFactory();
-        Network network = controler.getNetwork();
+        Network network = controler.getScenario().getNetwork();
 		this.routeAlgo = factory.createPathCalculator(network, disutility, time);
-        PopulationFactory populationFactory = controler.getPopulation().getFactory();
+        PopulationFactory populationFactory = controler.getScenario().getPopulation().getFactory();
 		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 	}
 

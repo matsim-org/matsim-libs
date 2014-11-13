@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.population.PersonImpl;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
 
@@ -48,7 +47,7 @@ public class AfterScoringSelectedPlanScoreRestoreListener implements
 	private void restoreScores() {
 		HashMap<Id, Double> nSASS = c
 				.getNonSimulatedAgentSelectedPlanScores();
-		Map<Id<Person>, ? extends Person> persons = c.getMATSimControler().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = c.getMATSimControler().getScenario().getPopulation().getPersons();
 		// double selectedPlanScoreAvg = 0;
 		// int i = 0;
 		for (Id id : nSASS.keySet()) {

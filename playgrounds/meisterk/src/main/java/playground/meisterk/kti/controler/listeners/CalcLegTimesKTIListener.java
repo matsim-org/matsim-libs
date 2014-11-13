@@ -20,10 +20,6 @@
 
 package playground.meisterk.kti.controler.listeners;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -35,9 +31,12 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
-
 import playground.meisterk.org.matsim.analysis.CalcLegTimesKTI;
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.TreeMap;
 
 public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimListener, ShutdownListener, IterationEndsListener {
 
@@ -86,7 +85,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 			e.printStackTrace();
 		}
 
-		this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getPopulation(), iterationSummaryOut);
+        this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getScenario().getPopulation(), iterationSummaryOut);
 		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}

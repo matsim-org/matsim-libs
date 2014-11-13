@@ -20,12 +20,7 @@
 
 package playground.telaviv.analysis;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -73,8 +68,8 @@ public class ComparingDistanceStats implements IterationEndsListener {
 	
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
 		this.bins.clear();
-		
-		for (Person p : event.getControler().getPopulation().getPersons().values()) {
+
+        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
 			if (!this.isInteger(p.getId().toString()) ||
@@ -105,7 +100,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 						Route route = previousLeg.getRoute();
 						if (route instanceof NetworkRoute) {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = RouteUtils.calcDistance((NetworkRoute) route, event.getControler().getNetwork());
+							else distance = RouteUtils.calcDistance((NetworkRoute) route, event.getControler().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
 							else distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());

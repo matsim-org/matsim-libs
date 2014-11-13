@@ -20,10 +20,6 @@
 
 package playground.yu.tests;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -35,6 +31,10 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class JamTest extends Controler {
 
@@ -50,7 +50,7 @@ public class JamTest extends Controler {
 
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			c = event.getControler();
-			Network n = c.getNetwork();
+            Network n = c.getScenario().getNetwork();
 			try {
 				for (Id linkId : va.getLinkIds()) {
 					int[] v = va.getVolumesForLink(linkId);
@@ -68,7 +68,7 @@ public class JamTest extends Controler {
 		}
 
 		public void notifyStartup(StartupEvent event) {
-			va = new VolumesAnalyzer(3600, 3600 * 24 - 1, c.getNetwork());
+            va = new VolumesAnalyzer(3600, 3600 * 24 - 1, c.getScenario().getNetwork());
 			c.getEvents().addHandler(va);
 			try {
 				out = IOUtils

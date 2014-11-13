@@ -20,8 +20,6 @@
 
 package playground.andreas.itsumo;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,6 +50,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.run.Events2Snapshot;
+
+import java.io.File;
 
 
 public class MyControler1 extends Controler {
@@ -300,7 +300,7 @@ public class MyControler1 extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-			events2Snapshot.run(eventsFile, this.config, this.network);
+            events2Snapshot.run(eventsFile, this.config, getScenario().getNetwork());
 
 			// Run NetVis if possible
 			if (this.config.getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){

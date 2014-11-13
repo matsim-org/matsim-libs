@@ -20,16 +20,6 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -40,12 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -64,6 +49,13 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+
+import static org.junit.Assert.*;
+
 public class ControlerTest {
 
 	private final static Logger log = Logger.getLogger(ControlerTest.class);
@@ -72,11 +64,11 @@ public class ControlerTest {
 	@Test
 	public void testConstructor() {
 		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
-		assertNotNull(controler.getNetwork()); // is required, e.g. for changing the factories
-		assertNotNull(controler.getPopulation());
-		assertEquals(0, controler.getNetwork().getLinks().size());
-		assertEquals(0, controler.getNetwork().getNodes().size());
-		assertEquals(0, controler.getPopulation().getPersons().size());
+        assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
+        assertNotNull(controler.getScenario().getPopulation());
+        assertEquals(0, controler.getScenario().getNetwork().getLinks().size());
+        assertEquals(0, controler.getScenario().getNetwork().getNodes().size());
+        assertEquals(0, controler.getScenario().getPopulation().getPersons().size());
 		assertNotNull(controler.getEvents());
 	}
 

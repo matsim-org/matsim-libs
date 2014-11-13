@@ -36,7 +36,7 @@ public class ManageSubchainsTest extends MatsimTestCase {
 		initializer.init(this);
 		ManageSubchains manager = new ManageSubchains();
 
-		Plan plan = initializer.getControler().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
+        Plan plan = initializer.getControler().getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 		Activity act = ((PlanImpl) plan).getFirstActivity();
 		Leg leg = ((PlanImpl) plan).getNextLeg(act);
 		manager.primaryActivityFound(act, leg);

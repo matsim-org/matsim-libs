@@ -21,16 +21,13 @@ package playground.benjamin.scoring.income.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingScheme;
-
 import playground.benjamin.BkControler;
 import playground.benjamin.BkPaths;
 
@@ -69,7 +66,7 @@ public class BkControlerIncome extends BkControler {
 		
 		/*		Setting the needed scoring function.
 		Remark: parameters must be set in several classes and independently for scoring and router!*/
-		ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, this.getNetwork());
+        ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, getScenario().getNetwork());
 		
 		this.setScoringFunctionFactory(scoringFactory);
 		super.setUp();

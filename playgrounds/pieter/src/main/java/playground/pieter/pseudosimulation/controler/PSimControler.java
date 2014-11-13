@@ -66,12 +66,12 @@ public class PSimControler {
 		matsimControler.addControlerListener(new QSimScoreWriter(this));
 		matsimControler.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
 		matsimControler.addControlerListener(new AfterScoringSelectedPlanScoreRestoreListener(this));
-		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(matsimControler.getNetwork(),
+        this.carTravelTimeCalculator = new PSimTravelTimeCalculator(matsimControler.getScenario().getNetwork(),
 				matsimControler.getConfig().travelTimeCalculator(),70);
 		matsimControler.getEvents().addHandler(carTravelTimeCalculator);
 		if (matsimControler.getConfig().scenario().isUseTransit()) {
-			this.waitTimeCalculator = new PSimWaitTimeCalculator(
-					matsimControler.getPopulation(),
+            this.waitTimeCalculator = new PSimWaitTimeCalculator(
+                    matsimControler.getScenario().getPopulation(),
 					matsimControler.getScenario().getTransitSchedule(),
 					matsimControler.getConfig().travelTimeCalculator()
 							.getTraveltimeBinSize(),

@@ -68,9 +68,9 @@ public class PassengerControlerHandler implements StartupListener {
 		event.getControler().addControlerListener(jointDepartureWriter);
 		
 		RideToRidePassengerContextProvider rideToRidePassengerContextProvider = new RideToRidePassengerContextProvider();
-		
-		RideToRidePassengerAgentIdentifierFactory identifierFactory = 
-				new RideToRidePassengerAgentIdentifierFactory(event.getControler().getNetwork(), 
+
+        RideToRidePassengerAgentIdentifierFactory identifierFactory =
+				new RideToRidePassengerAgentIdentifierFactory(event.getControler().getScenario().getNetwork(),
 						this.withinDayControlerListener.getMobsimDataProvider(), 
 						rideToRidePassengerContextProvider, jointDepartureOrganizer);
 		InitialIdentifier identifier = identifierFactory.createIdentifier();

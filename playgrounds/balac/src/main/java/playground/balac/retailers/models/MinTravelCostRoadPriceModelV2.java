@@ -1,21 +1,12 @@
 package playground.balac.retailers.models;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -32,9 +23,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 
@@ -48,10 +43,10 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
   {
     this.controler = controler;
     this.retailerFacilities = retailerFacilities;
-    this.controlerFacilities = this.controler.getFacilities();
+      this.controlerFacilities = this.controler.getScenario().getActivityFacilities();
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
-    for (Person p : controler.getPopulation().getPersons().values()) {
+      for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
       PersonImpl pi = (PersonImpl)p;
       this.persons.put(pi.getId(), pi);
     }
@@ -74,7 +69,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
     //we need to do this with the plans and activities before and after shopping
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
         String linkId = this.first.get(i);
-        LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
         double centerX = 683217.0; 
         double centerY = 247300.0;
         CoordImpl coord = new CoordImpl(centerX, centerY);
@@ -87,7 +82,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
 			
 		}
         double score = 0.0;
-        for (Person person:controler.getPopulation().getPersons().values()) {
+        for (Person person: controler.getScenario().getPopulation().getPersons().values()) {
     	
         	double scoreTemp = 0.0;
         	boolean lastPrimaryActivityInside = false;
@@ -101,17 +96,17 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
     		
         		if (pe instanceof Activity) {
     			
-        			 if (!((Activity) pe).getType().equals("shopgrocery")) { 
-        				if (CoordUtils.calcDistance(controler.getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), coord) < 4000) 
+        			 if (!((Activity) pe).getType().equals("shopgrocery")) {
+                         if (CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), coord) < 4000)
         					lastPrimaryActivityInside = true;
         				else
             				lastPrimaryActivityInside = false;
-        				
-        					if(CoordUtils.calcDistance(controler.getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), link.getCoord()) < 3000) {
+
+                         if(CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), link.getCoord()) < 3000) {
     						
         						lastPrimaryActivityInsideCatchmentArea = true;
-    						
-        						linklpa = controler.getNetwork().getLinks().get(((Activity)pe).getLinkId());
+
+                             linklpa = controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId());
     						
         					}
         					else
@@ -129,17 +124,17 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
         					PlanElement pe1 = plan.getPlanElements().get(j);
         					if (pe1 instanceof Activity) {
         						if (((Activity) pe1).getType().equals("home") || ((Activity) pe1).getType().startsWith("work") || ((Activity) pe1).getType().startsWith("education") ||((Activity) pe1).getType().startsWith("leisure") ) {
-    							
-        							if (CoordUtils.calcDistance(controler.getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), coord) < 4000) {
+
+                                    if (CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), coord) < 4000) {
         								nextPrimaryActivityInside = true;
     		    					
         							}
         							else
         								nextPrimaryActivityInside = false;
-        							if(CoordUtils.calcDistance(controler.getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), link.getCoord()) < 3000) {
+                                    if(CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), link.getCoord()) < 3000) {
     	    						
         								nextPrimaryActivityInsideCatchmentArea = true;
-        								linknpa = controler.getNetwork().getLinks().get(((Activity)pe1).getLinkId());
+                                        linknpa = controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId());
         							}
         							else
         								nextPrimaryActivityInsideCatchmentArea = false;
@@ -156,7 +151,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
         				
         				if (lastPrimaryActivityInsideCatchmentArea) {
         					scoreTemp = 0;
-        					Network network = this.controler.getNetwork();
+                            Network network = this.controler.getScenario().getNetwork();
         					TravelTime travelTime = this.controler.getLinkTravelTimes();
         					TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
 
@@ -164,9 +159,9 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
 
         					LegImpl li = new LegImpl(TransportMode.car);
         					li.setDepartureTime(0.0D);
-        					handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(linklpa.getId()), network, routeAlgo);
+                            handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linklpa.getId()), network, routeAlgo);
 
-        					Plan plan1 = this.controler.getPopulation().getFactory().createPlan();
+                            Plan plan1 = this.controler.getScenario().getPopulation().getFactory().createPlan();
         					plan1.addActivity(null);
         					plan1.addLeg(li);
         					plan1.addActivity(null);
@@ -186,7 +181,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
         			
         				if (nextPrimaryActivityInsideCatchmentArea) {
         					scoreTemp = 0;
-        					Network network = this.controler.getNetwork();
+                            Network network = this.controler.getScenario().getNetwork();
         					TravelTime travelTime = this.controler.getLinkTravelTimes();
         					TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
 
@@ -194,9 +189,9 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
 
         					LegImpl li = new LegImpl(TransportMode.car);
         					li.setDepartureTime(0.0D);
-        					handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(linknpa.getId()), network, routeAlgo);
+                            handleCarLeg(li, link, this.controler.getScenario().getNetwork().getLinks().get(linknpa.getId()), network, routeAlgo);
 
-        					Plan plan1 = this.controler.getPopulation().getFactory().createPlan();
+                            Plan plan1 = this.controler.getScenario().getPopulation().getFactory().createPlan();
         					plan1.addActivity(null);
         					plan1.addLeg(li);
         					plan1.addActivity(null);
@@ -242,8 +237,8 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
   private void computePotentialCustomers() {
 	  for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
 	      String linkId = this.first.get(i);
-	     
-	      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+
+          LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	      
 	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	        

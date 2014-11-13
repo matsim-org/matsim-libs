@@ -19,10 +19,6 @@
 
 package playground.kai.urbansim;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
@@ -36,6 +32,10 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.LeastCostPathTree;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 /**
@@ -62,7 +62,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		TravelTime ttc = controler.getLinkTravelTimes();
 		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
-		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
+        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;
 
 		try {

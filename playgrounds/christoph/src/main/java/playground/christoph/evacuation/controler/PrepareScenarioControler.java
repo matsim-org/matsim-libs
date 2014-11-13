@@ -20,8 +20,6 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
@@ -39,17 +37,17 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.VehicleWriterV1;
-
 import playground.christoph.controler.KTIEnergyFlowsController;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+
+import java.util.Arrays;
 
 /**
  * Prepares a scenario to be run as evacuation simulation.
@@ -114,9 +112,9 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
-		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);		
-		
-		legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), this.getNetwork());
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
+
+        legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), getScenario().getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());

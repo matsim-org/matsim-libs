@@ -100,7 +100,7 @@ public abstract class Utils
     double maxx = (-1.0D / 0.0D);
     double maxy = (-1.0D / 0.0D);
 
-    for (Link l : controler.getNetwork().getLinks().values()) {
+      for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
       if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
       if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
       if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
@@ -109,8 +109,8 @@ public abstract class Utils
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
 
     QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-    for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-      ((ActivityFacilityImpl) f).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), f.getCoord()).getId());
+      for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
+          ((ActivityFacilityImpl) f).setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), f.getCoord()).getId());
       Coord c = f.getCoord();
       facilityQuadTree.put(c.getX(), c.getY(), f);
     }
@@ -123,7 +123,7 @@ public abstract class Utils
     double maxx = (-1.0D / 0.0D);
     double maxy = (-1.0D / 0.0D);
 
-    for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+      for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
       if (f.getCoord().getX() < minx) minx = f.getCoord().getX();
       if (f.getCoord().getY() < miny) miny = f.getCoord().getY();
       if (f.getCoord().getX() > maxx) maxx = f.getCoord().getX();
@@ -131,8 +131,8 @@ public abstract class Utils
     }
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<Person> personQuadTree = new QuadTree<Person>(minx, miny, maxx, maxy);
-    for (Person p : controler.getPopulation().getPersons().values()) {
-      Coord c = ((ActivityFacility)controler.getFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
+      for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
+        Coord c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
       personQuadTree.put(c.getX(), c.getY(), p);
     }
     log.info("PersonQuadTree has been created");
@@ -144,7 +144,7 @@ public abstract class Utils
     double maxx = (-1.0D / 0.0D);
     double maxy = (-1.0D / 0.0D);
 
-    for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+      for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
       if (f.getCoord().getX() < minx) minx = f.getCoord().getX();
       if (f.getCoord().getY() < miny) miny = f.getCoord().getY();
       if (f.getCoord().getX() > maxx) maxx = f.getCoord().getX();
@@ -152,7 +152,7 @@ public abstract class Utils
     }
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<ActivityFacility> shopsQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-    for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+      for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
       //log.info("activity options = " + f.getActivityOptions());
       if (f.getActivityOptions().containsKey("shopgrocery")) {
         Coord c = f.getCoord();
@@ -171,7 +171,7 @@ public abstract class Utils
     double maxx = (-1.0D / 0.0D);
     double maxy = (-1.0D / 0.0D);
 
-    for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
+      for (ActivityFacility f : controler.getScenario().getActivityFacilities().getFacilities().values()) {
       if (f.getCoord().getX() < minx) minx = f.getCoord().getX();
       if (f.getCoord().getY() < miny) miny = f.getCoord().getY();
       if (f.getCoord().getX() > maxx) maxx = f.getCoord().getX();
@@ -180,7 +180,7 @@ public abstract class Utils
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
     QuadTree<PersonPrimaryActivity> personPrimaryActivityQuadTree = new QuadTree<PersonPrimaryActivity>(minx, miny, maxx, maxy);
     i = 0;
-    for (Person p : controler.getPopulation().getPersons().values()) {
+      for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
       int primaryActivityCount = 0;
       boolean hasHome = false;
       boolean hasWork = false;
@@ -199,8 +199,8 @@ public abstract class Utils
 
             if (act.getType().equals("home")) {
               if (!(hasHome)) {
-                c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getNetwork()), act.getCoord())).getId();
+                  c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
+                  activityLink = (NetworkUtils.getNearestLink(((NetworkImpl) controler.getScenario().getNetwork()), act.getCoord())).getId();
                 //activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
@@ -212,8 +212,8 @@ public abstract class Utils
             }
             else if (act.getType().equals("work")) {
               if (!(hasWork)) {
-                c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
+                  c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
+                  activityLink = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
                 personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);
@@ -224,8 +224,8 @@ public abstract class Utils
             } else {
               if ((!(act.getType().equals("education"))) ||
                 (hasEducation)) continue;
-              c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-              activityLink = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
+                c = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getCoord();
+                activityLink = ((ActivityFacility) controler.getScenario().getActivityFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
               log.info("Act Link " + activityLink);
               ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
               ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);

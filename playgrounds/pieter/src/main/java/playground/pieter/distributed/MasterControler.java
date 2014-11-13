@@ -171,7 +171,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         //split the population to be sent to the slaves
 
-        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getPopulation().getPersons().values(), numSlaves);
+        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getScenario().getPopulation().getPersons().values(), numSlaves);
         int i = 0;
         for (int j : slaves.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
@@ -302,7 +302,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             waitForSlaveThreads();
             mergePlansFromSlaves();
             //this code is a copy of the replanning strategy
-            for (Person person : matsimControler.getPopulation().getPersons().values()) {
+            for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
                 person.removePlan(person.getSelectedPlan());
                 Plan plan = newPlans.get(person.getId().toString());
                 person.addPlan(plan);
@@ -632,7 +632,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
             slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
             for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
-                plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
+                plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getScenario().getPopulation()));
             }
         }
 

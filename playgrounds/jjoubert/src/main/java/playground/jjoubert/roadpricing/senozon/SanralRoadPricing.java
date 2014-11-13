@@ -36,12 +36,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.CalcAverageTolledTripLength;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
+import org.matsim.roadpricing.*;
 import playground.jjoubert.roadpricing.senozon.routing.SanralTravelDisutilityIncludingToll;
 import playground.jjoubert.roadpricing.senozon.scoring.SanralCalcPaidToll;
 
@@ -81,7 +76,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 		}
 
 		// add the events handler to calculate the tolls paid by agents
-		this.tollCalc = new SanralCalcPaidToll(controler.getNetwork(), this.scheme);
+        this.tollCalc = new SanralCalcPaidToll(controler.getScenario().getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.tollCalc);
 
 		// replace the travelCostCalculator with a toll-dependent one if required
@@ -101,7 +96,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 
-		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
+        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.cattl);
 	}
 

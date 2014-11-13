@@ -6,7 +6,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
 import playground.meisterk.kti.population.algorithms.PersonInvalidateScores;
@@ -24,7 +23,7 @@ public class FtPopulationPreparation implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 
-		Population pop = event.getControler().getPopulation();
+        Population pop = event.getControler().getScenario().getPopulation();
 		Config config = event.getControler().getConfig();
 		
 		/*

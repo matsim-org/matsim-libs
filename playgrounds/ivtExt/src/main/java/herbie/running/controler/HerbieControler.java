@@ -27,17 +27,14 @@ import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * Controler for the Herbie project.
@@ -62,19 +59,17 @@ public class HerbieControler extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.network = this.scenarioData.getNetwork();
-		this.population = this.scenarioData.getPopulation();
 		this.scenarioLoaded = true;
 	}
 
 	@Override
 	protected void setUp() {
-		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
+        HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-				this.getFacilities(),
-				this.getNetwork());
+                getScenario().getActivityFacilities(),
+                getScenario().getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());

@@ -47,7 +47,7 @@ public class MyControlerListener implements StartupListener, IterationStartsList
 	public void notifyStartup(StartupEvent event) {
 		 
 		// Wenn eine Person in ein Vehicle steigt, wirf MoneyEvent
-		this.moneyThrowEventHandler = new MoneyThrowEventHandler(event.getControler().getEvents(), event.getControler().getPopulation(), this.fare);
+        this.moneyThrowEventHandler = new MoneyThrowEventHandler(event.getControler().getEvents(), event.getControler().getScenario().getPopulation(), this.fare);
 		event.getControler().getEvents().addHandler(this.moneyThrowEventHandler);
 	
 		event.getControler().getEvents().addHandler(inVehWaitHandler);

@@ -20,14 +20,7 @@
 
 package org.matsim.contrib.analysis.christoph;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,7 +37,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Analyzes the average link travel times and writes them to files (absolute and
@@ -273,7 +272,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 		Controler controler = event.getControler();
 		Config config = controler.getConfig();
 		this.travelTime = controler.getLinkTravelTimes();
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.timeSlice = config.travelTimeCalculator().getTraveltimeBinSize();
 		int maxTime = 30 * 3600;	// default value from TravelTimeCalculator
 		this.numSlots = (maxTime / timeSlice) + 1;	

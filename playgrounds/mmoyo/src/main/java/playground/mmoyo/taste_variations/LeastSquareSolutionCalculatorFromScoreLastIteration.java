@@ -38,7 +38,7 @@ public class LeastSquareSolutionCalculatorFromScoreLastIteration implements Iter
 		if (   event.getIteration() == event.getControler().getConfig().controler().getLastIteration() ||  event.getIteration() ==10) {
 			System.err.println("calculating svd values.........");
 			MyLeastSquareSolutionCalculator lssCalculator = new MyLeastSquareSolutionCalculator(event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(), MyLeastSquareSolutionCalculator.SVD );
-			lssCalculator.run(event.getControler().getPopulation());
+            lssCalculator.run(event.getControler().getScenario().getPopulation());
 			String STR_Solutions = "SVDSolutions.xml.gz";
 			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_Solutions);
 			lssCalculator.writeSolutionObjAttr(filename);

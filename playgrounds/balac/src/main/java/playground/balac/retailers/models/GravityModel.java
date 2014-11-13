@@ -1,8 +1,5 @@
 package playground.balac.retailers.models;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -15,10 +12,12 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.balac.retailers.data.PersonRetailersImpl;
 import playground.balac.retailers.data.RetailZone;
 import playground.balac.retailers.data.RetailZones;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 public class GravityModel extends RetailerModelImpl
 {
@@ -41,10 +40,10 @@ public class GravityModel extends RetailerModelImpl
     this.controler = controler;
     log.info("Controler" + this.controler);
     this.retailerFacilities = retailerFacilities;
-    this.controlerFacilities = controler.getFacilities();
+      this.controlerFacilities = controler.getScenario().getActivityFacilities();
     this.shops = findScenarioShops(this.controlerFacilities.getFacilities().values());
 
-    for (Person p : controler.getPopulation().getPersons().values()) {
+      for (Person p : controler.getScenario().getPopulation().getPersons().values()) {
       PersonImpl pi = (PersonImpl)p;
       this.persons.put(pi.getId(), pi);
     }
@@ -78,7 +77,7 @@ public class GravityModel extends RetailerModelImpl
     for (ActivityFacility c : this.retailerFacilities.values())
     {
       String linkId = this.first.get(solution.get(a));
-      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
+        Coord coord = ((Link) this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
 
       double loc_likelihood = 0.0D;
 
@@ -105,7 +104,7 @@ public class GravityModel extends RetailerModelImpl
             for (ActivityFacility af : this.retailerFacilities.values()) {
               if (af.equals(s)) {
                 int index = count;
-                Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
+                  Coord coord1 = ((Link) this.controler.getScenario().getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
 
                 dist = ((ActivityFacilityImpl)firstFacility).calcDistance(coord1);
                 if (dist == 0.0D) {
@@ -174,7 +173,7 @@ public class GravityModel extends RetailerModelImpl
     for (ActivityFacility c : this.retailerFacilities.values())
     {
       String linkId = this.first.get(solution.get(a));
-      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
+        Coord coord = ((Link) this.controler.getScenario().getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
 
       double loc_likelihood = 0.0D;
       if (!(solution.get(a).equals(incumbentSolution.get(a))))
@@ -204,7 +203,7 @@ public class GravityModel extends RetailerModelImpl
                 this.operationCount += 1;
                 if (af.equals(s)) {
                   int index = count;
-                  Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
+                    Coord coord1 = ((Link) this.controler.getScenario().getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
                   dist = ((ActivityFacilityImpl)firstFacility).calcDistance(coord1);
                   if (dist == 0.0D) {
                     dist = 10.0D;

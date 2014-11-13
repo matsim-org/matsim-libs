@@ -63,24 +63,24 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler();
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getNetwork());
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
-		Map<Id<Person>, ? extends Person> persons = event.getControler().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
 		if(controler.getConfig().scenario().isUseTransit())
 			modes.add("pt");
-		for(Person person: controler.getPopulation().getPersons().values())
+        for(Person person: controler.getScenario().getPopulation().getPersons().values())
 			toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson((PersonImpl) person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));
 		for(Person person:toBeAdded) {
-			controler.getPopulation().getPersons().remove(person.getId());
-			controler.getPopulation().addPerson(person);
+            controler.getScenario().getPopulation().getPersons().remove(person.getId());
+            controler.getScenario().getPopulation().addPerson(person);
 		}
 	}
 	@Override

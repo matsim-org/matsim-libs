@@ -20,32 +20,6 @@
 
 package playground.christoph.oldenburg;
 
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.swing.AbstractButton;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
-import javax.swing.SwingWorker;
-import javax.swing.border.TitledBorder;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -54,6 +28,17 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class ConfigPanel extends JPanel {
 
@@ -682,7 +667,7 @@ public class ConfigPanel extends JPanel {
 			
 			int i = 0;
 			List<NetworkChangeEvent> adaptedChangeEvents = new ArrayList<NetworkChangeEvent>();
-			for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) controler.getNetwork()).getNetworkChangeEvents()) {
+            for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) controler.getScenario().getNetwork()).getNetworkChangeEvents()) {
 				
 				int selected = selection.get(i);
 				
@@ -695,8 +680,8 @@ public class ConfigPanel extends JPanel {
 				 *  4 ... link is activated 1 1/2 hour after the evacuation starts
 				 */
 				double time = DemoConfig.evacuationTime + (selected - 1) * 1800;
-				
-				NetworkChangeEvent newEvent = ((NetworkFactoryImpl) controler.getNetwork().getFactory()).createNetworkChangeEvent(time);
+
+                NetworkChangeEvent newEvent = ((NetworkFactoryImpl) controler.getScenario().getNetwork().getFactory()).createNetworkChangeEvent(time);
 				
 				// clone event parameter
 				for (Link link : networkChangeEvent.getLinks()) newEvent.addLink(link);
@@ -710,7 +695,7 @@ public class ConfigPanel extends JPanel {
 			}
 			
 			// replace network change events
-			((NetworkImpl) controler.getNetwork()).setNetworkChangeEvents(adaptedChangeEvents);			
+            ((NetworkImpl) controler.getScenario().getNetwork()).setNetworkChangeEvents(adaptedChangeEvents);
 		}
 		
         /*

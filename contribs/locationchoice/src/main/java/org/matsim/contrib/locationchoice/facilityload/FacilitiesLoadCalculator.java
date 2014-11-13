@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.locationchoice.facilityload;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -36,8 +32,11 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.TreeMap;
 
 /**
  * Prints statistics of facility load
@@ -64,7 +63,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 		 */
 		double scaleNumberOfPersons = Double.parseDouble(controler.getConfig().locationchoice().getScaleFactor());
-		this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getFacilities(), scaleNumberOfPersons,
+        this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getScenario().getActivityFacilities(), scaleNumberOfPersons,
 				this.facilityPenalties, controler.getConfig().locationchoice());
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
@@ -86,7 +85,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
-		ActivityFacilities facilities = controler.getFacilities();
+        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
 		if (event.getIteration() % 2 == 0) {
 			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),

@@ -62,7 +62,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 
 /**
@@ -403,7 +402,7 @@ public class MATSim4UrbanSimParcel{
 		// From here outputs are for analysis/debugging purposes only
 		{ // dump population in csv format
 		if(isParcelMode)
-			readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getNetwork());
+            readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getScenario().getNetwork());
 //		else
 //			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
 			// I don't think that this has a chance to work: uses the parcel model keys to extract info from a zone 

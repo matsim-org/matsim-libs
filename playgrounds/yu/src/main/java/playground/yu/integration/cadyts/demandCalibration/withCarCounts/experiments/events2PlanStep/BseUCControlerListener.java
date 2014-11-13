@@ -20,13 +20,10 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.events2PlanStep;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import cadyts.calibrators.Calibrator;
+import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -48,15 +45,13 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseControlerListener;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGIS;
 import utilities.misc.DynamicData;
-import cadyts.calibrators.Calibrator;
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+
+import java.io.IOException;
+import java.util.*;
 
 public class BseUCControlerListener implements StartupListener,
 		AfterMobsimListener, BeforeMobsimListener, BseControlerListener {
@@ -86,7 +81,7 @@ public class BseUCControlerListener implements StartupListener,
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler ctl = event.getControler();
-		final Network network = ctl.getNetwork();
+        final Network network = ctl.getScenario().getNetwork();
 		Config config = ctl.getConfig();
 
 		// set up center and radius of counts stations locations
@@ -281,7 +276,7 @@ public class BseUCControlerListener implements StartupListener,
 		}
 
 		// prepare events2planStep
-		events2PlanSteps = new EventsToPlanSteps(network, ctl.getPopulation());
+        events2PlanSteps = new EventsToPlanSteps(network, ctl.getScenario().getPopulation());
 
 		// set up a/r-strategy
 		((BseUCStrategyManager) ctl.getStrategyManager()).init(calibrator,
@@ -310,13 +305,13 @@ public class BseUCControlerListener implements StartupListener,
 			try {
 				DynamicData<Link> linkCostOffsets = calibrator
 						.getLinkCostOffsets();
-				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(
+                new BseLinkCostOffsetsXMLFileIO(ctl.getScenario().getNetwork()).write(
 						io.getIterationFilename(iter, "linkCostOffsets.xml"),
 						linkCostOffsets);
 				if (writeQGISFile) {
 					for (int i = arStartTime; i <= arEndTime; i++) {
-						LinkCostOffsets2QGIS lco2QGSI = new LinkCostOffsets2QGIS(
-								ctl.getNetwork(), ctl.getConfig().global()
+                        LinkCostOffsets2QGIS lco2QGSI = new LinkCostOffsets2QGIS(
+                                ctl.getScenario().getNetwork(), ctl.getConfig().global()
 										.getCoordinateSystem(), i, i);
 						lco2QGSI.createLinkCostOffsets(links, linkCostOffsets);
 						lco2QGSI.output(linkIds,

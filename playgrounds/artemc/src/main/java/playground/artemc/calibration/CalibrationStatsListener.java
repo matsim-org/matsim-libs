@@ -20,20 +20,19 @@
 
 package playground.artemc.calibration;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-
 import playground.artemc.calibration.handlers.DistanceDistributionTrip;
 import playground.artemc.calibration.handlers.TimeDistributionTrip;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * 
@@ -106,7 +105,7 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(event.getIteration()%interval==0) {
 			try {
-				DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getControler().getPopulation(), event.getControler().getNetwork(), event.getControler().getScenario().getTransitSchedule(),this.pIdsToExclude);
+                DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getControler().getScenario().getPopulation(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(),this.pIdsToExclude);
 				distanceDistribution.saveChains();
 				SortedMap<Integer, Integer[]>  distanceTripsMap = distanceDistribution.getDistribution(categoriesDistanceDataset, modesDistanceDataset);
 				distanceDistribution.printDistribution(distanceTripsMap, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "tripDistanceHistogramByMode.csv"));

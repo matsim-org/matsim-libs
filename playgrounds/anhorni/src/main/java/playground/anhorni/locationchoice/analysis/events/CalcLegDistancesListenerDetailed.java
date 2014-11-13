@@ -20,11 +20,6 @@
 
 package playground.anhorni.locationchoice.analysis.events;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -33,6 +28,11 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.TreeMap;
 
 public class CalcLegDistancesListenerDetailed implements StartupListener, AfterMobsimListener, ShutdownListener {
 
@@ -64,7 +64,7 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.calcLegDistances = new CalcLegDistances(event.getControler().getPopulation());
+        this.calcLegDistances = new CalcLegDistances(event.getControler().getScenario().getPopulation());
 		event.getControler().getEvents().addHandler(this.calcLegDistances);
 
 	}

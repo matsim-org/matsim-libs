@@ -1,9 +1,5 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,8 +25,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class TwoWayCSQsimFactory implements MobsimFactory{
@@ -54,8 +53,8 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 				scenario.getConfig().getModule( TwoWayCSConfigGroup.GROUP_NAME );
 		BufferedReader reader;
 		String s;
-		
-		LinkUtils linkUtils = new LinkUtils(controler.getNetwork());
+
+        LinkUtils linkUtils = new LinkUtils(controler.getScenario().getNetwork());
 		
 	
 		if (configGrouptw.useTwoWayCarsharing()) {

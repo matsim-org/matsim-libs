@@ -23,12 +23,6 @@
  */
 package playground.yu.counts;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,9 +38,14 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-
 import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.io.SimpleWriter;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * prepares and creates chart with x-achse
@@ -126,7 +125,7 @@ public class CntSimCap4Chart implements StartupListener, AfterMobsimListener,
 		double[] xs = Collection2Array.toDoubleArray(iters);
 		iters.clear();
 
-		Network net = ctl.getNetwork();
+        Network net = ctl.getScenario().getNetwork();
 
 		int volIdx = 0;
 		for (Entry<Id<Link>, Count> countEntry : countsMap.entrySet()) {

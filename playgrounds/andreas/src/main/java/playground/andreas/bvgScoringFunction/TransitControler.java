@@ -114,7 +114,7 @@ public class TransitControler extends Controler {
 		ScenarioImpl sc = (ScenarioImpl) scLoader.loadScenario() ;
 		
 		TransitControler tc = new TransitControler(sc);
-		tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), tc.getNetwork()));
+        tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), tc.getScenario().getNetwork()));
 		
 
 

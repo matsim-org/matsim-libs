@@ -20,11 +20,6 @@
 
 package playground.anhorni.locationchoice.run.scoring;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -33,10 +28,14 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.TreeMap;
 
 public class ScoreElements implements StartupListener, ScoringListener, ShutdownListener {
 
@@ -78,8 +77,8 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		double d;
 
 		Controler c = event.getControler();
-		
-		for (Person p : c.getPopulation().getPersons().values()) {
+
+        for (Person p : c.getScenario().getPopulation().getPersons().values()) {
 			
 			ScoringFunction sf = c.getPlansScoring().getScoringFunctionForAgent(p.getId());
 			if (sf instanceof ScoringFunctionAccumulator) {
@@ -96,8 +95,8 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 				}
 			}
 		}
-		
-		int popSize = c.getPopulation().getPersons().size();
+
+        int popSize = c.getScenario().getPopulation().getPersons().size();
 		
 		try {
 			this.out.write(Integer.toString(event.getIteration()));

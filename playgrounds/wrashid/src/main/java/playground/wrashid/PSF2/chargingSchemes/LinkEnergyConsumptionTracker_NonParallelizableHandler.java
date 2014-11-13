@@ -23,14 +23,10 @@ package playground.wrashid.PSF2.chargingSchemes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -57,9 +53,8 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
 
-		
 
-		Link link = ParametersPSF2.controler.getNetwork().getLinks().get(event.getLinkId());
+        Link link = ParametersPSF2.controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
 		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getPersonId());
 
 		Double linkEnteranceTime = linkEntranceTime.get(event.getPersonId(), event.getLinkId());

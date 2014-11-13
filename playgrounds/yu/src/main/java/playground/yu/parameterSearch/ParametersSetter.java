@@ -23,14 +23,13 @@
  */
 package playground.yu.parameterSearch;
 
-import java.util.Map;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-
 import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+
+import java.util.Map;
 
 /**
  * sets parameters of scoringfunction into {@code Config} and also into
@@ -46,8 +45,8 @@ public class ParametersSetter {
 		Config cfg = ctl.getConfig();
 		setParametersInConfig(cfg, nameParameters);
 		// set new parameters in Controler
-		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
-				cfg, ctl.getNetwork()));
+        ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				cfg, ctl.getScenario().getNetwork()));
 	}
 
 	public static void setParametersInConfig(Config cfg,

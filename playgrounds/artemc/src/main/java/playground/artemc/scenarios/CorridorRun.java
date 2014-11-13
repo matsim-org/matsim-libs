@@ -1,12 +1,6 @@
 package playground.artemc.scenarios;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -19,21 +13,19 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
-import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutility;
-import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import playground.artemc.socialCost.vehicleOccupancy.VehicleOccupancy;
 import playground.artemc.transitRouterEventsBased.TransitRouterWSImplFactory;
-import playground.artemc.transitRouterEventsBased.TransitRouterWSVImplFactory;
 import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
-import playground.artemc.transitRouterEventsBased.vehicleOccupancy.VehicleOccupancyCalculator;
 import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class CorridorRun {
@@ -83,7 +75,7 @@ public class CorridorRun {
 
 		// Additional analysis
 		ScenarioImpl scenarioImpl = (ScenarioImpl) controler.getScenario();
-		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
+        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 		controler.addControlerListener(new SimpleAnnealer());
 		
 		// Additional analysis
@@ -93,8 +85,8 @@ public class CorridorRun {
 		controler.run();
 		
 		controler.setMobsimFactory(new QSimFactory());
-		
-		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+
+        WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);

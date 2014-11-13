@@ -19,14 +19,7 @@
  * *********************************************************************** */
 package herbie.running.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
@@ -37,7 +30,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -47,11 +39,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Collects and processes data on the mode shares, based on the travelled
@@ -88,7 +80,7 @@ public class ModeSharesEventHandler
 	 * @param controler the controler, used to get the network
 	 */
 	public ModeSharesEventHandler(final Controler controler) {
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.modeShares = new ArrayList<Map<String, Double>>(controler.getConfig().controler().getLastIteration());
 	}
 	

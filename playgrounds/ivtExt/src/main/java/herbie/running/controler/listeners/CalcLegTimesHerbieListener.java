@@ -22,11 +22,6 @@ package herbie.running.controler.listeners;
 
 import herbie.running.analysis.CalcLegTimesKTI;
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
-
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
@@ -40,6 +35,10 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.TreeMap;
 
 
 public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimListener, ShutdownListener, IterationEndsListener {
@@ -103,7 +102,7 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 		Population pop;
 		if (this.subPopulation == null) {
 			Controler c = event.getControler();
-			pop = c.getPopulation();				
+            pop = c.getScenario().getPopulation();
 		} else pop = this.subPopulation;
 		
 		this.calcLegTimesKTI = new CalcLegTimesKTI(pop, iterationSummaryOut);

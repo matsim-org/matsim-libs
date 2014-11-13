@@ -20,12 +20,7 @@
 package playground.anhorni.surprice.warmstart;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PlanImpl;
@@ -44,8 +39,8 @@ public class AdaptNextDay implements StartupListener {
 		// on monday or saturday no warmstarting
 		if (this.populationPreviousDay == null) return;
 		log.info("Adapting plans of next day ... ");
-		
-		Population population = event.getControler().getPopulation();
+
+        Population population = event.getControler().getScenario().getPopulation();
 		int cntTime = 0;
 		int cntRouteMode = 0;
 		int cntActs = 0;

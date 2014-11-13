@@ -230,7 +230,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		// until link with length non-zero in the set.
 		
 		int minLinkLength = 40;
-		for (Link link:network.getLinks().values()){
+        for (Link link: getScenario().getNetwork().getLinks().values()){
 			if (link.getLength()<minLinkLength){
 				link.setLength(minLinkLength);
 			}

@@ -19,11 +19,6 @@
 
 package org.matsim.contrib.parking.parkingChoice.manager;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
@@ -32,6 +27,10 @@ import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.PriorityQueue;
 
 //TODO:
 // get parking for agent
@@ -64,7 +63,7 @@ public class ParkingManager {
 	 * 
 	 */
 	public Id parkVehicle(Id agentId, Id actFacilityId, String actType){
-		Coord actCoordinate = controller.getFacilities().getFacilities().get(actFacilityId).getCoord();
+        Coord actCoordinate = controller.getScenario().getActivityFacilities().getFacilities().get(actFacilityId).getCoord();
 		
 		double radius=initialParkingSearchRadiusInMeter;
 		Collection<Parking> collection = parkings.get(actCoordinate.getX(), actCoordinate.getY(), radius);

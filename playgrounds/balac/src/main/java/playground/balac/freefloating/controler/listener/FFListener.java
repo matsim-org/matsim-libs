@@ -1,9 +1,5 @@
 package playground.balac.freefloating.controler.listener;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -11,8 +7,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.freefloating.controler.listener.FFParkingEventsHandler.RentalInfoFF;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class FFListener implements StartupListener, IterationEndsListener, IterationStartsListener{
@@ -66,9 +65,9 @@ public class FFListener implements StartupListener, IterationEndsListener, Itera
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-		
-		
-		ffhandler = new FFParkingEventsHandler(event.getControler().getNetwork());
+
+
+        ffhandler = new FFParkingEventsHandler(event.getControler().getScenario().getNetwork());
 		
 
 		

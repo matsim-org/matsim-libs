@@ -28,12 +28,9 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
@@ -106,8 +103,6 @@ public class Controler extends AbstractController {
 
 	protected final EventsManager events;
 
-    protected Network network = null;
-	protected Population population = null;
     private Injector injector;
 
     public static interface TerminationCriterion {
@@ -210,10 +205,6 @@ public class Controler extends AbstractController {
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			this.scenarioData  = ScenarioUtils.createScenario(this.config);
 		}
-
-		this.network = this.scenarioData .getNetwork();
-		this.population = this.scenarioData .getPopulation();
-		
 		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
@@ -289,8 +280,6 @@ public class Controler extends AbstractController {
 
 		if (!this.scenarioLoaded) {
 			ScenarioUtils.loadScenario(this.scenarioData );
-			this.network = this.scenarioData .getNetwork();
-			this.population = this.scenarioData .getPopulation();
 			this.scenarioLoaded = true;
 		}
 	}
@@ -340,7 +329,7 @@ public class Controler extends AbstractController {
 		this.addCoreControlerListener(plansScoring);
 
 		this.strategyManager = loadStrategyManager();
-		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
+        this.addCoreControlerListener(new PlansReplanning(this.strategyManager, getScenario().getPopulation()));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
@@ -384,7 +373,7 @@ public class Controler extends AbstractController {
 		setUp();
 
 		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
+        ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -425,7 +414,7 @@ public class Controler extends AbstractController {
 						new DijkstraFactory(),
 						getTravelDisutilityFactory(),
                         injector.getInstance(LinkToLinkTravelTime.class),
-						getPopulation().getFactory(),
+						getScenario().getPopulation().getFactory(),
 						(DefaultTripRouterFactoryImpl) tripRouterFactory);
 			}
 		}
@@ -581,19 +570,7 @@ public class Controler extends AbstractController {
 		return this.config;
 	}
 
-	public final ActivityFacilities getFacilities() {
-		return this.scenarioData.getActivityFacilities();
-	}
-
-	public final Network getNetwork() {
-		return this.network;
-	}
-
-	public final Population getPopulation() {
-		return this.population;
-	}
-
-	public final EventsManager getEvents() {
+    public final EventsManager getEvents() {
 		return this.events;
 	}
 

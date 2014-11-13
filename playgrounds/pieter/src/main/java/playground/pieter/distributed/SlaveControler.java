@@ -5,10 +5,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -297,21 +294,21 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
             }
         }
         Collection<Plan> plans = new ArrayList<>();
-        for (Person person : matsimControler.getPopulation().getPersons().values())
+        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
             plans.add(person.getSelectedPlan());
         pSimFactory.setPlans(plans);
         numberOfIterations++;
     }
 
     private void removeNonSimulatedAgents(List<String> idStrings) {
-        Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
+        Set<Id<Person>> noIds = new HashSet<>(matsimControler.getScenario().getPopulation().getPersons().keySet());
         Set<String> noIdStrings = new HashSet<>();
         for (Id<Person> id : noIds)
             noIdStrings.add(id.toString());
         noIdStrings.removeAll(idStrings);
         slaveLogger.warn("removing ids");
         for (String idString : noIdStrings) {
-            matsimControler.getPopulation().getPersons().remove(Id.create(idString, Person.class));
+            matsimControler.getScenario().getPopulation().getPersons().remove(Id.create(idString, Person.class));
         }
 
     }
@@ -327,7 +324,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
 
     private void addPersons(List<PersonSerializable> persons) {
         for (PersonSerializable person : persons) {
-            matsimControler.getPopulation().addPerson(person.getPerson());
+            matsimControler.getScenario().getPopulation().addPerson(person.getPerson());
         }
         slaveLogger.warn("Added " + persons.size() + " pax to my population.");
     }
@@ -336,18 +333,18 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         int i = 0;
         List<PersonSerializable> personsToSend = new ArrayList<>();
         Set<Id<Person>> personIdsToRemove = new HashSet<>();
-        for (Id<Person> personId : matsimControler.getPopulation().getPersons().keySet()) {
+        for (Id<Person> personId : matsimControler.getScenario().getPopulation().getPersons().keySet()) {
             if (i++ >= diff) break;
-            personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getPopulation().getPersons().get(personId)));
+            personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getScenario().getPopulation().getPersons().get(personId)));
             personIdsToRemove.add(personId);
         }
-        for (Id<Person> personId : personIdsToRemove) matsimControler.getPopulation().getPersons().remove(personId);
+        for (Id<Person> personId : personIdsToRemove) matsimControler.getScenario().getPopulation().getPersons().remove(personId);
         return personsToSend;
     }
 
     public void transmitPlans() throws IOException, ClassNotFoundException {
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
-        for (Person person : matsimControler.getPopulation().getPersons().values())
+        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
         plansCopyForSending = tempPlansCopyForSending;
         slaveLogger.warn("Sending plans...");
@@ -374,7 +371,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
                     " PSim iterations.");
         }
         writer.writeDouble(totalIterationTime);
-        writer.writeInt(matsimControler.getPopulation().getPersons().size());
+        writer.writeInt(matsimControler.getScenario().getPopulation().getPersons().size());
         //send memory usage fraction of max to prevent being assigned more persons
         writeMemoryStats();
 

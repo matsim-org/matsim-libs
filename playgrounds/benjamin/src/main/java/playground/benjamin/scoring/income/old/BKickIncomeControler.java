@@ -23,7 +23,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.households.PersonHouseholdMapping;
-
 import playground.benjamin.BkControler;
 
 
@@ -66,7 +65,7 @@ public final class BKickIncomeControler extends BkControler {
 //		}
 //		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
 		super.setUp();
-		this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, this.getNetwork() ) ) ;
+        this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, getScenario().getNetwork()) ) ;
 	}
 	
 //	@Override

@@ -20,18 +20,6 @@
 
 package org.matsim.contrib.analysis.christoph;
 
-import java.awt.Font;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.jfree.chart.axis.NumberAxis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -52,6 +40,12 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
 
 /**
  * Counts the number of activities performed at a time based on events.
@@ -197,8 +191,8 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		
 		ActivityData overallActivityData = this.overallCount.getLast();
-				
-		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+
+        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			if (this.observedAgents != null && !this.observedAgents.contains(person.getId())) continue;
 			

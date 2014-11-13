@@ -23,8 +23,6 @@
  */
 package playground.yu.tests;
 
-import java.io.IOException;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -32,9 +30,10 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-
 import playground.yu.analysis.LegTravelTimeModalSplit;
 import playground.yu.analysis.PtCheck;
+
+import java.io.IOException;
 
 /**
  * @author yu
@@ -56,7 +55,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 			int idx = event.getIteration();
 			if (idx % 10 == 0) {
 				pc.resetCnt();
-				pc.run(ctl.getPopulation());
+                pc.run(ctl.getScenario().getPopulation());
 				try {
 					pc.write(idx);
 				} catch (IOException e) {
@@ -82,7 +81,7 @@ public class TravelTimeRoadPricingControler extends Controler {
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			Controler c = event.getControler();
 			if (event.getIteration() == c.getConfig().controler().getLastIteration()) {
-				ttms = new LegTravelTimeModalSplit(3600, c.getPopulation());
+                ttms = new LegTravelTimeModalSplit(3600, c.getScenario().getPopulation());
 				c.getEvents().addHandler(ttms);
 			}
 		}

@@ -28,7 +28,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.yu.analysis.PtCheck;
 
 /**
@@ -63,7 +62,7 @@ public class PtTest extends MatsimTestCase {
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
 				pc.resetCnt();
-				pc.run(event.getControler().getPopulation());
+                pc.run(event.getControler().getScenario().getPopulation());
 				// AUTOMATIC VERIFICATION OF THE TESTS
 				if (betaPt == -6) {
 					System.out

@@ -96,7 +96,7 @@ IterationEndsListener, ShutdownListener {
 		event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
 
 		// add the events handler to calculate the tolls paid by agents
-		this.calcPaidToll = new CalcPaidToll(controler.getNetwork(), this.scheme);
+        this.calcPaidToll = new CalcPaidToll(controler.getScenario().getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.calcPaidToll);
 
 		// replace the travelCostCalculator with a toll-dependent one if required
@@ -114,7 +114,7 @@ IterationEndsListener, ShutdownListener {
 			controler.setTravelDisutilityFactory(travelDisutilityFactory);
 		}
 
-		this.cattl = new CalcAverageTolledTripLength(controler.getNetwork(), this.scheme);
+        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
 		controler.getEvents().addHandler(this.cattl);
 	}
 

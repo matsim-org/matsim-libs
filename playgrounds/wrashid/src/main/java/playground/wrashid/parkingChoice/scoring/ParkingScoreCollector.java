@@ -1,8 +1,5 @@
 package playground.wrashid.parkingChoice.scoring;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,13 +12,15 @@ import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
+
+import java.util.HashMap;
+import java.util.Set;
 
 //TODO: I could just collect the walking distances/time which needs to be deduced from score here.
 //TODO: => make use of this wisly, as this is invoked a lot of times...
@@ -110,9 +109,9 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		Coord activityCoord = null;
 
 		if (facilityId != null) {
-			activityCoord = controler.getFacilities().getFacilities().get(facilityId).getCoord();
+            activityCoord = controler.getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord();
 		} else if (linkId != null) {
-			activityCoord = controler.getNetwork().getLinks().get(linkId).getCoord();
+            activityCoord = controler.getScenario().getNetwork().getLinks().get(linkId).getCoord();
 		} else {
 			DebugLib.stopSystemAndReportInconsistency("facilityId and linkId of activity can't both be null!");
 		}
@@ -139,7 +138,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	}
 
 	private void updateWalkingTime(ParkingDepartureEvent event, Id personId) {
-		Coord activityCoord = controler.getNetwork().getLinks().get(event.getAgentDepartureEvent().getLinkId()).getCoord();
+        Coord activityCoord = controler.getScenario().getNetwork().getLinks().get(event.getAgentDepartureEvent().getLinkId()).getCoord();
 		double walkingTime = GeneralLib.getDistance(event.getParking().getCoord(), activityCoord)
 				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 		walkingTimesAtParkingDeparture.put(personId, walkingTime);

@@ -1,9 +1,5 @@
 package playground.balac.allcsmodestest.controler.listener;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -12,11 +8,14 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.allcsmodestest.controler.listener.CSEventsHandler.RentalInfo;
 import playground.balac.allcsmodestest.controler.listener.FFEventsHandler.RentalInfoFF;
 import playground.balac.allcsmodestest.controler.listener.NoParkingEventHandler.NoParkingInfo;
 import playground.balac.allcsmodestest.controler.listener.NoVehicleEventHandler.NoVehicleInfo;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class AllCSModesTestListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	CSEventsHandler cshandler;
@@ -151,12 +150,12 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-		
-		this.cshandler = new CSEventsHandler(event.getControler().getNetwork());
-		
-		this.ffhandler = new FFEventsHandler(event.getControler().getNetwork());
-		
-		this.owhandler = new OWEventsHandler(event.getControler().getNetwork());
+
+        this.cshandler = new CSEventsHandler(event.getControler().getScenario().getNetwork());
+
+        this.ffhandler = new FFEventsHandler(event.getControler().getScenario().getNetwork());
+
+        this.owhandler = new OWEventsHandler(event.getControler().getScenario().getNetwork());
 		
 		this.noVehicleHandler = new NoVehicleEventHandler();	
 		

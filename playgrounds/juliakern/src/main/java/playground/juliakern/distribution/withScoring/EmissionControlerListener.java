@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.juliakern.distribution.withScoring;
 
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,21 +26,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
 import playground.juliakern.distribution.GridTools;
 import playground.juliakern.distribution.ResponsibilityEvent;
 import playground.juliakern.distribution.withScoringFast.GeneratedEmissionsHandler;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author benjamin
@@ -84,10 +75,10 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 
 	public EmissionControlerListener(Controler controler) {
 		this.controler = controler;
-		this.gt = new GridTools(controler.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+        this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		this.intervalHandler = new IntervalHandler();
-		
-		logger.warn(controler.getNetwork().getLinks().size() + " number of links");
+
+        logger.warn(controler.getScenario().getNetwork().getLinks().size() + " number of links");
 		
 		Scenario scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario);

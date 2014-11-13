@@ -19,9 +19,6 @@
 
 package playground.anhorni.choiceSetGeneration.choicesetextractors;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,11 +33,13 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.old.PlanRouterAdapter;
-
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author anhorni
@@ -91,7 +90,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	 */
 
 	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
-		Network network = controler.getNetwork();
+        Network network = controler.getScenario().getNetwork();
 
 		Id<Link> linkId = facility.getLinkId();
 

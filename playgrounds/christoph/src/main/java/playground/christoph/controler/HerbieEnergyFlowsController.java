@@ -26,13 +26,11 @@ import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.christoph.energyflows.controller.EnergyFlowsController;
 
 public class HerbieEnergyFlowsController extends EnergyFlowsController {
@@ -62,12 +60,12 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 	
 	@Override
 	protected void setUp() {
-		HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
+        HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
 				super.config,
 				this.herbieConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-				this.getFacilities(),
-				this.getNetwork());
+                getScenario().getActivityFacilities(),
+                getScenario().getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());

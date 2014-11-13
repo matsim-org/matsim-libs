@@ -1,7 +1,5 @@
 package playground.wrashid.PSF.energy.consumption;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -13,6 +11,8 @@ import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+
+import java.util.HashMap;
 
 /*
  * During driving energy is being "consumed", log that for each vehicle and leg.
@@ -57,7 +57,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
 		double entranceTime = eConsumption.getTempEnteranceTimeOfLastLink();
-		Link link = controler.getNetwork().getLinks().get(event.getLinkId());
+        Link link = controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
 		double consumption = EnergyConsumptionInfo.getEnergyConsumption(link, event.getTime() - entranceTime,
 				EnergyConsumptionInfo.getVehicleType(personId));
 		eConsumption.addEnergyConsumptionLog(new LinkEnergyConsumptionLog(event.getLinkId(), eConsumption

@@ -1,9 +1,5 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,6 +9,10 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class TwoWayCSVehicleLocation {
 
@@ -24,8 +24,8 @@ public class TwoWayCSVehicleLocation {
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
-	    LinkUtils linkUtils = new LinkUtils(controler.getNetwork());
-	    for (Link l : controler.getNetwork().getLinks().values()) {
+        LinkUtils linkUtils = new LinkUtils(controler.getScenario().getNetwork());
+        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
@@ -68,7 +68,7 @@ public class TwoWayCSVehicleLocation {
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
 
-	    for (Link l : controler.getNetwork().getLinks().values()) {
+        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();

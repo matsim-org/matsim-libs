@@ -49,7 +49,7 @@ public class MZComparisonListener implements IterationEndsListener,
 
 			Controler ctl = event.getControler();
 			OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
-			Population pop = ctl.getPopulation();
+            Population pop = ctl.getScenario().getPopulation();
 
 			MZComparisonData mzcd = new MZComparisonData((RoadPricingScheme) ctl.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 			mzcd.run(pop);

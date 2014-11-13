@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.hook;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -33,7 +29,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.fare.StageContainerCreator;
@@ -45,6 +40,10 @@ import playground.andreas.P2.scoring.OperatorCostCollectorHandler;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
 import playground.andreas.P2.scoring.StageContainer2AgentMoneyEvent;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Black box for paratransit
@@ -92,13 +91,13 @@ final class PBox implements Operators {
 		this.strategyManager.init(this.pConfig, this.stageCollectorHandler, this.ticketMachine, timeProvider);
 		
 		// init fare collector
-		this.stageCollectorHandler.init(event.getControler().getNetwork());
+        this.stageCollectorHandler.init(event.getControler().getScenario().getNetwork());
 		event.getControler().getEvents().addHandler(this.stageCollectorHandler);
 		event.getControler().addControlerListener(this.stageCollectorHandler);
 		this.stageCollectorHandler.addStageContainerHandler(this.scorePlansHandler);
 		
 		// init operator cost collector
-		this.operatorCostCollectorHandler.init(event.getControler().getNetwork());
+        this.operatorCostCollectorHandler.init(event.getControler().getScenario().getNetwork());
 		event.getControler().getEvents().addHandler(this.operatorCostCollectorHandler);
 		event.getControler().addControlerListener(this.operatorCostCollectorHandler);
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
@@ -108,7 +107,7 @@ final class PBox implements Operators {
 		this.stageCollectorHandler.addStageContainerHandler(fare2AgentMoney);
 		
 		// init possible paratransit stops
-		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
+        this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getScenario().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		this.operators = new LinkedList<>();
 		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), timeProvider);

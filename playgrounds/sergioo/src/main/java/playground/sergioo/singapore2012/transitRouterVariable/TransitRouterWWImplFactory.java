@@ -46,7 +46,7 @@ public class TransitRouterWWImplFactory implements TransitRouterFactory {
 		this.config = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
 				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
 				controler.getScenario().getConfig().vspExperimental());
-		this.network = controler.getNetwork();
+        this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 		this.waitTime = waitTime;
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);

@@ -20,13 +20,10 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.crossValidation;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import cadyts.calibrators.Calibrator;
+import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,15 +43,13 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
-
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseControlerListener;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGIS;
 import utilities.misc.DynamicData;
-import cadyts.calibrators.Calibrator;
-import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+
+import java.io.IOException;
+import java.util.*;
 
 public class BseUCControlerListener implements StartupListener,
 		AfterMobsimListener, BseControlerListener {
@@ -92,7 +87,7 @@ public class BseUCControlerListener implements StartupListener,
 
 				Controler ctl = event.getControler();
 				OutputDirectoryHierarchy ctlIO = ctl.getControlerIO();
-				Network net = ctl.getNetwork();
+                Network net = ctl.getScenario().getNetwork();
 
 				new BseLinkCostOffsetsXMLFileIO(net).write(ctlIO
 						.getIterationFilename(iter, "linkCostOffsets.xml"),
@@ -121,7 +116,7 @@ public class BseUCControlerListener implements StartupListener,
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		final Controler controler = event.getControler();
-		final Network network = controler.getNetwork();
+        final Network network = controler.getScenario().getNetwork();
 		Config config = controler.getConfig();
 
 		// set up center and radius of counts stations locations

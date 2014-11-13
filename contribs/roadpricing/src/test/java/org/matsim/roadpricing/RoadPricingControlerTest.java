@@ -53,7 +53,7 @@ public class RoadPricingControlerTest {
 		controler1.setDumpDataAtEnd(false);
 		controler1.getConfig().controler().setWriteEventsInterval(0);
 		controler1.run();
-		double scoreBasecase = controler1.getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
+        double scoreBasecase = controler1.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
 
 		// now run toll case
 //        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
@@ -65,7 +65,7 @@ public class RoadPricingControlerTest {
 		controler2.setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);
 		controler2.run();
-		double scoreTollcase = controler2.getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
+        double scoreTollcase = controler2.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
 
 		// there should be a score difference
 		Assert.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020

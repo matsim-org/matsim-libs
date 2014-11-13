@@ -39,8 +39,8 @@ public class Main {
 		Controler ctrl = new Controler( args ) ;
 		
 		double logitScaleFactor = ctrl.getConfig().planCalcScore().getBrainExpBeta() ;
-		double pathSizeLogitExponent = ctrl.getConfig().planCalcScore().getPathSizeLogitBeta() ; 
-		PlanSelector planSelector = new PathSizeLogitSelector( pathSizeLogitExponent, - logitScaleFactor, ctrl.getNetwork() );
+		double pathSizeLogitExponent = ctrl.getConfig().planCalcScore().getPathSizeLogitBeta() ;
+        PlanSelector planSelector = new PathSizeLogitSelector( pathSizeLogitExponent, - logitScaleFactor, ctrl.getScenario().getNetwork());
 //		PlanSelector planSelector = new RandomPlanSelector() ;
 		
 

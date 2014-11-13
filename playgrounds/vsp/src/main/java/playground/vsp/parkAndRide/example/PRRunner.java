@@ -24,9 +24,6 @@
 package playground.vsp.parkAndRide.example;
 
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,13 +35,11 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-
-import playground.vsp.parkAndRide.PRAdaptiveCapacityControl;
-import playground.vsp.parkAndRide.PRConfigGroup;
-import playground.vsp.parkAndRide.PRConstants;
-import playground.vsp.parkAndRide.PRFacility;
-import playground.vsp.parkAndRide.PRFileReader;
+import playground.vsp.parkAndRide.*;
 import playground.vsp.parkAndRide.scoring.PRScoringFunctionFactory;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author ikaddoura
@@ -76,8 +71,8 @@ public class PRRunner {
 		ActivityParams prActivityParams = new ActivityParams(PRConstants.PARKANDRIDE_ACTIVITY_TYPE);
 		prActivityParams.setTypicalDuration(prSettings.getTypicalDuration());
 		controler.getConfig().planCalcScore().addActivityParams(prActivityParams);
-		
-		controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), prSettings.getIntermodalTransferPenalty()));
+
+        controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), prSettings.getIntermodalTransferPenalty()));
 		
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
 		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();

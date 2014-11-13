@@ -1,10 +1,5 @@
 package playground.vbmh.vmParking;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -14,11 +9,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-
 import playground.vbmh.util.CSVWriter;
-import playground.vbmh.util.RemoveDuplicate;
 import playground.vbmh.util.VMCharts;
 import playground.vbmh.vmEV.EVControl;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Generates some statistics and charts at the end of each iteration; All the data used for the charts is
@@ -95,9 +91,9 @@ public class IterEndStats {
 		
 		
 		EVControl evControl = parkControl.evControl;
-		
-		
-		for (Person person : controler.getPopulation().getPersons().values()){
+
+
+        for (Person person : controler.getScenario().getPopulation().getPersons().values()){
 			PersonImpl personImpl = (PersonImpl) person;
 			double soc;
 			boolean notParked=false;

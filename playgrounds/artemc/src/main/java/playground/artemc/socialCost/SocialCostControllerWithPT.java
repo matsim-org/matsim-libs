@@ -1,8 +1,5 @@
 package playground.artemc.socialCost;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -18,6 +15,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class SocialCostControllerWithPT {
 
@@ -79,7 +79,7 @@ public class SocialCostControllerWithPT {
 				VehicleOccupancyObserver vehicleObserver = new VehicleOccupancyObserver();
 				
 				// initialize the social costs calculator
-				SocialCostCalculatorWithPT scc = new SocialCostCalculatorWithPT(controler.getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, vehicleObserver, blendFactor);
+                SocialCostCalculatorWithPT scc = new SocialCostCalculatorWithPT(controler.getScenario().getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, vehicleObserver, blendFactor);
 				
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);

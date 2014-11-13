@@ -45,9 +45,9 @@ public class LinkFacilityAssociation {
 	}
 
 	public LinkFacilityAssociation(Controler controler) {
-		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) controler.getFacilities();
+        ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) controler.getScenario().getActivityFacilities();
 
-		this.network = (NetworkImpl) controler.getNetwork();
+        this.network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		init(facilities);
 	}

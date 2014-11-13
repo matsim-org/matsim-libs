@@ -1,12 +1,6 @@
 package playground.ciarif.retailers.stategies;
 
 
-
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,9 +9,12 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
@@ -58,7 +55,7 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 			for (int j=0; j<newlink_volumes.length;j=j+1) {
 				newlink_volume = newlink_volume + newlink_volumes[j];
 			}
-			Link fLink = this.controler.getNetwork().getLinks().get(f.getLinkId());
+            Link fLink = this.controler.getScenario().getNetwork().getLinks().get(f.getLinkId());
 			Collection<Person> persons_actual = Utils.getPersonQuadTree().get(fLink.getCoord().getX(), fLink.getCoord().getY(), 150);
 			Collection<Person> persons_new = Utils.getPersonQuadTree().get(link.getCoord().getX(),link.getCoord().getY(),150);
 			Collection<ActivityFacility> facilities_actual = Utils.getFacilityQuadTree().get(f.getCoord().getX(),f.getCoord().getY(),150);

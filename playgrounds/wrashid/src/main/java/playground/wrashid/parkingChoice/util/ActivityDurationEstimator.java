@@ -1,8 +1,5 @@
 package playground.wrashid.parkingChoice.util;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -17,6 +14,9 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, PersonDepartureEventHandler {
@@ -60,7 +60,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 	public static double getEstimatedActDuration(final ActivityStartEvent event, final Controler controler,
 			final ActDurationEstimationContainer actDurationEstimationContainer) {
 
-		Plan selectedPlan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
+        Plan selectedPlan = controler.getScenario().getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 
 		List<PlanElement> planElement = selectedPlan.getPlanElements();
 

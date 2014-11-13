@@ -20,18 +20,17 @@
 
 package playground.meisterk.kti.controler.listeners;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
+
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 public class LegDistanceDistributionWriter implements IterationEndsListener {
 
@@ -57,7 +56,7 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		if (event.getIteration() % 10 == 0) {
 
 			Controler c = event.getControler();
-			Population pop = c.getPopulation();
+            Population pop = c.getScenario().getPopulation();
 			
 			PrintStream out = null;
 			try {

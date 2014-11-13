@@ -1,31 +1,17 @@
 package playground.vbmh.einzel_klassen_tests;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Scanner;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
-import playground.vbmh.extendedPricingModels.specialTestModel;
 import playground.vbmh.util.RemoveDuplicate;
-import playground.vbmh.vmEV.EVControl;
 import playground.vbmh.vmEV.EVControlerListener;
-import playground.vbmh.vmParking.ParkControl;
-import playground.vbmh.vmParking.ParkControlerListener;
-import playground.vbmh.vmParking.ParkScoringFactory;
-import playground.vbmh.vmParking.Parking;
-import playground.vbmh.vmParking.ParkingPricingModel;
-import playground.vbmh.vmParking.ParkingSpot;
-import playground.vbmh.vmParking.PricingModels;
+import playground.vbmh.vmParking.*;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.LinkedList;
 
 
 public class Testcontroller {
@@ -86,7 +72,7 @@ public class Testcontroller {
 		
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();
-		ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getNetwork());
+        ParkScoringFactory factory = new ParkScoringFactory(planCalcScoreConfigGroup, controler.getScenario().getNetwork());
 		controler.setScoringFunctionFactory(factory);
 	
 		//Spezialpreis Test:

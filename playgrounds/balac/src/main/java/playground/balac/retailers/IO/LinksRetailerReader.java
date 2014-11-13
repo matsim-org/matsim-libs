@@ -1,12 +1,5 @@
 package playground.balac.retailers.IO;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,11 +8,17 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
-
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.Retailer;
 import playground.balac.retailers.data.Retailers;
 import playground.balac.retailers.utils.Utils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.TreeMap;
 
 public class LinksRetailerReader
 {
@@ -97,7 +96,7 @@ public class LinksRetailerReader
         String[] entries = curr_line.split("\t", -1);
 
         Id<Link> lId = Id.create(entries[0], Link.class);
-        LinkRetailersImpl l = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(lId), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+          LinkRetailersImpl l = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(lId), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
         l.setMaxFacOnLink(Integer.parseInt(entries[1]));
 //        if (l.getUpMapping().size() > Integer.parseInt(entries[1]))
 //        {
@@ -119,8 +118,8 @@ public class LinksRetailerReader
 	    TreeMap<Id<Link>, LinkRetailersImpl> links = new TreeMap<>();
 	    for (Retailer r : this.retailers.getRetailers().values()) {
 	      for (ActivityFacility af : r.getFacilities().values()) {
-	    	Link fLink =  this.controler.getNetwork().getLinks().get(af.getLinkId()); 
-	        LinkRetailersImpl link = new LinkRetailersImpl(fLink, this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+              Link fLink =  this.controler.getScenario().getNetwork().getLinks().get(af.getLinkId());
+              LinkRetailersImpl link = new LinkRetailersImpl(fLink, this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	        links.put(link.getId(), link);
 	        log.info("The facility " + af.getId() + " is currently on the link: " + link.getId());
 	      }
@@ -185,12 +184,12 @@ public class LinksRetailerReader
     String freeLinksParameterString = this.controler.getConfig().findParam("Retailers", "freeLinksParameter");
     Double freeLinksParameterInt = Double.valueOf(Double.parseDouble(freeLinksParameterString));
     Integer newLinksMax = Integer.valueOf((int)Math.round(this.currentLinks.size() * freeLinksParameterInt.doubleValue()));
-    int numberLinks = this.controler.getNetwork().getLinks().values().size();
+      int numberLinks = this.controler.getScenario().getNetwork().getLinks().values().size();
     log.info("number links = " + numberLinks);
     int attempts = 0;
     while (this.freeLinks.size() < newLinksMax.intValue()) {
       int rd = MatsimRandom.getRandom().nextInt(numberLinks);
-      LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl)this.controler.getNetwork().getLinks().values().toArray()[rd], (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        LinkRetailersImpl link = new LinkRetailersImpl((LinkImpl) this.controler.getScenario().getNetwork().getLinks().values().toArray()[rd], (NetworkImpl) this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       if (this.currentLinks.containsKey(link.getId())) { log.info("On the link " + link.getId() + " there is already a facility");
       }
       else if (this.freeLinks.containsKey(link.getId())) { log.info("The link " + link.getId() + " is already in the list");

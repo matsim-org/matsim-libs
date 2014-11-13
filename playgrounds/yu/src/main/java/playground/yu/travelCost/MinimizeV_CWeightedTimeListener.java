@@ -138,11 +138,11 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
-			ctl
+            ctl
 					.setTravelDisutilityFactory(new MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl(
 							ctl.getVolumes(), ctl.getConfig()
 									.qsim().getFlowCapFactor(),
-							ctl.getNetwork().getCapacityPeriod()));
+							ctl.getScenario().getNetwork().getCapacityPeriod()));
 		}
 	}
 

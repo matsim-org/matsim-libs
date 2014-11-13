@@ -1,11 +1,5 @@
 package tutorial.programming.example07ControlerListener;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -14,8 +8,13 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
-
 import tutorial.programming.example06EventsHandling.MyEventHandler2;
+
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -35,7 +34,7 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// after the controler is started create and add the event handler for events of the mobility simulation
-		this.eventHandler = new MyEventHandler2(event.getControler().getPopulation().getPersons().size());
+        this.eventHandler = new MyEventHandler2(event.getControler().getScenario().getPopulation().getPersons().size());
 		event.getControler().getEvents().addHandler(this.eventHandler);
 	}
 

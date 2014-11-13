@@ -1,9 +1,5 @@
 package playground.balac.freefloating.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -25,8 +21,11 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class FreeFloatingQsimFactory implements MobsimFactory{
@@ -60,8 +59,8 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
-		    
-		    	Link l = controler.getNetwork().getLinks().get(Id.create(arr[0], Link.class));
+
+                Link l = controler.getScenario().getNetwork().getLinks().get(Id.create(arr[0], Link.class));
 		    	
 		    	ArrayList<String> vehIDs = new ArrayList<String>();
 		    	

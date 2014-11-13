@@ -128,12 +128,12 @@ public class Simulator {
 		 * setup scoring and cadyts integration
 		 */
 		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("disableCadyts"));
-		LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getPopulation());
+        LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getScenario().getPopulation());
 		controler.getEvents().addHandler(calculator);
 		if (!disableCadyts) {
 			CadytsContext context = new CadytsContext(controler.getScenario().getConfig(), null, calculator);
 //			controler.addControlerListener(context);
-			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
+            controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getScenario().getNetwork()));
 
 			controler.addControlerListener(context);
 //			Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
@@ -145,8 +145,8 @@ public class Simulator {
 		Config config = controler.getConfig();
 		String countsFile = config.findParam("gsv", "countsfile");
 		double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
-		
-		DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
+
+        DTVAnalyzer dtv = new DTVAnalyzer(controler.getScenario().getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
 		controler.addControlerListener(dtv);
 		
 		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
@@ -188,7 +188,7 @@ public class Simulator {
 			/*
 			 * connect facilities to links
 			 */
-			NetworkImpl network = (NetworkImpl) controler.getNetwork();
+            NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 			for(ActivityFacility facility : controler.getScenario().getActivityFacilities().getFacilities().values()) {
 				Coord coord = facility.getCoord();
 //				Link link = network.getNearestLinkExactly(coord);
@@ -203,12 +203,12 @@ public class Simulator {
 			
 			
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-			task.addTask(new TripDistanceTask(controler.getFacilities()));
-			task.addTask(new SpeedFactorTask(controler.getFacilities()));
+            task.addTask(new TripDistanceTask(controler.getScenario().getActivityFacilities()));
+            task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
 			task.addTask(new ScoreTask());
 			task.addTask(new ArrivalLoadTask());
 			task.addTask(new DepartureLoadTask());
-			task.addTask(new PkmTask(controler.getFacilities()));
+            task.addTask(new PkmTask(controler.getScenario().getActivityFacilities()));
 //			task.addTask(new ModeShareTask());
 			task.addTask(new ActivityDurationTask());
 			task.addTask(new ActivityLoadTask());
@@ -242,7 +242,7 @@ public class Simulator {
 		
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			Population population = event.getControler().getPopulation();
+            Population population = event.getControler().getScenario().getPopulation();
 			for(Person person : population.getPersons().values()) {
 				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
 			}
@@ -315,8 +315,8 @@ public class Simulator {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			
-			Set<Person> person = new HashSet<Person>(controler.getPopulation().getPersons().values());
+
+            Set<Person> person = new HashSet<Person>(controler.getScenario().getPopulation().getPersons().values());
 			builder = new TrajectoryEventsBuilder(person);
 			controler.getEvents().addHandler(builder);
 		}

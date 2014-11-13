@@ -22,7 +22,6 @@ package herbie.running.controler.listeners;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.population.algorithms.PersonInvalidateScores;
-
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
@@ -41,7 +40,7 @@ public class KtiPopulationPreparation implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 
-		Population pop = event.getControler().getPopulation();
+        Population pop = event.getControler().getScenario().getPopulation();
 		Config config = event.getControler().getConfig();		
 		/*
 		 * for an explanation, see the element comment of the kti config parameter

@@ -20,9 +20,6 @@
 
 package playground.mrieser.pt.controler;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -37,6 +34,9 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 
 /**
@@ -95,7 +95,7 @@ public class TransitControler extends Controler {
 		params.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(params);
 
-		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 	}
 

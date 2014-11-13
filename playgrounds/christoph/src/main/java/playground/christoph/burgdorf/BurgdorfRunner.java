@@ -20,9 +20,6 @@
 
 package playground.christoph.burgdorf;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,9 +40,11 @@ import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFac
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
-
 import playground.christoph.burgdorf.withinday.identifiers.ParkingIdentifierFactory;
 import playground.christoph.burgdorf.withinday.replanners.ParkingReplannerFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *  
@@ -122,7 +121,7 @@ public class BurgdorfRunner implements StartupListener {
 		 * If network capacities have to be adapted.
 		 */
 		if(reduceUpstreamCapacity) {
-			NetworkImpl network = (NetworkImpl) event.getControler().getNetwork();
+            NetworkImpl network = (NetworkImpl) event.getControler().getScenario().getNetwork();
 			ChangeValue changeValue;
 			NetworkChangeEvent networkChangeEvent;
 

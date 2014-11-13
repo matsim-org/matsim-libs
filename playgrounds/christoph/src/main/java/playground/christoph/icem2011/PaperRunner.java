@@ -20,16 +20,6 @@
 
 package playground.christoph.icem2011;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,6 +48,16 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Code for the simulation runs presented in the ICEM 2011 (respectively TRB 2012) paper. 
@@ -202,7 +202,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 
 		// Module to analyze expected travel time on a single link
 		Collection<Link> changedLinks = new HashSet<Link>();
-		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) event.getControler().getNetwork()).getNetworkChangeEvents()) {
+        for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) event.getControler().getScenario().getNetwork()).getNetworkChangeEvents()) {
 			changedLinks.addAll(networkChangeEvent.getLinks());
 		}
 		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, 

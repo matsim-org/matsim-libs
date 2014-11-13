@@ -36,7 +36,7 @@ public class RetailerStrategyImpl
 	    int intCount = 0;
 	    for (ActivityFacility af : this.retailerFacilities.values())
 	    {
-	      locations.put(Integer.valueOf(intCount), NetworkUtils.getNearestLink(((NetworkImpl) this.controler.getNetwork()), af.getCoord()).getId().toString());
+            locations.put(Integer.valueOf(intCount), NetworkUtils.getNearestLink(((NetworkImpl) this.controler.getScenario().getNetwork()), af.getCoord()).getId().toString());
 	      ++intCount;
 	      log.info("The facility with Id: " + af.getId() + " has been added, this is located on the link: " + af.getLinkId());
 	    }
@@ -61,7 +61,7 @@ public class RetailerStrategyImpl
 	    TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
 	    for (ActivityFacility af : this.retailerFacilities.values()) {
 	    	Id<Link> id = af.getLinkId();
-	    	LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(id), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+            LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getScenario().getNetwork().getLinks().get(id), this.controler.getScenario().getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	    	availableLinks.put(id, link);
 	    }
 	    availableLinks.putAll(freeLinks);

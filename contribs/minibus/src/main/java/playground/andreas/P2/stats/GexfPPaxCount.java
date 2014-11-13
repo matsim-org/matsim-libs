@@ -105,7 +105,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.eventsHandler = new CountPPaxHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);

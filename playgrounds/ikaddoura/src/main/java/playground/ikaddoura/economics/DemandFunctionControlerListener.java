@@ -45,7 +45,7 @@ public class DemandFunctionControlerListener implements ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
 			

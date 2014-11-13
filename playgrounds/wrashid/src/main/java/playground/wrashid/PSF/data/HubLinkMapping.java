@@ -1,15 +1,14 @@
 package playground.wrashid.PSF.data;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.parking.lib.obj.Matrix;
+import playground.wrashid.PSF.ParametersPSF;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.StringTokenizer;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
-
-import playground.wrashid.PSF.ParametersPSF;
 
 /**
  * File format (for example see test case data).
@@ -46,7 +45,7 @@ public class HubLinkMapping {
 	private void handleUnmappedLinksEnd(){
 		if (ParametersPSF.getMainInitUnmappedLinks()!=null && ParametersPSF.getMainInitUnmappedLinks()){
 			// add unmapped links in "last column"
-			for (Link link:ParametersPSF.getMatsimControler().getNetwork().getLinks().values()){
+            for (Link link: ParametersPSF.getMatsimControler().getScenario().getNetwork().getLinks().values()){
 				String linkStringId=link.getId().toString();
 				if (!linkHubMapping.containsKey(linkStringId)){
 					linkHubMapping.put(linkStringId, this.numberOfHubs);

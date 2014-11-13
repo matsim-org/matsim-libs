@@ -24,9 +24,6 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,9 +36,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.parkAndRide.pRscoring.BvgScoringFunctionConfigGroupPR;
 import playground.ikaddoura.parkAndRide.pRscoring.BvgScoringFunctionFactoryPR;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Ihab
@@ -173,8 +172,8 @@ public class ParkAndRideMain {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
-		
-		controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getNetwork()));
+
+        controler.setScoringFunctionFactory(new BvgScoringFunctionFactoryPR(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroupPR(controler.getConfig()), controler.getScenario().getNetwork()));
 
 		ParkAndRideControlerListener prControlerListener = new ParkAndRideControlerListener(controler, adaptiveControl, id2prFacility, gravity);
 		prControlerListener.setAddPRProb(addPRProb);

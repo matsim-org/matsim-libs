@@ -26,14 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.yu.tests.ChangeLegModeWithParkLocation;
 
 /**
  * @author yu
@@ -84,7 +77,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			}
 			System.out.println("----->currentIteration=" + itr);
 
-			Plan plan = ctl.getPopulation().getPersons().values().iterator()
+            Plan plan = ctl.getScenario().getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -142,7 +135,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			}
 			System.out.println("----->currentIteration=" + itr);
 
-			Plan plan = ctl.getPopulation().getPersons().values().iterator()
+            Plan plan = ctl.getScenario().getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements()) {
@@ -200,7 +193,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			}
 			System.out.println("----->currentIteration=" + itr);
 
-			Plan plan = ctl.getPopulation().getPersons().values().iterator()
+            Plan plan = ctl.getScenario().getPopulation().getPersons().values().iterator()
 					.next().getSelectedPlan();
 			StringBuilder legChainModes = new StringBuilder("|");
 			for (PlanElement pe : plan.getPlanElements()) {

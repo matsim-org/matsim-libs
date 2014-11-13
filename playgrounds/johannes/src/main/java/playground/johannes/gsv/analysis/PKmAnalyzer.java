@@ -22,16 +22,16 @@
  */
 package playground.johannes.gsv.analysis;
 
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
 
 /**
  * @author johannes
@@ -72,7 +72,7 @@ public class PKmAnalyzer implements IterationEndsListener, StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		calculator = new PKmCalculator(event.getControler().getNetwork(), attributes);
+        calculator = new PKmCalculator(event.getControler().getScenario().getNetwork(), attributes);
 		event.getControler().getEvents().addHandler(calculator);
 	}
 

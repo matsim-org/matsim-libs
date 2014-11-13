@@ -1,11 +1,6 @@
 package playground.artemc.heterogeneity;
 
 
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -16,7 +11,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
@@ -24,9 +18,12 @@ import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouterEventsBased.TransitRouterHeteroWSImplFactory;
-import playground.artemc.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
+
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HeteroControler {
 
@@ -84,7 +81,7 @@ public class HeteroControler {
 		controler.setTravelDisutilityFactory(factory);
 
 		//Routing PT
-		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+        WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
@@ -96,7 +93,7 @@ public class HeteroControler {
 		controler.setTransitRouterFactory(new TransitRouterHeteroWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), heterogeneityConfig));
 
 		//Scoring
-		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), heterogeneityConfig));
+        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), heterogeneityConfig));
 		controler.setOverwriteFiles(true);
 		
 		// Additional analysis

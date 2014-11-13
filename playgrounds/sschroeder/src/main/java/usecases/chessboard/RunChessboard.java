@@ -1,16 +1,7 @@
 package usecases.chessboard;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -27,12 +18,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-
 import usecases.analysis.CarrierScoreStats;
 import usecases.analysis.LegHistogram;
 import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import usecases.chessboard.replanning.ReRouter;
 import usecases.chessboard.replanning.TimeAllocationMutator;
+
+import java.io.File;
 
 public class RunChessboard {
 	
@@ -53,7 +45,7 @@ public class RunChessboard {
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = createStrategyManagerFactory(types,controler);
-		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(controler.getNetwork());
+        CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(controler.getScenario().getNetwork());
 		
 		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
 		
@@ -77,10 +69,10 @@ public class RunChessboard {
 	
 	private static void prepareFreightOutputDataAndStats(Controler controler, final Carriers carriers) {
 		final LegHistogram freightOnly = new LegHistogram(900);
-		freightOnly.setPopulation(controler.getPopulation());
+        freightOnly.setPopulation(controler.getScenario().getPopulation());
 		freightOnly.setInclPop(false);
 		final LegHistogram withoutFreight = new LegHistogram(900);
-		withoutFreight.setPopulation(controler.getPopulation());
+        withoutFreight.setPopulation(controler.getScenario().getPopulation());
 		
 		CarrierScoreStats scores = new CarrierScoreStats(carriers, "output/carrier_scores", true);
 		
@@ -143,13 +135,13 @@ public class RunChessboard {
 					}
 					{
 						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.) ) ;
-						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
+                        strategy.addStrategyModule(new ReRouter(router, controler.getScenario().getNetwork(), controler.getLinkTravelTimes(), 1.));
 						strategyManager.addStrategy( strategy, null, 0.15) ;
 					}
 					{
 						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new KeepSelected<CarrierPlan, Carrier>() ) ;
 						strategy.addStrategyModule(new TimeAllocationMutator(1.));
-						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
+                        strategy.addStrategyModule(new ReRouter(router, controler.getScenario().getNetwork(), controler.getLinkTravelTimes(), 1.));
 						strategyManager.addStrategy( strategy, null, 0.15) ;
 					}
 //					{

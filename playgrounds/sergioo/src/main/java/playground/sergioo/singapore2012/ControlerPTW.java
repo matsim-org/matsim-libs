@@ -60,8 +60,8 @@ public class ControlerPTW extends Controler {
 		ConfigUtils.loadConfig(config, args[0]);
 		ControlerPTW controler = new ControlerPTW(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
-		controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getPopulation()));
-		controler.addCoreControlerListener(new ScoreStats(controler.getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
+        controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
+        controler.addCoreControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
