@@ -34,9 +34,7 @@ import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 
 public abstract class LocationMutator implements PlanAlgorithm {
 
@@ -62,8 +60,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	}
 
 	public LocationMutator(Scenario scenario, TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			Random random) {
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 
 		this.defineFlexibleActivities = new ActivitiesHandler(scenario.getConfig().locationchoice());
 		this.quadTreesOfType = quad_trees;
@@ -81,7 +78,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
 			locationChoiceBasedOnKnowledge = false;
 		}
-		this.initTrees(((ScenarioImpl) scenario).getActivityFacilities());
+		this.initTrees(scenario.getActivityFacilities());
 	}
 
 	/**

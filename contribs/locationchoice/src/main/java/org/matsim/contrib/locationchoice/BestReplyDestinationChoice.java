@@ -19,21 +19,24 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -42,19 +45,13 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.router.util.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
@@ -95,7 +92,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		this.flexibleTypes = this.lcContext.getFlexibleTypes() ;		
+		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 		this.initTrees(this.scenario.getActivityFacilities(), this.scenario.getConfig().locationchoice());
 		this.sampler = new DestinationSampler(
@@ -109,37 +106,11 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	 */
 	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
-		TreesBuilder treesBuilder = new TreesBuilder(this.flexibleTypes, this.scenario.getNetwork(), config);
-		treesBuilder.setActTypeConverter(this.lcContext.getConverter());
-		treesBuilder.createTrees(facilities);
-		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
-//		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 		
-		/*
-		 * Create a copy of the treesBuilder.getQuadTreesOfType() outcome where the
-		 * ActivityFacility objects are replaced by ActivityFacilityWithIndex objects. 
-		 */
-		Map<Id<ActivityFacility>, ActivityFacilityWithIndex> map = new HashMap<Id<ActivityFacility>, ActivityFacilityWithIndex>();
-		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
-			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
-			map.put(activityFacility.getId(), new ActivityFacilityWithIndex(activityFacility, index));
-		}
-		
-		TreeMap<String, QuadTreeRing<ActivityFacility>> quadTree = treesBuilder.getQuadTreesOfType();
-		for (Entry<String, QuadTreeRing<ActivityFacility>> entry : quadTree.entrySet()) {
-			String key = entry.getKey();
-			 QuadTreeRing<ActivityFacility> value = entry.getValue();
-			 
-			 double minX = value.getMinEasting();
-			 double maxX = value.getMaxEasting();
-			 double minY = value.getMinNorthing();
-			 double maxY = value.getMaxNorthing();
-			 QuadTreeRing<ActivityFacilityWithIndex> quadTreeRing = new QuadTreeRing<ActivityFacilityWithIndex>(minX, minY, maxX, maxY);
-			 for (ActivityFacility activityFacility : value.values()) {
-				 quadTreeRing.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), map.get(activityFacility.getId()));
-			 }
-			 
-			 this.quadTreesOfType.put(key, quadTreeRing);
+		for (String flexibleType : this.flexibleTypes) {
+			Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
+			this.quadTreesOfType.put(flexibleType, tuple.getFirst());
+			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
 		}
 	}
 
@@ -168,52 +139,5 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		
 		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
-	}
-	
-
-	public static final class ActivityFacilityWithIndex implements ActivityFacility, HasIndex {
-
-		private final ActivityFacility activityFacility;
-		private final int index;
-		
-		public ActivityFacilityWithIndex(ActivityFacility activityFacility, int index) {
-			this.activityFacility = activityFacility;
-			this.index = index;
-		}
-		
-		@Override
-		public Id<Link> getLinkId() {
-			return this.activityFacility.getLinkId();
-		}
-
-		@Override
-		public Coord getCoord() {
-			return this.activityFacility.getCoord();
-		}
-
-		@Override
-		public Id<ActivityFacility> getId() {
-			return this.activityFacility.getId();
-		}
-
-		@Override
-		public Map<String, Object> getCustomAttributes() {
-			return this.activityFacility.getCustomAttributes();
-		}
-
-		@Override
-		public int getArrayIndex() {
-			return this.index;
-		}
-
-		@Override
-		public Map<String, ActivityOption> getActivityOptions() {
-			return this.activityFacility.getActivityOptions();
-		}
-
-		@Override
-		public void addActivityOption(ActivityOption option) {
-			this.activityFacility.addActivityOption(option);
-		}
 	}
 }

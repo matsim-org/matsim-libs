@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.utils;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -40,7 +41,7 @@ public class TreesBuilder {
 
 	private Network network = null;
 	private static final Logger log = Logger.getLogger(TreesBuilder.class);
-	private HashSet<String> flexibleTypes = new HashSet<String>();
+	private Set<String> flexibleTypes = new HashSet<String>();
 	private final LocationChoiceConfigGroup config;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
@@ -49,7 +50,7 @@ public class TreesBuilder {
 	private ActTypeConverter converter = new ActTypeConverter(true);
 
 
-	public TreesBuilder(HashSet<String> flexibleTypes, Network network, LocationChoiceConfigGroup config) {
+	public TreesBuilder(Set<String> flexibleTypes, Network network, LocationChoiceConfigGroup config) {
 		this.flexibleTypes = flexibleTypes;
 		this.network = network;
 		this.config = config;

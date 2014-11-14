@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
 public class DestinationScoring { 
@@ -85,7 +84,7 @@ public class DestinationScoring {
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id facilityId, Id<Person> personId, int actIndex) {
+	private double getEpsilonAlternative(Id<ActivityFacility> facilityId, Id<Person> personId, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
 		 */		
