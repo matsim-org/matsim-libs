@@ -68,9 +68,12 @@ public class NoiseCalculationOffline {
 			log.info("Population scale factor: " + scaleFactor);
 			
 		} else {
+			
 //			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
 //			lastIteration = 100;
 //			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
+//			receiverPointGap = 100.;
+//			scaleFactor = 10.;
 			
 			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 			lastIteration = 5;
@@ -105,15 +108,15 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-//		events.addHandler(eventWriter);
+		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
 		
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario, noiseParameters);
 		spatialInfo.setActivityCoords();
 		
-//		spatialInfo.setReceiverPoints();
+		spatialInfo.setReceiverPoints();
 //		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
-		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+//		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
 		
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
 		spatialInfo.setRelevantLinkIds();
@@ -146,18 +149,18 @@ public class NoiseCalculationOffline {
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 		
-//		log.info("Calculating each agent's activity durations...");
-//		personActivityTracker.calculateDurationOfStay();
-//		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
-//		log.info("Calculating each agent's activity durations... Done.");
-//		
-//		log.info("Calculating noise damage costs and throwing noise events...");
-//		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
-//		noiseDamageCosts.setCollectNoiseEvents(false);
-//		noiseDamageCosts.calculateNoiseDamageCosts();
-//		log.info("Calculating noise damage costs and throwing noise events... Done.");
-//
-//		eventWriter.closeFile();
+		log.info("Calculating each agent's activity durations...");
+		personActivityTracker.calculateDurationOfStay();
+		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+		log.info("Calculating each agent's activity durations... Done.");
+		
+		log.info("Calculating noise damage costs and throwing noise events...");
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
+		noiseDamageCosts.setCollectNoiseEvents(false);
+		noiseDamageCosts.calculateNoiseDamageCosts();
+		log.info("Calculating noise damage costs and throwing noise events... Done.");
+
+		eventWriter.closeFile();
 	}
 }
 		
