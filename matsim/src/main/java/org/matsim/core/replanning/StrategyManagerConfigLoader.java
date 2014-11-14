@@ -110,8 +110,7 @@ public final class StrategyManagerConfigLoader {
 		}
 		String name = config.strategy().getPlanSelectorForRemoval();
 		if ( name != null ) {
-			// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
-			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
+			// ``manager'' has a default setting.
 			GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.getInstance(name).createPlanSelector(scenario);
 			manager.setPlanSelectorForRemoval(planSelector) ;
 		}

@@ -20,14 +20,14 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.gbl.MatsimRandom;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -226,8 +226,7 @@ public class StrategyConfigGroup extends Module {
 		Map<String,String> map = super.getComments();
 		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
 		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
-		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
-				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
+		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal. WorstPlanSelector is not a good " +
 				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
 				"tested. kai, feb'12") ;
 		map.put(ReflectiveDelegate.EXTERNAL_EXE_CONFIG_TEMPLATE,"the external executable will be called with a config file as argument.  This is the pathname to a possible "
@@ -352,8 +351,7 @@ public class StrategyConfigGroup extends Module {
 		private String externalExeTmpFileRootDir = null;
 		private long externalExeTimeOut = 3600;
 
-		private String planSelectorForRemoval = null ; 
-		// default is configured in StrategyManager; one may wish to change where the default is defined.  kai, feb'12
+		private String planSelectorForRemoval = "WorstPlanSelector";
 		
 		//---
 		private double fraction = Double.POSITIVE_INFINITY ;
