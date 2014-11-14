@@ -37,14 +37,14 @@ import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class MatrixDiffPlot {
 
 	public static ZoneLayer<Map<String, Object>> diffLayer(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zonelayer) {
 		zonelayer.overwriteCRS(CRSUtils.getCRS(4326));
 		Set<Zone<Map<String, Object>>> zones = new HashSet<>();
-		
+
 		for (Zone<Map<String, Object>> zone : zonelayer.getZones()) {
 			String code = zone.getAttribute().get("ISO_CODE").toString();
 			if (code.equalsIgnoreCase("DE")) {
@@ -52,44 +52,52 @@ public class MatrixDiffPlot {
 
 				double fromSum1 = sum(m1.getFromLocEntries(id), false);
 				double fromSum2 = sum(m2.getFromLocEntries(id), false);
-				
+
 				Zone<Map<String, Object>> newZone = new Zone<>(zone.getGeometry());
 				zones.add(newZone);
 				newZone.setAttribute(new HashMap<String, Object>());
-				newZone.getAttribute().put("SOURCE_ERR", (fromSum2 - fromSum1)/fromSum1);
+				double err = (fromSum2 - fromSum1) / fromSum1;
+				newZone.getAttribute().put("SOURCE_ERR", err);
+				
 
 				double toSum1 = sum(m1.getToLocEntries(id), false);
 				double toSum2 = sum(m2.getToLocEntries(id), false);
-				
-				newZone.getAttribute().put("TARGET_ERR", (toSum2 - toSum1)/toSum1);
+				err = (toSum2 - toSum1) / toSum1;
+
+				newZone.getAttribute().put("TARGET_ERR", err);
+				newZone.getAttribute().put("LABEL", String.format("%.2f / %.2f / %.2f", err, toSum1, toSum2));
 				
 				zones.add(newZone);
 			}
 		}
-		
+
 		ZoneLayer<Map<String, Object>> newLayer = new ZoneLayer<>(zones);
 		newLayer.overwriteCRS(CRSUtils.getCRS(4326));
-		
+
 		return newLayer;
 	}
-	
+
 	private static double sum(List<Entry> entries, boolean ignoreIntracell) {
 		double sum = 0;
 		if (entries != null) {
 			for (Entry e : entries) {
-				if (!ignoreIntracell && !e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
+				if (ignoreIntracell) {
+					if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
+						sum += e.getValue();
+					}
+				} else {
 					sum += e.getValue();
 				}
 			}
 		}
 		return sum;
 	}
-	
+
 	public static void main(String args[]) throws IOException {
 		Matrix m1 = new Matrix("2", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m1);
-		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
-		
+		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
+
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
 		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
@@ -97,11 +105,11 @@ public class MatrixDiffPlot {
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
 		MatrixOperations.applyFactor(m2, 11);
 		MatrixOperations.applyIntracellFactor(m2, 1.3);
-		
+
 		ZoneLayer<Map<String, Object>> zonelayer = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
-		
+
 		ZoneLayer<Map<String, Object>> newLayer = diffLayer(m1, m2, zonelayer);
-		
-		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/diff.shp");
+
+		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/diff.psm.shp");
 	}
 }

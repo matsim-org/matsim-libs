@@ -284,16 +284,17 @@ public class MatrixCompare {
 	public static void main(String[] args) throws IOException {
 		Matrix m1 = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m1);
-//		reader.readFile("/home/johannes/gsv/matrices/IV_gesamt.O.fma");
+//		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
 		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
 		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.324.fma");
+//		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
+		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
 
-		MatrixOperations.applyFactor(m1, 1 / 365.0);
-		MatrixOperations.applyFactor(m2, 40);
-		MatrixOperations.applyIntracellFactor(m2, 1.3);
+//		MatrixOperations.applyFactor(m1, 1 / 365.0);
+//		MatrixOperations.applyFactor(m2, 12);
+//		MatrixOperations.applyIntracellFactor(m2, 1.3);
 		
 		System.out.println(String.format("PSMobility - matrix sum: %s", MatrixOperations.sum(m1, false)));
 		System.out.println(String.format("Matsim - matrix sum: %s", MatrixOperations.sum(m2, false)));
@@ -301,7 +302,7 @@ public class MatrixCompare {
 		System.out.println(String.format("PSMobility: %s cells with zero value.", MatrixOperations.countEmptyCells(m1)));
 		System.out.println(String.format("Matsim: %s cells with zero value.", MatrixOperations.countEmptyCells(m2)));
 
-		boolean ignoreZeros = true;
+		boolean ignoreZeros = false;
 		DescriptiveStatistics stats = relErrorAll(m1, m2, false, ignoreZeros);
 		System.out.println(String.format("Relative error all cells: mean=%s, med=%s, min=%s, max=%s", stats.getMean(), stats.getPercentile(0.5),
 				stats.getMin(), stats.getMax()));

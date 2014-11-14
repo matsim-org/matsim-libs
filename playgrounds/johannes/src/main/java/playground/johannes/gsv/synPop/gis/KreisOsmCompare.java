@@ -29,7 +29,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -73,35 +76,69 @@ public class KreisOsmCompare {
 		
 		ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read("/home/johannes/gsv/osm/kreisCompare/zones_zone.SHP");
 		
+//		String[] types = new String[]{"W","A","S","B","H","F","E","D","U","R","T","V","P"};
+		String[] types = new String[]{"W"};
+		TObjectIntHashMap<String> attractivness = readAttractivness("/home/johannes/gsv/osm/kreisCompare/StrukturAttraktivitaet.csv", types);
+		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.shop.xml");
+		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.home.20.xml");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
-		String[] types = new String[]{"E"};
-		TObjectIntHashMap<String> attractivness = readEmployees("/home/johannes/gsv/osm/kreisCompare/StrukturAttraktivitaet.csv", types);
+		
 
 		countFacilities(zoneLayer, facilities);
 		
 		TDoubleArrayList values1 = new TDoubleArrayList(zoneLayer.getZones().size());
 		TDoubleArrayList values2 = new TDoubleArrayList(zoneLayer.getZones().size());
+	
+		double sum1 = 0;
+		double sum2 = 0;
 		
 		int zoneNotFound = 0;
-		for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			if(zone.getAttribute().get("NUTS0_CODE").equals("DE")) {
-			String id = String.valueOf(zone.getAttribute().get("NO"));
-			int cntEmpl = attractivness.get(id);
-			Integer cntFac = (Integer) zone.getAttribute().get(BUILDING_COUNT);
-			if(cntFac == null) {
-				cntFac = 0;
-				zoneNotFound++;
-			}
-			
-			values1.add(cntEmpl);
-			values2.add(cntFac);
+		for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
+			if (zone.getAttribute().get("NUTS0_CODE").equals("DE")) {
+				String id = String.valueOf(zone.getAttribute().get("NO"));
+				int attrac = attractivness.get(id);
+				Integer cntFac = (Integer) zone.getAttribute().get(BUILDING_COUNT);
+				if (cntFac == null) {
+					cntFac = 0;
+					zoneNotFound++;
+				}
+
+				values1.add(attrac);
+				values2.add(cntFac);
+				
+				sum1 += attrac;
+				sum2 += cntFac;
 			}
 		}
+
+		Set<Zone<Map<String, Object>>> zones = new HashSet<>();
+		for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
+			if (zone.getAttribute().get("NUTS0_CODE").equals("DE")) {
+				String id = String.valueOf(zone.getAttribute().get("NO"));
+				int attrac = attractivness.get(id);
+				Integer cntFac = (Integer) zone.getAttribute().get(BUILDING_COUNT);
+				if (cntFac == null) {
+					cntFac = 0;
+				}
+				
+				double val1 = attrac/sum1;
+				double val2 = cntFac/sum2;
+				
+				
+				Zone<Map<String, Object>> newZone = new Zone<>(zone.getGeometry());
+				newZone.setAttribute(new HashMap<String, Object>());
+				newZone.getAttribute().put("ATTRACT_ERR", (val2 - val1)/val1);
+				zones.add(newZone);
+			}
+		}
+
+		ZoneLayer<Map<String, Object>> newZoneLayer = new ZoneLayer<>(zones);
+		newZoneLayer.overwriteCRS(CRSUtils.getCRS(4326));
+		ZoneLayerSHP.writeWithAttributes(newZoneLayer, "/home/johannes/gsv/osm/kreisCompare/diff.work.shp");
 		
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
@@ -130,7 +167,8 @@ public class KreisOsmCompare {
 					count = new Integer(0);
 					
 				}
-				count++;
+//				count++;
+				count += facility.getActivityOptions().size();
 				
 				zone.getAttribute().put(BUILDING_COUNT, count);
 			} else {
@@ -145,7 +183,7 @@ public class KreisOsmCompare {
 		return CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(coord), transform);
 	}
 	
-	private static TObjectIntHashMap<String> readEmployees(String filename, String[] types) throws IOException {
+	private static TObjectIntHashMap<String> readAttractivness(String filename, String[] types) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		String line = reader.readLine();
 

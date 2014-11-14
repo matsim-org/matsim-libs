@@ -222,7 +222,9 @@ public class ZoneLayerSHP {
 		typeBuilder.setCRS(crs);
 		typeBuilder.setName("zone");
 		typeBuilder.add("the_geom", MultiPolygon.class);
-		
+		/*
+		 * TODO: Only those attributes of this zone are written.
+		 */
 		Zone<Map<String, Object>> azone = layer.getZones().iterator().next();
 		List<String> keys = new ArrayList<>(azone.getAttribute().keySet());
 		for(String key : keys) {

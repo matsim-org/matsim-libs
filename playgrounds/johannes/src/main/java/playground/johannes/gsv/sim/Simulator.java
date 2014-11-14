@@ -184,7 +184,7 @@ public class Simulator {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 			Controler controler = event.getControler();
-			Config config = event.getControler().getConfig();
+//			Config config = event.getControler().getConfig();
 			/*
 			 * connect facilities to links
 			 */
@@ -206,13 +206,13 @@ public class Simulator {
             task.addTask(new TripDistanceTask(controler.getScenario().getActivityFacilities()));
             task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
 			task.addTask(new ScoreTask());
-			task.addTask(new ArrivalLoadTask());
-			task.addTask(new DepartureLoadTask());
+//			task.addTask(new ArrivalLoadTask());
+//			task.addTask(new DepartureLoadTask());
             task.addTask(new PkmTask(controler.getScenario().getActivityFacilities()));
 //			task.addTask(new ModeShareTask());
-			task.addTask(new ActivityDurationTask());
-			task.addTask(new ActivityLoadTask());
-			task.addTask(new LegLoadTask());
+//			task.addTask(new ActivityDurationTask());
+//			task.addTask(new ActivityLoadTask());
+//			task.addTask(new LegLoadTask());
 			task.addTask(new TripDurationTask());
 			task.addTask(new TripPurposeShareTask());
 //			task.addTask(new LegFrequencyTask());
