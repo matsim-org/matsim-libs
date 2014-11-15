@@ -54,7 +54,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 	private Id<Link> cachedNextLinkId = null;
 
-	private int currentLinkIdIndex = 0 ;
+	private int currentLinkIndex = 0 ;
 
 	
 
@@ -64,19 +64,6 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
 		super(plan, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer()) ;
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
-		// yy should we keep the back pointer to the simTimer?  Without it, we need to pass more simulation times around but it might be nice to do it
-		// in that way. kai, nov'14
-
-		// I am moving the VehicleUsingAgent functionality into the basicAgentDelegate since a separate VehicleUsingAgentImpl to only
-		// pass into DriverAgent and PassengerAgent seems overkill.  kai, nov'14
-
-		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
-		if (planElements.size() > 0) {
-			Activity firstAct = (Activity) planElements.get(0);				
-			this.setCurrentLinkId( firstAct.getLinkId() ) ;
-			this.setState(MobsimAgent.State.ACTIVITY) ;
-			calculateAndSetDepartureTime(firstAct);
-		}
 	}
 
 	@Override
@@ -87,8 +74,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 			expectedLinkWarnCount++;
 		}
 		this.setCurrentLinkId( newLinkId ) ;
-//		this.setCurrentLinkIdIndex(this.getCurrentLinkIdIndex() + 1);
-		this.currentLinkIdIndex++ ;
+		this.currentLinkIndex++ ;
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
 
@@ -125,14 +111,14 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
 
-		if (this.getCurrentLinkIdIndex() >= routeLinkIds.size() ) {
+		if (this.getCurrentLinkIndex() >= routeLinkIds.size() ) {
 			// we have no more information from the routeLinkIds
 
 			Link currentLink = this.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
 			Link destinationLink = this.getScenario().getNetwork().getLinks().get(this.getDestinationLinkId());
 
 			// special case:
-			if (currentLink == destinationLink && this.getCurrentLinkIdIndex() > routeLinkIds.size()) {
+			if (currentLink == destinationLink && this.getCurrentLinkIndex() > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
 				// the condition for arrival currently is "route has run dry AND destination link not attached to current link".  now with loop links,
@@ -162,14 +148,14 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		}
 
 
-		Id<Link> nextLinkId = routeLinkIds.get(this.getCurrentLinkIdIndex());
+		Id<Link> nextLinkId = routeLinkIds.get(this.getCurrentLinkIndex());
 		Link currentLink = this.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
 		Link nextLink = this.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
 			this.cachedNextLinkId = nextLinkId; //save time in later calls, if link is congested
 			return this.cachedNextLinkId;
 		}
-		log.warn(this + " [no link to next routenode found: routeindex= " + this.getCurrentLinkIdIndex() + " ]");
+		log.warn(this + " [no link to next routenode found: routeindex= " + this.getCurrentLinkIndex() + " ]");
 		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
 	}
@@ -186,10 +172,10 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		// the standard condition is "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
 		// changing the second condition for the time being to "being at destination". kai, nov'14
-		if ( this.getCurrentLinkIdIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+		if ( this.getCurrentLinkIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
 
-			this.currentLinkIdIndex = 0 ; 
-			// (the above is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
+			this.currentLinkIndex = 0 ; 
+			// (this is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
 
 			return true ;
 		} else {
@@ -232,8 +218,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		}
 	}
 
-	final int getCurrentLinkIdIndex() {
-		return currentLinkIdIndex;
+	final int getCurrentLinkIndex() {
+		return currentLinkIndex;
 	}
 
 }

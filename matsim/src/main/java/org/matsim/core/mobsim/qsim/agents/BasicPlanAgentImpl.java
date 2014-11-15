@@ -1,5 +1,7 @@
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -46,16 +48,19 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 
-//	private transient Id<Link> cachedDestinationLinkId;
-	// why is this transient?  "transient" means it is not included in automatic serialization/deserialization.  But where are we using this for this 
-	// class?  kai, nov'14
-
 	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
 		this.plan = plan2 ;
 		this.scenario = scenario ;
 		this.events = events ;
 		this.simTimer = simTimer ;
-	}
+		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
+		if (planElements.size() > 0) {
+			Activity firstAct = (Activity) planElements.get(0);				
+			this.setCurrentLinkId( firstAct.getLinkId() ) ;
+			this.setState(MobsimAgent.State.ACTIVITY) ;
+			calculateAndSetDepartureTime(firstAct);
+		}
+}
 	
 	@Override
 	public final PlanElement getCurrentPlanElement() {
@@ -176,7 +181,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	}
 
 	private void advancePlan(double now) {
-		//		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
 		this.currentPlanElementIndex++ ;
 	
 		// check if plan has run dry:
@@ -247,8 +251,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	@Override
 	public final double getActivityEndTime() {
-		// I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
-		// Seems ok.  kai, nov'14
 		return this.activityEndTime;
 	}
 
@@ -263,7 +265,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-		//		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
 		Activity act = (Activity) this.getCurrentPlanElement() ;
 		this.getEvents().processEvent(
 				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
@@ -276,7 +277,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	public final String getMode() {
 		if( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question,
-			// this we answer with "null".  This will likely result in an "abort". kai, nov'14
+			// thus we answer with "null".  This will likely result in an "abort". kai, nov'14
 			return null ;
 		}
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
