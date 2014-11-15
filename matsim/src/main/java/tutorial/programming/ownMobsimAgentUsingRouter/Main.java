@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.ownMobsimAgent;
+package tutorial.programming.ownMobsimAgentUsingRouter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,25 +32,28 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.TripRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
+ * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
+ * 
  * @author nagel
- *
  */
-public class Main {
+class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		
 		final Controler ctrl = new Controler("abd") ;
 		
+		TripRouter router = ctrl.getTripRouterFactory().instantiateAndConfigureTripRouter() ;
+		
+		final MyGuidance guidance = new MyGuidance( router ) ;
+		
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				
 				MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance( MobsimType.qsim.toString() ) ;
 				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
@@ -65,7 +68,7 @@ public class Main {
 					@Override
 					public void insertAgentsIntoMobsim() {
 						// insert traveler agent:
-						final MobsimAgent ag = new MyMobsimAgent() ;
+						final MobsimAgent ag = new MyMobsimAgent( guidance, qsim.getSimTimer(), sc ) ;
 						qsim.insertAgentIntoMobsim(ag) ;
 						
 						// insert vehicle:

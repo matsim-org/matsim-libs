@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.ownMobsimAgent;
+package tutorial.programming.ownMobsimAgentWithPerception;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,17 +36,20 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
+ * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
+ * 
  * @author nagel
- *
  */
-public class Main {
+class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		
 		final Controler ctrl = new Controler("abd") ;
+		
+		final MyObserver eventsObserver = new MyObserver( ctrl.getScenario() ) ;
+		ctrl.getEvents().addHandler( eventsObserver );
+		
+		final MyGuidance guidance = new MyGuidance( eventsObserver, ctrl.getScenario() ) ;
 		
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
@@ -65,7 +68,7 @@ public class Main {
 					@Override
 					public void insertAgentsIntoMobsim() {
 						// insert traveler agent:
-						final MobsimAgent ag = new MyMobsimAgent() ;
+						final MobsimAgent ag = new MyMobsimAgent( guidance ) ;
 						qsim.insertAgentIntoMobsim(ag) ;
 						
 						// insert vehicle:
