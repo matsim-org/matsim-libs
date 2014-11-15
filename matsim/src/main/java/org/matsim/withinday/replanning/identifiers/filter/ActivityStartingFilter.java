@@ -68,8 +68,9 @@ public class ActivityStartingFilter implements AgentFilter {
 		 * yes, remove the agent from the set.
 		 */
 		DriverAgent driver = (DriverAgent) agent;
-		Id<Link> nextLinkId = driver.chooseNextLinkId();
-		if (nextLinkId == null) return false;
+//		Id<Link> nextLinkId = driver.chooseNextLinkId();
+//		if (nextLinkId == null) return false;
+		if ( driver.isArrivingOnCurrentLink() ) return false ;
 		
 		return true;
 	}

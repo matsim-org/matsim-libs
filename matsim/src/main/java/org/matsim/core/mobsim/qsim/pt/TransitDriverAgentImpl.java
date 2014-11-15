@@ -251,4 +251,17 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		return PopulationUtils.unmodifiablePlan(this.getPerson().getSelectedPlan());
 	}
 
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// this is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
+		// not sure if there was an error eventually. kai, nov'14
+		if ( this.chooseNextLinkId()==null ) {
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+	
+	
+
 }

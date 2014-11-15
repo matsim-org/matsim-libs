@@ -212,5 +212,11 @@ class MyAgent implements MobsimDriverAgent {
 	public void setVehicle(MobsimVehicle veh) {
 		this.vehicle = veh ;
 	}
+
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 	
 }

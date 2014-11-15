@@ -222,7 +222,7 @@ public class QNode implements NetsimNode {
 	}
 
 
-	private void checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
+	private static void checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
 		if (nextQLink == null){
 			throw new IllegalStateException("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + " plans to travel on that link from link " + veh.getCurrentLink().getId());
 		}

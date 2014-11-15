@@ -65,7 +65,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final BasicPlanAgentImpl basicAgentDelegate ; 
 	// yy ...Impl.  Not sure if this is a problem; can say that we have pluggable implementations, and they fulfill 
 	// (also) part of a public interface. kai, nov'14
-	
+
 	// other:
 	private Id<Link> cachedNextLinkId = null;
 
@@ -73,12 +73,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private Leg currentLeg;
 
-	private List<Id<Link>> cachedRouteLinkIds = null;
-
 	/* package, because of withinday */ int currentLinkIdIndex;
 
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
-
 
 	// ============================================================================================================================
 	// c'tor
@@ -88,7 +85,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
 		// yy should we keep the back pointer to the simTimer?  Without it, we need to pass more simulation times around but it might be nice to do it
 		// in that way. kai, nov'14
-		
+
 		// I am moving the VehicleUsingAgent functionality into the basicAgentDelegate since a separate VehicleUsingAgentImpl to only
 		// pass into DriverAgent and PassengerAgent seems overkill.  kai, nov'14
 
@@ -105,7 +102,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-//		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
+		//		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
 		Activity act = (Activity) this.basicAgentDelegate.getCurrentPlanElement() ;
 		this.basicAgentDelegate.getEvents().processEvent(
 				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
@@ -162,53 +159,68 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
 	@Override
-	public Id<Link> chooseNextLinkId() {
+	public final Id<Link> chooseNextLinkId() {
+		// To note: there is something really stupid going on here: A vehicle that is at the end of its route and on the destination link will arrive.
+		// However, a vehicle that is on the destination link BUT NOT AT THE END OF ITS ROUTE will NOT arrive.  This makes the whole thing
+		// very extremely messy.  kai, nov'14
 
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.
 		// I just fixed a situation where this method would give a warning about a bad route and return null
-		// the first time it is called, and happily return a link id when called the second time.
+		// the first time it is called, and happily return a link id when called the second time.  michaz 2013-08
 
-		// michaz 2013-08
+		// Agreed.  One should also not assume that anything here is the result of one consistent design process.  Rather, many people added
+		// and removed material as they needed it for their own studies.  Making the whole code more consistent would be highly
+		// desirable.  kai, nov'14
 
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
-		if (this.cachedRouteLinkIds == null) {
-			if ( this.currentLeg.getRoute() instanceof NetworkRoute ) {
-				this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
-			} else {
-				// (seems that this can happen if an agent is a DriverAgent, but wants to start a pt leg. 
-				// A situation where Marcel's ``wrapping approach'' may have an advantage.  On the other hand,
-				// DriverAgent should be a NetworkAgent, i.e. including pedestrians, and then this function
-				// should always be answerable.  kai, nov'11)
-				return null ;
-			}
+
+		if ( ! ( this.currentLeg.getRoute() instanceof NetworkRoute ) ) {
+			return null ;
 		}
 
-		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {
-			// we have no more information for the route, so the next link should be the destination link
+		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
+
+		if (this.currentLinkIdIndex >= routeLinkIds.size() ) {
+			// we have no more information from the routeLinkIds
+
 			Link currentLink = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
 			Link destinationLink = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(this.getDestinationLinkId());
-			if (currentLink == destinationLink && this.currentLinkIdIndex > this.cachedRouteLinkIds.size()) {
+
+			// special case:
+			if (currentLink == destinationLink && this.currentLinkIdIndex > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
+
+				// the standard condition for arrival is "route has run dry AND destination link not attached to current link".  now with loop links,
+				// this condition is never triggered.  So no wonder that for such cases currently a special condition is needed.  kai, nob'14
+
 				return null;
 			}
+
+			// destination is is attached to intersection ahead:
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
 			}
+
+			// else return null.  
+			// yy this is also used when driving by the arrival point and checking if this is truly the arrival link
+			// (i.e. plan has run out AND this is the destination link ... so we can drive past the ultimate destination if we want to)
+
 			if (!(this.getCurrentLinkId().equals(this.getDestinationLinkId()))) {
-				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
+				// normally, we should be here when on the destination link.  Otherwise, something has gone wrong.
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.getCurrentLinkId().toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.getDestinationLinkId().toString());
 				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
+				// (Also no abort is initiated by mobsim. kai, nov'14)
 			}
-			return null; // vehicle is at the end of its route
+			return null;
 		}
 
 
-		Id<Link> nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
+		Id<Link> nextLinkId = routeLinkIds.get(this.currentLinkIdIndex);
 		Link currentLink = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
 		Link nextLink = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
@@ -220,12 +232,43 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return null;
 	}
 
+	//	@Override
+	//	public final boolean isArrivingOnCurrentLink( ) {
+	//		// this is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
+	//		// not sure if there was an error eventually. kai, nov'14
+	//		if ( this.chooseNextLinkId()==null ) {
+	//			return true ;
+	//		} else {
+	//			return false ;
+	//		}
+	//	}
+
+	@Override
+	public final boolean isArrivingOnCurrentLink( ) {
+		if ( ! ( this.currentLeg.getRoute() instanceof NetworkRoute ) ) {
+			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question):
+			return true ;
+		}
+
+		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
+
+		// the standard condition is "route has run dry AND destination link not attached to current link":
+		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
+		// changing the second condition for the time being to "being at destination"
+		if ( this.currentLinkIdIndex >= routeLinkIds.size() && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+			return true ;
+		} else {
+			return false ;
+		}
+
+	}
+
 
 	// ============================================================================================================================
 	// below there only (package-)private methods or setters/getters
 
 	private void advancePlan() {
-//		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
+		//		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
 		this.basicAgentDelegate.advancePlan() ;
 
 		// check if plan has run dry:
@@ -259,16 +302,15 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 				noRouteWrnCnt++ ;
 			}
 			this.state = MobsimAgent.State.ABORT ;
-        } else {
-//			this.cachedDestinationLinkId = route.getEndLinkId();
-        	this.basicAgentDelegate.setDestinationLinkId( route.getEndLinkId() );
+		} else {
+			//			this.cachedDestinationLinkId = route.getEndLinkId();
+			this.basicAgentDelegate.setDestinationLinkId( route.getEndLinkId() );
 
 			// set the route according to the next leg
 			this.currentLeg = leg;
-			this.cachedRouteLinkIds = null;
 			this.currentLinkIdIndex = 0;
 			this.cachedNextLinkId = null;
-        }
+		}
 	}
 
 	private void initializeActivity(Activity act) {
@@ -298,7 +340,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 
 		this.cachedNextLinkId = null;
-		this.cachedRouteLinkIds = null;
 		this.basicAgentDelegate.setDestinationLinkId(null);
 
 		/*
@@ -308,7 +349,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		PlanElement currentPlanElement = this.basicAgentDelegate.getCurrentPlanElement() ;
 		if (currentPlanElement instanceof Leg) {
 			this.currentLeg  = ((Leg) currentPlanElement);
-			this.cachedRouteLinkIds = null;
 
 			Route route = currentLeg.getRoute();
 			if (route == null) {
@@ -316,7 +356,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 				this.state = MobsimAgent.State.ABORT ;
 				return;
 			}
-//			this.cachedDestinationLinkId = route.getEndLinkId();
+			//			this.cachedDestinationLinkId = route.getEndLinkId();
 			this.basicAgentDelegate.setDestinationLinkId(route.getEndLinkId());
 		} else {			
 			// If an activity is performed, update its current activity.
@@ -388,47 +428,40 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	public final void setVehicle(final MobsimVehicle veh) {
 		this.basicAgentDelegate.setVehicle(veh);
 	}
-
 	@Override
 	public final MobsimVehicle getVehicle() {
 		return this.basicAgentDelegate.getVehicle() ;
 	}
-
 	@Override
 	public final Id<Link> getCurrentLinkId() {
 		return basicAgentDelegate.getCurrentLinkId();
 	}
-
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
 		return basicAgentDelegate.getPlannedVehicleId();
 	}
-
 	@Override
 	public final Id<Link> getDestinationLinkId() {
 		return this.basicAgentDelegate.getDestinationLinkId();
 	}
-
 	@Override
 	public final Person getPerson() {
 		return this.basicAgentDelegate.getPerson() ;
 	}
-
 	@Override
 	public final Id<Person> getId() {
 		return this.basicAgentDelegate.getId() ;
 	}
-
 	@Override
-	public MobsimAgent.State getState() {
+	public final MobsimAgent.State getState() {
 		return state;
 	}
 	@Override
-	public PlanElement getCurrentPlanElement() {
+	public final PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
 	}
 	@Override
-	public PlanElement getNextPlanElement() {
+	public final PlanElement getNextPlanElement() {
 		return basicAgentDelegate.getNextPlanElement();
 	}
 	@Override
@@ -439,7 +472,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final Plan getModifiablePlan() {
 		return basicAgentDelegate.getModifiablePlan() ;
 	}
-	
+
 	final int getCurrentPlanElementIndex() {
 		return basicAgentDelegate.getCurrentPlanElementIndex() ;
 	}

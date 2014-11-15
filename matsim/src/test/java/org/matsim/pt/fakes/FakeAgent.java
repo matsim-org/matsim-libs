@@ -172,5 +172,11 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		return null;
 	}
+
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 	
 }
