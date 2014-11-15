@@ -149,7 +149,12 @@ class MultiModalQLinkExtension {
 
 			// Check if MobsimAgent has reached destination:
 			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
-			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
+
+//			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
+			if ((link.getId().equals(driver.getDestinationLinkId())) && (driver.isWantingToArriveOnCurrentLink())) {
+				// Christoph, the "isArrivingOnCurrentLink" method is new.  You may decide that this is enough, and getDestinationLinkId
+				// does not need to be queried.  kai, nov'14
+				
 				driver.endLegAndComputeNextState(now);
 				this.simEngine.internalInterface.arrangeNextAgentState(driver);
 			}

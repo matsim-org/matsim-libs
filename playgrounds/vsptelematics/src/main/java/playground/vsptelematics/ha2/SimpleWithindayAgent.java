@@ -97,8 +97,8 @@ public class SimpleWithindayAgent implements MobsimDriverAgent {
 		return delegate.toString();
 	}
 
-	public final boolean isArrivingOnCurrentLink() {
-		return delegate.isArrivingOnCurrentLink();
+	public final boolean isWantingToArriveOnCurrentLink() {
+		return delegate.isWantingToArriveOnCurrentLink();
 	}
 
 	public final double getActivityEndTime() {

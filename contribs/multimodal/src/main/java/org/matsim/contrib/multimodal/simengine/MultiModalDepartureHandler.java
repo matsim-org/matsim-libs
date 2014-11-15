@@ -59,7 +59,8 @@ class MultiModalDepartureHandler implements DepartureHandler {
 		
 		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(linkId);
 		
-		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
+//		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
+		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.isWantingToArriveOnCurrentLink() )) {
 			personAgent.endLegAndComputeNextState(now);
 			this.simEngine.internalInterface.arrangeNextAgentState(personAgent);
 			/* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */  

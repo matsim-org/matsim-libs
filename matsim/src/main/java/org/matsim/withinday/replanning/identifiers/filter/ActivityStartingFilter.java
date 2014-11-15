@@ -70,7 +70,7 @@ public class ActivityStartingFilter implements AgentFilter {
 		DriverAgent driver = (DriverAgent) agent;
 //		Id<Link> nextLinkId = driver.chooseNextLinkId();
 //		if (nextLinkId == null) return false;
-		if ( driver.isArrivingOnCurrentLink() ) return false ;
+		if ( driver.isWantingToArriveOnCurrentLink() ) return false ;
 		
 		return true;
 	}

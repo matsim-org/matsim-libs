@@ -235,8 +235,8 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 	}
 
 	@Override
-	public boolean isArrivingOnCurrentLink() {
-		return this.delegate.isArrivingOnCurrentLink() ;
+	public boolean isWantingToArriveOnCurrentLink() {
+		return this.delegate.isWantingToArriveOnCurrentLink() ;
 	}
 
 }

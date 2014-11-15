@@ -46,6 +46,7 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 	private double activityEndTime = Time.UNDEFINED_TIME;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
+	private int currentLinkIndex = 0;
 
 	BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
 
@@ -65,7 +66,7 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 }
 	
 	@Override
-	public final void endLegAndComputeNextState(final double now) {
+	public void endLegAndComputeNextState(final double now) {
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
@@ -111,7 +112,8 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 	}
 
 	private void initializeLeg(Leg leg) {
-		this.setState(MobsimAgent.State.LEG) ;			
+		this.setState(MobsimAgent.State.LEG) ;		
+		this.currentLinkIndex = 0 ;
 		if (leg.getRoute() == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT.");
 			if ( noRouteWrnCnt < 1 ) {
@@ -288,6 +290,14 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 	
 	final Leg getCurrentLeg() {
 		return (Leg) this.getCurrentPlanElement() ;
+	}
+
+	final int getCurrentLinkIndex() {
+		return currentLinkIndex;
+	}
+	
+	final void incCurrentLinkIndex() {
+		currentLinkIndex++ ;
 	}
 	
 }

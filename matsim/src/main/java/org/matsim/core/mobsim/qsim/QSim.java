@@ -354,6 +354,7 @@ public final class QSim implements VisMobsim, Netsim {
 			}
 		}
 		log.warn("no departure handler wanted to handle the departure of agent " + agent.getId());
+		// yy my intuition is that this should be followed by setting the agent state to abort. kai, nov'14
 
 	}
 

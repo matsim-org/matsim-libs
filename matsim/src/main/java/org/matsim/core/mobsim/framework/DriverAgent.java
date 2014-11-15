@@ -48,6 +48,6 @@ public interface DriverAgent extends Identifiable<Person>, NetworkAgent, Vehicle
 	 */
 	public void notifyMoveOverNode(Id<Link> newLinkId);
 	
-	public boolean isArrivingOnCurrentLink( ) ;
+	public boolean isWantingToArriveOnCurrentLink( ) ;
 	
 }

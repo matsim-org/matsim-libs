@@ -214,7 +214,7 @@ class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public boolean isArrivingOnCurrentLink() {
+	public boolean isWantingToArriveOnCurrentLink() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

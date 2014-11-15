@@ -52,8 +52,6 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 	private Id<Link> cachedNextLinkId = null;
 
-	private int currentLinkIndex = 0 ;
-
 	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
 		super(plan, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer()) ;
 		// deliberately does NOT keep a back pointer to the whole Netsim; this should also be removed in the constructor call.
@@ -67,8 +65,14 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 			expectedLinkWarnCount++;
 		}
 		this.setCurrentLinkId( newLinkId ) ;
-		this.currentLinkIndex++ ;
+		this.incCurrentLinkIndex();
 		this.cachedNextLinkId = null; //reset cached nextLink
+	}
+	
+	@Override
+	public final void endLegAndComputeNextState( final double now ) {
+		super.endLegAndComputeNextState(now);
+		this.cachedNextLinkId = null ;
 	}
 
 	/**
@@ -107,7 +111,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
 		
 		// (3) if route has run dry, we return the destination link (except for one special case, which however may not be necessary any more):
-		if (this.currentLinkIndex >= routeLinkIds.size() ) {
+		if (this.getCurrentLinkIndex() >= routeLinkIds.size() ) {
 
 			// special case:
 			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() )  && this.getCurrentLinkIndex() > routeLinkIds.size()) {
@@ -120,41 +124,60 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 				return null;
 			}
-
+			
 			this.cachedNextLinkId = this.getDestinationLinkId();
 			return this.cachedNextLinkId;
 
 		}
 
 		// (4) otherwise (normal case): return the next link of the plan (after caching it):
-		this.cachedNextLinkId = routeLinkIds.get(this.getCurrentLinkIndex()); //save time in later calls, if link is congested
+		this.cachedNextLinkId = routeLinkIds.get(this.getCurrentLinkIndex());
 		return this.cachedNextLinkId;
 		
 	}
 
 	@Override
-	public final boolean isArrivingOnCurrentLink( ) {
+	public final boolean isWantingToArriveOnCurrentLink( ) {
 		
 		if ( ! ( this.getCurrentLeg().getRoute() instanceof NetworkRoute ) ) {
 			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question). kai, nov'14
 			return true ;
 		}
 
-		final int routeLinkIdsSize = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds().size();
-
+		final List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
+		final int routeLinkIdsSize = routeLinkIds.size();
+		
 		// the standard condition used to be "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially meant "destination link EQUALS current link" but really stupid way of stating this.  Thus
 		// changing the second condition to "being at destination".  This breaks old code; I will fix as far as it is covered by tests.  kai, nov'14
-		if ( this.currentLinkIndex >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
-			
-			this.currentLinkIndex = 0 ; 
-			// (this is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
-
+		if ( this.getCurrentLinkIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
 			return true ;
-		} else {
-			return false ;
 		}
-
+		
+// the following are possible consistency checks on which previous code may have relied. Relatively expensive because of hash map lookups. kai, nov'14
+			
+//		Link currentLink = this.getScenario().getNetwork().getLinks().get( this.getCurrentLinkId() ) ;
+//		Link destinationLink = this.getScenario().getNetwork().getLinks().get( this.getDestinationLinkId() ) ;
+//			
+//		if ( this.currentLinkIndex >= routeLinkIdsSize ) { // route has run dry
+//			if ( currentLink.getToNode() == destinationLink.getFromNode() ) { // will arrive on next link
+//				return false ;
+//			} else { // will not arrive on next link
+//				log.error("route has run dry, and destination link is not attached to next node.  In consequence, vehicle has no chance to continue "
+//						+ "correctly.  Make it arrive here rather than explode it at the intersection.") ;
+//				return true ;
+//			}
+//		}
+			
+//		Link nextLink = this.getScenario().getNetwork().getLinks().get( routeLinkIds.get(this.getCurrentLinkIndex()) ) ;
+//		
+//		if ( currentLink.getToNode() != nextLink.getFromNode() ) {
+//			log.error("route is inconsistent.  In consequence, vehicle has no chance to continue correctly." +  
+//					"Make it arrive here rather than explode it at the intersection." ) ;
+//			return true ;
+//		}
+			
+		return false ;
 	}
 
 
@@ -185,10 +208,6 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		} else {			
 			this.calculateAndSetDepartureTime((Activity) this.getCurrentPlanElement());
 		}
-	}
-
-	final int getCurrentLinkIndex() {
-		return currentLinkIndex;
 	}
 
 }

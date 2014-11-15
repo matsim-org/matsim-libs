@@ -966,7 +966,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		return plan;
 	}
 	@Override
-	public boolean isArrivingOnCurrentLink() {
+	public boolean isWantingToArriveOnCurrentLink() {
 		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
 		// kai, nov'14
 		if ( this.chooseNextLinkId()==null ) {

@@ -176,7 +176,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				continue ;
 			}
 
-			if ( veh.getDriver().isArrivingOnCurrentLink() ) {
+			if ( veh.getDriver().isWantingToArriveOnCurrentLink() ) {
 				// If the driver wants to stop (again) on this link, give them a special treatment.
 				// addFromWait doesn't work here, because after that, they cannot stop anymore.
 				road.addTransitSlightlyUpstreamOfStop(veh) ;

@@ -112,8 +112,8 @@ public class GuidanceWithindayAgent implements MobsimDriverAgent {
 		return delegate.getState();
 	}
 
-	public boolean isArrivingOnCurrentLink() {
-		return delegate.isArrivingOnCurrentLink();
+	public boolean isWantingToArriveOnCurrentLink() {
+		return delegate.isWantingToArriveOnCurrentLink();
 	}
 
 	public double getActivityEndTime() {

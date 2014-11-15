@@ -174,7 +174,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public boolean isArrivingOnCurrentLink() {
+	public boolean isWantingToArriveOnCurrentLink() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

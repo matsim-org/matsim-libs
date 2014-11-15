@@ -102,11 +102,14 @@ class MultiModalQNodeExtension {
 		}
 	}
 	
-	private void checkNextLinkSemantics(Link currentLink, Link nextLink, MobsimAgent personAgent){
+	@SuppressWarnings("static-method")
+	private boolean checkNextLinkSemantics(Link currentLink, Link nextLink, MobsimAgent personAgent){
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
-	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getId() +
-	          " from link " + currentLink.getId() + " to link " + nextLink.getId());
+//	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getId() +
+//	          " from link " + currentLink.getId() + " to link " + nextLink.getId());
+			return false ;
 	   	}
+		return true ;
 	}
 	
 	  // ////////////////////////////////////////////////////////////////////
@@ -128,21 +131,28 @@ class MultiModalQNodeExtension {
 		if (nextLinkId != null) {
 			Link nextLink = this.simEngine.getMultiModalQLinkExtension(nextLinkId).getLink();
 			
-			this.checkNextLinkSemantics(currentLink, nextLink, mobsimAgent);
-			
-			// move Agent over the Node
-			((MobsimDriverAgent)mobsimAgent).notifyMoveOverNode(nextLinkId);
-			this.simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(mobsimAgent, now);
+			if ( this.checkNextLinkSemantics(currentLink, nextLink, mobsimAgent) == false ) {
+				moveToAbort(mobsimAgent, now, currentLink, nextLink);
+			} else {
+				// move Agent over the Node
+				((MobsimDriverAgent)mobsimAgent).notifyMoveOverNode(nextLinkId);
+				this.simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(mobsimAgent, now);
+			}
 		}
 		// --> nextLink == null
 		else {
-			log.error("Agent has no or wrong route! agentId=" + mobsimAgent.getId()
-					+ " currentLink=" + currentLink.getId().toString()
-					+ ". The agent is removed from the simulation.");
-			
-			mobsimAgent.setStateToAbort(now);
-			this.simEngine.internalInterface.arrangeNextAgentState(mobsimAgent);
+			moveToAbort(mobsimAgent, now, currentLink, null);
 		}
 		return true;
+	}
+
+	private void moveToAbort(final MobsimAgent mobsimAgent, final double now, Link currentLink, Link nextLink) {
+		log.error("Agent has no or wrong route! agentId=" + mobsimAgent.getId()
+				+ " currentLink=" + currentLink.getId().toString() + " nextLink=" + (nextLink!=null?nextLink.getId():"null") 
+				+ " currentLinkToNode=" + currentLink.getToNode().getId() + " nextLinkFromNode=" + (nextLink!=null?nextLink.getFromNode().getId():"null")
+				+ ". The agent is removed from the simulation.");
+		
+		mobsimAgent.setStateToAbort(now);
+		this.simEngine.internalInterface.arrangeNextAgentState(mobsimAgent);
 	}
 }

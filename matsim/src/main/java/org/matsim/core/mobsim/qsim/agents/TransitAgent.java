@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
+public final class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
 	private static final Logger log = Logger.getLogger(TransitAgent.class);
 
 	public static TransitAgent createTransitAgent(Person p, Netsim simulation) {
@@ -54,13 +54,13 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	@Override
-	public boolean getExitAtStop(final TransitStopFacility stop) {
+	public final  boolean getExitAtStop(final TransitStopFacility stop) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
 	@Override
-	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+	public final boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		if (line.getId().equals(route.getLineId())) {
 			return containsId(stopsToCome, route.getEgressStopId());
@@ -69,7 +69,8 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		}
 	}
 
-	boolean containsId(List<TransitRouteStop> stopsToCome,
+	@SuppressWarnings("static-method")
+	final boolean containsId(List<TransitRouteStop> stopsToCome,
                        Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
@@ -80,12 +81,12 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	@Override
-	public double getWeight() {
+	public final double getWeight() {
 		return 1.0;
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
+	public final Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
@@ -102,7 +103,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public final Id<TransitStopFacility> getDesiredDestinationStopId() {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId();
 	}
