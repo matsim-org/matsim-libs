@@ -1,22 +1,31 @@
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PlanImpl;
 
-public final class PlanAgentImpl implements PlanAgent {
+public final class BasicPlanAgentImpl implements PlanAgent, Identifiable, HasPerson {
 
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
 	private boolean firstTimeToGetModifiablePlan = true;
+	private final Scenario scenario;
+	private final EventsManager events;
+	private final MobsimTimer simTimer;
 
-	public PlanAgentImpl(Plan plan2) {
+	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
 		this.plan = plan2 ;
+		this.scenario = scenario ;
+		this.events = events ;
+		this.simTimer = simTimer ;
 	}
 	
 	@Override
@@ -66,6 +75,28 @@ public final class PlanAgentImpl implements PlanAgent {
 
 	void advancePlan() {
 		this.currentPlanElementIndex++ ;
+	}
+
+	@Override
+	public Id getId() {
+		return this.plan.getPerson().getId() ;
+	}
+
+	@Override
+	public Person getPerson() {
+		return this.plan.getPerson() ;
+	}
+
+	Scenario getScenario() {
+		return scenario;
+	}
+
+	EventsManager getEvents() {
+		return events;
+	}
+
+	MobsimTimer getSimTimer() {
+		return simTimer;
 	}
 
 }
