@@ -69,11 +69,6 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		}
 	}
 
-	Leg getCurrentLeg() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		return (Leg) currentPlanElement;
-	}
-
 	boolean containsId(List<TransitRouteStop> stopsToCome,
                        Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {

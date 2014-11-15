@@ -260,7 +260,8 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	@Override
 	public final double getActivityEndTime() {
-		// yyyyyy I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
+		// I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
+		// Seems ok.  kai, nov'14
 		return this.activityEndTime;
 	}
 
@@ -303,23 +304,23 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 		return state;
 	}
 
-	Leg getCurrentLeg() {
+	final Leg getCurrentLeg() {
 		return currentLeg;
 	}
 
-	void setCurrentLeg(Leg currentLeg) {
+	final void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
 	}
 
-	int getCurrentLinkIdIndex() {
+	final int getCurrentLinkIdIndex() {
 		return currentLinkIdIndex;
 	}
 
-	void setCurrentLinkIdIndex(int currentLinkIdIndex) {
+	final void setCurrentLinkIdIndex(int currentLinkIdIndex) {
 		this.currentLinkIdIndex = currentLinkIdIndex;
 	}
 
-	void setState(MobsimAgent.State state) {
+	final void setState(MobsimAgent.State state) {
 		this.state = state;
 	}
 	
