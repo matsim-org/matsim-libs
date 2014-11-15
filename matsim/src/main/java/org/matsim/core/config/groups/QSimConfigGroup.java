@@ -187,7 +187,7 @@ public class QSimConfigGroup extends ReflectiveModule implements MobsimConfigGro
 				+ ONLY_USE_STARTTIME + "'" );
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
-		map.put(MAIN_MODE, "Defines which modes are congested modes. Technically, these are the modes that " +
+		map.put(MAIN_MODE, "[comma-separated list] Defines which modes are congested modes. Technically, these are the modes that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
 				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
