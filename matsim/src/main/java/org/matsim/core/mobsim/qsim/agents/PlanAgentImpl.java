@@ -19,24 +19,15 @@ public final class PlanAgentImpl implements PlanAgent {
 		this.plan = plan2 ;
 	}
 	
-
-	/**
-	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
-	 */
-	 List<PlanElement> getPlanElements() {
-		return this.getCurrentPlan().getPlanElements();
-	}
-
 	@Override
 	public final PlanElement getCurrentPlanElement() {
-		return this.getPlanElements().get(this.currentPlanElementIndex);
+		return this.plan.getPlanElements().get(this.currentPlanElementIndex);
 	}
 
 	@Override
 	public final PlanElement getNextPlanElement() {
-		if ( this.currentPlanElementIndex < this.getPlanElements().size() ) {
-			return this.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
+		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size() ) {
+			return this.plan.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
 		} else {
 			return null ;
 		}
@@ -45,10 +36,6 @@ public final class PlanAgentImpl implements PlanAgent {
 
 	/* default */ final int getCurrentPlanElementIndex() {
 		return currentPlanElementIndex;
-	}
-
-	/* default */ final void setCurrentPlanElementIndex(int currentPlanElementIndex) {
-		this.currentPlanElementIndex = currentPlanElementIndex;
 	}
 
 	@Override
@@ -74,6 +61,11 @@ public final class PlanAgentImpl implements PlanAgent {
 			this.setPlan(newPlan);
 		}
 		return this.getCurrentPlan();
+	}
+
+
+	void advancePlan() {
+		this.currentPlanElementIndex++ ;
 	}
 
 }

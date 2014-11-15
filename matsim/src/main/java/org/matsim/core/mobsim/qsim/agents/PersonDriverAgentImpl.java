@@ -100,7 +100,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 //		this.setPlan(plan);
 		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
 		if (planElements.size() > 0) {
-			this.planAgentDelegate.setCurrentPlanElementIndex(0);
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.currentLinkId = firstAct.getLinkId();
 			this.state = MobsimAgent.State.ACTIVITY ;
@@ -232,10 +231,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	// below there only (package-)private methods or setters/getters
 
 	private void advancePlan() {
-		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
+//		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
+		this.planAgentDelegate.advancePlan() ;
 
 		// check if plan has run dry:
-		if ( this.planAgentDelegate.getCurrentPlanElementIndex() >= this.planAgentDelegate.getPlanElements().size() ) {
+		if ( this.planAgentDelegate.getCurrentPlanElementIndex() >= this.planAgentDelegate.getCurrentPlan().getPlanElements().size() ) {
 			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
 					"          (but continuing the mobsim).  This used to be an exception ...") ;
 			this.state = MobsimAgent.State.ABORT ;
@@ -342,7 +342,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 				(this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation());
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
-		if ( this.planAgentDelegate.getCurrentPlanElementIndex() == this.planAgentDelegate.getPlanElements().size()-1 ) {
+		if ( this.planAgentDelegate.getCurrentPlanElementIndex() == this.planAgentDelegate.getCurrentPlan().getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity of person driver agent id " + this.person.getId() + " has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
