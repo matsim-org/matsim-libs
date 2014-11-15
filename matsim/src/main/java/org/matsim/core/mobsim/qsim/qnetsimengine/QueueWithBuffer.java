@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -32,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
@@ -63,6 +66,8 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  */
 final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
+	private static final Logger log = Logger.getLogger(QueueWithBuffer.class);
+
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -398,7 +403,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 
 			// Check if veh has reached destination:
-//			if ((driver.chooseNextLinkId() == null)) {
 			if ( driver.isArrivingOnCurrentLink( ) ) {
 				letVehicleArrive(now, veh);
 				continue;

@@ -28,8 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -55,11 +53,6 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 	private Id<Link> cachedNextLinkId = null;
 
 	private int currentLinkIndex = 0 ;
-
-	
-
-	// ============================================================================================================================
-	// c'tor
 
 	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
 		super(plan, simulation.getScenario(), simulation.getEventsManager(), simulation.getSimTimer()) ;
@@ -98,63 +91,52 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		// and removed material as they needed it for their own studies.  Making the whole code more consistent would be highly
 		// desirable.  kai, nov'14
 
-		if (this.cachedNextLinkId != null && !this.cachedNextLinkId.equals(this.getCurrentLinkId()) ) {
+		// (1) if there is a cached link id, use that one: 
+		if (this.cachedNextLinkId != null && !(this.cachedNextLinkId.equals(this.getCurrentLinkId())) ) {
 			// cachedNextLinkId used to be set to null when a leg started.  Now the BasicPlanAgentImpl does not longer have access to cached
 			// value.  kai, nov'14
 
 			return this.cachedNextLinkId;
 		}
 
+		// (2) routes that are not network routes cannot be interpreted
 		if ( ! ( this.getCurrentLeg().getRoute() instanceof NetworkRoute ) ) {
 			return null ;
 		}
 
 		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
-
-		if (this.getCurrentLinkIndex() >= routeLinkIds.size() ) {
-			// we have no more information from the routeLinkIds
-
-			Link currentLink = this.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
-			Link destinationLink = this.getScenario().getNetwork().getLinks().get(this.getDestinationLinkId());
+		
+		// (3) if route has run dry, we essentially return the destination link:
+		if (this.currentLinkIndex >= routeLinkIds.size() ) {
 
 			// special case:
-			if (currentLink == destinationLink && this.getCurrentLinkIndex() > routeLinkIds.size()) {
+			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() )  && this.getCurrentLinkIndex() > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
-				// the condition for arrival currently is "route has run dry AND destination link not attached to current link".  now with loop links,
-				// this condition is never triggered.  So no wonder that for such cases currently a special condition is needed.  kai, nov'14
+				// the condition for arrival used to be "route has run dry AND destination link not attached to current link".  now with loop links,
+				// this condition is never triggered.  So no wonder that for such cases a special condition was needed.  kai, nov'14
+				
+				// The special condition may not be necessary any more. kai, nov'14
 
 				return null;
 			}
 
-			// destination is is attached to intersection ahead:
-			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
-				this.cachedNextLinkId = destinationLink.getId();
-				return this.cachedNextLinkId;
-			}
+			this.cachedNextLinkId = this.getDestinationLinkId();
+			return this.cachedNextLinkId;
 
-			// else return null.  
-			// yy this is also used when driving by the arrival point and checking if this is truly the arrival link
-			// (i.e. plan has run out AND this is the destination link ... so we can drive past the ultimate destination if we want to)
-
-			if (!(this.getCurrentLinkId().equals(this.getDestinationLinkId()))) {
-				// normally, we should be here when on the destination link.  Otherwise, something has gone wrong.
-				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.getCurrentLinkId().toString()
-						+ ", is at the end of its route, but has not yet reached its destination link " + this.getDestinationLinkId().toString());
-				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
-				// (Also no abort is initiated by mobsim. kai, nov'14)
-			}
-			return null;
 		}
-
 
 		Id<Link> nextLinkId = routeLinkIds.get(this.getCurrentLinkIndex());
 		Link currentLink = this.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
 		Link nextLink = this.getScenario().getNetwork().getLinks().get(nextLinkId);
+
+		// (4) if destination link is connected to current link, we return the destination link: 
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
 			this.cachedNextLinkId = nextLinkId; //save time in later calls, if link is congested
 			return this.cachedNextLinkId;
 		}
+
+		// (5) if destination link is NOT connected to current link, we return null: 
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.getCurrentLinkIndex() + " ]");
 		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
@@ -162,6 +144,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 	@Override
 	public final boolean isArrivingOnCurrentLink( ) {
+		
 		if ( ! ( this.getCurrentLeg().getRoute() instanceof NetworkRoute ) ) {
 			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question). kai, nov'14
 			return true ;
@@ -169,11 +152,11 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		final int routeLinkIdsSize = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds().size();
 
-		// the standard condition is "route has run dry AND destination link not attached to current link":
+		// the standard condition used to be "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
 		// changing the second condition for the time being to "being at destination". kai, nov'14
-		if ( this.getCurrentLinkIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
-
+		if ( this.currentLinkIndex >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+			
 			this.currentLinkIndex = 0 ; 
 			// (this is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
 
@@ -204,10 +187,6 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		this.cachedNextLinkId = null;
 
-		/*
-		 * The Leg may have been exchanged in the Person's Plan, so
-		 * we update the Reference to the currentLeg Object.
-		 */
 		if (this.getCurrentPlanElement() instanceof Leg) {
 			if (getCurrentLeg().getRoute() == null) {
 				log.error("The agent " + this.getId() + " has no route in its leg. Setting agent state to abort." );

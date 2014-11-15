@@ -75,6 +75,10 @@ abstract class QLaneI extends QInternalI {
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
+	 * <p/>
+	 * Notes:<ul>
+	 * <li> is not only used for transit and should thus be renamed.  kai, nov'14
+	 * </ul>
 	 */
 	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	

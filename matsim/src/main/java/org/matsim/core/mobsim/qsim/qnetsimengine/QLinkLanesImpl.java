@@ -358,7 +358,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				continue ;
 			}
 			
-			if (veh.getDriver().chooseNextLinkId() == null) {
+//			if (veh.getDriver().chooseNextLinkId() == null) {
+			if ( veh.getDriver().isArrivingOnCurrentLink() ) {
 				// If the driver wants to stop on this link, give them a special treatment.
 				// addFromWait doesn't work here, because after that, they cannot stop anymore.
 				this.firstLaneQueue.addTransitSlightlyUpstreamOfStop(veh) ;
