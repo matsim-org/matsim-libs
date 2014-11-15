@@ -44,9 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent{
-
-	private static final Logger log = Logger
-			.getLogger(TransitSubModeAgent.class);
+	private static final Logger log = Logger.getLogger(TransitSubModeAgent.class);
 
 	private boolean fixedSubMode;
 

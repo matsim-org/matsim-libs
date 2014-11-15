@@ -44,10 +44,9 @@ import java.util.List;
  * @author aneumann
  */
 class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
+	private static final Logger log = Logger.getLogger(PTransitAgent.class);
 
-	private final static Logger log = Logger.getLogger(PTransitAgent.class);
-
-    private final TransitSchedule transitSchedule;
+	private final TransitSchedule transitSchedule;
 
 	public static PTransitAgent createTransitAgent(Person p, Netsim simulation) {
         return new PTransitAgent(p, simulation);

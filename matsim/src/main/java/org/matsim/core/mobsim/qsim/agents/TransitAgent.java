@@ -42,8 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser
  */
 public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
-
-	private final static Logger log = Logger.getLogger(TransitAgent.class);
+	private static final Logger log = Logger.getLogger(TransitAgent.class);
 
 	public static TransitAgent createTransitAgent(Person p, Netsim simulation) {
 		TransitAgent agent = new TransitAgent(p, simulation);
