@@ -18,10 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mobsimagentsource;
+package tutorial.programming.ownMobsimAgent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -47,19 +49,10 @@ public class Main {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 
-				// not recommended (insertion too early):
-				MobsimAgent ag = new MyMobsimAgent() ;
-				qsim.insertAgentIntoMobsim(ag) ;
-
-				return qsim ;
-			}
-		}) ;
-		ctrl.setMobsimFactory(new MobsimFactory(){
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+				// yyyy Gibt es hier eine angenehmere Variante, oder könnten wir sie bauen?
+				// Wäre schön, wenn diese "angenehmere Variante" enrichSimulation irgendwie enthalten würde.
 				
 				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
 				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
@@ -73,7 +66,7 @@ public class Main {
 						
 						// insert vehicle:
 						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType() );
-						Id linkId4VehicleInsertion = null ;
+						Id<Link> linkId4VehicleInsertion = null ;
 						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 					}
 				}) ;
@@ -85,9 +78,14 @@ public class Main {
 }
 	
 	class MyMobsimAgent implements MobsimAgent {
+		private Id<Person> id;
+
+		MyMobsimAgent() {
+			this.id = Id.createPersonId( "MyMobsimAgent") ;
+		}
 
 		@Override
-		public Id getCurrentLinkId() {
+		public Id<Link> getCurrentLinkId() {
 			// TODO Auto-generated method stub
 			throw new UnsupportedOperationException() ;
 		}
@@ -99,9 +97,8 @@ public class Main {
 		}
 
 		@Override
-		public Id getId() {
-			// TODO Auto-generated method stub
-			throw new UnsupportedOperationException() ;
+		public Id<Person> getId() {
+			return this.id ;
 		}
 
 		@Override

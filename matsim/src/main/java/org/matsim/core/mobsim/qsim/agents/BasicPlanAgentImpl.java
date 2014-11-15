@@ -31,6 +31,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
+	// this is deliberately package-protected. kai, nov'14
 
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
@@ -46,6 +47,11 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 	private double activityEndTime = Time.UNDEFINED_TIME;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
+	/**
+	 * This notes how far a route is advanced.  One could move this into the DriverAgent(Impl).  There, howver, is no method to know about the
+	 * start of the route, thus one has to guess when to set it back to zero.  Also, IMO there is really some logic to providing this as a service
+	 * by the entity that holds the plan. Better ideas are welcome.  kai, nov'14
+	 */
 	private int currentLinkIndex = 0;
 
 	BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
