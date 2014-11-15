@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
@@ -31,7 +30,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
+class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
 
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
@@ -48,12 +47,15 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 
-	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
+	BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
+
 		this.plan = plan2 ;
+		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
+
 		this.scenario = scenario ;
 		this.events = events ;
 		this.simTimer = simTimer ;
-		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
+		List<PlanElement> planElements = this.getCurrentPlan().getPlanElements();
 		if (planElements.size() > 0) {
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.setCurrentLinkId( firstAct.getLinkId() ) ;
@@ -63,106 +65,12 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 }
 	
 	@Override
-	public final PlanElement getCurrentPlanElement() {
-		return this.plan.getPlanElements().get(this.currentPlanElementIndex);
-	}
-
-	@Override
-	public final PlanElement getNextPlanElement() {
-		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size() ) {
-			return this.plan.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
-		} else {
-			return null ;
-		}
-	}
-
-
-	/* default */ final int getCurrentPlanElementIndex() {
-		return currentPlanElementIndex;
-	}
-
-	@Override
-	public final Plan getCurrentPlan() {
-		return plan;
-	}
-
-	/**
-	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
-	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
-	 * (and will be scored).  This is deliberate behavior!
-	 */
-	final Plan getModifiablePlan() {
-		if (firstTimeToGetModifiablePlan) {
-			firstTimeToGetModifiablePlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.getCurrentPlan().getPerson());
-			newPlan.copyFrom(this.getCurrentPlan());
-			this.plan = newPlan;
-		}
-		return this.getCurrentPlan();
-	}
-
-	@Override
-	public final Id<Person> getId() {
-		return this.plan.getPerson().getId() ;
-	}
-
-	@Override
-	public final Person getPerson() {
-		return this.plan.getPerson() ;
-	}
-
-	final Scenario getScenario() {
-		return scenario;
-	}
-
-	final EventsManager getEvents() {
-		return events;
-	}
-
-	final MobsimTimer getSimTimer() {
-		return simTimer;
-	}
-
-	@Override
-	public MobsimVehicle getVehicle() {
-		return vehicle;
-	}
-
-	@Override
-	public final void setVehicle(MobsimVehicle vehicle) {
-		this.vehicle = vehicle;
-	}
-
-	@Override
-	public final Id<Vehicle> getPlannedVehicleId() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
-		if (route.getVehicleId() != null) {
-			return route.getVehicleId();
-		} else {
-	        if (!getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-	            throw new IllegalStateException("NetworkRoute without a specified vehicle id.");
-	        }
-			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
-		}
-	}
-
-	@Override
-	public final Id<Link> getCurrentLinkId() {
-		return this.currentLinkId;
-	}
-	
-	/* package */ final void setCurrentLinkId( Id<Link> linkId ) {
-		this.currentLinkId = linkId ;
-	}
-
-	@Override
 	public final void endLegAndComputeNextState(final double now) {
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.getDestinationLinkId()
-					+ ", but arrived on link " + this.getCurrentLinkId() + ". Removing the agent from the simulation.");
+					+ ", but arrived on link " + this.getCurrentLinkId() + ". Setting agent state to ABORT.");
 			this.setState(MobsimAgent.State.ABORT) ;
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
@@ -185,8 +93,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	
 		// check if plan has run dry:
 		if ( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
-			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
-					"          (but continuing the mobsim).  This used to be an exception ...") ;
+			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT (but continuing the mobsim).") ;
 			this.setState(MobsimAgent.State.ABORT) ;
 			return;
 		}
@@ -206,8 +113,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private void initializeLeg(Leg leg) {
 		this.setState(MobsimAgent.State.LEG) ;			
 		if (leg.getRoute() == null) {
-			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT " +
-					"(but continuing the mobsim).");
+			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT.");
 			if ( noRouteWrnCnt < 1 ) {
 				log.info( "(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)") ;
 				noRouteWrnCnt++ ;
@@ -224,11 +130,10 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	/**
 	 * If this method is called to update a changed ActivityEndTime please
-	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
+	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
 	final void calculateAndSetDepartureTime(Activity act) {
-		ActivityDurationInterpretation activityDurationInterpretation =
-				(this.getScenario().getConfig().plans().getActivityDurationInterpretation());
+		ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
 		double now = this.getSimTimer().getTimeOfDay() ;
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 	
@@ -245,34 +150,44 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	}
 
 	@Override
-	public final Id<Link> getDestinationLinkId() {
-		return this.getCurrentLeg().getRoute().getEndLinkId() ;
-	}
-
-	@Override
-	public final double getActivityEndTime() {
-		return this.activityEndTime;
-	}
-
-	@Override
-	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		return ((Leg) currentPlanElement).getTravelTime();
-	}
-
-	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getCurrentPlanElement() ;
-		this.getEvents().processEvent(
-				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 	
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
 	}
 
+	// ============================================================================
+	// (nearly) pure getters and setters below here
+	
+	/**
+	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
+	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
+	 * (and will be scored).  This is deliberate behavior!
+	 */
+	final Plan getModifiablePlan() {
+		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
+		if (firstTimeToGetModifiablePlan) {
+			firstTimeToGetModifiablePlan = false ;
+			PlanImpl newPlan = new PlanImpl(this.getCurrentPlan().getPerson());
+			newPlan.copyFrom(this.getCurrentPlan());
+			this.plan = newPlan;
+		}
+		return this.getCurrentPlan();
+	}
+	@Override
+	public final Id<Vehicle> getPlannedVehicleId() {
+		NetworkRoute route = (NetworkRoute) this.getCurrentLeg().getRoute(); // if casts fail: illegal state.
+		if (route.getVehicleId() != null) {
+			return route.getVehicleId();
+		} else {
+	        if (!getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+	            throw new IllegalStateException("NetworkRoute without a specified vehicle id.");
+	        }
+			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
+		}
+	}
 	@Override
 	public final String getMode() {
 		if( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
@@ -286,9 +201,84 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 		}
 		return ((Leg) currentPlanElement).getMode() ;
 	}
-
 	@Override
-	public MobsimAgent.State getState() {
+	public final Double getExpectedTravelTime() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return ((Leg) currentPlanElement).getTravelTime();
+	}
+	@Override
+	public final PlanElement getCurrentPlanElement() {
+		return this.plan.getPlanElements().get(this.currentPlanElementIndex);
+	}
+	@Override
+	public final PlanElement getNextPlanElement() {
+		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size() ) {
+			return this.plan.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
+		} else {
+			return null ;
+		}
+	}
+
+	/* default */ final int getCurrentPlanElementIndex() {
+		return currentPlanElementIndex;
+	}
+	@Override
+	public final Plan getCurrentPlan() {
+		return plan;
+	}
+	@Override
+	public final Id<Person> getId() {
+		return this.plan.getPerson().getId() ;
+	}
+	@Override
+	public final Person getPerson() {
+		return this.plan.getPerson() ;
+	}
+	
+	final Scenario getScenario() {
+		return scenario;
+	}
+	
+	final EventsManager getEvents() {
+		return events;
+	}
+	
+	final MobsimTimer getSimTimer() {
+		return simTimer;
+	}
+	
+	@Override
+	public final MobsimVehicle getVehicle() {
+		return vehicle;
+	}
+	
+	@Override
+	public final void setVehicle(MobsimVehicle vehicle) {
+		this.vehicle = vehicle;
+	}
+	
+	@Override
+	public final Id<Link> getCurrentLinkId() {
+		return this.currentLinkId;
+	}
+	
+	/* package */ final void setCurrentLinkId( Id<Link> linkId ) {
+		this.currentLinkId = linkId ;
+	}
+	
+	@Override
+	public final Id<Link> getDestinationLinkId() {
+		return this.getCurrentLeg().getRoute().getEndLinkId() ;
+	}
+	@Override
+	public final double getActivityEndTime() {
+		return this.activityEndTime;
+	}
+	@Override
+	public final MobsimAgent.State getState() {
 		return state;
 	}
 

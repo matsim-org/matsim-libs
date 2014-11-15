@@ -106,7 +106,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
 		
-		// (3) if route has run dry, we essentially return the destination link:
+		// (3) if route has run dry, we return the destination link (except for one special case, which however may not be necessary any more):
 		if (this.currentLinkIndex >= routeLinkIds.size() ) {
 
 			// special case:
@@ -114,7 +114,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
 				// the condition for arrival used to be "route has run dry AND destination link not attached to current link".  now with loop links,
-				// this condition is never triggered.  So no wonder that for such cases a special condition was needed.  kai, nov'14
+				// this condition was not triggered.  So no wonder that for such cases a special condition was needed.  kai, nov'14
 				
 				// The special condition may not be necessary any more. kai, nov'14
 
@@ -126,20 +126,10 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		}
 
-		Id<Link> nextLinkId = routeLinkIds.get(this.getCurrentLinkIndex());
-		Link currentLink = this.getScenario().getNetwork().getLinks().get(this.getCurrentLinkId());
-		Link nextLink = this.getScenario().getNetwork().getLinks().get(nextLinkId);
-
-		// (4) if destination link is connected to current link, we return the destination link: 
-		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
-			this.cachedNextLinkId = nextLinkId; //save time in later calls, if link is congested
-			return this.cachedNextLinkId;
-		}
-
-		// (5) if destination link is NOT connected to current link, we return null: 
-		log.warn(this + " [no link to next routenode found: routeindex= " + this.getCurrentLinkIndex() + " ]");
-		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
-		return null;
+		// (4) otherwise (normal case): return the next link of the plan (after caching it):
+		this.cachedNextLinkId = routeLinkIds.get(this.getCurrentLinkIndex()); //save time in later calls, if link is congested
+		return this.cachedNextLinkId;
+		
 	}
 
 	@Override
@@ -153,8 +143,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		final int routeLinkIdsSize = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds().size();
 
 		// the standard condition used to be "route has run dry AND destination link not attached to current link":
-		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
-		// changing the second condition for the time being to "being at destination". kai, nov'14
+		// 2nd condition essentially meant "destination link EQUALS current link" but really stupid way of stating this.  Thus
+		// changing the second condition to "being at destination".  This breaks old code; I will fix as far as it is covered by tests.  kai, nov'14
 		if ( this.currentLinkIndex >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
 			
 			this.currentLinkIndex = 0 ; 
