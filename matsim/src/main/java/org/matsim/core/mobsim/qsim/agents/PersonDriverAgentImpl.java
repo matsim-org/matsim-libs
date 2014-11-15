@@ -181,12 +181,12 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 			return true ;
 		}
 
-		List<Id<Link>> routeLinkIds = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds();
+		final int routeLinkIdsSize = ((NetworkRoute) this.getCurrentLeg().getRoute()).getLinkIds().size();
 
 		// the standard condition is "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
 		// changing the second condition for the time being to "being at destination". kai, nov'14
-		if ( this.getCurrentLinkIdIndex() >= routeLinkIds.size() && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+		if ( this.getCurrentLinkIdIndex() >= routeLinkIdsSize && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
 
 			this.currentLinkIdIndex = 0 ; 
 			// (the above is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
@@ -217,24 +217,17 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 
 		this.cachedNextLinkId = null;
-		this.setDestinationLinkId(null);
 
 		/*
 		 * The Leg may have been exchanged in the Person's Plan, so
 		 * we update the Reference to the currentLeg Object.
 		 */
 		if (this.getCurrentPlanElement() instanceof Leg) {
-			this.setCurrentLeg(((Leg) this.getCurrentPlanElement()));
-
-			Route route = getCurrentLeg().getRoute();
-			if (route == null) {
+			if (getCurrentLeg().getRoute() == null) {
 				log.error("The agent " + this.getId() + " has no route in its leg. Setting agent state to abort." );
 				this.setState(MobsimAgent.State.ABORT) ;
-				return;
 			}
-			this.setDestinationLinkId(route.getEndLinkId());
 		} else {			
-			// If an activity is performed, update its current activity.
 			this.calculateAndSetDepartureTime((Activity) this.getCurrentPlanElement());
 		}
 	}

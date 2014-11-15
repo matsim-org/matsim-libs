@@ -43,11 +43,10 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private final MobsimTimer simTimer;
 	private MobsimVehicle vehicle ;
 	private double activityEndTime = Time.UNDEFINED_TIME;
-	private Leg currentLeg;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 
-	private transient Id<Link> cachedDestinationLinkId;
+//	private transient Id<Link> cachedDestinationLinkId;
 	// why is this transient?  "transient" means it is not included in automatic serialization/deserialization.  But where are we using this for this 
 	// class?  kai, nov'14
 
@@ -202,8 +201,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	private void initializeLeg(Leg leg) {
 		this.setState(MobsimAgent.State.LEG) ;			
-		Route route = leg.getRoute();
-		if (route == null) {
+		if (leg.getRoute() == null) {
 			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT " +
 					"(but continuing the mobsim).");
 			if ( noRouteWrnCnt < 1 ) {
@@ -211,13 +209,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 				noRouteWrnCnt++ ;
 			}
 			this.setState(MobsimAgent.State.ABORT) ;
-		} else {
-			//			this.cachedDestinationLinkId = route.getEndLinkId();
-			this.setDestinationLinkId( route.getEndLinkId() );
-	
-			// set the route according to the next leg
-			this.setCurrentLeg(leg);
-		}
+		} 
 	}
 
 	private void initializeActivity(Activity act, double now) {
@@ -250,11 +242,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	@Override
 	public final Id<Link> getDestinationLinkId() {
-		return this.cachedDestinationLinkId;
-	}
-
-	final void setDestinationLinkId( Id<Link> linkId ) {
-		this.cachedDestinationLinkId = linkId ;
+		return this.getCurrentLeg().getRoute().getEndLinkId() ;
 	}
 
 	@Override
@@ -303,16 +291,12 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 		return state;
 	}
 
-	final Leg getCurrentLeg() {
-		return currentLeg;
-	}
-
-	final void setCurrentLeg(Leg currentLeg) {
-		this.currentLeg = currentLeg;
-	}
-
 	final void setState(MobsimAgent.State state) {
 		this.state = state;
+	}
+	
+	final Leg getCurrentLeg() {
+		return (Leg) this.getCurrentPlanElement() ;
 	}
 	
 }
