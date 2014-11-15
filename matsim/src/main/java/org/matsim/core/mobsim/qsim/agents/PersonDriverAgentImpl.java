@@ -20,16 +20,27 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -37,14 +48,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
-
 /**
  * @author dgrether, nagel
  * <p/>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
+public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10
 
@@ -53,6 +62,8 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 	private static int expectedLinkWarnCount = 0;
 
 	// direct delegates:
+	private final PlanAgentImpl planAgentDelegate ; 
+	// yy ...Impl. :-(
 	
 	// indirect delegates:
 	private final Person person;
@@ -83,13 +94,13 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 	// c'tor
 
 	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
-		super(plan) ;
+		this.planAgentDelegate = new PlanAgentImpl(plan) ;
 		this.person = plan.getPerson();
 		this.simulation = simulation;
 //		this.setPlan(plan);
 		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
 		if (planElements.size() > 0) {
-			this.setCurrentPlanElementIndex(0);
+			this.planAgentDelegate.setCurrentPlanElementIndex(0);
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.currentLinkId = firstAct.getLinkId();
 			this.state = MobsimAgent.State.ACTIVITY ;
@@ -101,7 +112,8 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
+//		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
+		Activity act = (Activity) this.planAgentDelegate.getCurrentPlanElement() ;
 		this.simulation.getEventsManager().processEvent(
 				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 
@@ -220,10 +232,10 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 	// below there only (package-)private methods or setters/getters
 
 	private void advancePlan() {
-		this.setCurrentPlanElementIndex(this.getCurrentPlanElementIndex() + 1);
+		this.planAgentDelegate.setCurrentPlanElementIndex(this.planAgentDelegate.getCurrentPlanElementIndex() + 1);
 
 		// check if plan has run dry:
-		if ( this.getCurrentPlanElementIndex() >= this.getPlanElements().size() ) {
+		if ( this.planAgentDelegate.getCurrentPlanElementIndex() >= this.planAgentDelegate.getPlanElements().size() ) {
 			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
 					"          (but continuing the mobsim).  This used to be an exception ...") ;
 			this.state = MobsimAgent.State.ABORT ;
@@ -298,7 +310,8 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 		 * The Leg may have been exchanged in the Person's Plan, so
 		 * we update the Reference to the currentLeg Object.
 		 */
-		PlanElement currentPlanElement = this.getPlanElements().get(this.getCurrentPlanElementIndex());
+//		PlanElement currentPlanElement = this.getPlanElements().get(this.getCurrentPlanElementIndex());
+		PlanElement currentPlanElement = this.planAgentDelegate.getCurrentPlanElement() ;
 		if (currentPlanElement instanceof Leg) {
 			this.currentLeg  = ((Leg) currentPlanElement);
 			this.cachedRouteLinkIds = null;
@@ -329,7 +342,7 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 				(this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation());
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
-		if ( this.getCurrentPlanElementIndex() == this.getPlanElements().size()-1 ) {
+		if ( this.planAgentDelegate.getCurrentPlanElementIndex() == this.planAgentDelegate.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity of person driver agent id " + this.person.getId() + " has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
@@ -383,7 +396,7 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 
 	@Override
 	public final String getMode() {
-		if( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
+		if( this.planAgentDelegate.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question.
 			// this is in most cases called in "abort".  kai, mar'12
 
@@ -429,5 +442,27 @@ public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriver
 	public MobsimAgent.State getState() {
 		return state;
 	}
+	@Override
+	public PlanElement getCurrentPlanElement() {
+		return planAgentDelegate.getCurrentPlanElement();
+	}
+	@Override
+	public PlanElement getNextPlanElement() {
+		return planAgentDelegate.getNextPlanElement();
+	}
+	@Override
+	public final Plan getCurrentPlan() {
+		return planAgentDelegate.getCurrentPlan();
+	}
+
+	final Plan getModifiablePlan() {
+		return planAgentDelegate.getModifiablePlan() ;
+	}
+	
+	final int getCurrentPlanElementIndex() {
+		return planAgentDelegate.getCurrentPlanElementIndex() ;
+	}
+
+
 
 }

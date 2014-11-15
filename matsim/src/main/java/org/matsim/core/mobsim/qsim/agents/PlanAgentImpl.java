@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PlanImpl;
 
-public class PlanAgentImpl implements PlanAgent {
+public final class PlanAgentImpl implements PlanAgent {
 
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
@@ -24,7 +24,7 @@ public class PlanAgentImpl implements PlanAgent {
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
-	protected List<PlanElement> getPlanElements() {
+	 List<PlanElement> getPlanElements() {
 		return this.getCurrentPlan().getPlanElements();
 	}
 
@@ -57,14 +57,16 @@ public class PlanAgentImpl implements PlanAgent {
 	}
 
 	private final void setPlan(Plan plan) {
+		this.firstTimeToGetModifiablePlan = true ;
 		this.plan = plan;
 	}
 
 	/**
 	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
-	 * This agent retains the copied plan and forgets the original one.
+	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
+	 * (and will be scored).  This is deliberate behavior!
 	 */
-	protected final Plan getModifiablePlan() {
+	final Plan getModifiablePlan() {
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
 			PlanImpl newPlan = new PlanImpl(this.getCurrentPlan().getPerson());
