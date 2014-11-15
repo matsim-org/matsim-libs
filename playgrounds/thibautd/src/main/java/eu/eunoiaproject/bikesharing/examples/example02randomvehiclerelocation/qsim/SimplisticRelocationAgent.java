@@ -22,6 +22,7 @@ package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.q
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -156,6 +157,16 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 	@Override
 	public String getMode() {
 		return TransportMode.car;
+	}
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
+		// kai, nov'14
+		if ( this.chooseNextLinkId()==null ) {
+			return true ;
+		} else {
+			return false ;
+		}
 	}
 
 	@Override

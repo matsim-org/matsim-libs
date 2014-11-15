@@ -172,7 +172,17 @@ public class FreeFloatingPersonDriverAgentNew implements PTPassengerAgent, Mobsi
 		return 0;
 	}
 	
-	
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
+		// kai, nov'14
+		if ( this.chooseNextLinkId()==null ) {
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+
 	
 
 }

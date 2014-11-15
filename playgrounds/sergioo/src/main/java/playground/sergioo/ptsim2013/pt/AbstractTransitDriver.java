@@ -312,6 +312,18 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 		return this.dummyPerson.getId() ;
 	}
 	
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
+		// kai, nov'14
+		if ( this.chooseNextLinkId()==null ) {
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+
+	
 	/**
 	 * for junit tests in same package
 	 */

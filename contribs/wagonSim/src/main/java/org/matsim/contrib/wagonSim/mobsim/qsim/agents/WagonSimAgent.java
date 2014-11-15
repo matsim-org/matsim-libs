@@ -234,5 +234,10 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 		return this.delegate.getPerson();
 	}
 
+	@Override
+	public boolean isArrivingOnCurrentLink() {
+		return this.delegate.isArrivingOnCurrentLink() ;
+	}
+
 }
 

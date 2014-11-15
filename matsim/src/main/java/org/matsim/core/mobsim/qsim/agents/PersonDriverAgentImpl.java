@@ -54,15 +54,16 @@ import org.matsim.vehicles.Vehicle;
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
 public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
-	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
-	// use this class directly.  kai, nov'10
+	// yy cannot make this final since it is overridden at 65 locations
+	// (but since all methods are final, it seems that all of these can be solved by delegation).
+	// kai, nov'14
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
 	private static int expectedLinkWarnCount = 0;
 
 	// direct delegates:
-	final BasicPlanAgentImpl basicAgentDelegate ; 
+	private final BasicPlanAgentImpl basicAgentDelegate ; 
 	// yy ...Impl.  Not sure if this is a problem; can say that we have pluggable implementations, and they fulfill 
 	// (also) part of a public interface. kai, nov'14
 
@@ -73,7 +74,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private Leg currentLeg;
 
-	/* package, because of withinday */ int currentLinkIdIndex;
+	private int currentLinkIdIndex;
 
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 
@@ -477,6 +478,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return basicAgentDelegate.getCurrentPlanElementIndex() ;
 	}
 
-
+	final int getCurrentLinkIdIndex() {
+		return currentLinkIdIndex;
+	}
 
 }

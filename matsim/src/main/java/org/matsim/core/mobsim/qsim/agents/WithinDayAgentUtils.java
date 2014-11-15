@@ -64,7 +64,7 @@ public class WithinDayAgentUtils {
 
 	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
-			return ((PersonDriverAgentImpl) agent).currentLinkIdIndex;			
+			return ((PersonDriverAgentImpl) agent).getCurrentLinkIdIndex();			
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
