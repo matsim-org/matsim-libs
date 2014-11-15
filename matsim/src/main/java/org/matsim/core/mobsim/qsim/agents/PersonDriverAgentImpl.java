@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -36,10 +35,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether, nagel
@@ -56,6 +53,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 	private static int expectedLinkWarnCount = 0;
 
 	private Id<Link> cachedNextLinkId = null;
+
+	private int currentLinkIdIndex = 0 ;
 
 	
 
@@ -88,7 +87,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 			expectedLinkWarnCount++;
 		}
 		this.setCurrentLinkId( newLinkId ) ;
-		this.setCurrentLinkIdIndex(this.getCurrentLinkIdIndex() + 1);
+//		this.setCurrentLinkIdIndex(this.getCurrentLinkIdIndex() + 1);
+		this.currentLinkIdIndex++ ;
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
 
@@ -135,8 +135,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 			if (currentLink == destinationLink && this.getCurrentLinkIdIndex() > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
-				// the standard condition for arrival is "route has run dry AND destination link not attached to current link".  now with loop links,
-				// this condition is never triggered.  So no wonder that for such cases currently a special condition is needed.  kai, nob'14
+				// the condition for arrival currently is "route has run dry AND destination link not attached to current link".  now with loop links,
+				// this condition is never triggered.  So no wonder that for such cases currently a special condition is needed.  kai, nov'14
 
 				return null;
 			}
@@ -177,7 +177,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 	@Override
 	public final boolean isArrivingOnCurrentLink( ) {
 		if ( ! ( this.getCurrentLeg().getRoute() instanceof NetworkRoute ) ) {
-			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question):
+			// non-network links in the past have always returned true (i.e. "null" to the chooseNextLink question). kai, nov'14
 			return true ;
 		}
 
@@ -185,8 +185,12 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 
 		// the standard condition is "route has run dry AND destination link not attached to current link":
 		// 2nd condition essentially means "destination link EQUALS current link" but really stupid way of stating this.  Thus
-		// changing the second condition for the time being to "being at destination"
+		// changing the second condition for the time being to "being at destination". kai, nov'14
 		if ( this.getCurrentLinkIdIndex() >= routeLinkIds.size() && this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+
+			this.currentLinkIdIndex = 0 ; 
+			// (the above is not so great; should be done at departure; but there is nothing there to notify the DriverAgent at departure ...  kai, nov'14)
+
 			return true ;
 		} else {
 			return false ;
@@ -208,7 +212,7 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 	 */
 	/* package */ final void resetCaches() {
 
-		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
+		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internals are
 		// known best.  kai, oct'10
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 
@@ -219,9 +223,8 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 		 * The Leg may have been exchanged in the Person's Plan, so
 		 * we update the Reference to the currentLeg Object.
 		 */
-		PlanElement currentPlanElement = this.getCurrentPlanElement() ;
-		if (currentPlanElement instanceof Leg) {
-			this.setCurrentLeg(((Leg) currentPlanElement));
+		if (this.getCurrentPlanElement() instanceof Leg) {
+			this.setCurrentLeg(((Leg) this.getCurrentPlanElement()));
 
 			Route route = getCurrentLeg().getRoute();
 			if (route == null) {
@@ -229,12 +232,15 @@ public class PersonDriverAgentImpl extends BasicPlanAgentImpl implements MobsimD
 				this.setState(MobsimAgent.State.ABORT) ;
 				return;
 			}
-			//			this.cachedDestinationLinkId = route.getEndLinkId();
 			this.setDestinationLinkId(route.getEndLinkId());
 		} else {			
 			// If an activity is performed, update its current activity.
 			this.calculateAndSetDepartureTime((Activity) this.getCurrentPlanElement());
 		}
+	}
+
+	final int getCurrentLinkIdIndex() {
+		return currentLinkIdIndex;
 	}
 
 }

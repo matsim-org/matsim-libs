@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.examples;
+package org.matsim.integration.daily;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

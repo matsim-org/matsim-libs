@@ -34,6 +34,7 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
 	private static int noRouteWrnCnt = 0;
+	
 	private int currentPlanElementIndex = 0;
 	private Plan plan;
 	private boolean firstTimeToGetModifiablePlan = true;
@@ -43,7 +44,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	private MobsimVehicle vehicle ;
 	private double activityEndTime = Time.UNDEFINED_TIME;
 	private Leg currentLeg;
-	private int currentLinkIdIndex;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 
@@ -217,7 +217,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 	
 			// set the route according to the next leg
 			this.setCurrentLeg(leg);
-			this.setCurrentLinkIdIndex(0);
 		}
 	}
 
@@ -310,14 +309,6 @@ public class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<
 
 	final void setCurrentLeg(Leg currentLeg) {
 		this.currentLeg = currentLeg;
-	}
-
-	final int getCurrentLinkIdIndex() {
-		return currentLinkIdIndex;
-	}
-
-	final void setCurrentLinkIdIndex(int currentLinkIdIndex) {
-		this.currentLinkIdIndex = currentLinkIdIndex;
 	}
 
 	final void setState(MobsimAgent.State state) {
