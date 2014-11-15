@@ -33,7 +33,6 @@ import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -45,7 +44,7 @@ import java.util.List;
  * <p/>
  * I think this class is reasonable in terms of what is public and/or final and what not.
  */
-public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
+public class PersonDriverAgentImpl extends PlanAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10
 
@@ -53,8 +52,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private static int expectedLinkWarnCount = 0;
 
+	// direct delegates:
+	
+	// indirect delegates:
 	private final Person person;
-
 	private MobsimVehicle vehicle;
 
 	private Id<Link> cachedNextLinkId = null;
@@ -67,16 +68,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
 	private Id<Link> currentLinkId = null;
-
-	int currentPlanElementIndex = 0;
-
-	/*
-	 * Holds the plan which is passed through the constructor,
-	 * (which is normally the original Plan from the Population, which must not be changed by this Agent)
-	 * until getModifiablePlan is called the first time,
-	 * when it is replaced by a deep copy.
-	 */
-	private Plan plan;
 
 	private transient Id<Link> cachedDestinationLinkId;
 
@@ -92,12 +83,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	// c'tor
 
 	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
+		super(plan) ;
 		this.person = plan.getPerson();
 		this.simulation = simulation;
-		this.plan = plan;
-		List<? extends PlanElement> planElements = this.plan.getPlanElements();
+//		this.setPlan(plan);
+		List<? extends PlanElement> planElements = this.getCurrentPlan().getPlanElements();
 		if (planElements.size() > 0) {
-			this.currentPlanElementIndex = 0;
+			this.setCurrentPlanElementIndex(0);
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.currentLinkId = firstAct.getLinkId();
 			this.state = MobsimAgent.State.ACTIVITY ;
@@ -109,9 +101,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
+		Activity act = (Activity) this.getPlanElements().get(this.getCurrentPlanElementIndex());
 		this.simulation.getEventsManager().processEvent(
 				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+
+		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan();
 	}
 
@@ -119,8 +113,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(
-				now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
+		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null)) 
 				&& !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
@@ -131,6 +124,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			advancePlan() ;
 		}
 	}
+
+	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public final void setStateToAbort(final double now) {
@@ -225,10 +220,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	// below there only (package-)private methods or setters/getters
 
 	private void advancePlan() {
-		this.currentPlanElementIndex++;
+		this.setCurrentPlanElementIndex(this.getCurrentPlanElementIndex() + 1);
 
 		// check if plan has run dry:
-		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
+		if ( this.getCurrentPlanElementIndex() >= this.getPlanElements().size() ) {
 			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
 					"          (but continuing the mobsim).  This used to be an exception ...") ;
 			this.state = MobsimAgent.State.ABORT ;
@@ -281,22 +276,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		calculateAndSetDepartureTime(act);
 	}
 
-	private boolean firstTimeToGetModifiablePlan = true;
-
-	/**
-	 * Returns a modifiable Plan for use by WithinDayAgentUtils in this package.
-	 * This agent retains the copied plan and forgets the original one.
-	 */
-	final Plan getModifiablePlan() {
-		if (firstTimeToGetModifiablePlan) {
-			firstTimeToGetModifiablePlan = false ;
-			PlanImpl newPlan = new PlanImpl(this.plan.getPerson());
-			newPlan.copyFrom(this.plan);
-			this.plan = newPlan;
-		}
-		return this.plan;
-	}
-
 	/**
 	 * Some data of the currently simulated Leg is cached to speed up
 	 * the simulation. If the Leg changes (for example the Route or
@@ -305,7 +284,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * If the Leg has not changed, calling this method should have no effect
 	 * on the Results of the Simulation!
 	 */
-	void resetCaches() {
+	/* package */ final void resetCaches() {
 
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internal are
 		// known best.  kai, oct'10
@@ -319,7 +298,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		 * The Leg may have been exchanged in the Person's Plan, so
 		 * we update the Reference to the currentLeg Object.
 		 */
-		PlanElement currentPlanElement = this.getPlanElements().get(this.currentPlanElementIndex);
+		PlanElement currentPlanElement = this.getPlanElements().get(this.getCurrentPlanElementIndex());
 		if (currentPlanElement instanceof Leg) {
 			this.currentLeg  = ((Leg) currentPlanElement);
 			this.cachedRouteLinkIds = null;
@@ -344,13 +323,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
-	void calculateAndSetDepartureTime(Activity act) {
+	/* package */final void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		ActivityDurationInterpretation activityDurationInterpretation =
 				(this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation());
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 
-		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
+		if ( this.getCurrentPlanElementIndex() == this.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
 				log.error( "last activity of person driver agent id " + this.person.getId() + " has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
@@ -367,30 +346,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private static int noRouteWrnCnt = 0 ;
 
-	/**
-	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
-	 */
-	private List<PlanElement> getPlanElements() {
-		return this.getCurrentPlan().getPlanElements();
-	}
-
-	final Netsim getMobsim(){
+	private final Netsim getMobsim(){
 		return this.simulation;
-	}
-
-	@Override
-	public final PlanElement getCurrentPlanElement() {
-		return this.getPlanElements().get(this.currentPlanElementIndex);
-	}
-
-	@Override
-	public final PlanElement getNextPlanElement() {
-		if ( this.currentPlanElementIndex < this.getPlanElements().size() ) {
-			return this.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
-		} else {
-			return null ;
-		}
 	}
 
 	@Override
@@ -426,7 +383,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	@Override
 	public final String getMode() {
-		if( this.currentPlanElementIndex >= this.plan.getPlanElements().size() ) {
+		if( this.getCurrentPlanElementIndex() >= this.getCurrentPlan().getPlanElements().size() ) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question.
 			// this is in most cases called in "abort".  kai, mar'12
 
@@ -466,17 +423,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	@Override
 	public final Id<Person> getId() {
 		return this.person.getId();
-	}
-
-	/**
-	 * The Plan this agent is executing. Please assume this to be immutable. 
-	 * Modifying a Plan which comes out of this method is a programming error.
-	 * This will eventually be replaced by a read-only interface.
-	 * 
-	 */
-	@Override
-	public final Plan getCurrentPlan() {
-		return plan;
 	}
 
 	@Override
