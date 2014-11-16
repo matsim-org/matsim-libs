@@ -213,6 +213,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -267,6 +268,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -321,6 +323,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -378,6 +381,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -436,6 +440,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 
 	/*
@@ -494,6 +499,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -559,6 +565,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -622,6 +629,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -685,6 +693,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -742,6 +751,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -821,6 +831,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p4", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p5", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -877,6 +888,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -941,6 +953,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 
 	/*
@@ -1005,6 +1018,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -1069,6 +1083,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -1110,6 +1125,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 	
 	/*
@@ -1163,6 +1179,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check whether all scheduled joint departures have been processed
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(true, jointDepartureOrganizer.scheduledDepartures.size() == 0);
 	}
 
 	/**

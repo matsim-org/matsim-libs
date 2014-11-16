@@ -188,7 +188,17 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		if (set != null) waitingOnLink = set.size();
 		
 		int waitingInVehicle = 0;
-		if (vehicle != null) waitingInVehicle = vehicle.getPassengers().size();
+		if (vehicle != null) {
+			waitingInVehicle = vehicle.getPassengers().size();
+			
+//			// identify leaving agents
+//			for (PassengerAgent passenger : vehicle.getPassengers()) {
+//				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
+//				if (mobsimAgent.getDestinationLinkId().equals(qlink.getLink().getId())) {
+//					waitingInVehicle--;
+//				}
+//			}
+		}
 		
 		return (waitingInVehicle + waitingOnLink) == jointDeparture.getPassengerIds().size();
 	}
@@ -257,7 +267,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		 * Check whether the driver's next leg ends at the current link.
 		 */
 		MobsimDriverAgent driver = vehicle.getDriver();
-		if (driver.getDestinationLinkId().equals(qlink.getLink().getId()) && (driver.chooseNextLinkId() == null)) {
+		if (driver.isWantingToArriveOnCurrentLink()) {
 
 			driver.endLegAndComputeNextState(now);
 			

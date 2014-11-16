@@ -103,11 +103,11 @@ public class JointDepartureOrganizer {
 	}
 	
 	public void assignAgentToJointDeparture(Id<Person> agentId, Leg leg, JointDeparture jointDeparture) {
+		this.scheduledDepartures.put(jointDeparture.getId(), jointDeparture);
 		Map<Leg, JointDeparture> jointDepartures = this.scheduledDeparturesMap.get(agentId);
 		if (jointDepartures == null) {
 			jointDepartures = new HashMap<Leg, JointDeparture>();
 			this.scheduledDeparturesMap.put(agentId, jointDepartures);
-			this.scheduledDepartures.put(jointDeparture.getId(), jointDeparture);
 		}
 		jointDepartures.put(leg, jointDeparture);
 	}
