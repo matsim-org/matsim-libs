@@ -46,7 +46,7 @@ public class Main {
         controler.setModules(new AbstractModule() {
             @Override
             public void install() {
-                // Include everything from ControlerDefaultsModule.java,
+                // Include some things from ControlerDefaultsModule.java,
                 // but leave out TravelTimeCalculator.
                 // You can just comment out these lines if you don't want them,
                 // these modules are optional.
