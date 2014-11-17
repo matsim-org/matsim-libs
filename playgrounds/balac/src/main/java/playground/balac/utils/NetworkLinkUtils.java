@@ -8,17 +8,15 @@ import org.matsim.core.network.NetworkUtils;
 
 public class NetworkLinkUtils {
 	
-	Network network;
+	NetworkImpl network;
 	public NetworkLinkUtils(Network network) {
 		
-		this.network = network;		}
+		this.network = (NetworkImpl) network;		}
 	
 	public LinkImpl getClosestLink(Coord coord) {
-				
+			
 		return (LinkImpl) NetworkUtils.getNearestLink(((NetworkImpl) this.network), coord);
-		
-				
-		
+
 	}
 
 }

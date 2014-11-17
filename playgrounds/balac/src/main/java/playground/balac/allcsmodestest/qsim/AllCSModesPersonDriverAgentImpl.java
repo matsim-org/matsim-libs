@@ -141,6 +141,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	
 	double walkSpeed = 0.0;
 
+	private TripRouter tripRouter;
 	// ============================================================================================================================
 	// c'tor
 
@@ -148,7 +149,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			final Netsim simulation, final Scenario scenario, final Controler controler,
 			FreeFloatingVehiclesLocation ffvehiclesLocation, 
 			OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, 
-			TwoWayCSVehicleLocation twvehiclesLocation) {
+			TwoWayCSVehicleLocation twvehiclesLocation, TripRouter tripRouter) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;
@@ -158,7 +159,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
 		this.twvehiclesLocation = twvehiclesLocation;
-		
+		this.tripRouter = tripRouter;
 		
 		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
 		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
@@ -451,9 +452,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
-		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();		
+			
 		
 		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
 		
@@ -463,7 +462,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, destinationLink.getId());
 		
-		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
+		for(PlanElement pe1: this.tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	
 			if (pe1 instanceof Leg) {
 				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();

@@ -33,14 +33,17 @@ import org.matsim.pt.transitSchedule.api.Departure;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
-public class PTRoutingFrequencyV2 {
+public class PTRoutingFrequencyClaude {
 	
 
 
 	private static TransitRouterFactory transitRouterFactory;
+	
+	
+	
 	public static void main(String[] args) throws IOException {
 		
-		PTRoutingFrequencyV2 pTRoutingFrequency = new PTRoutingFrequencyV2();
+		PTRoutingFrequencyClaude pTRoutingFrequency = new PTRoutingFrequencyClaude();
 		pTRoutingFrequency.run(args);
 	}
 	
@@ -93,25 +96,63 @@ public class PTRoutingFrequencyV2 {
 		
 		return -1 + count;
 	}
+	
+	
 	//simple check without checking if it is exactly the same route
-	public boolean isDominatedWithoutTran(List<? extends PlanElement> route, ArrayList<List<? extends PlanElement>> allRoutes) {
+	public boolean isDominatedWithTran(List<? extends PlanElement> route, ArrayList<List<? extends PlanElement>> allRoutes, Scenario scenario) {
+		
+		double lastArrival = ((Leg)route.get(0)).getDepartureTime() + ((Leg)route.get(0)).getTravelTime();
+		Leg pe1 = (Leg) route.get(2);
+		
+		ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+		double temp = Double.MAX_VALUE;
+		//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+		for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
+			
+			double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
+										
+			if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
+				
+				temp = d.getDepartureTime() + fromStopArrivalOffset;
+				
+			}
+		}
+		
+		
 		
 		for (List<? extends PlanElement> r : allRoutes) {
 			
-			if (((Leg)r.get(0)).getDepartureTime() + getTraveltime(r) == 
-					((Leg)route.get(0)).getDepartureTime() + getTraveltime(route) && getNumberOfTransfers(r) == getNumberOfTransfers(route)) {
+			double lastArrival1 = ((Leg)r.get(0)).getDepartureTime() + ((Leg)r.get(0)).getTravelTime();
+			Leg pe2 = (Leg) r.get(2);
+			
+			ExperimentalTransitRoute tr2 = ((ExperimentalTransitRoute)(((Leg)pe2).getRoute()));
+			double temp1 = Double.MAX_VALUE;
+			//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+			for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr2.getLineId()).getRoutes().get(tr2.getRouteId()).getDepartures().values()) {
 				
+				double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr2.getLineId()).getRoutes().get(tr2.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr2.getAccessStopId())).getDepartureOffset();
+											
+				if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival1 && d.getDepartureTime() + fromStopArrivalOffset < temp1) {
+					
+					temp1 = d.getDepartureTime() + fromStopArrivalOffset;
+					
+				}
+			}
+			
+			
+			if (temp == temp1 && (lastArrival + getTraveltime(route) == (lastArrival1 + getTraveltime(r)))) {
 				
-				return true;
+				return true;				
 				
 			}
+					
 			
 		}
 		
 		
 		return false;
 	}
-	public boolean isDominatedWithTran(List<? extends PlanElement> route, ArrayList<List<? extends PlanElement>> allRoutes) {
+	public boolean isDominatedWithoutTran(List<? extends PlanElement> route, ArrayList<List<? extends PlanElement>> allRoutes) {
 		
 		for (List<? extends PlanElement> r : allRoutes) {
 			
@@ -198,16 +239,16 @@ public class PTRoutingFrequencyV2 {
 		while(s != null) {
 			
 			String[] arr = s.split("\\s");
-			if (arr[1].equals("1")) {
-			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
+			if (arr[2].equals("1")) {
+			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
 			Link lStart = lUtils.getClosestLink(coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
+			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
 			Link lEnd = lUtils.getClosestLink(coordEnd);
 
 			
-			Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
+		//	Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 			
-		//	Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(Integer.toString(i)));
+			Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(Integer.toString(i)));
 		//	i++;
 		/*	PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
 			ActivityImpl act = new ActivityImpl("home", lStart.getId());
@@ -220,7 +261,7 @@ public class PTRoutingFrequencyV2 {
 			
 			LegImpl leg = new LegImpl("pt");	*/		
 			
-			double m = Double.parseDouble(arr[2]);
+			double m = Double.parseDouble(arr[3]);
 			TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", Facility.class), coordStart, lStart.getId());
 			
 			TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", Facility.class), coordEnd, lEnd.getId());
@@ -228,11 +269,6 @@ public class PTRoutingFrequencyV2 {
 			ArrayList<List<? extends PlanElement>> allRoutes = new ArrayList<List<? extends PlanElement>>();
 			
 			List<? extends PlanElement> route =  routingModule.calcRoute(startFacility, endFacility, m * 60, person);
-			
-			
-			
-			
-			
 			double departureTime = m *60 + ((Leg)route.get(0)).getTravelTime();
 			double travelTime = this.getTraveltime(route);			
 			int numberOfTransfers = this.getNumberOfTransfers(route);
@@ -244,7 +280,6 @@ public class PTRoutingFrequencyV2 {
 			
 			ArrayList<List<? extends PlanElement>> allRoutesFirst = new ArrayList<List<? extends PlanElement>>();
 			if (route.size() != 1) {
-					
 			for (double time = departureTime + 7200; time >= departureTime - 7200; time -= timeStep) {
 				
 					List<? extends PlanElement> routeNew =  routingModule.calcRoute(startFacility, endFacility, time, person);
@@ -253,12 +288,14 @@ public class PTRoutingFrequencyV2 {
 						
 					((Leg)routeNew.get(0)).setDepartureTime(time);
 						
-					if(!isDominatedWithoutTran(routeNew, allRoutesFirst)) {
+					if (routeNew.size() > 1)
+					
+					if(!isDominatedWithTran(routeNew, allRoutesFirst, scenario)) {
 						if (routeNew.size() != 1) {
 								
 							allRoutesFirst.add(routeNew);	
 							if (travelTimeNew < 1.30 * travelTime && numberOfTransfers + 2 > this.getNumberOfTransfers(routeNew) && 
-									!isDominatedWithTran(routeNew, allRoutes)	
+									!isDominatedWithoutTran(routeNew, allRoutes)	
 									) {
 							
 								allRoutes.add(routeNew);
@@ -294,6 +331,7 @@ public class PTRoutingFrequencyV2 {
 						countTransfers++;
 						//plan.addLeg((Leg)pe1);
 						ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+						
 						double temp = Double.MAX_VALUE;
 						//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
 						for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
@@ -473,10 +511,10 @@ public class PTRoutingFrequencyV2 {
 			outFrequency.newLine();
 			
 			}
-			
-		}
 			s = readLink.readLine();	
-			System.out.println(arr[0]);	
+			System.out.println(arr[0]);
+		}
+			
 			
 		}	
 		

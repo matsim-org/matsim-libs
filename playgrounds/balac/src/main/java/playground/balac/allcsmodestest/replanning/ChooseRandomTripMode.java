@@ -49,9 +49,9 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twowaycarsharing"))
 				return;
 		
-		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "FF_CARD"))))
+	//	if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "FF_CARD"))))
 			ffcard = true;
-		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "OW_CARD"))))
+	//	if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "OW_CARD"))))
 			owcard = true;
 		
 			//don't change the trips between the same links

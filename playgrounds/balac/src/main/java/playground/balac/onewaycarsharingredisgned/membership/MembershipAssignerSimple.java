@@ -31,8 +31,7 @@ final private int numMembers = 20850;
 		
 ObjectAttributes bla = new ObjectAttributes();
 		
-		new ObjectAttributesXmlReader(bla).parse(args[0]);
-		
+		new ObjectAttributesXmlReader(bla).parse(args[0]);		
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
@@ -139,9 +138,9 @@ ObjectAttributes bla = new ObjectAttributes();
 			bla.putAttribute(p.getId().toString(), "OW_CARD", "true");
 			
 		}
-		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV5(args[3] + "/plans_100perc_noride.xml.gz");		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
-		betaWriter.writeFile("C:/Users/balacm/Desktop" + "/desires_ow_memb.xml.gz");
+		betaWriter.writeFile(args[3] + "/desires_ow_memb_100perc.xml.gz");
 		
 	}
 

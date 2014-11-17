@@ -7,6 +7,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryInternal;
 
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
@@ -19,6 +21,7 @@ public class AllCSModesAgentFactory implements AgentFactory{
 	private FreeFloatingVehiclesLocation ffvehiclesLocation;
 	private OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation;
 	private TwoWayCSVehicleLocation twvehiclesLocation;
+	private TripRouter tripRouter;
 	public AllCSModesAgentFactory(final Netsim simulation, final Scenario scenario, final Controler controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.simulation = simulation;
 		this.scenario = scenario;
@@ -26,11 +29,21 @@ public class AllCSModesAgentFactory implements AgentFactory{
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
 		this.twvehiclesLocation = twvehiclesLocation;
+		
+		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		
+		tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();	
+		
+		
 	}
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
-		AllCSModesPersonDriverAgentImpl agent = new AllCSModesPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation); 
+		
+		
+		
+		
+		AllCSModesPersonDriverAgentImpl agent = new AllCSModesPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation, this.tripRouter); 
 		return agent;
 	}
 }

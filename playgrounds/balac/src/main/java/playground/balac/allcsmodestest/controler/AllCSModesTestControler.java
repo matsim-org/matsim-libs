@@ -49,6 +49,7 @@ public class AllCSModesTestControler extends Controler{
 	    Set<String> modes = new TreeSet<String>();
 	    modes.add("freefloating");
 	    modes.add("twowaycarsharing");
+	    modes.add("onewaycarsharing");
 	    modes.add("car");
 	    modes.add("walk");
 	    modes.add("pt");

@@ -155,12 +155,16 @@ public class CarSharingVehicles {
 			double distance = (1.0D / 0.0D);
 		    Id<Link> closestLinkId = Id.create(0L, Link.class);
 		    for (Link link : network.getLinks().values()) {
-		      LinkImpl mylink = (LinkImpl)link;
-		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
-		      if (newDistance.doubleValue() < distance) {
-		        distance = newDistance.doubleValue();
-		        closestLinkId = link.getId();
-		      }
+		    	
+		    	if (link.getAllowedModes().contains("car")) {
+		    	
+				      LinkImpl mylink = (LinkImpl)link;
+				      Double newDistance = Double.valueOf(mylink.calcDistance(coord));
+				      if (newDistance.doubleValue() < distance) {
+				        distance = newDistance.doubleValue();
+				        closestLinkId = link.getId();
+				      }
+		    	}
 
 		    }
 
