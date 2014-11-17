@@ -22,7 +22,7 @@ package playground.michalm.taxi.run;
 import java.util.concurrent.*;
 
 
-class MultiThreadTaxiLauncher
+class MielecMultiThreadMultiRunTaxiLauncher
 {
     //20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
     //d:\PP-rad\taxi\mielec-2-peaks\2014_02\
@@ -35,7 +35,7 @@ class MultiThreadTaxiLauncher
     //    private static final int[] DEMANDS = { 10 };
     //    private static final int[] SUPPLIES = { 25 };
 
-    private static final int RUNS = 20;
+    private static final int RUNS = 1;
 
     //Do not use multithreading for MIP 
     private static final int THREADS = 11;
@@ -52,7 +52,7 @@ class MultiThreadTaxiLauncher
                 service.execute(new Runnable() {
                     public void run()
                     {
-                        MultipleTaxiLauncher.runAll(RUNS, paramFile);
+                        MultiRunTaxiLauncher.runAll(RUNS, paramFile);
                     }
                 });
             }

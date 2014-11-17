@@ -33,7 +33,7 @@ import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
-class MultipleTaxiLauncher
+class MultiRunTaxiLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
@@ -48,7 +48,7 @@ class MultipleTaxiLauncher
     private PrintWriter pw3;
 
 
-    MultipleTaxiLauncher(String paramFile)
+    MultiRunTaxiLauncher(String paramFile)
     {
         launcher = new TaxiLauncher(TaxiLauncher.readParams(paramFile));
 
@@ -100,7 +100,7 @@ class MultipleTaxiLauncher
         launcher.clearVrpPathCalculator();
 
         //warmup
-        if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
+        if (launcher.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS) {
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
                 launcher.initVrpPathCalculator();
@@ -110,7 +110,7 @@ class MultipleTaxiLauncher
 
         ///========================
 
-        MultipleRunStats multipleRunStats = new MultipleRunStats();
+        MultiRunStats multipleRunStats = new MultiRunStats();
         launcher.initVrpPathCalculator();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
@@ -162,22 +162,19 @@ class MultipleTaxiLauncher
 
 
     static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
-            //NOS_TW_SL,
-            //NOS_TW_TD,
+            NOS_TW_TD,
             //NOS_TW_FF
             //NOS_TW_24H,
             NOS_TW_15M);
 
     static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
-            //NOS_TP_SL,
-            //NOS_TP_TD,
+            NOS_TP_TD,
             //NOS_TP_FF
             //NOS_TP_24H,
             NOS_TP_15M);
 
     static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
-            //NOS_DSE_SL,
-            //NOS_DSE_TD,
+            NOS_DSE_TD,
             //NOS_DSE_FF
             //NOS_DSE_24H,
             NOS_DSE_15M);
@@ -203,21 +200,18 @@ class MultipleTaxiLauncher
             RES_TP_15M);
 
     static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
-            //APS_TW_SL,
             //APS_TW_TD,
             //APS_TW_FF
             //APS_TW_24H,
             APS_TW_15M);
 
     static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
-            //APS_TP_SL,
             //APS_TP_TD,
             //APS_TP_FF
             //APS_TP_24H,
             APS_TP_15M);
 
     static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
-            //APS_DSE_SL,
             //APS_DSE_TD,
             //APS_DSE_FF
             //APS_DSE_24H,
@@ -226,25 +220,25 @@ class MultipleTaxiLauncher
 
     static void runAll(int runs, String paramFile)
     {
-        MultipleTaxiLauncher multiLauncher = new MultipleTaxiLauncher(paramFile);
+        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(paramFile);
         multiLauncher.initOutputFiles("");
 
         multiLauncher.run(NOS_TW_xx, runs);
         multiLauncher.run(NOS_TP_xx, runs);
         multiLauncher.run(NOS_DSE_xx, runs);
-
-        multiLauncher.run(OTS_TW_xx, runs);
-        multiLauncher.run(OTS_TP_xx, runs);
-
-        multiLauncher.run(RES_TW_xx, runs);
-        multiLauncher.run(RES_TP_xx, runs);
-
-        multiLauncher.run(APS_TW_xx, runs);
-        multiLauncher.run(APS_TP_xx, runs);
-        multiLauncher.run(APS_DSE_xx, runs);
+//
+//        multiLauncher.run(OTS_TW_xx, runs);
+//        multiLauncher.run(OTS_TP_xx, runs);
+//
+//        multiLauncher.run(RES_TW_xx, runs);
+//        multiLauncher.run(RES_TP_xx, runs);
+//
+//        multiLauncher.run(APS_TW_xx, runs);
+//        multiLauncher.run(APS_TP_xx, runs);
+//        multiLauncher.run(APS_DSE_xx, runs);
 
         //multiLauncher.run(NOS_DSE_FF, runs, true, true, true);
-        //multiLauncher.run(MIP_FF, runs, true, true, false);
+//        multiLauncher.run(MIP_TW_FF, runs, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }

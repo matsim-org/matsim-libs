@@ -23,8 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -32,7 +31,6 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.chart.ScheduleChartUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
@@ -40,8 +38,6 @@ import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.network.NetworkChangeEventsParser;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -51,12 +47,11 @@ import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.taxi.scheduler.*;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
+import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.util.RunningVehicleRegister;
+import playground.michalm.util.MovingAgentsRegister;
 
 
 /**
@@ -98,55 +93,47 @@ import playground.michalm.util.RunningVehicleRegister;
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
 
-
-
         // michalm - testing config (may be removed...)////////////////////////////////////
 
-//        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-//        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-//        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-//        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
-    	
-//    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
-//           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-//           taxisFileName = dirName + "taxis-3000.xml";
+        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
+        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
+        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
+        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
 
+        //    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
+        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
+        //           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
+        //           taxisFileName = dirName + "taxis-3000.xml";
 
-//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
-//    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_05_basic_scenario_v3\\";
-    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_10_basic_scenario_v4\\";
+        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
+        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_05_basic_scenario_v3\\";
+        dirName = "C:\\local_jb\\data\\scenarios\\2014_10_basic_scenario_v4\\";
 
-//           plansFileName = dirName + "1.0plans4to3.xml";
-//           plansFileName = dirName + "plans4to3.xml";
-             plansFileName = dirName + "plans/plans4to3_1.0.xml.gz";
-//           plansFileName = dirName + "1.5plans4to3.xml.gz";
-//    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
+        //           plansFileName = dirName + "1.0plans4to3.xml";
+        //           plansFileName = dirName + "plans4to3.xml";
+        plansFileName = dirName + "plans/plans4to3_1.0.xml.gz";
+        //           plansFileName = dirName + "1.5plans4to3.xml.gz";
+        //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
 
-//           plansFileName = dirName + "2.0plans4to4.xml.gz";
+        //           plansFileName = dirName + "2.0plans4to4.xml.gz";
 
-           
-//           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
-//           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
-//           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
-//           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
-//           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-//             taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-//             taxisFileName = dirName + "taxis4to4_EVonezone.xml";
-           taxisFileName = dirName + "taxis4to4_EV0.0.xml";
-//           taxisFileName = dirName + "oldtaxis4to4.xml";
-           
+        //           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
+        //           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
+        //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
+        //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
+        //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
+        //             taxisFileName = dirName + "taxis4to4_EV1.0.xml";
+        //             taxisFileName = dirName + "taxis4to4_EVonezone.xml";
+        taxisFileName = dirName + "taxis4to4_EV0.0.xml";
+        //           taxisFileName = dirName + "oldtaxis4to4.xml";
 
-           
-           changeEventsFilename = dirName + "changeevents_min.xml";
-           eventsFileName = dirName +"2kW.15.1000.events.xml.gz" ;
-           netFileName = dirName + "berlin_brb.xml";
-           
+        changeEventsFilename = dirName + "changeevents_min.xml";
+        eventsFileName = dirName + "2kW.15.1000.events.xml.gz";
+        netFileName = dirName + "berlin_brb.xml";
+
         ////////////////////////////////////////////////////////         
 
-   
         electricStatsDir = dirName + "test/";
-
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
@@ -171,10 +158,7 @@ import playground.michalm.util.RunningVehicleRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-//          scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, dirName+"2kW.15.1000.plans.xml.gz");
-        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName, changeEventsFilename);
-
-        
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, changeEventsFilename);
 
         //        List<String> taxiCustomerIds;
         //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
@@ -196,8 +180,8 @@ import playground.michalm.util.RunningVehicleRegister;
         File f = new File(electricStatsDir);
         f.mkdirs();
 
-//        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
-        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS_15_MIN;
+        //        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
+        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS;
 
         TravelDisutilitySource tdisSource = TravelDisutilitySource.TIME;
 
@@ -222,7 +206,7 @@ import playground.michalm.util.RunningVehicleRegister;
                 travelTime);
 
         LeastCostPathCalculatorWithCache routerWithCache = new LeastCostPathCalculatorWithCache(
-                router, new TimeDiscretizer(31*4, 15 *60,false));
+                router, new TimeDiscretizer(31 * 4, 15 * 60, false));
 
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
                 travelDisutility);
@@ -259,7 +243,7 @@ import playground.michalm.util.RunningVehicleRegister;
             events.addHandler(eventWriter);
         }
 
-        RunningVehicleRegister rvr = new RunningVehicleRegister();
+        MovingAgentsRegister rvr = new MovingAgentsRegister();
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
@@ -272,9 +256,9 @@ import playground.michalm.util.RunningVehicleRegister;
         //        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
         System.out.println("taxiless agents: ");
-        for (Id id : rvr.getRunningAgentIds()){
-        	System.out.println(id.toString());
-        	
+        for (Id id : rvr.getMovingAgentIds()) {
+            System.out.println(id.toString());
+
         }
         events.finishProcessing();
 
@@ -297,7 +281,8 @@ import playground.michalm.util.RunningVehicleRegister;
     {
         PrintWriter pw = new PrintWriter(System.out);
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData().getVehicles());
+        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
+                .getVehicles());
         pw.println(stats);
         pw.flush();
 
@@ -309,15 +294,15 @@ import playground.michalm.util.RunningVehicleRegister;
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         //        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
-//        try {
-////            ChartUtils.saveAsPDF(
-////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
-////                    electricStatsDir + "taxiSchedules", 2048, 1546);
-//        }
-//        catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+        //        try {
+        ////            ChartUtils.saveAsPDF(
+        ////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
+        ////                    electricStatsDir + "taxiSchedules", 2048, 1546);
+        //        }
+        //        catch (IOException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
         if (outHistogram) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
         }

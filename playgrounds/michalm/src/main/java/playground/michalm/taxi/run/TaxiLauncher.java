@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
+import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -53,7 +55,7 @@ import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
-import playground.michalm.util.RunningVehicleRegister;
+import playground.michalm.util.MovingAgentsRegister;
 
 
 class TaxiLauncher
@@ -61,43 +63,43 @@ class TaxiLauncher
     final String dir;
     final String netFile;
     final String plansFile;
+
     final String taxiCustomersFile;
     String taxisFile;
     final String ranksFile;
 
-    final boolean vrpOutFiles;
-    final String vrpOutDir;
-
-    final boolean outHistogram;
-    final String histogramOutDir;
-
-    final boolean otfVis;
-
-    final boolean writeSimEvents;
     final String eventsFile;
-
-    final Scenario scenario;
+    final String changeEventsFile;
 
     AlgorithmConfig algorithmConfig;
+
+    Integer nearestRequestsLimit;//null ==> no filtration
+    Integer nearestVehiclesLimit;//null ==> no filtration
+
     Boolean onlineVehicleTracker;
     Boolean advanceRequestSubmission;
-    Double pickupTripTimeLimit;
+    //Double pickupTripTimeLimit;
 
     Boolean destinationKnown;
     Double pickupDuration;
     Double dropoffDuration;
 
-    Integer nearestRequestsLimit;//null ==> no filtration
-    Integer nearestVehiclesLimit;//null ==> no filtration
+    final boolean otfVis;
 
-    LegHistogram legHistogram;
+    final String vrpOutDir;
+    final String histogramOutDir;
+    final String eventsOutFile;
+
     MatsimVrpContext context;
-    TaxiDelaySpeedupStats delaySpeedupStats;
-    LeastCostPathCalculatorCacheStats cacheStats;
+    final Scenario scenario;
 
     private TravelTimeCalculator travelTimeCalculator;
     private LeastCostPathCalculatorWithCache routerWithCache;
     private VrpPathCalculator pathCalculator;
+
+    LegHistogram legHistogram;
+    TaxiDelaySpeedupStats delaySpeedupStats;
+    LeastCostPathCalculatorCacheStats cacheStats;
 
 
     static Map<String, String> getDefaultParams()
@@ -107,31 +109,34 @@ class TaxiLauncher
         params.put("dir", "D:\\PP-rad\\taxi\\mielec-2-peaks\\");
         params.put("netFile", "network.xml");
         params.put("plansFile", "output\\ITERS\\it.20\\20.plans.xml.gz");
+
         params.put("taxiCustomersFile", "taxiCustomers_05_pc.txt");
-        params.put("ranksFile", null);
+        //params.put("ranksFile", null);
         params.put("taxisFile", "ranks-5_taxis-50.xml");
+
         params.put("eventsFile", "output\\ITERS\\it.20\\20.events.xml.gz");
+        //params.put("changeEventsFile", null);
 
         //optimizer:
         params.put("algorithmConfig", "NOS_DSE_SL");
-        params.put("onlineVehicleTracker", "true");
-        params.put("advanceRequestSubmission", "!true");
-        params.put("pickupTripTimeLimit", "600");
-
-        //scheduler:
-        params.put("destinationKnown", "!true");
-        params.put("pickupDuration", "120");
-        params.put("dropoffDuration", "60");
 
         params.put("nearestRequestsLimit", "20");
         params.put("nearestVehiclesLimit", "20");
+        //params.put("pickupTripTimeLimit", "600");
 
-        params.put("otfVis", "!true");
-        params.put("vrpOutFiles", "!true");
-        params.put("vrpOutDir", "vrp_output");
-        params.put("outHistogram", "true");
-        params.put("histogramOutDir", "histograms");
-        params.put("writeSimEvents", "!true");
+        params.put("onlineVehicleTracker", "");
+        //params.put("advanceRequestSubmission", "");
+
+        //scheduler:
+        //params.put("destinationKnown", "");
+        params.put("pickupDuration", "120");
+        params.put("dropoffDuration", "60");
+
+        //params.put("otfVis", "");
+
+        //params.put("vrpOutDir", "vrp_output");
+        //params.put("histogramOutDir", "histograms");
+        //params.put("eventsOutFile", "events.out.xml.gz");
 
         return params;
     }
@@ -148,44 +153,55 @@ class TaxiLauncher
     TaxiLauncher(Map<String, String> params)
     {
         dir = params.get("dir");
-        netFile = dir + params.get("netFileName");
-        plansFile = dir + params.get("plansFileName");
-        taxiCustomersFile = dir + params.get("taxiCustomersFileName");
-        ranksFile = dir + params.get("ranksFileName");
-        taxisFile = dir + params.get("taxisFileName");
-        eventsFile = dir + params.get("eventsFileName");
+        netFile = getFilePath(params, "netFile");
+        plansFile = getFilePath(params, "plansFile");
+
+        taxiCustomersFile = getFilePath(params, "taxiCustomersFile");
+        ranksFile = getFilePath(params, "ranksFile");
+        taxisFile = getFilePath(params, "taxisFile");
+
+        eventsFile = getFilePath(params, "eventsFile");
+        changeEventsFile = getFilePath(params, "changeEventsFile");
 
         algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
-        onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
-        advanceRequestSubmission = Boolean.valueOf(params.get("advanceRequestSubmission"));
-
-        destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
-        pickupDuration = Double.valueOf(params.get("pickupDuration"));
-        dropoffDuration = Double.valueOf(params.get("dropoffDuration"));
 
         nearestRequestsLimit = Integer.valueOf(params.get("nearestRequestsLimit"));
         nearestVehiclesLimit = Integer.valueOf(params.get("nearestVehiclesLimit"));
 
-        otfVis = Boolean.valueOf(params.get("otfVis"));
-        vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
-        vrpOutDir = dir + params.get("vrpOutDirName");
-        outHistogram = Boolean.valueOf(params.get("outHistogram"));
-        histogramOutDir = dir + params.get("histogramOutDirName");
-        writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
+        onlineVehicleTracker = params.containsKey("onlineVehicleTracker");
+        advanceRequestSubmission = params.containsKey("advanceRequestSubmission");
 
-        scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
-        //        scenario = VrpLauncherUtils.initTimeVariantScenario(netFileName, plansFileName,
-        //                dirName + "changeevents.xml.gz");
+        destinationKnown = params.containsKey("destinationKnown");
+        pickupDuration = Double.valueOf(params.get("pickupDuration"));
+        dropoffDuration = Double.valueOf(params.get("dropoffDuration"));
 
-        if (params.get("taxiCustomersFileName") != null) {
-            List<String> passengerIds = PersonCreatorWithRandomTaxiMode
-                    .readTaxiCustomerIds(taxiCustomersFile);
-            VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
+        otfVis = params.containsKey("otfVis");
+
+        vrpOutDir = getFilePath(params, "vrpOutDir");
+        histogramOutDir = getFilePath(params, "histogramOutDir");
+        eventsOutFile = getFilePath(params, "eventsOutFile");
+
+        if (changeEventsFile != null && onlineVehicleTracker) {
+            System.err.println("Online vehicle tracking may not be useful -- "
+                    + "travel times should be (almost?) deterministic for a time variant network");
         }
 
-        //temp TODO
-        //maybe should to extract a method or so??
+        scenario = VrpLauncherUtils.initScenario(netFile, plansFile, changeEventsFile);
+
+        if (taxiCustomersFile != null) {
+            List<String> passengerIds = PersonCreatorWithRandomTaxiMode
+                    .readTaxiCustomerIds(taxiCustomersFile);
+            VrpPopulationUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
+        }
+
         //TaxiDemandUtils.preprocessPlansBasedOnCoordsOnly(scenario);
+    }
+
+
+    private String getFilePath(Map<String, String> params, String key)
+    {
+        String fileName = params.get(key);
+        return fileName == null ? null : dir + fileName;
     }
 
 
@@ -201,9 +217,12 @@ class TaxiLauncher
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
 
-        routerWithCache = new LeastCostPathCalculatorWithCache(router,
-                algorithmConfig.ttimeSource.timeDiscretizer);
+        TimeDiscretizer timeDiscretizer = (algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
+        !scenario.getConfig().network().isTimeVariantNetwork()) ? //
+                TimeDiscretizer.CYCLIC_24_HOURS : //
+                TimeDiscretizer.CYCLIC_15_MIN;
 
+        routerWithCache = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
         pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
     }
 
@@ -259,8 +278,8 @@ class TaxiLauncher
         EventsManager events = qSim.getEventsManager();
 
         EventWriter eventWriter = null;
-        if (writeSimEvents) {
-            eventWriter = new EventWriterXML(dir + "events.xml.gz");
+        if (eventsOutFile != null) {
+            eventWriter = new EventWriterXML(eventsOutFile);
             events.addHandler(eventWriter);
         }
 
@@ -275,14 +294,14 @@ class TaxiLauncher
             optimizerConfig.scheduler.setDelaySpeedupStats(delaySpeedupStats);
         }
 
-        RunningVehicleRegister rvr = new RunningVehicleRegister();
-        events.addHandler(rvr);
+        MovingAgentsRegister mar = new MovingAgentsRegister();
+        events.addHandler(mar);
 
         if (otfVis) { // OFTVis visualization
             DynAgentLauncherUtils.runOTFVis(qSim, false, ColoringScheme.taxicab);
         }
 
-        if (outHistogram) {
+        if (histogramOutDir != null) {
             events.addHandler(legHistogram = new LegHistogram(300));
         }
 
@@ -290,7 +309,7 @@ class TaxiLauncher
 
         events.finishProcessing();
 
-        if (writeSimEvents) {
+        if (eventsOutFile != null) {
             eventWriter.closeFile();
         }
 
@@ -324,6 +343,7 @@ class TaxiLauncher
     void generateOutput()
     {
         PrintWriter pw = new PrintWriter(System.out);
+        pw.println(algorithmConfig.name());
         pw.println("m\t" + context.getVrpData().getVehicles().size());
         pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
@@ -332,7 +352,7 @@ class TaxiLauncher
         pw.println(stats);
         pw.flush();
 
-        if (vrpOutFiles) {
+        if (vrpOutDir != null) {
             new Schedules2GIS(context.getVrpData().getVehicles(),
                     TransformationFactory.WGS84_UTM33N).write(vrpOutDir);
         }
@@ -341,7 +361,7 @@ class TaxiLauncher
         ChartUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
                 .getVehicles()));
 
-        if (outHistogram) {
+        if (histogramOutDir != null) {
             VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDir);
         }
     }

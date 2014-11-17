@@ -28,24 +28,24 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 
 
-public class RunningVehicleRegister
+public class MovingAgentsRegister
     implements EventHandler, PersonDepartureEventHandler, PersonStuckEventHandler,
     PersonArrivalEventHandler
 {
-    private Map<Id<Person>, PersonDepartureEvent> runningAgentsMap = new HashMap<>();
+    private Map<Id<Person>, PersonDepartureEvent> movingAgentsMap = new HashMap<>();
 
 
     @Override
     public void handleEvent(PersonDepartureEvent event)
     {
-        runningAgentsMap.put(event.getPersonId(), event);
+        movingAgentsMap.put(event.getPersonId(), event);
     }
 
 
     @Override
     public void handleEvent(PersonArrivalEvent event)
     {
-        runningAgentsMap.remove(event.getPersonId());
+        movingAgentsMap.remove(event.getPersonId());
     }
 
 
@@ -58,15 +58,15 @@ public class RunningVehicleRegister
     }
 
 
-    public Set<Id<Person>> getRunningAgentIds()
+    public Set<Id<Person>> getMovingAgentIds()
     {
-        return runningAgentsMap.keySet();
+        return movingAgentsMap.keySet();
     }
 
 
     @Override
     public void reset(int iteration)
     {
-        runningAgentsMap.clear();
+        movingAgentsMap.clear();
     }
 }

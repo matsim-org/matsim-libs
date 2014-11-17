@@ -127,9 +127,6 @@ public class ElectroCabLaunchUtils
         ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer, ecabhandler);
 
         qSim.addMobsimEngine(taxiSimEngine);
-        if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
-            qSim.addMobsimEngine(new NetworkChangeEventsEngine());
-        }
         qSim.getScenario().getConfig().qsim().setEndTime(36 * 3600);
         return taxiSimEngine;
     }

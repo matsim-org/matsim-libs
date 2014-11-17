@@ -20,11 +20,9 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.io.File;
-import java.util.*;
 
 import org.matsim.analysis.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
@@ -47,22 +45,14 @@ public class VrpLauncherUtils
 {
     public static final int MAX_TIME = 36 * 60 * 60;
 
+    //only the free-flow speed should decide on the movement of vehicles
+    public static final double VARIANT_NETWORK_FLOW_CAP_FACTOR = 100;
+
 
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED("FF", TimeDiscretizer.CYCLIC_24_HOURS), // no eventsFileName
-        EVENTS_24_H("24H", TimeDiscretizer.CYCLIC_24_HOURS), // based on eventsFileName, averaged over a whole day
-        EVENTS_15_MIN("15M", TimeDiscretizer.CYCLIC_15_MIN); // based on eventsFileName, 15-minute time interval
-
-        public final String shortcut;
-        public final TimeDiscretizer timeDiscretizer;
-
-
-        private TravelTimeSource(String shortcut, TimeDiscretizer timeDiscretizer)
-        {
-            this.shortcut = shortcut;
-            this.timeDiscretizer = timeDiscretizer;
-        }
+        FREE_FLOW_SPEED, //time-variant (CYCLIC_24_HOURS) or invariant (CYCLIC_15_MIN); depends on the network type
+        EVENTS; // based on eventsFileName, averaged over a whole day (CYCLIC_24_HOURS) or 15-minute time intervals (CYCLIC_15_MIN) 
     }
 
 
@@ -74,77 +64,32 @@ public class VrpLauncherUtils
 
     public static Scenario initScenario(String netFileName, String plansFileName)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(netFileName);
-        new MatsimPopulationReader(scenario).readFile(plansFileName);
-        return scenario;
+        return initScenario(netFileName, plansFileName, null);
     }
 
 
-    public static Scenario initTimeVariantScenario(String netFileName, String plansFileName,
-            String changeEventsFilename)
+    public static Scenario initScenario(String netFileName, String plansFileName,
+            String changeEventsFileName)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        scenario.getConfig().network().setTimeVariantNetwork(true);
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
-        network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
-        new MatsimNetworkReader(scenario).readFile(netFileName);
-        System.out.println("use TimeVariantLinks in NetworkFactory.");
-        scenario.getConfig().network().setChangeEventInputFile(changeEventsFilename);
-        System.out.println("loading network change events from "
-                + scenario.getConfig().network().getChangeEventsInputFile());
-        NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-        parser.parse(scenario.getConfig().network().getChangeEventsInputFile());
 
-        network.setNetworkChangeEvents(parser.getEvents());
+        if (changeEventsFileName != null) {
+            scenario.getConfig().network().setTimeVariantNetwork(true);
+            scenario.getConfig().qsim().setFlowCapFactor(VARIANT_NETWORK_FLOW_CAP_FACTOR);
+            network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+        }
+
+        new MatsimNetworkReader(scenario).readFile(netFileName);
+
+        if (changeEventsFileName != null) {
+            NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
+            parser.parse(changeEventsFileName);
+            network.setNetworkChangeEvents(parser.getEvents());
+        }
 
         new MatsimPopulationReader(scenario).readFile(plansFileName);
         return scenario;
-    }
-
-
-    public static void convertLegModes(List<String> passengerIds, String mode, Scenario scenario)
-    {
-        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-
-        for (String id : passengerIds) {
-            Person person = persons.get(Id.create(id, Person.class));
-
-            for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-                if (pe instanceof Leg) {
-                    ((Leg)pe).setMode(mode);
-                }
-            }
-        }
-    }
-
-
-    public static void removeNonPassengers(String mode, Scenario scenario)
-    {
-        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
-        Iterator<? extends Person> personIter = persons.values().iterator();
-
-        while (personIter.hasNext()) {
-            Plan selectedPlan = personIter.next().getSelectedPlan();
-
-            if (!hasLegOfMode(selectedPlan, mode)) {
-                personIter.remove();
-            }
-        }
-    }
-
-
-    private static boolean hasLegOfMode(Plan plan, String mode)
-    {
-        for (PlanElement pe : plan.getPlanElements()) {
-            if (pe instanceof Leg) {
-                if ( ((Leg)pe).getMode().equals(mode)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
 
@@ -155,10 +100,9 @@ public class VrpLauncherUtils
             case FREE_FLOW_SPEED:
                 return new FreeSpeedTravelTime();
 
-            case EVENTS_15_MIN:
-            case EVENTS_24_H:
+            case EVENTS:
                 scenario.getConfig().travelTimeCalculator()
-                        .setTraveltimeBinSize(ttimeSource.timeDiscretizer.getTimeInterval());
+                        .setTraveltimeBinSize(TimeDiscretizer.CYCLIC_15_MIN.getTimeInterval());
                 TravelTimeCalculator ttCalculator = TravelTimeCalculators
                         .createTravelTimeCalculator(scenario);
                 return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
@@ -225,5 +169,4 @@ public class VrpLauncherUtils
                     + legMode + ".png", legMode);
         }
     }
-
 }

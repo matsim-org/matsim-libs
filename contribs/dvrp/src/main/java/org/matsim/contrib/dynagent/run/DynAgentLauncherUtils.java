@@ -25,6 +25,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
@@ -44,6 +45,10 @@ public class DynAgentLauncherUtils
         QNetsimEngineModule.configure(qSim);
 
         qSim.addMobsimEngine(new TeleportationEngine());
+        
+        if (scenario.getConfig().network().isTimeVariantNetwork()) {
+            qSim.addMobsimEngine(new NetworkChangeEventsEngine());
+        }
 
         return qSim;
     }

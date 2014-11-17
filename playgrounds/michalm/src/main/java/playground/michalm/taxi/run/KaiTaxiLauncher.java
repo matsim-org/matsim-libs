@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.run.*;
 
 import playground.michalm.taxi.TaxiRequestCreator;
 
@@ -35,7 +35,7 @@ class KaiTaxiLauncher
         TaxiLauncher launcher = new TaxiLauncher(TaxiLauncher.readParams(file));
 
         if (removeNonPassengers) {
-            VrpLauncherUtils.removeNonPassengers(TaxiRequestCreator.MODE, launcher.scenario);
+            VrpPopulationUtils.removePersonsNotUsingMode(TaxiRequestCreator.MODE, launcher.scenario);
 
             if (endActivitiesAtTimeZero) {
                 setEndTimeForFirstActivities(launcher.scenario, 0);

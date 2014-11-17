@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
-public class MultipleRunStats
+public class MultiRunStats
 {
     final SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
     final SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
