@@ -257,6 +257,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
+		// We need to call delegate, and not just check if next link is null
+		// (as was done in the refactoring), because PersonDriverAgentImpl,
+		// our usual delegate, does more than that.
 		return delegate.isWantingToArriveOnCurrentLink();
 	}
 
