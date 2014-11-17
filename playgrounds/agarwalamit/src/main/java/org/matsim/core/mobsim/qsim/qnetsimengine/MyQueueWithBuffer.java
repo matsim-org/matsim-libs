@@ -237,6 +237,15 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		this.timeStepSize = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getTimeStepSize() ;
 
+		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
+		
+		if(isSeeping != null && isSeeping.equals("true")){
+			this.seepageAllowed = true;
+			this.seepWarnCount =0;
+			this.seepMode = this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "seepMode");
+			this.isSeepModeStorageFree = Boolean.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "isSeepModeStorageFree"));
+		}
+		
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
@@ -614,7 +623,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		// reduce storage capacity by size of vehicle:
 		//	usedStorageCapacity += veh.getSizeInEquivalents();
-		
+
 		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 			if(seepWarnCount==0){
 				SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities."+ Gbl.ONLYONCE);
@@ -623,7 +632,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
 		}
-		
+
 		// get current time:
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
@@ -774,15 +783,15 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private boolean SeepageAllowed = true;
-	private String seepMode = "walk";//TransportMode.bike.toString();
-	private boolean isSeepModeStorageFree = false;
-	private int seepWarnCount=0;
+	private boolean seepageAllowed;
+	private String seepMode ; 
+	private boolean isSeepModeStorageFree;
+	private int seepWarnCount;
 
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
-		if(!SeepageAllowed || vehQueue.size() <= 1){
+		if(!seepageAllowed || vehQueue.size() <= 1){
 			// no seepage or no vehicle or only one vehicle in queue
 			return vehQueue.peek();
 		} else if(vehQueue.peek().getEarliestLinkExitTime()>now ){
@@ -800,7 +809,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			while(it.hasNext()){
 				QVehicle veh = vehQueue.poll(); 
 				if(veh.getDriver()==null) {
-					System.out.println("\n Driver is null \n");
 				} else if(veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) && !foundSeepMode) {
 					returnVeh = veh;
 					newVehQueue.add(veh);
