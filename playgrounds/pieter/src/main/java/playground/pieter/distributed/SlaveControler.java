@@ -5,10 +5,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -21,9 +25,12 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -42,9 +49,9 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener, StartupListener {
-    private final FastDijkstraFactoryWithCustomTravelTimes refreshableDijkstra;
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
+    private final ReplaceableTravelTime travelTime;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
@@ -53,7 +60,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
     private Config config;
     private double totalIterationTime;
     private Controler matsimControler;
-    private SerializableLinkTravelTimes linkTravelTimes;
+    private TravelTime linkTravelTimes;
     private WaitTime waitTimes;
     private StopStopTime stopStopTimes;
     private ObjectInputStream reader;
@@ -146,7 +153,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
 
         initialRouting = reader.readBoolean();
-        if(initialRouting)        slaveLogger.warn("Performing initial routing.");
+        if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
         memoryUsageCalculator = new MemoryUsageCalculator();
         writeMemoryStats();
@@ -169,11 +176,15 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
-
-        //override the LeastCostPathCalculatorFactory set in the config with one that can be customized
-        //with travel times from the master
-        refreshableDijkstra = new FastDijkstraFactoryWithCustomTravelTimes();
-        matsimControler.setLeastCostPathCalculatorFactory(refreshableDijkstra);
+        linkTravelTimes = new FreeSpeedTravelTime();
+        travelTime = new ReplaceableTravelTime();
+        travelTime.setTravelTime(linkTravelTimes);
+        matsimControler.setModules(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(TravelTime.class,travelTime);
+            }
+        });
 //        new Thread(new TimesReceiver()).start();
         if (config.scenario().isUseTransit()) {
 
@@ -276,15 +287,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
             initialRouting = false;
         }
         lastIterationStartTime = System.currentTimeMillis();
-        // the time calculators are null until the master sends them, need
-        // something to keep psim occupied until then
-//        pSimFactory = new PSimFactory();
-        if (linkTravelTimes == null)
-            pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
-        else {
-            pSimFactory.setTravelTime(linkTravelTimes);
-            refreshableDijkstra.setTravelTime(linkTravelTimes);
-        }
+        travelTime.setTravelTime(linkTravelTimes);
+        pSimFactory.setTravelTime(linkTravelTimes);
         if (config.scenario().isUseTransit()) {
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
@@ -338,7 +342,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
             personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getScenario().getPopulation().getPersons().get(personId)));
             personIdsToRemove.add(personId);
         }
-        for (Id<Person> personId : personIdsToRemove) matsimControler.getScenario().getPopulation().getPersons().remove(personId);
+        for (Id<Person> personId : personIdsToRemove)
+            matsimControler.getScenario().getPopulation().getPersons().remove(personId);
         return personsToSend;
     }
 
@@ -364,7 +369,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
     }
 
     public void transmitPerformance() throws IOException {
-        if(totalIterationTime>0) {
+        if (totalIterationTime > 0) {
             slaveLogger.warn("Spent a total of " + totalIterationTime +
                     " running " + plansCopyForSending.size() +
                     " person plans for " + numberOfPSimIterations +
@@ -474,5 +479,18 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
     @Override
     public void notifyStartup(StartupEvent event) {
         communications();
+    }
+}
+
+class ReplaceableTravelTime implements TravelTime{
+    private TravelTime delegate;
+
+    @Override
+    public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+        return this.delegate.getLinkTravelTime(link,time,person,vehicle);
+    }
+
+    public void setTravelTime(TravelTime linkTravelTimes) {
+        this.delegate =linkTravelTimes;
     }
 }

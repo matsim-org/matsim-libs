@@ -22,6 +22,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
@@ -30,9 +31,7 @@ import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -172,14 +171,28 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //split the population to be sent to the slaves
 
         List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getScenario().getPopulation().getPersons().values(), numSlaves);
-        int i = 0;
-        for (int j : slaves.keySet()) {
+        double[] totalIterationTime = new double[numSlaves];
+        int[] personsPerSlave = new int[numSlaves];
+        long[] usedMemoryPerSlave = new long[numSlaves];
+        long[] maxMemoryPerSlave = new long[numSlaves];
+        int j = 0;
+        for (int i : slaves.keySet()) {
+            totalIterationTime[j] = 1/slaves.get(i).numThreadsOnSlave;
+            personsPerSlave[j] = personSplit[j].size();
+            usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
+            maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
+            j++;
+        }
+        int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave, bytesPerPlan, bytesPerPerson, 0.0);
+        personSplit = (List<PersonImpl>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
+        j = 0;
+        for (int i : slaves.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
-            for (PersonImpl p : personSplit[i]) {
+            for (PersonImpl p : personSplit[j]) {
                 personsToSend.add(new PersonSerializable(p));
             }
-            slaves.get(j).slavePersonPool = personsToSend;
-            i++;
+            slaves.get(i).slavePersonPool = personsToSend;
+            j++;
         }
 
 
@@ -334,6 +347,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             loadBalance();
         isLoadBalanceIteration = false;
         waitForSlaveThreads();
+        linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
+                config.travelTimeCalculator().getTraveltimeBinSize(),
+                config.qsim().getEndTime(),
+                scenario.getNetwork().getLinks().values());
         startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
     }
 
@@ -549,6 +566,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             if (validSlaveIndices.size() == 0 && remainder > 0) {
                 masterLogger.error("All slaves are nearing their maximum memory capacity!! Probably not a sustainable situation...");
+                planAllocationLimiter--;
                 //just distribute as if nothing has happened..
                 for (int i = 0; i < numSlaves; i++) {
                     validSlaveIndices.add(i);
@@ -671,11 +689,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         public void transmitInitialPlans() throws IOException {
             writer.writeObject(slavePersonPool);
             writer.flush();
+
         }
 
         @Override
         public void run() {
             try {
+                slaveLogger.warn("Slave " + myNumber+" entering comms mode: "+communicationsMode.toString());
                 writer.writeObject(communicationsMode);
                 writer.flush();
                 switch (communicationsMode) {
@@ -715,6 +735,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             //end of a successful Thread.run()
             numThreads.decrementAndGet();
+            slaveLogger.warn("Slave " + myNumber+" leaving comms mode: "+communicationsMode.toString());
         }
 
 
@@ -828,3 +849,4 @@ class MemoryUsageCalculator {
         }
     }
 }
+

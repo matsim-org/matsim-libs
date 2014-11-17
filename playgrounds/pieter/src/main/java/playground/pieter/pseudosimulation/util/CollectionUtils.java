@@ -110,6 +110,13 @@ public class CollectionUtils {
         }
     }
 
+    public static <T> List<T>[] split(Collection<T> set, int[] weights) {
+        double[] doubleWeights = new double[weights.length];
+        for(int i=0;i<weights.length;i++){
+            doubleWeights[i] = weights[i];
+        }
+        return split(set,doubleWeights);
+    }
 
     public static void main(String[] args) {
         ArrayList<Integer> a = new ArrayList<>();
