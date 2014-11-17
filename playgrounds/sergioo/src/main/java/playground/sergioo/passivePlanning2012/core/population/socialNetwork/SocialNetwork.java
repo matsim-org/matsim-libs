@@ -7,19 +7,20 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public class SocialNetwork {
 	
-	private Map<Id, Map<Id, Set<String>>> network = new HashMap<Id, Map<Id, Set<String>>>();
+	private Map<Id<Person>, Map<Id<Person>, Set<String>>> network = new HashMap<Id<Person>, Map<Id<Person>, Set<String>>>();
 	private String description;
 	
-	public Map<Id, Map<Id, Set<String>>> getNetwork() {
+	public Map<Id<Person>, Map<Id<Person>, Set<String>>> getNetwork() {
 		return network;
 	}
-	public void relate(Id egoId, Id alterId) {
-		Map<Id, Set<String>> relations = network.get(egoId);
+	public void relate(Id<Person> egoId, Id<Person> alterId) {
+		Map<Id<Person>, Set<String>> relations = network.get(egoId);
 		if(relations == null) {
-			relations = new HashMap<Id, Set<String>>();
+			relations = new HashMap<Id<Person>, Set<String>>();
 			network.put(egoId, relations);
 		}
 		Set<String> alter = relations.get(alterId);
@@ -28,10 +29,10 @@ public class SocialNetwork {
 			relations.put(alterId, alter);
 		}
 	}
-	public void relate(Id egoId, Id alterId, String type) {
-		Map<Id, Set<String>> relations = network.get(egoId);
+	public void relate(Id<Person> egoId, Id<Person> alterId, String type) {
+		Map<Id<Person>, Set<String>> relations = network.get(egoId);
 		if(relations == null) {
-			relations = new HashMap<Id, Set<String>>();
+			relations = new HashMap<Id<Person>, Set<String>>();
 			network.put(egoId, relations);
 		}
 		Set<String> alter = relations.get(alterId);
@@ -41,10 +42,10 @@ public class SocialNetwork {
 		}
 		alter.add(type);
 	}
-	public void relate(Id egoId, Id alterId, Set<String> types) {
-		Map<Id, Set<String>> relations = network.get(egoId);
+	public void relate(Id<Person> egoId, Id<Person> alterId, Set<String> types) {
+		Map<Id<Person>, Set<String>> relations = network.get(egoId);
 		if(relations == null) {
-			relations = new HashMap<Id, Set<String>>();
+			relations = new HashMap<Id<Person>, Set<String>>();
 			network.put(egoId, relations);
 		}
 		Set<String> alter = relations.get(alterId);
@@ -54,26 +55,26 @@ public class SocialNetwork {
 		}
 		alter.addAll(types);
 	}
-	public boolean areRelated(Id egoId, Id alterId) {
+	public boolean areRelated(Id<Person> egoId, Id<Person> alterId) {
 		if(network.get(egoId)!=null && network.get(egoId).get(alterId)!=null)
 			return true;
 		return false;
 	}
-	public Set<String> getRelationTypes(Id egoId, Id alterId) {
+	public Set<String> getRelationTypes(Id<Person> egoId, Id<Person> alterId) {
 		if(areRelated(egoId, alterId))
 			return network.get(egoId).get(alterId);
 		return null;
 	}
-	public Map<Id, Set<String>> getAlters(Id egoId) {
+	public Map<Id<Person>, Set<String>> getAlters(Id<Person> egoId) {
 		return network.get(egoId);
 	}
-	public Set<Id> getAlterIds(Id egoId) {
-		Map<Id, Set<String>> map = network.get(egoId);
-		return map==null?new HashSet<Id>():map.keySet();
+	public Set<Id<Person>> getAlterIds(Id<Person> egoId) {
+		Map<Id<Person>, Set<String>> map = network.get(egoId);
+		return map==null?new HashSet<Id<Person>>():map.keySet();
 	}
-	public Map<Id, Set<String>> getEgos(Id alterId) {
-		Map<Id, Set<String>> relationsMap = new HashMap<Id, Set<String>>();
-		for(Entry<Id, Map<Id, Set<String>>> relations:network.entrySet()) {
+	public Map<Id<Person>, Set<String>> getEgos(Id<Person> alterId) {
+		Map<Id<Person>, Set<String>> relationsMap = new HashMap<Id<Person>, Set<String>>();
+		for(Entry<Id<Person>, Map<Id<Person>, Set<String>>> relations:network.entrySet()) {
 			Set<String> savedRelation = relations.getValue().get(alterId);
 			if(savedRelation != null) {
 				Set<String> relation = new HashSet<String>(); 
@@ -83,9 +84,9 @@ public class SocialNetwork {
 		}
 		return relationsMap;
 	}
-	public Set<Id> getEgoIds(Id alterId) {
-		Set<Id> egoIds = new HashSet<Id>();
-		for(Entry<Id, Map<Id, Set<String>>> relations:network.entrySet())
+	public Set<Id<Person>> getEgoIds(Id<Person> alterId) {
+		Set<Id<Person>> egoIds = new HashSet<Id<Person>>();
+		for(Entry<Id<Person>, Map<Id<Person>, Set<String>>> relations:network.entrySet())
 			if(relations.getValue().containsKey(alterId))
 				egoIds.add(relations.getKey());
 		return getEgoIds(alterId);

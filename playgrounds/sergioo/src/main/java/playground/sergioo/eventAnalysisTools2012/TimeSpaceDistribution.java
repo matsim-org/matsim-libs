@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -44,7 +45,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	private static final String SEPARATOR_TXT = "\t";
 	
 	private int numIntervals;
-	private Map<Id,LinkData> linksData;
+	private Map<Id<Link>, LinkData> linksData;
 	private Network network;
 	
 	/**
@@ -99,13 +100,13 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 				tSD.showKAvgGraph((int)((sdf.parse(args[5]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)),(int)((sdf.parse(args[6]).getTime()+millisSingapore)/(1000.0*TIME_INTERVAL)));
 			}
 			else {
-				Id moreCongested = null;
-				for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet())
+				Id<Link> moreCongested = null;
+				for(Entry<Id<Link>, LinkData> linkData:tSD.getLinksData().entrySet())
 					if(moreCongested==null || (linkData.getValue().getConcentration()>tSD.getLinksData().get(moreCongested).getConcentration()))
 						moreCongested = linkData.getKey();
 				System.out.println(moreCongested+" "+tSD.getLinksData().get(moreCongested).getConcentration());
 				moreCongested = null;
-				for(Entry<Id,LinkData> linkData:tSD.getLinksData().entrySet()) {
+				for(Entry<Id<Link>, LinkData> linkData:tSD.getLinksData().entrySet()) {
 					if(moreCongested==null || linkData.getValue().getDensity()>tSD.getLinksData().get(moreCongested).getDensity())
 						moreCongested = linkData.getKey();
 				}
@@ -117,7 +118,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	public TimeSpaceDistribution(Network network) {
 		super();
 		numIntervals = 0;
-		this.linksData = new HashMap<Id, LinkData>();
+		this.linksData = new HashMap<Id<Link>, LinkData>();
 		this.network = network;
 		for(Link link:network.getLinks().values())
 			if(link.getLength()>0)
@@ -131,7 +132,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_CSV);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getFlow()*3600+SEPARATOR_CSV);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getFlow(t)*3600;
@@ -147,7 +148,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_CSV);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>,LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getDensity()*1000+SEPARATOR_CSV);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getDensity(t)*1000;
@@ -163,7 +164,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_CSV);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getAvgTravelTimes(t);
@@ -179,7 +180,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_CSV);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getAvgSpeeds(t)*3600/1000;
@@ -195,7 +196,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_CSV);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_CSV+linkDataE.getValue().getConcentration()+SEPARATOR_CSV);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getConcentration(t)*1000;
@@ -213,7 +214,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_TXT);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getFlow()*3600+SEPARATOR_TXT);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getFlow(t)*3600;
@@ -229,7 +230,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_TXT);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getDensity()*1000+SEPARATOR_TXT);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getDensity(t)*1000;
@@ -245,7 +246,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_TXT);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getAvgTravelTimes(t);
@@ -261,7 +262,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_TXT);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getAvgSpeeds(t)*3600/1000;
@@ -277,7 +278,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 			printWriter.print(time+SEPARATOR_TXT);
 		}
 		printWriter.println();
-		for(Entry<Id,LinkData> linkDataE:linksData.entrySet()) {
+		for(Entry<Id<Link>, LinkData> linkDataE:linksData.entrySet()) {
 			printWriter.print(linkDataE.getKey().toString()+SEPARATOR_TXT+linkDataE.getValue().getConcentration()+SEPARATOR_TXT);
 			for(int t=0;t<linkDataE.getValue().getTimeSize();t++) {
 				double value=linkDataE.getValue().getConcentration(t)*1000;
@@ -287,7 +288,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		}
 		printWriter.close();
 	}
-	public Map<Id, LinkData> getLinksData() {
+	public Map<Id<Link>, LinkData> getLinksData() {
 		return linksData;
 	}
 	public void showFlowAvgGraph(int fromBin, int toBin) {
@@ -491,7 +492,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/ConcentrationAverage.png", 800, 600);
 	}
 	public void showFlowLinkGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Flow "+idString, "Time(h)", "Flow(veh/h)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -504,7 +505,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/flowLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensityLinkGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Density "+idString, "Time(h)", "Density(veh/Km)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -517,7 +518,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/densityLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showTTLinkGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Travel Time "+idString, "Time(h)", "Travel Time(s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -530,7 +531,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/ttLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showSpeedLinkGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Avg Speed "+idString, "Time(h)", "Speed(Km/h)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -543,7 +544,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/speedLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showKLinkGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYLineChart chart = new XYLineChart("Concentration", "Time(h)", "K(veh/Km)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -556,7 +557,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/kLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showFlowSpeedGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Flow Speed", "Flow(veh/s)", "Speed(m/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -569,7 +570,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/fSLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensityFlowGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Density Flow", "Density(veh/m)", "Flow(veh/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -582,7 +583,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		chart.saveAsPng("./data/youssef/dFLink_"+linkId.toString()+".png", 800, 600);
 	}
 	public void showDensitySpeedGraph(String idString) {
-		Id linkId = Id.createLinkId(idString);
+		Id<Link> linkId = Id.createLinkId(idString);
 		XYScatterChart chart = new XYScatterChart("Density Speed", "Density(veh/m)", "Speed(m/s)");
 		LinkData linkData = linksData.get(linkId);
 		double[] xs = new double[linkData.getTimeSize()];
@@ -614,31 +615,31 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	public void handleEvent(PersonStuckEvent event) {
 		System.out.println("stuck");
 	}
-	public void enterLink(double time, Id linkId, Id personId) {
+	public void enterLink(double time, Id<Link> linkId, Id<Person> personId) {
 		verifyNewInterval(time, linkId);
 		LinkData linkData = linksData.get(linkId);
 		if(linkData!=null)
 			linkData.addEnterVehicle(personId, time);
 	}
-	public void exitLink(double time, Id linkId, Id personId) {
+	public void exitLink(double time, Id<Link> linkId, Id<Person> personId) {
 		verifyNewInterval(time, linkId);
 		LinkData linkData = linksData.get(linkId);
 		if(linkData!=null)
 			linkData.addExitVehicle(personId, time);
 	}
-	public void finishActivityLink(double time, Id linkId, Id personId) {
+	public void finishActivityLink(double time, Id<Link> linkId, Id<Person> personId) {
 		verifyNewInterval(time, linkId);
 		LinkData linkData = linksData.get(linkId);
 		if(linkData!=null)
 			linkData.addEndActivity(personId, time);
 	}
-	public void beginActivityLink(double time, Id linkId, Id personId) {
+	public void beginActivityLink(double time, Id<Link> linkId, Id<Person> personId) {
 		verifyNewInterval(time, linkId);
 		LinkData linkData = linksData.get(linkId);
 		if(linkData!=null)
 			linkData.addStartActivity(personId, time);
 	}
-	public void verifyNewInterval(double time, Id linkId) {
+	public void verifyNewInterval(double time, Id<Link> linkId) {
 		LinkData linkData = linksData.get(linkId);
 		while(linkData!=null && time-linkData.getTimeSize()*TIME_INTERVAL>TIME_INTERVAL) {
 			linkData.addTimeInterval();

@@ -128,11 +128,11 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	private class KnownPlace {
 		
 		//Attributes
-		public Id facilityId;
+		public Id<ActivityFacility> facilityId;
 		public List<Tuple<Period, String>> timeTypes = new ArrayList<Tuple<Period, String>>();
 		
 		//Constructors
-		public KnownPlace(Id facilityId) {
+		public KnownPlace(Id<ActivityFacility> facilityId) {
 			this.facilityId = facilityId;
 		}
 		
@@ -145,8 +145,8 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	private final ScenarioSimplerNetwork scenario;
 	private final Household household;
 	private final Set<SocialDecisionMaker> knownPeople = new HashSet<SocialDecisionMaker>();
-	private final Map<Id, KnownPlace> knownPlaces = new HashMap<Id, KnownPlace>();
-	private final Map<String, Map<Id, Double[]>> knownTravelTimes = new HashMap<String, Map<Id, Double[]>>();
+	private final Map<Id<ActivityFacility>, KnownPlace> knownPlaces = new HashMap<Id<ActivityFacility>, KnownPlace>();
+	private final Map<String, Map<Id<Link>, Double[]>> knownTravelTimes = new HashMap<String, Map<Id<Link>, Double[]>>();
 	private final SimplerNetworkTravelDisutility simpleTravelDisutility =  new SimplerNetworkTravelDisutility();
 	private final SimplerNetworkTravelTime simpleTravelTime =  new SimplerNetworkTravelTime();
 	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
@@ -160,7 +160,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 			this.household = null;
 		this.leastCostPathCalculator = leastCostPathCalculator;
 		for(String mode:scenario.getConfig().plansCalcRoute().getNetworkModes())
-			knownTravelTimes.put(mode, new HashMap<Id, Double[]>());
+			knownTravelTimes.put(mode, new HashMap<Id<Link>, Double[]>());
 	}
 	
 	//Methods
@@ -173,7 +173,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 	public void addKnownPerson(SocialDecisionMaker socialDecisionMaker) {
 		knownPeople.add(socialDecisionMaker);
 	}
-	public void addKnownPlace(Id facilityId, Double time, String typeOfActivity) {
+	public void addKnownPlace(Id<ActivityFacility> facilityId, Double time, String typeOfActivity) {
 		KnownPlace knownPlace = knownPlaces.get(facilityId);
 		if(knownPlace==null) {
 			knownPlace = new KnownPlace(facilityId);
@@ -181,7 +181,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		}
 		knownPlace.timeTypes.add(new Tuple<Period, String>(Period.getPeriod(time), typeOfActivity));
 	}
-	public void setKnownTravelTime(double time, String mode, Id linkId, double travelTime) {
+	public void setKnownTravelTime(double time, String mode, Id<Link> linkId, double travelTime) {
 		for(Period period:Period.values())
 			if(period.isPeriod(time))
 				knownTravelTimes.get(mode).get(linkId)[period.ordinal()] = travelTime;
@@ -190,9 +190,9 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		return scenario;
 	}
 	@Override
-	public Tuple<String, Id> decideTypeOfActivityFacility(double time, Id startFacilityId) {
+	public Tuple<String, Id<ActivityFacility>> decideTypeOfActivityFacility(double time, Id<ActivityFacility> startFacilityId) {
 		Coord location = scenario.getActivityFacilities().getFacilities().get(startFacilityId).getCoord();
-		List<Tuple<String, Id>> options = new ArrayList<Tuple<String, Id>>();
+		List<Tuple<String, Id<ActivityFacility>>> options = new ArrayList<Tuple<String, Id<ActivityFacility>>>();
 		double maximumDistance = MAXIMUM_SEARCHING_DISTANCE/2;
 		while(options.size()==0) {
 			for(KnownPlace knownPlace:knownPlaces.values()) {
@@ -200,25 +200,25 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 				if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
 					for(Tuple<Period, String> types:knownPlace.timeTypes)
 						if(Period.getPeriod(time).equals(types.getFirst()))
-							options.add(new Tuple<String, Id>(types.getSecond(), knownPlace.facilityId));
+							options.add(new Tuple<String, Id<ActivityFacility>>(types.getSecond(), knownPlace.facilityId));
 			}
 			maximumDistance*=2;
 		}
 		return options.get((int) (Math.random()*options.size()));
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startLinkId, Id endLinkId, TripRouter tripRouter) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id<ActivityFacility> startId, Id<ActivityFacility> endId, TripRouter tripRouter) {
 		String bestMode = null;
 		List<Link> bestPath = null;
 		double minTime = Double.MAX_VALUE;
-		Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
-		Link endLink = scenario.getNetwork().getLinks().get(endLinkId);
+		ActivityFacility start = scenario.getActivityFacilities().getFacilities().get(startId);
+		ActivityFacility end = scenario.getActivityFacilities().getFacilities().get(endId);
 		for(String mode:knownTravelTimes.keySet()) {
 			simpleTravelDisutility.setMode(mode);
 			simpleTravelTime.setMode(mode);
 			LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
 			LeastCostPathCalculator leastCostPathCalculator = routerFactory.createPathCalculator(scenario.getSimplerNetwork(mode), simpleTravelDisutility, simpleTravelTime); 
-			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), startLink.getCoord()).getFromNode(), NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), endLink.getCoord()).getToNode(), time, null, null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), start.getCoord()).getFromNode(), NetworkUtils.getNearestLink(((NetworkImpl) scenario.getSimplerNetwork(mode)), end.getCoord()).getToNode(), time, null, null);
 			if(path.travelTime<minTime) {
 				minTime = path.travelTime;
 				bestPath = path.links;
@@ -228,12 +228,12 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		Set<String> mode = new HashSet<String>();
 		mode.add(bestMode);
 		leastCostPathCalculator.setModeRestriction(mode);
-		NetworkRoute networkRoute = getFullNetworkRoute(bestPath, startLinkId, endLinkId, time);
+		NetworkRoute networkRoute = getFullNetworkRoute(bestPath, start.getLinkId(), end.getLinkId(), time);
 		Leg leg = new LegImpl(bestMode);
 		leg.setRoute(networkRoute);
 		return Arrays.asList(leg);
 	}
-	private NetworkRoute getFullNetworkRoute(List<Link> bestPath, Id startLinkId, Id endLinkId, double time) {
+	private NetworkRoute getFullNetworkRoute(List<Link> bestPath, Id<Link> startLinkId, Id<Link> endLinkId, double time) {
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
@@ -256,11 +256,11 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		return networkRoute;
 	}
 	@Override
-	public double decideStartTime(double minimumStartTime, Id facilityId) {
+	public double decideStartTime(double minimumStartTime, Id<ActivityFacility> facilityId) {
 		return minimumStartTime;
 	}
 	@Override
-	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id facilityId) {
+	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id<ActivityFacility> facilityId) {
 		OpeningTime startTimeOpeningTime = null;
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes())

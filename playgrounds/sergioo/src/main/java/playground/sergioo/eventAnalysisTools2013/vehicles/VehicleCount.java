@@ -1,12 +1,8 @@
 package playground.sergioo.eventAnalysisTools2013.vehicles;
 
-import java.awt.Container;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JFrame;
 
@@ -15,18 +11,13 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.statistics.HistogramDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -36,30 +27,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHandler  {
 
-	/*private static Map<Id, Integer>[] numCars;
-	private static Map<Id, Integer>[] numCarsCh;
-	private static Map<Id, Integer>[] numCarsTo;
-	private static Map<Id, Integer>[] numBuses;
-	private static Map<Id, Integer>[] numTrucks;
-	private int timeInterval;
-	private Collection<Id> carAgents = new ArrayList<Id>();
-
-	
-	public VehicleCount(int totalTime, int timeInterval) {
-		int numSlots = totalTime/timeInterval;
-		this.timeInterval = timeInterval;
-		numCars = new Map[numSlots];
-		numCarsCh = new Map[numSlots];
-		numCarsTo = new Map[numSlots];
-		numBuses = new Map[numSlots];
-		numTrucks = new Map[numSlots];
-		for(int i=0; i<numSlots; i++) {
-			numCars[i] = new HashMap<Id, Integer>();
-			numCarsCh[i] = new HashMap<Id, Integer>();
-			numCarsTo[i] = new HashMap<Id, Integer>();
-			numBuses[i] = new HashMap<Id, Integer>();
-			numTrucks[i] = new HashMap<Id, Integer>();
-		}*/
 	private static Integer[] numCars;
 	private static Integer[] numCarsCh;
 	private static Integer[] numCarsTo;
@@ -71,9 +38,9 @@ public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHa
 	private static Integer[] numDBuses;
 	private static Integer[] numDTrucks;
 	private int timeInterval;
-	private Collection<Id> carAgents = new ArrayList<Id>();
-	private Collection<Id> touAgents = new ArrayList<Id>();
-	private Collection<Id> chAgents = new ArrayList<Id>();
+	private Collection<Id<Person>> carAgents = new ArrayList<Id<Person>>();
+	private Collection<Id<Person>> touAgents = new ArrayList<Id<Person>>();
+	private Collection<Id<Person>> chAgents = new ArrayList<Id<Person>>();
 	
 	public VehicleCount(int totalTime, int timeInterval) {
 		int numSlots = totalTime/timeInterval;

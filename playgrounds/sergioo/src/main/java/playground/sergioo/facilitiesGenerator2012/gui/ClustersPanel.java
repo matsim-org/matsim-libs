@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -82,10 +83,10 @@ public class ClustersPanel extends LayersPanel implements MouseListener, MouseMo
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public ClustersPanel(ClustersWindow window, List<org.apache.commons.math.stat.clustering.Cluster<PointPerson>> clusters,	int numTotalPoints) {
+	public ClustersPanel(ClustersWindow window, List<CentroidCluster<PointPerson>> clusters,	int numTotalPoints) {
 		super();
 		this.window = window;
-		for(org.apache.commons.math.stat.clustering.Cluster<PointPerson> cluster:clusters) {
+		for(CentroidCluster<PointPerson> cluster:clusters) {
 			Color color = new Color((float)(Math.random()*0.5), (float)(Math.random()*0.5), (float)(Math.random()*0.5));
 			//Color color = new Color(5.5f*(float)(cluster.getPoints().size())/numTotalPoints, 5.5f*(float)(cluster.getPoints().size())/numTotalPoints, 5.5f*(float)(cluster.getPoints().size())/numTotalPoints);
 			PointsPainter pointsPainter = new PointsPainter(color);

@@ -31,9 +31,9 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 
 	//Methods
 	@Override
-	public List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobsimStatus) {
+	public List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now, Id<ActivityFacility> startFacilityId, double endTime, Id<ActivityFacility> endFacilityId, final MobsimStatus mobsimStatus) {
 		SocialDecisionMaker socialDecisionMaker = ((SocialDecisionMaker)decisionMakers[0]);
-		Tuple<String, Id> typeOfActivityFacility = socialDecisionMaker.decideTypeOfActivityFacility(startTime, startFacilityId);
+		Tuple<String, Id<ActivityFacility>> typeOfActivityFacility = socialDecisionMaker.decideTypeOfActivityFacility(startTime, startFacilityId);
 		if(typeOfActivityFacility==null)
 			return null;
 		ActivityFacility facility = socialDecisionMaker.getScenario().getActivityFacilities().getFacilities().get(typeOfActivityFacility.getSecond());

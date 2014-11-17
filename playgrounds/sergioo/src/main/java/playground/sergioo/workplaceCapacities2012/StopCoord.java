@@ -2,13 +2,13 @@ package playground.sergioo.workplaceCapacities2012;
 
 import java.util.Collection;
 
-import org.apache.commons.math.stat.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.Clusterable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public class StopCoord extends CoordImpl implements Clusterable<StopCoord> {
+public class StopCoord extends CoordImpl implements Clusterable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -25,11 +25,9 @@ public class StopCoord extends CoordImpl implements Clusterable<StopCoord> {
 	public Id<TransitStopFacility> getId(){
 		return id;
 	}
-	@Override
 	public double distanceFrom(StopCoord p) {
 		return CoordUtils.calcDistance(this, p);
 	}
-	@Override
 	public StopCoord centroidOf(Collection<StopCoord> ps) {
 		double x=0, y=0;
 		for(StopCoord p:ps) {
@@ -37,6 +35,11 @@ public class StopCoord extends CoordImpl implements Clusterable<StopCoord> {
 			y+=p.getY();
 		}
 		return new StopCoord(x/ps.size(), y/ps.size(), null);
+	}
+
+	@Override
+	public double[] getPoint() {
+		return new double[] {getX(), getY()};
 	}
 
 }

@@ -32,8 +32,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import others.sergioo.util.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
 
+import others.sergioo.util.clustering.Cluster;
 import playground.sergioo.facilitiesGenerator2012.hits.PointPerson;
 import playground.sergioo.visualizer2D2012.LayersWindow;
 
@@ -122,7 +123,7 @@ public class ClustersWindow extends LayersWindow implements ActionListener {
 		this.add(infoPanel, BorderLayout.SOUTH);
 		pack();
 	}
-	public ClustersWindow(String title,	List<org.apache.commons.math.stat.clustering.Cluster<PointPerson>> clusters, int numTotalPoints) {
+	public ClustersWindow(String title,	List<CentroidCluster<PointPerson>> clusters, int numTotalPoints) {
 		setTitle(title);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLocation(0,0);

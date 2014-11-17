@@ -23,7 +23,7 @@ public class ArrivalStopTimeMutatorPlanStrategy implements PlanStrategy {
 	private PlanStrategyImpl delegate;
 
 	public ArrivalStopTimeMutatorPlanStrategy(Scenario scenario) {
-		Map<Id, Double> times = new HashMap<Id, Double>();
+		Map<Id<Person>, Double> times = new HashMap<Id<Person>, Double>();
 		String folder = scenario.getConfig().plans().getInputFile();
 		folder = folder.substring(0, folder.lastIndexOf("/")+1);
 		ObjectAttributes agentAttributes0 = new ObjectAttributes();
@@ -34,7 +34,7 @@ public class ArrivalStopTimeMutatorPlanStrategy implements PlanStrategy {
 		new ObjectAttributesXmlReader(agentAttributes).parse(folder+INPUT_FILE);
 		for(Person person:scenario.getPopulation().getPersons().values())
 			times.put(person.getId(), (Double)agentAttributes.getAttribute(person.getId().toString(), ORIGINAL_TIME));
-		delegate = new PlanStrategyImpl(new RandomPlanSelector());
+		delegate = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 		delegate.addStrategyModule(new ArrivalTimeToStopMutator(scenario.getConfig(), times));
 	}
 	@Override

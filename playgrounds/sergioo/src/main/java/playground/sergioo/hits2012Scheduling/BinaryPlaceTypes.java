@@ -209,8 +209,8 @@ public class BinaryPlaceTypes {
 			for(Map<String, String> los:locs.values())
 				for(String loc:los.keySet())
 					nodesPC.add(nodes.get(loc));
-			Map<Id, Path> paths = dijkstra.calcLeastCostPath(nodes.get(postalCode), nodesPC, 8*3600, null, null);
-			for(Entry<Id, Path> e:paths.entrySet())
+			Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(nodes.get(postalCode), nodesPC, 8*3600, null, null);
+			for(Entry<Id<Node>, Path> e:paths.entrySet())
 				printerP.println(nodes.get(postalCode).getId().toString()+" "+e.getKey().toString()+" "+e.getValue().travelTime+" "+e.getValue().travelCost);
 			//System.out.println(System.currentTimeMillis()-t);
 		}

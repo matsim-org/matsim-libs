@@ -201,7 +201,7 @@ public class MainEventAnalyzer {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		Set<Link> links = new HashSet<Link>();
-		Map<Id, Double> linkWeights = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkWeights = new HashMap<Id<Link>, Double>();
 		BufferedReader reader = new BufferedReader(new FileReader(new File("./data/chains_50.txt")));
 		String line = reader.readLine();
 		int i=0;

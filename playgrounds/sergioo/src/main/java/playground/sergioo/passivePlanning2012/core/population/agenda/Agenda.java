@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.math.distribution.Distribution;
-import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
 
 public class Agenda {
 	
@@ -94,7 +94,7 @@ public class Agenda {
 		double n=element.numObservations;
 		if(n>0) {
 			double meanP = ((NormalDistribution)element.getDuration()).getMean();
-			double varP = ((NormalDistributionImpl)element.getDuration()).getNumericalVariance();
+			double varP = Math.pow(((NormalDistributionImpl)element.getDuration()).getStandardDeviation(), 2);
 			double mean = n*meanP/(n+1)+x/(n+1);
 			double sd = n==1?Math.abs(meanP-x)/2:Math.sqrt(n*(varP+meanP-mean)/(n+1)+(x-mean)/(n+1));
 			if(sd<1000)

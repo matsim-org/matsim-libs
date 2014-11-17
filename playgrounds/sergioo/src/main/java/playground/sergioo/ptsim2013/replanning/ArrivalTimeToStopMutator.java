@@ -23,6 +23,7 @@ package playground.sergioo.ptsim2013.replanning;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
@@ -40,25 +41,25 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class ArrivalTimeToStopMutator extends AbstractMultithreadedModule {
 
 	private final double mutationRange;
-	private final Map<Id, Double> originalTimes;
+	private final Map<Id<Person>, Double> originalTimes;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
 	 */
-	public ArrivalTimeToStopMutator(Config config, Map<Id, Double> originalTimes) {
+	public ArrivalTimeToStopMutator(Config config, Map<Id<Person>, Double> originalTimes) {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 		this.originalTimes = originalTimes;
 	}
 
-	public ArrivalTimeToStopMutator(Config config, final int mutationRange, Map<Id, Double> originalTimes) {
+	public ArrivalTimeToStopMutator(Config config, final int mutationRange, Map<Id<Person>, Double> originalTimes) {
 		super(config.global());
 		this.mutationRange = mutationRange;
 		this.originalTimes = originalTimes;
 	}
 	
-	public ArrivalTimeToStopMutator(Config config, final double mutationRange, Map<Id, Double> originalTimes) {
+	public ArrivalTimeToStopMutator(Config config, final double mutationRange, Map<Id<Person>, Double> originalTimes) {
 		super(config.global());
 		this.mutationRange = mutationRange;
 		this.originalTimes = originalTimes;

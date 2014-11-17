@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -25,7 +26,7 @@ public class TypeActivityAnalyzer implements ActivityStartEventHandler, Activity
 	//Attributes
 	private SortedMap<String, SortedMap<Double, Integer>> peoplePerforming = new TreeMap<String, SortedMap<Double,Integer>>();
 	private SortedMap<String, SortedMap<Double, Integer>> durations = new TreeMap<String, SortedMap<Double,Integer>>();
-	private Map<Id, Tuple<String, Double>> startTimes = new HashMap<Id, Tuple<String, Double>>();
+	private Map<Id<Person>, Tuple<String, Double>> startTimes = new HashMap<Id<Person>, Tuple<String, Double>>();
 	private double timeBin;
 	private double totalTime;
 	

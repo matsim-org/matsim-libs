@@ -2,11 +2,11 @@ package playground.sergioo.facilitiesGenerator2012.hits;
 
 import java.util.Collection;
 
-import org.apache.commons.math.stat.clustering.Clusterable;
+import org.apache.commons.math3.ml.clustering.Clusterable;
 
 import others.sergioo.util.algebra.PointNDImpl;
 
-public class PointPerson extends PointNDImpl.Double implements Clusterable<PointPerson> {
+public class PointPerson extends PointNDImpl.Double implements Clusterable {
 	
 	//Attributes
 	private String id;
@@ -41,11 +41,9 @@ public class PointPerson extends PointNDImpl.Double implements Clusterable<Point
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
-	@Override
 	public double distanceFrom(PointPerson p) {
 		return getDistance(p);
 	}
-	@Override
 	public PointPerson centroidOf(Collection<PointPerson> points) {
 		PointPerson mean = new PointPerson(points.iterator().next().getDimension(), 0.0);
 		double totalWeight = 0;

@@ -5,10 +5,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
@@ -57,7 +59,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 		this.tripRouter = tripRouter;
 	}
 	@Override
-	public int planLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobsimStatus) {
+	public int planLegActivityLeg(double startTime, CurrentTime now, Id<ActivityFacility> startFacilityId, double endTime, Id<ActivityFacility> endFacilityId, final MobsimStatus mobsimStatus) {
 		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, now, startFacilityId, endTime, endFacilityId, mobsimStatus);
 		if(legActLeg == null || legActLeg.size()==0)
 			return 2;
@@ -102,7 +104,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			if(emptySpace)
 				empty.setTravelTime(empty.getTravelTime()+firstLegTime);
 			if(legActLeg.get(legActLeg.size()-1) instanceof Activity && previousEnd+old.getTravelTime()-finalTime>3600) {
-				Id finalLinkId = ((Activity)legActLeg.get(legActLeg.size()-1)).getLinkId();
+				Id<Link> finalLinkId = ((Activity)legActLeg.get(legActLeg.size()-1)).getLinkId();
 				empty = new EmptyTimeImpl(finalLinkId, previousEnd+old.getTravelTime()-finalTime);
 				plan.getPlanElements().add(index++, empty);
 			}
@@ -135,7 +137,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			return emptySpace?1:0;
 		}
 	}
-	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobsimStatus);
+	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now, Id<ActivityFacility> startFacilityId, double endTime, Id<ActivityFacility> endFacilityId, final MobsimStatus mobsimStatus);
 	@Override
 	public void advanceToNextActivity(double now, double penalty) {
 		agent.advanceToNextActivity(now, penalty);

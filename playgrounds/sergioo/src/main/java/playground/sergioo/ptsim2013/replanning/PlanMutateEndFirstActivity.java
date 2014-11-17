@@ -25,6 +25,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
@@ -43,13 +44,13 @@ public class PlanMutateEndFirstActivity implements PlanAlgorithm {
 
 	private final double mutationRange;
 	private final Random random;
-	private final Map<Id, Double> originalTimes;
+	private final Map<Id<Person>, Double> originalTimes;
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan
 	 * @param mutationRange
 	 * @param random
 	 */
-	public PlanMutateEndFirstActivity(final Map<Id, Double> originalTimes, final double mutationRange, final Random random) {
+	public PlanMutateEndFirstActivity(final Map<Id<Person>, Double> originalTimes, final double mutationRange, final Random random) {
 		this.originalTimes = originalTimes;
 		this.mutationRange = mutationRange;
 		this.random = random;

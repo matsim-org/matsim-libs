@@ -3,8 +3,6 @@ package playground.sergioo.eventAnalysisTools2013.backwards;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,7 +33,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.artemc.networkTools.StopFacilityGenerator;
 import playground.sergioo.visualizer2D2012.Layer;
 import playground.sergioo.visualizer2D2012.LayersPanel;
 import playground.sergioo.visualizer2D2012.LayersWindow;
@@ -58,7 +55,7 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 	private String[] args;
 	private StationsPainter stationsPainterA;
 	private StationsPainter stationsPainterB;
-	private Map<Id, Coord> coords = new HashMap<Id, Coord>();
+	private Map<Id<TransitStopFacility>, Coord> coords = new HashMap<Id<TransitStopFacility>, Coord>();
 
 	public BackwardsWindow(TransitRoute[] routes,  String[] args, StationsPainter[] stationsPainters, LayersPanel panel) {
 		this.args = args;

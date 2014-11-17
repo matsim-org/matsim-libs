@@ -9,8 +9,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -20,6 +22,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -32,7 +35,7 @@ import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSocialNetwor
 
 public class PlanningEngine implements MobsimEngine, DepartureHandler {
 
-	private Map<Id, PassivePlannerDriverAgent> planningAgents = new HashMap<Id, PassivePlannerDriverAgent>();
+	private Map<Id<Person>, PassivePlannerDriverAgent> planningAgents = new HashMap<Id<Person>, PassivePlannerDriverAgent>();
 	private InternalInterface internalInterface;
 	private QSim qSim;
 	private HashMap<String, VehicleType> modeVehicleTypes;
@@ -49,11 +52,11 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 	@Override
 	public void doSimStep(double time) {
 		this.time = time;
-		Set<Id> toDelete = new HashSet<Id>();
-		for(Entry<Id, PassivePlannerDriverAgent> planningAgent:planningAgents.entrySet())
+		Set<Id<Person>> toDelete = new HashSet<Id<Person>>();
+		for(Entry<Id<Person>, PassivePlannerDriverAgent> planningAgent:planningAgents.entrySet())
 			if(planningAgent.getValue().isPlanned())
 				toDelete.add(planningAgent.getKey());
-		for(Id id:toDelete) {
+		for(Id<Person> id:toDelete) {
 			PassivePlannerDriverAgent planningAgent = planningAgents.remove(id);
 			Set<String> seenModes = new HashSet<String>();
 			for (PlanElement planElement : planningAgent.getBasePerson().getSelectedPlan().getPlanElements())
@@ -61,8 +64,8 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 					Leg leg = (Leg) planElement;
 					if (this.mainModes.contains(leg.getMode())) // only simulated modes get vehicles
 						if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-							Id vehicleLink = findVehicleLink(planningAgent.getBasePerson().getSelectedPlan());
-							qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(id, modeVehicleTypes.get(leg.getMode())), vehicleLink);
+							Id<Link> vehicleLink = findVehicleLink(planningAgent.getBasePerson().getSelectedPlan());
+							qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(id, Vehicle.class), modeVehicleTypes.get(leg.getMode())), vehicleLink);
 							seenModes.add(leg.getMode());
 						}
 				}
@@ -72,7 +75,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 	public double getTime() {
 		return time;
 	}
-	private Id findVehicleLink(Plan p) {
+	private Id<Link> findVehicleLink(Plan p) {
 		// A more careful way to decide where this agent should have its vehicles created
 		// than to ask agent.getCurrentLinkId() after creation.
 		for (PlanElement planElement : p.getPlanElements()) {
@@ -90,11 +93,11 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
-	public boolean containsAgentId(Id agentId) {
+	public boolean containsAgentId(Id<Person> agentId) {
 		return planningAgents.containsKey(agentId);
 	}
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if(agent instanceof PassivePlannerDriverAgent && !((PassivePlannerDriverAgent)agent).isPlanned()) {
 			planningAgents.put(agent.getId(), (PassivePlannerDriverAgent) agent);
 			return true;
@@ -103,13 +106,13 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 	}
 	@Override
 	public void onPrepareSim() {
-		Map<Id, PassivePlannerDriverAgent> agents = new HashMap<Id, PassivePlannerDriverAgent>();
+		Map<Id<Person>, PassivePlannerDriverAgent> agents = new HashMap<Id<Person>, PassivePlannerDriverAgent>();
 		for(MobsimAgent agent:qSim.getAgents())
 			if(agent instanceof PassivePlannerAgendaAgent || agent instanceof PassivePlannerTransitAgendaAgent)
 				agents.put(agent.getId(), (PassivePlannerDriverAgent) agent);
 		SocialNetwork socialNetwork = ((ScenarioSocialNetwork)qSim.getScenario()).getSocialNetwork();
 		for(PassivePlannerDriverAgent agent:agents.values())
-			for(Id alterId:socialNetwork.getAlterIds(agent.getId())) {
+			for(Id<Person> alterId:socialNetwork.getAlterIds(agent.getId())) {
 				PlaceSharer placeSharer = getPlaceSharer(agents, alterId);
 				if(placeSharer!=null)
 					if(agent instanceof PassivePlannerAgendaAgent)
@@ -118,7 +121,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 						((PassivePlannerTransitAgendaAgent) agent).addKnownPerson(placeSharer);
 			}
 	}
-	private PlaceSharer getPlaceSharer(Map<Id, PassivePlannerDriverAgent> agents, Id alterId) {
+	private PlaceSharer getPlaceSharer(Map<Id<Person>, PassivePlannerDriverAgent> agents, Id<Person> alterId) {
 		PassivePlannerDriverAgent agent = agents.get(alterId);
 		if(agent instanceof PassivePlannerAgendaAgent)
 			return ((PassivePlannerAgendaAgent)agent).getPlaceSharer();

@@ -17,12 +17,16 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
 
@@ -36,12 +40,12 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 		NUM_PEOPLE_WEIGHT,
 		FULL_SAMPLE;
 	}
-	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
-	private final Map<Tuple<Id, Tuple<Id, Id>>, List<Double>> headways = new HashMap<Tuple<Id, Tuple<Id, Id>>, List<Double>>();
-	private final Map<Tuple<Id, Tuple<Id, Id>>, List<Collection<Double>>> waitTimes = new HashMap<Tuple<Id, Tuple<Id, Id>>, List<Collection<Double>>>();
-	private final Map<Id, Tuple<Id, Id>> linesRoutesNumVehicle = new HashMap<Id, Tuple<Id, Id>>();
-	private Map<Tuple<Id, Tuple<Id, Id>>, Double> timeOfStopLineRoute = new HashMap<Tuple<Id, Tuple<Id, Id>>, Double>();
-	private Map<Id, Id> stopOfVehicle = new HashMap<Id, Id>();
+	private final Map<Id<Person>, Double> agentsWaitingData = new HashMap<Id<Person>, Double>();
+	private final Map<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, List<Double>> headways = new HashMap<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, List<Double>>();
+	private final Map<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, List<Collection<Double>>> waitTimes = new HashMap<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, List<Collection<Double>>>();
+	private final Map<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>> linesRoutesNumVehicle = new HashMap<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>>();
+	private Map<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, Double> timeOfStopLineRoute = new HashMap<Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>, Double>();
+	private Map<Id<Vehicle>, Id<TransitStopFacility>> stopOfVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>();
 
 	@Override
 	public void reset(int iteration) {
@@ -64,7 +68,7 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
 		if(startWaitingTime!=null) {
 			double waitTime = event.getTime()-startWaitingTime;
-			Tuple<Id, Tuple<Id, Id>> keyStopLineRoute = new Tuple<Id, Tuple<Id, Id>>(stopOfVehicle.get(event.getVehicleId()), linesRoutesNumVehicle.get(event.getVehicleId()));
+			Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(stopOfVehicle.get(event.getVehicleId()), linesRoutesNumVehicle.get(event.getVehicleId()));
 			List<Collection<Double>> waitTimesCollections = waitTimes.get(keyStopLineRoute);
 			waitTimesCollections.get(waitTimesCollections.size()-1).add(waitTime);
 			agentsWaitingData.remove(event.getPersonId());
@@ -72,15 +76,15 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 	}
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		Tuple<Id, Id> lineRoute = new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId());
+		Tuple<Id<TransitLine>, Id<TransitRoute>> lineRoute = new Tuple<Id<TransitLine>, Id<TransitRoute>>(event.getTransitLineId(), event.getTransitRouteId());
 		linesRoutesNumVehicle.put(event.getVehicleId(), lineRoute);
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Tuple<Id, Id> linesRoute = linesRoutesNumVehicle.get(event.getVehicleId());
+		Tuple<Id<TransitLine>, Id<TransitRoute>> linesRoute = linesRoutesNumVehicle.get(event.getVehicleId());
 		if(linesRoute!=null) {
 			stopOfVehicle.put(event.getVehicleId(), event.getFacilityId());
-			Tuple<Id, Tuple<Id, Id>> keyStopLineRoute = new Tuple<Id, Tuple<Id, Id>>(event.getFacilityId(), linesRoute);
+			Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(event.getFacilityId(), linesRoute);
 			Double previousTime = timeOfStopLineRoute.get(keyStopLineRoute);
 			if(previousTime!=null) {
 				List<Double> headwaysList = headways.get(keyStopLineRoute);
@@ -99,9 +103,9 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 			waitTimesCollections.add(new ArrayList<Double>());
 		}
 	}
-	public double getAverageWaitTime(Id lineId, Id routeId, Id stopId, Mode mode) {
+	public double getAverageWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, Mode mode) {
 		double average=0, sum=0;
-		Tuple<Id, Tuple<Id, Id>> key = new Tuple<Id, Tuple<Id, Id>>(stopId, new Tuple<Id, Id>(lineId, routeId));
+		Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> key = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(stopId, new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId));
 		switch(mode) {
 		case TIME_WEIGHT:
 			for(double headway:headways.get(key)) {
@@ -127,9 +131,9 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 		}
 		return 0;
 	}
-	public double getExcessWaitTime(Id lineId, TransitRoute route, Id stopId, Mode mode) {
+	public double getExcessWaitTime(Id<TransitLine> lineId, TransitRoute route, Id<TransitStopFacility> stopId, Mode mode) {
 		double average=0, sum=0;
-		Tuple<Id, Tuple<Id, Id>> key = new Tuple<Id, Tuple<Id, Id>>(stopId, new Tuple<Id, Id>(lineId, route.getId()));
+		Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> key = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(stopId, new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, route.getId()));
 		TransitRouteStop stop = null;
 		STOPS:
 		for(TransitRouteStop s:route.getStops())

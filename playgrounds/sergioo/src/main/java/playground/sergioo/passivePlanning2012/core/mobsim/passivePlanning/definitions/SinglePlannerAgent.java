@@ -2,6 +2,7 @@ package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.defin
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.router.TripRouter;
 
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
@@ -14,7 +15,7 @@ public interface SinglePlannerAgent {
 	public int getPlanElementIndex();
 	public void incrementPlanElementIndex();
 	public void setRouter(TripRouter tripRouter);
-	public int planLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobSimEnds);
+	public int planLegActivityLeg(double startTime, CurrentTime now, Id<ActivityFacility> startFacilityId, double endTime, Id<ActivityFacility> endFacilityId, final MobsimStatus mobSimEnds);
 	public void advanceToNextActivity(double now, double penalty);
 
 }

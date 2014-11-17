@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 
@@ -65,7 +66,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	 * b) 	a map could be used instead of a list. By doing so, no multiple entries are possible.
 	 * 		However, still multiple "put" operations will be performed for the same node.
 	 */
-	private final Map<Id, QNode> nodesToActivate = new ConcurrentHashMap<Id, QNode>();
+	private final Map<Id<Node>, QNode> nodesToActivate = new ConcurrentHashMap<Id<Node>, QNode>();
 	
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<PTQLink> linksToActivate = new ArrayList<PTQLink>();

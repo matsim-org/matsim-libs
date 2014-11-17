@@ -6,8 +6,10 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -20,6 +22,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
@@ -166,11 +169,11 @@ public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, Ha
 		return ((Leg)getCurrentPlanElement()).getMode();
 	}
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		
 	}
 	@Override
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		if(getCurrentPlanElement() instanceof Activity)
 			return ((Activity)getCurrentPlanElement()).getLinkId();
 		else {
@@ -192,15 +195,15 @@ public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, Ha
 		}
 	}
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return ((Leg)getCurrentPlanElement()).getRoute().getEndLinkId();
 	}
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return basePerson.getId();
 	}
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 		Leg leg = (Leg)getCurrentPlanElement();
 		if(leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute route = (NetworkRoute)leg.getRoute();
@@ -216,7 +219,7 @@ public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, Ha
 		return null;
 	}
 	@Override
-	public void notifyMoveOverNode(Id newLinkId) {
+	public void notifyMoveOverNode(Id<Link> newLinkId) {
 		Leg leg = (Leg)getCurrentPlanElement();
 		if(leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute route = (NetworkRoute)leg.getRoute();
@@ -239,12 +242,12 @@ public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, Ha
 		return vehicle;
 	}
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		if(((Leg)getCurrentPlanElement()).getRoute() instanceof NetworkRoute)
 			if(((NetworkRoute)((Leg)getCurrentPlanElement()).getRoute()).getVehicleId() != null)
 				return ((NetworkRoute)((Leg)getCurrentPlanElement()).getRoute()).getVehicleId();
 			else
-				return basePerson.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.
+				return Id.create(basePerson.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		else
 			log.error("Agent "+getId()+" is a driver without NetworkRoute.");
 		return null;

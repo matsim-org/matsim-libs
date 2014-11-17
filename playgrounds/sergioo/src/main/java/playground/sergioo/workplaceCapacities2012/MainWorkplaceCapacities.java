@@ -43,19 +43,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.EigenDecomposition;
-import org.apache.commons.math.linear.EigenDecompositionImpl;
-import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealVector;
-import org.apache.commons.math.stat.clustering.Cluster;
-import org.apache.commons.math.stat.clustering.KMeansPlusPlusClusterer;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
+import org.apache.commons.math3.ml.clustering.Cluster;
+import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -152,7 +151,7 @@ public class MainWorkplaceCapacities {
 	//Static attributes
 	private static int SIZE = 10;
 	private static int NUM_ITERATIONS = 100;
-	private static List<Cluster<PointPerson>> clusters;
+	private static List<CentroidCluster<PointPerson>> clusters;
 	private static SortedMap<Id<ActivityFacility>, MPAreaData> dataMPAreas = new TreeMap<Id<ActivityFacility>, MPAreaData>();
 	private static SortedMap<String, Coord> stopsBase = new TreeMap<String, Coord>();
 	private static Network network;
@@ -210,7 +209,7 @@ public class MainWorkplaceCapacities {
 		System.out.println("Stops done!");
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CLUSTERS_FILE));
-			clusters = (List<Cluster<PointPerson>>) ois.readObject();
+			clusters = (List<CentroidCluster<PointPerson>>) ois.readObject();
 			ois.close();
 		} catch(EOFException e) {
 			clusters = clusterWorkActivities(getWorkActivityTimes());
@@ -312,7 +311,7 @@ public class MainWorkplaceCapacities {
 			stopIdsI = stopsBase.keySet().iterator();
 			for(int s=0; s<weights.getDimension(1); s++) {
 				Id sId = Id.create(stopIdsI.next(), TransitStopFacility.class);
-				Tuple<Boolean, Double> weight = weightsMap.get(new Tuple<Id, Id>(sId, mPAreaId));
+				Tuple<Boolean, Double> weight = weightsMap.get(new Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>(sId, mPAreaId));
 				if(weight==null)
 					weights.setElement(f, s, 0.0);
 				else
@@ -424,11 +423,10 @@ public class MainWorkplaceCapacities {
 		dataBaseHits.close();
 		return points;
 	}
-	private static List<Cluster<PointPerson>> clusterWorkActivities(Map<String,PointPerson> points) throws FileNotFoundException, IOException, ClassNotFoundException {
-		List<Cluster<PointPerson>> clusters = null;
+	private static List<CentroidCluster<PointPerson>> clusterWorkActivities(Map<String,PointPerson> points) throws FileNotFoundException, IOException, ClassNotFoundException {
+		List<CentroidCluster<PointPerson>> clusters = null;
 		Set<PointPerson> pointsC = getPCATransformation(points.values());
-		Random r = new Random();
-		clusters = new KMeansPlusPlusClusterer<PointPerson>(r).cluster(pointsC, SIZE, 1000);
+		clusters = new KMeansPlusPlusClusterer<PointPerson>(SIZE, 1000).cluster(pointsC);
 		new ClustersWindow("Work times cluster PCA: "+getClustersDeviations(clusters)+" "+getWeightedClustersDeviations(clusters), clusters).setVisible(true);
 		for(Cluster<PointPerson> cluster:clusters)
 			for(PointPerson pointPersonT:cluster.getPoints()) {
@@ -441,18 +439,18 @@ public class MainWorkplaceCapacities {
 		oos.close();
 		return clusters;
 	}
-	private static double getClustersDeviations(List<Cluster<PointPerson>> clusters) {
+	private static double getClustersDeviations(List<CentroidCluster<PointPerson>> clusters) {
 		double deviation = 0;
-		for(Cluster<PointPerson> cluster:clusters)
+		for(CentroidCluster<PointPerson> cluster:clusters)
 			for(PointPerson pointPerson:cluster.getPoints())
-				deviation += cluster.getCenter().distanceFrom(pointPerson);
+				deviation += ((PointPerson)cluster.getCenter()).distanceFrom(pointPerson);
 		return deviation;
 	}
-	private static double getWeightedClustersDeviations(List<Cluster<PointPerson>> clusters) {
+	private static double getWeightedClustersDeviations(List<CentroidCluster<PointPerson>> clusters) {
 		double deviation = 0, totalWeight=0;
-		for(Cluster<PointPerson> cluster:clusters) {
+		for(CentroidCluster<PointPerson> cluster:clusters) {
 			for(PointPerson pointPerson:cluster.getPoints()) {
-				deviation += cluster.getCenter().distanceFrom(pointPerson)*pointPerson.getWeight();
+				deviation += ((PointPerson)cluster.getCenter()).distanceFrom(pointPerson)*pointPerson.getWeight();
 				totalWeight = pointPerson.getWeight();
 			}
 		}
@@ -478,7 +476,7 @@ public class MainWorkplaceCapacities {
 			for(int c=0; c<deviations.getColumnDimension(); c++)
 				deviations.setEntry(r, c, pointsM.getEntry(r, c)-means.getEntry(r, 0));
 		RealMatrix covariance = deviations.multiply(deviations.transpose()).scalarMultiply(1/(double)pointsM.getColumnDimension());
-		EigenDecomposition eigenDecomposition = new EigenDecompositionImpl(covariance, 0);
+		EigenDecomposition eigenDecomposition = new EigenDecomposition(covariance, 0);
 		RealMatrix eigenVectorsT = eigenDecomposition.getVT();
 		RealVector eigenValues = new ArrayRealVector(eigenDecomposition.getD().getRowDimension());
 		for(int r=0; r<eigenDecomposition.getD().getRowDimension(); r++)
@@ -847,7 +845,7 @@ public class MainWorkplaceCapacities {
 			return travelTime-tt1+90;
 	}
 
-	private static Map<String, List<Double>> calculateTypeBuildingOptionWeights(List<Cluster<PointPerson>> clusters) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static Map<String, List<Double>> calculateTypeBuildingOptionWeights(List<CentroidCluster<PointPerson>> clusters) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		Map<String, List<String>> mPTypesAll = new HashMap<String, List<String>>();
 		Map<String, List<Double>> proportions = new HashMap<String, List<Double>>();
@@ -954,8 +952,7 @@ public class MainWorkplaceCapacities {
 		Set<StopCoord> pointsC = new HashSet<StopCoord>();
 		for(Entry<String,Coord> stop:stopsBase.entrySet())
 			pointsC.add(new StopCoord(stop.getValue().getX(), stop.getValue().getY(), Id.create(stop.getKey(), TransitStopFacility.class)));
-		Random r = new Random();
-		List<Cluster<StopCoord>> clusters = new KMeansPlusPlusClusterer<StopCoord>(r).cluster(pointsC, numRegions, 1000);
+		List<CentroidCluster<StopCoord>> clusters = new KMeansPlusPlusClusterer<StopCoord>(numRegions, 1000).cluster(pointsC);
 		for(int n=0; n<numRegions; n++) {
 			double[][] tts = new double[clusters.get(n).getPoints().size()][1];
 			for(StopCoord stop:clusters.get(n).getPoints()) {

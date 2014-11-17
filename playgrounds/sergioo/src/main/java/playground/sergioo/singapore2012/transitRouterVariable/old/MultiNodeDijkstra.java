@@ -86,7 +86,7 @@ public class MultiNodeDijkstra {
 	 * Augments the iterationID and checks whether the visited information in
 	 * the nodes in the nodes have to be reset.
 	 */
-	private synchronized int augmentIterationId(Map<Id, DijkstraNodeData> nodeData) {
+	private synchronized int augmentIterationId(Map<Id<Node>, DijkstraNodeData> nodeData) {
 		if (this.iterationID == Integer.MAX_VALUE) {
 			this.iterationID = Integer.MIN_VALUE + 1;
 			resetNetworkVisited(nodeData);
@@ -99,7 +99,7 @@ public class MultiNodeDijkstra {
 	/**
 	 * Resets all nodes in the network as if they have not been visited yet.
 	 */
-	private void resetNetworkVisited(Map<Id, DijkstraNodeData> nodeData) {
+	private void resetNetworkVisited(Map<Id<Node>, DijkstraNodeData> nodeData) {
 		for (Node node : this.network.getNodes().values()) {
 			DijkstraNodeData data = getData(node, nodeData);
 			data.resetVisited();
@@ -112,7 +112,7 @@ public class MultiNodeDijkstra {
 	}
 	
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person, final Vehicle vehicle) {
-		Map<Id, DijkstraNodeData> nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		Map<Id<Node>, DijkstraNodeData> nodeData = new HashMap<Id<Node>, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
 		Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
 
 		int itID = augmentIterationId(nodeData);
@@ -211,7 +211,7 @@ public class MultiNodeDijkstra {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes, final Person person, final Vehicle vehicle, int itID, Map<Id, DijkstraNodeData> nodeData) {
+	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes, final Person person, final Vehicle vehicle, int itID, Map<Id<Node>, DijkstraNodeData> nodeData) {
 
 		DijkstraNodeData outData = getData(outNode, nodeData);
 		double currTime = outData.getTime();
@@ -227,7 +227,7 @@ public class MultiNodeDijkstra {
 	 */
 	/*package*/ void relaxNodeLogic(final Link l, final PseudoRemovePriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode,
-			final PreProcessDijkstra.DeadEndData ddOutData, final Person person, final Vehicle vehicle, int itID, Map<Id, DijkstraNodeData> nodeData) {
+			final PreProcessDijkstra.DeadEndData ddOutData, final Person person, final Vehicle vehicle, int itID, Map<Id<Node>, DijkstraNodeData> nodeData) {
 				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode, person, vehicle, itID, nodeData);
 	}
 	
@@ -252,7 +252,7 @@ public class MultiNodeDijkstra {
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
-			final double currCost, final Node toNode, final Person person, final Vehicle vehicle, int itID, Map<Id, DijkstraNodeData> nodeData) {
+			final double currCost, final Node toNode, final Person person, final Vehicle vehicle, int itID, Map<Id<Node>, DijkstraNodeData> nodeData) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, person, vehicle);
 		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, person, vehicle);
@@ -323,7 +323,7 @@ public class MultiNodeDijkstra {
 	 *            The Node for which to return the data.
 	 * @return The data for the given Node
 	 */
-	protected DijkstraNodeData getData(final Node n, Map<Id, DijkstraNodeData> nodeData) {
+	protected DijkstraNodeData getData(final Node n, Map<Id<Node>, DijkstraNodeData> nodeData) {
 		DijkstraNodeData r = nodeData.get(n.getId());
 		if (null == r) {
 			r = new DijkstraNodeData();

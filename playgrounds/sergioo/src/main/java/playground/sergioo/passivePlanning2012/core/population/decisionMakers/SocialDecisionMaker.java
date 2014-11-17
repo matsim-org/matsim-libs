@@ -54,9 +54,9 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 		return scenario;
 	}
 	@Override
-	public Tuple<String, Id> decideTypeOfActivityFacility(double time, Id startFacilityId) {
+	public Tuple<String, Id<ActivityFacility>> decideTypeOfActivityFacility(double time, Id<ActivityFacility> startFacilityId) {
 		Coord location = scenario.getActivityFacilities().getFacilities().get(startFacilityId).getCoord();
-		List<Tuple<String, Id>> options = new ArrayList<Tuple<String, Id>>();
+		List<Tuple<String, Id<ActivityFacility>>> options = new ArrayList<Tuple<String, Id<ActivityFacility>>>();
 		double maximumDistance = MAXIMUM_SEARCHING_DISTANCE/2;
 		if(knownPlaces.size()>0)
 			//Known places
@@ -65,26 +65,26 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.getFacilityId());
 					if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
 						for(String type:knownPlace.getActivityTypes(time))
-							options.add(new Tuple<String, Id>(type, knownPlace.getFacilityId()));
+							options.add(new Tuple<String, Id<ActivityFacility>>(type, knownPlace.getFacilityId()));
 				}
 				maximumDistance *= 2;
 			}
 		else {
 			//Activities of the household
 			Time.Period period = Time.Period.getPeriod(time);
-			for(Id memberID:household.getMemberIds()) {
+			for(Id<Person> memberID:household.getMemberIds()) {
 				Person member = scenario.getPopulation().getPersons().get(memberID); 
 				if(member instanceof BasePerson)
 					for(Plan plan:member.getPlans())
 						for(PlanElement planElement:plan.getPlanElements())
 							if(planElement instanceof Activity && ((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME && Time.Period.getPeriod(((Activity)planElement).getEndTime()).equals(period))
-								options.add(new Tuple<String, Id>(((Activity)planElement).getType(), ((Activity)planElement).getFacilityId()));
+								options.add(new Tuple<String, Id<ActivityFacility>>(((Activity)planElement).getType(), ((Activity)planElement).getFacilityId()));
 			}
 		}
 		return options.size()==0?null:options.get((int) (Math.random()*options.size()));
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId, TripRouter tripRouter) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, TripRouter tripRouter) {
 		List<? extends PlanElement> bestTrip = null;
 		double minTime = Double.MAX_VALUE;
 		ActivityFacility startFacility = scenario.getActivityFacilities().getFacilities().get(startFacilityId);
@@ -110,7 +110,7 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 		return bestTrip;
 	}
 	@Override
-	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id facilityId) {
+	public double decideEndTime(double startTime, double maximumEndTime, String typeOfActivity, Id<ActivityFacility> facilityId) {
 		OpeningTime startTimeOpeningTime = null;
 		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		double maxFacilityTime= Time.MIDNIGHT;

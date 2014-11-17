@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.ml.clustering.CentroidCluster;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.facilitiesGenerator2012.gui.WeigthsNetworkWindow.Option;
@@ -83,13 +84,13 @@ public class ClustersPanel extends LayersPanel implements MouseListener, MouseMo
 		addKeyListener(this);
 		setFocusable(true);
 	}
-	public ClustersPanel(ClustersWindow window, List<org.apache.commons.math.stat.clustering.Cluster<PointPerson>> clusters) {
+	public ClustersPanel(ClustersWindow window, List<CentroidCluster<PointPerson>> clusters) {
 		super();
 		this.window = window;
 		addLayer(new Layer(new AxisPainter(24*3600, 18*3600, 0, 6*3600, 3600, 3600, Color.DARK_GRAY)));
 		PointsPainter pointsPainter = new PointsPainter();
 		float i=0;
-		for(org.apache.commons.math.stat.clustering.Cluster<PointPerson> cluster:clusters) {
+		for(org.apache.commons.math3.ml.clustering.Cluster<PointPerson> cluster:clusters) {
 			//Color color = new Color((float)(Math.random()*0.5), (float)(Math.random()*0.5), (float)(Math.random()*0.5), 0.3f);
 			float p = (i+0.5f)/clusters.size();
 			Color color = JetColor.getJetColor(p);

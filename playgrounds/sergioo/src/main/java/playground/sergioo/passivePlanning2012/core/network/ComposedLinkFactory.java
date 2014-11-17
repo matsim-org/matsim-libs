@@ -52,7 +52,7 @@ public class ComposedLinkFactory implements LinkFactory {
 	private static final Logger log = Logger.getLogger(ScenarioSimplerNetwork.class);
 
 	//Attributes
-	private final Map<Id, Id> composedNodes;
+	private final Map<Id<Node>, Id<Node>> composedNodes;
 	private final IntermodalLeastCostPathCalculator leastCostPathCalculator;
 
 	//Constructors
@@ -81,7 +81,7 @@ public class ComposedLinkFactory implements LinkFactory {
 		Set<String> modes = new HashSet<String>();
 		modes.add(mode);
 		leastCostPathCalculator.setModeRestriction(modes);
-		composedNodes = new HashMap<Id, Id>();
+		composedNodes = new HashMap<Id<Node>, Id<Node>>();
 		for(Node mainNode:simplerNetwork.getNodes().values()) {
 			for(Node node:((ComposedNode)mainNode).getNodes()) {
 				if(composedNodes.get(node.getId())!=null) {
@@ -95,7 +95,7 @@ public class ComposedLinkFactory implements LinkFactory {
 
 	//Methods
 	@Override
-	public Link createLink(Id id, Node nodeA, Node nodeB, Network network, double length, double freespeed, double capacity, double nOfLanes) {
+	public Link createLink(Id<Link> id, Node nodeA, Node nodeB, Network network, double length, double freespeed, double capacity, double nOfLanes) {
 		if(!nodeA.getId().equals(nodeB.getId())) {
 			Path path = directShortestPath((ComposedNode)nodeA, (ComposedNode)nodeB, leastCostPathCalculator);
 			if(path!=null) {

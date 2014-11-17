@@ -278,8 +278,8 @@ public class PlaceTypes {
 			Set<Node> nodesPC = new HashSet<Node>();
 			for(String loc:locs)
 				nodesPC.add(nodes.get(loc));
-			Map<Id, Path> paths = dijkstra.calcLeastCostPath(nodes.get(postalCode), nodesPC, 8*3600, null, null);
-			for(Entry<Id, Path> e:paths.entrySet())
+			Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(nodes.get(postalCode), nodesPC, 8*3600, null, null);
+			for(Entry<Id<Node>, Path> e:paths.entrySet())
 				printer.println(nodes.get(postalCode).getId().toString()+" "+e.getKey().toString()+" "+e.getValue().travelTime+" "+e.getValue().travelCost);
 			//System.out.println(System.currentTimeMillis()-t);
 		}

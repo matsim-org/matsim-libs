@@ -78,6 +78,12 @@ public abstract class PointNDImpl<T> implements PointND<T>, Serializable {
 		public PointND<java.lang.Double> clone() {
 			return new PointNDImpl.Double((java.lang.Double[])elements.toArray());
 		}
+		public double[] getPoint() {
+			double[] point = new double[elements.size()];
+			for(int i=0; i<elements.size(); i++)
+				point[i] = elements.get(i);
+			return point;
+		}
 		
 	}
 	

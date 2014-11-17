@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -38,10 +39,10 @@ public class SocialNetworkWriter extends MatsimXmlWriter implements MatsimWriter
 			writeXmlHead();
 			writeDoctype("social_network", dtd);
 			startSocialNetwork(socialNetwork, this.writer);
-			for(Entry<Id, Map<Id, Set<String>>> entry: socialNetwork.getNetwork().entrySet()) {
-				Id egoId = entry.getKey();
-				for(Entry<Id, Set<String>> types:entry.getValue().entrySet()) {
-					Id alterId = types.getKey();
+			for(Entry<Id<Person>, Map<Id<Person>, Set<String>>> entry: socialNetwork.getNetwork().entrySet()) {
+				Id<Person> egoId = entry.getKey();
+				for(Entry<Id<Person>, Set<String>> types:entry.getValue().entrySet()) {
+					Id<Person> alterId = types.getKey();
 					for(String type:types.getValue()) {
 						startRelation(egoId, alterId, type, this.writer);
 						endRelation(this.writer);
@@ -73,7 +74,7 @@ public class SocialNetworkWriter extends MatsimXmlWriter implements MatsimWriter
 	// <relation ... > ... </relation>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startRelation(final Id egoId, final Id alterId, final String type, final BufferedWriter out) throws IOException {
+	public void startRelation(final Id<Person> egoId, final Id<Person> alterId, final String type, final BufferedWriter out) throws IOException {
 		out.write("\t<relation");
 		out.write(" id_ego=\"" + egoId + "\"");
 		out.write(" id_alter=\"" + alterId + "\"");
