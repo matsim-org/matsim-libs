@@ -241,9 +241,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		
 		if(isSeeping != null && isSeeping.equals("true")){
 			this.seepageAllowed = true;
-			this.seepWarnCount =0;
 			this.seepMode = this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "seepMode");
 			this.isSeepModeStorageFree = Boolean.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "isSeepModeStorageFree"));
+			SeepQLinkImpl.log.info("Seepage is allowed. Seep mode is "+this.seepMode+".");
+			if(this.isSeepModeStorageFree) SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities.");
 		}
 		
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
@@ -432,10 +433,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
 		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
-			if(seepWarnCount==0){
-				SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities."+ Gbl.ONLYONCE);
-				seepWarnCount++;
-			}
+		
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
@@ -625,10 +623,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		//	usedStorageCapacity += veh.getSizeInEquivalents();
 
 		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
-			if(seepWarnCount==0){
-				SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities."+ Gbl.ONLYONCE);
-				seepWarnCount++;
-			}
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
 		}
@@ -786,7 +780,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private boolean seepageAllowed;
 	private String seepMode ; 
 	private boolean isSeepModeStorageFree;
-	private int seepWarnCount;
 
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
