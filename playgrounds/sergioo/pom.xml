@@ -67,14 +67,9 @@
   			<version>9.2-1003-jdbc4</version>
   		</dependency>
   		<dependency>
-  			<groupId>org.apache.commons</groupId>
-  			<artifactId>commons-math3</artifactId>
-  			<version>3.3</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>commons-math</groupId>
-  			<artifactId>commons-math</artifactId>
-  			<version>20040218.045431</version>
-  		</dependency>
+		<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.3</version>
+		</dependency>
 	</dependencies>
 </project>
