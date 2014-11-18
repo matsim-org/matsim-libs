@@ -30,9 +30,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
-	// this is deliberately package-protected. kai, nov'14
-
+final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
+	// this could probably be opened up to public as long as it remains final.  kai, nov'14
+	
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;
 	private static int noRouteWrnCnt = 0;
@@ -83,6 +83,8 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 			advancePlan(now) ;
 		}
+		
+		this.currentLinkIndex = 0 ;
 	}
 
 	@Override
@@ -164,6 +166,10 @@ class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>
 	
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
+	}
+	
+	final void resetCaches() {
+		// currently does not do anything
 	}
 
 	// ============================================================================

@@ -55,7 +55,9 @@ public class TransitStopAgentTracker {
 			agents = new CopyOnWriteArrayList<>();// TODO check again. this might turn out to be slow, but we likely need something thread safe here. marcel/oct2014 
 			this.agentsAtStops.put(stopId, agents);
 		}
-		agents.add(agent);
+		if ( !agents.add(agent) ) {
+			log.error("did NOT add agent " + agent.getId() + " since it was already there.");
+		}
 		Id<TransitStopFacility> destinationStopId = agent.getDesiredDestinationStopId();
 		events.processEvent(new AgentWaitingForPtEvent(now, agent.getId(), stopId, destinationStopId));
 	}
@@ -69,6 +71,8 @@ public class TransitStopAgentTracker {
 			if (!agents.remove(agent)) {
 				log.error("Agent " + agent.getId() + " could not be removed from waiting at stop " + stopId);
 			}
+		} else {
+			log.error("Agent " + agent.getId() + " could not be removed from waiting at stop " + stopId + " since agents list was null.");
 		}
 	}
 
