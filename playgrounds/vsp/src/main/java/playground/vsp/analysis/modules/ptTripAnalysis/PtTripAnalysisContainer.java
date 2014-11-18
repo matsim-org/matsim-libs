@@ -89,8 +89,8 @@ public class PtTripAnalysisContainer {
 		}
 	}
 	
-	public final static int nRows = 32;
-	public final static int nColumns = 4;
+	public final static int nRows = FIELDS.values().length;
+	public final static int nColumns = ZONES.values().length;
 	
 	private double[][] datafields = new double[PtTripAnalysisContainer.nRows][PtTripAnalysisContainer.nColumns];
 	
