@@ -23,8 +23,9 @@ public class BerlinTaxiLauncher
 {
     public static void main(String[] args)
     {
-        String file = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/scenarios/2014_10_basic_scenario_v4/params.in";
-        TaxiLauncher launcher = new TaxiLauncher(TaxiLauncher.readParams(file));
+        String file = "d:/michalm/eclipse-vsp/eCab/scenarios/2014_10_basic_scenario_v4/params.in";
+        //String file = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/scenarios/2014_10_basic_scenario_v4/params.in";
+        TaxiLauncher launcher = new TaxiLauncher(TaxiLauncherParams.readParams(file));
         launcher.initVrpPathCalculator();
         launcher.go(false);
         launcher.generateOutput();

@@ -39,7 +39,9 @@ class MultiRunTaxiLauncher
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
             643, 647, 653 };
 
+    private final TaxiLauncherParams params;
     private final TaxiLauncher launcher;
+
     private final TaxiDelaySpeedupStats delaySpeedupStats;
     private final LeastCostPathCalculatorCacheStats cacheStats;
 
@@ -50,7 +52,8 @@ class MultiRunTaxiLauncher
 
     MultiRunTaxiLauncher(String paramFile)
     {
-        launcher = new TaxiLauncher(TaxiLauncher.readParams(paramFile));
+        params = TaxiLauncherParams.readParams(paramFile);
+        launcher = new TaxiLauncher(params);
 
         delaySpeedupStats = new TaxiDelaySpeedupStats();
         launcher.delaySpeedupStats = delaySpeedupStats;
@@ -63,12 +66,12 @@ class MultiRunTaxiLauncher
     void initOutputFiles(String outputFileSuffix)
     {
         try {
-            pw = new PrintWriter(launcher.dir + "stats" + outputFileSuffix);
+            pw = new PrintWriter(params.dir + "stats" + outputFileSuffix);
             pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
 
-            pw2 = new PrintWriter(launcher.dir + "timeUpdates" + outputFileSuffix);
+            pw2 = new PrintWriter(params.dir + "timeUpdates" + outputFileSuffix);
 
-            pw3 = new PrintWriter(launcher.dir + "cacheStats" + outputFileSuffix);
+            pw3 = new PrintWriter(params.dir + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
         }
         catch (IOException e) {
@@ -92,15 +95,15 @@ class MultiRunTaxiLauncher
             throw new RuntimeException();
         }
 
-        launcher.algorithmConfig = config;
-        launcher.destinationKnown = destinationKnown;
-        launcher.onlineVehicleTracker = onlineVehicleTracker;
-        launcher.advanceRequestSubmission = advanceRequestSubmission;
+        params.algorithmConfig = config;
+        params.destinationKnown = destinationKnown;
+        params.onlineVehicleTracker = onlineVehicleTracker;
+        params.advanceRequestSubmission = advanceRequestSubmission;
 
         launcher.clearVrpPathCalculator();
 
         //warmup
-        if (launcher.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS) {
+        if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS) {
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
                 launcher.initVrpPathCalculator();
@@ -125,14 +128,14 @@ class MultiRunTaxiLauncher
         }
 
         VrpData data = launcher.context.getVrpData();
-        String cfg = launcher.algorithmConfig.name();
+        String cfg = params.algorithmConfig.name();
 
         multipleRunStats.printStats(pw, cfg, data);
 
-        delaySpeedupStats.printStats(pw2, launcher.algorithmConfig.name());
+        delaySpeedupStats.printStats(pw2, params.algorithmConfig.name());
         delaySpeedupStats.clearStats();
 
-        cacheStats.printStats(pw3, launcher.algorithmConfig.name());
+        cacheStats.printStats(pw3, params.algorithmConfig.name());
         cacheStats.clearStats();
 
         //=========== stats & graphs for the last run
@@ -226,19 +229,19 @@ class MultiRunTaxiLauncher
         multiLauncher.run(NOS_TW_xx, runs);
         multiLauncher.run(NOS_TP_xx, runs);
         multiLauncher.run(NOS_DSE_xx, runs);
-//
-//        multiLauncher.run(OTS_TW_xx, runs);
-//        multiLauncher.run(OTS_TP_xx, runs);
-//
-//        multiLauncher.run(RES_TW_xx, runs);
-//        multiLauncher.run(RES_TP_xx, runs);
-//
-//        multiLauncher.run(APS_TW_xx, runs);
-//        multiLauncher.run(APS_TP_xx, runs);
-//        multiLauncher.run(APS_DSE_xx, runs);
+        //
+        //        multiLauncher.run(OTS_TW_xx, runs);
+        //        multiLauncher.run(OTS_TP_xx, runs);
+        //
+        //        multiLauncher.run(RES_TW_xx, runs);
+        //        multiLauncher.run(RES_TP_xx, runs);
+        //
+        //        multiLauncher.run(APS_TW_xx, runs);
+        //        multiLauncher.run(APS_TP_xx, runs);
+        //        multiLauncher.run(APS_DSE_xx, runs);
 
         //multiLauncher.run(NOS_DSE_FF, runs, true, true, true);
-//        multiLauncher.run(MIP_TW_FF, runs, true, true, false);
+        //        multiLauncher.run(MIP_TW_FF, runs, true, true, false);
 
         multiLauncher.closeOutputFiles();
     }
