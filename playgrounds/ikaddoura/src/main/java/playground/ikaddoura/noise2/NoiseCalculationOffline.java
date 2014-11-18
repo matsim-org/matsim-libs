@@ -114,16 +114,15 @@ public class NoiseCalculationOffline {
 		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario, noiseParameters);
 		spatialInfo.setActivityCoords();
 		
-		spatialInfo.setReceiverPoints();
+//		spatialInfo.setReceiverPoints();
 //		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
-//		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
 		
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
 		spatialInfo.setRelevantLinkIds();
 		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
-		noiseEmissionHandler.setHdvVehicles(null);
 		events.addHandler(noiseEmissionHandler);
 
 		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, spatialInfo, noiseParameters);

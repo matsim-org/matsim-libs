@@ -61,7 +61,6 @@ public class NoiseDamageCalculation {
 	private NoiseParameters noiseParams;
 		
 	// from emission handler
-	private List<Id<Vehicle>> hdvVehicles;
 	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
 	private Map<Id<Link>, Map<Double,Integer>> linkId2timeInterval2linkEnterVehicleIDsCar;
 	private Map<Id<Link>, Map<Double,Integer>> linkId2timeInterval2linkEnterVehicleIDsHdv;
@@ -100,7 +99,6 @@ public class NoiseDamageCalculation {
 		this.noiseParams = noiseParams;
 		this.noiseImmissionCalculator = new NoiseEquations();
 		
-		this.hdvVehicles = noiseEmissionHandler.getHdvVehicles();
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
 		this.linkId2timeInterval2linkEnterVehicleIDsCar = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterCars();
 		this.linkId2timeInterval2linkEnterVehicleIDsHdv = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterHdv();
@@ -392,7 +390,7 @@ public class NoiseDamageCalculation {
 					double amount = 0.;
 					boolean isHdv = false;
 					
-					if(!(hdvVehicles.contains(id))) {
+					if(!(id.toString().startsWith(this.noiseParams.getHgvIdPrefix()))) {
 						amount = amountCar;
 					} else {
 						amount = amountHdv;

@@ -38,6 +38,7 @@ public class NoiseParameters {
 	private double scaleFactor = 1.;
 	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
+	private String hgvIdPrefix = "lkw";
 	
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("Setting the annual cost rate to " + annualCostRate);
@@ -68,6 +69,11 @@ public class NoiseParameters {
 		log.info("Setting the radius of relevant links around each receiver point to " + relevantRadius);
 		this.relevantRadius = relevantRadius;
 	}
+	
+	public void setHgvIdPrefix(String hgvIdPrefix) {
+		log.info("Setting the HGV Id Prefix to " + hgvIdPrefix);
+		this.hgvIdPrefix = hgvIdPrefix;
+	}
 
 	public double getAnnualCostRate() {
 		return annualCostRate;
@@ -91,6 +97,10 @@ public class NoiseParameters {
 	
 	public double getRelevantRadius() {
 		return relevantRadius;
+	}
+
+	public String getHgvIdPrefix() {
+		return hgvIdPrefix;
 	}
 
 }

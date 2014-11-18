@@ -51,9 +51,7 @@ import org.matsim.vehicles.Vehicle;
 public class NoiseEmissionHandler implements LinkEnterEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseEmissionHandler.class);
-	
-	private final List<Id<Vehicle>> hdvVehicles = new ArrayList<Id<Vehicle>>();
-	
+		
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
 		
@@ -83,14 +81,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		linkId2timeInterval2numberOfLinkEnterHdv.clear();
 		linkId2timeInterval2noiseEmission.clear();
 	}
-	
-	public void setHdvVehicles(ArrayList<Id<Vehicle>> hdvVehicles) {
-		if (hdvVehicles == null){
-			log.warn("No HDV vehicle information provided. All vehicles are considered as cars and the HGV share is set to zero.");
-		} else {
-			this.hdvVehicles.addAll(hdvVehicles);
-		}
-	}
 		
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -100,7 +90,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 			
 		} else {
 		
-			if (hdvVehicles.contains(event.getVehicleId())) {
+			if (event.getVehicleId().toString().startsWith(this.noiseParams.getHgvIdPrefix())) {
 				
 				// hdv
 				if (linkId2linkEnterEventsHdv.containsKey(event.getLinkId())) {
@@ -435,10 +425,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	
 	public Map<Id<Link>, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
 		return linkId2timeInterval2noiseEmission;
-	}
-	
-	public List<Id<Vehicle>> getHdvVehicles() {
-		return hdvVehicles;
 	}
 	
 	public Map<Id<Link>, Map<Double, List<Id<Vehicle>>>> getLinkId2timeInterval2linkEnterVehicleIDs() {
