@@ -27,12 +27,12 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		modes.add("bike");
 		modes.add("walk");
 		modes.add("pt");
-	//	if (p.getLicense().equals( "yes" ) && !p.getCarAvail().equals( "never" )) 
-		//	modes.add("car");
+		if (p.getLicense().equals( "yes" ))// && p.getCarAvail() != null && !p.getCarAvail().equals( "never" )) 
+			modes.add("car");
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
-		)//&& Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "RT_CARD")))
+		&& Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "RT_CARD")))
 		
 				modes.add("twowaycarsharing");
 		
