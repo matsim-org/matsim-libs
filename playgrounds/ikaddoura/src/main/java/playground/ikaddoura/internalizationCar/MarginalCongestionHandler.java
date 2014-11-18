@@ -93,7 +93,7 @@ public abstract class MarginalCongestionHandler implements
 		this.scenario = scenario;
 		
 		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
-			throw new RuntimeException("Expecting a capacity period of 3600. Aborting...");
+			log.warn("Capacity period is other than 3600.");
 		}
 		
 		// TODO: Runtime exception if parallel events handling.
@@ -292,8 +292,8 @@ public abstract class MarginalCongestionHandler implements
 		linkInfo.setLinkId(link.getId());
 		linkInfo.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
 		
-		double flowCapacity_hour = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-		double marginalDelay_sec = ((1 / (flowCapacity_hour / this.scenario.getNetwork().getCapacityPeriod()) ) );
+		double flowCapacity_capPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+		double marginalDelay_sec = ((1 / (flowCapacity_capPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
 		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 		
 		int storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
