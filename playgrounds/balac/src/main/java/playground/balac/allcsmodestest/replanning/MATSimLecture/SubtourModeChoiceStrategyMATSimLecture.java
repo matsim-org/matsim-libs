@@ -32,7 +32,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.balac.allcsmodestest.replanning.SubTourPermissableModesCalculator;
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
  * mode choice and re-routing
@@ -46,7 +45,7 @@ public class SubtourModeChoiceStrategyMATSimLecture implements PlanStrategy {
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
 		SubtourModeChoiceMATSimLecture smc = new SubtourModeChoiceMATSimLecture(scenario.getConfig());
-		SubTourPermissableModesCalculator cpmc = new SubTourPermissableModesCalculator(scenario);
+		SubTourPermissableModecCalculatorMATSimLecture cpmc = new SubTourPermissableModecCalculatorMATSimLecture(scenario);
 		smc.setPermissibleModesCalculator(cpmc);
 		
 		addStrategyModule(smc );

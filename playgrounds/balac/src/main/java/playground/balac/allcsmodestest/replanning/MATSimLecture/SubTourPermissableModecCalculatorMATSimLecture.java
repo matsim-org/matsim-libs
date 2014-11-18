@@ -1,4 +1,4 @@
-package playground.balac.allcsmodestest.replanning;
+package playground.balac.allcsmodestest.replanning.MATSimLecture;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,10 +8,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 
-public class SubTourPermissableModesCalculator implements PermissibleModesCalculator{
+public class SubTourPermissableModecCalculatorMATSimLecture implements PermissibleModesCalculator{
 
 	private final Scenario scenario;
-	public SubTourPermissableModesCalculator(final Scenario scenario) {
+	public SubTourPermissableModecCalculatorMATSimLecture(final Scenario scenario) {
 		// TODO Auto-generated constructor stub
 		this.scenario = scenario;
 	}
@@ -27,7 +27,7 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		modes.add("bike");
 		modes.add("walk");
 		modes.add("pt");
-		if (p.getLicense().equals( "yes" ) && p.getCarAvail() != null && !p.getCarAvail().equals( "never" )) 
+		if (p.getLicense().equals( "yes" ))// && p.getCarAvail() != null && !p.getCarAvail().equals( "never" )) 
 			modes.add("car");
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
