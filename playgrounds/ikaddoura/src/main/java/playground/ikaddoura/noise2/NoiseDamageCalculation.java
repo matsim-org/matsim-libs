@@ -158,7 +158,8 @@ public class NoiseDamageCalculation {
 				
 				if (receiverPointId2timeInterval2affectedAgentUnits.containsKey(receiverPointId)) {
 					
-					if(receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(timeInterval)) {
+					if (receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(timeInterval)) {
+						
 						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).get(timeInterval);
 					} 	
 				}
@@ -191,7 +192,7 @@ public class NoiseDamageCalculation {
 		
 		String dayOrNight = "NIGHT";
 		
-		if (timeInterval > 6 * 3600 && timeInterval <= 22 * 3600) {
+		if (timeInterval > 6 * 3600 && timeInterval <= 18 * 3600) {
 			dayOrNight = "DAY";
 		} else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
 			dayOrNight = "EVENING";
@@ -203,11 +204,11 @@ public class NoiseDamageCalculation {
 		
 		double damageCosts = 0.;
 		if (dayOrNight == "DAY"){
-			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(this.noiseParams.getTimeBinSizeNoiseComputation()/(24.0 * 3600));
 		} else if (dayOrNight == "EVENING"){
-			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(this.noiseParams.getTimeBinSizeNoiseComputation()/(24.0 * 3600));
 		} else if (dayOrNight == "NIGHT"){
-			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+			damageCosts = (this.noiseParams.getAnnualCostRate() * laermEinwohnerGleichwert/(365))*(this.noiseParams.getTimeBinSizeNoiseComputation()/(24.0 * 3600));
 		} else {
 			throw new RuntimeException("Neither day nor night. Aborting...");
 		}
@@ -283,7 +284,7 @@ public class NoiseDamageCalculation {
 		//summing up the link-based-costs
 		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
-			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
+			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 				timeInterval2damageCost.put(timeInterval, 0.);
 			}
 			linkId2timeInterval2damageCost.put(linkId, timeInterval2damageCost);

@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * 
@@ -335,6 +343,39 @@ public class NoiseImmissionCalculation {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
+	}
+	
+	public void writeNoiseImmissionStatsPerHourShapeFile(String fileName){
+		
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
+		.setName("receiver point")
+		.addAttribute("Time", String.class)
+		.addAttribute("immissions", Double.class)
+		.create();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for (Id<ReceiverPoint> receiverPoint : this.receiverPointId2timeInterval2noiseImmission.keySet()) {
+			for (Double timeInterval : this.receiverPointId2timeInterval2noiseImmission.get(receiverPoint).keySet()) {
+				if (timeInterval <= 23 * 3600.) {
+					String dateTimeString = convertSeconds2dateTimeFormat(timeInterval);
+					double result = this.receiverPointId2timeInterval2noiseImmission.get(receiverPoint).get(timeInterval);
+					
+					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(this.spatialInfo.getReceiverPointId2Coord().get(receiverPoint)), new Object[] {dateTimeString, result}, null);
+					features.add(feature);
+				}				
+			}
+		}
+		
+		ShapeFileWriter.writeGeometries(features, fileName);
+		log.info("Shape file written to " + fileName);
+	}
+	
+	private String convertSeconds2dateTimeFormat(double endOfTimeInterval) {
+		String date = "2000-01-01 ";
+		String time = Time.writeTime(endOfTimeInterval, Time.TIMEFORMAT_HHMMSS);
+		String dateTimeString = date + time;
+		return dateTimeString;
 	}
 	
 	public Map<Id<ReceiverPoint>, Map<Double, Map<Id<Link>, Double>>> getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission() {

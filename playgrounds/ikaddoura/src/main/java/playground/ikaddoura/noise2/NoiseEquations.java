@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * 
- * Contains general equations that are relevant to compute noise emission and immission levels, based on the German EWS approach 'Lange gerade Straßen'.
+ * Contains general equations that are relevant to compute noise emission and immission levels, based on the German RLS-90 approach 'Lange gerade Straßen'.
  * 
  * @author lkroeger, ikaddoura
  *

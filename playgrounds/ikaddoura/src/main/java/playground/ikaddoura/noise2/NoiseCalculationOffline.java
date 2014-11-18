@@ -147,6 +147,7 @@ public class NoiseCalculationOffline {
 		noiseImmission.calculateNoiseImmission();
 		noiseImmission.writeNoiseImmissionStats(outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
 		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
+		noiseImmission.writeNoiseImmissionStatsPerHourShapeFile(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
 		log.info("Calculating noise immission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
