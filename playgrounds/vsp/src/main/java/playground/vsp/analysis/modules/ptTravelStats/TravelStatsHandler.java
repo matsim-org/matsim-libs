@@ -154,12 +154,12 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 				countPax = this.mode2CountsPax.get(mode).getCount(event.getLinkId());
 				countPax_m = this.mode2CountsPax_m.get(mode).getCount(event.getLinkId());
 			} else {
-				//we always want to start with hour zero
-				countVehicles.createVolume(0, 0.);
-				countCapacity.createVolume(0, 0.);
-				countCapacity_m.createVolume(0, 0.);
-				countPax.createVolume(0, 0.);
-				countPax_m.createVolume(0, 0.);
+				//we always want to start with hour one
+				countVehicles.createVolume(1, 0.);
+				countCapacity.createVolume(1, 0.);
+				countCapacity_m.createVolume(1, 0.);
+				countPax.createVolume(1, 0.);
+				countPax_m.createVolume(1, 0.);
 			}
 
 			this.increaseCount(countVehicles, event.getTime(), 1);
@@ -201,7 +201,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	}
 
 	private void increaseCount(Count count, double time, double amount) {
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}

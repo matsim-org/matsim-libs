@@ -73,15 +73,15 @@ public class TransitVehicleVolumeHandler implements TransitDriverStartsEventHand
 				count = this.mode2Counts.get(vehId2mode.
 						get(event.getVehicleId())).getCount(event.getLinkId());
 			}else{
-				//we always want to start with hour zero
-				count.createVolume(0, 0);
+				//we always want to start with hour one
+				count.createVolume(1, 0);
 			}
 			this.increase(count, event.getTime());
 		}
 	}
 		
 	private void increase(Count count, Double time){
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}

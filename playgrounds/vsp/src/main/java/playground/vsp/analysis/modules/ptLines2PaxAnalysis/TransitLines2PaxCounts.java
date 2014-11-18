@@ -347,7 +347,7 @@ public class TransitLines2PaxCounts {
 	}
 	
 	private Integer getTimeSlice(double time){
-		int slice =  (int) (time / this.interval);
+		int slice =  (int) (time / this.interval) + 1;
 		if(slice >= this.maxSlice){
 			return this.maxSlice;
 		}
