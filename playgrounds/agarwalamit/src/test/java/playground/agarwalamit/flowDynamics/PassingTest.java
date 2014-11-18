@@ -34,7 +34,10 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -49,10 +52,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -84,15 +83,20 @@ public class PassingTest {
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = net.population.getFactory().createPerson(id);
-			PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
-			ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
+			Plan plan = net.population.getFactory().createPlan();
+			p.addPlan(plan);
+			Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
 			a1.setEndTime(8*3600+i*5);
-			LegImpl leg=plan.createAndAddLeg(transportModes[i]);
+			Leg leg = net.population.getFactory().createLeg(transportModes[i]);
+			plan.addActivity(a1);
+			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
 			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
 			leg.setRoute(route);
-			plan.createAndAddActivity("w", net.link3.getId());
+			
+			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
+			plan.addActivity(a2);
 			net.population.addPerson(p);
 		}
 
@@ -195,17 +199,17 @@ public class PassingTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes == null) {
 				travelTimes = new HashMap<Id<Link>, Double>();
-				this.personLinkTravelTimes.put(event.getPersonId(), travelTimes);
+				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {

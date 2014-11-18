@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.agarwalamit.flowDynamics;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +36,10 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -45,16 +54,10 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.*;
 
 /**
  * Tests that two persons can leave a link at the same time if flow capacity permits
@@ -74,15 +77,21 @@ public class LargeFlowCapacityTest {
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = net.population.getFactory().createPerson(id);
-			PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
-			ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
+			Plan plan = net.population.getFactory().createPlan();
+			p.addPlan(plan);
+			Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
+			Leg leg = net.population.getFactory().createLeg(TransportMode.car);
+			plan.addActivity(a1);
+			plan.addLeg(leg);
+			
 			a1.setEndTime(8*3600);
-			LegImpl leg=plan.createAndAddLeg(TransportMode.car);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
 			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
 			leg.setRoute(route);
-			plan.createAndAddActivity("w", net.link3.getId());
+			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
+			plan.addActivity(a2);
+			
 			net.population.addPerson(p);
 		}
 
@@ -173,12 +182,12 @@ public class LargeFlowCapacityTest {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (times == null) {
 				times = new HashMap<Id<Link>, double[]>();
 				double [] linkEnterLeaveTime = {Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
 				times.put(event.getLinkId(), linkEnterLeaveTime);
-				this.personLinkEnterLeaveTimes.put(event.getPersonId(), times);
+				this.personLinkEnterLeaveTimes.put(Id.createPersonId(event.getVehicleId()), times);
 			}
 			double linkLeaveTime;
 			if(times.get(event.getLinkId())!=null){
@@ -192,7 +201,7 @@ public class LargeFlowCapacityTest {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (times != null) {
 				double linkEnterTime = times.get(event.getLinkId())[0];
 				double [] linkEnterLeaveTime = {linkEnterTime,event.getTime()};

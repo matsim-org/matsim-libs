@@ -37,7 +37,10 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -52,10 +55,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,45 +82,33 @@ public class SeepageTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		String transportModes [] = new String [] {"car","walk"};
+		for (int i=0;i<3;i++){
+			Id<Person> id = Id.createPersonId(i);
+			Person p = net.population.getFactory().createPerson(id);
+			Plan plan = net.population.getFactory().createPlan();
+			p.addPlan(plan);
+			Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
+			Leg leg;
+			if(i!=2){
+				a1.setEndTime(948+i);
+				leg = net.population.getFactory().createLeg(TransportMode.car);
+			} else {
+				a1.setEndTime(49);
+				leg = net.population.getFactory().createLeg(TransportMode.walk);
+			}
 
-		Id<Person> id = Id.create(0, Person.class);
-		Person p = net.population.getFactory().createPerson(id);
-		PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
-		a1.setEndTime(948);
-		LegImpl leg=plan.createAndAddLeg(TransportMode.car);
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
-		route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", net.link3.getId());
-		net.population.addPerson(p);
+			plan.addActivity(a1);
+			plan.addLeg(leg);
+			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
+			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
+			leg.setRoute(route);
+			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
+			plan.addActivity(a2);
+			net.population.addPerson(p);
+		}
 
-
-		id = Id.create(1, Person.class);
-		p = net.population.getFactory().createPerson(id);
-		plan = ((PersonImpl)p).createAndAddPlan(true);
-		a1 = plan.createAndAddActivity("h",net.link1.getId());
-		a1.setEndTime(949);
-		leg=plan.createAndAddLeg(TransportMode.car);
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", net.link3.getId());
-		net.population.addPerson(p);
-
-		id = Id.create(2, Person.class);
-		p = net.population.getFactory().createPerson(id);
-		plan = ((PersonImpl)p).createAndAddPlan(true);
-		a1 = plan.createAndAddActivity("h",net.link1.getId());
-		a1.setEndTime(49);
-		leg=plan.createAndAddLeg(TransportMode.walk);
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", net.link3.getId());
-		net.population.addPerson(p);
-
-
-
-		Map<Id, Map<Id, Double>> personLinkTravelTimes = new HashMap<Id, Map<Id, Double>>();
+		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
@@ -130,8 +117,8 @@ public class SeepageTest {
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
-		Map<Id, Double> travelTime1 = personLinkTravelTimes.get(Id.createPersonId("2"));
-		Map<Id, Double> travelTime2 = personLinkTravelTimes.get(Id.createPersonId("1"));
+		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.createPersonId("2"));
+		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.createPersonId("1"));
 
 		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue(); 
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
@@ -149,7 +136,7 @@ public class SeepageTest {
 		qSim1.addActivityHandler(activityEngine);
 
 		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
-		
+
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,seepNetFactory);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
@@ -193,11 +180,11 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList("car","walk"));
-			
+
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode", "walk");
 			config.setParam("seepage","isSeepModeStorageFree","false");
-			
+
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			Node node1 = network.createAndAddNode(Id.createNodeId("1"), scenario.createCoord(-100.0,0.0));
@@ -220,19 +207,19 @@ public class SeepageTest {
 	}
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
 
-		private final Map<Id, Map<Id, Double>> personLinkTravelTimes;
+		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id, Map<Id, Double>> agentTravelTimes) {
+		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
 			this.personLinkTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			System.out.println(event.toString());
-			Map<Id, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes == null) {
-				travelTimes = new HashMap<Id, Double>();
-				this.personLinkTravelTimes.put(event.getPersonId(), travelTimes);
+				travelTimes = new HashMap<>();
+				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
 		}
@@ -240,7 +227,7 @@ public class SeepageTest {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			System.out.println(event.toString());
-			Map<Id, Double> travelTimes = this.personLinkTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {
