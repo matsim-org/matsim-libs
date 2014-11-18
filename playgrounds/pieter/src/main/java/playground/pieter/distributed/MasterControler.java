@@ -22,7 +22,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
@@ -63,7 +62,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private boolean somethingWentWrong = false;
     private int socketNumber = 12345;
     public static double planAllocationLimiter = 10.0;
-    public static long bytesPerSlaveBuffer = (long) 2e8;
+    public static final long bytesPerSlaveBuffer = (long) 2e8;
+    public int slaveUniqueNumber = 0;
+
     /**
      * value between 0 and 1; increasing it increases the dampening effect of preventing
      * large transfers of persons during load balance iterations
@@ -138,11 +139,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
             masterLogger.warn("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.");
-            int currSlaveNumber = assignSlaveNumber();
-            Slave slave = new Slave(socket, i);
-            slaves.put(currSlaveNumber, slave);
+            Slave slave = new Slave(socket, slaveUniqueNumber);
+            slaves.put(slaveUniqueNumber, slave);
             //order is important
-            slave.sendNumber(currSlaveNumber);
+            slave.sendNumber(slaveUniqueNumber++);
             slave.sendNumber(numberOfPSimIterations);
             slave.sendBoolean(initialRoutingOnSlaves);
             slave.readMemoryStats();
@@ -183,7 +183,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
             j++;
         }
-        int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave, bytesPerPlan, bytesPerPerson, 0.0);
+        int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave, bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
         personSplit = (List<PersonImpl>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
         j = 0;
         for (int i : slaves.keySet()) {
@@ -220,9 +220,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
     }
 
-    public int assignSlaveNumber() {
-        return (int) (System.currentTimeMillis() - startMillis) / 1000;
-    }
+
 
     private int getTotalNumberOfPlansFromSlaves() {
         int total = 0;
@@ -321,7 +319,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 person.addPlan(plan);
                 person.setSelectedPlan(plan);
             }
-            if (slaves.size() > 1) loadBalance();
+            if (slaves.size() > 1 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size()>0)
+                loadBalance();
             waitForSlaveThreads();
             startSlavesInMode(CommunicationsMode.CONTINUE);
         }
@@ -341,7 +340,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //wating for slaves to receive plans from notifyIterationStarts()
         waitForSlaveThreads();
         mergePlansFromSlaves();
-        isLoadBalanceIteration = event.getIteration() % loadBalanceInterval == 0;
+        isLoadBalanceIteration = event.getIteration() % loadBalanceInterval == 0 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size()>0;
         //do load balancing, if necessary
         if (isLoadBalanceIteration)
             loadBalance();
@@ -352,6 +351,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 config.qsim().getEndTime(),
                 scenario.getNetwork().getLinks().values());
         startSlavesInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
+    }
+
+    private boolean slavesHaveRequestedShutdown() {
+        for(Slave slave:slaves.values()){
+            if(!slave.isOkForNextIter)
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -374,12 +381,23 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
         personPool = new ArrayList<>();
         masterLogger.warn("About to start load balancing.");
-        double[] totalIterationTime = new double[slaves.size()];
-        int[] personsPerSlave = new int[slaves.size()];
-        long[] usedMemoryPerSlave = new long[slaves.size()];
-        long[] maxMemoryPerSlave = new long[slaves.size()];
+        Set<Integer> validSlaves  = new TreeSet<>();
+        Set<Integer> inValidSlaves  = new TreeSet<>();
+        validSlaves.addAll(slaves.keySet());
+        for(Slave slave:slaves.values()){
+            if(!slave.isOkForNextIter) {
+                validSlaves.remove(slave.myNumber);
+                inValidSlaves.add(slave.myNumber);
+                slave.targetPopulationSize = 0;
+            }
+        }
+
+        double[] totalIterationTime = new double[validSlaves.size()];
+        int[] personsPerSlave = new int[validSlaves.size()];
+        long[] usedMemoryPerSlave = new long[validSlaves.size()];
+        long[] maxMemoryPerSlave = new long[validSlaves.size()];
         int j = 0;
-        for (int i : slaves.keySet()) {
+        for (int i : validSlaves) {
             totalIterationTime[j] = slaves.get(i).totalIterationTime;
             personsPerSlave[j] = slaves.get(i).currentPopulationSize;
             usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
@@ -387,13 +405,19 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             j++;
         }
 
-        setSlaveTargetPopulationSizes(
+        setSlaveTargetPopulationSizes(validSlaves,
                 getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave,
-                        bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor));
+                        bytesPerPlan, bytesPerPerson, loadBalanceDampeningFactor, scenario.getPopulation().getPersons().size()));
         startSlavesInMode(CommunicationsMode.POOL_PERSONS);
         waitForSlaveThreads();
         mergePersonsFromSlaves();
         masterLogger.warn("Distributing persons between  slaves");
+        //kill slaves that are not ok for another round
+        for(int i: inValidSlaves){
+            slaves.get(i).communicationsMode = CommunicationsMode.DIE;
+            new Thread(slaves.get(i)).start();
+            slaves.remove(i);
+        }
         startSlavesInMode(CommunicationsMode.DISTRIBUTE_PERSONS);
     }
 
@@ -405,12 +429,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         return total;
     }
 
-    private void setSlaveTargetPopulationSizes(int[] slaveTargetPopulationSizes) {
-        Iterator<Entry<Integer, Slave>> iterator = slaves.entrySet().iterator();
-        int i = 0;
-        while (iterator.hasNext()) {
-            iterator.next().getValue().targetPopulationSize = slaveTargetPopulationSizes[i];
-            i++;
+    private void setSlaveTargetPopulationSizes(Set<Integer> keys,int[] slaveTargetPopulationSizes) {
+        int j=0;
+        for(int i:keys){
+            slaves.get(i).targetPopulationSize = slaveTargetPopulationSizes[j];
+            j++;
         }
     }
 
@@ -466,7 +489,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     public static int[] getSlaveTargetPopulationSizes(double[] totalIterationTime, int[] personsPerSlave,
                                                       long[] maxMemory, long[] usedMemory, long bytesPerPlan, long bytesPerPerson,
-                                                      double dampeningFactor) {
+                                                      double dampeningFactor, int popSize) {
         int numSlaves = totalIterationTime.length;
         StringBuffer sb = new StringBuffer();
         sb.append("\n");
@@ -507,26 +530,24 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         int[] allocation = new int[numSlaves];
         boolean[] fullyAllocated = new boolean[numSlaves];
         long[] overheadMemory = new long[numSlaves];
-        int popSize = 0;
 
         Set<Integer> validSlaveIndices = new HashSet<>();
         Set<Integer> newSlaves = new HashSet<>();
-        double slowestTimePerPlan = 0.0;
+        double fastestTimePerPlan = Double.POSITIVE_INFINITY;
 
         for (int i = 0; i < numSlaves; i++) {
             if (personsPerSlave[i] > 0) {
                 timesPerPlan[i] = (totalIterationTime[i] / personsPerSlave[i]);
-                if (timesPerPlan[i] > slowestTimePerPlan)
-                    slowestTimePerPlan = timesPerPlan[i];
+                if (timesPerPlan[i] < fastestTimePerPlan)
+                    fastestTimePerPlan = timesPerPlan[i];
             } else
                 newSlaves.add(i);
-            popSize += personsPerSlave[i];
             validSlaveIndices.add(i);
             maxMemory[i] = maxMemory[i] - bytesPerSlaveBuffer;
             overheadMemory[i] = usedMemory[i] - (personsPerSlave[i] * bytesPerPerson);
         }
         for(int i: newSlaves)
-                timesPerPlan[i] = slowestTimePerPlan;
+                timesPerPlan[i] = fastestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaves
         boolean allGood = false;
         int remainder = popSize;
@@ -636,6 +657,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         private long maxMemory;
         private int numberOfPlans;
         private int numThreadsOnSlave;
+        private boolean isOkForNextIter =true;
 
         public Slave(Socket socket, int i) throws IOException {
             super();
@@ -715,6 +737,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     case TRANSMIT_PLANS_TO_MASTER:
                         writer.reset();
                         transmitPlans();
+                        slaveIsOKForNextIter();
                         break;
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
@@ -726,6 +749,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                         writer.writeObject(communicationsMode);
                         writer.flush();
                         break;
+                    case DIE:
+                        return;
                 }
                 reader.readBoolean();
             } catch (IOException | InterruptedException | IndexOutOfBoundsException | ClassNotFoundException e) {
@@ -735,7 +760,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             //end of a successful Thread.run()
             numThreads.decrementAndGet();
-            slaveLogger.warn("Slave " + myNumber+" leaving comms mode: "+communicationsMode.toString());
+            slaveLogger.warn("Slave " + myNumber + " leaving comms mode: " + communicationsMode.toString());
+        }
+
+        private void slaveIsOKForNextIter() throws IOException {
+            this.isOkForNextIter = reader.readBoolean();
         }
 
 
@@ -776,7 +805,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 writeServer = new ServerSocket(socketNumber);
                 while (true) {
                     Socket socket = writeServer.accept();
-                    int i = assignSlaveNumber();
+                    int i = slaveUniqueNumber++;
                     masterLogger.warn("Slave accepted.");
                     Slave slave = new Slave(socket, i);
                     while (accessingMap.get()) {
@@ -813,6 +842,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 }
             }
             accessingMap.set(true);
+            List<Integer> slavesToDrop = new ArrayList<>();
+            for(Slave slave:hydraSlaves.values()){
+                if(!slave.isOkForNextIter) slavesToDrop.add(slave.myNumber);
+            }
+            for(int i:slavesToDrop) hydraSlaves.remove(i);
             slaveBatch = hydraSlaves;
             accessingMap.set(false);
             return slaveBatch;

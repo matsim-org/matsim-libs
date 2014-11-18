@@ -48,7 +48,7 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener {
+public class SlaveControler implements IterationStartsListener, StartupListener, Runnable {
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
@@ -71,6 +71,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
     private long lastIterationStartTime;
     private boolean somethingWentWrong = false;
     private long fSLEEP_INTERVAL = 100;
+    private boolean isOkForNextIter = true;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -182,7 +183,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
         matsimControler.setModules(new AbstractModule() {
             @Override
             public void install() {
-                bindToInstance(TravelTime.class,travelTime);
+                bindToInstance(TravelTime.class, travelTime);
             }
         });
 //        new Thread(new TimesReceiver()).start();
@@ -266,13 +267,28 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
         SlaveControler slave = new SlaveControler(args);
-        slave.run();
+        new Thread(slave).start();
+        System.out.printf("Enter KILL to kill the slave: ");
+        Scanner in = new Scanner(System.in);
+        String s;
+        boolean running = true;
+        do{
+            s = in.nextLine();
+            if(s.equals("KILL"))
+                running=false;
+        }while(running);
+        slave.requestShutDown();
     }
 
-    private void run() {
+    @Override
+    public void run() {
         pSimFactory = new PSimFactory();
         matsimControler.setMobsimFactory(pSimFactory);
         matsimControler.run();
+    }
+
+    public void requestShutDown(){
+        isOkForNextIter = false;
     }
 
     @Override
@@ -448,6 +464,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
                         break;
                     case TRANSMIT_PLANS_TO_MASTER:
                         transmitPlans();
+                        slaveIsOKForNextIter();
                         break;
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
@@ -474,6 +491,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener 
             return;
         }
         slaveLogger.warn("Communications completed.");
+    }
+
+    private void slaveIsOKForNextIter() throws IOException {
+        writer.writeBoolean(isOkForNextIter);
     }
 
     @Override
