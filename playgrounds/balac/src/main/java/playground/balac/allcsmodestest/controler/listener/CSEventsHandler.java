@@ -156,7 +156,7 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +
 			startLinkId.toString() + " " + Double.toString(distance)+ " " + Double.toString(accessEndTime - accessStartTime)
-			+ " " + Double.toString(egressEndTime - egressStartTime) + " " + null;
+			+ " " + Double.toString(egressEndTime - egressStartTime) + " " + vehId;
 		}
 	}
 

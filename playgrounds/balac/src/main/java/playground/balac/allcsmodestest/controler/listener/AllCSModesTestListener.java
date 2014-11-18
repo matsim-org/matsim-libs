@@ -43,7 +43,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 		
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "RT_CS"));
 		try {
-			outLink.write("personID   startTime   endTIme   startLink   distance   accessTime   egressTime");
+			outLink.write("personID   startTime   endTIme   startLink   distance   accessTime   egressTime	vehicleID");
 			outLink.newLine();
 		for(RentalInfo i: info) {
 			
@@ -63,7 +63,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 		
 		final BufferedWriter outLinkff = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "FF_CS"));
 		try {
-			outLinkff.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime");
+			outLinkff.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime	vehicleID");
 			outLinkff.newLine();
 		for(RentalInfoFF i: infoff) {
 			
@@ -79,13 +79,13 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 			e.printStackTrace();
 		}
 		
-		ArrayList<playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoFF> infoow = owhandler.rentals();
+		ArrayList<playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoOW> infoow = owhandler.rentals();
 		
 		final BufferedWriter outLinkow = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "OW_CS"));
 		try {
-			outLinkow.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime   egressTime");
+			outLinkow.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime   egressTime	vehicleID");
 			outLinkow.newLine();
-		for(playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoFF i: infoow) {
+		for(playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoOW i: infoow) {
 			
 			
 			outLinkow.write(i.toString());

@@ -17,9 +17,9 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 
 public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
-	HashMap<Id, RentalInfoFF> ffRentalsStats = new HashMap<Id, RentalInfoFF>();
+	HashMap<Id, RentalInfoOW> ffRentalsStats = new HashMap<Id, RentalInfoOW>();
 	HashMap<Id, String> arrivals = new HashMap<Id, String>();
-	ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
+	ArrayList<RentalInfoOW> arr = new ArrayList<RentalInfoOW>();
 	HashMap<Id, Boolean> inVehicle = new HashMap<Id, Boolean>();
 	HashMap<Id, Id> personVehicles = new HashMap<Id, Id>();
 
@@ -32,9 +32,9 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		ffRentalsStats = new HashMap<Id, RentalInfoFF>();
+		ffRentalsStats = new HashMap<Id, RentalInfoOW>();
 		arrivals = new HashMap<Id, String>();
-		arr = new ArrayList<RentalInfoFF>();
+		arr = new ArrayList<RentalInfoOW>();
 		inVehicle = new HashMap<Id, Boolean>();
 		personVehicles = new HashMap<Id, Id>();
 
@@ -56,7 +56,8 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		if (event.getVehicleId().toString().startsWith("OW")) {
 			Id perid = personVehicles.get(event.getVehicleId());
 			
-			RentalInfoFF info = ffRentalsStats.get(perid);
+			RentalInfoOW info = ffRentalsStats.get(perid);
+			info.vehId = event.getVehicleId();
 			info.distance += network.getLinks().get(event.getLinkId()).getLength();
 			
 		}
@@ -69,7 +70,7 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		inVehicle.put(event.getPersonId(), false);
 		if (event.getLegMode().equals("walk_ow_sb")) {
 			
-			RentalInfoFF info = new RentalInfoFF();
+			RentalInfoOW info = new RentalInfoOW();
 			info.accessStartTime = event.getTime();
 			info.personId = event.getPersonId();
 			
@@ -80,7 +81,7 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 			}
 			else {
 				
-				RentalInfoFF info1 = ffRentalsStats.get(event.getPersonId());
+				RentalInfoOW info1 = ffRentalsStats.get(event.getPersonId());
 				info1.egressStartTime = event.getTime();				
 				
 			}
@@ -89,7 +90,7 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		else if (event.getLegMode().equals("onewaycarsharing")) {
 			inVehicle.put(event.getPersonId(), true);
 
-			RentalInfoFF info = ffRentalsStats.get(event.getPersonId());
+			RentalInfoOW info = ffRentalsStats.get(event.getPersonId());
 			
 			info.startTime = event.getTime();
 			info.startLinkId = event.getLinkId();
@@ -103,14 +104,14 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		// TODO Auto-generated method stub
 		
 		if (event.getLegMode().equals("onewaycarsharing")) {
-			RentalInfoFF info = ffRentalsStats.get(event.getPersonId());
+			RentalInfoOW info = ffRentalsStats.get(event.getPersonId());
 			info.endTime = event.getTime();
 			info.endLinkId = event.getLinkId();
 			
 		}
 		else if (event.getLegMode().equals("walk_ow_sb")) {
 			if (ffRentalsStats.get(event.getPersonId()) != null && ffRentalsStats.get(event.getPersonId()).accessEndTime != 0.0) {
-				RentalInfoFF info = ffRentalsStats.remove(event.getPersonId());
+				RentalInfoOW info = ffRentalsStats.remove(event.getPersonId());
 				info.egressEndTime = event.getTime();
 				arr.add(info);	
 			}
@@ -118,12 +119,12 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		
 	}
 	
-	public ArrayList<RentalInfoFF> rentals() {
+	public ArrayList<RentalInfoOW> rentals() {
 		
 		return arr;
 	}
 	
-	public class RentalInfoFF {
+	public class RentalInfoOW {
 		private Id personId = null;
 		private double startTime = 0.0;
 		private double endTime = 0.0;
@@ -134,10 +135,14 @@ public class OWEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
 		private double egressEndTime = 0.0;
+		private Id vehId = null;
+
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +
-			startLinkId.toString() + " " +	endLinkId.toString()+ " " + Double.toString(distance)+ " " + Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime);
+			startLinkId.toString() + " " +	endLinkId.toString()+ " " + Double.toString(distance)+ " " +
+					Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime) + " " +
+			vehId;
 		}
 	}
 
