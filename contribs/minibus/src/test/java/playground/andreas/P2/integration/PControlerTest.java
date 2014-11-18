@@ -115,7 +115,7 @@ public class PControlerTest implements TabularFileHandler{
         Assert.assertEquals("Number of routes (first iteration)", "1", this.pStatsResults.get(1)[3]);
         Assert.assertEquals("Number of pax (first iteration)", "3399", this.pStatsResults.get(1)[5]);
         Assert.assertEquals("Number of veh (first iteration)", "3", this.pStatsResults.get(1)[7]);
-        Assert.assertEquals("Number of budget (first iteration)", "-118.73266666667139", this.pStatsResults.get(1)[9]);
+        Assert.assertEquals("Number of budget (first iteration)", "-118.7326666667", this.pStatsResults.get(1)[9]);
         
         Assert.assertEquals("Number of +coops (first iteration)", "0", this.pStatsResults.get(1)[2]);
         Assert.assertEquals("Number of +routes (first iteration)", "0", this.pStatsResults.get(1)[4]);
@@ -127,13 +127,13 @@ public class PControlerTest implements TabularFileHandler{
         Assert.assertEquals("Number of routes (last iteration)", "3", this.pStatsResults.get(11)[3]);
         Assert.assertEquals("Number of pax (last iteration)", "7134", this.pStatsResults.get(11)[5]);
         Assert.assertEquals("Number of veh (last iteration)", "10", this.pStatsResults.get(11)[7]);
-        Assert.assertEquals("Number of budget (last iteration)", "86.61933333330529", this.pStatsResults.get(11)[9]);
+        Assert.assertEquals("Number of budget (last iteration)", "86.6193333333", this.pStatsResults.get(11)[9]);
 
         Assert.assertEquals("Number of +coops (last iteration)", "1", this.pStatsResults.get(11)[2]);
         Assert.assertEquals("Number of +routes (last iteration)", "2", this.pStatsResults.get(11)[4]);
         Assert.assertEquals("Number of +pax (last iteration)", "7055", this.pStatsResults.get(11)[6]);
         Assert.assertEquals("Number of +veh (last iteration)", "9", this.pStatsResults.get(11)[8]);
-        Assert.assertEquals("Number of +budget (last iteration)", "100.51744444438853", this.pStatsResults.get(11)[10]);
+        Assert.assertEquals("Number of +budget (last iteration)", "100.5174444444", this.pStatsResults.get(11)[10]);
 	}
 
 	@Override

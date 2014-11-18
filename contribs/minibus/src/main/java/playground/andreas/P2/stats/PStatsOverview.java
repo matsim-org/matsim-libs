@@ -30,15 +30,20 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.Operators;
 import playground.andreas.P2.operator.PPlan;
+import playground.andreas.P2.stats.PStatsOverviewDataContainer.FIELDS;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -59,37 +64,66 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 
 	private final static Logger log = Logger.getLogger(PStatsOverview.class);
 	
-	final private static int INDEX_NOPERATORS = 0;
-	final private static int INDEX_NOPERATORSPOS = 1;
-	final private static int INDEX_NROUTES = 2;
-	final private static int INDEX_NROUTESPOS = 3;	
-	final private static int INDEX_NPAX = 4;
-	final private static int INDEX_NPAXPOS = 5;
-	final private static int INDEX_NVEH = 6;
-	final private static int INDEX_NVEHPOS = 7;
-	final private static int INDEX_NBUDGET = 8;
-	final private static int INDEX_NBUDGETPOS = 9;
-	final private static int INDEX_NSCORE = 10;
-	final private static int INDEX_NSCOREPOS = 11;
+	protected final static String DELIMITER = "\t";
 	
-	final private static int INDEX_SHAREPOSOPERATORS = 12;
-	final private static int INDEX_SHAREPOSROUTES = 13;
-	final private static int INDEX_SHAREPOSPAX = 14;
-	final private static int INDEX_SHAREPOSVEH = 15;
-	
-	final private static int INDEX_MEANPOSOPERATORS = 16;
-	final private static int INDEX_MEANPOSROUTES = 17;
-	final private static int INDEX_MEANPOSPAX = 18;
-	final private static int INDEX_MEANPOSVEH = 19;
-	final private static int INDEX_SIGMAUPPERPOSOPERATORS = 20;
-	final private static int INDEX_SIGMAUPPERPOSROUTES = 21;
-	final private static int INDEX_SIGMAUPPERPOSPAX = 22;
-	final private static int INDEX_SIGMAUPPERPOSVEH = 23;
-	final private static int INDEX_SIGMALOWERPOSOPERATORS = 24;
-	final private static int INDEX_SIGMALOWERPOSROUTES = 25;
-	final private static int INDEX_SIGMALOWERPOSPAX = 26;
-	final private static int INDEX_SIGMALOWERPOSVEH = 27;
+	public enum INDEX {
+		INDEX_NOPERATORS("N operators", "N operators", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NOPERATORSPOS("N pos operators", "N pos operators", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NROUTES("N routes", "N routes", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NROUTESPOS("N pos routes", "N pos routes", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NPAX("N pax", "N pax", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NPAXPOS("N pos pax", "N pos pax", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NVEH("N veh", "N veh", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NVEHPOS("N pos veh", "N pos veh", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		
+		INDEX_NBUDGET("budget per operator", "budget per operator", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NBUDGETPOS("pos budget per pos operator", "pos budget per pos operator", new DecimalFormat( "#########0.00", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NSCORE("score per route", "score per route", new DecimalFormat( "#########0.00", new DecimalFormatSymbols(Locale.US))),
+		INDEX_NSCOREPOS("pos score per pos route", "pos score per pos route", new DecimalFormat( "#########0.00", new DecimalFormatSymbols(Locale.US))),
+		
+		INDEX_SHAREPOSOPERATORS("share pos operators", "share pos operators", new DecimalFormat( "#########0.00", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SHAREPOSROUTES("share pos routes", "share pos routes", new DecimalFormat( "#########0.0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SHAREPOSPAX("share pos pax", "share pos pax", new DecimalFormat( "#########0.0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SHAREPOSVEH("share pos veh", "share pos veh", new DecimalFormat( "#########0.0", new DecimalFormatSymbols(Locale.US))),
+		
+		INDEX_MEANPOSOPERATORS("average number of pos operators", "average number of pos operators", new DecimalFormat( "#########0.0", new DecimalFormatSymbols(Locale.US))),
+		INDEX_MEANPOSROUTES("average number of pos routes", "average number of pos routes", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_MEANPOSPAX("average number of pos pax", "average number of pos pax", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_MEANPOSVEH("average number of pos veh", "average number of pos veh", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
 
+		INDEX_SIGMAUPPERPOSOPERATORS("average number of pos operators + 1 sigma", "average number of pos operators + 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMAUPPERPOSROUTES("average number of pos routes + 1 sigma", "average number of pos routes + 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMAUPPERPOSPAX("average number of pos pax + 1 sigma", "average number of pos pax + 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMAUPPERPOSVEH("average number of pos veh + 1 sigma", "average number of pos veh + 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		
+		INDEX_SIGMALOWERPOSOPERATORS("average number of pos operators - 1 sigma", "average number of pos operators - 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMALOWERPOSROUTES("average number of pos routes - 1 sigma", "average number of pos routes - 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMALOWERPOSPAX("average number of pos pax - 1 sigma", "average number of pos pax - 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US))),
+		INDEX_SIGMALOWERPOSVEH("average number of pos veh - 1 sigma", "average number of pos veh - 1 sigma", new DecimalFormat( "#########0.00000", new DecimalFormatSymbols(Locale.US)));
+		
+		private String enName;
+		private String deName;
+		private DecimalFormat decimalFormat;
+
+		private INDEX(String enName, String deName, DecimalFormat decimalFormat){
+			this.enName = enName;
+			this.deName = deName;
+			this.decimalFormat = decimalFormat;
+		}
+		
+		public String getEnName(){
+			return this.enName;
+		}
+		
+		public String getDeName(){
+			return this.deName;
+		}
+		
+		public DecimalFormat getDecimalFormat(){
+			return this.decimalFormat;
+		}
+	}
+	
 	private BufferedWriter pStatsWriter;
 
 	private double[][] history = null;
@@ -113,7 +147,12 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			log.info("enabled");
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				this.pStatsWriter.write("iter\toperators\t+operators\troutes\t+routes\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosOperators\tsharePosRoutes\tsharePosPax\tsharePosVeh\tESmeanOperators+\tESstdDevOperators+\tESmeanRoutes+\tESstdDevRoutes+\tESmeanPax+\tESstdDevPax+\tESmeanVeh+\tESstdDevVeh+\tmeanOperators+\tstdDevOperators+\tmeanRoutes+\tstdDevRoutes+\tmeanPax+\tstdDevPax+\tmeanVeh+\tstdDevVeh+\t\n");
+				StringBuffer strB = new StringBuffer();
+				for (FIELDS field : PStatsOverviewDataContainer.FIELDS.values()) {
+					strB.append(field.getEnName()).append(PStatsOverview.DELIMITER);
+				}
+				strB.append("\n");
+				this.pStatsWriter.write(strB.toString());
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -134,18 +173,22 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(this.pConfig.getWriteStatsInterval() > 0){
 			
-			double operators = 0.0;
-			double operatorsPos = 0.0;
-			double routes = 0.0;
-			double routesPos = 0.0;
-			double pax = 0.0;
-			double paxPos = 0.0;
-			double veh = 0.0;
-			double vehPos = 0.0;
-			double budget = 0.0;
-			double budgetPos = 0.0;
-			double score = 0.0;
-			double scorePos = 0.0;
+			PStatsOverviewDataContainer pStats = new PStatsOverviewDataContainer();
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.iteration.ordinal(), event.getIteration());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nPax.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nVehicle.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal(), 0.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal(), 0.0);
 
 			for (Operator operator : this.pBox.getOperators()) {
 				List<PPlan> plans = operator.getAllPlans();
@@ -162,39 +205,81 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 					operatorScore += plan.getScore();
 				}
 				
-				operators++;
-				routes += operatorRoutes;
-				pax += operatorPax;				
-				veh += operatorVeh;
-				budget += operator.getBudget();
-				score += operatorScore;				
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal()) + 1.0);
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal()) + operatorRoutes);
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.nPax.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nPax.ordinal()) + operatorPax);
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.nVehicle.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicle.ordinal()) + operatorVeh);
+				
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal()) + operator.getBudget());
+				pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal()) + operatorScore);
 				
 				// statistics for each operator in business
 				if(operator.getOperatorState().equals(OperatorState.INBUSINESS)){
-					operatorsPos++;
-					routesPos += operatorRoutes;
-					paxPos += operatorPax;
-					vehPos += operatorVeh;
-					budgetPos += operator.getBudget();
-					scorePos += operatorScore;					
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal()) + 1.0);
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal()) + operatorRoutes);
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal()) + operatorPax);
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal()) + operatorVeh);
+					
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal()) + operator.getBudget());
+					pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal()) + operatorScore);
 				}				
 			}
 			
-			double sharePosOperators = operatorsPos / operators * 100.0;
-			double sharePosRoutes = routesPos / routes * 100.0;
-			double sharePosPax = paxPos / pax * 100.0;
-			double sharePosVeh = vehPos / veh * 100.0;
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.shareOfInBusinessOperators.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal()) * 100.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.shareOfInBusinessRoutes.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal()) * 100.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.shareOfPaxServedByInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nPax.ordinal()) * 100.0);
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.shareOfVehOfInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicle.ordinal()) * 100.0);
 			
-			this.statsContainer.handleNewEntry(operatorsPos, routesPos, paxPos, vehPos);
-			this.statsApproxContainer.handleNewEntry(operatorsPos, routesPos, paxPos, vehPos);
+			
+			this.statsContainer.handleNewEntry(pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal()));
+			this.statsApproxContainer.handleNewEntry(pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal()), pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal()));
+			
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal()));
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal()));
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal()));
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal(), pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal()) / pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal()));
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedMeanOperatorsInBusiness.ordinal(), statsApproxContainer.getArithmeticMeanOperators());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedSDOperatorsInBusiness.ordinal(), statsApproxContainer.getStdDevOperators());
+
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedMeanRouteOfInBusiness.ordinal(), statsApproxContainer.getArithmeticMeanRoutes());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedSDRouteOfInBusiness.ordinal(), statsApproxContainer.getStdDevRoutes());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedMeanPaxServedByInBusiness.ordinal(), statsApproxContainer.getArithmeticMeanPax());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedSDPaxServedByInBusiness.ordinal(), statsApproxContainer.getStdDevPax());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedMeanVehicleOfInBusiness.ordinal(), statsApproxContainer.getArithmeticMeanVeh());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.estimatedSDVehicleOfInBusiness.ordinal(), statsApproxContainer.getStdDevVeh());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactMeanOperatorsInBusiness.ordinal(), statsContainer.getArithmeticMeanOperators());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactSDOperatorsInBusiness.ordinal(), statsContainer.getStdDevOperators());
+
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactMeanRouteOfInBusiness.ordinal(), statsContainer.getArithmeticMeanRoutes());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactSDRouteOfInBusiness.ordinal(), statsContainer.getStdDevRoutes());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactMeanPaxServedByInBusiness.ordinal(), statsContainer.getArithmeticMeanPax());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactSDPaxServedByInBusiness.ordinal(), statsContainer.getStdDevPax());
+			
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactMeanVehicleOfInBusiness.ordinal(), statsContainer.getArithmeticMeanVeh());
+			pStats.addData(PStatsOverviewDataContainer.FIELDS.exactSDVehicleOfInBusiness.ordinal(), statsContainer.getStdDevVeh());
 			
 			try {
-				this.pStatsWriter.write(event.getIteration() + "\t" + (int) operators + "\t" + (int) operatorsPos + "\t" + (int) routes + "\t" + (int) routesPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
-						(budget / operators) + "\t" + (budgetPos / operatorsPos) + "\t" + (score / routes) + "\t" + (scorePos / routesPos) + "\t" + sharePosOperators + "\t" + sharePosRoutes + "\t" + sharePosPax + "\t" + sharePosVeh + "\t" +
-						statsApproxContainer.getArithmeticMeanOperators() + "\t" + statsApproxContainer.getStdDevOperators() + "\t" + statsApproxContainer.getArithmeticMeanRoutes() + "\t" + statsApproxContainer.getStdDevRoutes() + "\t" +
-						statsApproxContainer.getArithmeticMeanPax() + "\t" + statsApproxContainer.getStdDevPax() + "\t" + statsApproxContainer.getArithmeticMeanVeh() + "\t" + statsApproxContainer.getStdDevVeh() + "\t" +
-						statsContainer.getArithmeticMeanOperators() + "\t" + statsContainer.getStdDevOperators() + "\t" + statsContainer.getArithmeticMeanRoutes() + "\t" + statsContainer.getStdDevRoutes() + "\t" + 
-						statsContainer.getArithmeticMeanPax() + "\t" + statsContainer.getStdDevPax() + "\t" + statsContainer.getArithmeticMeanVeh() + "\t" + statsContainer.getStdDevVeh() + "\n");
+				StringBuffer strB = new StringBuffer();
+				for (FIELDS field : PStatsOverviewDataContainer.FIELDS.values()) {
+					String value;
+					
+					if (Double.isNaN(pStats.getData(field.ordinal()))) {
+						value = Double.toString(pStats.getData(field.ordinal()));
+					} else {
+						value = field.getDecimalFormat().format(pStats.getData(field.ordinal()));
+					}
+					
+					strB.append(value).append(PStatsOverview.DELIMITER);
+				}
+				strB.append("\n");
+				this.pStatsWriter.write(strB.toString());
 				this.pStatsWriter.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -203,36 +288,38 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			if (this.history != null) {
 				int index = event.getIteration() - this.minIteration;
 				
-				this.history[INDEX_NOPERATORS][index] = operators;
-				this.history[INDEX_NOPERATORSPOS][index] = operatorsPos;
-				this.history[INDEX_NROUTES][index] = routes;
-				this.history[INDEX_NROUTESPOS][index] = routesPos;
-				this.history[INDEX_NPAX][index] = pax;
-				this.history[INDEX_NPAXPOS][index] = paxPos;
-				this.history[INDEX_NVEH][index] = veh;
-				this.history[INDEX_NVEHPOS][index] = vehPos;
-				this.history[INDEX_NBUDGET][index] = budget / operators;
-				this.history[INDEX_NBUDGETPOS][index] = budgetPos / operatorsPos;
-				this.history[INDEX_NSCORE][index] = score / routes;
-				this.history[INDEX_NSCOREPOS][index] = scorePos / routesPos;
+				this.history[INDEX.INDEX_NOPERATORS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperators.ordinal());
+				this.history[INDEX.INDEX_NOPERATORSPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nOperatorsInBusiness.ordinal());
+				this.history[INDEX.INDEX_NROUTES.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutes.ordinal());
+				this.history[INDEX.INDEX_NROUTESPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nRoutesOfInBusiness.ordinal());
+				this.history[INDEX.INDEX_NPAX.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nPax.ordinal());
+				this.history[INDEX.INDEX_NPAXPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nPaxServedByInBusiness.ordinal());
+				this.history[INDEX.INDEX_NVEH.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicle.ordinal());
+				this.history[INDEX.INDEX_NVEHPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.nVehicleOfInBusiness.ordinal());
+				this.history[INDEX.INDEX_NBUDGET.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerOperator.ordinal());
+				this.history[INDEX.INDEX_NBUDGETPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.avgBudgetPerInBusinessOperator.ordinal());
+				this.history[INDEX.INDEX_NSCORE.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRoute.ordinal());
+				this.history[INDEX.INDEX_NSCOREPOS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.avgCashflowPerRouteOfInBusiness.ordinal());
 				
-				this.history[INDEX_SHAREPOSOPERATORS][index] = sharePosOperators;
-				this.history[INDEX_SHAREPOSROUTES][index] = sharePosRoutes;
-				this.history[INDEX_SHAREPOSPAX][index] = sharePosPax;
-				this.history[INDEX_SHAREPOSVEH][index] = sharePosVeh;
+				this.history[INDEX.INDEX_SHAREPOSOPERATORS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.shareOfInBusinessOperators.ordinal());
+				this.history[INDEX.INDEX_SHAREPOSROUTES.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.shareOfInBusinessRoutes.ordinal());
+				this.history[INDEX.INDEX_SHAREPOSPAX.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.shareOfPaxServedByInBusiness.ordinal());
+				this.history[INDEX.INDEX_SHAREPOSVEH.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.shareOfVehOfInBusiness.ordinal());
 				
-				this.history[INDEX_MEANPOSOPERATORS][index] = statsApproxContainer.getArithmeticMeanOperators();
-				this.history[INDEX_MEANPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes();
-				this.history[INDEX_MEANPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax();
-				this.history[INDEX_MEANPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh();
-				this.history[INDEX_SIGMAUPPERPOSOPERATORS][index] = statsApproxContainer.getArithmeticMeanOperators() + statsApproxContainer.getStdDevOperators();
-				this.history[INDEX_SIGMAUPPERPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes() + statsApproxContainer.getStdDevRoutes();
-				this.history[INDEX_SIGMAUPPERPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax() + statsApproxContainer.getStdDevPax();
-				this.history[INDEX_SIGMAUPPERPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh() + statsApproxContainer.getStdDevVeh();
-				this.history[INDEX_SIGMALOWERPOSOPERATORS][index] = statsApproxContainer.getArithmeticMeanOperators() - statsApproxContainer.getStdDevOperators();
-				this.history[INDEX_SIGMALOWERPOSROUTES][index] = statsApproxContainer.getArithmeticMeanRoutes() - statsApproxContainer.getStdDevRoutes();
-				this.history[INDEX_SIGMALOWERPOSPAX][index] = statsApproxContainer.getArithmeticMeanPax() - statsApproxContainer.getStdDevPax();
-				this.history[INDEX_SIGMALOWERPOSVEH][index] = statsApproxContainer.getArithmeticMeanVeh() - statsApproxContainer.getStdDevVeh();
+				this.history[INDEX.INDEX_MEANPOSOPERATORS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanOperatorsInBusiness.ordinal());
+				this.history[INDEX.INDEX_MEANPOSROUTES.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanRouteOfInBusiness.ordinal());
+				this.history[INDEX.INDEX_MEANPOSPAX.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanPaxServedByInBusiness.ordinal());
+				this.history[INDEX.INDEX_MEANPOSVEH.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanVehicleOfInBusiness.ordinal());
+
+				this.history[INDEX.INDEX_SIGMAUPPERPOSOPERATORS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanOperatorsInBusiness.ordinal()) + pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDOperatorsInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMAUPPERPOSROUTES.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanRouteOfInBusiness.ordinal()) + pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDRouteOfInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMAUPPERPOSPAX.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanPaxServedByInBusiness.ordinal()) + pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDPaxServedByInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMAUPPERPOSVEH.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanVehicleOfInBusiness.ordinal()) + pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDVehicleOfInBusiness.ordinal());
+
+				this.history[INDEX.INDEX_SIGMALOWERPOSOPERATORS.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanOperatorsInBusiness.ordinal()) - pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDOperatorsInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMALOWERPOSROUTES.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanRouteOfInBusiness.ordinal()) - pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDRouteOfInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMALOWERPOSPAX.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanPaxServedByInBusiness.ordinal()) - pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDPaxServedByInBusiness.ordinal());
+				this.history[INDEX.INDEX_SIGMALOWERPOSVEH.ordinal()][index] = pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedMeanVehicleOfInBusiness.ordinal()) - pStats.getData(PStatsOverviewDataContainer.FIELDS.estimatedSDVehicleOfInBusiness.ordinal());
 
 				if ((event.getIteration() % this.pConfig.getWriteStatsInterval() == 0) ) {
 					if (event.getIteration() != this.minIteration) {
@@ -251,71 +338,42 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						for (int i = 0; i <= index; i++) {
 							iterations[i] = i + this.minIteration;
 						}
-						double[] values = new double[index + 1];
 
-						System.arraycopy(this.history[INDEX_NOPERATORS], 0, values, 0, index + 1);
-						size.addSeries("N operators", iterations, values);
-						System.arraycopy(this.history[INDEX_NOPERATORSPOS], 0, values, 0, index + 1);
-						size.addSeries("N pos operators", iterations, values);
-						System.arraycopy(this.history[INDEX_NROUTES], 0, values, 0, index + 1);
-						size.addSeries("N routes", iterations, values);
-						System.arraycopy(this.history[INDEX_NROUTESPOS], 0, values, 0, index + 1);
-						size.addSeries("N pos routes", iterations, values);
-						System.arraycopy(this.history[INDEX_NVEH], 0, values, 0, index + 1);
-						size.addSeries("N veh", iterations, values);
-						System.arraycopy(this.history[INDEX_NVEHPOS], 0, values, 0, index + 1);
-						size.addSeries("N pos veh", iterations, values);
-
-						System.arraycopy(this.history[INDEX_NBUDGET], 0, values, 0, index + 1);
-						scores.addSeries("budget per operator", iterations, values);
-						System.arraycopy(this.history[INDEX_NBUDGETPOS], 0, values, 0, index + 1);
-						scores.addSeries("pos budget per pos operator", iterations, values);
-						System.arraycopy(this.history[INDEX_NSCORE], 0, values, 0, index + 1);
-						scores.addSeries("score per route", iterations, values);
-						System.arraycopy(this.history[INDEX_NSCOREPOS], 0, values, 0, index + 1);
-						scores.addSeries("pos score per pos route", iterations, values);
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NOPERATORS.ordinal());
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NOPERATORSPOS.ordinal());
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NROUTES.ordinal());
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NROUTESPOS.ordinal());
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NVEH.ordinal());
+						addSeriesToPlot(index, size, iterations, INDEX.INDEX_NVEHPOS.ordinal());
 						
-						System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
-						passengers.addSeries("N pax", iterations, values);
-						System.arraycopy(this.history[INDEX_NPAXPOS], 0, values, 0, index + 1);
-						passengers.addSeries("N pos pax", iterations, values);	
+						addSeriesToPlot(index, scores, iterations, INDEX.INDEX_NBUDGET.ordinal());
+						addSeriesToPlot(index, scores, iterations, INDEX.INDEX_NBUDGETPOS.ordinal());
+						addSeriesToPlot(index, scores, iterations, INDEX.INDEX_NSCORE.ordinal());
+						addSeriesToPlot(index, scores, iterations, INDEX.INDEX_NSCOREPOS.ordinal());
 
-						System.arraycopy(this.history[INDEX_SHAREPOSOPERATORS], 0, values, 0, index + 1);
-						shares.addSeries("share pos operators", iterations, values);
-						System.arraycopy(this.history[INDEX_SHAREPOSROUTES], 0, values, 0, index + 1);
-						shares.addSeries("share pos routes", iterations, values);
-						System.arraycopy(this.history[INDEX_SHAREPOSPAX], 0, values, 0, index + 1);
-						shares.addSeries("share pos pax", iterations, values);
-						System.arraycopy(this.history[INDEX_SHAREPOSVEH], 0, values, 0, index + 1);
-						shares.addSeries("share pos veh", iterations, values);
-
-						System.arraycopy(this.history[INDEX_MEANPOSOPERATORS], 0, values, 0, index + 1);
-						relaxOperator.addSeries("average number of pos operators", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSOPERATORS], 0, values, 0, index + 1);
-						relaxOperator.addSeries("average number of pos operators + 1 sigma", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMALOWERPOSOPERATORS], 0, values, 0, index + 1);
-						relaxOperator.addSeries("average number of pos operators - 1 sigma", iterations, values);
+						addSeriesToPlot(index, passengers, iterations, INDEX.INDEX_NPAX.ordinal());
+						addSeriesToPlot(index, passengers, iterations, INDEX.INDEX_NPAXPOS.ordinal());
 						
-						System.arraycopy(this.history[INDEX_MEANPOSROUTES], 0, values, 0, index + 1);
-						relaxRoutes.addSeries("average number of pos routes", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSROUTES], 0, values, 0, index + 1);
-						relaxRoutes.addSeries("average number of pos routes + 1 sigma", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMALOWERPOSROUTES], 0, values, 0, index + 1);
-						relaxRoutes.addSeries("average number of pos routes - 1 sigma", iterations, values);
+						addSeriesToPlot(index, shares, iterations, INDEX.INDEX_SHAREPOSOPERATORS.ordinal());
+						addSeriesToPlot(index, shares, iterations, INDEX.INDEX_SHAREPOSROUTES.ordinal());
+						addSeriesToPlot(index, shares, iterations, INDEX.INDEX_SHAREPOSPAX.ordinal());
+						addSeriesToPlot(index, shares, iterations, INDEX.INDEX_SHAREPOSVEH.ordinal());
+						
+						addSeriesToPlot(index, relaxOperator, iterations, INDEX.INDEX_MEANPOSOPERATORS.ordinal());
+						addSeriesToPlot(index, relaxOperator, iterations, INDEX.INDEX_SIGMAUPPERPOSOPERATORS.ordinal());
+						addSeriesToPlot(index, relaxOperator, iterations, INDEX.INDEX_SIGMALOWERPOSOPERATORS.ordinal());
 
-						System.arraycopy(this.history[INDEX_MEANPOSPAX], 0, values, 0, index + 1);
-						relaxPax.addSeries("average number of pos pax", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSPAX], 0, values, 0, index + 1);
-						relaxPax.addSeries("average number of pos pax + 1 sigma", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMALOWERPOSPAX], 0, values, 0, index + 1);
-						relaxPax.addSeries("average number of pos pax - 1 sigma", iterations, values);
+						addSeriesToPlot(index, relaxRoutes, iterations, INDEX.INDEX_MEANPOSROUTES.ordinal());
+						addSeriesToPlot(index, relaxRoutes, iterations, INDEX.INDEX_SIGMAUPPERPOSROUTES.ordinal());
+						addSeriesToPlot(index, relaxRoutes, iterations, INDEX.INDEX_SIGMALOWERPOSROUTES.ordinal());
+						
+						addSeriesToPlot(index, relaxPax, iterations, INDEX.INDEX_MEANPOSPAX.ordinal());
+						addSeriesToPlot(index, relaxPax, iterations, INDEX.INDEX_SIGMAUPPERPOSPAX.ordinal());
+						addSeriesToPlot(index, relaxPax, iterations, INDEX.INDEX_SIGMALOWERPOSPAX.ordinal());
 
-						System.arraycopy(this.history[INDEX_MEANPOSVEH], 0, values, 0, index + 1);
-						relaxVeh.addSeries("average number of pos veh", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSVEH], 0, values, 0, index + 1);
-						relaxVeh.addSeries("average number of pos veh + 1 sigma", iterations, values);
-						System.arraycopy(this.history[INDEX_SIGMALOWERPOSVEH], 0, values, 0, index + 1);
-						relaxVeh.addSeries("average number of pos veh - 1 sigma", iterations, values);
+						addSeriesToPlot(index, relaxVeh, iterations, INDEX.INDEX_MEANPOSVEH.ordinal());
+						addSeriesToPlot(index, relaxVeh, iterations, INDEX.INDEX_SIGMAUPPERPOSVEH.ordinal());
+						addSeriesToPlot(index, relaxVeh, iterations, INDEX.INDEX_SIGMALOWERPOSVEH.ordinal());
 
 						size.addMatsimLogo();
 						scores.addMatsimLogo();
@@ -342,6 +400,12 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 				}
 			}
 		}
+	}
+
+	private void addSeriesToPlot(int index, XYLineChart xyLineChart, double[] iterations, int series) {
+		double[] values = new double[index + 1];
+		System.arraycopy(this.history[series], 0, values, 0, index + 1);
+		xyLineChart.addSeries(INDEX.values()[series].enName, iterations, values);
 	}
 
 	@Override
