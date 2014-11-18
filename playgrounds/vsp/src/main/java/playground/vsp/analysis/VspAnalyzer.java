@@ -31,12 +31,11 @@ import org.matsim.core.gbl.Gbl;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
- * @author droeder
+ * @author aneumann, droeder
  *
  */
 public class VspAnalyzer {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(VspAnalyzer.class);
 	private String outdir;
 	private LinkedList<AbstractAnalyisModule> modules;
@@ -104,8 +103,12 @@ public class VspAnalyzer {
 	private void preProcess() {
 		log.info("preprocessing all modules...");
 		for(AbstractAnalyisModule module: this.modules){
-			log.info("preprocessing " + module.getName());
-			module.preProcessData();
+			try {
+				log.info("preprocessing " + module.getName());
+				module.preProcessData();
+			} catch (Exception e) {
+				log.error("Preprocessing of module " + module.getName() + " failed.");
+			}
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("preprocessing finished...");
@@ -146,14 +149,13 @@ public class VspAnalyzer {
 	 */
 	private void writeResults() {
 		log.info("writing data for all modules...");
-		String outdir;
 		for(AbstractAnalyisModule module: this.modules){
-			outdir = this.outdir + "/" + module.getName() + "/";
-			log.info("writing output for " + module.getName() + " to " + outdir);
-			if(!new File(outdir).exists()){
-				new File(outdir).mkdirs();
+			String outputDir = this.outdir + "/" + module.getName() + "/";
+			log.info("writing output for " + module.getName() + " to " + outputDir);
+			if(!new File(outputDir).exists()){
+				new File(outputDir).mkdirs();
 			}
-			module.writeResults(outdir);
+			module.writeResults(outputDir);
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("writing finished...");
@@ -162,21 +164,29 @@ public class VspAnalyzer {
 	private void combinedPostProcessAndWriteResults() {
 		log.info("combinedPostProcessAndWriteResults for all modules...");
 		
-		String outdir;
 		while (!this.modules.isEmpty()) {
 			AbstractAnalyisModule module = this.modules.removeFirst();
 			
-			log.info("postprocessing " + module.getName());
-			module.postProcessData();
+			try {
+				log.info("postprocessing " + module.getName());
+				module.postProcessData();
+				
+			} catch (Exception e) {
+				log.error("Postprocessing of module " + module.getName() + " failed.");
+			}
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 //			log.info("post-processing finished...");
 			
-			outdir = this.outdir + "/" + module.getName() + "/";
-			log.info("writing output for " + module.getName() + " to " + outdir);
-			if(!new File(outdir).exists()){
-				new File(outdir).mkdirs();
+			try {	
+				String outputDir = this.outdir + "/" + module.getName() + "/";
+				log.info("writing output for " + module.getName() + " to " + outputDir);
+				if(!new File(outputDir).exists()){
+					new File(outputDir).mkdirs();
+				}
+				module.writeResults(outputDir);
+			} catch (Exception e) {
+				log.error("Writing the output of module " + module.getName() + " failed.");
 			}
-			module.writeResults(outdir);
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}
 		log.info("combinedPostProcessAndWriteResults for all modules finished...");
