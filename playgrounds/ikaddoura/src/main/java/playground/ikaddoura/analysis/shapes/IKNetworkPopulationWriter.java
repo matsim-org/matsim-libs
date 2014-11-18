@@ -21,12 +21,10 @@
 package playground.ikaddoura.analysis.shapes;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,13 +37,12 @@ import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author dhosse, ikaddoura
@@ -56,7 +53,6 @@ public class IKNetworkPopulationWriter {
 	private final static Logger log = Logger.getLogger(IKNetworkPopulationWriter.class);
 
 	private Scenario scenario;
-	private SimpleFeatureBuilder builder;
 	
 //	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
 //	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
@@ -93,39 +89,26 @@ public class IKNetworkPopulationWriter {
 		
 		new PopulationReaderMatsimV5(scenario).readFile(populationFile);
 		
-		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
-		tbuilder.setName("shape");
-		tbuilder.add("geometry", Point.class);
-		tbuilder.add("actType", String.class);
-		tbuilder.add("personId", String.class);
-		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+		.setName("Activity")
+		.addAttribute("Type", String.class)
+		.addAttribute("Person Id", String.class)
+		.create();
 		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		GeometryFactory gf = new GeometryFactory();
-
-		int i = 0;
-		
-		for(Person p : scenario.getPopulation().getPersons().values()){
+		for (Person p : scenario.getPopulation().getPersons().values()){
 			
-			for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
 
-				if(pe instanceof Activity){
+				if (pe instanceof Activity){
 					
-					Activity act = (Activity)pe;
-					SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
-						gf.createPoint(MGC.coord2Coordinate(act.getCoord())),
-						act.getType(),
-						p.getId()						
-					});
-					i++;
+					Activity act = (Activity) pe;
+					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(act.getCoord()), new Object[] {act.getType(), p.getId().toString()}, null);
 					features.add(feature);
-					
 				}
-				
 			}
-			
 		}
 		
 		log.info("Writing out activity points shapefile... ");
@@ -138,35 +121,28 @@ public class IKNetworkPopulationWriter {
 		if (this.scenario.getNetwork().getLinks().size() == 0) {
 			new NetworkReaderMatsimV1(scenario).parse(this.networkFile);
 		}
-				
-		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
-		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		tbuilder.setName("shape");
-		tbuilder.add("geometry", LineString.class);
-		tbuilder.add("id", String.class);
-		tbuilder.add("length", Double.class);
-		tbuilder.add("capacity", Double.class);
-		tbuilder.add("freespeed", Double.class);
-		tbuilder.add("modes", String.class);
 		
-		builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
+		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+		.setName("Link")
+		.addAttribute("Id", String.class)
+		.addAttribute("Length", Double.class)
+		.addAttribute("capacity", Double.class)
+		.addAttribute("lanes", Double.class)
+		.addAttribute("Freespeed", Double.class)
+		.addAttribute("Modes", String.class)
+		.create();
 		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		
-		GeometryFactory gf = new GeometryFactory();
-		
-		for(Link link : scenario.getNetwork().getLinks().values()){
-			SimpleFeature feature = builder.buildFeature(link.getId().toString(), new Object[]{
-					gf.createLineString(new Coordinate[]{
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+						
+		for (Link link : scenario.getNetwork().getLinks().values()){
+			SimpleFeature feature = factory.createPolyline(
+					new Coordinate[]{
 							new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
 							new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord()))
-					}),
-					link.getId(),
-					link.getLength(),
-					link.getCapacity(),
-					link.getFreespeed(),
-					link.getAllowedModes().toString()
-			});
+					}, new Object[] {link.getId(), link.getLength(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(), link.getAllowedModes()
+					}, null
+			);
 			features.add(feature);
 		}
 		
