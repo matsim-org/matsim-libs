@@ -16,6 +16,10 @@ public class Constants {
 	public static final double FRICTION_PROBABILITY = 0.7;
 
 	public static final double CELL_SIZE = matsimConnector.utility.Constants.CA_CELL_SIDE;
+
+	public static final int SHADOWS_LIFE = 1;
+
+	public static final double SHADOWS_PROBABILITY = 0.5;
 	
 	//Constants for Pedestrian Model
 	public static Double KS = 6.0;

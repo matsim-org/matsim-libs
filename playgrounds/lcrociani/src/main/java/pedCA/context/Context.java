@@ -1,7 +1,9 @@
 package pedCA.context;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import matsimConnector.environment.TransitionArea;
 import pedCA.agents.Population;
 import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.grid.FloorFieldsGrid;
@@ -10,7 +12,7 @@ import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.environment.network.CANetwork;
 
 public class Context {
-	private PedestrianGrid pedestrianGrid;
+	private ArrayList<PedestrianGrid> pedestrianGrids;
 	private EnvironmentGrid environmentGrid;
 	private FloorFieldsGrid floorFieldsGrid;
 	private MarkerConfiguration markerConfiguration;
@@ -31,7 +33,8 @@ public class Context {
 		this.environmentGrid = environmentGrid;
 		this.markerConfiguration = markerConfiguration;
 		floorFieldsGrid = new FloorFieldsGrid(environmentGrid, markerConfiguration);
-		pedestrianGrid = new PedestrianGrid(environmentGrid.getRows(), environmentGrid.getColumns());
+		pedestrianGrids = new ArrayList<PedestrianGrid>();
+		pedestrianGrids.add(new PedestrianGrid(environmentGrid.getRows(), environmentGrid.getColumns()));
 	}
 	
 	public void saveConfiguration(String path) throws IOException{
@@ -48,8 +51,17 @@ public class Context {
 		return floorFieldsGrid;
 	}
 
+	public ArrayList<PedestrianGrid> getPedestrianGrids() {
+		return pedestrianGrids;
+	}
+
 	public PedestrianGrid getPedestrianGrid(){
-		return pedestrianGrid;
+		return pedestrianGrids.get(0);
+	}
+	
+	//FOR MATSIM CONNECTOR
+	public void registerTransitionArea(TransitionArea transitionArea){
+		pedestrianGrids.add(transitionArea);
 	}
 	
 	public Population getPopulation(){

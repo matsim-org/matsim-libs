@@ -9,18 +9,14 @@ import pedCA.environment.grid.Neighbourhood;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.grid.WeightedCell;
 import pedCA.environment.markers.Destination;
+import pedCA.utility.DirectionUtility.Heading;
 import pedCA.utility.Constants;
 import pedCA.utility.Lottery;
 
-enum Heading{
-	N, NE, NO, S, SE, SO, E, O, X
-}
-
-public class Agent{
+public class Agent extends PhysicalObject{
 	
 	private final int Id;
 	private final Context context;
-	private GridPoint position;
 	private GridPoint nextpos; 
 	private Double speed;
 	private Heading heading;
@@ -102,14 +98,14 @@ public class Agent{
 	}
 	
 	public void move(){
-		if(!position.equals(nextpos)){
+		if(!position.equals(nextpos))
 			getPedestrianGrid().moveTo(this, nextpos);
-			//Log.log("MOVED FROM "+position.toString()+" TO "+nextpos.toString());
-			setPosition(nextpos);
-		}
+		//Log.log("MOVED FROM "+position.toString()+" TO "+nextpos.toString());
+		setPosition(nextpos);
 	}
 
 	protected void setPosition(GridPoint position) {
+		
 		this.position = position;
 	}
 	
@@ -165,10 +161,6 @@ public class Agent{
 	
 	public Context getContext(){
 		return context;
-	}
-	
-	public GridPoint getPosition(){
-		return position;
 	}
 	
 	public GridPoint getNewPosition(){

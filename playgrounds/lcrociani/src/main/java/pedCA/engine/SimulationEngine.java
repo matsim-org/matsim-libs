@@ -12,6 +12,7 @@ public class SimulationEngine {
 	private AgentsUpdater agentUpdater;
 	private ConflictSolver conflictSolver;
 	private AgentMover agentMover;
+	private GridsUpdater gridsUpdater;
 	
 	public SimulationEngine(int finalStep, Context context){
 		step = 1;
@@ -20,6 +21,7 @@ public class SimulationEngine {
 		agentUpdater = new AgentsUpdater(context.getPopulation());
 		conflictSolver = new ConflictSolver(context);
 		agentMover = new AgentMover(context);
+		gridsUpdater = new GridsUpdater(context);
 	}
 	
 	public SimulationEngine(int finalStep, String path) throws IOException{
@@ -34,7 +36,8 @@ public class SimulationEngine {
 		agentGenerator.step();
 		agentUpdater.step();
 		conflictSolver.step();
-		agentMover.step();			
+		agentMover.step();		
+		gridsUpdater.step();
 		step++;
 	}
 	
@@ -44,7 +47,8 @@ public class SimulationEngine {
 		Log.log("STEP at: "+time);
 		agentUpdater.step();
 		conflictSolver.step();
-		agentMover.step(time);			
+		agentMover.step(time);		
+		gridsUpdater.step();
 		step++;
 	}
 	

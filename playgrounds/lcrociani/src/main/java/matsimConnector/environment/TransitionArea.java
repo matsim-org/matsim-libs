@@ -92,8 +92,7 @@ public class TransitionArea extends PedestrianGrid {
 		positionsForGeneration = new ArrayList<GridPoint>();
 		for (int i=0;i<cells.size();i++)
 			for (int j=0;j<cells.get(i).size()-1;j++)
-				if (get(i,j).size()==0)
-					positionsForGeneration.add(new GridPoint(j,i));
+				positionsForGeneration.add(new GridPoint(j,i));
 		return positionsForGeneration;
 	}
 

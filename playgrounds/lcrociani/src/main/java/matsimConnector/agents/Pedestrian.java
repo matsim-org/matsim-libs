@@ -13,7 +13,6 @@ import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.Neighbourhood;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.TacticalDestination;
-import pedCA.output.Log;
 
 public class Pedestrian extends Agent {
 
@@ -59,11 +58,10 @@ public class Pedestrian extends Agent {
 
 	public void move(double now){
 		if (transitionArea!=null){
-			if(!getPosition().equals(getNewPosition())){
+			if(!getPosition().equals(getNewPosition()))
 				transitionArea.moveTo(this, getNewPosition());
-				Log.log("MOVED FROM "+getPosition().toString()+" TO "+getNewPosition().toString()+" INSIDE TRANSITION AREA");
-				setPosition(getNewPosition());
-			}
+			//Log.log("MOVED FROM "+getPosition().toString()+" TO "+getNewPosition().toString()+" INSIDE TRANSITION AREA");
+			setPosition(getNewPosition());
 		}else {
 			if (finalDestinationReached && !getNewPosition().equals(getPosition()))
 				lastTimeCheckAtExit = now;

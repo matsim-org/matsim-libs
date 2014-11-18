@@ -15,7 +15,7 @@ public class TestLottery {
 	
 	@Test
 	public void testLotteryMultiple(){
-		int nTests = 1000;
+		int nTests = 100;
 		for (int i=0;i<nTests;i++)
 			testLottery();
 	}
@@ -25,7 +25,7 @@ public class TestLottery {
 		ArrayList<WeightedCell> pValues = randomDistribution(5);
 		//System.out.println(pValues);
 		
-		int extractions = 1000;
+		int extractions = 10000;
 		Couple average = average(pValues);		
 		Couple sum=new Couple(0.,0.);
 		for (int i=0;i<extractions;i++){
@@ -35,7 +35,7 @@ public class TestLottery {
 		}
 		sum.x/=extractions;
 		sum.y/=extractions;
-		System.out.println(sum + "  " + average);
+		//System.out.println(sum + "  " + average);
 		boolean test=verifyEquality(sum,average);		
 		assertEquals(test,true);
 	}
