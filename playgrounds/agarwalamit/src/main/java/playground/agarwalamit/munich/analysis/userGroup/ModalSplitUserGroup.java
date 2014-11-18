@@ -39,7 +39,7 @@ public class ModalSplitUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, double[]>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,double[]>>();
 	
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run6/";/*"./output/run2/";*/
+		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
 		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
 		for(String runCase :runCases){
 		ModalSplitUserGroup msUG = new ModalSplitUserGroup();

@@ -60,7 +60,7 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";/*"./output/run2/";*/
+		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
 		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);

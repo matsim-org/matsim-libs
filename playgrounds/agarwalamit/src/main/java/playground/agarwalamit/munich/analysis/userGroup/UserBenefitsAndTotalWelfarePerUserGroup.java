@@ -70,10 +70,10 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private int lastIteration;
 	private boolean considerAllPersonsInSumOfTolls;
 
-	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
+	private final WelfareMeasure wm = WelfareMeasure.LOGSUM;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
