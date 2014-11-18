@@ -30,6 +30,11 @@ import playground.michalm.taxi.TaxiRequestCreator;
 
 class KaiTaxiLauncher
 {
+    /**
+     * @param file path to the configuration file (e.g. param.in)
+     * @param removeNonPassengers if {@code true}, only taxi traffic is simulated
+     * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0 
+     */
     public static void run(String file, boolean removeNonPassengers, boolean endActivitiesAtTimeZero)
     {
         TaxiLauncher launcher = new TaxiLauncher(TaxiLauncherParams.readParams(file));
