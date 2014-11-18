@@ -48,9 +48,11 @@ public class PopGenerator {
 	
 	public static void main(String[] args) {
 		
-		String outputDir = "F:/temp/";
-		String networkFilename = outputDir + "network_corridor.xml";
-		int nPersonsPerHour = 1000;
+		String outputDir = "E:/temp/";
+		String networkFilename = outputDir + "network_tut.xml";
+		int nPersonsPerHour = 72;
+		
+		PopGenerator.createPopTut(networkFilename, nPersonsPerHour, outputDir + "pop_tut.xml.gz");
 		
 //		PopGenerator.createPopT1(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_1.xml.gz");
 //		PopGenerator.createPopT2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_2.xml.gz");
@@ -66,10 +68,50 @@ public class PopGenerator {
 //		nPersonsPerHour = 1000;
 //		PopGenerator.createPopCross(networkFilename, nPersonsPerHour, outputDir + "pop_cross.xml.gz");
 		
-		networkFilename = outputDir + "network_corridor.xml";
-		nPersonsPerHour = 1000;
-		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000.xml.gz", 7, 9);
-		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000_short.xml.gz", 7, 8);
+//		networkFilename = outputDir + "network_corridor.xml";
+//		nPersonsPerHour = 1000;
+//		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000.xml.gz", 7, 9);
+//		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000_short.xml.gz", 7, 8);
+	}
+	
+	private static void createPopTut(String networkFilename, int nPersonsPerHour, String outFilename) {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc).readFile(networkFilename);
+		Population pop = sc.getPopulation();
+		
+		MatsimRandom.reset(4711);
+		Random rnd = MatsimRandom.getLocalInstance();
+		
+		Coord nodeACoord = sc.getNetwork().getNodes().get(Id.create("14", Node.class)).getCoord();
+		Coord nodeBCoord = sc.getNetwork().getNodes().get(Id.create("44", Node.class)).getCoord();
+		Coord nodeCCoord = sc.getNetwork().getNodes().get(Id.create("11", Node.class)).getCoord();
+		Coord nodeDCoord = sc.getNetwork().getNodes().get(Id.create("41", Node.class)).getCoord();
+		
+		// create trips from node A to node B and trips from node B to node A, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeACoord, nodeBCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeBCoord, nodeACoord, 6, 10);
+		
+		// create trips from node A to node C and trips from node C to node A, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeACoord, nodeCCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeCCoord, nodeACoord, 6, 10);
+		
+		// create trips from node A to node D and trips from node D to node A, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeACoord, nodeDCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeDCoord, nodeACoord, 6, 10);
+		
+		// create trips from node B to node C and trips from node C to node B, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeBCoord, nodeCCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeCCoord, nodeBCoord, 6, 10);
+
+		// create trips from node B to node D and trips from node D to node B, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeBCoord, nodeDCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeDCoord, nodeBCoord, 6, 10);
+		
+		// create trips from node C to node D and trips from node D to node C, 6-10
+		createPersons(rnd, pop, nPersonsPerHour, nodeCCoord, nodeDCoord, 6, 10);
+		createPersons(rnd, pop, nPersonsPerHour, nodeDCoord, nodeCCoord, 6, 10);
+		
+		new PopulationWriter(pop, null).write(outFilename);		
 	}
 
 	private static void createPopCross(String networkFilename, int nPersonsPerHour, String outFilename) {
