@@ -17,28 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class ConstrainedPersonTask implements ProxyPersonTask {
 
+	private final String key;
+	
+	private final String value;
+	
+	private final ProxyPersonTask delegate;
+	
+	public ConstrainedPersonTask(String key, String value, ProxyPersonTask delegate) {
+		this.key = key;
+		this.value = value;
+		this.delegate = delegate;
+	}
+	
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			}
+	public void apply(ProxyPerson person) {
+		String val = person.getAttribute(key);
+		if(value.equals(val)) {
+			delegate.apply(person);
 		}
+
 	}
 
 }

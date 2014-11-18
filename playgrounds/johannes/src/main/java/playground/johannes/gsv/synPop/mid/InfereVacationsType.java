@@ -17,28 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class InfereVacationsType implements ProxyPlanTask {
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
+	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
+		for(ProxyObject act : plan.getActivities()) {
+			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("vacations")) {
+				int days = Integer.parseInt(plan.getAttribute("journeydays"));
+				if(days > 4) {
+					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
+				} else {
+					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
+				}
 			}
 		}
+
 	}
 
 }

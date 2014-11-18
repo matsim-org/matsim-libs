@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -46,6 +48,10 @@ public class TXTReader {
 	
 	private List<LegAttributeHandler> legAttHandlers = new ArrayList<LegAttributeHandler>();
 	
+	private List<LegAttributeHandler> journeyAttHandlers = new ArrayList<>();
+	
+	private List<PlanAttributeHandler> planAttHandlers = new ArrayList<>();
+	
 	private Map<String, ProxyPerson> persons;
 	
 
@@ -57,11 +63,19 @@ public class TXTReader {
 		legAttHandlers.add(handler);
 	}
 
+	public void addJourneyAttributeHandler(LegAttributeHandler handler) {
+		journeyAttHandlers.add(handler);
+	}
+	
+	public void addPlanAttributeHandler(PlanAttributeHandler handler) {
+		planAttHandlers.add(handler);
+	}
+	
 	public void setSeparator(String separator) {
 		this.separator = separator;
 	}
 	
-	public Map<String, ProxyPerson> read(String personFile, String legFile) throws IOException {
+	public Map<String, ProxyPerson> read(String personFile, String legFile, String journeyFile) throws IOException {
 		persons = new LinkedHashMap<String, ProxyPerson>(65000);
 		/*
 		 * read and create persons
@@ -71,12 +85,18 @@ public class TXTReader {
 		 * add an empty plan to each person
 		 */
 		for(ProxyPerson person : persons.values()) {
-			person.setPlan(new ProxyPlan());
+			ProxyPlan plan = new ProxyPlan();
+			plan.setAttribute("datasource", "midtrips");
+			person.setPlan(plan);
 		}
 		/*
 		 * read and create legs
 		 */
 		new LegRowHandler().read(legFile);
+		/*
+		 * read and create journeys
+		 */
+		new JourneyRowHandler().read(journeyFile);
 		
 		return persons;
 	}
@@ -117,6 +137,31 @@ public class TXTReader {
 			}
 		
 			persons.put(person.getId(), person);
+		}
+		
+	}
+	
+	private class JourneyRowHandler extends RowHandler {
+
+		@Override
+		protected void handleRow(Map<String, String> attributes) {
+			String id = personIdBuilder(attributes);
+			ProxyPerson person = persons.get(id);
+			
+			ProxyPlan plan = new ProxyPlan();
+			plan.setAttribute("datasource", "midjourneys");
+			for(PlanAttributeHandler handler : planAttHandlers) {
+				handler.hanle(plan, attributes);
+			}
+			
+			person.addPlan(plan);
+			
+			ProxyObject leg = new ProxyObject();
+			plan.addLeg(leg);
+			leg.setAttribute(CommonKeys.LEG_ORIGIN, ActivityType.HOME);
+			for(LegAttributeHandler handler : journeyAttHandlers) {
+				handler.handle(leg, attributes);
+			}
 		}
 		
 	}

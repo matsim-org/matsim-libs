@@ -17,27 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import java.util.Map;
+
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class JourneyModeHandler implements LegAttributeHandler {
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			}
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
+		String mode = attributes.get("hvm_r");
+		
+		if(mode.equalsIgnoreCase("Auto")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_CAR);
+		} else if(mode.equalsIgnoreCase("Bahn")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+		} else if(mode.equalsIgnoreCase("Reisebus")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+		} else if(mode.equalsIgnoreCase("Flugzeug")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+		} else if(mode.equalsIgnoreCase("Schiff")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+		} else if(mode.equalsIgnoreCase("Schiff")) {
+			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PT);
+		} else {
+			leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
 		}
 	}
 

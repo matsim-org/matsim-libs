@@ -64,7 +64,7 @@ public class ProxyTaskRunner {
 			ProgressLogger.termiante();
 	}
 	
-	public static Set<ProxyPerson> runAndDelete(ProxyPersonTask task, Collection<ProxyPerson> persons) {
+	public static Set<ProxyPerson> runAndDeletePerson(ProxyPersonTask task, Collection<ProxyPerson> persons) {
 		Set<ProxyPerson> newPersons = new HashSet<ProxyPerson>(persons.size());
 		
 		run(task, persons);
@@ -78,7 +78,7 @@ public class ProxyTaskRunner {
 		return newPersons;
 	}
 	
-	public static void runAndDelete(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+	public static void runAndDeletePerson(ProxyPlanTask task, Collection<ProxyPerson> persons) {
 		run(task, persons);
 		
 		for(ProxyPerson person : persons) {

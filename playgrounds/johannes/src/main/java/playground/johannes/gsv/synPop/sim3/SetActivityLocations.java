@@ -34,6 +34,7 @@ import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -75,6 +76,9 @@ public class SetActivityLocations {
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
+		logger.info("Replacing activity types...");
+		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
+		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
@@ -83,22 +87,10 @@ public class SetActivityLocations {
 		logger.info("Registering data loaders...");
 		DataPool dataPool = new DataPool();
 		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-		// dataPool.register(new
-		// LandUseDataLoader(config.getModule(MODULE_NAME)),
-		// LandUseDataLoader.KEY);
-		logger.info("Done.");
-
-		// logger.info("Validation data...");
-		// FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);
-		// FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 1);
-		// logger.info("Done.");
 		/*
 		 * Assign random facilities to acts
 		 */
 		logger.info("Initializing activities...");
-		// ProxyTaskRunner.run(new InitActivitLocations(dataPool), persons);
-		// ProxyTaskRunner.run(new InitHomeBasedActLocations(dataPool, random),
-		// persons);
 		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		ConcurrentProxyTaskRunner.run(new InitHomeBasedActLocsFactory(dataPool, random), persons, numThreads);
 

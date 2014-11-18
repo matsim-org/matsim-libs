@@ -17,28 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import java.util.Map;
+
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class JourneyDestinationHandler implements LegAttributeHandler {
 
+	public static final String DESTINATION = "destination";
+	
+	public static final String GERMANY = "de";
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
+	 */
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
+		String dest = attributes.get("p1012");
 			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			}
+		if("innerhalb Deutschlands".equals(dest)) {
+			leg.setAttribute(DESTINATION, GERMANY);
 		}
+
 	}
 
 }

@@ -17,27 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import java.util.Map;
+
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class JourneyPurposeHandler implements LegAttributeHandler {
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			}
+	public void handle(ProxyObject leg, Map<String, String> attributes) {
+		String purpose = attributes.get("p101");
+		
+		if(purpose.equalsIgnoreCase("Ausflug, Urlaub, Kurzreise zu touristischen Zielen")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
+		} else if(purpose.equalsIgnoreCase("Besuche von Freunden oder Bekannten")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
+		} else if(purpose.equalsIgnoreCase("andere Privatreise")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
+		} else if(purpose.equalsIgnoreCase("Dienst- oder Geschäftsreise")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUISINESS);
+		} else if(purpose.equalsIgnoreCase("Fahrt als Berufspendler | Wochenendpendler")) {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, "wecommuter");
+		} else {
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.MISC);
 		}
 	}
 

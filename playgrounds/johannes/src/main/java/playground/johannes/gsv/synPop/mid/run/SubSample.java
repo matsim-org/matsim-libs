@@ -63,7 +63,7 @@ public class SubSample {
 		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
 		tasks.addComponent(new DeleteRandom(1-proba));
 		
-		Collection<ProxyPerson> subset = ProxyTaskRunner.runAndDelete(tasks, parser.getPersons());
+		Collection<ProxyPerson> subset = ProxyTaskRunner.runAndDeletePerson(tasks, parser.getPersons());
 		logger.info(String.format("New population: %s persons.", subset.size()));
 		
 		logger.info("Writing population...");

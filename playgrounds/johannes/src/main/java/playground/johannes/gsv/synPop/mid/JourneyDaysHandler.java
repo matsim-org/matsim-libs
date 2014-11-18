@@ -17,28 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import java.util.Map;
+
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
  *
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class JourneyDaysHandler implements PlanAttributeHandler {
 
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.gsv.synPop.ProxyPlan, java.util.Map)
+	 */
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			}
-		}
+	public void hanle(ProxyPlan plan, Map<String, String> attributes) {
+		int nights = Integer.parseInt(attributes.get("p1014"));
+		
+		plan.setAttribute("journeydays", String.valueOf(nights + 1));
 	}
 
 }

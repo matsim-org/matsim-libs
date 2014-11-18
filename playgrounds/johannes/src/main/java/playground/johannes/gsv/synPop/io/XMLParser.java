@@ -85,6 +85,15 @@ public class XMLParser extends MatsimXmlParser {
 			}
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
 			plan = new ProxyPlan();
+			for(int i = 0; i < atts.getLength(); i++) {
+				String type = atts.getLocalName(i);
+
+				if (!blacklist.contains(type)) {
+					plan.setAttribute(type, getAttribute(type, atts));
+				}
+
+			}
+			
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
 			ProxyObject act = new ProxyObject();
 			for(int i = 0; i < atts.getLength(); i++) {

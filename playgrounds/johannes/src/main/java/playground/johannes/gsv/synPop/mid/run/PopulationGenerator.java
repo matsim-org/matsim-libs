@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.ConstrainedPlanTask;
 import playground.johannes.gsv.synPop.DeleteMissingTimesTask;
 import playground.johannes.gsv.synPop.DeleteNegativeDurationTask;
 import playground.johannes.gsv.synPop.DeleteOverlappingLegsTask;
@@ -38,6 +39,16 @@ import playground.johannes.gsv.synPop.SetActivityTypeTask;
 import playground.johannes.gsv.synPop.SetFirstActivityTypeTask;
 import playground.johannes.gsv.synPop.SortLegsTimeTask;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.mid.AddReturnPlan;
+import playground.johannes.gsv.synPop.mid.ConstrainedPersonTask;
+import playground.johannes.gsv.synPop.mid.DeletePlansDestination;
+import playground.johannes.gsv.synPop.mid.InfereVacationsType;
+import playground.johannes.gsv.synPop.mid.JourneyDaysHandler;
+import playground.johannes.gsv.synPop.mid.JourneyDestinationHandler;
+import playground.johannes.gsv.synPop.mid.JourneyDistanceHandler;
+import playground.johannes.gsv.synPop.mid.JourneyModeHandler;
+import playground.johannes.gsv.synPop.mid.JourneyPlans2PersonTask;
+import playground.johannes.gsv.synPop.mid.JourneyPurposeHandler;
 import playground.johannes.gsv.synPop.mid.LegDistanceHandler;
 import playground.johannes.gsv.synPop.mid.LegEndTimeHandler;
 import playground.johannes.gsv.synPop.mid.LegMainPurposeHandler;
@@ -69,6 +80,7 @@ public class PopulationGenerator {
 		String personFile = "/home/johannes/gsv/mid2008/raw/MiD2008_PUF_Personen.txt";
 		String legFile = "/home/johannes/gsv/mid2008/raw/MiD2008_PUF_Wege.txt";
 		String outFile = "/home/johannes/gsv/mid2008/pop/pop.xml";
+		String journeyFile = "/home/johannes/gsv/mid2008/raw/MiD2008_PUF_Reisen.txt";
 		/*
 		 * setup text parser
 		 */
@@ -87,19 +99,27 @@ public class PopulationGenerator {
 		reader.addLegAttributeHandler(new LegEndTimeHandler());
 		reader.addLegAttributeHandler(new LegDistanceHandler());
 		reader.addLegAttributeHandler(new LegModeHandler());
+		
+		reader.addJourneyAttributeHandler(new JourneyDestinationHandler());
+		reader.addJourneyAttributeHandler(new JourneyDistanceHandler());
+		reader.addJourneyAttributeHandler(new JourneyModeHandler());
+		reader.addJourneyAttributeHandler(new JourneyPurposeHandler());
+		
+		reader.addPlanAttributeHandler(new JourneyDaysHandler());
 		/*
 		 * read files
 		 */
 		logger.info("Reading persons...");
-		Collection<ProxyPerson> persons = reader.read(personFile, legFile).values();
+		Collection<ProxyPerson> persons = reader.read(personFile, legFile, journeyFile).values();
 		logger.info(String.format("Read %s persons.", persons.size()));
 		/*
 		 * sort legs
 		 */
 		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
+//		ProxyPlanTaskComposite composite = new ConstrainedPlanTaskComposite("datasource", "midtrips");
 		composite.addComponent(new SortLegsTimeTask());
 		logger.info("Sorting legs...");
-		ProxyTaskRunner.run(composite, persons);
+		ProxyTaskRunner.run(new ConstrainedPlanTask("datasource", "midtrips", composite), persons);
 		/*
 		 * filter legs		
 		 */
@@ -109,7 +129,7 @@ public class PopulationGenerator {
 		pComposite.addComponent(new DeleteOverlappingLegsTask());
 		
 		logger.info(String.format("Filtering %s legs...", persons.size()));
-		persons = ProxyTaskRunner.runAndDelete(pComposite, persons);
+		persons = ProxyTaskRunner.runAndDeletePerson(new ConstrainedPersonTask("datasource", "midtrips", pComposite), persons);
 		logger.info(String.format("After filter: %s persons.", persons.size()));
 		/*
 		 * generate activities
@@ -123,13 +143,33 @@ public class PopulationGenerator {
 		composite.addComponent(new FixMissingActTimesTask());
 		
 		logger.info("Applying person tasks...");
-		ProxyTaskRunner.run(composite, persons);
+		ProxyTaskRunner.run(new ConstrainedPlanTask("datasource", "midtrips", composite), persons);
 		logger.info("Done.");
+		/*
+		 * process journeys
+		 */
+		composite = new ProxyPlanTaskComposite();
+		composite.addComponent(new InsertActivitiesTask());
+		composite.addComponent(new SetActivityTypeTask());
+		composite.addComponent(new SetFirstActivityTypeTask());
+		composite.addComponent(new InfereVacationsType());
+		ProxyTaskRunner.run(new ConstrainedPlanTask("datasource", "midjourneys", composite), persons);
+		
+		ProxyTaskRunner.run(new DeletePlansDestination(), persons);
+		
+		ProxyTaskRunner.run(new AddReturnPlan(), persons);
+		
+		JourneyPlans2PersonTask plans2persons = new JourneyPlans2PersonTask(); 
+		ProxyTaskRunner.run(plans2persons, persons);
+		for(ProxyPerson person : plans2persons.getPersons()) {
+			persons.add(person);
+		}
 		
 		logger.info("Writing persons...");
 		XMLWriter writer = new XMLWriter();
 		writer.write(outFile, persons);
 		logger.info("Done.");
+		
 	}
 
 }

@@ -17,28 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.gsv.synPop.mid;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class Convert2MatsimModes implements ProxyPlanTask {
+public class DeletePlansDestination implements ProxyPersonTask {
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
-			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
-			
-			if(mode == null) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
-			} else if(mode.equalsIgnoreCase("rail")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "pt");
-			} else if(mode.equalsIgnoreCase("plane")) {
-				leg.setAttribute(CommonKeys.LEG_MODE, "undefined");
+	public void apply(ProxyPerson person) {
+		Set<ProxyPlan> remove = new HashSet<>();
+
+		for (ProxyPlan plan : person.getPlans()) {
+			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
+				for (ProxyObject leg : plan.getLegs()) {
+					if (!JourneyDestinationHandler.GERMANY.equals(leg.getAttribute(JourneyDestinationHandler.DESTINATION))) {
+						remove.add(plan);
+					}
+				}
 			}
 		}
+
+		for (ProxyPlan plan : remove) {
+			person.getPlans().remove(plan);
+		}
+
 	}
 
 }
