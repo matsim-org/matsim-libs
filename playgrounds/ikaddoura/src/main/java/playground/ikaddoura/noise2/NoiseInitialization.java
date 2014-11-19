@@ -666,7 +666,7 @@ public class NoiseInitialization {
 	}
 	
 	// for testing purposes
-	public Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
+	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
 		return zoneTuple2listOfReceiverPointIds;
 	}
 

@@ -57,8 +57,6 @@ public class NoiseImmissionCalculation {
 	
 	private NoiseInitialization spatialInfo;
 	private NoiseParameters noiseParams;
-
-	private NoiseEquations noiseImmissionCalculator;
 		
 	// from emission handler
 	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
@@ -75,7 +73,6 @@ public class NoiseImmissionCalculation {
 	public NoiseImmissionCalculation (NoiseInitialization spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams) {
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
-		this.noiseImmissionCalculator = new NoiseEquations();
 		
 		this.linkId2timeInterval2noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
@@ -152,7 +149,7 @@ public class NoiseImmissionCalculation {
 							noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(rpId).get(timeInterval).get(linkId));
 						}
 					}	
-					double resultingNoiseImmission = noiseImmissionCalculator.calculateResultingNoiseImmission(noiseImmissions);
+					double resultingNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(noiseImmissions);
 					timeInterval2noiseImmission.put(timeInterval, resultingNoiseImmission);
 				} else {
 					// if no link has to to be considered for the calculation due to too long distances
