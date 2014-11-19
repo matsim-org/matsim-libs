@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats;
+package playground.andreas.P2.stats.operatorLogger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -59,7 +59,7 @@ import java.util.List;
  *
  * @author aneumann
  */
-final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
+public final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(POperatorLogger.class);
 	

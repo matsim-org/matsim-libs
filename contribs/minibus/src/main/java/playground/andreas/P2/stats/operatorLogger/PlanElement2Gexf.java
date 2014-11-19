@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.ana.log2something;
+package playground.andreas.P2.stats.operatorLogger;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
