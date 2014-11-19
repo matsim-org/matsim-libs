@@ -65,10 +65,6 @@ public class NoiseImmissionCalculation {
 	// optional information for a more detailed calculation of noise immissions
 	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
 	private final List<Id<Link>> noiseBarrierLinks = new ArrayList<Id<Link>>();
-	
-	// noise immissions
-//	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
-//	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Link>,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Link>,Double>>>();
 		
 	public NoiseImmissionCalculation (NoiseInitialization spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams) {
 		this.spatialInfo = spatialInfo;
