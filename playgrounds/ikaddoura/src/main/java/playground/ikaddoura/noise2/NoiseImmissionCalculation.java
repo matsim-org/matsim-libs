@@ -62,7 +62,7 @@ public class NoiseImmissionCalculation {
 	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
 	private Map<Id <Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
 	
-	// optional information for a more detailed calculation of noise immission
+	// optional information for a more detailed calculation of noise immissions
 	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
 	private final List<Id<Link>> noiseBarrierLinks = new ArrayList<Id<Link>>();
 	

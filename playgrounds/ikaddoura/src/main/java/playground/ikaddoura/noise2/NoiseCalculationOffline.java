@@ -111,21 +111,19 @@ public class NoiseCalculationOffline {
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 		
-		NoiseInitialization spatialInfo = new NoiseInitialization(scenario, noiseParameters);
-		spatialInfo.setActivityCoords();
-		
-//		spatialInfo.setReceiverPoints();
-//		spatialInfo.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
-		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
-		
-		spatialInfo.setActivityCoord2NearestReceiverPointId();
-		spatialInfo.setRelevantLinkInfo();
-		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
+		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters);
+		initialization.setActivityCoords();
+//		initialization.setReceiverPoints();
+//		initialization.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
+		initialization.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
+		initialization.setActivityCoord2NearestReceiverPointId();
+		initialization.setRelevantLinkInfo();
+		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
 
-		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, spatialInfo, noiseParameters);
+		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, initialization, noiseParameters);
 		events.addHandler(personActivityTracker);
 				
 		log.info("Reading events file...");
@@ -140,7 +138,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
-		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(spatialInfo, noiseEmissionHandler, noiseParameters);
+		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -155,7 +153,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");

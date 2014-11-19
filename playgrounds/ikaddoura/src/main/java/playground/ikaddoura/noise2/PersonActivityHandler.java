@@ -67,12 +67,12 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>> receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>>();
 	private Map<Id<ReceiverPoint>,List<Id<Person>>> receiverPointId2ListOfHomeAgents = new HashMap<Id<ReceiverPoint>, List<Id<Person>>>();
 
-	private NoiseInitialization spatialInfo;
+	private NoiseInitialization initialization;
 	
-	public PersonActivityHandler (Scenario scenario , NoiseInitialization spatialInfo, NoiseParameters noiseParams) {
+	public PersonActivityHandler (Scenario scenario , NoiseInitialization initialization, NoiseParameters noiseParams) {
 		this.scenario = scenario;
-		this.spatialInfo = spatialInfo;		
 		this.noiseParams = noiseParams;
+		this.initialization = initialization;		
 	}
 	
 	@Override
@@ -99,8 +99,8 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 				personId2actualActNumber.put(event.getPersonId(), personId2actualActNumber.get(event.getPersonId())+1);
 				int actNumber = personId2actualActNumber.get(personId);
 				double time = event.getTime();
-				Coord coord = spatialInfo.getPersonId2listOfCoords().get(personId).get(actNumber-1);
-				Id<ReceiverPoint> receiverPointId = spatialInfo.getActivityCoord2receiverPointId().get(coord);
+				Coord coord = initialization.getPersonId2listOfCoords().get(personId).get(actNumber-1);
+				Id<ReceiverPoint> receiverPointId = initialization.getActivityCoord2receiverPointId().get(coord);
 				
 				double startTime = time;
 				double endTime = 30 * 3600;
@@ -161,8 +161,8 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 				int actNumber = personId2actualActNumber.get(personId);
 				double time = event.getTime();
 	
-				Coord coord = spatialInfo.getPersonId2listOfCoords().get(personId).get(actNumber-1);
-				Id<ReceiverPoint> receiverPointId = spatialInfo.getActivityCoord2receiverPointId().get(coord);
+				Coord coord = initialization.getPersonId2listOfCoords().get(personId).get(actNumber-1);
+				Id<ReceiverPoint> receiverPointId = initialization.getActivityCoord2receiverPointId().get(coord);
 				
 				if (personId2actNumber2receiverPointId2activityStartAndActivityEnd.containsKey(personId)) {
 					// not the first activity

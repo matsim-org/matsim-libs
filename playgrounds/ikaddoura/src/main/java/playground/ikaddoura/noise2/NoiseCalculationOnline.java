@@ -40,7 +40,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	private NoiseParameters noiseParameters;
-	private NoiseInitialization spatialInfo;
+	private NoiseInitialization initialization;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
@@ -55,16 +55,16 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		log.info("Initialization...");
 		
-		this.spatialInfo = new NoiseInitialization(event.getControler().getScenario(), noiseParameters);
-		this.spatialInfo.setActivityCoords();
-		this.spatialInfo.setReceiverPoints();
-		this.spatialInfo.setActivityCoord2NearestReceiverPointId();
-		this.spatialInfo.setRelevantLinkInfo();
-		this.spatialInfo.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
+		this.initialization = new NoiseInitialization(event.getControler().getScenario(), noiseParameters);
+		this.initialization.setActivityCoords();
+		this.initialization.setReceiverPoints();
+		this.initialization.setActivityCoord2NearestReceiverPointId();
+		this.initialization.setRelevantLinkInfo();
+		this.initialization.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		
-		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.spatialInfo, noiseParameters);
+		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.initialization, noiseParameters);
 
 		log.info("Initialization... Done.");
 		
@@ -85,7 +85,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");
-		this.noiseImmission = new NoiseImmissionCalculation(this.spatialInfo, this.noiseEmissionHandler, noiseParameters);
+		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -99,7 +99,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		log.info("Calculating each agent's activity durations... Done.");
 				
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
@@ -107,76 +107,30 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
-//		log.info("Set average tolls for each link Id and time bin.");
-//		noiseImmissionHandler.setLinkId2timeBin2avgToll();
-//		noiseImmissionHandler.setLinkId2timeBin2avgTollCar();
-//		noiseImmissionHandler.setLinkId2timeBin2avgTollHdv();
-		
 		log.info("Total Caused Noise Cost: " + noiseDamageCosts.getTotalCausedNoiseCost());
 		log.info("Total Affected Noise Cost: " + noiseDamageCosts.getTotalAffectedNoiseCost());
-
-//		
-//		log.info("total toll (second approach L_den)"+(noiseImmissionHandler.getTotalTollAffectedAgentBasedCalculation()));
-//		log.info("control value: "+(noiseImmissionHandler.getTotalTollAffectedAgentBasedCalculationControl()));
-//		log.info("total toll (first approach): "+(noiseImmissionHandler.getTotalToll()));
-//		log.info("total toll affected (first approach): "+(noiseImmissionHandler.getTotalTollAffected()));
-//		
-//		log.info("Write toll stats");
-//		String filenameToll = "noise_tollstats.csv";
-//		String filenameTollCar = "noise_tollstatsCar.csv";
-//		String filenameTollHdv = "noise_tollstatsHdv.csv";
-//		noiseImmissionHandler.writeTollStats(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameToll);
-//		noiseImmissionHandler.writeTollStatsCar(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollCar);
-//		noiseImmissionHandler.writeTollStatsHdv(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollHdv);
-//		
-//		log.info("Write toll stats per hour");
-//		String filenameTollPerHour = "tollstatsPerHour.csv";
-//		String filenameTollPerHourCar = "tollstatsPerHourCar.csv";
-//		String filenameTollPerHourHdv = "tollstatsPerHourHdv.csv";
-//		noiseImmissionHandler.writeTollStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollPerHour);
-//		noiseImmissionHandler.writeTollStatsPerHourCar(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollPerHourCar);
-//		noiseImmissionHandler.writeTollStatsPerHourHdv(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollPerHourHdv);
-//		
-//		log.info("Write toll stats per activity");
-//		String filenameTollPerActivity = "tollstatsPerActivity.csv";
-//		noiseImmissionHandler.writeTollStatsPerActivity(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollPerActivity);
-//		
-//		log.info("Write toll stats for comparing home-based vs. activity-based");
-//		String filenameTollCompareHomeVsActivityBased = "tollstatsCompareHomeVsActivityBased.csv";
-//		noiseImmissionHandler.writeTollStatsCompareHomeVsActivityBased(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameTollCompareHomeVsActivityBased);
-//		
-//		log.info("Write noise emission stats");
-//		String filenameNoiseEmission = "noiseEmissionStats.csv";
-//		noiseImmissionHandler.writeNoiseEmissionStats(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameNoiseEmission);
-//		
-//		log.info("Write noise immission stats");
-//		String filenameNoiseImmission = "noiseImmissionStats.csv";
-//		
-//		noiseImmissionHandler.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameNoiseImmission);
-
 	}
 	
 	// for testing purposes
 	
-	public NoiseEmissionHandler getNoiseEmissionHandler() {
+	NoiseEmissionHandler getNoiseEmissionHandler() {
 		return noiseEmissionHandler;
 	}
 
-	public PersonActivityHandler getPersonActivityTracker() {
+	PersonActivityHandler getPersonActivityTracker() {
 		return personActivityTracker;
 	}
 
-	public NoiseImmissionCalculation getNoiseImmission() {
+	NoiseImmissionCalculation getNoiseImmission() {
 		return noiseImmission;
 	}
 
-	public NoiseDamageCalculation getNoiseDamageCosts() {
+	NoiseDamageCalculation getNoiseDamageCosts() {
 		return noiseDamageCosts;
 	}
 
-	public NoiseInitialization getSpatialInfo() {
-		return spatialInfo;
+	NoiseInitialization getSpatialInfo() {
+		return initialization;
 	}
 		
 }
