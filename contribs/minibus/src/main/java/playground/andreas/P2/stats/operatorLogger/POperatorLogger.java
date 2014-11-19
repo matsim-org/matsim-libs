@@ -142,7 +142,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 				
 				try {
 					this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + operator.getId() + "\t" + operator.getOperatorState() + "\t" + "===" + "\t" 
-							+ "TOTAL" + "\t" + operator.getNumberOfVehiclesOwned() + "\t" + (int) operatorPax + "\t" + operatorScore + "\t" + operator.getBudget() + "\t"
+							+ "TOTAL" + "\t" + "===" + "\t" + operator.getNumberOfVehiclesOwned() + "\t" + (int) operatorPax + "\t" + operatorScore + "\t" + operator.getBudget() + "\t"
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
