@@ -1,36 +1,28 @@
 package playground.nmviljoen.network;
 
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
-import java.io.BufferedReader;
+
 import java.io.BufferedWriter;
 
-import org.apache.log4j.Logger;
+
 import org.matsim.core.utils.io.IOUtils;
 import org.apache.commons.collections15.Transformer;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
-import edu.uci.ics.jung.algorithms.matrix.GraphMatrixOperations;
+
 import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyLink;
 import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyNode;
-import edu.uci.ics.jung.graph.*;
-import edu.uci.ics.jung.algorithms.util.*;
 import edu.uci.ics.jung.algorithms.scoring.BetweennessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.ClosenessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.EigenvectorCentrality;
 import edu.uci.ics.jung.algorithms.scoring.PageRank;
-import edu.uci.ics.jung.algorithms.util.ConstantMap;
-import edu.uci.ics.jung.algorithms.util.Indexer;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.event.GraphEvent.Vertex;
+
 
 public class JungCentrality {
 	public static void calculateAndWriteUnweightedCloseness(DirectedGraph<MyNode,MyLink> myGraph, String nodeCloseUnweighted,
@@ -192,23 +184,264 @@ public class JungCentrality {
 		double[][] transProb = new double[nodeList.size()][nodeList.size()];
 		for (int p = 0; p<nodeList.size();p++){
 			for (int y=0;y<nodeList.size();y++){
-				transProb[p][y] = adj.getQuick(p, y)/rowsums[p];
+				//this didn't fix it - but maybe because I haven't fixed the transProb matrix yet.
+				double roundOff = (double) Math.round((adj.getQuick(p, y)/rowsums[p]) * 1000000) / 1000000;
+				transProb[p][y] = roundOff;
+//				transProb[p][y]=(adj.getQuick(p, y)/rowsums[p]);
 			}
 		}
 		
-		//Set the transition probabilities
+		//TESTING TRANSPROB ADD TO 1
+		
+		double[] transSums = new double[nodeList.size()];
+		for (int p = 0; p<nodeList.size();p++){
+			for (int y=0;y<nodeList.size();y++){
+				transSums[p] = transSums[p]+transProb[p][y];
+			}
+		}
+		// 	I BROKE THIS AND NOT SURE HOW.... i think it's fixed now
+		for (int test=0;test<nodeList.size();test++){
+			if(transSums[test]!=1){
+				//				System.out.println("An transSum wasn't == 1");
+//				boolean s = true;
+
+				int small = 0;
+				int big = 0;
+				if(transSums[test]<1){
+					for (int count=0;count<nodeList.size();count++){
+						if (transProb[test][count]<transProb[test][small]){
+							small = count;
+						}
+
+					}
+					transProb[test][small]=transProb[test][small]+(1-transSums[test]);//add the missing fraction to the first non-zero element
+				}else{
+					for (int count=0;count<nodeList.size();count++){
+						if (transProb[test][count]>transProb[test][big]){
+							big = count;
+						}
+					}
+					transProb[test][big]=transProb[test][big]-(transSums[test]-1);//add the missing fraction to the first non-zero element
+				}
+			}
+		}
+					
+//					while (s==true){
+//						
+//							transProb[test][count]=transProb[test][count]+(1-transSums[test]);//add the missing fraction to the first non-zero element
+////							System.out.println("Added the missing bit");
+//							s=false;
+//						}else count++;
+					
+//				}else{
+//					if (transProb[test][count]!=0){
+//						transProb[test][count]=transProb[test][count]-(transSums[test]-1);//take the additional fraction from the first non-zero element
+////						System.out.println("Took away the extra bit");
+//						s=false;
+//					}else count++;
+//				}
+//			}
+//		}
+		double[] transSumsNew = new double[nodeList.size()];
+		for (int p = 0; p<nodeList.size();p++){
+			for (int y=0;y<nodeList.size();y++){
+				transSumsNew[p] = transSumsNew[p]+transProb[p][y];
+			}
+		}
+		
+		BufferedWriter btrans = IOUtils.getBufferedWriter("/Users/nadiaviljoen/Desktop/transProb_WestRand_big.csv");
+		try{
+			for (int i=0;i<nodeList.size();i++){
+				btrans.write(String.format("%d", i));
+				btrans.write(",");
+			}
+			btrans.newLine();
+			for (int row=0;row<nodeList.size();row++){
+				btrans.write(String.format("%d", row));
+				btrans.write(",");
+				for (int col=0; col<nodeList.size();col++){
+					btrans.write(String.format("%.8f", transProb[row][col]));
+					btrans.write(",");
+				}
+				btrans.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+//			LOG.error("Oops, couldn't write to file.");
+		} finally{
+			try {
+				btrans.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+//				LOG.error("Oops, couldn't close");
+			}
+		}
+		
+//		//wite nodelist to file
+//		BufferedWriter bnode = IOUtils.getBufferedWriter("/Users/nadiaviljoen/Desktop/nodeList_WestRand_big.csv");
+//		try{
+//			String dummy;
+//			for (int k=0;k<nodeList.size();k++){
+////				System.out.println(nodeList.get(k).getId());
+//				dummy = nodeList.get(k).getId();
+//				bnode.write(dummy);
+//				bnode.write(",");
+//				bnode.newLine();
+//			}
+//			
+//		} catch (IOException e) {
+//			e.printStackTrace();
+////			LOG.error("Oops, couldn't write to file.");
+//		} finally{
+//			try {
+//				bnode.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+////				LOG.error("Oops, couldn't close");
+//			}
+//		}
+//		
+//		
+		BufferedWriter btest = IOUtils.getBufferedWriter("/Users/nadiaviljoen/Desktop/test.csv");
+		try{
+
+			for (int row=0;row<nodeList.size();row++){
+				btest.write(String.valueOf(transSumsNew[row]));
+				btest.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+//			LOG.error("Oops, couldn't write to file.");
+		} finally{
+			try {
+				btest.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+//				LOG.error("Oops, couldn't close");
+			}
+		}
+		
+		
+		//Set the transition probabilities - METHOD 1 OUT Edges
 		for (int i = 0; i<nodeList.size();i++){
 			MyNode begin = nodeList.get(i);
+			int debug = 0;
+//			System.out.println(begin.getId());
+//			System.out.println(myGraph.getOutEdges(begin));
 			for (Iterator o_iter = myGraph.getOutEdges(begin).iterator(); o_iter.hasNext(); )
 			{
+
+				debug++;
+//				if(debug>1){
+//				System.out.print(" ");
+//				}
+				//no idea why it never goes in here!
+
 				MyLink e = (MyLink) o_iter.next();
 				if(e.getTransProb()==-99){
 					MyNode end = myGraph.getOpposite(begin,e);
 					int j = nodeList.indexOf(end);
-					e.setTransProb(transProb[i][j]);
+					double roundOff = (double) Math.round((transProb[i][j]) * 1000000) / 1000000;
+					e.setTransProb(roundOff);
+//					e.setTransProb((transProb[i][j]));
+//					System.out.println(String.format("%d,%.15f",j,e.getTransProb()));
+//					if(debug>1){
+//					System.out.print(" ");
+//					}
+				}else{
+					//This is to test whether there are multiple edges with multiple values but there aren't this is not the problem
+					MyNode end = myGraph.getOpposite(begin,e);
+					int j = nodeList.indexOf(end);
+					if(e.getTransProb()!=transProb[i][j]){
+						System.out.println("VarkSteaks!!");
+					}
 				}
 			}
 		}
+		
+//		//Set trans probs - METHOD 2 - ENUMERATE
+//		
+//		for (int i = 0; i<nodeList.size();i++){
+//			for (int p = 0; p<nodeList.size();p++){
+//			//Some null pointer exception I cannot figure out	
+//		if(myGraph.findEdge(nodeList.get(i), nodeList.get(p)).getTransProb()==-99){
+//					myGraph.findEdge(nodeList.get(i), nodeList.get(p)).setTransProb(transProb[i][p]);
+//				}
+//				
+//			}
+//		}
+		
+		
+		
+		
+		//test that TransProb still add to 1 after setting
+		
+		for (int i = 0; i<nodeList.size();i++){
+			double sum=0;
+			MyNode testNode = nodeList.get(i);
+			for (Iterator o_iter = myGraph.getOutEdges(testNode).iterator(); o_iter.hasNext(); )
+			{
+				MyLink e = (MyLink) o_iter.next();
+				sum=sum+e.getTransProb();
+			
+			}
+			if (Math.abs(1-sum)>0.000001){
+				System.out.println(String.format("%s,%.20f",testNode.getId(),sum));
+				boolean s =true;
+				if(sum<1){
+					Iterator o_iter = myGraph.getOutEdges(testNode).iterator();
+					//add to the smallest element
+					
+					while (s==true&&o_iter.hasNext()){
+						MyLink e = (MyLink) o_iter.next();
+						double current = e.getTransProb();
+						//check that by adding you don't make one element bigger than 1
+						if(current+1-sum<1){
+							e.setTransProb(current+(1-sum));
+							System.out.println(String.format("%.20f,%.20f",current,e.getTransProb()));
+							s = false;
+						}
+					}
+				}else{
+					
+					Iterator o_iter = myGraph.getOutEdges(testNode).iterator();
+					while (s==true&&o_iter.hasNext()){
+						MyLink e = (MyLink) o_iter.next();
+						double current = e.getTransProb();
+						//check that you don't make any element negative
+						if(current-(sum-1)>0){
+							e.setTransProb(current-(sum-1));
+							System.out.println(String.format("%.20f,%.20f",current,e.getTransProb()));
+							s = false;
+						}
+					}
+				}
+			}
+		}
+		
+		//Iron out precision errors
+//		for (int r=0; r<linkList.size();r++){
+//			double current;
+//			current = Math.floor(linkList.get(r).getTransProb()*1000000)/1000000;
+//			linkList.get(r).setTransProb(current);
+//			
+//		}
+		
+		System.out.println("TESTING");
+		for (int i = 0; i<nodeList.size();i++){
+			double sum2=0;
+			MyNode testNode2 = nodeList.get(i);
+			for (Iterator o_iter = myGraph.getOutEdges(testNode2).iterator(); o_iter.hasNext(); )
+			{
+				MyLink e = (MyLink) o_iter.next();
+				sum2=sum2+e.getTransProb();
+
+			}
+			if (sum2!=1){
+				System.out.println(String.format("%s,%.20f",testNode2.getId(),sum2));
+			}
+		}
+		
 		Transformer<MyLink, Double> wtTransformer = new Transformer<MyLink,Double>(){
 			public Double transform(MyLink link){
 				return link.getTransProb();
@@ -223,7 +456,7 @@ public class JungCentrality {
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.15f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
 
 			}
 		} catch (IOException e) {
@@ -238,6 +471,35 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Weighted Eigenvector written to file");
+	}
+	public static void calculateAndWriteDegreeCentrality(DirectedGraph<MyNode,MyLink> myGraph, String degreeFile,
+			ArrayList<MyNode> nodeList,final LinkedList<MyLink> linkList){
+		int currentDegree;
+		int currentInDegree;
+		int currentOutDegree;
+		BufferedWriter bdegree = IOUtils.getBufferedWriter(degreeFile);
+		try{
+			bdegree.write("NodeID,X,Y,Long,Lat,C_Dtot,C_Din,C_Dout");
+			bdegree.newLine();
+			for (int i=0;i<nodeList.size();i++){
+				MyNode current = nodeList.get(i);
+				currentDegree=myGraph.degree(current);
+				currentInDegree=myGraph.inDegree(current);
+				currentOutDegree=myGraph.outDegree(current);
+				bdegree.write(String.format("%s,%s,%s,%.6f,%.6f,%d,%d,%d\n", current.getId(),current.getX(), current.getY(),null,null,currentDegree,currentInDegree,currentOutDegree));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+//			LOG.error("Oops, couldn't write to file.");
+		} finally{
+			try {
+				bdegree.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+//				LOG.error("Oops, couldn't close");
+			}
+		}
+		
 	}
 	public static void calculateAndWriteUnweightedPageRank(DirectedGraph<MyNode,MyLink> myGraph, String nodePageRankUnweighted,
 			ArrayList<MyNode> nodeList) {

@@ -36,17 +36,12 @@ import java.util.Set;
 import java.util.List;
 import java.util.Map;
 
-//import network.MyDirectedGraphCreatorVer2.MyLink;
-//import network.MyDirectedGraphCreatorVer2.MyNode;
 
 import org.apache.commons.collections15.Transformer;
 import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
-
-
-//import com.csvreader.CsvWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -133,12 +128,12 @@ public class MyDirectedGraphCreatorVer2 {
 				while ((lineNode = br1.readLine()) != null) {
 					String[] nodeData = lineNode.split(",");
 					counterID = Integer.toString(counter);
-//					currentNodeId = nodeData[1]; //for road data files
-					currentNodeId = nodeData[0]; //for test data files
-//					currentNodeX = Double.parseDouble(nodeData[3]);//for road data files
-//					currentNodeY = Double.parseDouble(nodeData[5]);//for road data files
-					currentNodeX = Double.parseDouble(nodeData[1]);//for test data files
-					currentNodeY = Double.parseDouble(nodeData[2]);//for test data files
+					currentNodeId = nodeData[1]; //for road data files
+//					currentNodeId = nodeData[0]; //for test data files
+					currentNodeX = Double.parseDouble(nodeData[3]);//for road data files
+					currentNodeY = Double.parseDouble(nodeData[5]);//for road data files
+//					currentNodeX = Double.parseDouble(nodeData[1]);//for test data files
+//					currentNodeY = Double.parseDouble(nodeData[2]);//for test data files
 					currentNode = new MyNode(counterID,currentNodeId,currentNodeX,currentNodeY);
 					nodeId[counter]=currentNodeId;
 					nodeList.add(counter, currentNode);
@@ -161,7 +156,6 @@ public class MyDirectedGraphCreatorVer2 {
 			}
 			System.out.println("Nodes loaded in array list");
 			System.out.println("Adding links to graph....");
-			//System.out.println("(go make coffee, this takes about 15 minutes)");
 
 			//The approach followed to prevent duplicate nodes being added to the graph
 			//as edges are added is pretty tedious as it searches through the whole
@@ -186,12 +180,12 @@ public class MyDirectedGraphCreatorVer2 {
 				br2 = new BufferedReader(new FileReader(csvFile2));
 				while ((lineLink = br2.readLine()) != null) {
 					String[] linkData = lineLink.split(",");
-//					currentLinkId = linkData[1];//for road data
-					currentLinkId = linkData[0];//for test data
-//					currentFromId =linkData[3];//for road data
-//					currentToId =linkData[5];//for road data
-					currentFromId =linkData[1];//for test data
-					currentToId =linkData[2];//for test data
+					currentLinkId = linkData[1];//for road data
+//					currentLinkId = linkData[0];//for test data
+					currentFromId =linkData[3];//for road data
+					currentToId =linkData[5];//for road data
+//					currentFromId =linkData[1];//for test data
+//					currentToId =linkData[2];//for test data
 					currentLinkWeight = Double.parseDouble(linkData[weightIndex]);   
 					indexFrom = getNode(nodeList,currentFromId);
 					indexTo = getNode(nodeList,currentToId);
@@ -291,8 +285,8 @@ public class MyDirectedGraphCreatorVer2 {
 			String nodeCloseWeighted = args[12];
 			String nodeEigenUnweighted = args[13];
 			String nodeEigenWeighted = args[14];
-//			String nodePageRankUnweighted = args[19];
-//			String nodePageRankWeighted = args[20];
+			String degreeFile=args[19];
+
 
 			//clustering measures
 			String clusterFile = args[15];
@@ -321,10 +315,7 @@ public class MyDirectedGraphCreatorVer2 {
 					JungCentrality.calculateAndWriteWeightedCloseness(myApp.myGraph, nodeCloseWeighted, nodeList);
 					JungCentrality.calculateAndWriteUnweightedEigenvector(myApp.myGraph, nodeEigenUnweighted, nodeList);
 					JungCentrality.calculateAndWriteWeightedEigenvector(myApp.myGraph, nodeEigenWeighted, nodeList,linkList);
-
-// I thought that I could use PageRank with alpha = 0 to overcome my issue with the weighted eigenvectorCentrality					
-//					JungCentrality.calculateAndWriteUnweightedPageRank(myApp.myGraph, nodePageRankUnweighted, nodeList);
-//					JungCentrality.calculateAndWriteWeightedPageRank(myApp.myGraph, nodePageRankWeighted, nodeList);
+					JungCentrality.calculateAndWriteDegreeCentrality(myApp.myGraph, degreeFile, nodeList, linkList);
 
 			//Clustering
 					JungClusters.calculateAndWriteClusteringCoefficient(myApp.myGraph, clusterFile);
@@ -332,11 +323,10 @@ public class MyDirectedGraphCreatorVer2 {
 					JungClusters.calculateAndWriteTriadicCensus(myApp.myGraph, triadFile);
 
 			//Graph distance
-			//		JungGraphDistance.calculateAndWriteUnweightedDistances(myApp.myGraph, distUnweightedFile);
+					JungGraphDistance.calculateAndWriteUnweightedDistances(myApp.myGraph, distUnweightedFile);
 
-			//ShortestPaths.metricCalc(myApp.myGraph, clustFile, dijkstraFile, dijkstraFileWeight);
 
-//			 myApp.testFiles(myApp.myGraph, graphTestFile, nodeTestFile, linkTestFile);//self-check procedure
+			 myApp.testFiles(myApp.myGraph, graphTestFile, nodeTestFile, linkTestFile);//self-check procedure
 
 		}
 		//
