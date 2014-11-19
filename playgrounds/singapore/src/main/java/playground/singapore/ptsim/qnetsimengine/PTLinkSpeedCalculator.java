@@ -49,7 +49,7 @@ public class PTLinkSpeedCalculator implements LinkSpeedCalculator {
 			}
 			else
 				travelTime = link.getLength()/3.0;
-			return Math.min(link.getFreespeed(), link.getLength()/travelTime);
+			return Math.min(link.getFreespeed(time), link.getLength()/travelTime);
 		}
 		else {
 			double speed = vehicle.getMaximumVelocity();
@@ -71,7 +71,7 @@ public class PTLinkSpeedCalculator implements LinkSpeedCalculator {
 							}
 				speed = Math.max(MIN_SPEED_BUS, speed);
 			}
-			return Math.min(link.getFreespeed(), speed);
+			return Math.min(link.getFreespeed(time), speed);
 		}
 	}
 	
