@@ -42,14 +42,14 @@ public class DistanceDistributionTrip {
 	}
 	
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, DistanceDistributionTrip.TravellerChain>();
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, DistanceDistributionTrip.TravellerChain>();
 	private Population population;
 	private Network network;
 	private TransitSchedule transitSchedule;
-	private Set<Id> pIdsToExclude;
+	private Set<Id<Person>> pIdsToExclude;
 	
 	//Constructors
-	public DistanceDistributionTrip(Population population, Network network, TransitSchedule transitSchedule, Set<Id> pIdsToExclude) {
+	public DistanceDistributionTrip(Population population, Network network, TransitSchedule transitSchedule, Set<Id<Person>> pIdsToExclude) {
 		this.network = network;
 		this.transitSchedule = transitSchedule;
 		this.population = population;
@@ -166,7 +166,7 @@ public class DistanceDistributionTrip {
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
             scenario.setPopulation(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()));
 			new MatsimPopulationReader(scenario).readFile(args[4]+"/ITERS/it."+i+"/"+i+".plans.xml.gz");
-			DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(scenario.getPopulation(), scenario.getNetwork(), scenario.getTransitSchedule(), new HashSet<Id>());
+			DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(scenario.getPopulation(), scenario.getNetwork(), scenario.getTransitSchedule(), new HashSet<Id<Person>>());
 			distanceDistribution.saveChains();
 			distanceDistribution.printDistribution(distanceDistribution.getDistribution(new String[]{args[5]}, new String[]{"car","pt","walk"}), args[6]+"/distanceDistribution2."+i+".csv");
 		}

@@ -22,9 +22,11 @@ package playground.artemc.calibration;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+
 import playground.artemc.calibration.handlers.DistanceDistributionTrip;
 import playground.artemc.calibration.handlers.TimeDistributionTrip;
 
@@ -61,7 +63,7 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	private String[] categoriesTTDataset;
 	private String[] modesTTDataset;
 	private SortedMap<Integer, Integer[]> numberTripsPerMode = new TreeMap<Integer, Integer[]>();
-	private Set<Id> pIdsToExclude;
+	private Set<Id<Person>> pIdsToExclude;
 
 
 	/** Set graph output units, km and min recommended*/
@@ -77,7 +79,7 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	 *  Additional color schemes can be added inside the class GraphEditor 
 	 */ 
 
-	public CalibrationStatsListener(final EventsManager events, final String[] surveyFiles, int interval, String surveyName, String colorScheme, Set<Id> pIdsToExclude) {
+	public CalibrationStatsListener(final EventsManager events, final String[] surveyFiles, int interval, String surveyName, String colorScheme, Set<Id<Person>> pIdsToExclude) {
 		this.pIdsToExclude = pIdsToExclude;
 		this.surveyName = surveyName;
 		this.colorScheme = colorScheme; 		

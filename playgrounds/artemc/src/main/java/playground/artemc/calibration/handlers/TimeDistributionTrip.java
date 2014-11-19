@@ -1,8 +1,6 @@
 package playground.artemc.calibration.handlers;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -20,6 +18,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -45,11 +44,11 @@ public class TimeDistributionTrip implements PersonDepartureEventHandler, Activi
 	}
 
 	//Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, TimeDistributionTrip.TravellerChain>();
-	private Set<Id> pIdsToExclude;
+	private Map<Id<Person>, TravellerChain> chains = new HashMap<Id<Person>, TimeDistributionTrip.TravellerChain>();
+	private Set<Id<Person>> pIdsToExclude;
 	
 	//Constructor
-	public TimeDistributionTrip(Set<Id> pIdsToExclude) {
+	public TimeDistributionTrip(Set<Id<Person>> pIdsToExclude) {
 		this.pIdsToExclude = pIdsToExclude;
 	}
 	
@@ -148,7 +147,7 @@ public class TimeDistributionTrip implements PersonDepartureEventHandler, Activi
 		int iterationsInterval = new Integer(args[1]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			TimeDistributionTrip timeDistribution = new TimeDistributionTrip(new HashSet<Id>());
+			TimeDistributionTrip timeDistribution = new TimeDistributionTrip(new HashSet<Id<Person>>());
 			eventsManager.addHandler(timeDistribution);
 			new MatsimEventsReader(eventsManager).readFile(args[2]+"/ITERS/it."+i+"/"+i+".events.xml.gz");
 			timeDistribution.printDistribution(timeDistribution.getDistribution(new String[] {args[3]}, new String[]{"car","pt", "walk"}), args[4]+"/timeDistribution."+i+".csv");

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,7 +41,7 @@ public class MySiouxFallsController {
 		
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
-		Set<Id> pIdsToExclude = new HashSet<Id>();
+		Set<Id<Person>> pIdsToExclude = new HashSet<Id<Person>>();
 		controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), SURVEY_FILES,1, "HITS 2008", "Red_Scheme", pIdsToExclude));
 		controler.setOverwriteFiles(true);
 		controler.run();
