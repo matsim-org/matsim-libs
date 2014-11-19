@@ -67,9 +67,9 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>> receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Person>,Map<Integer,Tuple<Double,String>>>>>();
 	private Map<Id<ReceiverPoint>,List<Id<Person>>> receiverPointId2ListOfHomeAgents = new HashMap<Id<ReceiverPoint>, List<Id<Person>>>();
 
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 	
-	public PersonActivityHandler (Scenario scenario , NoiseSpatialInfo spatialInfo, NoiseParameters noiseParams) {
+	public PersonActivityHandler (Scenario scenario , NoiseInitialization spatialInfo, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.spatialInfo = spatialInfo;		
 		this.noiseParams = noiseParams;

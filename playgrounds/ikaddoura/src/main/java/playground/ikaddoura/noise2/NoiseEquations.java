@@ -105,6 +105,16 @@ public class NoiseEquations {
 		
 		double share = ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
 		return share;
+	}
+
+	public static double calculateDistanceCorrection(double distance) {
+		double correctionTermDs = 15.8 - (10 * Math.log10(distance)) - (0.0142 * (Math.pow(distance, 0.9)));
+		return correctionTermDs;
+	}
+
+	public static double calculateAngleCorrection(double angle) {
+		double angleCorrection = 10 * Math.log10((angle) / (180));
+		return angleCorrection;
 	}	
 	
 }

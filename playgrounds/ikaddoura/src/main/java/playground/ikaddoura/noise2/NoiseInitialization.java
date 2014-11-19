@@ -29,10 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -62,74 +60,58 @@ import com.vividsolutions.jts.geom.Point;
  * @author lkroeger, ikaddoura
  *
  */
-public class NoiseSpatialInfo {
+public class NoiseInitialization {
 	
-	private static final Logger log = Logger.getLogger(NoiseSpatialInfo.class);
+	private static final Logger log = Logger.getLogger(NoiseInitialization.class);
 			
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
-	private Map<Id<Person>, List<Coord>> personId2listOfCoords = new HashMap<>();
-	private List <Coord> allActivityCoords = new ArrayList <Coord>();
+	
+	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<>();
+	private List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
 	private double xCoordMax = Double.MIN_VALUE;
 	private double yCoordMin = Double.MAX_VALUE;
 	private double yCoordMax = Double.MIN_VALUE;
 	
-	private Map<Id<ReceiverPoint>,Coord> receiverPointId2Coord = new HashMap<>();
 	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<>();
-
 	private Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<>();
-	private Map<Coord,Id<ReceiverPoint>> coord2receiverPointId = new HashMap<>();
 	
-	private double xCoordMinLinkNodes = Double.MAX_VALUE;
-	private double xCoordMaxLinkNodes = Double.MIN_VALUE;
-	private double yCoordMinLinkNodes = Double.MAX_VALUE;
-	private double yCoordMaxLinkNodes = Double.MIN_VALUE;
+	private double xCoordMinLinkNode = Double.MAX_VALUE;
+	private double xCoordMaxLinkNode = Double.MIN_VALUE;
+	private double yCoordMinLinkNode = Double.MAX_VALUE;
+	private double yCoordMaxLinkNode = Double.MIN_VALUE;
+	
 	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
 	
-	private Map<Id<ReceiverPoint>, List<Id<Link>>> receiverPointId2relevantLinkIds = new HashMap<>();
-	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermDs = new HashMap<>();
-	private Map<Id<ReceiverPoint>, Map<Id<Link>,Double>> receiverPointId2relevantLinkId2correctionTermAngle = new HashMap<>();
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<>();
 				
-	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams) {
+	public NoiseInitialization(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 	}	
 	
 	public void setActivityCoords () {
-		Map<Id<Person>, Queue<Coord>> personId2coordsOfActivities = new HashMap<>();
-
+		
 		for (Person person: scenario.getPopulation().getPersons().values()) {
-	
-			personId2coordsOfActivities.put(person.getId(), new LinkedList<Coord>());
-			Map<Coord,String> tmpMapCoord2Activity = new HashMap<Coord, String>();
-			
+				
 			for (PlanElement planElement: person.getSelectedPlan().getPlanElements()) {
 				if (planElement instanceof Activity) {
-					Activity currentActivity = (Activity) planElement;
+					Activity activity = (Activity) planElement;
 					
-					// exclude "pt interaction" pseudo-activities
-					if (!currentActivity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-						personId2coordsOfActivities.get(person.getId()).add(currentActivity.getCoord());
-						List<Coord> listTmp = new ArrayList<Coord>();
-						if(personId2listOfCoords.containsKey(person.getId())) {
-							listTmp = personId2listOfCoords.get(person.getId());
-						}
-						Coord coordTmp = currentActivity.getCoord();
-						listTmp.add(coordTmp);
-						personId2listOfCoords.put(person.getId(), listTmp);
+					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						
-						if (tmpMapCoord2Activity.containsKey(currentActivity.getCoord())) {
-							if (tmpMapCoord2Activity.get(currentActivity.getCoord())==currentActivity.getType().toString()) {
-							} else {
-								allActivityCoords.add(currentActivity.getCoord());
-								tmpMapCoord2Activity.put(currentActivity.getCoord(), currentActivity.getType().toString());
-							}
-						} else {
-							allActivityCoords.add(currentActivity.getCoord());
-							tmpMapCoord2Activity.put(currentActivity.getCoord(), currentActivity.getType().toString());
+						List<Coord> activityCoordinates = new ArrayList<Coord>();
+						
+						if (personId2activityCoords.containsKey(person.getId())) {
+							activityCoordinates = personId2activityCoords.get(person.getId());
 						}
+						
+						activityCoordinates.add(activity.getCoord());
+						personId2activityCoords.put(person.getId(), activityCoordinates);
+						
+						populationActivityCoords.add(activity.getCoord());
 					}
 				}
 			}
@@ -138,229 +120,118 @@ public class NoiseSpatialInfo {
 	
 	public void setReceiverPoints() {
 		
-		for(Coord coord : allActivityCoords) {
-			if(coord.getX() < xCoordMin) {
+		log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates.");
+		
+		log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates...");
+		
+		for (Coord coord : populationActivityCoords) {
+			if (coord.getX() < xCoordMin) {
 				xCoordMin = coord.getX();
 			}
-			if(coord.getX() > xCoordMax) {
+			if (coord.getX() > xCoordMax) {
 				xCoordMax = coord.getX();
 			}
-			if(coord.getY() < yCoordMin) {
+			if (coord.getY() < yCoordMin) {
 				yCoordMin = coord.getY();
 			}
-			if(coord.getY() > yCoordMax) {
+			if (coord.getY() > yCoordMax) {
 				yCoordMax = coord.getY();
 			}
 		}
+		log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates... Done.");
 		
-		int counter = 0;
-		
-		// a grid of receiver points
-		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
-			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
-				Coord coord = new CoordImpl(x, y);
-				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
-				receiverPointId2Coord.put(rpId, coord);
-				counter++;
-							
-				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
-				List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
-				if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
-					listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
-				}
-				listOfReceiverPointIDs.add(rpId);
-				zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
-			}
-		}
-		
-		log.info("Total number of receiver points: " + receiverPointId2Coord.size());
+		createReceiverPoints();		
 	}
 	
 	public void setReceiverPoints(double xMin, double yMin, double xMax, double yMax) {
+		
+		log.info("Creating receiver points for the area between the coordinates (" + xMin + "/" + yMin + ") and (" + xMax + "/" + yMax + ").");
 		
 		xCoordMin = xMin;
 		xCoordMax = xMax;
 		yCoordMin = yMin;
 		yCoordMax = yMax;
 		
+		createReceiverPoints();
+	}
+	
+	private void createReceiverPoints() {
+
 		int counter = 0;
 		
-		// a grid of receiver points
-		for (double y = yMax + 100. ; y > yMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
-			for (double x = xMin - 100. ; x < xMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
+		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
+		
+			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
+				
+				Id<ReceiverPoint> id = Id.create(counter, ReceiverPoint.class);
 				Coord coord = new CoordImpl(x, y);
-				Id<ReceiverPoint> rpId = Id.create(counter, ReceiverPoint.class);
-				receiverPointId2Coord.put(rpId, coord);
+				
+				ReceiverPoint rp = new ReceiverPoint(id);
+				rp.setCoord(coord);
+				
+				receiverPoints.put(id, rp);
+				
 				counter++;
-							
+						
 				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
 				List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
 				if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
 					listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
 				}
-				listOfReceiverPointIDs.add(rpId);
+				listOfReceiverPointIDs.add(id);
 				zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
 			}
 		}
-		
-		log.info("Total number of receiver points: " + receiverPointId2Coord.size());
+		log.info("Total number of receiver points: " + receiverPoints.size());
 	}
 		
-	public void writeReceiverPoints(String outputPath) {
-
-		// csv file
-		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
-		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
-		int c = 0;
-		for(Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
-			c++;
-			if(c % 1000 == 0) {
-				log.info("Writing out receiver point # "+ c);
-			}
-			id2xCoord.put(id, receiverPointId2Coord.get(id).getX());
-			id2yCoord.put(id, receiverPointId2Coord.get(id).getY());
-		}
-		List<String> headers = new ArrayList<String>();
-		headers.add("receiverPointId");
-		headers.add("xCoord");
-		headers.add("yCoord");
-		
-		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
-		values.add(id2xCoord);
-		values.add(id2yCoord);
-		
-		write(outputPath, 3, headers, values);
-		
-		// shape file		
-		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
-		tbuilder.setName("shape");
-		tbuilder.add("geometry", Point.class);
-		tbuilder.add("pointId", String.class);
-		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
-		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		
-		GeometryFactory gf = new GeometryFactory();
-		int i = 0;
-		for(Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
-			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
-				gf.createPoint(MGC.coord2Coordinate(receiverPointId2Coord.get(id))),
-				id
-			});
-			features.add(feature);			
-			i++;
-		}
-		String filePath = outputPath;
-		File file = new File(filePath);
-		file.mkdirs();
-		
-		log.info("Writing out receiver points to shapefile... ");
-		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
-		log.info("Writing out receiver points to shapefile... Done. ");
-	}
-	
-	private void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
-		
-		File file = new File(fileName);
-		file.mkdirs();
-		
-		File file2 = new File(fileName + "receiverPoints.csv");
-			
-		// For all maps, the number of keys should be the same
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write(headers.get(0));
-			for(int i = 1 ; i < columns ; i++) {
-				bw.write(";"+headers.get(i));
-			}
-			bw.newLine();
-			
-			for(Id<ReceiverPoint> id : values.get(0).keySet()) {
-				bw.write(id.toString());
-				for(int i = 0 ; i < (columns-1) ; i++) {
-					bw.write(";"+values.get(i).get(id));
-				}
-				bw.newLine();
-			}
-				
-			bw.close();
-				log.info("Receiver points written to " + fileName);
-				
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	public void setActivityCoord2NearestReceiverPointId () {
 		
-		int xi = 0;
-		for (Coord coord : allActivityCoords) {
-			xi++;
-			if (xi % 20000 == 0) {
-				log.info("Setting activity coordinates to nearest receiver point. activity location # " + xi);
+		int counter = 0;
+		for (Coord coord : populationActivityCoords) {
+			if (counter % 20000 == 0) {
+				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
 			}
 			
 			if (!(activityCoord2receiverPointId.containsKey(coord))) {
 			
-				Id<ReceiverPoint> receiverPointId = this.getNearestReceiverPoint(coord);
+				Id<ReceiverPoint> receiverPointId = identifyNearestReceiverPoint(coord);
 				activityCoord2receiverPointId.put(coord, receiverPointId);
 			}
-		}
-				
-		int xii = 0;
-
-		for (Id<ReceiverPoint> id : receiverPointId2Coord.keySet()) {
 			
-			xii++;
-			
-			if (xii % 20000 == 0) {
-				log.info("Setting receiver point to receiver point coordinates # " + xii);
-			}
-			coord2receiverPointId.put(receiverPointId2Coord.get(id), id);
-		}
+			counter++;
+		}				
 	}
 	
-	private Tuple<Integer,Integer> getZoneTupleForLinks(Coord coord) {
-		 
-		double xCoord = coord.getX();
-		double yCoord = coord.getY();
-		
-		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (noiseParams.getRelevantRadius() / 1.));	
-		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / noiseParams.getRelevantRadius() / 1.);
-		
-		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
-	}
-	
-	public void setRelevantLinkIds() {
+	public void setRelevantLinkInfo() {
 		
 		setLinksMinMax();
 		setLinksToZones();
 				
 		int counter = 0;
 		
-		for (Id<ReceiverPoint> pointId : receiverPointId2Coord.keySet()) {
+		for (ReceiverPoint rp : this.receiverPoints.values()) {
 			counter++;
+			
 			if (counter % 1000. == 0.) {
-				log.info("Setting relevant links for receiver point # " + counter);
+				log.info("Setting relevant link information for receiver point # " + counter);
 			}
 			
-			double pointCoordX = receiverPointId2Coord.get(pointId).getX();
-			double pointCoordY = receiverPointId2Coord.get(pointId).getY();
+			double pointCoordX = this.receiverPoints.get(rp.getId()).getCoord().getX();
+			double pointCoordY = this.receiverPoints.get(rp.getId()).getCoord().getY();
 
 			Map<Id<Link>,Double> relevantLinkIds2Ds = new HashMap<>();
 			Map<Id<Link>,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<>();
 		
 			// get the zone grid cell around the receiver point
-			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(receiverPointId2Coord.get(pointId));
+			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(this.receiverPoints.get(rp.getId()).getCoord());
 			
 			// collect all Ids of links in this zone grid cell...
 			List<Id<Link>> potentialLinks = new ArrayList<>();
 			if(zoneTuple2listOfLinkIds.containsKey(zoneTuple)) {
 				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(zoneTuple));
 			}
-			// ... and in all surrounding zone grid cells
+			// collect all Ids of links in all surrounding zone grid cells
 			int x = zoneTuple.getFirst();
 			int y = zoneTuple.getSecond();
 			Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
@@ -396,7 +267,7 @@ public class NoiseSpatialInfo {
 				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSO));
 			}
 
-			// go through these (potential) links
+			// go through these potential relevant link Ids
 			List<Id<Link>> relevantLinkIds = new ArrayList<>();
 			for (Id<Link> linkId : potentialLinks){
 				if (!(relevantLinkIds.contains(linkId))) {
@@ -430,7 +301,7 @@ public class NoiseSpatialInfo {
 					double xValue = 0.;
 					double yValue = 0.;
 				
-					if(yAbschnitt<yAbschnitt2) {
+					if (yAbschnitt<yAbschnitt2) {
 						yAbschnitt2 = yAbschnitt2 - yAbschnitt;
 						yAbschnitt = 0;
 						xValue = yAbschnitt2 / (vector - vector2);
@@ -467,10 +338,10 @@ public class NoiseSpatialInfo {
 						if (distance == 0) {
 							double minimumDistance = 5.;
 							distance = minimumDistance;
-							log.warn("Distance between " + linkId + " and " + pointId + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
+							log.warn("Distance between " + linkId + " and " + rp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
 						}
-						double correctionTermDs = calculateDs(distance);
-						double correctionTermAngle = calculateAngleImmissionCorrection(receiverPointId2Coord.get(pointId), scenario.getNetwork().getLinks().get(linkId));
+						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
+						double correctionTermAngle = calculateAngleImmissionCorrection(this.receiverPoints.get(rp.getId()).getCoord(), scenario.getNetwork().getLinks().get(linkId));
 						
 						relevantLinkIds2Ds.put(linkId, correctionTermDs);
 						relevantLinkIds2angleImmissionCorrection.put(linkId, correctionTermAngle);						
@@ -478,26 +349,26 @@ public class NoiseSpatialInfo {
 				}
 			}
 			
-			receiverPointId2relevantLinkIds.put(pointId, relevantLinkIds);
-			receiverPointId2relevantLinkId2correctionTermDs.put(pointId, relevantLinkIds2Ds);
-			receiverPointId2relevantLinkId2correctionTermAngle.put(pointId, relevantLinkIds2angleImmissionCorrection);
+			rp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
+			rp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
+			// TODO: Check if the object is acually changed...
 		}
 	}
 	
 	private void setLinksMinMax() {
 		
 		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) < xCoordMinLinkNodes) {
-				xCoordMinLinkNodes = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
+			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) < xCoordMinLinkNode) {
+				xCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
 			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) < yCoordMinLinkNodes) {
-				yCoordMinLinkNodes = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
+			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) < yCoordMinLinkNode) {
+				yCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
 			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) > xCoordMaxLinkNodes) {
-				xCoordMaxLinkNodes = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
+			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) > xCoordMaxLinkNode) {
+				xCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
 			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) > yCoordMaxLinkNodes) {
-				yCoordMaxLinkNodes = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
+			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) > yCoordMaxLinkNode) {
+				yCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
 			}
 		}		
 	}
@@ -552,10 +423,16 @@ public class NoiseSpatialInfo {
 		}
 	}
 	
-	private double calculateDs (double distanceToRoad){
-		double correctionTermDs = 0.;
-		correctionTermDs = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-		return correctionTermDs;
+	private Tuple<Integer,Integer> getZoneTupleForLinks(Coord coord) {
+		 
+		double xCoord = coord.getX();
+		double yCoord = coord.getY();
+		
+		int xDirection = (int) ((xCoord - xCoordMinLinkNode) / (noiseParams.getRelevantRadius() / 1.));	
+		int yDirection = (int) ((yCoordMaxLinkNode - yCoord) / noiseParams.getRelevantRadius() / 1.);
+		
+		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
+		return zoneDefinition;
 	}
 	
 	private double calculateAngleImmissionCorrection(Coord receiverPointCoord, Link link) {
@@ -620,7 +497,7 @@ public class NoiseSpatialInfo {
 		}
 					
 //		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
-		double immissionCorrection = 10 * Math.log10((angle) / (180));
+		double immissionCorrection = NoiseEquations.calculateAngleCorrection(angle);
 		return immissionCorrection;
 	}
 	
@@ -636,12 +513,8 @@ public class NoiseSpatialInfo {
 		return zoneDefinition;
 	}
 	
-	private Id<ReceiverPoint> getNearestReceiverPoint (Coord coord) {
+	private Id<ReceiverPoint> identifyNearestReceiverPoint (Coord coord) {
 		Id<ReceiverPoint> nearestReceiverPointId = null;
-
-		double xCoord = coord.getX();
-		double yCoord = coord.getY();
-		double distance = Double.MAX_VALUE;
 		
 		List<Tuple<Integer,Integer>> tuples = new ArrayList<Tuple<Integer,Integer>>();
 		Tuple<Integer,Integer> centralTuple = getZoneTuple(coord);
@@ -665,66 +538,137 @@ public class NoiseSpatialInfo {
 		Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
 		tuples.add(TupleSO);
 		
-		Map<Id<ReceiverPoint>,Coord> relevantId2Coord = new HashMap<>();
-		for(Tuple<Integer,Integer> tuple : tuples) {
-			if(zoneTuple2listOfReceiverPointIds.containsKey(tuple)) {
-				for(Id<ReceiverPoint> id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
-					Coord relevantCoord = receiverPointId2Coord.get(id);
-					relevantId2Coord.put(id,relevantCoord);
+		List<Id<ReceiverPoint>> relevantReceiverPointIds = new ArrayList<Id<ReceiverPoint>>();
+		
+		for (Tuple<Integer,Integer> tuple : tuples) {
+			if (zoneTuple2listOfReceiverPointIds.containsKey(tuple)) {
+				for (Id<ReceiverPoint> id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
+					relevantReceiverPointIds.add(id);
 				}
 			}
 		}
 		
-		for(Id<ReceiverPoint> receiverPointId : relevantId2Coord.keySet()) {
-			double xValue = relevantId2Coord.get(receiverPointId).getX();
-			double yValue = relevantId2Coord.get(receiverPointId).getY();
+		double minDistance = Double.MAX_VALUE;
+
+		for (Id<ReceiverPoint> receiverPointId : relevantReceiverPointIds) {
+			double xValue = this.receiverPoints.get(receiverPointId).getCoord().getX();
+			double yValue = this.receiverPoints.get(receiverPointId).getCoord().getY();
 			
-			double a = xCoord - xValue;
-			double b = yCoord - yValue;
+			double a = coord.getX() - xValue;
+			double b = coord.getY() - yValue;
 			
-			double distanceTmp = Math.sqrt((Math.pow(a, 2))+(Math.pow(b, 2)));
-			if(distanceTmp < distance) {
-				// update the nearest receiver point
-				distance = distanceTmp;
+			double distance = Math.sqrt((Math.pow(a, 2))+(Math.pow(b, 2)));
+			if (distance < minDistance) {
+				minDistance = distance;
 				nearestReceiverPointId = receiverPointId;
-			} else {
 			}
 		}
 
 		return nearestReceiverPointId;
 	}
+	
+	public void writeReceiverPoints(String outputPath) {
 
-	public Map<Id<ReceiverPoint>, Coord> getReceiverPointId2Coord() {
-		return receiverPointId2Coord;
+		// csv file
+		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
+		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
+		int c = 0;
+		for(Id<ReceiverPoint> id : this.receiverPoints.keySet()) {
+			c++;
+			if(c % 1000 == 0) {
+				log.info("Writing out receiver point # "+ c);
+			}
+			id2xCoord.put(id, this.receiverPoints.get(id).getCoord().getX());
+			id2yCoord.put(id, this.receiverPoints.get(id).getCoord().getY());
+		}
+		List<String> headers = new ArrayList<String>();
+		headers.add("receiverPointId");
+		headers.add("xCoord");
+		headers.add("yCoord");
+		
+		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
+		values.add(id2xCoord);
+		values.add(id2yCoord);
+		
+		write(outputPath, 3, headers, values);
+		
+		// shape file		
+		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
+		tbuilder.setName("shape");
+		tbuilder.add("geometry", Point.class);
+		tbuilder.add("pointId", String.class);
+		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
+		
+		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		
+		GeometryFactory gf = new GeometryFactory();
+		int i = 0;
+		for(Id<ReceiverPoint> id : this.receiverPoints.keySet()) {
+			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
+				gf.createPoint(MGC.coord2Coordinate(this.receiverPoints.get(id).getCoord())),
+				id
+			});
+			features.add(feature);			
+			i++;
+		}
+		String filePath = outputPath;
+		File file = new File(filePath);
+		file.mkdirs();
+		
+		log.info("Writing out receiver points to shapefile... ");
+		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
+		log.info("Writing out receiver points to shapefile... Done. ");
+	}
+	
+	private void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
+		
+		File file = new File(fileName);
+		file.mkdirs();
+		
+		File file2 = new File(fileName + "receiverPoints.csv");
+			
+		// For all maps, the number of keys should be the same
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write(headers.get(0));
+			for(int i = 1 ; i < columns ; i++) {
+				bw.write(";"+headers.get(i));
+			}
+			bw.newLine();
+			
+			for(Id<ReceiverPoint> id : values.get(0).keySet()) {
+				bw.write(id.toString());
+				for(int i = 0 ; i < (columns-1) ; i++) {
+					bw.write(";"+values.get(i).get(id));
+				}
+				bw.newLine();
+			}
+				
+			bw.close();
+				log.info("Receiver points written to " + fileName);
+				
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
+		return receiverPoints;
 	}
 	
 	public Map<Id<Person>, List<Coord>> getPersonId2listOfCoords() {
-		return personId2listOfCoords;
+		return personId2activityCoords;
 	}
 
 	public Map<Coord, Id<ReceiverPoint>> getActivityCoord2receiverPointId() {
 		return activityCoord2receiverPointId;
 	}
 	
-	public Map<Coord,Id<ReceiverPoint>> getCoord2receiverPointId() {
-		return coord2receiverPointId;
-	}	
-	
-	public Map<Id<ReceiverPoint>, List<Id<Link>>> getReceiverPointId2relevantLinkIds() {
-		return receiverPointId2relevantLinkIds;
-	}
-	
-	public Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> getReceiverPointId2relevantLinkId2correctionTermAngle() {
-		return receiverPointId2relevantLinkId2correctionTermAngle;
-	}
-
-	public Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> getReceiverPointId2relevantLinkId2correctionTermDs() {
-		return receiverPointId2relevantLinkId2correctionTermDs;
-	}
-
 	// for testing purposes
 	public Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
 		return zoneTuple2listOfReceiverPointIds;
 	}
+
 
 }

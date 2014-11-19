@@ -111,7 +111,7 @@ public class NoiseCalculationOffline {
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 		
-		NoiseSpatialInfo spatialInfo = new NoiseSpatialInfo(scenario, noiseParameters);
+		NoiseInitialization spatialInfo = new NoiseInitialization(scenario, noiseParameters);
 		spatialInfo.setActivityCoords();
 		
 //		spatialInfo.setReceiverPoints();
@@ -119,7 +119,7 @@ public class NoiseCalculationOffline {
 		spatialInfo.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
 		
 		spatialInfo.setActivityCoord2NearestReceiverPointId();
-		spatialInfo.setRelevantLinkIds();
+		spatialInfo.setRelevantLinkInfo();
 		spatialInfo.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);

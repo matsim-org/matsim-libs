@@ -56,7 +56,7 @@ public class NoiseDamageCalculation {
 	private Scenario scenario;
 	private EventsManager events;
 	
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 	private NoiseEquations noiseImmissionCalculator;
 	private NoiseParameters noiseParams;
 		
@@ -92,7 +92,7 @@ public class NoiseDamageCalculation {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseInitialization spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;
@@ -288,16 +288,16 @@ public class NoiseDamageCalculation {
 			linkId2timeInterval2damageCost.put(linkId, timeInterval2damageCost);
 		}
 
-		log.info("Going through all receiver points... Total number: " + spatialInfo.getReceiverPointId2Coord().keySet().size());
+		log.info("Going through all receiver points... Total number: " + spatialInfo.getReceiverPoints().keySet().size());
 		int counter = 0;
-		for(Id<ReceiverPoint> coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
+		for(Id<ReceiverPoint> id : spatialInfo.getReceiverPoints().keySet()) {
 			if (counter % 10000 == 0) {
 				log.info("receiver point # " + counter);
 			}
-			for(Id<Link> linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
+			for(Id<Link> linkId : spatialInfo.getReceiverPoints().get(id).getLinkId2distanceCorrection().keySet()) {
 				for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
-					if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
-						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
+					if(!((receiverPointId2timeInterval2damageCost.get(id).get(timeInterval)) == 0.)) {
+						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(id).get(timeInterval).get(linkId);
 						linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
 					}
 				}

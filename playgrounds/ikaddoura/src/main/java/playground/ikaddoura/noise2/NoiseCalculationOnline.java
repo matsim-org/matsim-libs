@@ -40,7 +40,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	private NoiseParameters noiseParameters;
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
@@ -55,11 +55,11 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		log.info("Initialization...");
 		
-		this.spatialInfo = new NoiseSpatialInfo(event.getControler().getScenario(), noiseParameters);
+		this.spatialInfo = new NoiseInitialization(event.getControler().getScenario(), noiseParameters);
 		this.spatialInfo.setActivityCoords();
 		this.spatialInfo.setReceiverPoints();
 		this.spatialInfo.setActivityCoord2NearestReceiverPointId();
-		this.spatialInfo.setRelevantLinkIds();
+		this.spatialInfo.setRelevantLinkInfo();
 		this.spatialInfo.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
@@ -175,7 +175,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		return noiseDamageCosts;
 	}
 
-	public NoiseSpatialInfo getSpatialInfo() {
+	public NoiseInitialization getSpatialInfo() {
 		return spatialInfo;
 	}
 		

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -43,8 +42,6 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * 
@@ -58,7 +55,7 @@ public class NoiseImmissionCalculation {
 
 	private static final Logger log = Logger.getLogger(NoiseImmissionCalculation.class);
 	
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 	private NoiseParameters noiseParams;
 
 	private NoiseEquations noiseImmissionCalculator;
@@ -75,7 +72,7 @@ public class NoiseImmissionCalculation {
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
 	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Link>,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Link>,Double>>>();
 		
-	public NoiseImmissionCalculation (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams) {
+	public NoiseImmissionCalculation (NoiseInitialization spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams) {
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
 		this.noiseImmissionCalculator = new NoiseEquations();
@@ -110,18 +107,17 @@ public class NoiseImmissionCalculation {
 
 	private void calculateImmissionSharesPerReceiverPointPerTimeInterval() {
 		
-		for (Id<ReceiverPoint> coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
+		for (Id<ReceiverPoint> coordId : spatialInfo.getReceiverPoints().keySet()) {
 			Map<Double,Map<Id<Link>,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id<Link>,Double>>();
 		
 			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
 			 	Map<Id<Link>,Double> noiseLinks2isolatedImmission = new HashMap<Id<Link>, Double>();
 			
-			 	for(Id<Link> linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
+			 	for(Id<Link> linkId : spatialInfo.getReceiverPoints().get(coordId).getLinkId2distanceCorrection().keySet()) {
 					double noiseEmission = linkId2timeInterval2noiseEmission.get(linkId).get(timeInterval);
 					double noiseImmission = 0.;
-					Coord coord = spatialInfo.getReceiverPointId2Coord().get(coordId);
 					if (!(noiseEmission == 0.)) {
-						noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , coord);						
+						noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , coordId);						
 					}
 					noiseLinks2isolatedImmission.put(linkId,noiseImmission);
 				}
@@ -132,30 +128,28 @@ public class NoiseImmissionCalculation {
 	}
 	
 	
-	private double emission2immission(NoiseSpatialInfo spatialInfo, Id<Link> linkId, double noiseEmission, Coord coord) {
+	private double emission2immission(NoiseInitialization spatialInfo, Id<Link> linkId, double noiseEmission, Id<ReceiverPoint> rpId) {
 		double noiseImmission = 0.;
-		
-		Id<ReceiverPoint> receiverPointId = spatialInfo.getCoord2receiverPointId().get(coord);
-	
+			
 		noiseImmission = noiseEmission
-				+ spatialInfo.getReceiverPointId2relevantLinkId2correctionTermDs().get(receiverPointId).get(linkId)
-				+ spatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(receiverPointId).get(linkId);
+				+ spatialInfo.getReceiverPoints().get(rpId).getLinkId2distanceCorrection().get(linkId)
+				+ spatialInfo.getReceiverPoints().get(rpId).getLinkId2angleCorrection().get(linkId);
 		
-		if(noiseImmission < 0.) {
+		if (noiseImmission < 0.) {
 			noiseImmission = 0.;
 		}
 		return noiseImmission;
 	}
 
 	private void calculateFinalNoiseImmissions() {
-		for(Id<ReceiverPoint> coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
+		for(Id<ReceiverPoint> rpId : spatialInfo.getReceiverPoints().keySet()) {
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
 			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
-				if(!(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval)==null)) {
-					for(Id<Link> linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).keySet()) {
+				if(!(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(rpId).get(timeInterval)==null)) {
+					for(Id<Link> linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(rpId).get(timeInterval).keySet()) {
 						if(!(linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get(timeInterval).size() == 0.)) {
-							noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).get(linkId));
+							noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(rpId).get(timeInterval).get(linkId));
 						}
 					}	
 					double resultingNoiseImmission = noiseImmissionCalculator.calculateResultingNoiseImmission(noiseImmissions);
@@ -165,7 +159,7 @@ public class NoiseImmissionCalculation {
 					timeInterval2noiseImmission.put(timeInterval, 0.);
 				}
 			}
-			receiverPointId2timeInterval2noiseImmission.put(coordId, timeInterval2noiseImmission);
+			receiverPointId2timeInterval2noiseImmission.put(rpId, timeInterval2noiseImmission);
 		}
 	}
 	
@@ -361,7 +355,7 @@ public class NoiseImmissionCalculation {
 					String dateTimeString = convertSeconds2dateTimeFormat(timeInterval);
 					double result = this.receiverPointId2timeInterval2noiseImmission.get(receiverPoint).get(timeInterval);
 					
-					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(this.spatialInfo.getReceiverPointId2Coord().get(receiverPoint)), new Object[] {dateTimeString, result}, null);
+					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(this.spatialInfo.getReceiverPoints().get(receiverPoint).getCoord()), new Object[] {dateTimeString, result}, null);
 					features.add(feature);
 				}				
 			}
