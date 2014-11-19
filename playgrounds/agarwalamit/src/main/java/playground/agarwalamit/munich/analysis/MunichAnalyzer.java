@@ -33,8 +33,8 @@ import playground.agarwalamit.analysis.legModeHandler.LegModeTripTimeDistributio
 public class MunichAnalyzer {
 
 	public static void main(String[] args) {
-		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run7/";
-		String [] runs = {"baseCase"};
+		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+		String [] runs = {"baseCaseCtd","ei","ci","eci"};
 		
 		for(String str:runs){
 			MunichAnalyzer ana = new MunichAnalyzer();

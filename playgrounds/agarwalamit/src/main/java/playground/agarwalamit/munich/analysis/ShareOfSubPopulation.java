@@ -35,13 +35,13 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ShareOfSubPopulation {
 
-	private static String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/";/*"./output/run2/";*/
+	private static String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9//";/*"./output/run2/";*/
 //	private static String populationFile =outputDir+ "/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";//"/network.xml";
-	private static String populationFile = outputDir+"/output/1pct/baseCase2/output_plans.xml.gz";
-	private static String networkFile =outputDir+ "/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";//"/network.xml";
+	private static String populationFile = outputDir+"/baseCaseCtd/output_plans.xml.gz";
+	private static String networkFile =outputDir+ "/baseCaseCtd/output_network.xml.gz";//"/network.xml";
 
 	public static void main(String[] args) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/output/1pct/analysis/subPopulationShare.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/subPopulationShare.txt");
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(populationFile, networkFile);
 		PersonFilter pf = new PersonFilter();
 		Population wholePop = sc.getPopulation();
