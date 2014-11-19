@@ -57,7 +57,6 @@ public class NoiseDamageCalculation {
 	private EventsManager events;
 	
 	private NoiseInitialization spatialInfo;
-	private NoiseEquations noiseImmissionCalculator;
 	private NoiseParameters noiseParams;
 		
 	// from emission handler
@@ -97,7 +96,6 @@ public class NoiseDamageCalculation {
 		this.events = events;
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
-		this.noiseImmissionCalculator = new NoiseEquations();
 		
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
 		this.linkId2timeInterval2linkEnterVehicleIDsCar = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterCars();
@@ -266,7 +264,7 @@ public class NoiseDamageCalculation {
 						
 						if (!(noiseImmission == 0.)) {
 						
-							double costShare = noiseImmissionCalculator.calculateShareOfResultingNoiseImmission(noiseImmission, resultingNoiseImmission);
+							double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(noiseImmission, resultingNoiseImmission);
 							costs = costShare * receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval);	
 						}
 						noiseLinks2costShare.put(linkId, costs);

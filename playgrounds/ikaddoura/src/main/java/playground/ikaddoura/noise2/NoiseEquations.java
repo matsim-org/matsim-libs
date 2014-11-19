@@ -66,7 +66,7 @@ public class NoiseEquations {
 		return geschwindigkeitskorrekturDv;
 	}
 			
-	public double calculateResultingNoiseImmission (List<Double> noiseImmissions){
+	public static double calculateResultingNoiseImmission (List<Double> noiseImmissions){
 		
 		double resultingNoiseImmission = 0.;
 		
@@ -83,7 +83,7 @@ public class NoiseEquations {
 		return resultingNoiseImmission;
 	}
 	
-	public double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
+	public static double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
 		
 		double shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05 * noiseImmission))) / (Math.pow(10, (0.05 * resultingNoiseImmission)))), 2);
 		return shareOfResultingNoiseImmission;	
