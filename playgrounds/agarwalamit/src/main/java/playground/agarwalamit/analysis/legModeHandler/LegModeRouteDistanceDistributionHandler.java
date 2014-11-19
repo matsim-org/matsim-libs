@@ -44,6 +44,8 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 
 /**
+ * 1) Two categories congested modes and teleported modes (only departure and arrival events)
+ * 2) oneTripDist map is used first just to accumulate the distance (linkLevae Event) and then on arrival transfered to distances map
  * @author amit
  */
 public class LegModeRouteDistanceDistributionHandler implements PersonDepartureEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, TeleportationArrivalEventHandler {
@@ -84,7 +86,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
 		Id<Link> linkId = event.getLinkId();
 		// if a person is in more than two groups, then which one is correct mode ?
 		String mode = this.personId2LegModes.get(personId);
