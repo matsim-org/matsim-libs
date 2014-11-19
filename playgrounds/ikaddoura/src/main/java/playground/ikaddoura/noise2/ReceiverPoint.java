@@ -41,6 +41,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<Id<Link>, Double>();
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
 	private Map<Double,Map<Id<Link>,Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
+	private Map<Double,Double> timeInterval2immission = new HashMap<Double, Double>();
 	
 	public ReceiverPoint(Id<ReceiverPoint> id) {
 		this.id = id;
@@ -83,6 +84,14 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	public void setTimeInterval2LinkId2IsolatedImmission(
 			Map<Double,Map<Id<Link>,Double>> timeInterval2LinkId2IsolatedImmission) {
 		this.timeInterval2LinkId2IsolatedImmission = timeInterval2LinkId2IsolatedImmission;
+	}
+
+	public Map<Double,Double> getTimeInterval2immission() {
+		return timeInterval2immission;
+	}
+
+	public void setTimeInterval2immission(Map<Double,Double> timeInterval2immission) {
+		this.timeInterval2immission = timeInterval2immission;
 	}
 
 }

@@ -77,9 +77,6 @@ public class NoiseDamageCalculation {
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2damageCost = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
 	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Id<ReceiverPoint>, Map<Double,Double>>();
 	
-	private Map<Id<ReceiverPoint>,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission;
-	private Map<Id<ReceiverPoint>,Map<Double,Map<Id<Link>,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
-
 	// some additional analysis
 	private Map<Id<Person>,Double> personId2causedNoiseCosts = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>,Double> personId2affectedNoiseCosts = new HashMap<Id<Person>, Double>();
@@ -104,10 +101,7 @@ public class NoiseDamageCalculation {
 		this.receiverPointId2personId2actNumber2activityStartAndActivityEnd = activityTracker.getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
 		this.receiverPointId2timeInterval2affectedAgentUnits = activityTracker.getReceiverPointId2timeInterval2affectedAgentUnits();
 		this.receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType = activityTracker.getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
-		
-		this.receiverPointId2timeInterval2noiseImmission = noiseImmission.getReceiverPointId2timeInterval2noiseImmission();
-		this.receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = noiseImmission.getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
-						
+								
 		this.collectNoiseEvents = true;
 	}
 	
@@ -141,15 +135,16 @@ public class NoiseDamageCalculation {
 		
 	private void calculateDamagePerReceiverPoint() {
 		int counter = 0;
-		log.info("Calculating noise exposure costs for a total of " + receiverPointId2timeInterval2noiseImmission.size() + " receiver points.");
+		log.info("Calculating noise exposure costs for a total of " + this.spatialInfo.getReceiverPoints().size() + " receiver points.");
 		
-		for(Id<ReceiverPoint> receiverPointId : receiverPointId2timeInterval2noiseImmission.keySet()) {
+		for(ReceiverPoint rp : this.spatialInfo.getReceiverPoints().values()) {
+			Id<ReceiverPoint> receiverPointId = rp.getId();
 			if (counter % 10000 == 0) {
 				log.info("receiver point # " + counter);
 			}
 			
-			for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(receiverPointId).keySet()) {
-				double noiseImmission = receiverPointId2timeInterval2noiseImmission.get(receiverPointId).get(timeInterval);
+			for(double timeInterval : rp.getTimeInterval2immission().keySet()) {
+				double noiseImmission = rp.getTimeInterval2immission().get(timeInterval);
 				double affectedAgentUnits = 0.;
 				
 				if (receiverPointId2timeInterval2affectedAgentUnits.containsKey(receiverPointId)) {
@@ -242,7 +237,8 @@ public class NoiseDamageCalculation {
 
 		log.info("Initialization...");
 		int prepCounter = 0;
-		for (Id<ReceiverPoint> coordId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.keySet()) {
+		for (ReceiverPoint rp : this.spatialInfo.getReceiverPoints().values()) {
+			Id<ReceiverPoint> coordId = rp.getId();
 			
 			if (prepCounter % 10000 == 0) {
 				log.info("receiver point # " + prepCounter);
@@ -252,9 +248,9 @@ public class NoiseDamageCalculation {
 			
 			for (double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
 				
-				Map<Id<Link>,Double> noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval);
+				Map<Id<Link>,Double> noiseLinks2isolatedImmission = rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval);
 				Map<Id<Link>,Double> noiseLinks2costShare = new HashMap<Id<Link>, Double>();
-				double resultingNoiseImmission = receiverPointId2timeInterval2noiseImmission.get(coordId).get(timeInterval);
+				double resultingNoiseImmission = rp.getTimeInterval2immission().get(timeInterval);
 				
 				if (!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
 					for (Id<Link> linkId : noiseLinks2isolatedImmission.keySet()) {
@@ -458,186 +454,6 @@ public class NoiseDamageCalculation {
 				}
 			}
 		}
-	}
-	
-	// write immission infos
-	
-	public void writeNoiseImmissionStats(String fileName) {
-		File file = new File(fileName);
-				
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("receiver point Id;avg noise immission;avg noise immission (day);avg noise immission (night);avg noise immission (peak);avg noise immission (off-peak)");
-			bw.newLine();
-			
-			List<Double> day = new ArrayList<Double>();
-			for(double timeInterval = 6 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
-				day.add(timeInterval);
-			}
-			List<Double> night = new ArrayList<Double>();
-			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
-				if(!(day.contains(timeInterval))) {
-					night.add(timeInterval);
-				}
-			}
-			
-			List<Double> peak = new ArrayList<Double>();
-			for(double timeInterval = 7 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
-				peak.add(timeInterval);
-			}
-			for(double timeInterval = 15 * 3600 + this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
-				peak.add(timeInterval);
-			}
-			List<Double> offPeak = new ArrayList<Double>();
-			for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()){
-				if(!(peak.contains(timeInterval))) {
-					offPeak.add(timeInterval);
-				}
-			}
-			
-			for (Id<ReceiverPoint> rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
-				double avgNoise = 0.;
-				double avgNoiseDay = 0.;
-				double avgNoiseNight = 0.;
-				double avgNoisePeak = 0.;
-				double avgNoiseOffPeak = 0.;
-				
-				double sumAvgNoise = 0.;
-				int counterAvgNoise = 0;
-				double sumAvgNoiseDay = 0.;
-				int counterAvgNoiseDay = 0;
-				double sumAvgNoiseNight = 0.;
-				int counterAvgNoiseNight = 0;
-				double sumAvgNoisePeak = 0.;
-				int counterAvgNoisePeak = 0;
-				double sumAvgNoiseOffPeak = 0.;
-				int counterAvgNoiseOffPeak = 0;
-				
-				for(double timeInterval : receiverPointId2timeInterval2noiseImmission.get(rpId).keySet()) {
-					double noiseValue = receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval);
-					double termToAdd = Math.pow(10., noiseValue/10.);
-					
-					if(timeInterval < 30 * 3600) {
-						sumAvgNoise = sumAvgNoise + termToAdd;
-						counterAvgNoise++;
-					}
-					
-					if(day.contains(timeInterval)) {
-						sumAvgNoiseDay = sumAvgNoiseDay + termToAdd;
-						counterAvgNoiseDay++;
-					}
-					
-					if(night.contains(timeInterval)) {
-						sumAvgNoiseNight = sumAvgNoiseNight + termToAdd;
-						counterAvgNoiseNight++;
-					}
-				
-					if(peak.contains(timeInterval)) {
-						sumAvgNoisePeak = sumAvgNoisePeak + termToAdd;
-						counterAvgNoisePeak++;
-					}
-					
-					if(offPeak.contains(timeInterval)) {
-						sumAvgNoiseOffPeak = sumAvgNoiseOffPeak + termToAdd;
-						counterAvgNoiseOffPeak++;
-					}	
-				}
-				
-				avgNoise = 10 * Math.log10(sumAvgNoise / (counterAvgNoise));
-				avgNoiseDay = 10 * Math.log10(sumAvgNoiseDay / counterAvgNoiseDay);
-				avgNoiseNight = 10 * Math.log10(sumAvgNoiseNight / counterAvgNoiseNight);
-				avgNoisePeak = 10 * Math.log10(sumAvgNoisePeak / counterAvgNoisePeak);
-				avgNoiseOffPeak = 10 * Math.log10(sumAvgNoiseOffPeak / counterAvgNoiseOffPeak);
-								
-				bw.write(rpId + ";" + avgNoise + ";" + avgNoiseDay+";"+avgNoiseNight+";"+avgNoisePeak+";"+avgNoiseOffPeak);
-				bw.newLine();
-			}
-			
-			bw.close();
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		File file2 = new File(fileName + "t");
-		
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\",\"Real\",\"Real\",\"Real\",\"Real\"");
-			
-			bw.newLine();
-			
-			bw.close();
-			log.info("Output written to " + fileName + "t");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-				
-	}
-	
-	public void writeNoiseImmissionStatsPerHour(String fileName) {
-		File file = new File(fileName);
-			
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			
-			// column headers
-			bw.write("receiver point");
-			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1) * this.noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
-				bw.write(";agent units " + time + ";noise immission " + time);
-			}
-			bw.newLine();
-
-			
-			for (Id<ReceiverPoint> rpId : this.receiverPointId2timeInterval2noiseImmission.keySet()){
-				bw.write(rpId.toString());
-				for(int i = 0 ; i < 30 ; i++) {
-					double timeInterval = (i+1) * this.noiseParams.getTimeBinSizeNoiseComputation();
-					double affectedAgentUnits = 0.;
-					double noiseImmission = 0.;
-					
-					if (receiverPointId2timeInterval2affectedAgentUnits.get(rpId) != null) {
-						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(rpId).get(timeInterval);
-					}
-					
-					if (receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval) != null) {
-						noiseImmission = receiverPointId2timeInterval2noiseImmission.get(rpId).get(timeInterval);
-					}
-					
-					bw.write(";"+ affectedAgentUnits + ";" + noiseImmission);	
-				}
-				
-				bw.newLine();
-			}
-			
-			bw.close();
-			log.info("Output written to " + fileName);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		File file2 = new File(fileName + "t");
-		
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\"");
-			
-			for(int i = 0; i < 30 ; i++) {
-				bw.write(",\"Real\",\"Real\"");
-			}
-			
-			bw.newLine();
-			
-			bw.close();
-			log.info("Output written to " + fileName + "t");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}		
 	}
 	
 	// analysis

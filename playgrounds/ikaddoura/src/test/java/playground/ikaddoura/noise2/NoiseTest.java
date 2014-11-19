@@ -206,8 +206,8 @@ public class NoiseTest {
 		//
 
 		// before and after time interval '10 - 11' the noise immission should be zero.
-		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(Id.create("16", ReceiverPoint.class)).get(10 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(Id.create("16", ReceiverPoint.class)).get(12 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2immission().get(10 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2immission().get(12 * 3600.), MatsimTestUtils.EPSILON);
 		
 		// test the emission
 		double emissionLinkA5 = noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2noiseEmission().get(Id.create("linkA5", Link.class)).get(11 * 3600.);
@@ -223,15 +223,15 @@ public class NoiseTest {
 
 		// now test for the relevant time interval '10 - 11' the isolated noise immission that results from each link
 		double immissionFromLinkA5 = emissionLinkA5 + correctionTermDs + correctionTermAngle;		
-		Assert.assertEquals("wrong immission at receiver point 16", immissionFromLinkA5, noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("linkA5", Link.class)), 0.0000001);
-		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong immission at receiver point 16", immissionFromLinkA5, noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2LinkId2IsolatedImmission().get(11 * 3600.).get(Id.create("linkA5", Link.class)), 0.0000001);
+		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2LinkId2IsolatedImmission().get(11 * 3600.).get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 
 		// now test for the relevant time interval '10 - 11' the noise immission resulting from all (relevant) links
 		double immissionRP16 = 10 * Math.log10((
-				Math.pow(10,(0.1 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("linkA5", Link.class))))
-						+ (Math.pow(10,(0.1 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("link2", Link.class)))))
+				Math.pow(10,(0.1 * noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2LinkId2IsolatedImmission().get(11 * 3600.).get(Id.create("linkA5", Link.class))))
+						+ (Math.pow(10,(0.1 * noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2LinkId2IsolatedImmission().get(11 * 3600.).get(Id.create("link2", Link.class)))))
 				));		
-		Assert.assertEquals("wrong immission at receiver point 16", immissionRP16, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong immission at receiver point 16", immissionRP16, noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2immission().get(11 * 3600.), MatsimTestUtils.EPSILON);
 			
 		// ++++++++++++++++++++++++++++++++++++++++++ exposures ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
@@ -275,7 +275,7 @@ public class NoiseTest {
 		// linkA5
 		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", Math.pow(((Math.pow(10, (0.05 * immissionFromLinkA5))) / (Math.pow(10, (0.05 * immissionRP16)))), 2)  * damageCostsRP16, noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("linkA5", Link.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
 		// link2
-		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", Math.pow(((Math.pow(10, (0.05 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("link2", Link.class))))) / (Math.pow(10, (0.05 * immissionRP16)))), 2)  * damageCostsRP16, noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("link2", Link.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", Math.pow(((Math.pow(10, (0.05 * noiseControlerListener.getSpatialInfo().getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2LinkId2IsolatedImmission().get(11 * 3600.).get(Id.create("link2", Link.class))))) / (Math.pow(10, (0.05 * immissionRP16)))), 2)  * damageCostsRP16, noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("link2", Link.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
 
 		double allocatedExposuresLinks = noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("linkB5", Link.class)).get(11 * 3600.)
 				+ noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("linkA5", Link.class)).get(11 * 3600.)
