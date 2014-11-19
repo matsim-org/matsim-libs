@@ -18,6 +18,8 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeData;
@@ -27,8 +29,8 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 	
 	private final Map<String, StopStopTimeData> stopStopTimes = new ConcurrentHashMap<String, StopStopTimeData>(6602);
 	private final Map<String, Double> scheduledStopStopTimes = new ConcurrentHashMap<String, Double>(6602);
-	private final Map<Id, Tuple<Id, Double>> inTransitVehicles = new ConcurrentHashMap<Id, Tuple<Id,Double>>(1000);
-	private final Set<Id> vehicleIds = new HashSet<Id>();
+	private final Map<Id<Vehicle>, Tuple<Id<TransitStopFacility>, Double>> inTransitVehicles = new ConcurrentHashMap<Id<Vehicle>, Tuple<Id<TransitStopFacility>,Double>>(1000);
+	private final Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
 	private double timeSlot;
 	public static int scheduled = 0;
 	public static int recorded = 0;
@@ -62,7 +64,7 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 			for(TransitRoute route:line.getRoutes().values())
 				for(Departure departure:route.getDepartures().values()) {
 					vehicleIds.add(departure.getVehicleId());
-					inTransitVehicles.put(departure.getVehicleId(), new Tuple<Id, Double>(departure.getVehicleId(), 0.0));
+					inTransitVehicles.put(departure.getVehicleId(), new Tuple<Id<TransitStopFacility>, Double>(route.getStops().get(0).getStopFacility().getId(), 0.0));
 				}
 	}
 		
@@ -70,16 +72,16 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 	public StopStopTime getStopStopTimes() {
 		return new StopStopTime() {
 			@Override
-			public double getStopStopTime(Id stopOId, Id stopDId, double time) {
+			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 				return StopStopTimeCalculatorOld.this.getStopStopTime(stopOId, stopDId, time);
 			}
 			@Override
-			public double getStopStopTimeVariance(Id stopOId, Id stopDId, double time) {
+			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 				return 0;
 			}
 		};
 	}
-	private double getStopStopTime(Id stopOId, Id stopDId, double time) {
+	private double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 		String key = stopOId.toString()+">"+stopDId.toString();
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(key);
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -100,12 +102,12 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		if(vehicleIds.contains(event.getVehicleId()))
-			inTransitVehicles.put(event.getVehicleId(), new Tuple<Id, Double>(event.getFacilityId(), event.getTime()));
+			inTransitVehicles.put(event.getVehicleId(), new Tuple<Id<TransitStopFacility>, Double>(event.getFacilityId(), event.getTime()));
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		if(vehicleIds.contains(event.getVehicleId())) {
-			Tuple<Id, Double> route = inTransitVehicles.remove(event.getVehicleId());
+			Tuple<Id<TransitStopFacility>, Double> route = inTransitVehicles.remove(event.getVehicleId());
 			if(!route.getFirst().equals(event.getVehicleId())) {
 				String key = route.getFirst().toString()+">"+event.getFacilityId().toString();
 				stopStopTimes.get(key).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());

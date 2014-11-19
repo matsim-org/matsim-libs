@@ -48,7 +48,7 @@ import playground.sergioo.typesPopulation2013.population.PersonImplPops;
 public class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
 	private final EventsManager events;
-	private final Map<Id, LegHistogram> histograms = new HashMap<Id, LegHistogram>();
+	private final Map<Id<Population>, LegHistogram> histograms = new HashMap<Id<Population>, LegHistogram>();
 	private final boolean outputGraph;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
@@ -57,7 +57,7 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 		this.events = events;
 		this.outputGraph = outputGraph;
 		for(Person person:population.getPersons().values()) {
-			Id popId = ((PersonImplPops)person).getPopulationId();
+			Id<Population> popId = ((PersonImplPops)person).getPopulationId();
 			if(histograms.get(popId)==null) {
 				LegHistogram legHistogram = new LegHistogram(300, popId, population);
 				histograms.put(popId, legHistogram);
@@ -74,11 +74,11 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		for(Entry<Id, LegHistogram> histogram:histograms.entrySet())
+		for(Entry<Id<Population>, LegHistogram> histogram:histograms.entrySet())
 			histogram.getValue().write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram.txt"));
 		this.printStats();
 		if (this.outputGraph) {
-			for(Entry<Id, LegHistogram> histogram:histograms.entrySet()) {
+			for(Entry<Id<Population>, LegHistogram> histogram:histograms.entrySet()) {
 				histogram.getValue().writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_all.png"));
 				for (String legMode : histogram.getValue().getLegModes())
 					histogram.getValue().writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_" + legMode + ".png"), legMode);

@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.sergioo.passivePlanning2012.api.population.AgendaBasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
@@ -23,7 +24,7 @@ public class SinglePlannerAgendaAgent extends SinglePlannerAgentImpl {
 	
 	@Override
 	protected List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now,
-			Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobsimStatus) {
+			Id<ActivityFacility> startFacilityId, double endTime, Id<ActivityFacility> endFacilityId, final MobsimStatus mobsimStatus) {
 		((AgendaDecisionMaker)decisionMakers[0]).prepareScheduling((Activity) agent.getCurrentPlan().getPlanElements().get(currentElementIndex.get()-1), agent.getCurrentPlan(), now);
 		((AgendaDecisionMaker)decisionMakers[0]).setMobsimEnds(mobsimStatus);
 		return ((AgendaDecisionMaker)decisionMakers[0]).decideRoute(startTime, startFacilityId, endFacilityId, null, tripRouter);
@@ -31,7 +32,7 @@ public class SinglePlannerAgendaAgent extends SinglePlannerAgentImpl {
 	public void addKnownPerson(PlaceSharer sharer) {
 		((PlaceSharer)decisionMakers[0]).addKnownPerson(sharer);
 	}
-	public void shareKnownPlace(Id facilityId, double startTime, String type) {
+	public void shareKnownPlace(Id<ActivityFacility> facilityId, double startTime, String type) {
 		PlaceSharer sharer = ((PlaceSharer)decisionMakers[0]);
 		if(!type.equals("home"))
 			sharer.shareKnownPlace(facilityId, startTime, type);
@@ -40,7 +41,7 @@ public class SinglePlannerAgendaAgent extends SinglePlannerAgentImpl {
 		return (PlaceSharer)decisionMakers[0];
 	}
 
-	public void shareKnownTravelTime(Id prevFacilityId, Id facilityId, String mode, double startTime, double travelTime) {
+	public void shareKnownTravelTime(Id<ActivityFacility> prevFacilityId, Id<ActivityFacility> facilityId, String mode, double startTime, double travelTime) {
 		((PlaceSharer)decisionMakers[0]).shareKnownTravelTime(prevFacilityId, facilityId, mode, startTime, travelTime);
 	}
 

@@ -188,7 +188,7 @@ public class QNode implements NetsimNode {
 	}
 
 
-	private void checkNextLinkSemantics(Link currentLink, Id nextLinkId, PTQLink nextQLink, QVehicle veh){
+	private void checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, PTQLink nextQLink, QVehicle veh){
 		if (nextQLink == null){
 			throw new IllegalStateException("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + " plans to travel on that link from link " + veh.getCurrentLink().getId());
 		}
@@ -210,7 +210,7 @@ public class QNode implements NetsimNode {
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	private boolean moveVehicleOverNode(final QVehicle veh, final PTQLink fromLaneBuffer, final double now) {
-		Id nextLinkId = veh.getDriver().chooseNextLinkId();
+		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 
 		if ((!fromLaneBuffer.hasGreenForToLink(nextLinkId))) {

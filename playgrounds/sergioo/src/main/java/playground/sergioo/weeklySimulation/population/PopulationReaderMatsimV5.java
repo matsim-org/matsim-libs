@@ -212,7 +212,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startAct(final Attributes atts) {
 		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
+			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
@@ -232,13 +232,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
-			Id startLinkId = null;
+			Id<Link> startLinkId = null;
 			if (this.currRoute.getStartLinkId() != null) {
 				startLinkId = this.currRoute.getStartLinkId();
 			} else if (this.prevAct.getLinkId() != null) {
 				startLinkId = this.prevAct.getLinkId();
 			}
-			Id endLinkId = null;
+			Id<Link> endLinkId = null;
 			if (this.currRoute.getEndLinkId() != null) {
 				endLinkId = this.currRoute.getEndLinkId();
 			} else if (this.curract.getLinkId() != null) {

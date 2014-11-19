@@ -232,11 +232,11 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
-			Id startLinkId = null;
+			Id<Link> startLinkId = null;
 			if (this.prevAct.getLinkId() != null) {
 				startLinkId = this.prevAct.getLinkId();
 			}
-			Id endLinkId = null;
+			Id<Link> endLinkId = null;
 			if (this.curract.getLinkId() != null) {
 				endLinkId = this.curract.getLinkId();
 			}

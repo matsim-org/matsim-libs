@@ -59,7 +59,7 @@ public abstract class PassivePlannerTransitAgent extends PassivePlannerDriverAge
 			return false;
 	}
 	private boolean containsId(List<TransitRouteStop> stopsToCome,
-			Id egressStopId) {
+			Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome)
 			if (egressStopId.equals(stop.getStopFacility().getId()))
 				return true;
@@ -71,7 +71,7 @@ public abstract class PassivePlannerTransitAgent extends PassivePlannerDriverAge
 		return route.getEgressStopId().equals(stop.getId());
 	}
 	@Override
-	public Id getDesiredAccessStopId() {
+	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = (Leg)getCurrentPlanElement();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
@@ -82,12 +82,12 @@ public abstract class PassivePlannerTransitAgent extends PassivePlannerDriverAge
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			Id accessStopId = route.getAccessStopId();
+			Id<TransitStopFacility> accessStopId = route.getAccessStopId();
 			return accessStopId;
 		}
 	}
 	@Override
-	public Id getDesiredDestinationStopId() {
+	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) ((Leg)getCurrentPlanElement()).getRoute();
 		return route.getEgressStopId();
 	}

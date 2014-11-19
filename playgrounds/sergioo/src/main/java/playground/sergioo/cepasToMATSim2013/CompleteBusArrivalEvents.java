@@ -13,20 +13,15 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHandler {
 
-	private TransitSchedule transitSchedule;
-	private EventsManager eventsManager;
 	private Map<Id<Vehicle>, Id<TransitStopFacility>> lastStopsVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>(); 
 	
-	public CompleteBusArrivalEvents(TransitSchedule transitSchedule, EventsManager outEventsManager) {
-		this.transitSchedule = transitSchedule;
-		this.eventsManager = outEventsManager;
+	public CompleteBusArrivalEvents() {
 	}
 	@Override
 	public void reset(int iteration) {
@@ -35,7 +30,7 @@ public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHa
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id lastStop = lastStopsVehicle.get(event.getVehicleId());
+		Id<TransitStopFacility> lastStop = lastStopsVehicle.get(event.getVehicleId());
 		if(lastStop != null) {
 			
 		}
@@ -48,7 +43,7 @@ public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHa
 		EventsManager outEventsManager = EventsUtils.createEventsManager();
 		outEventsManager.addHandler(new EventWriterXML(args[2]));
 		EventsManager inEventsManager = EventsUtils.createEventsManager();
-		inEventsManager.addHandler(new CompleteBusArrivalEvents(scenario.getTransitSchedule(), outEventsManager));
+		inEventsManager.addHandler(new CompleteBusArrivalEvents());
 		new EventsReaderXMLv1(inEventsManager).parse(args[1]);
 	}
 

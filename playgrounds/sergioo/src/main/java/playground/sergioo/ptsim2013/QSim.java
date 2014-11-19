@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -44,6 +46,7 @@ import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
 import playground.sergioo.ptsim2013.pt.TransitQSimEngine;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQNetsimEngine;
 
@@ -135,7 +138,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		@Override
-		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
 			return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
 
@@ -221,12 +224,12 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
+	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
 		QVehicle veh = new QVehicle(vehicle);
 		netEngine.addParkedVehicle(veh, linkId);
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		netEngine.addParkedVehicle(veh, startLinkId);
 	}
 
@@ -312,7 +315,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		String mode = agent.getMode();
-		Id linkId = agent.getCurrentLinkId();
+		Id<Link> linkId = agent.getCurrentLinkId();
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, mode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {

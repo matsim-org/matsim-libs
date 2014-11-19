@@ -35,7 +35,7 @@ public abstract class ComposedLink extends LinkImpl {
 		links.add(link);
 	}
 	
-	public ComposedLink(Id id, Node from, Node to, Network network) {
+	public ComposedLink(Id<Link> id, Node from, Node to, Network network) {
 		super(id, from, to, network, 0, 0, 0, 0);
 		links = new ArrayList<Link>();
 	}

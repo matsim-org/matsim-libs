@@ -43,9 +43,9 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 	private final TransitSchedule existingSchedule;
 	private TransitSchedule newSchedule;
 	private final TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
-	private final Map<Id, Tuple<Id, Tuple<Id, Id>>> startDrivers = new HashMap<Id, Tuple<Id, Tuple<Id, Id>>>();
-	private final List<Tuple<Id, VehicleType>> vehicles = new ArrayList<Tuple<Id, VehicleType>>();
-	private final Set<Id> newVehicles = new HashSet<Id>();
+	private final Map<Id<Vehicle>, Tuple<Id<Departure>, Tuple<Id<TransitLine>, Id<TransitRoute>>>> startDrivers = new HashMap<Id<Vehicle>, Tuple<Id<Departure>, Tuple<Id<TransitLine>, Id<TransitRoute>>>>();
+	private final List<Tuple<Id<Vehicle>, VehicleType>> vehicles = new ArrayList<Tuple<Id<Vehicle>, VehicleType>>();
+	private final Set<Id<Vehicle>> newVehicles = new HashSet<Id<Vehicle>>();
 	
 	public EventsToTransitSchedule(TransitSchedule transitSchedule, Vehicles vehicles) {
 		existingSchedule = transitSchedule;
@@ -58,7 +58,7 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 			newSchedule.addStopFacility(newStop);
 		}
 		for(Vehicle vehicle:vehicles.getVehicles().values())
-			this.vehicles.add(new Tuple<Id, VehicleType>(vehicle.getId(), vehicle.getType()));
+			this.vehicles.add(new Tuple<Id<Vehicle>, VehicleType>(vehicle.getId(), vehicle.getType()));
 	}
 	public TransitSchedule getNewSchedule() {
 		return newSchedule;
@@ -84,11 +84,11 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 			route = factory.createTransitRoute(event.getTransitRouteId(), existingRoute.getRoute(), existingRoute.getStops(), existingRoute.getTransportMode());
 			line.addRoute(route);
 		}
-		startDrivers.put(event.getVehicleId(), new Tuple<Id, Tuple<Id, Id>>(event.getDepartureId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId())));
+		startDrivers.put(event.getVehicleId(), new Tuple<Id<Departure>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(event.getDepartureId(), new Tuple<Id<TransitLine>, Id<TransitRoute>>(event.getTransitLineId(), event.getTransitRouteId())));
 	}
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		Tuple<Id, Tuple<Id, Id>> startStop = startDrivers.remove(event.getVehicleId());
+		Tuple<Id<Departure>, Tuple<Id<TransitLine>, Id<TransitRoute>>> startStop = startDrivers.remove(event.getVehicleId());
 		if(startStop != null) {
 			TransitRoute route = newSchedule.getTransitLines().get(startStop.getSecond().getFirst()).getRoutes().get(startStop.getSecond().getSecond());
 			double time = event.getTime();
@@ -104,11 +104,11 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 	}
 	public void printVehicles(String fileName) {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		for(Tuple<Id, VehicleType> veh:this.vehicles) {
+		for(Tuple<Id<Vehicle>, VehicleType> veh:this.vehicles) {
 			if(vehicles.getVehicleTypes().get(veh.getSecond().getId())==null)
 				vehicles.addVehicleType(veh.getSecond());
 		}
-		for(Id id:newVehicles)
+		for(Id<Vehicle> id:newVehicles)
 			vehicles.addVehicle(new VehicleImpl(id, this.vehicles.remove(0).getSecond()));
 		new VehicleWriterV1(vehicles).writeFile(fileName);
 	}

@@ -102,7 +102,7 @@ public class TravelDistanceStats {
 		}
 	}
 
-	public void addIteration(int iteration, Map<Id, Plan> map) {
+	public void addIteration(int iteration, Map<Id<Plan>, Plan> map) {
 
 		int numOfThreads = this.config.global().getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;

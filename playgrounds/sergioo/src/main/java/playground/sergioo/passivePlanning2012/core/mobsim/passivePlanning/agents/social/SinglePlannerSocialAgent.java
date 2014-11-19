@@ -58,7 +58,7 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 	public void addKnownPerson(PlaceSharer sharer) {
 		((PlaceSharer)decisionMakers[0]).addKnownPerson(sharer);
 	}
-	public void shareKnownPlace(Id facilityId, double startTime, String type) {
+	public void shareKnownPlace(Id<ActivityFacility> facilityId, double startTime, String type) {
 		((PlaceSharer)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
 	}
 	public PlaceSharer getPlaceSharer() {

@@ -2,86 +2,32 @@ package playground.sergioo.eventAnalysisTools2012;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import javax.swing.JFrame;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.AStarEuclidean;
-import org.matsim.core.router.FastDijkstra;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.MatsimCountsReader;
-import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleWriterV1;
-
-import playground.sergioo.eventAnalysisTools2012.gui.VariableSizeSelectionNetworkPainter;
-import playground.sergioo.visualizer2D2012.networkVisualizer.SimpleNetworkWindow;
-import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;
 
 public class MainEventAnalyzer {
 
@@ -166,15 +112,15 @@ public class MainEventAnalyzer {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		new MatsimPopulationReader(scenario).parse("./data/MATSim-Sin-2.0/input/population/routedPlans25.xml.gz");
-		Set<Id> keys = new HashSet<Id>();
+		Set<Id<Person>> keys = new HashSet<Id<Person>>();
 		int i=0;
-		for(Id key:scenario.getPopulation().getPersons().keySet()) {
+		for(Id<Person> key:scenario.getPopulation().getPersons().keySet()) {
 			keys.add(key);
 			if(i>scenario.getPopulation().getPersons().size()/2)
 				break;
 			i++;
 		}
-		for(Id key:keys)
+		for(Id<Person> key:keys)
 			scenario.getPopulation().getPersons().remove(key);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write("./data/MATSim-Sin-2.0/input/population/routedPlans12.5.xml.gz");
 	}*/
@@ -262,7 +208,7 @@ public class MainEventAnalyzer {
 					double distance = 0;
 					if(leg.getMode().equals("car"))
 						if(leg.getRoute() instanceof NetworkRoute)
-							for(Id linkId:((NetworkRoute)leg.getRoute()).getLinkIds())
+							for(Id<Link> linkId:((NetworkRoute)leg.getRoute()).getLinkIds())
 								distance += scenario.getNetwork().getLinks().get(linkId).getLength();
 						else
 							distance += leg.getTravelTime()*CAR_SPEED;
@@ -280,7 +226,7 @@ public class MainEventAnalyzer {
 										String[] description = ((GenericRoute)leg.getRoute()).getRouteDescription().split("===");
 										boolean inRoute=false;
 										ROUTE:
-										for(Id linkId:scenario.getTransitSchedule().getTransitLines().get(Id.create(description[2], TransitLine.class)).getRoutes().get(Id.create(description[3], TransitRoute.class)).getRoute().getLinkIds()) {
+										for(Id<Link> linkId:scenario.getTransitSchedule().getTransitLines().get(Id.create(description[2], TransitLine.class)).getRoutes().get(Id.create(description[3], TransitRoute.class)).getRoute().getLinkIds()) {
 											if(linkId.toString().equals(description[1]))
 												inRoute=true;
 											if(inRoute)
@@ -341,11 +287,11 @@ public class MainEventAnalyzer {
 		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario2).parse("./data/MATSim-Sin-2.0/input/network/singapore6.xml");
-		Set<Id> removedLinkIds = new HashSet<Id>();
+		Set<Id<Link>> removedLinkIds = new HashSet<Id<Link>>();
 		for(Link link:scenario2.getNetwork().getLinks().values())
 			if(!link.getAllowedModes().contains("car"))
 				removedLinkIds.add(link.getId());
-		for(Id linkId:removedLinkIds)
+		for(Id<Link> linkId:removedLinkIds)
 			scenario2.getNetwork().removeLink(linkId);
 		new NetworkCleaner().run(scenario2.getNetwork());
 		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
@@ -378,7 +324,7 @@ public class MainEventAnalyzer {
 			if(legs!=null) {
 				for(Leg leg:legs) {
 					if(leg.getRoute() instanceof NetworkRoute)
-						for(Id linkId:((NetworkRoute)leg.getRoute()).getLinkIds()) {
+						for(Id<Link> linkId:((NetworkRoute)leg.getRoute()).getLinkIds()) {
 							distancePT+=scenario.getNetwork().getLinks().get(linkId).getLength();
 							timePT += ttc.getLinkTravelTime(linkId, new Double(parts[6]));
 						}
@@ -432,7 +378,7 @@ public class MainEventAnalyzer {
 			if(legs!=null) {
 				for(Leg leg:legs) {
 					if(leg.getRoute() instanceof NetworkRoute)
-						for(Id linkId:((NetworkRoute)leg.getRoute()).getLinkIds()) {
+						for(Id<Link> linkId:((NetworkRoute)leg.getRoute()).getLinkIds()) {
 							distancePT+=scenario.getNetwork().getLinks().get(linkId).getLength();
 							timePT += ttc.getLinkTravelTime(linkId, new Double(parts[6]));
 						}

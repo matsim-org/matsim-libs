@@ -65,7 +65,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private final int nofBins;
 	private final Map<String, ModeData> data = new TreeMap<String, ModeData>();
 	private ModeData allModesData = null;
-	private Id popId;
+	private Id<Population> popId;
 	private Population population;
 	
 	/**
@@ -74,7 +74,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @param binSize The size of a time bin in seconds.
 	 * @param nofBins The number of time bins for this analysis.
 	 */
-	public LegHistogram(final int binSize, final int nofBins, Id popId, Population population) {
+	public LegHistogram(final int binSize, final int nofBins, Id<Population> popId, Population population) {
 		super();
 		this.binSize = binSize;
 		this.nofBins = nofBins;
@@ -88,7 +88,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 *
 	 * @param binSize The size of a time bin in seconds.
 	 */
-	public LegHistogram(final int binSize, Id popId, Population population) {
+	public LegHistogram(final int binSize, Id<Population> popId, Population population) {
 		this(binSize, 30*3600/binSize + 1, popId, population);
 	}
 

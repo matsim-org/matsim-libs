@@ -360,14 +360,14 @@ public class SchedulingNetwork implements Network {
 		while(((SchedulingNode)path.get(path.size()-1).toNode).time<endTime) {
 			addNodesAndLinks(fromNode, facilities, originId, destinationId, lastActivity, lastTime, timeInterval, modes, modes.contains("car")?originId:null, placeSharer, agenda, path, modes.contains("car"));
 			variableStartTime+=timeInterval;
-			Id toNodeId = Id.createNodeId(originId+"("+variableStartTime+")");
+			Id<Node> toNodeId = Id.createNodeId(originId+"("+variableStartTime+")");
 			fromNode = (SchedulingNode) delegate.getNodes().get(toNodeId);
 			if(fromNode==null) {
 				fromNode = new SchedulingNode(toNodeId, facilities.getFacilities().get(originId).getCoord(), variableStartTime, getMaxActivityUtility(endTime-variableStartTime));
 				addNode(fromNode);
 			}
 			String activityType = ((ActivitySchedulingLink)path.get(path.size()-1)).activityType;
-			Id linkId = Id.createLinkId(activityType+","+originId+"("+(int)((SchedulingNode)path.get(path.size()-1).fromNode).time+"-"+fromNode.time+")");
+			Id<Link> linkId = Id.createLinkId(activityType+","+originId+"("+(int)((SchedulingNode)path.get(path.size()-1).fromNode).time+"-"+fromNode.time+")");
 			SchedulingLink link = (SchedulingLink) delegate.getLinks().get(linkId);
 			if(link==null) {
 				link = new ActivitySchedulingLink(linkId, path.get(path.size()-1).fromNode, fromNode, activityType, originId);

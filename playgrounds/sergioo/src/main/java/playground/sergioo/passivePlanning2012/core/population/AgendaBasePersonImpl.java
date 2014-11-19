@@ -24,7 +24,7 @@ public class AgendaBasePersonImpl extends BasePersonImpl implements	AgendaBasePe
 
 	private final AgendaDecisionMaker agendaDecisionMaker;
 	
-	public AgendaBasePersonImpl(Id id, AgendaDecisionMaker agendaDecisionMaker) {
+	public AgendaBasePersonImpl(Id<Person> id, AgendaDecisionMaker agendaDecisionMaker) {
 		super(id);
 		this.agendaDecisionMaker = agendaDecisionMaker;
 	}

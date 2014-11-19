@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.routes.GenericRoute;
@@ -41,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeData;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeDataArray;
@@ -60,8 +62,8 @@ public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, Perso
 	private final double timeSlot;
 	private final Map<String, WaitTimeData> waitTimes = new ConcurrentHashMap<String, WaitTimeData>(26883);
 	private final Map<String, double[]> scheduledWaitTimes = new ConcurrentHashMap<String, double[]>(26883);
-	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
-	private final Map<Id, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id, Integer>();
+	private final Map<Id<Person>, Double> agentsWaitingData = new ConcurrentHashMap<Id<Person>, Double>();
+	private final Map<Id<Person>, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id<Person>, Integer>();
 	private final Population population;
 
 	//Constructors
@@ -105,13 +107,13 @@ public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, Perso
 		return new WaitTimeOld() {
 			
 			@Override
-			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 				return WaitTimeCalculatorOld.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		
 		};
 	}
-	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		String key = lineId.toString()+")["+routeId.toString()+"]"+stopId.toString();
 		WaitTimeData waitTimeData = waitTimes.get(key);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {

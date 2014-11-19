@@ -49,7 +49,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWWOld extends TransitRou
 	private Network network;
 	private final TravelTime travelTime;
 	private final WaitTimeOld waitTime;
-	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
+	private final Map<Id<Link>, double[]> linkTravelTimes = new HashMap<Id<Link>, double[]>();
 	private final double timeSlot;
 	private final int numSlots;
 	private double startTime;
@@ -78,7 +78,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWWOld extends TransitRou
 				linkTravelTimes.put(link.getId(), new double[numSlots]);
 				for(int slot = 0; slot<numSlots; slot++) {
 					double linksTime = travelTime.getLinkTravelTime(network.getLinks().get(link.fromNode.stop.getStopFacility().getLinkId()), startTime+slot*timeSlot, null, null);
-					for(Id linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
+					for(Id<Link> linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
 						linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), startTime+slot*timeSlot, null, null);
 					linkTravelTimes.get(link.getId())[slot] = linksTime;
 				}

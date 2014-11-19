@@ -1,6 +1,7 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.PersonImpl;
@@ -16,7 +17,7 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	private BasePlan basePlan = new BasePlanImpl(this);
 	
 	//Constructors
-	public BasePersonImpl(Id id) {
+	public BasePersonImpl(Id<Person> id) {
 		super(id);
 	}
 

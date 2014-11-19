@@ -45,7 +45,7 @@ public class BusLines {
 				points[0] = new Coordinate(transformation.transform(first.getFromNode().getCoord()).getX(), transformation.transform(first.getFromNode().getCoord()).getY());
 				points[1] = new Coordinate(transformation.transform(first.getToNode().getCoord()).getX(), transformation.transform(first.getToNode().getCoord()).getY());
 				int i=1;
-				for(Id linkId:route.getRoute().getLinkIds()) {
+				for(Id<Link> linkId:route.getRoute().getLinkIds()) {
 					first = scenario.getNetwork().getLinks().get(linkId);
 					points[++i] = new Coordinate(transformation.transform(first.getToNode().getCoord()).getX(), transformation.transform(first.getToNode().getCoord()).getY());
 				}

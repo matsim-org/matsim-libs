@@ -16,6 +16,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PopulationLinksToStopLinks implements PersonAlgorithm {
 
@@ -33,7 +34,7 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 
 	private void processPlan(final Plan plan) {
 		ActivityImpl act = null, ptAct = null;
-		Id eStopId = null, eStopId2 = null;
+		Id<TransitStopFacility> eStopId = null, eStopId2 = null;
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if(planElement instanceof ActivityImpl && !((ActivityImpl)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
@@ -44,14 +45,14 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 				}
 				act = (ActivityImpl) planElement;
 				if(eStopId2!=null) {
-					act.setLinkId(eStopId2);
+					act.setLinkId(Id.createLinkId(eStopId2));
 					eStopId2 = null;
 				}
 			}
 			else if(planElement instanceof ActivityImpl) {
 				ptAct = (ActivityImpl) planElement;
 				if(eStopId!=null) {
-					ptAct.setLinkId(eStopId);
+					ptAct.setLinkId(Id.createLinkId(eStopId));
 					eStopId2 = eStopId;
 					eStopId = null;
 				}
@@ -61,11 +62,11 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 				if(route!=null) {
 					ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) factory.createRoute(route.getStartLinkId(), route.getEndLinkId());
 					eRoute.setRouteDescription(route.getStartLinkId(), ((GenericRoute)route).getRouteDescription(), route.getEndLinkId());
-					Id aStopId = eRoute.getAccessStopId();
+					Id<TransitStopFacility> aStopId = eRoute.getAccessStopId();
 					eStopId = eRoute.getEgressStopId();
 					if(act!=null)
-						act.setLinkId(aStopId);
-					ptAct.setLinkId(aStopId);
+						act.setLinkId(Id.createLinkId(aStopId));
+					ptAct.setLinkId(Id.createLinkId(aStopId));
 				}
 				else if(act!=null)
 					act.setLinkId(NetworkUtils.getNearestLink(((NetworkImpl) network), act.getCoord()).getId());

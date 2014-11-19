@@ -21,11 +21,11 @@ import playground.sergioo.typesPopulation2013.population.PersonImplPops;
 
 public class StrategyManagerPops extends StrategyManager {
 	
-	private final Map<Id, ArrayList<PlanStrategy>> strategies = new HashMap<Id, ArrayList<PlanStrategy>>();
-	private final Map<Id, ArrayList<Double>> weights = new HashMap<Id, ArrayList<Double>>();
-	private Map<Id, Double> totalWeights = new HashMap<Id, Double>();
-	private Map<Id, Integer> maxPlansPerAgent = new HashMap<Id, Integer>();
-	private Map<Id, GenericPlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id, GenericPlanSelector<Plan, Person>>();
+	private final Map<Id<Population>, ArrayList<PlanStrategy>> strategies = new HashMap<Id<Population>, ArrayList<PlanStrategy>>();
+	private final Map<Id<Population>, ArrayList<Double>> weights = new HashMap<Id<Population>, ArrayList<Double>>();
+	private Map<Id<Population>, Double> totalWeights = new HashMap<Id<Population>, Double>();
+	private Map<Id<Population>, Integer> maxPlansPerAgent = new HashMap<Id<Population>, Integer>();
+	private Map<Id<Population>, GenericPlanSelector<Plan, Person>> removalPlanSelector = new HashMap<Id<Population>, GenericPlanSelector<Plan, Person>>();
 	private final TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>> changeRequests = new TreeMap<Integer, Map<String, Map<PlanStrategy, Double>>>();
 	/**
 	 * chooses a (weight-influenced) random strategy
@@ -66,7 +66,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 * @param strategy
 	 * @param weight
 	 */
-	public final void addStrategy(final PlanStrategy strategy, final double weight, final Id populationId) {
+	public final void addStrategy(final PlanStrategy strategy, final double weight, final Id<Population> populationId) {
 		ArrayList<PlanStrategy> strategies = this.strategies.get(populationId);
 		if(strategies==null) {
 			strategies = new ArrayList<PlanStrategy>();
@@ -85,7 +85,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 * @return true if the strategy was successfully removed from this manager,
 	 * 		false if the strategy was not part of this manager and could thus not be removed.
 	 */
-	public final boolean removeStrategy(final PlanStrategy strategy, final Id populationId) {
+	public final boolean removeStrategy(final PlanStrategy strategy, final Id<Population> populationId) {
 		int idx = this.strategies.get(populationId).indexOf(strategy);
 		if (idx != -1) {
 			this.strategies.get(populationId).remove(idx);
@@ -104,7 +104,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
-	public final boolean changeWeightOfStrategy(final PlanStrategy strategy, final double newWeight, final Id populationId) {
+	public final boolean changeWeightOfStrategy(final PlanStrategy strategy, final double newWeight, final Id<Population> populationId) {
 		int idx = this.strategies.get(populationId).indexOf(strategy);
 		if (idx != -1) {
 			double oldWeight = this.weights.get(populationId).set(idx, Double.valueOf(newWeight)).doubleValue();
@@ -121,7 +121,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 *
 	 * @param maxPlansPerAgent
 	 */
-	public final void setMaxPlansPerAgent(final int maxPlansPerAgent, Id populationId) {
+	public final void setMaxPlansPerAgent(final int maxPlansPerAgent, Id<Population> populationId) {
 		this.maxPlansPerAgent.put(populationId, maxPlansPerAgent);
 	}
 	/**
@@ -173,7 +173,7 @@ public class StrategyManagerPops extends StrategyManager {
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
-	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector, Id populationId) {
+	public final void setPlanSelectorForRemoval(final GenericPlanSelector<Plan, Person> planSelector, Id<Population> populationId) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector.put(populationId, planSelector);
 	}

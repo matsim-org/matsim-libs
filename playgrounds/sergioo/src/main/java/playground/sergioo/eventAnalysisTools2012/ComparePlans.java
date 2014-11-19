@@ -49,7 +49,7 @@ public class ComparePlans {
 					writeScoreDetails(writer, person.getId(), person.getPlans().get(p1), person.getPlans().get(p2), network);
 		writer.close();
 	}
-	private void writeScoreDetails(PrintWriter writer, Id personId, Plan plan1, Plan plan2, Network network) throws Exception { 
+	private void writeScoreDetails(PrintWriter writer, Id<Person> personId, Plan plan1, Plan plan2, Network network) throws Exception { 
 		String s = SEPARATOR_TXT;
 		List<Tuple<String, Coord>> activities1 = new ArrayList<Tuple<String, Coord>>();
 		for(PlanElement planElement:plan1.getPlanElements())
@@ -137,7 +137,7 @@ public class ComparePlans {
 						writePlans(writer, person.getId(), person.getPlans().get(p1), person.getPlans().get(p2));
 		writer.close();
 	}
-	private void writePlans(PrintWriter writer, Id personId, Plan plan1, Plan plan2) {
+	private void writePlans(PrintWriter writer, Id<Person> personId, Plan plan1, Plan plan2) {
 		String plan = personId+"("+plan1.getScore()+"): ";
 		for(PlanElement planElement:plan1.getPlanElements())
 			plan+=(planElement instanceof Activity?((Activity)planElement).getType(): ((Leg)planElement).getMode()+(((Leg)planElement).getMode().equals("pt")?"("+((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription()+")":""))+"   ";

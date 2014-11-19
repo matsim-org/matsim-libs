@@ -21,7 +21,7 @@ public class MatchingComposedLink extends ComposedLink {
 		super(link, from, to, network);
 	}
 	
-	public MatchingComposedLink(Id id, Node from, Node to, Network network) {
+	public MatchingComposedLink(Id<Link> id, Node from, Node to, Network network) {
 		super(id, from, to, network);
 	}
 	

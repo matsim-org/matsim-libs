@@ -38,17 +38,6 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
 
 public class StopStopCalculator extends Thread{
 
-	/*private static class TimeOfDayOriginDestination {
-		private Double time;
-		private Id origin;
-		private Id destination;
-		public TimeOfDayOriginDestination(Double time, Id origin, Id destination) {
-			super();
-			this.time = time;
-			this.origin = origin;
-			this.destination = destination;
-		}
-	}*/
 	private static class RouteInfo {
 		private Double travelTime;
 		private Double firstWalkingDistance = 0.0;
@@ -526,7 +515,7 @@ public class StopStopCalculator extends Thread{
 			Map<Id<TransitStopFacility>, Set<Id<TransitStopFacility>>> remainingPaths = new HashMap<Id<TransitStopFacility>, Set<Id<TransitStopFacility>>>();
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values())
 				if(network.getNodes().get(stop.getId())!=null) {
-					Set<Id<TransitStopFacility>> stopIds = new HashSet<Id>();
+					Set<Id<TransitStopFacility>> stopIds = new HashSet<Id<TransitStopFacility>>();
 					for(TransitStopFacility stop2:scenario.getTransitSchedule().getFacilities().values())
 						if(network.getNodes().get(stop2.getId())!=null) {
 							stopIds.add(stop2.getId());
@@ -538,7 +527,7 @@ public class StopStopCalculator extends Thread{
 				if(network.getNodes().get(stop.getId())!=null) {
 					System.out.println(s+++" "+time+" "+stop.getId()+": "+(System.currentTimeMillis()-milis));
 					Set<Node> toNodes = new HashSet<Node>();
-					for(Id stopId:remainingPaths.get(stop.getId()))
+					for(Id<TransitStopFacility> stopId:remainingPaths.get(stop.getId()))
 						if(network.getNodes().get(stopId)!=null)
 							toNodes.add(network.getNodes().get(stopId));
 					Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(network.getNodes().get(stop.getId()), toNodes, time, null, null);
@@ -577,51 +566,6 @@ public class StopStopCalculator extends Thread{
 				}
 		}
 		writer.close();
-	}
-
-	private static void writePath(Path path, TransitRouterNetworkTravelTimeAndDisutilityVariableWW travelFunction, double startTime, Id idStart, Id idEnd, Writer writer) throws IOException {
-		RouteInfo routeInfo = new RouteInfo();
-		routeInfo.time = path.travelTime;
-		boolean first = true;
-		double travelTime = 0;
-		for(Link link:path.links) {
-			TransitRouterNetworkLink tLink = (TransitRouterNetworkLink)link;
-			TransitRouterNetworkNode tFromNode = (TransitRouterNetworkNode)link.getFromNode();
-			TransitRouterNetworkNode tToNode = (TransitRouterNetworkNode)link.getToNode();
-			if(first) {
-				first = false;
-				if(tToNode.getRoute()==null) {
-					routeInfo.firstWalkingDistance += tLink.getLength();
-					first = true;
-				}
-				else
-					routeInfo.firstWaitingTime = travelFunction.getLinkTravelTime(link, startTime+travelTime, null, null);
-			}
-			else if(tLink.getRoute()==null)
-				if(tToNode.getRoute()!=null) {
-					routeInfo.sumWaitingTimes = travelFunction.getLinkTravelTime(link, startTime+travelTime, null, null);
-					routeInfo.numberOfTransfers ++;
-				}
-				else if(tFromNode.getRoute()==null) {
-					routeInfo.sumWalkingDistances += tLink.getLength();
-					routeInfo.numberOfWalkingTransfers ++;
-				}
-			travelTime += travelFunction.getLinkTravelTime(link, startTime+travelTime, null, null);
-		}
-		if(((TransitRouterNetworkNode)path.links.get(path.links.size()-1).getFromNode()).getRoute()==null) {
-			routeInfo.lastWalkingDistance = path.links.get(path.links.size()-1).getLength();
-			routeInfo.sumWalkingDistances -= routeInfo.lastWalkingDistance;
-			routeInfo.numberOfWalkingTransfers --;
-		}
-		writer.write(startTime+S+idStart+S+idEnd+S+
-				routeInfo.time+S+
-				routeInfo.firstWalkingDistance+S+
-				routeInfo.firstWaitingTime+S+
-				routeInfo.sumWalkingDistances+S+
-				routeInfo.sumWaitingTimes+S+
-				routeInfo.numberOfWalkingTransfers+S+
-				routeInfo.numberOfTransfers+S+
-				routeInfo.lastWalkingDistance+"\n");
 	}
 
 	private static Path getPath(Path mainPath, int n, int m, double startTime,

@@ -21,7 +21,7 @@ public class CarNetworkPainterManager extends NetworkPainterManager  {
 	public void selectLink(double x, double y) {
 		selectedLinkId = getIdNearestCarLink(x, y);
 	}
-	protected Id getIdNearestCarLink(double x, double y) {
+	protected Id<Link> getIdNearestCarLink(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Link nearest = null;
 		double nearestDistance = Double.POSITIVE_INFINITY;

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -72,7 +73,7 @@ public class TransitActsRemover implements PlanAlgorithm {
 					leg.setMode(TransportMode.pt);
 					double distance = 0;
 					double travelTime = 0;
-					Id endLinkId = null;
+					Id<Link> endLinkId = null;
 					DISTANCE_CALC:
 					for(int j = i; ;j++) {
 						PlanElement pe2 = planElements.get(j);

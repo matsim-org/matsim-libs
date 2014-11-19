@@ -40,18 +40,18 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 
 	private static final String SEPARATOR = " & ";
 	//Attributes
-	private final List<Id> selectedNodesId;
+	private final List<Id<Node>> selectedNodesId;
 	private final List<Link> selectedLinks;
 	
 	//Methods
 	public NetworkTwoNodesPainterManager(Network network) {
 		super(network);
-		selectedNodesId = new ArrayList<Id>();
+		selectedNodesId = new ArrayList<Id<Node>>();
 		selectedLinks = new ArrayList<Link>();
 	}
 	public Set<Node> getSelectedNodes() {
 		Set<Node> selectedNodes = new HashSet<Node>();
-		for(Id selectedNodeId:selectedNodesId)
+		for(Id<Node> selectedNodeId:selectedNodesId)
 			selectedNodes.add(network.getNodes().get(selectedNodeId));
 		return selectedNodes;
 	}
@@ -74,11 +74,11 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 		if(selectedNodesId.size()>0)
 			selectedNodesId.remove(getIdNearestSelectedNode(x, y));
 	}
-	private Id getIdNearestSelectedNode(double x, double y) {
+	private Id<Node> getIdNearestSelectedNode(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
-		for(Id nodeId:selectedNodesId) {
+		for(Id<Node> nodeId:selectedNodesId) {
 			Node node = network.getNodes().get(nodeId);
 			double distance = CoordUtils.calcDistance(coord, node.getCoord());
 			if(distance<nearestDistance) {
@@ -90,7 +90,7 @@ public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 	}
 	public String refreshNodes() {
 		String text = "";
-		for(Id selectedNodeId:selectedNodesId)
+		for(Id<Node> selectedNodeId:selectedNodesId)
 			text += selectedNodeId.toString()+SEPARATOR;
 		return text;
 	}

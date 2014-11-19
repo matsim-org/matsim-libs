@@ -67,11 +67,11 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	final private static int INDEX_EXECUTED = 3;
 
 	final private Population population;
-	final private Map<Id, BufferedWriter> out = new HashMap<Id, BufferedWriter>();
+	final private Map<Id<Population>, BufferedWriter> out = new HashMap<Id<Population>, BufferedWriter>();
 	private String fileName;
 	
 	private final boolean createPNG;
-	private Map<Id, double[][]> history = new HashMap<Id, double[][]>();
+	private Map<Id<Population>, double[][]> history = new HashMap<Id<Population>, double[][]>();
 	private int minIteration = 0;
 
 	private final static Logger log = Logger.getLogger(ScoreStats.class);
@@ -99,11 +99,11 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		for(Person person:population.getPersons().values()) {
-			Id popId = ((PersonImplPops)person).getPopulationId();
+			Id<Population> popId = ((PersonImplPops)person).getPopulationId();
 			if(history.get(popId)==null)
 				history.put(popId, new double[4][iterations+1]);
 		}
-		for(Id popId:history.keySet()) {
+		for(Id<Population> popId:history.keySet()) {
 			if (this.fileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
 				this.out.put(popId, IOUtils.getBufferedWriter(this.fileName.substring(0, this.fileName.length()-4)+"_"+popId+".txt"));
 			} else {
@@ -119,7 +119,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		for(Entry<Id, double[][]> his:this.history.entrySet()) {
+		for(Entry<Id<Population>, double[][]> his:this.history.entrySet()) {
 			double sumScoreWorst = 0.0;
 			double sumScoreBest = 0.0;
 			double sumAvgScores = 0.0;
@@ -246,7 +246,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
-			for(Id popId:history.keySet())
+			for(Id<Population> popId:history.keySet())
 				this.out.get(popId).close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -257,12 +257,12 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	/**
 	 * @return the history of scores in last iterations
 	 */
-	public Map<Id, double[][]> getHistory() {
+	public Map<Id<Population>, double[][]> getHistory() {
 		if (this.history == null) {
 			return null;
 		}
-		Map<Id, double[][]> historyC = new HashMap<Id, double[][]>();
-		for(Entry<Id, double[][]> his:history.entrySet()) {
+		Map<Id<Population>, double[][]> historyC = new HashMap<Id<Population>, double[][]>();
+		for(Entry<Id<Population>, double[][]> his:history.entrySet()) {
 			historyC.put(his.getKey(), his.getValue().clone());
 		}
 		return historyC;

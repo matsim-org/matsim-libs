@@ -10,7 +10,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -41,14 +43,14 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 
 		//Attributes
 		private final SinglePlannerAgent planner;
-		private final Id startFacilityId;
-		private final Id endFacilityId;
+		private final Id<ActivityFacility> startFacilityId;
+		private final Id<ActivityFacility> endFacilityId;
 		private final double startTime;
-		private final Id agentId;
+		private final Id<Person> agentId;
 
 		//Constructors
-		public PlanningInfo(SinglePlannerAgent planner, Id startFacilityId,
-				Id endFacilityId, double startTime, Id agentId) {
+		public PlanningInfo(SinglePlannerAgent planner, Id<ActivityFacility> startFacilityId,
+				Id<ActivityFacility> endFacilityId, double startTime, Id<Person> agentId) {
 			super();
 			this.planner = planner;
 			this.startFacilityId = startFacilityId;
@@ -78,7 +80,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 		public int getNumPlanners() {
 			return plannersInfo.size();
 		}
-		public void addPlanner(SinglePlannerAgent planner, Id startFacilityId, Id endFacilityId, double startTime, Id agentId) {
+		public void addPlanner(SinglePlannerAgent planner, Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, double startTime, Id<Person> agentId) {
 			planner.setRouter(tripRouter);
 			while(!lock.tryLock());
 			plannersInfo.add(new PlanningInfo(planner, startFacilityId, endFacilityId, startTime, agentId));
@@ -197,7 +199,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 	public void setMaxPlanners(int maxPlanners) {
 		this.maxPlanners = maxPlanners;
 	}
-	public void addPlanner(SinglePlannerAgent planner, Id startFacilityId, Id endFacilityId, double now, Id agentId) {
+	public void addPlanner(SinglePlannerAgent planner, Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, double now, Id<Person> agentId) {
 		while(counter.getCounter()>=maxPlanners);
 		int less = Integer.MAX_VALUE;
 		ParallelPassivePlanners lessPlanners = null;

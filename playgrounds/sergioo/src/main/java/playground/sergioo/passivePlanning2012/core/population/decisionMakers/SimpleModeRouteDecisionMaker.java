@@ -6,6 +6,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.router.TripRouter;
 
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
@@ -23,7 +24,7 @@ public class SimpleModeRouteDecisionMaker implements ModeRouteDecisionMaker {
 		this.facilities = facilities;
 	}
 	@Override
-	public List<? extends PlanElement> decideModeRoute(double time, Id startFacilityId, Id endFacilityId, TripRouter tripRouter) {
+	public List<? extends PlanElement> decideModeRoute(double time, Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, TripRouter tripRouter) {
 		double lessTime = Double.MAX_VALUE;
 		List<? extends PlanElement> shortestTrip = null;
 		for (String mode : modes) {

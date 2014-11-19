@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -108,7 +107,7 @@ public class WeeklyPlans {
 	}
 
 	private static void addSecondaryActivitiesDay(Plan plan, int dayPos, Config config) {
-		Id homeFacilityId = null;
+		Id<ActivityFacility> homeFacilityId = null;
 		Coord homeCoord = null;
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Activity && ((Activity)planElement).getType().equals("home")) {
@@ -125,7 +124,7 @@ public class WeeklyPlans {
 		((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
 		String typeLast = ((ActivityImpl)plan.getPlanElements().get(0)).getType();
 		Coord lastCoord = ((ActivityImpl)plan.getPlanElements().get(0)).getCoord();
-		Id lastFacilityId = ((ActivityImpl)plan.getPlanElements().get(0)).getFacilityId();
+		Id<ActivityFacility> lastFacilityId = ((ActivityImpl)plan.getPlanElements().get(0)).getFacilityId();
 		Activity activity = null;
 		while(totalDurations<Time.MIDNIGHT-2*3600) {
 			String prevActivityType = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType();

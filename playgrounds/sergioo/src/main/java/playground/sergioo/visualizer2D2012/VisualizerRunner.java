@@ -37,7 +37,7 @@ public class VisualizerRunner {
 			RoadPricingScheme roadPricingScheme = new RoadPricingScheme();
 			new RoadPricingReaderXMLv1(roadPricingScheme).parse(args[2]);
 			Collection<Link> selectedLinks = new ArrayList<Link>();
-			for(Id id:roadPricingScheme.getLinkIdSet())
+			for(Id<Link> id:roadPricingScheme.getLinkIdSet())
 				selectedLinks.add(scenario.getNetwork().getLinks().get(id));
 			networkPainter.selectLinks(selectedLinks);
 			window = new SimpleNetworkWindow(args[0], networkPainter); 

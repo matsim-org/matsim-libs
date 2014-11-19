@@ -26,6 +26,8 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -186,8 +188,8 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
-		Id agentId = agent.getId();
-		Id linkId = agent.getCurrentLinkId();
+		Id<Person> agentId = agent.getId();
+		Id<Link> linkId = agent.getCurrentLinkId();
 		if (linkId != null) { // may be bushwacking
 			internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}

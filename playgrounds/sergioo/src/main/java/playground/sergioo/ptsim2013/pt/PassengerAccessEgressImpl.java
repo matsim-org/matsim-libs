@@ -27,6 +27,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -44,6 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -93,9 +96,9 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	private void fireBoardingDeniedEvents(TransitVehicle vehicle, double now){
-		Id vehicleId = vehicle.getId() ;
+		Id<Vehicle> vehicleId = vehicle.getId() ;
 		for (PTPassengerAgent agent : this.agentsDeniedToBoard){
-			Id agentId = agent.getId() ;
+			Id<Person> agentId = agent.getId() ;
 			this.internalInterface.getMobsim().getEventsManager().processEvent(
 					new BoardingDeniedEvent(now, agentId, vehicleId)
 					) ;
@@ -147,14 +150,14 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle,  Id fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle,  Id<TransitStopFacility> fromStopFacilityId, double time) {
 		boolean handled = vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
 			MobsimAgent planAgent = (MobsimAgent) passenger;
 			if (planAgent instanceof PersonDriverAgentImpl) { 
-				Id agentId = planAgent.getId();
-				Id linkId = planAgent.getCurrentLinkId();
+				Id<Person> agentId = planAgent.getId();
+				Id<Link> linkId = planAgent.getCurrentLinkId();
 				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
@@ -165,7 +168,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id toLinkId, double time) {
+	public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
 		boolean handled = vehicle.removePassenger(passenger);
 		if(handled){
 //			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;

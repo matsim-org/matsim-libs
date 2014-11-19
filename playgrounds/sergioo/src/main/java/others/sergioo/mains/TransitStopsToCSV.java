@@ -1,25 +1,20 @@
 package others.sergioo.mains;
 
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class TransitStopsToCSV {
-
-	private static final String S = ",";
 
 	/**
 	 * @param args
@@ -30,11 +25,11 @@ public class TransitStopsToCSV {
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		int numRoutesBus = 0, numRoutesRail = 0, numDeparturesBus = 0, numDeparturesRail = 0;
-		Set<Id> railPlatforms = new HashSet<Id>();
+		Set<Id<TransitStopFacility>> railPlatforms = new HashSet<Id<TransitStopFacility>>();
 		Set<String> railStops = new HashSet<String>();
-		Set<Id> busStops = new HashSet<Id>();
-		Set<Id> railLines = new HashSet<Id>();
-		Set<Id> busLines = new HashSet<Id>();
+		Set<Id<TransitStopFacility>> busStops = new HashSet<Id<TransitStopFacility>>();
+		Set<Id<TransitLine>> railLines = new HashSet<Id<TransitLine>>();
+		Set<Id<TransitLine>> busLines = new HashSet<Id<TransitLine>>();
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values()) {
 			for(TransitRoute route:line.getRoutes().values())
 				if(route.getTransportMode().contains("bus")) {

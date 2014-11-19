@@ -18,7 +18,6 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
@@ -213,15 +212,15 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 			}
 		return planElements;
 	}
-	public void addKnownPlace(Id facilityId, double startTime, String typeOfActivity) {
+	public void addKnownPlace(Id<ActivityFacility> facilityId, double startTime, String typeOfActivity) {
 		if(agenda.containsType(typeOfActivity))
 			super.addKnownPlace(facilityId, startTime, typeOfActivity);
 	}
-	public void addKnownPlace(Id facilityId, double startTime, double endTime, String typeOfActivity) {
+	public void addKnownPlace(Id<ActivityFacility> facilityId, double startTime, double endTime, String typeOfActivity) {
 		if(agenda.containsType(typeOfActivity))
 			super.addKnownPlace(facilityId, startTime, endTime, typeOfActivity);
 	}
-	public void addKnownPlace(Id facilityId, String typeOfActivity) {
+	public void addKnownPlace(Id<ActivityFacility> facilityId, String typeOfActivity) {
 		ActivityFacility facility = facilities.getFacilities().get(facilityId);
 		if(facility.getActivityOptions().get(typeOfActivity)!=null && agenda.containsType(typeOfActivity))
 			if(facility.getActivityOptions().get(typeOfActivity).getOpeningTimes().isEmpty())
@@ -230,7 +229,7 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 				for(OpeningTime openingTime:facility.getActivityOptions().get(typeOfActivity).getOpeningTimes())
 					super.addKnownPlace(facilityId, openingTime.getStartTime(), openingTime.getEndTime(), typeOfActivity);
 	}
-	public void addKnownPlace(Id facilityId) {
+	public void addKnownPlace(Id<ActivityFacility> facilityId) {
 		ActivityFacility facility = facilities.getFacilities().get(facilityId);
 		for(Entry<String, ActivityOption> entry:facility.getActivityOptions().entrySet())
 			if(agenda.containsType(entry.getKey()))

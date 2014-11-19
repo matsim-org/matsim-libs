@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -258,7 +259,7 @@ import org.matsim.core.utils.misc.Time;
 			
 			out.write("type=\"links\">");
 			out.write(nr.getStartLinkId().toString());
-			for (Id linkId : nr.getLinkIds()) {
+			for (Id<Link> linkId : nr.getLinkIds()) {
 				out.write(" ");
 				out.write(linkId.toString());
 			}

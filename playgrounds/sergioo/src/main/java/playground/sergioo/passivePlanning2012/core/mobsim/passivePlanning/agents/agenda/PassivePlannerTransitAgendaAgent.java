@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -36,7 +37,7 @@ import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning
 public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent  {
 
 	private double legBeginning = Time.UNDEFINED_TIME;
-	private Id prevFacilityId = null;
+	private Id<ActivityFacility> prevFacilityId = null;
 	
 	//Constructors
 	public PassivePlannerTransitAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager) {

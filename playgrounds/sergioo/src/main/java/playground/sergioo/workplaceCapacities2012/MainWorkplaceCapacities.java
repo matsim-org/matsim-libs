@@ -307,10 +307,10 @@ public class MainWorkplaceCapacities {
 		/*Matrix2DImpl weights = new Matrix2DImpl(new int[]{dataMPAreas.size(),stopsBase.size()});
 		mPAreaI = dataMPAreas.keySet().iterator();
 		for(int f=0; f<weights.getDimension(0); f++) {
-			Id mPAreaId = mPAreaI.next();
+			Id<ActivityFacility> mPAreaId = mPAreaI.next();
 			stopIdsI = stopsBase.keySet().iterator();
 			for(int s=0; s<weights.getDimension(1); s++) {
-				Id sId = Id.create(stopIdsI.next(), TransitStopFacility.class);
+				Id<TransitStopFacility> sId = Id.create(stopIdsI.next(), TransitStopFacility.class);
 				Tuple<Boolean, Double> weight = weightsMap.get(new Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>(sId, mPAreaId));
 				if(weight==null)
 					weights.setElement(f, s, 0.0);
