@@ -111,8 +111,8 @@ public class NoiseCalculationOffline {
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 		
-		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters);
-		initialization.init();
+		NoiseSpatialInfo initialization = new NoiseSpatialInfo(scenario, noiseParameters);
+		initialization.setSpatialInfo();
 		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);

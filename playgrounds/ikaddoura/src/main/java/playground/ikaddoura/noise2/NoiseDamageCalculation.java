@@ -22,10 +22,6 @@
  */
 package playground.ikaddoura.noise2;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -56,7 +51,7 @@ public class NoiseDamageCalculation {
 	private Scenario scenario;
 	private EventsManager events;
 	
-	private NoiseInitialization spatialInfo;
+	private NoiseSpatialInfo spatialInfo;
 	private NoiseParameters noiseParams;
 		
 	// from emission handler
@@ -88,7 +83,7 @@ public class NoiseDamageCalculation {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseInitialization spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission) {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;
