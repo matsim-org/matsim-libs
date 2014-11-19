@@ -112,12 +112,7 @@ public class NoiseCalculationOffline {
 		events.addHandler(eventWriter);
 		
 		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters);
-		initialization.setActivityCoords();
-//		initialization.setReceiverPoints();
-//		initialization.setReceiverPoints(4590855., 5819679., 4594202., 5821736.); // area around the city center of Berlin (Tiergarten)
-		initialization.setReceiverPoints(4573258., 5801225., 4620323., 5839639.); // area around Berlin
-		initialization.setActivityCoord2NearestReceiverPointId();
-		initialization.setRelevantLinkInfo();
+		initialization.init();
 		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);

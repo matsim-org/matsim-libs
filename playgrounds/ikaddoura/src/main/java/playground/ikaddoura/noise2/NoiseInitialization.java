@@ -92,7 +92,14 @@ public class NoiseInitialization {
 		this.noiseParams = noiseParams;
 	}	
 	
-	public void setActivityCoords () {
+	public void init() {
+		setActivityCoords();
+		createGrid();
+		setActivityCoord2NearestReceiverPointId();
+		setRelevantLinkInfo();
+	}
+	
+	private void setActivityCoords () {
 		
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 				
@@ -118,41 +125,43 @@ public class NoiseInitialization {
 		}
 	}
 	
-	public void setReceiverPoints() {
+	private void createGrid() {
 		
-		log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates.");
-		
-		log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates...");
-		
-		for (Coord coord : populationActivityCoords) {
-			if (coord.getX() < xCoordMin) {
-				xCoordMin = coord.getX();
+		if (this.noiseParams.getxMin() == 0. || this.noiseParams.getyMin() == 0. || this.noiseParams.getxMax() == 0. || this.noiseParams.getyMax() == 0.) {
+			
+			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates.");
+			
+			log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates...");
+			
+			for (Coord coord : populationActivityCoords) {
+				if (coord.getX() < xCoordMin) {
+					xCoordMin = coord.getX();
+				}
+				if (coord.getX() > xCoordMax) {
+					xCoordMax = coord.getX();
+				}
+				if (coord.getY() < yCoordMin) {
+					yCoordMin = coord.getY();
+				}
+				if (coord.getY() > yCoordMax) {
+					yCoordMax = coord.getY();
+				}
 			}
-			if (coord.getX() > xCoordMax) {
-				xCoordMax = coord.getX();
-			}
-			if (coord.getY() < yCoordMin) {
-				yCoordMin = coord.getY();
-			}
-			if (coord.getY() > yCoordMax) {
-				yCoordMax = coord.getY();
-			}
+			log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates... Done.");
+			
+		} else {
+			
+			xCoordMin = this.noiseParams.getxMin();
+			xCoordMax = this.noiseParams.getxMax();
+			yCoordMin = this.noiseParams.getyMin();
+			yCoordMax = this.noiseParams.getyMax();
+			
+			log.info("Creating receiver points for the area between the coordinates (" + xCoordMin + "/" + yCoordMin + ") and (" + xCoordMax + "/" + yCoordMax + ").");
+			
+			createReceiverPoints();
 		}
-		log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates... Done.");
 		
 		createReceiverPoints();		
-	}
-	
-	public void setReceiverPoints(double xMin, double yMin, double xMax, double yMax) {
-		
-		log.info("Creating receiver points for the area between the coordinates (" + xMin + "/" + yMin + ") and (" + xMax + "/" + yMax + ").");
-		
-		xCoordMin = xMin;
-		xCoordMax = xMax;
-		yCoordMin = yMin;
-		yCoordMax = yMax;
-		
-		createReceiverPoints();
 	}
 	
 	private void createReceiverPoints() {
@@ -185,7 +194,7 @@ public class NoiseInitialization {
 		log.info("Total number of receiver points: " + receiverPoints.size());
 	}
 		
-	public void setActivityCoord2NearestReceiverPointId () {
+	private void setActivityCoord2NearestReceiverPointId () {
 		
 		int counter = 0;
 		for (Coord coord : populationActivityCoords) {
@@ -203,7 +212,7 @@ public class NoiseInitialization {
 		}				
 	}
 	
-	public void setRelevantLinkInfo() {
+	private void setRelevantLinkInfo() {
 		
 		setLinksMinMax();
 		setLinksToZones();
@@ -669,6 +678,5 @@ public class NoiseInitialization {
 	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
 		return zoneTuple2listOfReceiverPointIds;
 	}
-
 
 }

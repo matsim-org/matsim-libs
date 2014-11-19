@@ -58,14 +58,12 @@ public class NoiseTest {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		NoiseInitialization noiseSpatialInfo = new NoiseInitialization(scenario, new NoiseParameters());
 		
-		noiseSpatialInfo.setActivityCoords();
+		noiseSpatialInfo.init();
 		
 		// test the resulting Map
 //		Assert.assertEquals("wrong number of activities per grid cell (0/0)", 1, noiseSpatialInfo.getZoneTuple2listOfActivityCoords().get(new Tuple<Integer, Integer>(0 , 0)).size(), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("wrong number of activities per grid cell (0/1)", 2, noiseSpatialInfo.getZoneTuple2listOfActivityCoords().get(new Tuple<Integer, Integer>(0 , 1)).size(), MatsimTestUtils.EPSILON);
 //		Assert.assertEquals("wrong number of activities per grid cell (1/0)", 1, noiseSpatialInfo.getZoneTuple2listOfActivityCoords().get(new Tuple<Integer, Integer>(1 , 0)).size(), MatsimTestUtils.EPSILON);
-
-		noiseSpatialInfo.setReceiverPoints();
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseSpatialInfo.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -73,17 +71,13 @@ public class NoiseTest {
 		
 		// test the allocation of receiver point to grid cell
 		Assert.assertEquals("wrong number of grid cells for which receiver points are stored", 9, noiseSpatialInfo.getZoneTuple2listOfReceiverPointIds().size(), MatsimTestUtils.EPSILON);
-		
-		noiseSpatialInfo.setActivityCoord2NearestReceiverPointId();
-		
+				
 		// test the allocation of activity coordinates to the nearest receiver point
 		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseSpatialInfo.getActivityCoord2receiverPointId().get(new CoordImpl(300, 300)).toString());
 		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseSpatialInfo.getActivityCoord2receiverPointId().get(new CoordImpl(150, 150)).toString());
 		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseSpatialInfo.getActivityCoord2receiverPointId().get(new CoordImpl(100, 100)).toString());
 		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseSpatialInfo.getActivityCoord2receiverPointId().get(new CoordImpl(500, 500)).toString());
-			
-		noiseSpatialInfo.setRelevantLinkInfo();
-		
+					
 		// test the allocation of relevant links to the receiver point
 //		List<Id<Link>> relevantlinkIDs = ((List<Id<Link>>) noiseSpatialInfo.getReceiverPoints().get(Id.create("15", ReceiverPoint.class)).getLinkId2distanceCorrection().keySet());
 //		Assert.assertEquals("wrong relevant link for receiver point Id '15'", Id.create("link1", Link.class), relevantlinkIDs.get(0) );

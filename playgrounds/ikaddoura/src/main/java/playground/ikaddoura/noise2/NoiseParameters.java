@@ -23,6 +23,7 @@
 package playground.ikaddoura.noise2;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author ikaddoura
@@ -32,6 +33,7 @@ public class NoiseParameters {
 	private static final Logger log = Logger.getLogger(NoiseParameters.class);
 
 	// default values
+	
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double timeBinSizeRouter = 3600.0;
@@ -40,6 +42,23 @@ public class NoiseParameters {
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
 	
+	private double xMin = 0.;
+	private double yMin = 0.;
+	private double xMax = 0.;
+	private double yMax = 0.;
+	
+	// for the area around the city center of Berlin (Tiergarten)
+//	private double xMin = 4590855.;
+//	private double yMin = 5819679.;
+//	private double xMax = 4594202.;
+//	private double yMax = 5821736.;
+	
+	// for the area of Berlin
+//	private double xMin = 4573258.;
+//	private double yMin = 5801225.;
+//	private double xMax = 4620323.;
+//	private double yMax = 5839639.;
+		
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("Setting the annual cost rate to " + annualCostRate);
 		this.annualCostRate = annualCostRate;
@@ -101,6 +120,38 @@ public class NoiseParameters {
 
 	public String getHgvIdPrefix() {
 		return hgvIdPrefix;
+	}
+
+	public double getxMin() {
+		return xMin;
+	}
+
+	public void setxMin(double xMin) {
+		this.xMin = xMin;
+	}
+
+	public double getyMin() {
+		return yMin;
+	}
+
+	public void setyMin(double yMin) {
+		this.yMin = yMin;
+	}
+
+	public double getxMax() {
+		return xMax;
+	}
+
+	public void setxMax(double xMax) {
+		this.xMax = xMax;
+	}
+
+	public double getyMax() {
+		return yMax;
+	}
+
+	public void setyMax(double yMax) {
+		this.yMax = yMax;
 	}
 
 }
