@@ -67,7 +67,7 @@ public class NoiseSpatialInfo {
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
 	
-	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<>();
+	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
 	private List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
@@ -75,17 +75,17 @@ public class NoiseSpatialInfo {
 	private double yCoordMin = Double.MAX_VALUE;
 	private double yCoordMax = Double.MIN_VALUE;
 	
-	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<>();
-	private Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<>();
+	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>>();
+	private Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
 	
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
-	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
+	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<>();
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 				
 	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
