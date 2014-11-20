@@ -34,7 +34,7 @@ import java.util.Map;
 public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler{
 
 	
-	private Map<Integer, Map<Id, EmissionsAndVehicleKm>> intervals2links2emissions;
+	private Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>> intervals2links2emissions;
 	private WarmPollutant warmPollutant;
 	private ColdPollutant coldPollutant;
 	private int noOfTimeBins;
@@ -49,9 +49,9 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 		coldPollutant = ColdPollutant.valueOf(pollutant2analyze);
 		this.noOfTimeBins=noOfTimeBins;
 		this.simulationEndTime = simulationEndTime;
-		intervals2links2emissions = new HashMap<Integer, Map<Id,EmissionsAndVehicleKm>>();
+		intervals2links2emissions = new HashMap<Integer, Map<Id<Link>,EmissionsAndVehicleKm>>();
 		for(int i=0;i<noOfTimeBins;i++){
-			intervals2links2emissions.put(i, new HashMap<Id, EmissionsAndVehicleKm>());
+			intervals2links2emissions.put(i, new HashMap<Id<Link>, EmissionsAndVehicleKm>());
 		}
 	}
 
@@ -63,12 +63,12 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		Double emissionValue = event.getWarmEmissions().get(warmPollutant);
 		Double linkLenghtKm = links.get(linkId).getLength()/1000.;
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
 		if(timeInterval!=0)System.out.println(timeInterval);
-		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
+		Map<Id<Link>, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, linkLenghtKm));
 		}else{
@@ -81,10 +81,10 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		Double emissionValue = event.getColdEmissions().get(coldPollutant);
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
-		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
+		Map<Id<Link>, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, 0.0));
 		}else{
@@ -95,7 +95,7 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 		
 	}
 
-	public Map<Integer, Map<Id, EmissionsAndVehicleKm>> getTimeIntervals2EmissionsPerLink() {
+	public Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>> getTimeIntervals2EmissionsPerLink() {
 		return this.intervals2links2emissions;
 	}
 

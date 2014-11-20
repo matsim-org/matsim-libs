@@ -110,7 +110,7 @@ public class SpatialAveragingDemandEmissions {
 		
 		parseEmissionFile(inputData.getEmissionFileForBaseCase());
 		
-		Map <Integer, Map<Id, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		timeInterval2GridBaseCase= new SpatialGrid[noOfTimeBins];
 		
@@ -122,7 +122,7 @@ public class SpatialAveragingDemandEmissions {
 				linkWeightUtil = new CellWeightUtil((Collection<Link>) network.getLinks().values(), sGrid);
 			}
 			
-			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
+			for(Id<Link> linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			Double factor = linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor;
@@ -145,13 +145,13 @@ public class SpatialAveragingDemandEmissions {
 		
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
 		
-		Map <Integer, Map<Id, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating differences to base case for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
 			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			
-			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
+			for(Id<Link> linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor);

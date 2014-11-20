@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 public class CellWeightUtil implements LinkWeightUtil {
@@ -48,13 +47,14 @@ public class CellWeightUtil implements LinkWeightUtil {
 	}
 
 	private Map<Link, Cell> mapLinksToGridCells(Collection<Link> links, SpatialGrid grid) {
-		Map<Link, Cell> links2Cells = new HashMap<Link, Cell>();
+		links2Cells = new HashMap<Link, Cell>();
 		
 		for(Link link: links){
 			Cell cCell = grid.getCellForCoordinate(link.getCoord());
-			links2Cells.put(link, cCell);
+			if(cCell!=null)links2Cells.put(link, cCell);
 		}
 		System.out.println("Mapped " + links2Cells.size() + " links to grid");
+		System.out.println((links.size() - links2Cells.size()) + " links were not mapped.");
 		return links2Cells;
 	}
 

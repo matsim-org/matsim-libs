@@ -45,9 +45,14 @@ public class SpatialAveragingInputData {
 	private String configFile1;
 	private String emissionFile1, emissionFile2;
 	private Integer lastIteration1;
-	private String plansfile, plansfile2;
+	private String plansfile1, plansfile2;
+	private String eventsFile1, eventsFile2;
+
+	private String baseCase, compareCase;
 	
 	public SpatialAveragingInputData(String baseCase, String compareCase) {
+		this.baseCase = baseCase;
+		this.compareCase = compareCase;
 		setFieldsForBaseCase(baseCase);
 		setFieldsForCompareCase(baseCase, compareCase);
 	}
@@ -62,6 +67,7 @@ public class SpatialAveragingInputData {
 			configFile1 = runDirectory1 + "output_config.xml";
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+			eventsFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz";
 		}
 		if(baseCase.equals("latsis")){
 			scalingFactor = 100.;
@@ -71,6 +77,7 @@ public class SpatialAveragingInputData {
 			configFile1 = runDirectory1 + "output_config.xml.gz";
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+			eventsFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz";
 		}
 		if(baseCase.equals("981")){
 			scalingFactor = 10.;
@@ -80,8 +87,9 @@ public class SpatialAveragingInputData {
 			configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+			eventsFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".events.xml.gz";
 		}
-		plansfile = runDirectory1 + "output_plans.xml.gz";
+		plansfile1 = runDirectory1 + "output_plans.xml.gz";
 	}
 	private void setFieldsForCompareCase(String baseCase, String compareCase) {
 		if(baseCase.equals("exposureInternalization")){
@@ -99,6 +107,7 @@ public class SpatialAveragingInputData {
 			}
 			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 			plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".plans.xml.gz";
+			eventsFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz";
 		}
 		
 		if(baseCase.equals("latsis")){
@@ -112,6 +121,7 @@ public class SpatialAveragingInputData {
 			}
 			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 			plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".plans.xml.gz";
+			eventsFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz";
 		}
 		
 		if(baseCase.equals("981")){
@@ -120,7 +130,16 @@ public class SpatialAveragingInputData {
 				runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
 				emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".emission.events.xml.gz";
 				plansfile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".plans.xml.gz";
+				eventsFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".events.xml.gz";
 			}
+		}
+		
+		if(compareCase.equals("base")){
+			runNumber2 = runNumber1;
+			runDirectory2=runDirectory1;
+			emissionFile2=emissionFile1;
+			plansfile2 = plansfile1;
+			eventsFile2 = eventsFile1;
 		}
 	}
 
@@ -142,6 +161,9 @@ public class SpatialAveragingInputData {
 		return endTime;
 	}
 	
+	public String getScenarioInformation(){
+		return ("Scenario: " + baseCase + " , policy/run for comparision: " + compareCase );
+	}
 
 	public String getNetworkFile() {
 		return this.netFile;
@@ -194,12 +216,15 @@ public class SpatialAveragingInputData {
 	}
 
 	public String getPlansFileBaseCase() {
-		return plansfile;
+		return plansfile1;
 	}
 
-	public String getEventsFile() {
-//		return (runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".events.xml.gz");
-		return (runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".events.xml.gz");
+	public String getEventsFileBaseCase() {
+		return eventsFile1;
+	}
+
+	public String getEventsFileCompareCase() {
+		return eventsFile2;
 	}
 
 	public Double getScalingFactor() {
