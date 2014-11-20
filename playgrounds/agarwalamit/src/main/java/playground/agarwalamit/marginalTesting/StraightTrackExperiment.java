@@ -42,7 +42,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -68,13 +67,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 public class StraightTrackExperiment {
 	final Logger log = Logger.getLogger(StraightTrackExperiment.class);
 
-
-	private static final double marginal_Utl_money=0.062;
-	private static final double marginal_Utl_performing_sec=0.96/3600;
-	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
-	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
-	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
-
 	public static void main(String[] args) {
 		StraightTrackExperiment stTrEx = new StraightTrackExperiment();
 		stTrEx.test4MarginalCongestionCosts();
@@ -88,14 +80,14 @@ public class StraightTrackExperiment {
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
-		pseudoInputs.createConfig();
 		Scenario sc = pseudoInputs.scenario;
+		sc.getConfig().controler().setWriteEventsInterval(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
 		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
 		events.addHandler(writer);
-		
+
 		final boolean useOTFVis = false ;
 		QSim qSim = createQSim(sc, events,useOTFVis);
 		qSim.run();
@@ -228,20 +220,6 @@ public class StraightTrackExperiment {
 				}
 				population.addPerson(p);
 			}
-		}
-
-		private void createConfig(){
-			config.qsim().setFlowCapFactor(1);
-			config.qsim().setStorageCapFactor(1);
-			config.qsim().setMainModes(Arrays.asList(TransportMode.car));
-			config.qsim().setEndTime(24*3600);
-			config.controler().setFirstIteration(0);
-			config.controler().setLastIteration(0);
-			config.controler().setWriteEventsInterval(1);
-
-			ActivityParams homeAct = new ActivityParams("h");
-			homeAct.setTypicalDuration(1*3600);
-			config.planCalcScore().addActivityParams(homeAct);
 		}
 	}
 }

@@ -36,6 +36,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -58,7 +59,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 
@@ -70,7 +70,9 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * 2) Persons leaving that link is identified and these are charged until delay =0; if there is no leaving agents (=spill back delays), spill back causing link and person are stored
  * 3) Subsequently spill back delays are processed by identifying person in front of queue and charging entering agents and leaving agents alternatively untill delay=0;
  * 
- * @author amit based on ikaddoura
+ * @author amit
+ * 
+ * warnings and structure is kept same as in previous implementation of congestion pricing.
  *
  */
 
@@ -84,7 +86,7 @@ PersonStuckEventHandler
 {
 
 	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
-	final ScenarioImpl scenario;
+	final Scenario scenario;
 	final EventsManager events;
 	final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	final Map<Id, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfoExtended>();
@@ -95,7 +97,7 @@ PersonStuckEventHandler
 	double totalStorageDelay = 0.0;
 	double delayNotInternalized_roundingErrors = 0.0;
 
-	public MarginalCongestionHandlerImplV4(EventsManager events, ScenarioImpl scenario) {
+	public MarginalCongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 
@@ -160,7 +162,7 @@ PersonStuckEventHandler
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
-			log.warn("Public transport mode. Mixed traffic is not tested.");
+			log.warn("Public transport mode and mixed traffic is not tested.");
 		} else { // car
 			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
 				// no one entered or left this link before
@@ -177,7 +179,7 @@ PersonStuckEventHandler
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
-			log.warn("Public transport mode. Mixed traffic is not tested.");
+			log.warn("Public transport mode and mixed traffic is not implemented yet.");
 		} else {// car
 			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
 				// no one left this link before
@@ -366,7 +368,6 @@ PersonStuckEventHandler
 		Map<WarmPollutant, Double> emissionsToPayFor = linkInfo.getPersonId2WarmEmissionsToPayFor().get(event.getVehicleId());
 
 		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
-//			Map<WarmPollutant, Double> emissionCorrespondingToDelays = new HashMap<WarmPollutant, Double>();
 			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
 				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
@@ -375,13 +376,10 @@ PersonStuckEventHandler
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
-				//				emissionCorrespondingToDelays = getDelaysEquivalentEmissions(marginalDelaysPerLeavingVehicle/delayToPayFor, emissionsToPayFor);
-				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionCorrespondingToDelays);
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId(),this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
-			//			emissionsToPayFor = eu.subtractTwoWarmEmissionsMap(emissionsToPayFor, emissionCorrespondingToDelays);
 		} else if(delayToPayFor > 0){
 			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
@@ -390,7 +388,6 @@ PersonStuckEventHandler
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionsToPayFor);
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId(), this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
 				this.events.processEvent(congestionEvent);	
 			}
