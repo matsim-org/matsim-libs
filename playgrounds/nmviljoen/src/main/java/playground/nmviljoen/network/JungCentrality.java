@@ -49,6 +49,7 @@ public class JungCentrality {
 				}
 			}
 			System.out.println("Unweighted node Closeness written to file");
+			ranker = null;
 		}
 			
 	public static void calculateAndWriteWeightedCloseness(DirectedGraph<MyNode,MyLink> myGraph, String nodeCloseWeighted,
@@ -79,6 +80,7 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Weighted node Closeness written to file");
+		ranker = null;
 	}
 		
 	public static void calculateAndWriteUnweightedBetweenness(DirectedGraph<MyNode,MyLink> myGraph,String nodeBetUnweighted,
@@ -105,6 +107,7 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Unweighted Node Betweenness written to file");
+		ranker = null;
 	}
 
 	public static void calculateAndWriteWeightedBetweenness(DirectedGraph<MyNode,MyLink> myGraph,String nodeBetWeighted,
@@ -136,6 +139,7 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Weighted Edge Betweenness written to file");
+		ranker = null;
 	}
 
 	public static void calculateAndWriteUnweightedEigenvector(DirectedGraph<MyNode,MyLink> myGraph, String nodeEigenUnweighted,
@@ -163,6 +167,7 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Unweighted Eigenvector written to file");
+		ranker = null;
 	}
 	
 	public static void calculateAndWriteWeightedEigenvector(DirectedGraph<MyNode,MyLink> myGraph, String nodeEigenWeighted,

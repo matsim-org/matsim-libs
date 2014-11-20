@@ -40,6 +40,7 @@ public class JungGraphDistance {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		distanceMap = null;
 
 	}
 	public static void calculateAndWriteWeightedDistances(DirectedGraph<MyNode,MyLink> myGraph, String distWeightedFile){

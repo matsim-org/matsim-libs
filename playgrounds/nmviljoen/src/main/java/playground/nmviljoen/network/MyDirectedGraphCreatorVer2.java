@@ -313,8 +313,8 @@ public class MyDirectedGraphCreatorVer2 {
 					JungCentrality.calculateAndWriteUnweightedCloseness(myApp.myGraph, nodeCloseUnweighted, nodeList);
 					JungCentrality.calculateAndWriteWeightedBetweenness(myApp.myGraph,nodeBetWeighted, edgeBetWeighted,nodeList, linkList);
 					JungCentrality.calculateAndWriteWeightedCloseness(myApp.myGraph, nodeCloseWeighted, nodeList);
-					JungCentrality.calculateAndWriteUnweightedEigenvector(myApp.myGraph, nodeEigenUnweighted, nodeList);
-					JungCentrality.calculateAndWriteWeightedEigenvector(myApp.myGraph, nodeEigenWeighted, nodeList,linkList);
+//					JungCentrality.calculateAndWriteUnweightedEigenvector(myApp.myGraph, nodeEigenUnweighted, nodeList);
+//					JungCentrality.calculateAndWriteWeightedEigenvector(myApp.myGraph, nodeEigenWeighted, nodeList,linkList);
 					JungCentrality.calculateAndWriteDegreeCentrality(myApp.myGraph, degreeFile, nodeList, linkList);
 
 			//Clustering
