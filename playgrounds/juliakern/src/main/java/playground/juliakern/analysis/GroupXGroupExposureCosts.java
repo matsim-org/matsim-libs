@@ -30,14 +30,14 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
-public class GroupXGroupEmissionCosts {
+public class GroupXGroupExposureCosts {
 	
 	Double [][] groupXgroupMatrix;
 	private UserGroup[] userGroups;
 	private Double scalingFactor;
-	private static final Logger logger = Logger.getLogger(GroupXGroupEmissionCosts.class);
+	private static final Logger logger = Logger.getLogger(GroupXGroupExposureCosts.class);
 
-	public GroupXGroupEmissionCosts(Double scalingFactor){
+	public GroupXGroupExposureCosts(Double scalingFactor){
 		userGroups = UserGroup.values();
 		groupXgroupMatrix = new Double[userGroups.length][userGroups.length];
 		initializeMatrix(groupXgroupMatrix);

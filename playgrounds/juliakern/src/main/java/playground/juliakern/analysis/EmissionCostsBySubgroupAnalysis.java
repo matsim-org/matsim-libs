@@ -141,11 +141,11 @@ public class EmissionCostsBySubgroupAnalysis {
 		
 //		linkweightUtil = new LinkLineWeightUtil(500., inputData.getBoundingboxSizeSquareMeter()/noOfXbins/noOfYbins);
 		linkweightUtil = new CellWeightUtil(links2cells, sGrid);
-		HashMap<Integer, GroupXGroupEmissionCosts> timeBin2GroupEmissionCostMatrix = new HashMap<Integer, GroupXGroupEmissionCosts>();
+		HashMap<Integer, GroupXGroupExposureCosts> timeBin2GroupEmissionCostMatrix = new HashMap<Integer, GroupXGroupExposureCosts>();
 		for(int i=0; i<numberOfTimeBins; i++){
 			logger.info("Calculating group specific emission costs for time interval " + (i+1) + ".");
 			Double averageDurationPerCell = getAverageDurationPerCell(totalDurations.get(i));
-			timeBin2GroupEmissionCostMatrix.put(i, new GroupXGroupEmissionCosts(inputData.getScalingFactor()));
+			timeBin2GroupEmissionCostMatrix.put(i, new GroupXGroupExposureCosts(inputData.getScalingFactor()));
 			timeBin2GroupEmissionCostMatrix.get(i).calculateGroupCosts(timeBin2causingUserGroup2links2flatEmissionCosts.get(i),
 					groupDurations.get(i), linkweightUtil, averageDurationPerCell,
 					scenario.getNetwork().getLinks());
