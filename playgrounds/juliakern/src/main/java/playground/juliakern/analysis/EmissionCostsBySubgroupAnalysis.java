@@ -44,6 +44,7 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveraging
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
 public class EmissionCostsBySubgroupAnalysis {
+	private static final Logger logger = Logger.getLogger(EmissionCostsBySubgroupAnalysis.class);
 
 	final static int noOfXbins = 160;
 	final static int noOfYbins = 120; 
@@ -64,18 +65,13 @@ public class EmissionCostsBySubgroupAnalysis {
 	private Map<Integer, SpatialGrid> totalDurations;
 	private HashMap<Integer, GroupLinkFlatEmissions> timeBin2causingUserGroup2links2flatEmissionCosts;
 	private SpatialGrid sGrid;
-	private static final Logger logger = Logger.getLogger(EmissionCostsBySubgroupAnalysis.class);
 	
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		EmissionCostsBySubgroupAnalysis ecbsa = new EmissionCostsBySubgroupAnalysis();
 		ecbsa.initialize();
 		ecbsa.calculateDurations();
 		ecbsa.calculateFlatEmissionCosts();
-		ecbsa.calculateGroupSpecificEmissionCosts();
+		ecbsa.calculateExposureCostsByGroup();
 		logger.info("done.");
 	}
 	
@@ -96,10 +92,9 @@ public class EmissionCostsBySubgroupAnalysis {
 		mapLinksToGridCells(scenario.getNetwork().getLinks().values(), sGrid );
 		logger.info("Mapped " + linkIds2cells.size() + " links to cells. ");
 	}
+	
 	private void calculateDurations(){
-
-		logger.info("Starting to calculate durations");
-		
+		logger.info("Starting to calculate durations...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
 		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, linkIds2cells);
@@ -125,7 +120,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		
 	}
 	private void calculateFlatEmissionCosts(){
-		logger.info("Starting to calculate flat emission costs.");
+		logger.info("Starting to calculate flat emission costs...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		// calculate flat emission costs per link for each causing usergroup	
@@ -139,7 +134,7 @@ public class EmissionCostsBySubgroupAnalysis {
 		logger.info("Done calculating flat emission costs.");
 	}
 	
-	private void calculateGroupSpecificEmissionCosts(){
+	private void calculateExposureCostsByGroup(){
 		logger.info("Starting to calculate group specific emission costs. This may take a while....");
 		// calculate scaled (relative duration density, scenario scaling factor)
 		// emission costs -> timebin x subgroup x subgroup matrix

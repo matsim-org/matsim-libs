@@ -38,7 +38,7 @@ import playground.juliakern.distribution.GridTools;
  * @author benjamin
  *
  */
-public class RunNewInternalizationMunich {
+public class RunExposureInternalizationMunich {
 
 	static String configFile;
 	static String emissionCostFactor;
