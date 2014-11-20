@@ -84,11 +84,11 @@ public class StraightTrackExperiment {
 		sc.getConfig().controler().setWriteEventsInterval(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		events.addHandler(new MarginalCongstionHandlerImplV5(events, sc));
 		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
 		events.addHandler(writer);
 
-		final boolean useOTFVis = false ;
+		final boolean useOTFVis = true ;
 		QSim qSim = createQSim(sc, events,useOTFVis);
 		qSim.run();
 		writer.closeFile();
