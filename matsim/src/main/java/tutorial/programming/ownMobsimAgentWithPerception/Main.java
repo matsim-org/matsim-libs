@@ -33,7 +33,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
@@ -74,8 +76,11 @@ class Main {
 						qsim.insertAgentIntoMobsim(ag) ;
 						
 						// insert vehicle:
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType() );
-						Id<Link> linkId4VehicleInsertion = null ;
+						final Id<Vehicle> vehId = Id.create(ag.getId(), Vehicle.class);
+						final VehicleType vehType = VehicleUtils.getDefaultVehicleType();
+						final VehiclesFactory vehFactory = VehicleUtils.getFactory();
+						final Vehicle vehicle = vehFactory.createVehicle(vehId, vehType );
+						Id<Link> linkId4VehicleInsertion = null ; // replace by something meaningful
 						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 					}
 				}) ;
