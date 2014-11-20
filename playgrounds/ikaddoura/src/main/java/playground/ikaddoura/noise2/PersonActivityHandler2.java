@@ -192,19 +192,17 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 							
 //							System.out.println("Duration in this interval: " + Time.writeTime(durationInThisInterval, Time.TIMEFORMAT_HHMMSS));
 							
-							double affectedAgentUnits = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
+							double affectedAgentUnitsThisAgent = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
 
 							// affected agent units
 							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){								
 								Map<Double, Double> time2affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits();
-								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + affectedAgentUnits;
+								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + affectedAgentUnitsThisAgent;
 								time2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnitsSumNew);
 								rp.setTimeInterval2affectedAgentUnits(time2affectedAgentUnits);
 								
 							} else {
-								Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
-								timeInterval2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnits);
-								rp.setTimeInterval2affectedAgentUnits(timeInterval2affectedAgentUnits);
+								rp.getTimeInterval2affectedAgentUnits().put(timeIntervalEnd, affectedAgentUnitsThisAgent);
 							}
 							
 							// further information to be stored
