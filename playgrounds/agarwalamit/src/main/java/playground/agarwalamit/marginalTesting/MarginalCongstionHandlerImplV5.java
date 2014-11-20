@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.VehicleUtils;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 
@@ -54,6 +55,7 @@ public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandl
 	private final List<String> congestedModes = new ArrayList<String>();
 	private final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo;
 	private final Map<Id<Person>, String> personId2LegMode;
+	private double totalDelay = 0;
 
 	/**
 	 * @param events
@@ -107,19 +109,6 @@ public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandl
 		linkInfo.getPersonId2linkEnterTime().put(personId, event.getTime());
 	}
 
-	/**
-	 * @param link to get link length and maximum allowed (legal) speed on link
-	 * @param travelMode to get maximum speed of vehicle
-	 * @return minimum travel time on above link depending on the allowed link speed and vehicle speed
-	 */
-	private double getEarliestLinkExitTime(Link link, String travelMode){
-		if(!travelMode.equals(TransportMode.car)) throw new RuntimeException("Travel mode other than car is not implemented yet. Thus aborting ...");
-		double linkLength = link.getLength();
-		double maxFreeSpeed = Math.min(link.getFreespeed(), Double.POSITIVE_INFINITY);
-		double minLinkTravelTime = Math.floor(linkLength / maxFreeSpeed );
-		return minLinkTravelTime;
-	}
-
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
@@ -131,6 +120,7 @@ public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandl
 		double delay = linkLeaveTime - freeSpeedLeaveTime ;
 
 		if(delay > 0.){
+			totalDelay += delay;
 			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
 			if (causingAgent==null) throw new RuntimeException("Delays are more than 0. and there is no causing agent."
 					+ "this should not happen.");
@@ -140,5 +130,24 @@ public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandl
 			this.events.processEvent(congestionEvent);
 		}
 		linkInfo.setLastLeavingAgent(personId);
+	}
+	
+	/**
+	 * @param link to get link length and maximum allowed (legal) speed on link
+	 * @param travelMode to get maximum speed of vehicle
+	 * @return minimum travel time on above link depending on the allowed link speed and vehicle speed
+	 */
+	private double getEarliestLinkExitTime(Link link, String travelMode){
+		if(!travelMode.equals(TransportMode.car)) throw new RuntimeException("Travel mode other than car is not implemented yet. Thus aborting ...");
+		double linkLength = link.getLength(); // see org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator.java
+//		Id<VehicleType> vehTyp = Id.create(travelMode,VehicleType.class);
+		double vehSpeed = VehicleUtils.getDefaultVehicleType().getMaximumVelocity(); //VehicleUtils.createVehiclesContainer().getVehicleTypes().get(vehTyp).getMaximumVelocity();
+		double maxFreeSpeed = Math.min(link.getFreespeed(), vehSpeed);
+		double minLinkTravelTime = Math.floor(linkLength / maxFreeSpeed );
+		return minLinkTravelTime;
+	}
+
+	public double getTotalDelay() {
+		return totalDelay;
 	}
 }
