@@ -28,10 +28,9 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="20" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: queueSimulation qsim JDEQSim 
+		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
-		For 'qsim', add a module 'qsim' to the config.
-		For 'queueSimulation', add a module 'simulation' to the config. -->
+		For 'qsim', add a module 'qsim' to the config. -->
 		<param name="mobsim" value="qsim" />
 
 		<param name="outputDirectory" value="./test/output/" />
@@ -194,10 +193,10 @@
 
 	<module name="parallelEventHandling" >
 
-		<!-- estimated number of events during mobsim run, useful for configuration -->
+		<!-- Estimated number of events during mobsim run. An optional optimization hint for the framework. -->
 		<param name="estimatedNumberOfEvents" value="null" />
 
-		<!-- number of threads for parallel events handler.  0 or null means parallel events handler is disabled -->
+		<!-- Number of threads for parallel events handler. 0 or null means the framework decides by itself. -->
 		<param name="numberOfThreads" value="null" />
 	</module>
 
@@ -408,7 +407,7 @@
 		<!-- default: FIFO; options: FIFO PassingQ -->
 		<param name="linkDynamics" value="FIFO" />
 
-		<!-- Defines which mode should be the qsim `main' (=congested) mode. Technically, this is the mode that the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense. -->
+		<!-- Defines which modes are congested modes. Technically, these are the modes that the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense. -->
 		<param name="mainMode" value="car" />
 
 		<!-- Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow.  -->
@@ -448,9 +447,6 @@
 
 		<!-- Set this parameter to true if households should be used, false if not. -->
 		<param name="useHouseholds" value="false" />
-
-		<!-- Set this parameter to true if knowledge should be used, false if not. -->
-		<param name="useKnowledge" value="true" />
 
 		<!-- Set this parameter to true if lanes should be used, false if not. -->
 		<param name="useLanes" value="false" />
