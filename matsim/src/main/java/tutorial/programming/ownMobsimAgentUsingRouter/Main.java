@@ -45,10 +45,13 @@ class Main {
 
 	public static void main(String[] args) {
 		
-		final Controler ctrl = new Controler("abd") ;
+		final Controler ctrl = new Controler( args[0] ) ;
 		
+		// router.  In order to be thread safe, one needs one router per agent.  Since, on the other hand, routers are heavy-weight objects, 
+		// this will not scale.  For large numbers of replanning agents, one needs to think of a better software architecture here. kai, nov'14
 		TripRouter router = ctrl.getTripRouterFactory().instantiateAndConfigureTripRouter() ;
 		
+		// guidance.  Will need one instance per agent in order to be thread safe
 		final MyGuidance guidance = new MyGuidance( router ) ;
 		
 		ctrl.setMobsimFactory(new MobsimFactory(){
@@ -56,12 +59,11 @@ class Main {
 			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				
 				MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance( MobsimType.qsim.toString() ) ;
+				// (this takes the default QSim factory from the MATSim platform.  One could as well just copy the constructor from there. kai, nov'14)
+				
 				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
-				// von mir aus ok so.  Aber ist es der empfohlene Weg?
 				
-				// yy Wäre schön, wenn diese "angenehmere Variante" enrichSimulation irgendwie enthalten würde.
-				
-				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
+				// Why AgentSource instead of inserting agents directly?  Inserting agents into activities is, in fact possible just
 				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
 				// sure that this is appropriately delayed.
 				qsim.addAgentSource(new AgentSource(){

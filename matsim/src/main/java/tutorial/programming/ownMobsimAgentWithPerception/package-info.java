@@ -17,6 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 /**
+ * Untested code.  Structural example of an agent that has perception and bases decisions on that perception.
+ * 
  * @author nagel
  *
  */

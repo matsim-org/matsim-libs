@@ -17,6 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 /**
+ * Untested code.  Structural example of an agent that asks a router every time it is leaving a link.
+ * 
  * @author nagel
  *
  */
