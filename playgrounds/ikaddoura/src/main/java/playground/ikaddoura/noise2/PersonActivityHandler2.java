@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * 
@@ -134,7 +135,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 		}		
 	}
 
-	public void calculataDurationsOfStay() {
+	public void calculataDurationsOfStay(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 				
 		// sort by receiver point
 		Map<Id<ReceiverPoint>, List<PersonActivityInfo>> rpId2actInfos = new HashMap<Id<ReceiverPoint>, List<PersonActivityInfo>>();
@@ -158,7 +159,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 		
 		
 		// sort by time interval
-		for (ReceiverPoint rp : spatialInfo.getReceiverPoints().values()) {
+		for (ReceiverPoint rp : receiverPoints.values()) {
 
 			if (rpId2actInfos.containsKey(rp.getId())) {
 				
@@ -166,9 +167,10 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 					double timeIntervalStart = timeIntervalEnd - noiseParams.getTimeBinSizeNoiseComputation();
 					
 					for (PersonActivityInfo actInfo : rpId2actInfos.get(rp.getId())) {
-			
+//						System.out.println(actInfo.toString() );
+
 						if (( actInfo.getStartTime() < timeIntervalEnd ) && ( actInfo.getEndTime() >=  timeIntervalStart )) {
-							
+//							System.out.println("Relevant for time interval: " + Time.writeTime(timeIntervalStart, Time.TIMEFORMAT_HHMMSS) + " - " + Time.writeTime(timeIntervalEnd, Time.TIMEFORMAT_HHMMSS));
 							double durationInThisInterval = 0.;
 							
 							if ((actInfo.getStartTime() <= timeIntervalStart) && actInfo.getEndTime() >= timeIntervalEnd ) {
@@ -178,7 +180,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 								durationInThisInterval = actInfo.getEndTime() - timeIntervalStart;
 							
 							} else if (actInfo.getStartTime() >= timeIntervalStart && actInfo.getEndTime() >= timeIntervalEnd) {
-								durationInThisInterval = actInfo.getEndTime() - actInfo.getStartTime();
+								durationInThisInterval = timeIntervalEnd - actInfo.getStartTime();
 							
 							} else if (actInfo.getStartTime() >= timeIntervalStart && actInfo.getEndTime() <= timeIntervalEnd) {
 								durationInThisInterval = actInfo.getEndTime() - actInfo.getStartTime();
@@ -187,15 +189,22 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 								throw new RuntimeException("Unknown case. Aborting...");
 							}
 							
+							
+//							System.out.println("Duration in this interval: " + Time.writeTime(durationInThisInterval, Time.TIMEFORMAT_HHMMSS));
+							
 							double affectedAgentUnits = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
 
 							// affected agent units
-							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){
-								double affectedAgentUnitsSum = rp.getTimeInterval2affectedAgentUnits().get(timeIntervalEnd);
-								affectedAgentUnitsSum = affectedAgentUnitsSum + affectedAgentUnits;
+							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){								
+								Map<Double, Double> time2affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits();
+								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + affectedAgentUnits;
+								time2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnitsSumNew);
+								rp.setTimeInterval2affectedAgentUnits(time2affectedAgentUnits);
+								
 							} else {
 								Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
 								timeInterval2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnits);
+								rp.setTimeInterval2affectedAgentUnits(timeInterval2affectedAgentUnits);
 							}
 							
 							// further information to be stored
@@ -214,7 +223,12 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 						}
 					}
 				}
-			}			
+			}
+			
+//			// testing
+//			for (double timeIntervalEnd = noiseParams.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParams.getTimeBinSizeNoiseComputation()) {
+//				System.out.println(receiverPoints.get(Id.create("16", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(timeIntervalEnd));
+//			}
 		}	
 	}
 }

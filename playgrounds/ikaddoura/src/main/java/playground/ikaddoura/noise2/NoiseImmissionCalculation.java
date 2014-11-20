@@ -57,7 +57,9 @@ public class NoiseImmissionCalculation {
 	
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseParameters noiseParams;
-		
+	
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	
 	// from emission handler
 	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
 	private Map<Id <Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
@@ -66,9 +68,10 @@ public class NoiseImmissionCalculation {
 	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
 	private final List<Id<Link>> noiseBarrierLinks = new ArrayList<Id<Link>>();
 		
-	public NoiseImmissionCalculation (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams) {
+	public NoiseImmissionCalculation (NoiseSpatialInfo spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
+		this.receiverPoints = receiverPoints;
 		
 		this.linkId2timeInterval2noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
@@ -100,7 +103,7 @@ public class NoiseImmissionCalculation {
 
 	private void calculateImmissionSharesPerReceiverPointPerTimeInterval() {
 		
-		for (ReceiverPoint rp : spatialInfo.getReceiverPoints().values()) {
+		for (ReceiverPoint rp : this.receiverPoints.values()) {
 			Map<Double,Map<Id<Link>,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id<Link>,Double>>();
 		
 			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
@@ -125,8 +128,8 @@ public class NoiseImmissionCalculation {
 		double noiseImmission = 0.;
 			
 		noiseImmission = noiseEmission
-				+ spatialInfo.getReceiverPoints().get(rpId).getLinkId2distanceCorrection().get(linkId)
-				+ spatialInfo.getReceiverPoints().get(rpId).getLinkId2angleCorrection().get(linkId);
+				+ this.receiverPoints.get(rpId).getLinkId2distanceCorrection().get(linkId)
+				+ this.receiverPoints.get(rpId).getLinkId2angleCorrection().get(linkId);
 		
 		if (noiseImmission < 0.) {
 			noiseImmission = 0.;
@@ -135,7 +138,7 @@ public class NoiseImmissionCalculation {
 	}
 
 	private void calculateFinalNoiseImmissions() {
-		for(ReceiverPoint rp : spatialInfo.getReceiverPoints().values()) {
+		for(ReceiverPoint rp : this.receiverPoints.values()) {
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
 			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
@@ -191,7 +194,7 @@ public class NoiseImmissionCalculation {
 				}
 			}
 			
-			for (ReceiverPoint rp : this.spatialInfo.getReceiverPoints().values()){
+			for (ReceiverPoint rp : this.receiverPoints.values()){
 				double avgNoise = 0.;
 				double avgNoiseDay = 0.;
 				double avgNoiseNight = 0.;
@@ -288,7 +291,7 @@ public class NoiseImmissionCalculation {
 			bw.newLine();
 
 			
-			for (ReceiverPoint rp : this.spatialInfo.getReceiverPoints().values()){
+			for (ReceiverPoint rp : this.receiverPoints.values()){
 				bw.write(rp.getId().toString());
 				for(int i = 0 ; i < 30 ; i++) {
 					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
@@ -342,7 +345,7 @@ public class NoiseImmissionCalculation {
 		.create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		for (ReceiverPoint rp : this.spatialInfo.getReceiverPoints().values()) {
+		for (ReceiverPoint rp : this.receiverPoints.values()) {
 			for (Double timeInterval : rp.getTimeInterval2immission().keySet()) {
 				if (timeInterval <= 23 * 3600.) {
 					String dateTimeString = convertSeconds2dateTimeFormat(timeInterval);

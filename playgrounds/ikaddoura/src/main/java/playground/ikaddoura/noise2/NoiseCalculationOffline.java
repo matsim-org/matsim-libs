@@ -20,8 +20,11 @@
 package playground.ikaddoura.noise2;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -111,7 +114,9 @@ public class NoiseCalculationOffline {
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 		
-		NoiseSpatialInfo initialization = new NoiseSpatialInfo(scenario, noiseParameters);
+		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
+		
+		NoiseSpatialInfo initialization = new NoiseSpatialInfo(scenario, noiseParameters, receiverPoints);
 		initialization.setSpatialInfo();
 		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
@@ -133,7 +138,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
-		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters);
+		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters, receiverPoints);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
@@ -148,7 +153,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission, receiverPoints);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");

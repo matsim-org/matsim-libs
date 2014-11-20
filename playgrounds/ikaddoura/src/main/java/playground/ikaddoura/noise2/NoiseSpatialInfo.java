@@ -67,6 +67,8 @@ public class NoiseSpatialInfo {
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
 	
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	
 	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
 	private List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
@@ -84,12 +86,11 @@ public class NoiseSpatialInfo {
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
 	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
-	
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
-				
-	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams) {
+					
+	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
+		this.receiverPoints = receiverPoints;
 	}	
 	
 	public void setSpatialInfo() {
@@ -660,10 +661,6 @@ public class NoiseSpatialInfo {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
-		return receiverPoints;
 	}
 	
 	public Map<Id<Person>, List<Coord>> getPersonId2listOfCoords() {
