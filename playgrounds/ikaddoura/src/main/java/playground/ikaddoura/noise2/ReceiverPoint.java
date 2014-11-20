@@ -23,6 +23,7 @@
 package playground.ikaddoura.noise2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -40,8 +41,12 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private Coord coord;
 	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<Id<Link>, Double>();
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
-	private Map<Double,Map<Id<Link>,Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
-	private Map<Double,Double> timeInterval2immission = new HashMap<Double, Double>();
+	
+	private Map<Double, Map<Id<Link>, Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
+	private Map<Double, Double> timeInterval2immission = new HashMap<Double, Double>();
+	
+	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
+	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
 	
 	public ReceiverPoint(Id<ReceiverPoint> id) {
 		this.id = id;
@@ -92,6 +97,23 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 
 	public void setTimeInterval2immission(Map<Double,Double> timeInterval2immission) {
 		this.timeInterval2immission = timeInterval2immission;
+	}
+
+	public Map<Double, List<PersonActivityInfo>> getTimeInterval2actInfos() {
+		return timeInterval2actInfos;
+	}
+
+	public void setTimeInterval2actInfos(Map<Double, List<PersonActivityInfo>> timeInterval2actInfos) {
+		this.timeInterval2actInfos = timeInterval2actInfos;
+	}
+
+	public Map<Double, Double> getTimeInterval2affectedAgentUnits() {
+		return timeInterval2affectedAgentUnits;
+	}
+
+	public void setTimeInterval2affectedAgentUnits(
+			Map<Double, Double> timeInterval2affectedAgentUnits) {
+		this.timeInterval2affectedAgentUnits = timeInterval2affectedAgentUnits;
 	}
 
 }

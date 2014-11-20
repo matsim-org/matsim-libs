@@ -23,6 +23,7 @@
 package playground.ikaddoura.noise2;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -44,6 +45,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
+	private PersonActivityHandler2 personActivityTracker2;
 	private NoiseDamageCalculation noiseDamageCosts;
 	
 	public NoiseCalculationOnline(NoiseParameters noiseParameters) {
@@ -62,11 +64,13 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		
 		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.spatialInfo, noiseParameters);
+		this.personActivityTracker2 = new PersonActivityHandler2(event.getControler().getScenario(), noiseParameters, spatialInfo);
 
 		log.info("Initialization... Done.");
 		
 		event.getControler().getEvents().addHandler(noiseEmissionHandler);
 		event.getControler().getEvents().addHandler(personActivityTracker);
+		event.getControler().getEvents().addHandler(personActivityTracker2);
 	}
 	
 	@Override
@@ -92,7 +96,14 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		// calculate activity durations for each agent
 		log.info("Calculating each agent's activity durations...");
 		this.personActivityTracker.calculateDurationOfStay();
+		this.personActivityTracker2.calculataDurationsOfStay();
 		log.info("Calculating each agent's activity durations... Done.");
+		
+		// testing
+		for (double timeIntervalEnd = noiseParameters.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParameters.getTimeBinSizeNoiseComputation()) {
+			System.out.println(this.personActivityTracker.getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("16", ReceiverPoint.class)).get(timeIntervalEnd) + " <-?-> " + this.spatialInfo.getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(timeIntervalEnd));
+		}
+
 				
 		log.info("Calculating noise damage costs and throwing noise events...");
 		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), spatialInfo, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission);
