@@ -33,7 +33,6 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 public class GroupXGroupEmissionCosts {
 	
 	Double [][] groupXgroupMatrix;
-//	Map <UserGroup, Integer> userGroupToMatrixIndex;
 	private UserGroup[] userGroups;
 	private Double scalingFactor;
 	private static final Logger logger = Logger.getLogger(GroupXGroupEmissionCosts.class);
@@ -92,27 +91,58 @@ public class GroupXGroupEmissionCosts {
 		System.out.println();
 		for(int receiving=0; receiving<userGroups.length; receiving++){
 			System.out.print("Receiving:" + userGroups[receiving].toString() + "  ");
-			Double totalReceivedValue =0.0;
+			//Double totalReceivedValue =0.0;
 			for(int causing=0; causing<userGroups.length; causing++){
 				System.out.print(groupXgroupMatrix[causing][receiving] + "   ");
-				totalReceivedValue+= groupXgroupMatrix[causing][receiving];
+				//totalReceivedValue+= groupXgroupMatrix[causing][receiving];
 			}
 			
-			System.out.println(totalReceivedValue);
+			System.out.println(getTotalReceivedValue(receiving));
 			System.out.println();
 		}
 		System.out.print("Total receiving:   ");
 		for(int causing=0; causing<userGroups.length; causing++){
-			Double totalCausing=0.0;
-			for(int receiving=0; receiving<userGroups.length; receiving++){
-				totalCausing+= groupXgroupMatrix[causing][receiving];
-			}
-			System.out.print(totalCausing + "   ");
+//			Double totalCausing=0.0;
+//			for(int receiving=0; receiving<userGroups.length; receiving++){
+//				totalCausing+= groupXgroupMatrix[causing][receiving];
+//			}
+			System.out.print(getTotalCausedValue(causing) + "   ");
 		}
-		
 		System.out.println();
+		System.out.println("Total costs: " + getTotalCosts());
+		//TODO factors received/caused
+		System.out.println();
+		System.out.println("Received/Causing:");
+		for(int group=0; group<userGroups.length; group++){
+			System.out.println(userGroups[group].toString() + " : "+ (getTotalReceivedValue(group)/getTotalCausedValue(group)));
+		}
 	}
 	
+	
+	private Double getTotalCosts() {
+		Double totalCosts =0.0;
+		for(int causing =0; causing<userGroups.length; causing++){
+			totalCosts += getTotalCausedValue(causing);
+		}
+		return totalCosts;
+	}
+
+
+	private Double getTotalReceivedValue(int receiving) {
+		Double totalReceived= new Double(0.0);
+		for(int causing = 0; causing<userGroups.length; causing++){
+			totalReceived += groupXgroupMatrix[causing][receiving];
+		}
+		return totalReceived;
+	}
+
+	private Double getTotalCausedValue(int causing) {
+		Double totalCaused= new Double(0.0);
+		for(int receiving = 0; receiving<userGroups.length; receiving++){
+			totalCaused += groupXgroupMatrix[causing][receiving];
+		}
+		return totalCaused;
+	}
 	
 	private void initializeMatrix(Double[][] matrix) {
 		for(int i=0; i<matrix.length; i++){
