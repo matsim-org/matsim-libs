@@ -21,8 +21,10 @@ package playground.agarwalamit.marginalTesting;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,23 +43,24 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import playground.ikaddoura.internalizationCar.MarginalCostPricing;
-import playground.ikaddoura.internalizationCar.TollHandler;
 
 /**
  * @author amit
@@ -78,45 +81,61 @@ public class StraightTrackExperiment {
 	}
 
 	public void test4MarginalCongestionCosts(){
-		createPseudoInputs pseudoInputs;
-		Controler controler;
-
-		int numberOfPersonInPlan = 2000;
 		String outputDir = "./output/pop20/";
-		pseudoInputs = new createPseudoInputs();
-		double flowCapFactor = 1;
-		double storageCapFactor = 1;
+		new File(outputDir).mkdirs();
+
+		int numberOfPersonInPlan = 20;
+		createPseudoInputs pseudoInputs = new createPseudoInputs();
+		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
-		pseudoInputs.createConfig(flowCapFactor, storageCapFactor);
-		pseudoInputs.config.controler().setOutputDirectory(outputDir);
-		controler = new Controler(pseudoInputs.scenario);
+		pseudoInputs.createConfig();
+		Scenario sc = pseudoInputs.scenario;
+
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
+		events.addHandler(writer);
 		
-		controler.setCreateGraphs(true);
-		controler.setDumpDataAtEnd(false);
-		controler.setOverwriteFiles(true);
-		TollHandler tollHandler = new TollHandler( controler.getScenario() ) ;
-		controler.addControlerListener( new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ) ) ;
+		final boolean useOTFVis = false ;
+		QSim qSim = createQSim(sc, events,useOTFVis);
+		qSim.run();
+		writer.closeFile();
+	}
 
-		final boolean useOTFVis = true ;
-		controler.setMobsimFactory( new MobsimFactory() {
-			@Override		
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-				if ( useOTFVis ) {
-					// otfvis configuration.  There is more you can do here than via file!
-					final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-					otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-					//				otfVisConfig.setShowParking(true) ; // this does not really work
-					otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
-					//					otfVisConfig.setShowTeleportedAgents(false) ;
+	private QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
+		QSim qSim1 = new QSim(sc, manager);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim1.addMobsimEngine(activityEngine);
+		qSim1.addActivityHandler(activityEngine);
 
-					OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-					OTFClientLive.run(sc.getConfig(), server);
-				}
-				return qSim ;
-			}
-		} );
-		controler.run();
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
+		qSim1.addMobsimEngine(netsimEngine);
+		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim1.addMobsimEngine(teleportationEngine);
+		QSim qSim = qSim1;
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		car.setMaximumVelocity(20);
+		car.setPcuEquivalents(1.0);
+		modeVehicleTypes.put("car", car);
+		agentSource.setModeVehicleTypes(modeVehicleTypes);
+		qSim.addAgentSource(agentSource);
+
+		if ( useOTFVis ) {
+			// otfvis configuration.  There is more you can do here than via file!
+			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+			//				otfVisConfig.setShowParking(true) ; // this does not really work
+
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);
+			OTFClientLive.run(sc.getConfig(), server);
+		}
+		return qSim;
 	}
 
 	/**
@@ -147,7 +166,6 @@ public class StraightTrackExperiment {
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (NetworkImpl) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
-			createNetwork();
 		}
 
 		private void createNetwork(){
@@ -162,7 +180,7 @@ public class StraightTrackExperiment {
 			Node node6 = network.createAndAddNode(Id.createNodeId("6"), this.scenario.createCoord(500, 20));
 			Node node7 = network.createAndAddNode(Id.createNodeId("7"), this.scenario.createCoord(700, 100));
 
-			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,10000.0,20.0,36000,1,null,"7");
+			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600,1,null,"7");
 			link1.setAllowedModes(allModesAllowed);
 			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,1000.0,20.0,3600,1,null,"7");
 			link2.setAllowedModes(allModesAllowed);
@@ -172,7 +190,7 @@ public class StraightTrackExperiment {
 			link4.setAllowedModes(allModesAllowed);
 			link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node3, node6,1000.0,20.0,3600,1,null,"7");
 			link5.setAllowedModes(allModesAllowed);
-			link6 = network.createAndAddLink(Id.createLinkId(String.valueOf("6")), node6, node7,10000.0,20.0,36000,1,null,"7");
+			link6 = network.createAndAddLink(Id.createLinkId(String.valueOf("6")), node6, node7,1000.0,20.0,3600,1,null,"7");
 			link6.setAllowedModes(allModesAllowed);
 		}
 
@@ -212,9 +230,9 @@ public class StraightTrackExperiment {
 			}
 		}
 
-		private void createConfig(double flowCapFactor, double storageCapFactor){
-			config.qsim().setFlowCapFactor(flowCapFactor);
-			config.qsim().setStorageCapFactor(storageCapFactor);
+		private void createConfig(){
+			config.qsim().setFlowCapFactor(1);
+			config.qsim().setStorageCapFactor(1);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car));
 			config.qsim().setEndTime(24*3600);
 			config.controler().setFirstIteration(0);
@@ -224,10 +242,6 @@ public class StraightTrackExperiment {
 			ActivityParams homeAct = new ActivityParams("h");
 			homeAct.setTypicalDuration(1*3600);
 			config.planCalcScore().addActivityParams(homeAct);
-
-//			ActivityParams workAct =new ActivityParams("w");
-//			workAct.setTypicalDuration(1);;
-//			config.planCalcScore().addActivityParams(workAct);
 		}
 	}
 }
