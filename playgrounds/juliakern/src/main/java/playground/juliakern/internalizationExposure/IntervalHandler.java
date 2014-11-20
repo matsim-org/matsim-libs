@@ -1,4 +1,4 @@
-package playground.juliakern.newInternalization;
+package playground.juliakern.internalizationExposure;
 
 import java.util.HashMap;
 import java.util.HashSet;

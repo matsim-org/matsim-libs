@@ -49,7 +49,7 @@ import playground.benjamin.scenarios.munich.analysis.kuhmo.MultiAnalyzerWriter;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.TravelTimePerModeEventHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.juliakern.distribution.GridTools;
-import playground.juliakern.newInternalization.IntervalHandler;
+import playground.juliakern.internalizationExposure.IntervalHandler;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**

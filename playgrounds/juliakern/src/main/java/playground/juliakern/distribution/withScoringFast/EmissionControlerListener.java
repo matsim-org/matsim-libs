@@ -38,10 +38,11 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+
 import playground.juliakern.distribution.EmActivity;
 import playground.juliakern.distribution.EmPerCell;
 import playground.juliakern.distribution.GridTools;
-import playground.juliakern.newInternalization.IntervalHandler;
+import playground.juliakern.internalizationExposure.IntervalHandler;
 import playground.juliakern.responsibilityOffline.EmCarTrip;
 
 import java.util.ArrayList;

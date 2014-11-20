@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.juliakern.newInternalization;
+package playground.juliakern.internalizationExposure;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
