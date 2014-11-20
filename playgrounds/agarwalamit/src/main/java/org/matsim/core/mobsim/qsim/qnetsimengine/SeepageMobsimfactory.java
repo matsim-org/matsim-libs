@@ -69,21 +69,6 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 
 		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory();
 
-		//		  NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
-		//
-		//	            @Override
-		//	            public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-		//	                    return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
-		//	            }
-		//
-		//	            @Override
-		//	            public QNode createNetsimNode(final Node node, QNetwork network) {
-		//	                return new QNode(node, network);
-		//	            }
-		//
-		//
-		//	        };
-
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
 
 		qSim.addMobsimEngine(netsimEngine);
