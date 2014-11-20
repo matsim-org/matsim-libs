@@ -51,7 +51,7 @@ public class NoiseDamageCalculation {
 	private Scenario scenario;
 	private EventsManager events;
 	
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 	private NoiseParameters noiseParams;
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 		
@@ -84,7 +84,7 @@ public class NoiseDamageCalculation {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseInitialization spatialInfo, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker, NoiseImmissionCalculation noiseImmission, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.scenario = scenario;
 		this.events = events;
 		this.spatialInfo = spatialInfo;

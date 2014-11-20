@@ -59,9 +59,9 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		NoiseSpatialInfo noiseSpatialInfo = new NoiseSpatialInfo(scenario, new NoiseParameters(), receiverPoints);
+		NoiseInitialization noiseSpatialInfo = new NoiseInitialization(scenario, new NoiseParameters(), receiverPoints);
 		
-		noiseSpatialInfo.setSpatialInfo();
+		noiseSpatialInfo.initialize();
 		
 		// test the resulting Map
 //		Assert.assertEquals("wrong number of activities per grid cell (0/0)", 1, noiseSpatialInfo.getZoneTuple2listOfActivityCoords().get(new Tuple<Integer, Integer>(0 , 0)).size(), MatsimTestUtils.EPSILON);

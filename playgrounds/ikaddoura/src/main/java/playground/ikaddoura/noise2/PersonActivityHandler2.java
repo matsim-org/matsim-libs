@@ -52,12 +52,12 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 	
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
-	private NoiseSpatialInfo spatialInfo;
+	private NoiseInitialization spatialInfo;
 		
 	private Map<Id<Person>, Integer> personId2activityNumber = new HashMap<Id<Person>, Integer>(); // if doesn't contains the personId, the activityNumber is 0
 	private Map<Id<Person>, Map<Integer, PersonActivityInfo>> personId2actNr2actInfo = new HashMap<Id<Person>, Map<Integer, PersonActivityInfo>>();
 		
-	public PersonActivityHandler2 (Scenario scenario, NoiseParameters noiseParams, NoiseSpatialInfo spatialInfo) {
+	public PersonActivityHandler2 (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 		this.spatialInfo = spatialInfo;
@@ -192,7 +192,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 							
 //							System.out.println("Duration in this interval: " + Time.writeTime(durationInThisInterval, Time.TIMEFORMAT_HHMMSS));
 							
-							double affectedAgentUnitsThisAgent = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
+							double affectedAgentUnitsThisAgent = (noiseParams.getScaleFactor()) * (durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation());
 
 							// affected agent units
 							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){								
@@ -222,11 +222,6 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 					}
 				}
 			}
-			
-//			// testing
-//			for (double timeIntervalEnd = noiseParams.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParams.getTimeBinSizeNoiseComputation()) {
-//				System.out.println(receiverPoints.get(Id.create("16", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(timeIntervalEnd));
-//			}
 		}	
 	}
 }

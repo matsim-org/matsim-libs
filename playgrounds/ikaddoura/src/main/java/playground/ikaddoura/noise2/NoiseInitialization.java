@@ -60,9 +60,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author lkroeger, ikaddoura
  *
  */
-public class NoiseSpatialInfo {
+public class NoiseInitialization {
 	
-	private static final Logger log = Logger.getLogger(NoiseSpatialInfo.class);
+	private static final Logger log = Logger.getLogger(NoiseInitialization.class);
 			
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
@@ -87,13 +87,13 @@ public class NoiseSpatialInfo {
 	
 	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 					
-	public NoiseSpatialInfo(Scenario scenario, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public NoiseInitialization(Scenario scenario, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = receiverPoints;
 	}	
 	
-	public void setSpatialInfo() {
+	public void initialize() {
 		setActivityCoords();
 		createGrid();
 		setActivityCoord2NearestReceiverPointId();

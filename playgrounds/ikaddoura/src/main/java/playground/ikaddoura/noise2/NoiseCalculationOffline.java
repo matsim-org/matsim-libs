@@ -116,8 +116,8 @@ public class NoiseCalculationOffline {
 		
 		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
-		NoiseSpatialInfo initialization = new NoiseSpatialInfo(scenario, noiseParameters, receiverPoints);
-		initialization.setSpatialInfo();
+		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters, receiverPoints);
+		initialization.initialize();
 		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
