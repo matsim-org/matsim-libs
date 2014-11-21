@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 
 /**
  * 
- * Collects each agent's performance of activities throughout the day.
+ * Calculates each agent's performance of activities throughout the day.
  * 
  * @author ikaddoura
  *
@@ -75,7 +75,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		
 			if (!event.getActType().toString().equals("pt_interaction")) {
 				
-				// update activity number
+				// update the activity number
 				if (this.personId2activityNumber.containsKey(event.getPersonId())){
 					int newActNr = this.personId2activityNumber.get(event.getPersonId()) + 1;
 					this.personId2activityNumber.put(event.getPersonId(), newActNr);

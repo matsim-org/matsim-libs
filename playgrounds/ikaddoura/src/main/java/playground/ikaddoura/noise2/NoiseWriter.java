@@ -81,33 +81,28 @@ public class NoiseWriter {
 		
 		write(outputPath, 3, headers, values);
 		
-		// shape file		
-		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
-		tbuilder.setName("shape");
-		tbuilder.add("geometry", Point.class);
-		tbuilder.add("pointId", String.class);
-		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
+		// shape file	
+				
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
+		.setName("receiver point")
+		.addAttribute("Id", String.class)
+		.create();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		
-		GeometryFactory gf = new GeometryFactory();
-		int i = 0;
-		for(Id<ReceiverPoint> id : receiverPoints.keySet()) {
-			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
-				gf.createPoint(MGC.coord2Coordinate(receiverPoints.get(id).getCoord())),
-				id
-			});
-			features.add(feature);			
-			i++;
+		for (ReceiverPoint rp : receiverPoints.values()) {
+					
+			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
+			features.add(feature);
 		}
+		
 		String filePath = outputPath;
 		File file = new File(filePath);
 		file.mkdirs();
 		
-		log.info("Writing out receiver points to shapefile... ");
+		log.info("Writing receiver points to shapefile... ");
 		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
-		log.info("Writing out receiver points to shapefile... Done. ");
+		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
 	private static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
