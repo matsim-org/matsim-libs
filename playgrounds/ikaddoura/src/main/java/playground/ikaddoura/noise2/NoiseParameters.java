@@ -39,7 +39,6 @@ public class NoiseParameters {
 	
 	private static final Logger log = Logger.getLogger(NoiseParameters.class);
 
-	// default values
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
@@ -48,14 +47,14 @@ public class NoiseParameters {
 	private String hgvIdPrefix = "lkw";
 	private String[] consideredActivities = {"home", "work"};	
 
-	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
-	
 	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which activities are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
-		
+
+	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+			
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("Setting the annual cost rate to " + annualCostRate);
 		this.annualCostRate = annualCostRate;
@@ -84,34 +83,6 @@ public class NoiseParameters {
 	public void setHgvIdPrefix(String hgvIdPrefix) {
 		log.info("Setting the HGV Id Prefix to " + hgvIdPrefix);
 		this.hgvIdPrefix = hgvIdPrefix;
-	}
-
-	public double getAnnualCostRate() {
-		return annualCostRate;
-	}
-	
-	public double getTimeBinSizeNoiseComputation() {
-		return timeBinSizeNoiseComputation;
-	}
-	
-	public double getScaleFactor() {
-		return scaleFactor;
-	}
-	
-	public double getReceiverPointGap() {
-		return receiverPointGap;
-	}
-	
-	public double getRelevantRadius() {
-		return relevantRadius;
-	}
-
-	public String getHgvIdPrefix() {
-		return hgvIdPrefix;
-	}
-
-	public List<Id<Link>> getTunnelLinkIDs() {
-		return tunnelLinkIDs;
 	}
 
 	public void setTunnelLinkIDs(List<Id<Link>> tunnelLinkIDs) {
@@ -163,6 +134,33 @@ public class NoiseParameters {
 		log.info("Setting considered activities to " + consideredActivities);
 		this.consideredActivities = consideredActivities;
 	}
+	
+	public double getAnnualCostRate() {
+		return annualCostRate;
+	}
+	
+	public double getTimeBinSizeNoiseComputation() {
+		return timeBinSizeNoiseComputation;
+	}
+	
+	public double getScaleFactor() {
+		return scaleFactor;
+	}
+	
+	public double getReceiverPointGap() {
+		return receiverPointGap;
+	}
+	
+	public double getRelevantRadius() {
+		return relevantRadius;
+	}
 
+	public String getHgvIdPrefix() {
+		return hgvIdPrefix;
+	}
+
+	public List<Id<Link>> getTunnelLinkIDs() {
+		return tunnelLinkIDs;
+	}
 	
 }
