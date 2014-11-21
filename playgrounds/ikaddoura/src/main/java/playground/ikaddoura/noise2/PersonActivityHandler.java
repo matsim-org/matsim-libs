@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,23 +36,27 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.PtConstants;
 
 /**
  * 
- * Calculates each agent's performance of activities throughout the day.
+ * Calculates each agent's performance of considered activities.
  * 
  * @author ikaddoura
  *
  */
 
 public class PersonActivityHandler implements ActivityEndEventHandler , ActivityStartEventHandler {
-	
+	private static final Logger log = Logger.getLogger(PersonActivityHandler.class);
+
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
 	private NoiseInitialization spatialInfo;
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	
+	private final List<String> consideredActivityTypes = new ArrayList<String>();
 		
-	private Map<Id<Person>, Integer> personId2activityNumber = new HashMap<Id<Person>, Integer>();
+	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 	private Map<Id<Person>, Map<Integer, PersonActivityInfo>> personId2actNr2actInfo = new HashMap<Id<Person>, Map<Integer, PersonActivityInfo>>();
 		
 	public PersonActivityHandler (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
@@ -59,11 +64,21 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		this.noiseParams = noiseParams;
 		this.spatialInfo = spatialInfo;
 		this.receiverPoints = receiverPoints;
+		
+		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
+		for (int i = 0; i < consideredActTypesArray.length; i++) {
+			this.consideredActivityTypes.add(consideredActTypesArray[i]);
+		}
+		
+		if (this.consideredActivityTypes.size() == 0) {
+			log.warn("Not considering any activity type for the noise damage computation.");
+		}
+		
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		this.personId2activityNumber.clear();
+		this.personId2currentActNr.clear();
 		this.personId2actNr2actInfo.clear();
 	}
 	
@@ -73,29 +88,32 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		if (!(scenario.getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
 		
-			if (!event.getActType().toString().equals("pt_interaction")) {
+			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
-				// update the activity number
-				if (this.personId2activityNumber.containsKey(event.getPersonId())){
-					int newActNr = this.personId2activityNumber.get(event.getPersonId()) + 1;
-					this.personId2activityNumber.put(event.getPersonId(), newActNr);
-				} else {
-					this.personId2activityNumber.put(event.getPersonId(), 1);
+				if (this.consideredActivityTypes.contains(event.getActType())) {
+					
+					if (this.personId2currentActNr.containsKey(event.getPersonId())){
+						int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
+						this.personId2currentActNr.put(event.getPersonId(), newActNr);
+					} else {
+						this.personId2currentActNr.put(event.getPersonId(), 1);
+					}
+					
+					PersonActivityInfo actInfo = new PersonActivityInfo();
+					actInfo.setStartTime(event.getTime());
+					actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
+					actInfo.setPersonId(event.getPersonId());
+					actInfo.setActivityType(event.getActType());
+					
+					if (this.personId2actNr2actInfo.containsKey(event.getPersonId())){
+						this.personId2actNr2actInfo.get(event.getPersonId()).put(this.personId2currentActNr.get(event.getPersonId()), actInfo);
+					
+					} else {
+						Map<Integer, PersonActivityInfo> actNr2actInfo = new HashMap<Integer, PersonActivityInfo>();
+						actNr2actInfo.put(this.personId2currentActNr.get(event.getPersonId()), actInfo);
+						this.personId2actNr2actInfo.put(event.getPersonId(), actNr2actInfo);
+					}
 				}
-			}
-			
-			PersonActivityInfo actInfo = new PersonActivityInfo();
-			actInfo.setStartTime(event.getTime());
-			actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
-			actInfo.setPersonId(event.getPersonId());
-			actInfo.setActivityType(event.getActType());
-			
-			if (this.personId2actNr2actInfo.containsKey(event.getPersonId())){
-				this.personId2actNr2actInfo.get(event.getPersonId()).put(this.personId2activityNumber.get(event.getPersonId()), actInfo);
-			} else {
-				Map<Integer, PersonActivityInfo> actNr2actInfo = new HashMap<Integer, PersonActivityInfo>();
-				actNr2actInfo.put(this.personId2activityNumber.get(event.getPersonId()), actInfo);
-				this.personId2actNr2actInfo.put(event.getPersonId(), actNr2actInfo);
 			}
 		}
 	}
@@ -106,29 +124,32 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		if (!(scenario.getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
 			
-			if (!event.getActType().toString().equals("pt_interaction")) {
+			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
-				if (this.personId2activityNumber.containsKey(event.getPersonId())){
-					// not the first activity
+				if (this.consideredActivityTypes.contains(event.getActType())) {
 					
-					// since this is not the last activity, overwrite the end time
-					PersonActivityInfo actInfo = this.personId2actNr2actInfo.get(event.getPersonId()).get(this.personId2activityNumber.get(event.getPersonId()));
-					actInfo.setEndTime(event.getTime());
-				
-				} else {
-					// the first activity
+					if (this.personId2currentActNr.containsKey(event.getPersonId())){
+						// not the first activity
+						
+						// since this is not the last activity, overwrite the end time
+						PersonActivityInfo actInfo = this.personId2actNr2actInfo.get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
+						actInfo.setEndTime(event.getTime());
+					
+					} else {
+						// the first activity
 
-					// since this is the first activity, this activity has not yet appeared
-					PersonActivityInfo actInfo = new PersonActivityInfo();
-					actInfo.setStartTime(0.); // since this is the first activity
-					actInfo.setEndTime(event.getTime());
-					actInfo.setPersonId(event.getPersonId());
-					actInfo.setActivityType(event.getActType());
-					
-					Map<Integer, PersonActivityInfo> actNr2actInfo = new HashMap<Integer, PersonActivityInfo>();
-					actNr2actInfo.put(0, actInfo);
-					this.personId2actNr2actInfo.put(event.getPersonId(), actNr2actInfo);
-					
+						// since this is the first activity, this activity has not yet appeared
+						PersonActivityInfo actInfo = new PersonActivityInfo();
+						actInfo.setStartTime(0.); // since this is the first activity
+						actInfo.setEndTime(event.getTime());
+						actInfo.setPersonId(event.getPersonId());
+						actInfo.setActivityType(event.getActType());
+						
+						Map<Integer, PersonActivityInfo> actNr2actInfo = new HashMap<Integer, PersonActivityInfo>();
+						actNr2actInfo.put(0, actInfo);
+						this.personId2actNr2actInfo.put(event.getPersonId(), actNr2actInfo);
+						
+					}
 				}
 			} 
 		}		

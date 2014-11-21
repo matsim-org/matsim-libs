@@ -77,6 +77,20 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	}
 	
 	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		log.info("Resetting noise immissions, activity information and damages...");
+		for (ReceiverPoint rp : this.receiverPoints.values()) {
+			rp.getTimeInterval2actInfos().clear();
+			rp.getTimeInterval2affectedAgentUnits().clear();
+			rp.getTimeInterval2damageCostPerAffectedAgentUnit().clear();
+			rp.getTimeInterval2damageCosts().clear();
+			rp.getTimeInterval2immission().clear();
+			rp.getTimeInterval2LinkId2IsolatedImmission().clear();	
+		}
+		log.info("Resetting noise immissions, activity information and damages... Done.");
+	}
+	
+	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 				
 		log.info("Calculating noise emission...");
@@ -128,20 +142,6 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 
 	Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
 		return receiverPoints;
-	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		log.info("Resetting noise immissions, activity information and damages...");
-		for (ReceiverPoint rp : this.receiverPoints.values()) {
-			rp.getTimeInterval2actInfos().clear();
-			rp.getTimeInterval2affectedAgentUnits().clear();
-			rp.getTimeInterval2damageCostPerAffectedAgentUnit().clear();
-			rp.getTimeInterval2damageCosts().clear();
-			rp.getTimeInterval2immission().clear();
-			rp.getTimeInterval2LinkId2IsolatedImmission().clear();	
-		}
-		log.info("Resetting noise immissions, activity information and damages... Done.");
 	}
 		
 }

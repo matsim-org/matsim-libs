@@ -46,7 +46,7 @@ public class NoiseParameters {
 	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private String[] consideredActivitiesDamageCalculation = {"home", "work"};	
+	private String[] consideredActivities = {"home", "work"};	
 
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
@@ -119,16 +119,6 @@ public class NoiseParameters {
 		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
 
-	public String[] getConsideredActivitiesDamageCalculation() {
-		return consideredActivitiesDamageCalculation;
-	}
-
-	public void setConsideredActivitiesDamageCalculation(
-			String[] consideredActivitiesDamageCalculation) {
-		log.info("Setting considered activities for damage calculation to " + consideredActivitiesDamageCalculation);
-		this.consideredActivitiesDamageCalculation = consideredActivitiesDamageCalculation;
-	}
-
 	public double getReceiverPointsGridMinX() {
 		return receiverPointsGridMinX;
 	}
@@ -163,6 +153,15 @@ public class NoiseParameters {
 	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
 		log.info("Setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
+	}
+
+	public String[] getConsideredActivities() {		
+		return consideredActivities;
+	}
+
+	public void setConsideredActivities(String[] consideredActivities) {
+		log.info("Setting considered activities to " + consideredActivities);
+		this.consideredActivities = consideredActivities;
 	}
 
 	
