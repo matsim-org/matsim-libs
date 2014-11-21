@@ -153,7 +153,7 @@ public class NoiseCalculationOffline {
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, noiseImmission, receiverPoints);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, noiseParameters, noiseEmissionHandler, noiseImmission, receiverPoints);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");

@@ -102,7 +102,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		log.info("Calculating each agent's activity durations... Done.");
 			
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), initialization, noiseParameters, noiseEmissionHandler, noiseImmission, this.receiverPoints);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), noiseParameters, noiseEmissionHandler, noiseImmission, this.receiverPoints);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
@@ -119,10 +119,6 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	NoiseEmissionHandler getNoiseEmissionHandler() {
 		return noiseEmissionHandler;
 	}
-
-//	PersonActivityHandler getPersonActivityTracker() {
-//		return personActivityTracker;
-//	}
 
 	NoiseImmissionCalculation getNoiseImmission() {
 		return noiseImmission;

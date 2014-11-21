@@ -62,11 +62,6 @@ public class PersonActivityInfo {
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}	
-	
-	@Override
-	public String toString() {
-		return "PersonId: " + personId + " / activityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
-	}
 	public double getDurationWithinInterval() {
 		return durationWithinInterval;
 	}
@@ -74,4 +69,8 @@ public class PersonActivityInfo {
 		this.durationWithinInterval = durationWithinInterval;
 	}
 	
+	@Override
+	public String toString() {
+		return "PersonId: " + personId + " / activityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
+	}
 }

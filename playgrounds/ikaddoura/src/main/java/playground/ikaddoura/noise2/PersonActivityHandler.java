@@ -195,16 +195,12 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 							double affectedUnitsThisAgent = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
 							
 							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){	
-								if (rp.getId().toString().equals(Id.create("16", ReceiverPoint.class)) && timeIntervalEnd == 10 * 3600.) {
-									System.out.println(actInfo.toString());
-								}
+								
 								Map<Double, Double> time2affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits();
 								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + (noiseParams.getScaleFactor() * affectedUnitsThisAgent);
 								time2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnitsSumNew);
 								rp.setTimeInterval2affectedAgentUnits(time2affectedAgentUnits);
-								if (rp.getId().toString().equals(Id.create("16", ReceiverPoint.class)) && timeIntervalEnd == 10 * 3600.) {
-									
-								}
+								
 							} else {
 								rp.getTimeInterval2affectedAgentUnits().put(timeIntervalEnd, affectedUnitsThisAgent);
 							}
