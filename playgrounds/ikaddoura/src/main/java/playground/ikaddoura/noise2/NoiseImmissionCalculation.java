@@ -40,7 +40,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.Vehicle;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -59,10 +58,7 @@ public class NoiseImmissionCalculation {
 	private NoiseParameters noiseParams;
 	
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
-	
-	// from emission handler
-	private Map<Id <Link>, Map<Double,Double>> linkId2timeInterval2noiseEmission;
-	private Map<Id <Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs;
+	private NoiseEmissionHandler noiseEmissionHandler;
 	
 	// optional information for a more detailed calculation of noise immissions
 	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
@@ -72,17 +68,16 @@ public class NoiseImmissionCalculation {
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = receiverPoints;
-		
-		this.linkId2timeInterval2noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
-		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
+		this.noiseEmissionHandler = noiseEmissionHandler;		
 	}
 	
-	public void setTunnelLinks(ArrayList<Id<Link>> tunnelLinks) {
+	public void setTunnelLinks(String[] tunnelLinks) {
 		if (tunnelLinks == null) {
 			log.warn("No information on tunnels provided.");
 		} else {
-			this.tunnelLinks.addAll(tunnelLinks);
-			log.warn("Consideration of tunnels not yet implemented.");
+			for (int i = 0; i < tunnelLinks.length; i++) {
+				this.tunnelLinks.add(Id.create(tunnelLinks[i], Link.class));
+			}
 		}
 	}
 	
@@ -110,12 +105,17 @@ public class NoiseImmissionCalculation {
 			 	Map<Id<Link>,Double> noiseLinks2isolatedImmission = new HashMap<Id<Link>, Double>();
 			
 			 	for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
-					double noiseEmission = linkId2timeInterval2noiseEmission.get(linkId).get(timeInterval);
-					double noiseImmission = 0.;
-					if (!(noiseEmission == 0.)) {
-						noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , rp.getId());						
-					}
-					noiseLinks2isolatedImmission.put(linkId,noiseImmission);
+			 		if (tunnelLinks.contains(linkId)) {
+			 			// skip this link
+			 			
+			 		} else {
+			 			double noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission().get(linkId).get(timeInterval);
+						double noiseImmission = 0.;
+						if (!(noiseEmission == 0.)) {
+							noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , rp.getId());						
+						}
+						noiseLinks2isolatedImmission.put(linkId,noiseImmission);
+			 		}
 				}
 				timeIntervals2noiseLinks2isolatedImmission.put(timeInterval, noiseLinks2isolatedImmission);
 			}
@@ -144,7 +144,7 @@ public class NoiseImmissionCalculation {
 				List<Double> noiseImmissions = new ArrayList<Double>();
 				if(!(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval) == null)) {
 					for(Id<Link> linkId : rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval).keySet()) {
-						if(!(linkId2timeInterval2linkEnterVehicleIDs.get(linkId).get(timeInterval).size() == 0.)) {
+						if(!(noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs().get(linkId).get(timeInterval).size() == 0.)) {
 							noiseImmissions.add(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval).get(linkId));
 						}
 					}	

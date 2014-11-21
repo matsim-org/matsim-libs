@@ -87,7 +87,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		// calculate the noise immission for each receiver point and time interval
 		log.info("Calculating noise immission...");
 		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters, this.receiverPoints);
-		noiseImmission.setTunnelLinks(null);
+		noiseImmission.setTunnelLinks(this.noiseParameters.getTunnelLinks());
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
 		this.noiseImmission.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");

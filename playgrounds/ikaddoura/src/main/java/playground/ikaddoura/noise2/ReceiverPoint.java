@@ -37,17 +37,21 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
+	// initialization
 	private Id<ReceiverPoint> id;
 	private Coord coord;
 	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<Id<Link>, Double>();
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
 	
+	// immission
 	private Map<Double, Map<Id<Link>, Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
 	private Map<Double, Double> timeInterval2immission = new HashMap<Double, Double>();
 	
+	// activity tracker
 	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
 	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
 	
+	// damages
 	private Map<Double, Double> timeInterval2damageCosts = new HashMap<Double, Double>();
 	private Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Double, Double>();
 

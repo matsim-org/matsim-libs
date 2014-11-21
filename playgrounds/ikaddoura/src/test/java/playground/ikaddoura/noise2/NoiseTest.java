@@ -254,7 +254,6 @@ public class NoiseTest {
 		
 		boolean tested = false;
 		for (NoiseEventCaused event : noiseControlerListener.getNoiseDamageCosts().getNoiseEventsCaused()){
-			System.out.println(event.toString());
 			if (event.getTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString())) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("linkA5", Link.class)).get(11 * 3600.) / 2., event.getAmount(), MatsimTestUtils.EPSILON);
 				tested = true;

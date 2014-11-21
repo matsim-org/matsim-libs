@@ -361,7 +361,6 @@ public class NoiseInitialization {
 			
 			rp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
 			rp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
-			// TODO: Check if the object is acually changed...
 		}
 	}
 	
@@ -583,13 +582,13 @@ public class NoiseInitialization {
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
 		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
-		for(Id<ReceiverPoint> id : this.receiverPoints.keySet()) {
+		for(Id<ReceiverPoint> id : receiverPoints.keySet()) {
 			c++;
 			if(c % 1000 == 0) {
 				log.info("Writing out receiver point # "+ c);
 			}
-			id2xCoord.put(id, this.receiverPoints.get(id).getCoord().getX());
-			id2yCoord.put(id, this.receiverPoints.get(id).getCoord().getY());
+			id2xCoord.put(id, receiverPoints.get(id).getCoord().getX());
+			id2yCoord.put(id, receiverPoints.get(id).getCoord().getY());
 		}
 		List<String> headers = new ArrayList<String>();
 		headers.add("receiverPointId");
@@ -614,9 +613,9 @@ public class NoiseInitialization {
 		
 		GeometryFactory gf = new GeometryFactory();
 		int i = 0;
-		for(Id<ReceiverPoint> id : this.receiverPoints.keySet()) {
+		for(Id<ReceiverPoint> id : receiverPoints.keySet()) {
 			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
-				gf.createPoint(MGC.coord2Coordinate(this.receiverPoints.get(id).getCoord())),
+				gf.createPoint(MGC.coord2Coordinate(receiverPoints.get(id).getCoord())),
 				id
 			});
 			features.add(feature);			
