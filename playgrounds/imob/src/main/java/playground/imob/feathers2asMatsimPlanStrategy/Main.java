@@ -49,6 +49,7 @@ class Main {
 
 	public static void main(String[] args) {
 
+		// loading and modifying the config:
 		Config config ; 
 		if ( args.length > 0 ) { 
 			config = ConfigUtils.loadConfig( args[0] ) ;
@@ -56,19 +57,26 @@ class Main {
 			throw new RuntimeException("needs argument config.xml") ;
 		}
 		
+		// request FEATHERS2 as a PlanStrategy (it is added to the controler further below):
 		StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 		stratSets.setModuleName( FEATHERS2 );
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		
+		// loading the scenario:
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
+		// loading and modifying the controler:
 		final Controler ctrl = new Controler( scenario ) ;
 		
+		// generate the FEATHERS adapter class:
 		final FeathersModule feathers2 = new FeathersModule() ;
+		
+		// make it an events handler (so it can listen to events; a different solution may be desired here)
 		ctrl.getEvents().addHandler(feathers2);
 		
-		PlanStrategyFactory planStrategyFactory = new PlanStrategyFactory() {
+		// add it as a PlanStrategy:
+		ctrl.addPlanStrategyFactory( FEATHERS2, new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
 				GenericPlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;
@@ -97,10 +105,10 @@ class Main {
 				builder.addStrategyModule(module);	
 				return builder.build() ;
 			}
-		} ;
-		ctrl.addPlanStrategyFactory( FEATHERS2, planStrategyFactory);
+		});
 
-		
+		// running the controler:
+		ctrl.run() ;
 		
 	}
 
