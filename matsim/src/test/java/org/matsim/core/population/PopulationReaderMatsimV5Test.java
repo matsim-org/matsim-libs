@@ -41,6 +41,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.testcases.utils.AttributesBuilder;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -358,7 +359,7 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
 		Leg leg = (Leg) plan.getPlanElements().get(1) ;
 		NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-		Assert.assertEquals(Id.create("123", Person.class), route.getVehicleId() ) ;
+		Assert.assertEquals(Id.create("123", Vehicle.class), route.getVehicleId() ) ;
 		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
 	}
 

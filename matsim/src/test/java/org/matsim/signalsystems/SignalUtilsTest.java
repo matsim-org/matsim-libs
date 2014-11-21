@@ -45,13 +45,14 @@ public class SignalUtilsTest {
 		Id<SignalSystem> id1 = Id.create("1", SignalSystem.class);
 		Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
 		Id<SignalGroup> idSg3 = Id.create("3", SignalGroup.class);
-		Id<Signal> id3 = Id.create("3", Signal.class);
+		Id<Signal> idS1 = Id.create("1", Signal.class);
+		Id<Signal> idS3 = Id.create("3", Signal.class);
 		SignalsData signals = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
 		SignalSystemData system = fac.createSignalSystemData(id1);
 		SignalData signal = fac.createSignalData(Id.create(id1, Signal.class));
 		system.addSignalData(signal);
-		signal = fac.createSignalData(id3);
+		signal = fac.createSignalData(idS3);
 		system.addSignalData(signal);
 		
 		
@@ -65,15 +66,15 @@ public class SignalUtilsTest {
 		Assert.assertTrue(system1Groups.containsKey(idSg1));
 		SignalGroupData group4sys = system1Groups.get(idSg1);
 		Assert.assertNotNull(group4sys);
-		Assert.assertEquals(id1, group4sys.getId());
+		Assert.assertEquals(idSg1, group4sys.getId());
 		Assert.assertNotNull(group4sys.getSignalIds());
-		Assert.assertEquals(id1, group4sys.getSignalIds().iterator().next());
+		Assert.assertEquals(idS1, group4sys.getSignalIds().iterator().next());
 		
 		group4sys = system1Groups.get(idSg3);
 		Assert.assertNotNull(group4sys);
-		Assert.assertEquals(id3, group4sys.getId());
+		Assert.assertEquals(idSg3, group4sys.getId());
 		Assert.assertNotNull(group4sys.getSignalIds());
-		Assert.assertEquals(id3, group4sys.getSignalIds().iterator().next());
+		Assert.assertEquals(idS3, group4sys.getSignalIds().iterator().next());
 		
 		
 	}

@@ -209,13 +209,13 @@ public class TransitRouterImplTest {
 		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
 		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(Id.create("blue A > I", TransitRouter.class), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof ExperimentalTransitRoute);
 		ptRoute = (ExperimentalTransitRoute) legs.get(2).getRoute();
 		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
 		assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.redLine.getId(), ptRoute.getLineId());
-		assertEquals(Id.create("red C > G", TransitRouter.class), ptRoute.getRouteId());
+		assertEquals(Id.create("red C > G", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();

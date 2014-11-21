@@ -40,13 +40,16 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	private static final String TESTHOUSEHOLDSINPUT  = "testHouseholds.xml";
 	private static final String TESTXMLOUTPUT  = "testHouseholdsOut.xml";
 
+	private final Id<Person> pid23 = Id.create("23", Person.class);
+	private final Id<Person> pid42 = Id.create("42", Person.class);
+	private final Id<Person> pid43 = Id.create("43", Person.class);
+	private final Id<Person> pid44 = Id.create("44", Person.class);
+	private final Id<Person> pid45 = Id.create("45", Person.class);
+	private final Id<Vehicle> vid23 = Id.create("23", Vehicle.class);
+	private final Id<Vehicle> vid42 = Id.create("42", Vehicle.class);
   private final Id<Household> id23 = Id.create("23", Household.class);
   private final Id<Household> id24 = Id.create("24", Household.class);
   private final Id<Household> id25 = Id.create("25", Household.class);
-  private final Id<Household> id42 = Id.create("42", Household.class);
-  private final Id<Household> id43 = Id.create("43", Household.class);
-  private final Id<Household> id44 = Id.create("44", Household.class);
-  private final Id<Household> id45 = Id.create("45", Household.class);
 
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		Households households = new HouseholdsImpl();
@@ -77,17 +80,17 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		List<Id<Person>> hhmemberIds = new ArrayList<Id<Person>>();
 		hhmemberIds.addAll(hh.getMemberIds());
 		Collections.sort(hhmemberIds);
-		assertEquals(id23, hhmemberIds.get(0));
-		assertEquals(id42, hhmemberIds.get(1));
-		assertEquals(id43, hhmemberIds.get(2));
+		assertEquals(pid23, hhmemberIds.get(0));
+		assertEquals(pid42, hhmemberIds.get(1));
+		assertEquals(pid43, hhmemberIds.get(2));
 
 		assertNotNull(hh.getVehicleIds());
 		List<Id<Vehicle>> vehIds = new ArrayList<>();
 		vehIds.addAll(hh.getVehicleIds());
 		Collections.sort(vehIds);
 		assertEquals(2, vehIds.size());
-		assertEquals(id23, vehIds.get(0));
-		assertEquals(id42, vehIds.get(1));
+		assertEquals(vid23, vehIds.get(0));
+		assertEquals(vid42, vehIds.get(1));
 
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());
@@ -100,12 +103,12 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh);
 		assertEquals(id24, hh.getId());
 		assertEquals(2, hh.getMemberIds().size());
-		assertEquals(id44, hh.getMemberIds().get(0));
-		assertEquals(id45, hh.getMemberIds().get(1));
+		assertEquals(pid44, hh.getMemberIds().get(0));
+		assertEquals(pid45, hh.getMemberIds().get(1));
 
 		assertNotNull(hh.getVehicleIds());
 		assertEquals(1, hh.getVehicleIds().size());
-		assertEquals(id23, hh.getVehicleIds().get(0));
+		assertEquals(vid23, hh.getVehicleIds().get(0));
 
 		assertNotNull(hh.getIncome());
 		assertNotNull(hh.getIncome().getIncomePeriod());

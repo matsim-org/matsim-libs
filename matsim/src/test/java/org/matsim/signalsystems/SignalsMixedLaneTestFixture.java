@@ -21,6 +21,7 @@ package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.MixedLaneTestFixture;
 import org.matsim.lanes.data.v20.Lane;
@@ -42,6 +43,7 @@ public class SignalsMixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
 	public final Id<Link> id1, id2, id3;
+	public final Id<Person> pid1, pid2;
 	private MixedLaneTestFixture delegate;
 
 	public SignalsMixedLaneTestFixture(){
@@ -50,6 +52,8 @@ public class SignalsMixedLaneTestFixture {
 		id1 = delegate.id1;
 		id2 = delegate.id2;
 		id3 = delegate.id3;
+		pid1 = delegate.pid1;
+		pid2 = delegate.pid2;
 		this.sc.getConfig().scenario().setUseSignalSystems(true);
 	
 		//create signalsystems

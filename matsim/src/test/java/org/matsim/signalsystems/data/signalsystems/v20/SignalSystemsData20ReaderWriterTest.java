@@ -126,7 +126,7 @@ public class SignalSystemsData20ReaderWriterTest {
   	signaldata = ssdata.getSignalData().get(signalId1);
   	Assert.assertNotNull(signaldata);
   	Assert.assertEquals(signalId1, signaldata.getId());
-  	Assert.assertEquals(signalId3, signaldata.getLinkId());
+  	Assert.assertEquals(linkId3, signaldata.getLinkId());
   	Assert.assertNotNull(signaldata.getLaneIds());
   	Assert.assertEquals(laneId1, signaldata.getLaneIds().iterator().next());
   	Assert.assertNull(signaldata.getTurningMoveRestrictions());

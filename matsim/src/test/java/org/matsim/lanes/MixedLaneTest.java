@@ -68,7 +68,7 @@ public class MixedLaneTest {
 		Assert.assertEquals(100.1, lane1ol.getStartsAtMeterFromLinkEnd());
 		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour());
 		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
-		Assert.assertEquals(fixture.id1 , lane1ol.getToLaneIds().get(0));
+		Assert.assertEquals(fixture.laneId1 , lane1ol.getToLaneIds().get(0));
 		Assert.assertNull(lane1ol.getToLinkIds());
 		LaneData20 lane1 = lanesLink1.getLanes().get(fixture.laneId1);
 		Assert.assertNotNull(lane1);
@@ -104,7 +104,7 @@ public class MixedLaneTest {
 		Assert.assertEquals(3600.0 + 7.0, handler.lane1LeaveEvent.getTime());
 		
 		Assert.assertNotNull(handler.link2Event);
-		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + 7.0, handler.link2Event.getTime());
 
 		Assert.assertNull(handler.link3Event);
@@ -147,7 +147,7 @@ public class MixedLaneTest {
 		Assert.assertEquals(3600.0 + 7.0, handler.lane1LeaveEvent.getTime());
 		
 		Assert.assertNotNull(handler.link2Event);
-		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + 7.0, handler.link2Event.getTime());
 
 		Assert.assertNull(handler.link3Event);
@@ -183,11 +183,11 @@ public class MixedLaneTest {
 		// (*)
 
 		Assert.assertNotNull(handler.link2Event);
-		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link2Event.getTime());
 
 		Assert.assertNotNull(handler.link3Event);
-		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid2, handler.link3Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link3Event.getTime());
 
 		// the following comes chronologically at (*) but was moved here so that it can fail first on
@@ -234,11 +234,11 @@ public class MixedLaneTest {
 //		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.lane1LeaveEvent.getTime());
 		
 		Assert.assertNotNull(handler.link2Event);
-		Assert.assertEquals(fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(fixture.pid1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link2Event.getTime());
 
 		Assert.assertNotNull(handler.link3Event);
-		Assert.assertEquals(fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(fixture.pid2, handler.link3Event.getPersonId());
 		Assert.assertEquals(3600.0 + linkLeaveOffset, handler.link3Event.getTime());
 	}
 
@@ -274,11 +274,11 @@ public class MixedLaneTest {
 		Assert.assertEquals(3600.0 + 14.0, handler.lane1LeaveEvent.getTime());
 		
 		Assert.assertNotNull(handler.link2Event);
-		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid1, handler.link2Event.getPersonId());
 		Assert.assertEquals(3600.0 + 14.0, handler.link2Event.getTime());
 
 		Assert.assertNotNull(handler.link3Event);
-		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(this.fixture.pid2, handler.link3Event.getPersonId());
 		Assert.assertEquals(3600.0 + 12.0, handler.link3Event.getTime());
 	}
 
@@ -301,6 +301,7 @@ public class MixedLaneTest {
 			this.fixture = fixture;
 		}
 
+		@Override
 		public void reset(int iteration) {}
 
 		@Override
@@ -308,6 +309,7 @@ public class MixedLaneTest {
 			agentDepartureEvent = event;
 		}
 		
+		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			
 			if (event.getLinkId().equals(this.fixture.id2)){

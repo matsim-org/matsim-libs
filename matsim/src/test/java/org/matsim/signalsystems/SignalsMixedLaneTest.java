@@ -76,17 +76,19 @@ public class SignalsMixedLaneTest {
 			this.fixture = fixture;
 		}
 
+		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (event.getLinkId().equals(this.fixture.id2)){
-				Assert.assertEquals(this.fixture.id1, event.getPersonId());
+				Assert.assertEquals(this.fixture.pid1, event.getPersonId());
 				hasCollectedLink2Event = true;
 			}
 			else if (event.getLinkId().equals(this.fixture.id3)){
-				Assert.assertEquals(this.fixture.id2, event.getPersonId());
+				Assert.assertEquals(this.fixture.pid2, event.getPersonId());
 				hasCollectedLink3Event = true;
 			}
 		}
 
+		@Override
 		public void reset(int iteration) {
 		}
 
