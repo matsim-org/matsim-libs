@@ -48,7 +48,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 //	private PersonActivityHandler personActivityTracker;
-	private PersonActivityHandler2 personActivityTracker2;
+	private PersonActivityHandler personActivityTracker;
 	private NoiseDamageCalculation noiseDamageCosts;
 	
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
@@ -68,14 +68,12 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		
-//		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.initialization, noiseParameters);
-		this.personActivityTracker2 = new PersonActivityHandler2(event.getControler().getScenario(), noiseParameters, initialization);
+		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseParameters, initialization);
 
 		log.info("Initialization... Done.");
 		
 		event.getControler().getEvents().addHandler(noiseEmissionHandler);
-//		event.getControler().getEvents().addHandler(personActivityTracker);
-		event.getControler().getEvents().addHandler(personActivityTracker2);
+		event.getControler().getEvents().addHandler(personActivityTracker);
 	}
 	
 	@Override
@@ -100,7 +98,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		// calculate activity durations for each agent
 		log.info("Calculating each agent's activity durations...");
-		this.personActivityTracker2.calculateDurationsOfStay(receiverPoints);
+		this.personActivityTracker.calculateDurationsOfStay(receiverPoints);
 		log.info("Calculating each agent's activity durations... Done.");
 			
 		log.info("Calculating noise damage costs and throwing noise events...");

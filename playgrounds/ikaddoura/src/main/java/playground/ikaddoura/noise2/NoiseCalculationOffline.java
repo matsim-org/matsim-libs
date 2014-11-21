@@ -123,7 +123,7 @@ public class NoiseCalculationOffline {
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
 
-		PersonActivityHandler2 personActivityTracker = new PersonActivityHandler2(scenario, noiseParameters, initialization);
+		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, noiseParameters, initialization);
 		events.addHandler(personActivityTracker);
 				
 		log.info("Reading events file...");
