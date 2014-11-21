@@ -6,7 +6,5 @@ public interface VehicleCosts {
 	
 	public double getPerMeterTravelCost();
 	
-	public double getPaidParkingCost();
-	
 	public double getPaidTollCost();
 }

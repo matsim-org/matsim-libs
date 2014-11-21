@@ -84,6 +84,8 @@ public class RunZurichScenario {
 		
 		
 		//================ start custom code for EV scenario
+		GlobalTESFParameters.init(config);
+		
 		controler.setScoringFunctionFactory(
 			new EVScoringFunctionFactory(
 					controler.getScenario(),

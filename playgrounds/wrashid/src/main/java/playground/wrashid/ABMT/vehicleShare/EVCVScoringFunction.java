@@ -14,8 +14,8 @@ public class EVCVScoringFunction implements BasicScoring {
 	private double score = 0;
 	private Person person;
 
-	CVCosts cvCosts = new CVCosts();
-	EVCosts evCosts = new EVCosts();
+	public static CVCosts cvCosts = new CVCosts();
+	public static EVCosts evCosts = new EVCosts();
 
 	public EVCVScoringFunction(Person person) {
 		this.person = person;
@@ -29,10 +29,10 @@ public class EVCVScoringFunction implements BasicScoring {
 
 			if (VehicleInitializer.hasElectricVehicle.get(selectedPlan)) {
 				this.score += evCosts.getInitialInvestmentCost();
-				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * evCosts.getPaidParkingCost();
+				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * evCosts.getPerMeterTravelCost();
 			} else {
 				this.score += cvCosts.getInitialInvestmentCost();
-				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * cvCosts.getPaidParkingCost();
+				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * cvCosts.getPerMeterTravelCost();
 			}
 			
 			if (TollsManager.tollDisutilities.containsKey(person.getId())){

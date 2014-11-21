@@ -57,15 +57,15 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 			}
 			
 			if (VehicleInitializer.hasElectricVehicle.get(person.getSelectedPlan())) {
-				tollDisutility = 0;
+				tollDisutility = EVCVScoringFunction.evCosts.getPaidTollCost();
 			} else {
-				tollDisutility = -1000;
+				tollDisutility = EVCVScoringFunction.cvCosts.getPaidTollCost();
 			}
 
 			Coord coordinatesQuaiBridgeZH = new CoordImpl(683423.0, 246819.0);
 			Link prevLink = network.getLinks().get(previousLinks.get(event.getPersonId()));
 			Link currentLink = network.getLinks().get(event.getLinkId());
-			double radiusInMeters = 5000;
+			double radiusInMeters = GlobalTESFParameters.tollAreaRadius;
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters
 					&& GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters) {
 				tollDisutilities.put(event.getPersonId(), tollDisutility);

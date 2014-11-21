@@ -18,11 +18,6 @@ public class CVCosts implements VehicleCosts {
 	}
 
 	@Override
-	public double getPaidParkingCost() {
-		return 0;
-	}
-
-	@Override
 	public double getPaidTollCost() {
 		return 0;
 	}
