@@ -52,7 +52,6 @@ public class NoiseCalculationOffline {
 	private static String outputDirectory;
 	private static int lastIteration;
 	private static double receiverPointGap;
-	private static double scaleFactor;
 				
 	public static void main(String[] args) {
 		
@@ -70,9 +69,6 @@ public class NoiseCalculationOffline {
 			receiverPointGap = Double.valueOf(args[3]);		
 			log.info("Receiver point gap: " + receiverPointGap);
 			
-			scaleFactor = Double.valueOf(args[4]);		
-			log.info("Population scale factor: " + scaleFactor);
-			
 		} else {
 			
 //			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
@@ -85,7 +81,6 @@ public class NoiseCalculationOffline {
 			lastIteration = 5;
 			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
 			receiverPointGap = 250.;
-			scaleFactor = 1.;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -102,7 +97,7 @@ public class NoiseCalculationOffline {
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setReceiverPointGap(receiverPointGap);
-		noiseParameters.setScaleFactor(scaleFactor);
+		noiseParameters.setScaleFactor(10.);
 		
 		// Berlin Tunnel Link IDs
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
@@ -171,7 +166,7 @@ public class NoiseCalculationOffline {
 //		String[] consideredActivities = {"home"};
 		String[] consideredActivities = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivities(consideredActivities);
-		
+				
 		log.info("Loading scenario...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
