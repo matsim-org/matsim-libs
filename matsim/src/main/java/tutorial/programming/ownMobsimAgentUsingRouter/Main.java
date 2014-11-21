@@ -24,14 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MobsimRegistrar;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.router.TripRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -58,9 +57,9 @@ class Main {
 			@Override
 			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				
-				MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance( MobsimType.qsim.toString() ) ;
-				// (this takes the default QSim factory from the MATSim platform.  One could as well just copy the constructor from there. kai, nov'14)
-				
+				MobsimFactory factory = new QSimFactory() ;
+				// (one can look up often-used mobsim factories in the MobsimRegistrar class)
+
 				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
 				
 				// Why AgentSource instead of inserting agents directly?  Inserting agents into activities is, in fact possible just
