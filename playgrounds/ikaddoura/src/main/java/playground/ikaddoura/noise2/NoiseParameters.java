@@ -133,7 +133,10 @@ public class NoiseParameters {
 	}
 
 	public void setConsideredActivities(String[] consideredActivities) {
-		log.info("Setting considered activities to " + consideredActivities);
+		log.info("Setting considered activities to: ");
+		for (int i = 0; i < consideredActivities.length; i++) {
+			log.info(consideredActivities[i]);
+		}
 		this.consideredActivities = consideredActivities;
 	}
 	

@@ -57,6 +57,8 @@ public class NoiseInitialization {
 	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
 	private List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
+	private final List<String> consideredActivityTypes = new ArrayList<String>();
+	
 	private double xCoordMin = Double.MAX_VALUE;
 	private double xCoordMax = Double.MIN_VALUE;
 	private double yCoordMin = Double.MAX_VALUE;
@@ -76,6 +78,15 @@ public class NoiseInitialization {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = receiverPoints;
+		
+		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
+		for (int i = 0; i < consideredActTypesArray.length; i++) {
+			this.consideredActivityTypes.add(consideredActTypesArray[i]);
+		}
+		
+		if (this.consideredActivityTypes.size() == 0) {
+			log.warn("Not considering any activity type for the noise damage computation.");
+		}
 	}	
 	
 	public void initialize() {
@@ -95,16 +106,18 @@ public class NoiseInitialization {
 					
 					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						
-						List<Coord> activityCoordinates = new ArrayList<Coord>();
-						
-						if (personId2activityCoords.containsKey(person.getId())) {
-							activityCoordinates = personId2activityCoords.get(person.getId());
+						if (this.consideredActivityTypes.contains(activity.getType())) {
+							List<Coord> activityCoordinates = new ArrayList<Coord>();
+							
+							if (personId2activityCoords.containsKey(person.getId())) {
+								activityCoordinates = personId2activityCoords.get(person.getId());
+							}
+							
+							activityCoordinates.add(activity.getCoord());
+							personId2activityCoords.put(person.getId(), activityCoordinates);
+							
+							populationActivityCoords.add(activity.getCoord());
 						}
-						
-						activityCoordinates.add(activity.getCoord());
-						personId2activityCoords.put(person.getId(), activityCoordinates);
-						
-						populationActivityCoords.add(activity.getCoord());
 					}
 				}
 			}
