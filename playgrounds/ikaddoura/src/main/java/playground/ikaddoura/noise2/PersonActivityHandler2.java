@@ -22,6 +22,10 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,7 +139,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 		}		
 	}
 
-	public void calculataDurationsOfStay(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public void calculateDurationsOfStay(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 				
 		// sort by receiver point
 		Map<Id<ReceiverPoint>, List<PersonActivityInfo>> rpId2actInfos = new HashMap<Id<ReceiverPoint>, List<PersonActivityInfo>>();
@@ -157,7 +161,6 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 			}
 		}
 		
-		
 		// sort by time interval
 		for (ReceiverPoint rp : receiverPoints.values()) {
 
@@ -165,12 +168,10 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 				
 				for (double timeIntervalEnd = noiseParams.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParams.getTimeBinSizeNoiseComputation()) {
 					double timeIntervalStart = timeIntervalEnd - noiseParams.getTimeBinSizeNoiseComputation();
-					
+
 					for (PersonActivityInfo actInfo : rpId2actInfos.get(rp.getId())) {
-//						System.out.println(actInfo.toString() );
 
 						if (( actInfo.getStartTime() < timeIntervalEnd ) && ( actInfo.getEndTime() >=  timeIntervalStart )) {
-//							System.out.println("Relevant for time interval: " + Time.writeTime(timeIntervalStart, Time.TIMEFORMAT_HHMMSS) + " - " + Time.writeTime(timeIntervalEnd, Time.TIMEFORMAT_HHMMSS));
 							double durationInThisInterval = 0.;
 							
 							if ((actInfo.getStartTime() <= timeIntervalStart) && actInfo.getEndTime() >= timeIntervalEnd ) {
@@ -189,23 +190,25 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 								throw new RuntimeException("Unknown case. Aborting...");
 							}
 							
+							actInfo.setDurationWithinInterval(durationInThisInterval);
 							
-//							System.out.println("Duration in this interval: " + Time.writeTime(durationInThisInterval, Time.TIMEFORMAT_HHMMSS));
+							double affectedUnitsThisAgent = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
 							
-							double affectedAgentUnitsThisAgent = (noiseParams.getScaleFactor()) * (durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation());
-
-							// affected agent units
-							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){								
+							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){	
+								if (rp.getId().toString().equals(Id.create("16", ReceiverPoint.class)) && timeIntervalEnd == 10 * 3600.) {
+									System.out.println(actInfo.toString());
+								}
 								Map<Double, Double> time2affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits();
-								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + affectedAgentUnitsThisAgent;
+								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + (noiseParams.getScaleFactor() * affectedUnitsThisAgent);
 								time2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnitsSumNew);
 								rp.setTimeInterval2affectedAgentUnits(time2affectedAgentUnits);
-								
+								if (rp.getId().toString().equals(Id.create("16", ReceiverPoint.class)) && timeIntervalEnd == 10 * 3600.) {
+									
+								}
 							} else {
-								rp.getTimeInterval2affectedAgentUnits().put(timeIntervalEnd, affectedAgentUnitsThisAgent);
+								rp.getTimeInterval2affectedAgentUnits().put(timeIntervalEnd, affectedUnitsThisAgent);
 							}
 							
-							// further information to be stored
 							if (rp.getTimeInterval2actInfos().containsKey(timeIntervalEnd)) {
 								rp.getTimeInterval2actInfos().get(timeIntervalEnd).add(actInfo);
 							
@@ -213,7 +216,7 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 								List<PersonActivityInfo> actInfos = new ArrayList<PersonActivityInfo>();
 								actInfos.add(actInfo);
 
-								Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
+								Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = rp.getTimeInterval2actInfos();
 								timeInterval2actInfos.put(timeIntervalEnd, actInfos);
 								
 								rp.setTimeInterval2actInfos(timeInterval2actInfos);
@@ -223,5 +226,63 @@ public class PersonActivityHandler2 implements ActivityEndEventHandler , Activit
 				}
 			}
 		}	
+	}
+	
+	public void writePersonActivityInfoPerHour(String fileName, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+		File file = new File(fileName);
+			
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			// column headers
+			bw.write("receiver point");
+			for(int i = 0; i < 30 ; i++) {
+				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				bw.write(";agent units " + time);
+			}
+			bw.newLine();
+
+			
+			for (ReceiverPoint rp : receiverPoints.values()) {
+				Id<ReceiverPoint> rpId = rp.getId();
+				bw.write(rpId.toString());
+				for(int i = 0 ; i < 30 ; i++) {
+					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
+					double affectedAgentUnits = 0.;
+					
+					if (rp.getTimeInterval2affectedAgentUnits() != null) {
+						affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits().get(timeInterval);
+					}					
+					bw.write(";"+ affectedAgentUnits);	
+				}
+				
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\"");
+			
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(",\"Real\"");
+			}
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 }

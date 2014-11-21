@@ -47,7 +47,7 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private NoiseInitialization initialization;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
-	private PersonActivityHandler personActivityTracker;
+//	private PersonActivityHandler personActivityTracker;
 	private PersonActivityHandler2 personActivityTracker2;
 	private NoiseDamageCalculation noiseDamageCosts;
 	
@@ -68,13 +68,13 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		
-		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.initialization, noiseParameters);
+//		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), this.initialization, noiseParameters);
 		this.personActivityTracker2 = new PersonActivityHandler2(event.getControler().getScenario(), noiseParameters, initialization);
 
 		log.info("Initialization... Done.");
 		
 		event.getControler().getEvents().addHandler(noiseEmissionHandler);
-		event.getControler().getEvents().addHandler(personActivityTracker);
+//		event.getControler().getEvents().addHandler(personActivityTracker);
 		event.getControler().getEvents().addHandler(personActivityTracker2);
 	}
 	
@@ -100,18 +100,11 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		
 		// calculate activity durations for each agent
 		log.info("Calculating each agent's activity durations...");
-		this.personActivityTracker.calculateDurationOfStay();
-		this.personActivityTracker2.calculataDurationsOfStay(this.receiverPoints);
+		this.personActivityTracker2.calculateDurationsOfStay(receiverPoints);
 		log.info("Calculating each agent's activity durations... Done.");
-		
-		// testing
-		for (double timeIntervalEnd = noiseParameters.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParameters.getTimeBinSizeNoiseComputation()) {
-			System.out.println(this.personActivityTracker.getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("0", ReceiverPoint.class)).get(timeIntervalEnd) + " <-?-> " + this.receiverPoints.get(Id.create("0", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(timeIntervalEnd));
-		}
-
-				
+			
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission, this.receiverPoints);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), initialization, noiseParameters, noiseEmissionHandler, noiseImmission, this.receiverPoints);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
@@ -129,9 +122,9 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		return noiseEmissionHandler;
 	}
 
-	PersonActivityHandler getPersonActivityTracker() {
-		return personActivityTracker;
-	}
+//	PersonActivityHandler getPersonActivityTracker() {
+//		return personActivityTracker;
+//	}
 
 	NoiseImmissionCalculation getNoiseImmission() {
 		return noiseImmission;

@@ -36,6 +36,7 @@ public class PersonActivityInfo {
 	private String activityType;
 	private double startTime;
 	private double endTime;
+	private double durationWithinInterval;
 	
 	public Id<Person> getPersonId() {
 		return personId;
@@ -65,6 +66,12 @@ public class PersonActivityInfo {
 	@Override
 	public String toString() {
 		return "PersonId: " + personId + " / activityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
+	}
+	public double getDurationWithinInterval() {
+		return durationWithinInterval;
+	}
+	public void setDurationWithinInterval(double durationWithinInterval) {
+		this.durationWithinInterval = durationWithinInterval;
 	}
 	
 }

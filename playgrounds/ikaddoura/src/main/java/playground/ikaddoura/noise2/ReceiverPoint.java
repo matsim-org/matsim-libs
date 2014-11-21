@@ -47,7 +47,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
 	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
 	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
-	
+
 	public ReceiverPoint(Id<ReceiverPoint> id) {
 		this.id = id;
 	}

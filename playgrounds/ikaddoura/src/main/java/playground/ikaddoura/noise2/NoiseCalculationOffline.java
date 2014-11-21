@@ -123,7 +123,7 @@ public class NoiseCalculationOffline {
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
 
-		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, initialization, noiseParameters);
+		PersonActivityHandler2 personActivityTracker = new PersonActivityHandler2(scenario, noiseParameters, initialization);
 		events.addHandler(personActivityTracker);
 				
 		log.info("Reading events file...");
@@ -148,12 +148,12 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise immission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
-		personActivityTracker.calculateDurationOfStay();
-		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+		personActivityTracker.calculateDurationsOfStay(receiverPoints);
+//		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, personActivityTracker, noiseImmission, receiverPoints);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, initialization, noiseParameters, noiseEmissionHandler, noiseImmission, receiverPoints);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
 		log.info("Calculating noise damage costs and throwing noise events... Done.");

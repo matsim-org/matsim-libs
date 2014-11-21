@@ -163,31 +163,20 @@ public class NoiseTest {
 		// homeCoord: x="500.0" y="5.0" --> nearest receiver point: 0 (400/105)
 		// workCoord: x="4500" y="5.0" --> nearest receiver point: 16 (4400/105)
 		
-		// test the right tracking of person, activity number, start and end time
-		Assert.assertEquals("wrong activity performing time", 0., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("0", ReceiverPoint.class)).get(Id.create("person_car_test2", Person.class)).get(1).getFirst(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong activity performing time", Time.parseTime("10:17:54") , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("0", ReceiverPoint.class)).get(Id.create("person_car_test2", Person.class)).get(1).getSecond(), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("wrong activity performing time", 37375. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("16", ReceiverPoint.class)).get(Id.create("person_car_test2", Person.class)).get(2).getFirst(), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("wrong activity performing time", 37436. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("16", ReceiverPoint.class)).get(Id.create("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong activity performing time", null , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(Id.create("16", ReceiverPoint.class)).get(Id.create("person_car_test2", Person.class)).get(1));
+		// TODO: test the right tracking of person, activity number, start and end time
 
 		// between 11 and 12 there is no agent at receiver point 0
-		Assert.assertEquals("wrong agent units per receiver point and time interval", 0. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("0", ReceiverPoint.class)).get(12 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong agent units per receiver point and time interval", null , noiseControlerListener.getReceiverPoints().get(Id.create("0", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(12 * 3600.));
 		// between 9 and 10 two agents are at receiver point 0
-		Assert.assertEquals("wrong agent units per receiver point and time interval", 2. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("0", ReceiverPoint.class)).get(10 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong agent units per receiver point and time interval", 2. , noiseControlerListener.getReceiverPoints().get(Id.create("0", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(10 * 3600.), MatsimTestUtils.EPSILON);
 		// between 5 and 6 there is one agent at receiver point 16
-		Assert.assertEquals("wrong agent units per receiver point and time interval", 1. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("16", ReceiverPoint.class)).get(6 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong agent units per receiver point and time interval", 1. , noiseControlerListener.getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(6 * 3600.), MatsimTestUtils.EPSILON);
 		// between 10 and 11 both testAgent1 and testAgent2 are partly at receiver point 0 and partly at receiver point 16, testAgent1 is over the entire time interval at receiver point 16
 		double partTimeTestAgent3 = 0.;
 		double partTimeTestAgent2 = (Time.parseTime("10:17:54") - (10. * 3600)) / 3600.;
 		double partTimeTestAgent1 = (Time.parseTime("10:10:53") - (10. * 3600)) / 3600.;
 		double affectedAgentUnits = partTimeTestAgent2 + partTimeTestAgent1 + partTimeTestAgent3;
-		Assert.assertEquals("wrong agent units per receiver point and time interval", affectedAgentUnits, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("0", ReceiverPoint.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", partTimeTestAgent2, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(Id.create("0", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("person_car_test2", Person.class)).get(1).getFirst(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", "home", noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(Id.create("0", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("person_car_test2", Person.class)).get(1).getSecond());
-		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", 1., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(Id.create("16", ReceiverPoint.class)).get(12 * 3600.).get(Id.create("person_car_test2", Person.class)).get(2).getFirst(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", "work", noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(Id.create("16", ReceiverPoint.class)).get(12 * 3600.).get(Id.create("person_car_test2", Person.class)).get(2).getSecond());
+		Assert.assertEquals("wrong agent units per receiver point and time interval", affectedAgentUnits, noiseControlerListener.getReceiverPoints().get(Id.create("0", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(11 * 3600.), MatsimTestUtils.EPSILON);
 
 		// ++++++++++++++++++++++++++++++++++++++++++ immission +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
@@ -240,7 +229,7 @@ public class NoiseTest {
 		
 		// test the translation of immission into total damage costs for all affected agents per receiver point
 		double lautheitsgewicht = Math.pow(2.0 , 0.1 * (immissionRP16 - 50));
-		double laermEinwohnerGleichwert = lautheitsgewicht * noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.);
+		double laermEinwohnerGleichwert = lautheitsgewicht * noiseControlerListener.getReceiverPoints().get(Id.create("16", ReceiverPoint.class)).getTimeInterval2affectedAgentUnits().get(11 * 3600.);
 		double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 		double damageCostsRP16 = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0); // = 0.0664164095284536
 		Assert.assertEquals("wrong damage costs", damageCostsRP16, noiseControlerListener.getNoiseDamageCosts().getReceiverPointId2timeInterval2damageCost().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
@@ -252,26 +241,9 @@ public class NoiseTest {
 		double damageCostsPerAffectedAgentUnitRP16 = (annualCostRate * laermEinwohnerGleichwertAffectedAgentUnit/(365))*(1.0/24.0);		
 		Assert.assertEquals("wrong damage cost per affected agent unit", damageCostsPerAffectedAgentUnitRP16, noiseControlerListener.getNoiseDamageCosts().getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
 	
-		// test the right allocation of total damage cost per receiver point to affected person
-		double allocatedExposuresAffectedPersons = 0.;
-		for (NoiseEventAffected event : noiseControlerListener.getNoiseDamageCosts().getNoiseEventsAffected()) {
-			
-			if (event.getrReceiverPointId().toString().equals("16")) {
-				allocatedExposuresAffectedPersons = allocatedExposuresAffectedPersons + event.getAmount();
+		// TODO: test the right allocation of total damage cost per receiver point to affected person
 
-				if (event.getTime() == 11. * 3600. && event.getAffectedAgentId().toString().equals("person_car_test3")) {
-					// this agent is affected the entire time interval
-					Assert.assertEquals("wrong noise exposure allocation to affected agents", damageCostsPerAffectedAgentUnitRP16 * 1., event.getAmount(), MatsimTestUtils.EPSILON);
-				}
-				
-				if (event.getTime() == 11. * 3600. && event.getAffectedAgentId().toString().equals("person_car_test1")) {
-					// this agent is not affected for the duration of the entire time interval
-					Assert.assertEquals("wrong noise exposure allocation to affected agents", damageCostsPerAffectedAgentUnitRP16 * noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(Id.create("16", ReceiverPoint.class)).get(11 * 3600.).get(Id.create("person_car_test1", Person.class)).get(2).getFirst(), event.getAmount(), MatsimTestUtils.EPSILON);
-				}
-			}
-		}
-		Assert.assertEquals("difference between total damage costs (per receiver point) and sum of allocated damage (per person)", damageCostsRP16, allocatedExposuresAffectedPersons, MatsimTestUtils.EPSILON);
-
+		
 		// test the right allocation of total damage cost per receiver point to the relevant links
 		// linkB5 should be zero
 		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", 0., noiseControlerListener.getNoiseDamageCosts().getLinkId2timeInterval2damageCost().get(Id.create("linkB5", Link.class)).get(11 * 3600.), MatsimTestUtils.EPSILON);
