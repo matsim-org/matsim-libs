@@ -45,9 +45,9 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * Simplest version of congestion handler, if a person is delayed, it will charge everything to the person who just left before.
  */
 
-public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	public static final Logger  log = Logger.getLogger(MarginalCongstionHandlerImplV5.class);
+	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV5.class);
 
 	private final EventsManager events;
 	private final Scenario scenario;
@@ -61,7 +61,7 @@ public class MarginalCongstionHandlerImplV5 implements PersonDepartureEventHandl
 	 * @param events
 	 * @param scenario must contain network and config
 	 */
-	public MarginalCongstionHandlerImplV5(EventsManager events, Scenario scenario) {
+	public MarginalCongestionHandlerImplV5(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 

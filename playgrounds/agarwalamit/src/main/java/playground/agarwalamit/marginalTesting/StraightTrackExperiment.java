@@ -84,7 +84,7 @@ public class StraightTrackExperiment {
 		sc.getConfig().controler().setWriteEventsInterval(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new MarginalCongstionHandlerImplV5(events, sc));
+		events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
 		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
 		events.addHandler(writer);
 
