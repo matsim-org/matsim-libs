@@ -46,7 +46,7 @@ import org.matsim.core.utils.misc.Time;
  * 
  * Collects each agent's performance of activities throughout the day.
  * 
- * @author lkroeger, ikaddoura
+ * @author ikaddoura
  *
  */
 
@@ -58,7 +58,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private NoiseParameters noiseParams;
 	private NoiseInitialization spatialInfo;
 		
-	private Map<Id<Person>, Integer> personId2activityNumber = new HashMap<Id<Person>, Integer>(); // if doesn't contains the personId, the activityNumber is 0
+	private Map<Id<Person>, Integer> personId2activityNumber = new HashMap<Id<Person>, Integer>();
 	private Map<Id<Person>, Map<Integer, PersonActivityInfo>> personId2actNr2actInfo = new HashMap<Id<Person>, Map<Integer, PersonActivityInfo>>();
 		
 	public PersonActivityHandler (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo) {
@@ -69,7 +69,8 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO
+		this.personId2activityNumber.clear();
+		this.personId2actNr2actInfo.clear();
 	}
 	
 	

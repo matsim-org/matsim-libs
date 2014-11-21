@@ -55,7 +55,7 @@ public class NoiseTest {
 	public final void test1(){
 		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
-		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config1.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		NoiseInitialization noiseSpatialInfo = new NoiseInitialization(scenario, new NoiseParameters(), receiverPoints);
@@ -111,7 +111,7 @@ public class NoiseTest {
 	@Test
 	public final void test2(){
 		
-		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config2.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 
 		Controler controler = new Controler(configFile);
 		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline(new NoiseParameters());
@@ -262,4 +262,20 @@ public class NoiseTest {
 		}		
 		Assert.assertTrue("No event found to be tested.", tested);
 	 }
+	
+	// tests the hgv specific calculation of noise immissions
+	@Test
+	public final void test3(){
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config3.xml";
+
+		Controler controler = new Controler(configFile);
+		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline(new NoiseParameters());
+		controler.addControlerListener(noiseControlerListener);
+				
+		controler.setOverwriteFiles(true);
+		controler.run();
+			
+		Assert.assertEquals("wrong number of hgv on linkA5 in timeInterval 11 * 3600.", 1, noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2numberOfLinkEnterHgv().get(Id.create("linkA5", Link.class)).get(11 * 3600.), 0.);	
+		// ...
+	}
 }

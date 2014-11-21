@@ -61,7 +61,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	
 	private Map<Id<Link>, Map<Double,List<Id<Vehicle>>>> linkId2timeInterval2linkEnterVehicleIDs = new HashMap<Id<Link>, Map<Double,List<Id<Vehicle>>>>();
 	private Map<Id<Link>, Map<Double, Integer>> linkId2timeInterval2numberOfLinkEnterCars = new HashMap<Id<Link>, Map<Double, Integer>>();
-	private Map<Id<Link>, Map<Double, Integer>> linkId2timeInterval2numberOfLinkEnterHdv = new HashMap<Id<Link>, Map<Double, Integer>>();
+	private Map<Id<Link>, Map<Double, Integer>> linkId2timeInterval2numberOfLinkEnterHgv = new HashMap<Id<Link>, Map<Double, Integer>>();
 
 	// output
 	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id<Link>, Map<Double,Double>>();
@@ -78,7 +78,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		linkId2linkEnterEventsHdv.clear();
 		linkId2timeInterval2linkEnterVehicleIDs.clear();
 		linkId2timeInterval2numberOfLinkEnterCars.clear();
-		linkId2timeInterval2numberOfLinkEnterHdv.clear();
+		linkId2timeInterval2numberOfLinkEnterHgv.clear();
 		linkId2timeInterval2noiseEmission.clear();
 	}
 		
@@ -91,8 +91,8 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		} else {
 		
 			if (event.getVehicleId().toString().startsWith(this.noiseParams.getHgvIdPrefix())) {
-				
 				// hdv
+				
 				if (linkId2linkEnterEventsHdv.containsKey(event.getLinkId())) {
 					List<LinkEnterEvent> listTmp = linkId2linkEnterEventsHdv.get(event.getLinkId());
 					listTmp.add(event);
@@ -104,8 +104,8 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				}
 				
 			} else {
-				
 				// car
+				
 				if (linkId2linkEnterEventsCar.containsKey(event.getLinkId())) {
 					List<LinkEnterEvent> listTmp = linkId2linkEnterEventsCar.get(event.getLinkId());
 					listTmp.add(event);
@@ -148,7 +148,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 				double noiseEmission = 0.;
 
 				int n_car = linkId2timeInterval2numberOfLinkEnterCars.get(linkId).get(timeInterval);
-				int n_hdv = linkId2timeInterval2numberOfLinkEnterHdv.get(linkId).get(timeInterval);
+				int n_hdv = linkId2timeInterval2numberOfLinkEnterHgv.get(linkId).get(timeInterval);
 				int n = n_car + n_hdv;
 				double p = 0.;
 				
@@ -244,13 +244,13 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 					if ((time % noiseParams.getTimeBinSizeNoiseComputation()) == 0) {
 						timeInterval = time;
 					} else {
-						timeInterval = (( (int)(time/noiseParams.getTimeBinSizeNoiseComputation()) ) * noiseParams.getTimeBinSizeNoiseComputation() ) + noiseParams.getTimeBinSizeNoiseComputation();
+						timeInterval = (( (int) (time / noiseParams.getTimeBinSizeNoiseComputation()) ) * noiseParams.getTimeBinSizeNoiseComputation() ) + noiseParams.getTimeBinSizeNoiseComputation();
 					}
 					int newNumberOfLinkEnterCars = timeInterval2linkEnterVehicleIDsHdv.get(timeInterval) + 1;
 					timeInterval2linkEnterVehicleIDsHdv.put(timeInterval, newNumberOfLinkEnterCars);
 				}
 			}
-			linkId2timeInterval2numberOfLinkEnterHdv.put(linkId, timeInterval2linkEnterVehicleIDsHdv);
+			linkId2timeInterval2numberOfLinkEnterHgv.put(linkId, timeInterval2linkEnterVehicleIDsHdv);
 		}
 		
 		// Deleting unnecessary information
@@ -435,7 +435,7 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		return linkId2timeInterval2numberOfLinkEnterCars;
 	}
 
-	public Map<Id<Link>, Map<Double, Integer>> getLinkId2timeInterval2numberOfLinkEnterHdv() {
-		return linkId2timeInterval2numberOfLinkEnterHdv;
+	public Map<Id<Link>, Map<Double, Integer>> getLinkId2timeInterval2numberOfLinkEnterHgv() {
+		return linkId2timeInterval2numberOfLinkEnterHgv;
 	}
 }

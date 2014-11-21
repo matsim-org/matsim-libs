@@ -41,6 +41,7 @@ public class NoiseParameters {
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
 	
+	// for the entire area with activity locations
 	private double xMin = 0.;
 	private double yMin = 0.;
 	private double xMax = 0.;
@@ -52,7 +53,7 @@ public class NoiseParameters {
 //	private double xMax = 4594202.;
 //	private double yMax = 5821736.;
 	
-	// for the area of Berlin
+//	 for the area of Berlin
 //	private double xMin = 4573258.;
 //	private double yMin = 5801225.;
 //	private double xMax = 4620323.;

@@ -123,8 +123,8 @@ public class NoiseCalculationOffline {
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
 
-		PersonActivityHandler personActivityTracker = new PersonActivityHandler(scenario, noiseParameters, initialization);
-		events.addHandler(personActivityTracker);
+		PersonActivityHandler personActivityHandler = new PersonActivityHandler(scenario, noiseParameters, initialization);
+		events.addHandler(personActivityHandler);
 				
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -148,8 +148,8 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise immission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
-		personActivityTracker.calculateDurationsOfStay(receiverPoints);
-		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv", receiverPoints);
+		personActivityHandler.calculateDurationsOfStay(receiverPoints);
+		personActivityHandler.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv", receiverPoints);
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");

@@ -82,7 +82,7 @@ public class NoiseDamageCalculation {
 		
 		this.linkId2timeInterval2linkEnterVehicleIDs = noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs();
 		this.linkId2timeInterval2linkEnterVehicleIDsCar = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterCars();
-		this.linkId2timeInterval2linkEnterVehicleIDsHdv = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterHdv();
+		this.linkId2timeInterval2linkEnterVehicleIDsHdv = noiseEmissionHandler.getLinkId2timeInterval2numberOfLinkEnterHgv();
 										
 		this.collectNoiseEvents = true;
 	}

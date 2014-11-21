@@ -47,7 +47,6 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 	private NoiseInitialization initialization;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
-//	private PersonActivityHandler personActivityTracker;
 	private PersonActivityHandler personActivityTracker;
 	private NoiseDamageCalculation noiseDamageCosts;
 	
@@ -67,7 +66,6 @@ public class NoiseCalculationOnline implements AfterMobsimListener , IterationEn
 		this.initialization.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
-		
 		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseParameters, initialization);
 
 		log.info("Initialization... Done.");
