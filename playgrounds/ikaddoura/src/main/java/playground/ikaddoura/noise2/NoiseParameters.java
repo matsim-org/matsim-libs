@@ -23,7 +23,12 @@
 package playground.ikaddoura.noise2;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -35,80 +40,21 @@ public class NoiseParameters {
 	private static final Logger log = Logger.getLogger(NoiseParameters.class);
 
 	// default values
-	
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
-	private double timeBinSizeRouter = 3600.0;
 	private double scaleFactor = 1.;
 	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
+	private String[] consideredActivitiesDamageCalculation = {"home", "work"};	
 
-//	private String[] tunnelLinks = null;
+	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
-	// for Berlin
-	private String[] tunnelLinks = {
-			"108041",
-			"108142",
-			"108970",
-			"109085",
-			"109757",
-			"109919",
-			"110060",
-			"110226",
-			"110164",
-			"110399",
-			"96503",
-			"110389",
-			"110116",
-			"110355",
-			"92604",
-			"92603",
-			"25651",
-			"25654",
-			"112540",
-			"112556",
-			"5052",
-			"5053",
-			"5380",
-			"5381",
-			"106309",
-			"106308",
-			"26103",
-			"26102",
-			"4376",
-			"4377",
-			"106353",
-			"106352",
-			"103793",
-			"103792",
-			"26106",
-			"26107",
-			"4580",
-			"4581",
-			"4988",
-			"4989",
-			"73496",
-			"73497"
-	};
-	
-	// for the entire area with activity locations
-	private double xMin = 0.;
-	private double yMin = 0.;
-	private double xMax = 0.;
-	private double yMax = 0.;
-	
-//	// for the area around the city center of Berlin (Tiergarten)
-//	private double xMin = 4590855.;
-//	private double yMin = 5819679.;
-//	private double xMax = 4594202.;
-//	private double yMax = 5821736.;
-	
-//	//	 for the area of Berlin
-//	private double xMin = 4573258.;
-//	private double yMin = 5801225.;
-//	private double xMax = 4620323.;
-//	private double yMax = 5839639.;
+	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which activities are found.
+	private double receiverPointsGridMinX = 0.;
+	private double receiverPointsGridMinY = 0.;
+	private double receiverPointsGridMaxX = 0.;
+	private double receiverPointsGridMaxY = 0.;
 		
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("Setting the annual cost rate to " + annualCostRate);
@@ -118,11 +64,6 @@ public class NoiseParameters {
 	public void setTimeBinSizeNoiseComputation(double timeBinSizeNoiseComputation) {
 		log.info("Setting the time bin size for the computation of noise to " + timeBinSizeNoiseComputation);
 		this.timeBinSizeNoiseComputation = timeBinSizeNoiseComputation;
-	}
-
-	public void setTimeBinSizeRouter(double timeBinSizeRouter) {
-		log.info("Setting the time bin size for the router to " + timeBinSizeRouter);
-		this.timeBinSizeRouter = timeBinSizeRouter;
 	}
 
 	public void setScaleFactor(double scaleFactor) {
@@ -153,10 +94,6 @@ public class NoiseParameters {
 		return timeBinSizeNoiseComputation;
 	}
 	
-	public double getTimeBinSizeRouter() {
-		return timeBinSizeRouter;
-	}
-	
 	public double getScaleFactor() {
 		return scaleFactor;
 	}
@@ -173,44 +110,60 @@ public class NoiseParameters {
 		return hgvIdPrefix;
 	}
 
-	public double getxMin() {
-		return xMin;
+	public List<Id<Link>> getTunnelLinkIDs() {
+		return tunnelLinkIDs;
 	}
 
-	public void setxMin(double xMin) {
-		this.xMin = xMin;
+	public void setTunnelLinkIDs(List<Id<Link>> tunnelLinkIDs) {
+		log.info("Setting tunnel link IDs to " + tunnelLinkIDs.toString());
+		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
 
-	public double getyMin() {
-		return yMin;
+	public String[] getConsideredActivitiesDamageCalculation() {
+		return consideredActivitiesDamageCalculation;
 	}
 
-	public void setyMin(double yMin) {
-		this.yMin = yMin;
+	public void setConsideredActivitiesDamageCalculation(
+			String[] consideredActivitiesDamageCalculation) {
+		log.info("Setting considered activities for damage calculation to " + consideredActivitiesDamageCalculation);
+		this.consideredActivitiesDamageCalculation = consideredActivitiesDamageCalculation;
 	}
 
-	public double getxMax() {
-		return xMax;
+	public double getReceiverPointsGridMinX() {
+		return receiverPointsGridMinX;
 	}
 
-	public void setxMax(double xMax) {
-		this.xMax = xMax;
+	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
+		log.info("Setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
+		this.receiverPointsGridMinX = receiverPointsGridMinX;
 	}
 
-	public double getyMax() {
-		return yMax;
+	public double getReceiverPointsGridMinY() {
+		return receiverPointsGridMinY;
 	}
 
-	public void setyMax(double yMax) {
-		this.yMax = yMax;
+	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
+		log.info("Setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
+		this.receiverPointsGridMinY = receiverPointsGridMinY;
 	}
 
-	public String[] getTunnelLinks() {
-		return tunnelLinks;
+	public double getReceiverPointsGridMaxX() {
+		return receiverPointsGridMaxX;
 	}
 
-	public void setTunnelLinks(String[] tunnelLinks) {
-		this.tunnelLinks = tunnelLinks;
+	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
+		log.info("Setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
+		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
 	}
 
+	public double getReceiverPointsGridMaxY() {
+		return receiverPointsGridMaxY;
+	}
+
+	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
+		log.info("Setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
+		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
+	}
+
+	
 }

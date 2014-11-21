@@ -71,11 +71,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
 		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseParameters, initialization, this.receiverPoints);
-		
-		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters, this.receiverPoints);
-		noiseImmission.setTunnelLinks(this.noiseParameters.getTunnelLinks());
-		noiseImmission.setNoiseBarrierLinks(null);
-				
+						
 		event.getControler().getEvents().addHandler(noiseEmissionHandler);
 		event.getControler().getEvents().addHandler(personActivityTracker);
 	}
@@ -90,6 +86,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
+		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters, this.receiverPoints);
 		noiseImmission.calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStats(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
 		NoiseWriter.writeNoiseImmissionStatsPerHour(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");

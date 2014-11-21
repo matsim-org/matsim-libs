@@ -50,33 +50,26 @@ public class NoiseImmissionCalculation {
 	private NoiseEmissionHandler noiseEmissionHandler;
 	
 	// optional information for a more detailed calculation of noise immissions
-	private final List<Id<Link>> tunnelLinks = new ArrayList<Id<Link>>();
-	private final List<Id<Link>> noiseBarrierLinks = new ArrayList<Id<Link>>();
+	private final List<Id<Link>> tunnelLinks;
+	private final List<Id<Link>> noiseBarrierLinks;
 		
 	public NoiseImmissionCalculation (NoiseInitialization spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.spatialInfo = spatialInfo;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = receiverPoints;
-		this.noiseEmissionHandler = noiseEmissionHandler;		
-	}
-	
-	public void setTunnelLinks(String[] tunnelLinks) {
+		this.noiseEmissionHandler = noiseEmissionHandler;
+		
+		this.tunnelLinks = noiseParams.getTunnelLinkIDs();
+		this.noiseBarrierLinks = null;
+		
 		if (tunnelLinks == null) {
 			log.warn("No information on tunnels provided.");
-		} else {
-			for (int i = 0; i < tunnelLinks.length; i++) {
-				this.tunnelLinks.add(Id.create(tunnelLinks[i], Link.class));
-			}
 		}
-	}
-	
-	public void setNoiseBarrierLinks(ArrayList<Id<Link>> noiseBarrierLinks) {
+		
 		if (noiseBarrierLinks == null) {
 			log.warn("No information on noise barriers provided.");
-		} else {
-			this.noiseBarrierLinks.addAll(noiseBarrierLinks);
-			log.warn("Consideration of noise barriers not yet implemented.");
 		}
+		
 	}
 	
 	public void calculateNoiseImmission() {

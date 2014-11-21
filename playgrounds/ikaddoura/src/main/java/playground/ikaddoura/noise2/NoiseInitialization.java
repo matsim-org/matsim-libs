@@ -22,20 +22,12 @@
  */
 package playground.ikaddoura.noise2;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,14 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.PtConstants;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Contains all spatial information for the RLS approach 'Lange gerade Fahrstreifen' to calculate noise immissions.
@@ -128,7 +113,7 @@ public class NoiseInitialization {
 	
 	private void createGrid() {
 		
-		if (this.noiseParams.getxMin() == 0. || this.noiseParams.getyMin() == 0. || this.noiseParams.getxMax() == 0. || this.noiseParams.getyMax() == 0.) {
+		if (this.noiseParams.getReceiverPointsGridMinX() == 0. || this.noiseParams.getReceiverPointsGridMinY() == 0. || this.noiseParams.getReceiverPointsGridMaxX() == 0. || this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
 			
 			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates.");
 			
@@ -152,10 +137,10 @@ public class NoiseInitialization {
 			
 		} else {
 			
-			xCoordMin = this.noiseParams.getxMin();
-			xCoordMax = this.noiseParams.getxMax();
-			yCoordMin = this.noiseParams.getyMin();
-			yCoordMax = this.noiseParams.getyMax();
+			xCoordMin = this.noiseParams.getReceiverPointsGridMinX();
+			xCoordMax = this.noiseParams.getReceiverPointsGridMaxX();
+			yCoordMin = this.noiseParams.getReceiverPointsGridMinY();
+			yCoordMax = this.noiseParams.getReceiverPointsGridMaxY();
 			
 			log.info("Creating receiver points for the area between the coordinates (" + xCoordMin + "/" + yCoordMin + ") and (" + xCoordMax + "/" + yCoordMax + ").");
 			

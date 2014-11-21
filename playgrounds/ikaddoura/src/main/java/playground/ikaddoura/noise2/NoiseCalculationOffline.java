@@ -20,11 +20,14 @@
 package playground.ikaddoura.noise2;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -101,6 +104,69 @@ public class NoiseCalculationOffline {
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		noiseParameters.setScaleFactor(scaleFactor);
 		
+		// Berlin Tunnel Link IDs
+		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+		tunnelLinkIDs.add(Id.create("108041", Link.class));
+		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108970", Link.class));
+		tunnelLinkIDs.add(Id.create("109085", Link.class));
+		tunnelLinkIDs.add(Id.create("109757", Link.class));
+		tunnelLinkIDs.add(Id.create("109919", Link.class));
+		tunnelLinkIDs.add(Id.create("110060", Link.class));
+		tunnelLinkIDs.add(Id.create("110226", Link.class));
+		tunnelLinkIDs.add(Id.create("110164", Link.class));
+		tunnelLinkIDs.add(Id.create("110399", Link.class));
+		tunnelLinkIDs.add(Id.create("96503", Link.class));
+		tunnelLinkIDs.add(Id.create("110389", Link.class));
+		tunnelLinkIDs.add(Id.create("110116", Link.class));
+		tunnelLinkIDs.add(Id.create("110355", Link.class));
+		tunnelLinkIDs.add(Id.create("92604", Link.class));
+		tunnelLinkIDs.add(Id.create("92603", Link.class));
+		tunnelLinkIDs.add(Id.create("25651", Link.class));
+		tunnelLinkIDs.add(Id.create("25654", Link.class));
+		tunnelLinkIDs.add(Id.create("112540", Link.class));
+		tunnelLinkIDs.add(Id.create("112556", Link.class));
+		tunnelLinkIDs.add(Id.create("5052", Link.class));
+		tunnelLinkIDs.add(Id.create("5053", Link.class));
+		tunnelLinkIDs.add(Id.create("5380", Link.class));
+		tunnelLinkIDs.add(Id.create("5381", Link.class));
+		tunnelLinkIDs.add(Id.create("106309", Link.class));
+		tunnelLinkIDs.add(Id.create("106308", Link.class));
+		tunnelLinkIDs.add(Id.create("26103", Link.class));
+		tunnelLinkIDs.add(Id.create("26102", Link.class));
+		tunnelLinkIDs.add(Id.create("4376", Link.class));
+		tunnelLinkIDs.add(Id.create("4377", Link.class));
+		tunnelLinkIDs.add(Id.create("106353", Link.class));
+		tunnelLinkIDs.add(Id.create("106352", Link.class));
+		tunnelLinkIDs.add(Id.create("103793", Link.class));
+		tunnelLinkIDs.add(Id.create("103792", Link.class));
+		tunnelLinkIDs.add(Id.create("26106", Link.class));
+		tunnelLinkIDs.add(Id.create("26107", Link.class));
+		tunnelLinkIDs.add(Id.create("4580", Link.class));
+		tunnelLinkIDs.add(Id.create("4581", Link.class));
+		tunnelLinkIDs.add(Id.create("4988", Link.class));
+		tunnelLinkIDs.add(Id.create("4989", Link.class));
+		tunnelLinkIDs.add(Id.create("73496", Link.class));
+		tunnelLinkIDs.add(Id.create("73497", Link.class));
+		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		
+		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+//		double xMin = 4590855.;
+//		double yMin = 5819679.;
+//		double xMax = 4594202.;
+//		double yMax = 5821736.;
+		
+		// Berlin Coordinates: Area of Berlin
+		double xMin = 4573258.;
+		double yMin = 5801225.;
+		double xMax = 4620323.;
+		double yMax = 5839639.;
+		
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
+		
 		log.info("Loading scenario...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
@@ -139,8 +205,6 @@ public class NoiseCalculationOffline {
 		
 		log.info("Calculating noise immissions...");
 		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters, receiverPoints);
-		noiseImmission.setTunnelLinks(null);
-		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStats(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
 		NoiseWriter.writeNoiseImmissionStatsPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
