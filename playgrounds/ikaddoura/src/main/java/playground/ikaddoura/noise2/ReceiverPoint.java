@@ -47,6 +47,9 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
 	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
 	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
+	
+	private Map<Double, Double> timeInterval2damageCosts = new HashMap<Double, Double>();
+	private Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Double, Double>();
 
 	public ReceiverPoint(Id<ReceiverPoint> id) {
 		this.id = id;
@@ -114,6 +117,23 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	public void setTimeInterval2affectedAgentUnits(
 			Map<Double, Double> timeInterval2affectedAgentUnits) {
 		this.timeInterval2affectedAgentUnits = timeInterval2affectedAgentUnits;
+	}
+
+	public Map<Double, Double> getTimeInterval2damageCosts() {
+		return timeInterval2damageCosts;
+	}
+
+	public void setTimeInterval2damageCosts(Map<Double, Double> timeInterval2damageCosts) {
+		this.timeInterval2damageCosts = timeInterval2damageCosts;
+	}
+
+	public Map<Double,Double> getTimeInterval2damageCostPerAffectedAgentUnit() {
+		return timeInterval2damageCostPerAffectedAgentUnit;
+	}
+
+	public void setTimeInterval2damageCostPerAffectedAgentUnit(
+			Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit) {
+		this.timeInterval2damageCostPerAffectedAgentUnit = timeInterval2damageCostPerAffectedAgentUnit;
 	}
 
 }
