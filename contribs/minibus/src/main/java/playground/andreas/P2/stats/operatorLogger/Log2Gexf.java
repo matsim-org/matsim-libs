@@ -22,6 +22,7 @@ package playground.andreas.P2.stats.operatorLogger;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -37,8 +38,8 @@ final class Log2Gexf {
 	
 	private static void convertLog2Gexf(String inputFile, String outputFile) {
 		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
-		ArrayList<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
-		planElements = FindAncestorOfPlanElements.findAncestorOfPlanElements(planElements);
+		List<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
+		planElements = PlanElementLinkParent.linkParentPlansToGivenPlanElements(planElements);
 		PlanElement2Gexf.planElement2Gexf(planElements, outputFile);
 	}
 	

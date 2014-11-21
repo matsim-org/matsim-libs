@@ -32,7 +32,7 @@ import java.util.List;
  * @author aneumann
  *
  */
-final class LogElement2PlanElement {
+public class LogElement2PlanElement {
 	
 	private static final Logger log = Logger.getLogger(LogElement2PlanElement.class);
 	

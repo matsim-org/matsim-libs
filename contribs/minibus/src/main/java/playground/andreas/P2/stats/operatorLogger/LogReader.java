@@ -23,10 +23,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.PConstants;
+import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.operator.PPlan;
 
 /**
  * Reads a pLogger file omitting the header and all totals.
@@ -57,7 +64,7 @@ public final class LogReader implements TabularFileHandler {
 	private LogReader(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
+		tabFileParserConfig.setDelimiterTags(new String[] {LogElement.DELIMITER});
 	}
 
 	public static ArrayList<LogElement> readFile(String filename){
@@ -76,27 +83,52 @@ public final class LogReader implements TabularFileHandler {
 	
 	@Override
 	public void startRow(String[] row) {
-		if(!row[0].trim().startsWith("iter")){
-			if(!row[3].trim().startsWith("===")){
+		if(!row[0].trim().startsWith(LogElement.COMMENTTAG) || !row[0].trim().startsWith("iter")){
+			if(!row[3].trim().startsWith(LogElement.NOVALUE) || !row[3].trim().startsWith("===")){
 				try {
 					LogElement logElement = new LogElement();
 					
 					logElement.setIteration(Integer.parseInt(row[0]));
-					logElement.setOperatorId(row[1]);
-					logElement.setStatus(row[2]);
-					logElement.setPlanId(row[3]);
-					logElement.setCreatorId(row[4]);
-					logElement.setnVeh(Integer.parseInt(row[5]));
-					logElement.setnPax(Integer.parseInt(row[6]));
-					logElement.setScore(Double.parseDouble(row[7]));
-					logElement.setBudget(Double.parseDouble(row[8]));
-					logElement.setStartTime(Time.parseTime(row[9]));
-					logElement.setEndTime(Time.parseTime(row[10]));
+					logElement.setOperatorId(Id.create(row[1], Operator.class));
 					
-					String nodes = row[11];
-					nodes = nodes.substring(1, nodes.length() - 1);
-					String[] n = nodes.split(",");
-					logElement.setStopsToBeServed(n);
+					String state = row[2];
+					if (state.equalsIgnoreCase(PConstants.OperatorState.PROSPECTING.name())) {
+						logElement.setStatus(PConstants.OperatorState.PROSPECTING);
+					} else if (state.equalsIgnoreCase(PConstants.OperatorState.INBUSINESS.name())) {
+						logElement.setStatus(PConstants.OperatorState.INBUSINESS);
+					} else if (state.equalsIgnoreCase(PConstants.OperatorState.BANKRUPT.name())) {
+						logElement.setStatus(PConstants.OperatorState.BANKRUPT);
+					} else {
+						log.error("Couldn't determine the operator state " + state);
+					}
+					
+					logElement.setPlanId(Id.create(row[3], PPlan.class));
+					logElement.setCreatorId(row[4]);
+					logElement.setParentId(Id.create(row[5], PPlan.class));
+					logElement.setnVeh(Integer.parseInt(row[6]));
+					logElement.setnPax(Integer.parseInt(row[7]));
+					logElement.setScore(Double.parseDouble(row[8]));
+					logElement.setBudget(Double.parseDouble(row[9]));
+					logElement.setStartTime(Time.parseTime(row[10]));
+					logElement.setEndTime(Time.parseTime(row[11]));
+					
+					String stops = row[12];
+					stops = stops.substring(1, stops.length() - 1); // remove brackets
+					String[] stopArray = stops.split(","); // split the array
+					ArrayList<Id<TransitStopFacility>> stopIds = new ArrayList<Id<TransitStopFacility>>();
+					for (String stop : stopArray) {
+						stopIds.add(Id.create(stop.trim(), TransitStopFacility.class));
+					}
+					logElement.setStopsToBeServed(stopIds);
+					
+					String links = row[13];
+					links = links.substring(1, links.length() - 1); // remove brackets
+					String[] linkArray = links.split(","); // split the array
+					ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+					for (String link : linkArray) {
+						linkIds.add(Id.create(link.trim(), Link.class));
+					}
+					logElement.setLinksServed(linkIds);
 					
 					sink.process(logElement);
 					

@@ -20,16 +20,21 @@
 package playground.andreas.P2.stats.operatorLogger;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +55,7 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 	private final ObjectFactory gexfFactory;
 	private final XMLGexfContent gexfContainer;
 
-	public static void planElement2Gexf(ArrayList<PlanElement> planElements, String outputFile){
+	public static void planElement2Gexf(List<PlanElement> planElements, String outputFile){
 		PlanElement2Gexf planElement2Gexf = new PlanElement2Gexf();
 		planElement2Gexf.writeAllNodes(planElements);
 		planElement2Gexf.write(outputFile);
@@ -172,7 +177,7 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 		}		
 	}
 
-	private void writeAllNodes(ArrayList<PlanElement> planElements) {
+	private void writeAllNodes(List<PlanElement> planElements) {
 		List<Object> attr = this.gexfContainer.getGraph().getAttributesOrNodesOrEdges();
 		
 		// nodes
@@ -187,8 +192,8 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory vizFac = new playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory();
 			PositionContent pos = vizFac.createPositionContent();
 			pos.setX((float) node.getIterationFounded());
-			pos.setY((float) Integer.parseInt(node.getOperatorId().split("_")[1]));
-			pos.setZ((float) Integer.parseInt(node.getPlanId().split("_")[1]));
+			pos.setY((float) Integer.parseInt(node.getOperatorId().toString().split("_")[1]));
+			pos.setZ((float) Integer.parseInt(node.getPlanId().toString().split("_")[1]));
 
 			n.getAttvaluesOrSpellsOrNodes().add(pos);
 			
@@ -209,7 +214,7 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			
 			attValue = new XMLAttvalue();
 			attValue.setFor("planId");
-			attValue.setValue(node.getPlanId());
+			attValue.setValue(node.getPlanId().toString());
 			attValueContent.getAttvalue().add(attValue);
 			
 			attValue = new XMLAttvalue();
@@ -218,14 +223,14 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			attValueContent.getAttvalue().add(attValue);
 			
 			String lastStatus = "";
-			for (Tuple<Integer, String> status : node.getStatus()) {
-				if (!lastStatus.equalsIgnoreCase(status.getSecond())) {
+			for (Tuple<Integer, OperatorState> status : node.getStatus()) {
+				if (!lastStatus.equalsIgnoreCase(status.getSecond().toString())) {
 					attValue = new XMLAttvalue();
 					attValue.setFor("status");
-					attValue.setValue(status.getSecond());
+					attValue.setValue(status.getSecond().toString());
 					attValue.setStart(Double.toString(status.getFirst()));
 					attValueContent.getAttvalue().add(attValue);
-					lastStatus = status.getSecond();
+					lastStatus = status.getSecond().toString();
 				}
 			}
 			
@@ -250,8 +255,8 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			attValueContent.getAttvalue().add(attValue);
 			
 			StringBuffer strB = new StringBuffer();
-			for (String stop : node.getStopsToBeServed()) {
-				strB.append(stop + ", ");
+			for (Id<TransitStopFacility> stop : node.getStopsToBeServed()) {
+				strB.append(stop.toString() + ", ");
 			}
 			
 			attValue = new XMLAttvalue();
@@ -307,12 +312,12 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 		List<XMLEdgeContent> edgeList = edges.getEdge();
 		
 		for (PlanElement planElement : planElements) {
-			if (planElement.getAncestor() != null) {
+			if (planElement.getParentId() != null) {
 				// create one edge from ancestor to child
 				XMLEdgeContent e = this.gexfFactory.createXMLEdgeContent();
-				e.setId(planElement.getAncestor().getUniquePlanIdentifier() + "-" + planElement.getUniquePlanIdentifier());
+				e.setId(planElement.getParentPlan().getUniquePlanIdentifier() + "-" + planElement.getUniquePlanIdentifier());
 				e.setLabel(planElement.getCreatorId());
-				e.setSource(planElement.getAncestor().getUniquePlanIdentifier());
+				e.setSource(planElement.getParentPlan().getUniquePlanIdentifier());
 				e.setTarget(planElement.getUniquePlanIdentifier());
 				e.setWeight(new Float(1.0));
 				edgeList.add(e);

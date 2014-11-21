@@ -19,12 +19,17 @@
 
 package playground.andreas.P2.stats.operatorLogger;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.andreas.P2.replanning.*;
-
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.PConstants.OperatorState;
+import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.operator.PPlan;
 
 public final class PlanElement {
 
@@ -32,22 +37,25 @@ public final class PlanElement {
 	private static final Logger log = Logger.getLogger(PlanElement.class);
 	
 	private final int iterationFounded;
-	private final String operatorId;
-	private final ArrayList<Tuple<Integer, String>> status;
-	private final String planId;
+	private final Id<Operator> operatorId;
+	private final ArrayList<Tuple<Integer, OperatorState>> status;
+	private final Id<PPlan> planId;
 	private final String creatorId;
+	private final Id<PPlan> parentId;
 	private final ArrayList<Tuple<Integer, Integer>> nVeh;
 	private final ArrayList<Tuple<Integer, Integer>> nPax;
 	private final ArrayList<Tuple<Integer, Double>> score;
 	private final ArrayList<Tuple<Integer, Double>> budget;
 	private final double startTime;
 	private final double endTime;
-	private final String[] stopsToBeServed;
+	private final ArrayList<Id<TransitStopFacility>> stopsToBeServed;
+	private final ArrayList<Id<Link>> linksServed;
+	
+	private PlanElement parentPlan;
 	
 	private int iterationCeased = Integer.MAX_VALUE;
 
-	private PlanElement ancestor = null;
-	
+
 	public PlanElement(LogElement logElement) {
 		this.iterationFounded = logElement.getIteration();
 		this.operatorId = logElement.getOperatorId();
@@ -57,6 +65,7 @@ public final class PlanElement {
 		
 		this.planId = logElement.getPlanId();
 		this.creatorId = logElement.getCreatorId();
+		this.parentId = logElement.getParentId();
 		
 		this.nVeh = new ArrayList<>();
 		this.nVeh.add(new Tuple<>(this.iterationFounded, logElement.getnVeh()));
@@ -73,6 +82,7 @@ public final class PlanElement {
 		this.startTime = logElement.getStartTime();
 		this.endTime = logElement.getEndTime();
 		this.stopsToBeServed = logElement.getStopsToBeServed();
+		this.linksServed = logElement.getLinksServed();
 	}
 	
 	public String getUniquePlanIdentifier() {
@@ -83,20 +93,24 @@ public final class PlanElement {
 		return iterationFounded;
 	}
 
-	public String getOperatorId() {
+	public Id<Operator> getOperatorId() {
 		return operatorId;
 	}
 
-	public ArrayList<Tuple<Integer, String>> getStatus() {
+	public ArrayList<Tuple<Integer, OperatorState>> getStatus() {
 		return status;
 	}
 
-	public String getPlanId() {
+	public Id<PPlan> getPlanId() {
 		return planId;
 	}
 
 	public String getCreatorId() {
 		return creatorId;
+	}
+	
+	public Id<PPlan> getParentId() {
+		return parentId;
 	}
 
 	public ArrayList<Tuple<Integer, Integer>> getnVeh() {
@@ -123,8 +137,12 @@ public final class PlanElement {
 		return endTime;
 	}
 
-	public String[] getStopsToBeServed() {
+	public ArrayList<Id<TransitStopFacility>> getStopsToBeServed() {
 		return stopsToBeServed;
+	}
+	
+	public ArrayList<Id<Link>> getLinksServed() {
+		return linksServed;
 	}
 	
 	public int getIterationCeased() {
@@ -135,83 +153,20 @@ public final class PlanElement {
 		this.iterationCeased = iterationCeased;
 	}
 
+	public PlanElement getParentPlan() {
+		return this.parentPlan;
+	}
+	
+	public void setParentPlan(PlanElement parent) {
+		this.parentPlan = parent;
+	}
+	
 	public void update(LogElement logElement) {
 		this.status.add(new Tuple<>(logElement.getIteration(), logElement.getStatus()));
 		this.nVeh.add(new Tuple<>(logElement.getIteration(), logElement.getnVeh()));
 		this.nPax.add(new Tuple<>(logElement.getIteration(), logElement.getnPax()));
 		this.score.add(new Tuple<>(logElement.getIteration(), logElement.getScore()));
 		this.budget.add(new Tuple<>(logElement.getIteration(), logElement.getBudget()));
-	}
-
-	public boolean canBeChild(PlanElement planElement) {
-		if (!this.getOperatorId().equalsIgnoreCase(planElement.getOperatorId())) {
-			// wrong family
-			return false;
-		}
-		
-		if (this.getIterationFounded() > planElement.getIterationFounded() || this.getIterationCeased() < planElement.getIterationFounded()) {
-			// they never met
-			return false;
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(WeightedStartTimeExtension.STRATEGY_NAME) || planElement.getCreatorId().equalsIgnoreCase(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
-			if (this.getStartTime() > planElement.getStartTime() && this.getEndTime() == planElement.getEndTime() && this.getStopsToBeServed().length == planElement.getStopsToBeServed().length) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(WeightedEndTimeExtension.STRATEGY_NAME) || planElement.getCreatorId().equalsIgnoreCase(MaxRandomEndTimeAllocator.STRATEGY_NAME)) {
-			if (this.getStartTime() == planElement.getStartTime()  && this.getEndTime() < planElement.getEndTime() && this.getStopsToBeServed().length == planElement.getStopsToBeServed().length) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(EndRouteExtension.STRATEGY_NAME)) {
-			if (this.getStartTime() == planElement.getStartTime()  && this.getEndTime() == planElement.getEndTime() && this.getStopsToBeServed().length + 1== planElement.getStopsToBeServed().length) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(SidewaysRouteExtension.STRATEGY_NAME)) {
-			if (this.getStartTime() == planElement.getStartTime()  && this.getEndTime() == planElement.getEndTime() && this.getStopsToBeServed().length + 2 == planElement.getStopsToBeServed().length) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(ReduceTimeServedRFare.STRATEGY_NAME)) {
-			if (this.getStopsToBeServed().length == planElement.getStopsToBeServed().length) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		if (planElement.getCreatorId().equalsIgnoreCase(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
-			if (this.getStartTime() == planElement.getStartTime()  && this.getEndTime() == planElement.getEndTime()) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		// Couldn't guess the strategy
-		return false;
-	}
-
-	public PlanElement getAncestor() {
-		return this.ancestor;
-	}
-	
-	public void setAncestor(PlanElement candidate) {
-		this.ancestor  = candidate;
 	}
 
 }

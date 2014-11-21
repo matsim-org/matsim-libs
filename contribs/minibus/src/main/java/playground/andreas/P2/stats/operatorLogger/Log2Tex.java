@@ -20,8 +20,10 @@
 package playground.andreas.P2.stats.operatorLogger;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -65,7 +67,7 @@ final class Log2Tex {
 
 					strB.append(" & ");
 
-					String operatorName = logElement.getOperatorId().split("_")[1];
+					String operatorName = logElement.getOperatorId().toString().split("_")[1];
 					if (!lastOperatorName.equalsIgnoreCase(operatorName)) {
 						strB.append("O" + operatorCounterInThatIteration + " -- ");
 						operatorCounterInThatIteration++;
@@ -75,7 +77,7 @@ final class Log2Tex {
 
 					strB.append(" & ");
 
-					String iteration = logElement.getPlanId().split("_")[0];
+					String iteration = logElement.getPlanId().toString().split("_")[0];
 					strB.append(iteration);
 
 					strB.append(" & ");
@@ -88,14 +90,14 @@ final class Log2Tex {
 
 					strB.append(" & ");
 
-					String[] n = logElement.getStopsToBeServed(); //nodes.split(",");
+					ArrayList<Id<TransitStopFacility>> stops = logElement.getStopsToBeServed(); //nodes.split(",");
 					boolean firstIsDone = false;
-					for (String node : n) {
+					for (Id<TransitStopFacility> stop : stops) {
 						if (firstIsDone) {
 							strB.append("--");
 						}
 						firstIsDone = true;
-						strB.append(node.trim());
+						strB.append(stop.toString());
 					}
 
 					strB.append(" & ");
