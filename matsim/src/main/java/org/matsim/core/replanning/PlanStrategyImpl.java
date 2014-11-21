@@ -38,6 +38,24 @@ import java.util.ArrayList;
  */
 public final class PlanStrategyImpl implements PlanStrategy {
 
+	public final static class Builder {
+		private GenericPlanSelector<Plan, Person> planSelector;
+		private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
+		public Builder( final GenericPlanSelector<Plan,Person> planSelector ) {
+			this.planSelector = planSelector ;
+		}
+		public final void addStrategyModule( final PlanStrategyModule module ) {
+			this.modules.add( module ) ;
+		}
+		public final PlanStrategy build() {
+			PlanStrategyImpl impl = new PlanStrategyImpl( planSelector ) ;
+			for ( PlanStrategyModule module : modules ) {
+				impl.addStrategyModule(module);
+			}
+			return impl ;
+		}
+	}
+
 	private GenericPlanSelector<Plan, Person> planSelector = null;
 	private PlanStrategyModule firstModule = null;
 	private final ArrayList<PlanStrategyModule> modules = new ArrayList<PlanStrategyModule>();
@@ -51,42 +69,43 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	 *
 	 * @param planSelector the PlanSelector to use
 	 */
+	@Deprecated // "public" is deprecated.  Please use the Builder instead.  Reason: separate "construction interface" from "application interface". kai, nov'14
 	public PlanStrategyImpl(final GenericPlanSelector<Plan, Person> planSelector) {
 		this.planSelector = planSelector;
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {
-        if (module == null) {
-            // Neccessary because the "firstModule == null" construction masks bugs. You could pass a null pointer
-            // here and nothing would happen.
-            throw new NullPointerException();
-        }
+		if (module == null) {
+			// Neccessary because the "firstModule == null" construction masks bugs. You could pass a null pointer
+			// here and nothing would happen.
+			throw new NullPointerException();
+		}
 		if (this.firstModule == null) {
 			this.firstModule = module;
 		} else {
 			this.modules.add(module);
 		}
 	}
-	
+
 	public int getNumberOfStrategyModules() {
 		if (this.firstModule == null) {
 			return 0;
 		}
 		return this.modules.size() + 1; // we also have to count "firstModule", thus +1
 	}
-	
+
 	@Override
 	public void run(final HasPlansAndId<Plan, Person> person) {
 		this.counter++;
-		
+
 		// if there is at least one unscored plan, find that one:
 		Plan plan = new RandomUnscoredPlanSelector<Plan, Person>().selectPlan(person);
-		
+
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
 		if (plan == null) {
 			plan = this.planSelector.selectPlan(person);
 		}
-		
+
 		// "select" that plan:
 		if ( plan != null ) {
 			person.setSelectedPlan(plan);
@@ -94,14 +113,14 @@ public final class PlanStrategyImpl implements PlanStrategy {
 		else {
 			log.error( planSelector+" returned no plan: not changing selected plan for person "+person );
 		}
-		
+
 		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {
-			
+
 			// set the working plan to a copy of the selected plan:
 			plan = person.createCopyOfSelectedPlanAndMakeSelected();
 			// (this makes, as a side effect, the _new_ plan selected)
-			
+
 			// add new plan to container that contains the plans that are handled by this PlanStrategy:
 			this.plans.add(plan);
 
@@ -122,7 +141,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	public void finish() {
 		if (this.firstModule != null) {
 			// finish the first module
-				this.firstModule.finishReplanning();
+			this.firstModule.finishReplanning();
 			// now work through the others
 			for (PlanStrategyModule module : this.modules) {
 				module.prepareReplanning(replanningContext);
@@ -155,5 +174,5 @@ public final class PlanStrategyImpl implements PlanStrategy {
 	public GenericPlanSelector<Plan, Person> getPlanSelector() {
 		return planSelector;
 	}
-	
+
 }
