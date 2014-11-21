@@ -178,8 +178,8 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
+//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+//		events.addHandler(eventWriter);
 		
 		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
@@ -209,7 +209,7 @@ public class NoiseCalculationOffline {
 		noiseImmission.calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStats(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
 		NoiseWriter.writeNoiseImmissionStatsPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
-		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
+//		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
 		log.info("Calculating noise immissions... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
@@ -221,9 +221,10 @@ public class NoiseCalculationOffline {
 		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, noiseParameters, noiseEmissionHandler, noiseImmission, receiverPoints);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
+		NoiseWriter.writeDamageInfoPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".damageCostInfoPerHour.csv");
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
-		eventWriter.closeFile();
+//		eventWriter.closeFile();
 	}
 }
 		

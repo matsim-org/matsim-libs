@@ -113,6 +113,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Calculating noise damage costs and throwing noise events...");
 		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), noiseParameters, noiseEmissionHandler, noiseImmission, this.receiverPoints);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
+		NoiseWriter.writeDamageInfoPerHour(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/damageStatsPerHour.csv");
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
 	}

@@ -566,4 +566,63 @@ public class NoiseWriter {
 		}		
 	}
 	
+	public static void writeDamageInfoPerHour(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParams, String fileName) {
+		File file = new File(fileName);
+			
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			// column headers
+			bw.write("receiver point");
+			for(int i = 0; i < 30 ; i++) {
+				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				bw.write(";damage costs (EUR) " + time);
+			}
+			bw.newLine();
+
+			
+			for (ReceiverPoint rp : receiverPoints.values()) {
+				bw.write(rp.getId().toString());
+				for(int i = 0 ; i < 30 ; i++) {
+					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
+					double damage = 0.;
+					
+					if (rp.getTimeInterval2damageCosts() != null) {
+						if (rp.getTimeInterval2damageCosts().get(timeInterval) != null) {
+							damage = rp.getTimeInterval2damageCosts().get(timeInterval);
+						}
+					}					
+					bw.write(";"+ damage);	
+				}
+				
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\"");
+			
+			for(int i = 0; i < 30 ; i++) {
+				bw.write(",\"Real\"");
+			}
+			
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+	
 }
