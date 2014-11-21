@@ -55,9 +55,9 @@ public class NoiseDamageCalculation {
 	private NoiseEmissionHandler noiseEmissionHandler;
 			
 	// link based noise damage cost
-	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2damageCost = new HashMap<Id<Link>, Map<Double,Double>>();
-	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2damageCostPerCar = new HashMap<Id<Link>, Map<Double,Double>>();
-	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2damageCostPerHdvVehicle = new HashMap<Id<Link>, Map<Double,Double>>();
+	private Map<Id<Link>, Map<Double,Double>> linkId2timeInterval2damageCost = new HashMap<Id<Link>, Map<Double,Double>>();
+	private Map<Id<Link>, Map<Double,Double>> linkId2timeInterval2damageCostPerCar = new HashMap<Id<Link>, Map<Double,Double>>();
+	private Map<Id<Link>, Map<Double,Double>> linkId2timeInterval2damageCostPerHdvVehicle = new HashMap<Id<Link>, Map<Double,Double>>();
 		
 	// some additional analysis
 	private Map<Id<Person>,Double> personId2causedNoiseCosts = new HashMap<Id<Person>, Double>();
@@ -66,7 +66,7 @@ public class NoiseDamageCalculation {
 	private double totalAffectedNoiseCost = 0.;
 	
 //	 to be filled during the computation of noise events
-	private boolean collectNoiseEvents;
+	private boolean collectNoiseEvents = true;
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
@@ -75,9 +75,7 @@ public class NoiseDamageCalculation {
 		this.events = events;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = receiverPoints;
-		this.noiseEmissionHandler = noiseEmissionHandler;
-												
-		this.collectNoiseEvents = true;
+		this.noiseEmissionHandler = noiseEmissionHandler;												
 	}
 	
 	public void setCollectNoiseEvents(boolean collectNoiseEvents) {
