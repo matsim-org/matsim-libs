@@ -167,6 +167,11 @@ public class NoiseCalculationOffline {
 		noiseParameters.setReceiverPointsGridMaxX(xMax);
 		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
+		// Berlin Activity Types
+//		String[] consideredActivities = {"home"};
+		String[] consideredActivities = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		noiseParameters.setConsideredActivities(consideredActivities);
+		
 		log.info("Loading scenario...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
@@ -184,7 +189,7 @@ public class NoiseCalculationOffline {
 		
 		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters, receiverPoints);
 		initialization.initialize();
-		NoiseWriter.writeReceiverPoints(receiverPoints, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(receiverPoints, noiseParameters, outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
@@ -208,7 +213,7 @@ public class NoiseCalculationOffline {
 		noiseImmission.calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStats(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
 		NoiseWriter.writeNoiseImmissionStatsPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
-		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
+		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
 		log.info("Calculating noise immissions... Done.");
 		
 		log.info("Calculating each agent's activity durations...");

@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
 /**
@@ -45,7 +46,8 @@ public class NoiseParameters {
 	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private String[] consideredActivities = {"home", "work"};	
+	private String[] consideredActivities = {"home", "work"};
+	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
 	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which activities are found.
 	private double receiverPointsGridMinX = 0.;
@@ -161,6 +163,14 @@ public class NoiseParameters {
 
 	public List<Id<Link>> getTunnelLinkIDs() {
 		return tunnelLinkIDs;
+	}
+
+	public String getTransformationFactory() {
+		return transformationFactory;
+	}
+
+	public void setTransformationFactory(String transformationFactory) {
+		this.transformationFactory = transformationFactory;
 	}
 	
 }

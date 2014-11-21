@@ -29,34 +29,29 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 /**
+ * 
+ * Contains all methods for writing noise-specific output. TODO: Condense the code.
+ * 
  * @author ikaddoura
  *
  */
 public class NoiseWriter {
 	private static final Logger log = Logger.getLogger(NoiseWriter.class);
 
-	public static void writeReceiverPoints(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, String outputPath) {
+	public static void writeReceiverPoints(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParameters, String outputPath) {
 
 		// csv file
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
@@ -84,7 +79,7 @@ public class NoiseWriter {
 		// shape file	
 				
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
+		.setCrs(MGC.getCRS(noiseParameters.getTransformationFactory()))
 		.setName("receiver point")
 		.addAttribute("Id", String.class)
 		.create();
@@ -479,10 +474,10 @@ public class NoiseWriter {
 		
 	}
 	
-	public static void writeNoiseImmissionStatsPerHourShapeFile(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, String fileName){
+	public static void writeNoiseImmissionStatsPerHourShapeFile(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParameters, String fileName){
 		
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
+		.setCrs(MGC.getCRS(noiseParameters.getTransformationFactory()))
 		.setName("receiver point")
 		.addAttribute("Time", String.class)
 		.addAttribute("immissions", Double.class)
