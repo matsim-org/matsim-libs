@@ -20,57 +20,59 @@
 
 package org.matsim.contrib.grips.model.locale;
 
+public class EnglishLocale implements Locale {
 
-public class EnglishLocale implements Locale
-{
-	
-	private String btOK = "ok"; 
-	private String btOpen = "open"; 
-	private String btSave = "save"; 
-	private String btCancel = "cancel"; 
+	private static final String leaveEmptyToCreateNewLabel = "Leave empty to create a new file.";
+	private String btOK = "ok";
+	private String btOpen = "open";
+	private String btSave = "save";
+	private String btCancel = "cancel";
 	private String btRun = "run";
 	private String btRemove = "remove";
 	private String btClear = "clear";
-	
+
 	private String popArea = "Area";
-	
+
 	private String btCircular = "circular";
 	private String btPolygonal = "polygonal";
-	
+
 	private String infoGripsFile = "Grips settings";
 	private String infoMatsimFile = "MATSim settings";
 	private String infoMatsimTime = "The calculation may take a long time!";
-	
-	private String msgOpenGripsConfigFailed      = "The Grips file could not be opened."; 
-	private String msgOpenMatsimConfigFailed     = "The MATSim file could not be opened."; 
-	private String msgOpenEvacShapeFailed 		 = "The evacuation area shape file could not be opened.";
 
-	private String moduleEvacAreaSelector 		 = "evacuation area";
-	private String modulePopAreaSelector 		 = "population areas";
-	private String moduleScenearioGenerator 	 = "Grips scenario";
-	private String moduleRoadClosureEditor 		 = "road closures";
-	private String modulePTLEditor 				 = "bus stops";
+	private String msgOpenGripsConfigFailed = "The Grips file could not be opened.";
+	private String msgOpenMatsimConfigFailed = "The MATSim file could not be opened.";
+	private String msgOpenEvacShapeFailed = "The evacuation area shape file could not be opened.";
+
+	private String moduleEvacAreaSelector = "evacuation area";
+	private String modulePopAreaSelector = "population areas";
+	private String moduleScenearioGenerator = "Grips scenario";
+	private String moduleRoadClosureEditor = "road closures";
+	private String modulePTLEditor = "bus stops";
 	private String moduleMatsimScenarioGenerator = "MATSim scenario";
-	private String moduleEvacuationAnalysis 	 = "analysis";
-	private String moduleScenarioXml			 = "scenario";
-	
+	private String moduleEvacuationAnalysis = "analysis";
+	private String moduleScenarioXml = "scenario";
+
 	private String titlePopAreas = "population areas";
 	private String titleAreaID = "ID";
 	private String titlePopulation = "population";
-	
-	private String usage = "usage 1: " + "currentmodule.java" +"\n" +
-						   "         starts the editor and uses openstreetmap as backround layer\n" +
-						   "         requires a working internet connection \n\n" + 
-						   "usage 2: " + "currentmodule.java"  + " -wms <url> -layer <layer name>\n" +
-				           "         starts the editor and uses the given wms server to load a backgorund layer\n\n";
-	
-	
+
+	private String usage = "usage 1: "
+			+ "currentmodule.java"
+			+ "\n"
+			+ "         starts the editor and uses openstreetmap as backround layer\n"
+			+ "         requires a working internet connection \n\n"
+			+ "usage 2: "
+			+ "currentmodule.java"
+			+ " -wms <url> -layer <layer name>\n"
+			+ "         starts the editor and uses the given wms server to load a backgorund layer\n\n";
+
 	private String labelSelection = "Selection mode";
-	
+
 	public String trafficTypeVeh = "vehicular";
 	public String trafficTypePed = "pedestrian";
 	public String trafficTypeMixed = "mixed";
-	
+
 	public String labelNetworkFile = "network file";
 	public String labelTrafficType = "main traffic type";
 	public String labelEvacFile = "evacuation file";
@@ -92,144 +94,118 @@ public class EnglishLocale implements Locale
 	public String labelWMS = "WMS";
 	public String labelLayer = "layer";
 
-	
-	
-	
 	@Override
-	public String btOK()
-	{
+	public String btOK() {
 		return btOK;
 	}
 
 	@Override
-	public String btCancel()
-	{
+	public String btCancel() {
 		return btCancel;
 	}
 
 	@Override
-	public String btOpen()
-	{
+	public String btOpen() {
 		return btOpen;
 	}
 
 	@Override
-	public String btSave()
-	{
+	public String btSave() {
 		return btSave;
 	}
-	
+
 	@Override
-	public String btRun()
-	{
+	public String btRun() {
 		return btRun;
 	}
-	
+
 	@Override
-	public String infoGripsFile()
-	{
+	public String infoGripsFile() {
 		return infoGripsFile;
 	}
-	
+
 	@Override
-	public String msgOpenGripsConfigFailed()
-	{
+	public String msgOpenGripsConfigFailed() {
 		return msgOpenGripsConfigFailed;
 	}
-	
+
 	@Override
-	public String msgOpenEvacShapeFailed()
-	{
+	public String msgOpenEvacShapeFailed() {
 		return msgOpenEvacShapeFailed;
 	}
-	
+
 	@Override
-	public String infoMatsimFile()
-	{
+	public String infoMatsimFile() {
 		return infoMatsimFile;
 	}
-	
+
 	@Override
-	public String msgOpenMatsimConfigFailed()
-	{
+	public String msgOpenMatsimConfigFailed() {
 		return msgOpenMatsimConfigFailed;
 	}
-	
+
 	@Override
-	public String btRemove()
-	{
+	public String btRemove() {
 		return btRemove;
 	}
 
 	@Override
-	public String moduleScenarioXml()
-	{
+	public String moduleScenarioXml() {
 		return moduleScenarioXml;
 	}
 
 	@Override
-	public String moduleEvacAreaSelector()
-	{
+	public String moduleEvacAreaSelector() {
 		return moduleEvacAreaSelector;
 	}
 
 	@Override
-	public String modulePopAreaSelector()
-	{
+	public String modulePopAreaSelector() {
 		return modulePopAreaSelector;
 	}
 
 	@Override
-	public String moduleScenarioGenerator()
-	{
+	public String moduleScenarioGenerator() {
 		return moduleScenearioGenerator;
 	}
 
 	@Override
-	public String moduleRoadClosureEditor()
-	{
+	public String moduleRoadClosureEditor() {
 		return moduleRoadClosureEditor;
 	}
 
 	@Override
-	public String modulePTLEditor()
-	{
+	public String modulePTLEditor() {
 		return modulePTLEditor;
 	}
 
 	@Override
-	public String moduleMatsimScenarioGenerator()
-	{
+	public String moduleMatsimScenarioGenerator() {
 		return moduleMatsimScenarioGenerator;
 	}
 
 	@Override
-	public String moduleEvacuationAnalysis()
-	{
+	public String moduleEvacuationAnalysis() {
 		return moduleEvacuationAnalysis;
 	}
-	
+
 	@Override
-	public String infoMatsimTime()
-	{
+	public String infoMatsimTime() {
 		return infoMatsimTime;
 	}
-	
+
 	@Override
-	public String titlePopAreas()
-	{
+	public String titlePopAreas() {
 		return titlePopAreas;
 	}
 
 	@Override
-	public String titlePopulation()
-	{
+	public String titlePopulation() {
 		return titlePopulation;
 	};
-	
+
 	@Override
-	public String titleAreaID()
-	{
+	public String titleAreaID() {
 		return titleAreaID;
 	}
 
@@ -265,7 +241,7 @@ public class EnglishLocale implements Locale
 
 	@Override
 	public String agents() {
-		
+
 		return "agents";
 	}
 
@@ -341,20 +317,20 @@ public class EnglishLocale implements Locale
 
 	@Override
 	public String[] getTrafficTypeStrings() {
-		
-		return new String[]{trafficTypeVeh,trafficTypePed,trafficTypeMixed};
+
+		return new String[] { trafficTypeVeh, trafficTypePed, trafficTypeMixed };
 	}
 
 	@Override
 	public String btNew() {
-		return btNew ;
+		return btNew;
 	}
 
 	@Override
 	public String labelCurrentFile() {
-		return labelCurrentFile ;
+		return labelCurrentFile;
 	}
-	
+
 	@Override
 	public String btSet() {
 		return btSet;
@@ -374,6 +350,7 @@ public class EnglishLocale implements Locale
 	public Object infoMatsimOverwriteOutputDir() {
 		return infoMatsimOverwrite;
 	}
+
 	@Override
 	public String labelExistingShapeFile() {
 		return labelExistingShapeFile;
@@ -389,5 +366,9 @@ public class EnglishLocale implements Locale
 		return labelLayer;
 	}
 
-	
+	@Override
+	public String getLeaveEmptyToCreateNew() {
+		return leaveEmptyToCreateNewLabel;
+	}
+
 }

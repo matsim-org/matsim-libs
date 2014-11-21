@@ -18,8 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-
-package org.matsim.contrib.grips.scenariomanager;
+package org.matsim.contrib.grips.run;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -47,12 +46,12 @@ import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
 import org.matsim.contrib.grips.populationselector.PopulationAreaSelector;
 import org.matsim.contrib.grips.roadclosureseditor.RoadClosuresEditor;
 import org.matsim.contrib.grips.scenariogenerator.MatsimNetworkGenerator;
+import org.matsim.contrib.grips.scenariomanager.ScenarioXMLEditor;
 import org.matsim.contrib.grips.simulation.SimulationComputation;
 import org.matsim.contrib.grips.view.DefaultWindow;
 import org.matsim.contrib.grips.view.TabButton;
 
-public class ScenarioManager extends DefaultWindow
-{
+public class ScenarioManager extends DefaultWindow {
 	private static final long serialVersionUID = 1L;
 	static int width = 1024;
 	static int height = 864;
@@ -60,17 +59,17 @@ public class ScenarioManager extends DefaultWindow
 	public ConcurrentHashMap<ModuleType, TabButton> selectionButtons;
 	private ConcurrentHashMap<ModuleType, AbstractModule> modules;
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		final Controller controller = new Controller(args);
-		controller.setImageContainer(BufferedImageContainer.getImageContainer(width, height, border));
+		controller.setImageContainer(BufferedImageContainer.getImageContainer(
+				width, height, border));
 		controller.setMainFrameUndecorated(false);
-		
+
 		controller.setModuleChain(new ScenarioManagerModuleChain());
 		controller.setStandAlone(false);
 		ArrayList<AbstractModule> moduleChain = new ArrayList<AbstractModule>();
-		
-		//current work flow
+
+		// current work flow
 		moduleChain.add(new ScenarioXMLEditor(controller));
 		moduleChain.add(new EvacuationAreaSelector(controller));
 		moduleChain.add(new PopulationAreaSelector(controller));
@@ -79,150 +78,157 @@ public class ScenarioManager extends DefaultWindow
 		moduleChain.add(new EvacuationPTLinesEditor(controller));
 		moduleChain.add(new SimulationComputation(controller));
 		moduleChain.add(new EvacuationAnalysis(controller));
-		
+
 		controller.addModuleChain(moduleChain);
-		
+
 		ScenarioManager manager = new ScenarioManager(controller);
-		
+
 		// set parent component to forward the (re)paint event
-		controller.setParentComponent(manager);		
+		controller.setParentComponent(manager);
 		controller.setMainPanel(manager.getMainPanel(), true);
-		
-		
+
 		manager.setVisible(true);
 	}
-	
-	public ScenarioManager(Controller controller)
-	{
+
+	public ScenarioManager(Controller controller) {
 		super(controller);
-		
+
 		selectionButtons = new ConcurrentHashMap<ModuleType, TabButton>();
 		modules = new ConcurrentHashMap<ModuleType, AbstractModule>();
-		
+
 		JPanel tabPanel = new JPanel();
 		JPanel tabSelectPanel = new JPanel();
 		JPanel panels = new JPanel();
 		panels.add(tabPanel);
-//		panels.add(tabSelectPanel);
 		panels.setMaximumSize(new Dimension(width, 120));
 		panels.setPreferredSize(new Dimension(width, 120));
 		panels.setBackground(Color.darkGray);
 		tabPanel.setMinimumSize(new Dimension(width, 95));
 		tabPanel.setPreferredSize(new Dimension(width, 120));
-		
+
 		tabSelectPanel.setMaximumSize(new Dimension(width, 20));
 		tabPanel.setBackground(Color.darkGray);
-		
+
 		int i = 0;
-		for (AbstractModule module : controller.getModules())
-		{
-			
+		for (AbstractModule module : controller.getModules()) {
+
 			JPanel panel = new JPanel();
-			panel.setPreferredSize(new Dimension(80,100));
-			TabButton button = new TabButton(module.getModuleType(),panel,80,80);
-			
-			button.setIcon(new ImageIcon(Constants.getModuleImage(module.getModuleType())));
-			
+			panel.setPreferredSize(new Dimension(80, 100));
+			TabButton button = new TabButton(module.getModuleType(), panel, 80,
+					80);
+
+			button.setIcon(new ImageIcon(Constants.getModuleImage(module
+					.getModuleType())));
+
 			button.setFocusPainted(false);
-			
-			ModuleButtonListener l = new ModuleButtonListener(this, module.getModuleType());
+
+			ModuleButtonListener l = new ModuleButtonListener(this,
+					module.getModuleType());
 			button.addActionListener(l);
 			button.addMouseMotionListener(l);
 			button.addMouseListener(l);
-			
+
 			button.setColor(Constants.getModuleColor(module.getModuleType()));
 			button.setHoverColor(button.getColor().brighter());
-			
-			if (i>0)
-			{
+
+			if (i > 0) {
 				button.setEnabled(false);
 				module.setEnabled(false);
-			}
-			else
+			} else
 				module.setEnabled(true);
-			
+
 			i++;
-			
+
 			selectionButtons.put(module.getModuleType(), button);
 			modules.put(module.getModuleType(), module);
-			
+
 			panel.add(button);
 			tabPanel.add(panel);
 		}
-		this.controller.setActiveModuleType(this.controller.getModules().get(0).getModuleType());
-		
-		this.add(panels,BorderLayout.NORTH);
-		
-		
+		this.controller.setActiveModuleType(this.controller.getModules().get(0)
+				.getModuleType());
+
+		this.add(panels, BorderLayout.NORTH);
+
 	}
-	
-	private class ModuleButtonListener implements MouseInputListener, ActionListener
-	{
+
+	private class ModuleButtonListener implements MouseInputListener,
+			ActionListener {
 		private ScenarioManager manager;
 		private ModuleType moduleType;
-		
-		public ModuleButtonListener(ScenarioManager manager, ModuleType moduleType)
-		{
+
+		public ModuleButtonListener(ScenarioManager manager,
+				ModuleType moduleType) {
 			this.manager = manager;
 			this.moduleType = moduleType;
 		}
+
 		@Override
-		public void mouseDragged(MouseEvent e) {}
+		public void mouseDragged(MouseEvent e) {
+		}
+
 		@Override
-		public void mouseMoved(MouseEvent e) {}
+		public void mouseMoved(MouseEvent e) {
+		}
+
 		@Override
-		public void actionPerformed(ActionEvent e)
-		{
+		public void actionPerformed(ActionEvent e) {
 			this.manager.controller.setActiveModuleType(this.moduleType);
 			this.manager.modules.get(this.moduleType).start();
-			AbstractModule module = this.manager.controller.getModuleByType(this.moduleType);
+			AbstractModule module = this.manager.controller
+					.getModuleByType(this.moduleType);
 			this.manager.setTitle(module.getTitle());
 		}
+
 		@Override
-		public void mouseClicked(MouseEvent e) {}
+		public void mouseClicked(MouseEvent e) {
+		}
+
 		@Override
-		public void mousePressed(MouseEvent e) {}
+		public void mousePressed(MouseEvent e) {
+		}
+
 		@Override
-		public void mouseReleased(MouseEvent e) {}
+		public void mouseReleased(MouseEvent e) {
+		}
+
 		@Override
-		public void mouseEntered(MouseEvent e)
-		{
+		public void mouseEntered(MouseEvent e) {
 			updateHoverColors(true);
 			if (this.manager.selectionButtons.get(this.moduleType).isEnabled())
-				this.manager.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				this.manager.setCursor(Cursor
+						.getPredefinedCursor(Cursor.HAND_CURSOR));
 		}
+
 		@Override
-		public void mouseExited(MouseEvent e)
-		{
+		public void mouseExited(MouseEvent e) {
 			updateHoverColors(false);
 			this.manager.setCursor(Cursor.getDefaultCursor());
-//			if (this.manager.selectionButtons.get(this.moduleType).isEnabled())
+			// if
+			// (this.manager.selectionButtons.get(this.moduleType).isEnabled())
 		}
-		
-		private void updateHoverColors(boolean enter)
-		{
-			for (TabButton button : selectionButtons.values())
-			{
-				TabButton buttonFromList = this.manager.selectionButtons.get(button.getModuleType());
-				
-				if (enter)
-				{
+
+		private void updateHoverColors(boolean enter) {
+			for (TabButton button : selectionButtons.values()) {
+				TabButton buttonFromList = this.manager.selectionButtons
+						.get(button.getModuleType());
+
+				if (enter) {
 					if (buttonFromList.isEnabled())
-						buttonFromList.hover(button.getModuleType().equals(this.moduleType));
-				}
-				else
+						buttonFromList.hover(button.getModuleType().equals(
+								this.moduleType));
+				} else
 					buttonFromList.hover(false);
 			}
 		}
-		
-	}
-	
-	@Override
-	public void updateMask()
-	{
-		for (AbstractModule module : modules.values())
-			this.selectionButtons.get(module.getModuleType()).setEnabled(module.isEnabled());
-	}
-	
-}
 
+	}
+
+	@Override
+	public void updateMask() {
+		for (AbstractModule module : modules.values())
+			this.selectionButtons.get(module.getModuleType()).setEnabled(
+					module.isEnabled());
+	}
+
+}
