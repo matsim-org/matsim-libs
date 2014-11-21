@@ -57,14 +57,16 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
 	private NoiseInitialization spatialInfo;
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 		
 	private Map<Id<Person>, Integer> personId2activityNumber = new HashMap<Id<Person>, Integer>();
 	private Map<Id<Person>, Map<Integer, PersonActivityInfo>> personId2actNr2actInfo = new HashMap<Id<Person>, Map<Integer, PersonActivityInfo>>();
 		
-	public PersonActivityHandler (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo) {
+	public PersonActivityHandler (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 		this.spatialInfo = spatialInfo;
+		this.receiverPoints = receiverPoints;
 	}
 	
 	@Override
@@ -140,7 +142,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		}		
 	}
 
-	public void calculateDurationsOfStay(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public void calculateDurationsOfStay() {
 				
 		// sort by receiver point
 		Map<Id<ReceiverPoint>, List<PersonActivityInfo>> rpId2actInfos = new HashMap<Id<ReceiverPoint>, List<PersonActivityInfo>>();
