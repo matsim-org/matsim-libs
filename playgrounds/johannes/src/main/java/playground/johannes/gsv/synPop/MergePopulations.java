@@ -59,23 +59,35 @@ public class MergePopulations {
 		Set<ProxyPerson> persons2 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 
-		double w1 = 100;
+		logger.info("Loading persons...");
+		parser.parse(args[2]);
+		Set<ProxyPerson> persons3 = parser.getPersons();
+		logger.info(String.format("Loaded %s persons.", persons3.size()));
+
+		double w1 = 200;
 		double w2 = 1;
+		double w3 = 1;
 		
-		double proba1 = w1/(w1 + w2);
-		double proba2 = w2/(w1 + w2);
+		double wsum = w1 + w2 + w3;
+		double proba1 = w1/wsum;
+		double proba2 = w2/wsum;
+		double proba3 = w3/wsum;
 		
 		logger.info(String.format("Probability for population 1: %s", proba1));
 		logger.info(String.format("Probability for population 2: %s", proba2));
+		logger.info(String.format("Probability for population 3: %s", proba3));
 		
-		int N = Integer.parseInt(args[3]);
+		int N = Integer.parseInt(args[4]);
 		logger.info(String.format("Generating %s persons...", N));
 		
 		int n1 = (int) (N * proba1);
-		int n2 = N - n1;
+//		int n2 = N - n1;
+		int n2 = (int) (N * proba2);
+		int n3 = N - (n1 + n2);
 		
 		logger.info(String.format("Person from population 1: %s", n1));
 		logger.info(String.format("Person from population 2: %s", n2));
+		logger.info(String.format("Person from population 2: %s", n3));
 		
 		Set<ProxyPerson> newPersons = new HashSet<>(N);
 		
@@ -91,9 +103,15 @@ public class MergePopulations {
 			newPersons.add(it.next());
 		}
 		
+		logger.info("Merging population 3...");
+		it = persons3.iterator();
+		for(int i = 0; i < n3; i++) {
+			newPersons.add(it.next());
+		}
+		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write(args[2], newPersons);
+		writer.write(args[3], newPersons);
 		logger.info("Done.");
 	}
 

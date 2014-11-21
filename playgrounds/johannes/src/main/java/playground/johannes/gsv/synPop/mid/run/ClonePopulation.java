@@ -25,7 +25,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ApplySampleProbas;
-import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
@@ -47,22 +46,22 @@ public class ClonePopulation {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		parser.parse(args[0]);
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones(persons, 2000000, random);
+		persons = PersonCloner.weightedClones(persons, (int) Double.parseDouble(args[2]), random);
 		new ApplySampleProbas(82000000).apply(persons);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
-		logger.info("Deleting persons with no legs..." );
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
-		logger.info("Population size = " + persons.size());
+//		logger.info("Deleting persons with no legs..." );
+//		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+//		logger.info("Population size = " + persons.size());
 		
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.mob.xml", persons);
+		writer.write(args[1], persons);
 	}
 
 }

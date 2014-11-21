@@ -17,44 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.counts;
+package playground.johannes.gsv.synPop.mid.run;
 
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ApplyFactor {
+public class ExtractStatePopulation {
 
+	private static final Logger logger = Logger.getLogger(ExtractStatePopulation.class);
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.xml");
-
-		Counts newCounts = new Counts();
-		newCounts.setDescription(counts.getDescription());
-		newCounts.setName(counts.getName());
-		newCounts.setYear(counts.getYear());
-
-		for (Count count : counts.getCounts().values()) {
-			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
-				for (int i = 1; i < 25; i++) {
-					newCount.createVolume(i, count.getVolume(i).getValue() / 24.0);
-				}
-				newCount.setCoord(count.getCoord());
-			}
-		}
-
-		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.24h.xml");
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
+	
+		logger.info("Loading persons...");
+		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		Set<ProxyPerson> persons = parser.getPersons();
+		logger.info(String.format("Loaded %s persons.", persons.size()));
+		
+		logger.info("Applying filter...");
+		persons = ProxyTaskRunner.runAndDeletePerson(new DeletePersonKeyValue("state", "Hessen"), persons);
+		logger.info(String.format("Population size: %s", persons.size()));
+		
+		XMLWriter writer = new XMLWriter();
+		writer.write("/home/johannes/gsv/mid2008/pop/hessen.xml", persons);
 	}
 
 }

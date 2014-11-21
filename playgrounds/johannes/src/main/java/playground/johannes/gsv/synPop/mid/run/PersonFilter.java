@@ -49,12 +49,12 @@ public class PersonFilter {
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		parser.parse("/home/johannes/gsv/mid2008/pop/hessen.xml");
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		logger.info("Cloning persons...");
-		persons = PersonCloner.weightedClones(persons, 1000000, new XORShiftRandom());
+		persons = PersonCloner.weightedClones(persons, 100000, new XORShiftRandom());
 		new ApplySampleProbas(82000000).apply(persons);
 		logger.info("Population size = " + persons.size());
 		
@@ -67,18 +67,18 @@ public class PersonFilter {
 		logger.info("Removing non mobile persons...");
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filte: %s", persons.size()));
-		writer.write(outDir + "pop.mob.xml", persons);
+//		writer.write(outDir + "pop.mob.xml", persons);
 		
 		logger.info("Removing non car persons...");
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
 		logger.info(String.format("Persons after filte: %s", persons.size()));
-		writer.write(outDir + "pop.car.xml", persons);
+//		writer.write(outDir + "pop.car.xml", persons);
 		
 		logger.info("Removing legs with less than 3 KM...");
 		ProxyTaskRunner.run(new DeleteShortTrips(3000), persons);
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filte: %s", persons.size()));
-		writer.write(outDir + "pop.car.wo3km.xml", persons);
+		writer.write(outDir + "hesen.car.wo3km.midjourneys.xml", persons);
 		
 		logger.info("Done.");
 	}

@@ -44,7 +44,7 @@ public class ExtractMidJourneys {
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		parser.parse(args[0]);
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
@@ -54,10 +54,11 @@ public class ExtractMidJourneys {
 				newPersons.add(person);
 			}
 		}
+		logger.info(String.format("New population size: %s.", newPersons.size()));
 		
 		logger.info("Writing persons...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.midjourneys.xml", newPersons);
+		writer.write(args[1], newPersons);
 		logger.info("Done.");
 	}
 

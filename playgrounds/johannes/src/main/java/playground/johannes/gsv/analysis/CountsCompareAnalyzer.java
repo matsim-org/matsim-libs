@@ -21,6 +21,7 @@ package playground.johannes.gsv.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -30,6 +31,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
+
+import playground.johannes.gsv.gis.CountsCompare2GeoJSON;
+import playground.johannes.gsv.gis.NetworkLoad2GeoJSON;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
@@ -127,6 +131,9 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 			writer.newLine();
 			
 			writer.close();
+			
+			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);
+			NetworkLoad2GeoJSON.write(event.getControler().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

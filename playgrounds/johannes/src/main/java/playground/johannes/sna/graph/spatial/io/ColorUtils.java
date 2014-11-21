@@ -80,4 +80,25 @@ public class ColorUtils {
 			return new Color(red, green, blue);
 		}
 	}
+	
+	public static Color getRedGreenColor(double val) {
+		if(val < 0) {
+			return Color.BLACK;
+		} else if(val > 1) {
+			return Color.WHITE;
+		} else {
+			float red = 0;
+			float green = 1;
+			float blue = 0;
+			
+			if(val <= 0.5) {
+				red = (float) (val * 2);
+			} else {
+				red = 1;
+				green = (float) (1 - ((val-0.5) * 2));
+			}
+			
+			return new Color(red, green, blue);
+		}
+	}
 }

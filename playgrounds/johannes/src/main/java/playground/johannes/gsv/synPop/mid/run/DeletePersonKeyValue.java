@@ -17,44 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.counts;
+package playground.johannes.gsv.synPop.mid.run;
 
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ApplyFactor {
+public class DeletePersonKeyValue implements ProxyPersonTask {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.xml");
-
-		Counts newCounts = new Counts();
-		newCounts.setDescription(counts.getDescription());
-		newCounts.setName(counts.getName());
-		newCounts.setYear(counts.getYear());
-
-		for (Count count : counts.getCounts().values()) {
-			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
-				for (int i = 1; i < 25; i++) {
-					newCount.createVolume(i, count.getVolume(i).getValue() / 24.0);
-				}
-				newCount.setCoord(count.getCoord());
-			}
+	private final String key;
+	
+	private final String value;
+	
+	public DeletePersonKeyValue(String key, String value) {
+		this.key = key;
+		this.value = value;
+	}
+	
+	@Override
+	public void apply(ProxyPerson person) {
+		String val = person.getAttribute(key);
+		if(!value.equalsIgnoreCase(val)) {
+			person.setAttribute(CommonKeys.DELETE, "true");
 		}
-
-		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.24h.xml");
 	}
 
 }

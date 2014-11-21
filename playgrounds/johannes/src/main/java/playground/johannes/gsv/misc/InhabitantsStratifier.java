@@ -17,44 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.counts;
+package playground.johannes.gsv.misc;
 
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 /**
  * @author johannes
  * 
  */
-public class ApplyFactor {
+public class InhabitantsStratifier {
 
 	/**
 	 * @param args
+	 * @throws IOException
 	 */
-	public static void main(String[] args) {
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.xml");
+	public static void main(String[] args) throws IOException {
+		ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read("/home/johannes/gsv/gis/vg250-ew_3112.gk3.shape.ebenen/vg250-ew_ebenen/vg250_gem.shp");
 
-		Counts newCounts = new Counts();
-		newCounts.setDescription(counts.getDescription());
-		newCounts.setName(counts.getName());
-		newCounts.setYear(counts.getYear());
-
-		for (Count count : counts.getCounts().values()) {
-			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
-				for (int i = 1; i < 25; i++) {
-					newCount.createVolume(i, count.getVolume(i).getValue() / 24.0);
-				}
-				newCount.setCoord(count.getCoord());
+		SortedMap<Double, Zone<Map<String, Object>>> inhabs = new TreeMap<>();
+		double total = 0;
+		for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
+			Double ewz = (Double) zone.getAttribute().get("EWZ");
+			if (ewz != null) {
+				inhabs.put(ewz, zone);
+				total += ewz;
 			}
 		}
 
-		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/sge/prj/matsim/data/counts.2009.net20140909.5.24h.xml");
+		System.out.println("Total: " + total);
+		
+		double threshold = 0.0;
+		int sum = 0;
+
+		for (Zone<Map<String, Object>> zone : inhabs.values()) {
+			sum += (Double) zone.getAttribute().get("EWZ");
+			double p = sum / total;
+			if (p > threshold) {
+				threshold += 0.2;
+			}
+			zone.getAttribute().put("percentile", threshold);
+		}
+
+		zoneLayer.overwriteCRS(CRSUtils.getCRS(31467));
+		ZoneLayerSHP.writeWithAttributes(zoneLayer, "/home/johannes/Schreibtisch/ger-perc.shp");
 	}
 
 }

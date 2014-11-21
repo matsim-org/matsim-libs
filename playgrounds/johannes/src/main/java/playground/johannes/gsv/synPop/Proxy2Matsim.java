@@ -83,8 +83,16 @@ public class Proxy2Matsim {
 				ActivityFacility facility = facilities.getFacilities().get(Id.create(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class));
 				act = (ActivityImpl) factory.createActivityFromCoord(type, facility.getCoord());
 				act.setFacilityId(facility.getId());
-				act.setStartTime(Integer.parseInt(proxyAct.getAttribute(CommonKeys.ACTIVITY_START_TIME)));
-				act.setEndTime(Integer.parseInt(proxyAct.getAttribute(CommonKeys.ACTIVITY_END_TIME)));
+				String startTime = proxyAct.getAttribute(CommonKeys.ACTIVITY_START_TIME);
+				if(startTime == null) {
+					startTime = String.valueOf(i * 60*60*8); //TODO quick fix for mid journeys
+				}
+				act.setStartTime(Integer.parseInt(startTime));
+				String endTime = proxyAct.getAttribute(CommonKeys.ACTIVITY_END_TIME);
+				if(endTime == null) {
+					endTime = String.valueOf((i+1) + 60*60*7); //TODO quick fix for mid journeys
+				}
+				act.setEndTime(Integer.parseInt(endTime));
 				plan.addActivity(act);
 				
 				if(i < proxyPlan.getLegs().size()) {

@@ -41,8 +41,8 @@ public class ReplaceActTypes implements ProxyPlanTask {
 	public Map<String, String> getTypeMapping() {
 		if(typeMapping == null) {
 			typeMapping = new HashMap<String, String>();
-			typeMapping.put("vactions_short", ActivityType.LEISURE);
-			typeMapping.put("vactions_long", ActivityType.LEISURE);
+			typeMapping.put("vacations_short", ActivityType.LEISURE);
+			typeMapping.put("vacations_long", ActivityType.LEISURE);
 			typeMapping.put("visit", ActivityType.LEISURE);
 			typeMapping.put("culture", ActivityType.LEISURE);
 			typeMapping.put("gastro", ActivityType.LEISURE);
@@ -50,6 +50,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 			typeMapping.put("private", ActivityType.MISC);
 			typeMapping.put("pickdrop", ActivityType.MISC);
 			typeMapping.put("sport", ActivityType.LEISURE);
+			typeMapping.put("wecommuter", ActivityType.WORK);
 		}
 		
 		return typeMapping;

@@ -45,7 +45,7 @@ import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
  */
 public class AnalyzerListener implements SamplerListener {
 
-	private final TrajectoryAnalyzerTaskComposite task;
+//	private final TrajectoryAnalyzerTaskComposite task;
 
 	private final AnalyzerTask pTask;
 
@@ -59,11 +59,11 @@ public class AnalyzerListener implements SamplerListener {
 		this.rootDir = rootDir;
 		this.interval = interval;
 
-		task = new TrajectoryAnalyzerTaskComposite();
+//		task = new TrajectoryAnalyzerTaskComposite();
 
-		FacilityData data = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+//		FacilityData data = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		// task.addTask(new FacilityOccupancyTask(facilities));
-		task.addTask(new TripDistanceTask(data.getAll(), CartesianDistanceCalculator.getInstance()));
+//		task.addTask(new TripDistanceTask(data.getAll(), CartesianDistanceCalculator.getInstance()));
 
 		pTask = new LegTargetDistanceTask("car");
 		ProxyAnalyzer.setAppend(true);
@@ -76,12 +76,12 @@ public class AnalyzerListener implements SamplerListener {
 		// accepted);
 
 		if (iters.get() % interval == 0) {
-			Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
+//			Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
 			String output = String.format("%s/%s", rootDir, String.valueOf(iters));
 			File file = new File(output);
 			file.mkdirs();
 			try {
-				TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
+//				TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
 				ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
 			} catch (IOException e) {
 				e.printStackTrace();
