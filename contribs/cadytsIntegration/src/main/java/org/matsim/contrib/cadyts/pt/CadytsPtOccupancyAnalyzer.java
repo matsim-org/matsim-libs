@@ -42,6 +42,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.counts.SimpleWriter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -68,9 +69,9 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> analyzedTransitDrivers = new HashSet<Id>();
 	private final Set<Id> analyzedTransitVehicles = new HashSet<Id>();
-	private final Set<Id> calibratedLines;
+	private final Set<Id<TransitLine>> calibratedLines;
 
-	public CadytsPtOccupancyAnalyzer(final Set<Id> calibratedLines, int timeBinSize_s ) {
+	public CadytsPtOccupancyAnalyzer(final Set<Id<TransitLine>> calibratedLines, int timeBinSize_s ) {
 		this.calibratedLines = calibratedLines;
 		this.timeBinSize = timeBinSize_s ;
 

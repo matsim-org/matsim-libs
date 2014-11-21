@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.transEnergySim.controllers;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
@@ -31,8 +33,6 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.Energy
 import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.HashMap;
 
 /**
  * @author wrashid
@@ -58,7 +58,7 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		inductiveCharger.setSamePowerAtAllStreets(3000);
 		
 		ChargingUponArrival chargingUponArrival= controller.getChargingUponArrival();
-        chargingUponArrival.setPowerForNonInitializedActivityTypes(controller.getScenario().getActivityFacilities(), 3500);
+		chargingUponArrival.setPowerForNonInitializedActivityTypes(controller.getScenario().getActivityFacilities(), 3500);
 		chargingUponArrival.getChargablePowerAtActivityTypes().put("h", 7000.0);
 		
 		

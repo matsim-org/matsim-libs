@@ -41,7 +41,7 @@ class LinkLookUp implements LookUp<Link>{
 	}
 	
 	@Override
-	public Link lookUp( Id id ) {
+	public Link lookUp( Id<Link> id ) {
 		return this.network.getLinks().get( id ) ;
 	}
 

@@ -99,7 +99,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 
 	private final LookUp<Item> lookUp = new LookUp<Item>() {
 		@Override
-		public Item lookUp(Id id) {
+		public Item lookUp(Id<Item> id) {
 			return itemContainer.get(id) ;
 		}
 	};
@@ -120,7 +120,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		}
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(config, counts , lookUp );
+		this.calibrator = CadytsBuilder.buildCalibrator(config, counts , lookUp , Item.class);
 		
 		// prepare the sim results container:
 		this.simResults = new SimResultsImpl<Item>( itemContainer.values() ) ;

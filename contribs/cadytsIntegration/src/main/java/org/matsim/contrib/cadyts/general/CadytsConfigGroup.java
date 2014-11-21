@@ -65,7 +65,7 @@ public class CadytsConfigGroup extends Module {
 	private int endTime = (int)Time.MIDNIGHT-1;
 	private int timeBinSize = 3600 ;
 
-	private final Set<Id> calibratedItems = new HashSet<>();
+	private final Set<Id<Link>> calibratedItems = new HashSet<>();
 
 	public CadytsConfigGroup() {
 		super(GROUP_NAME);
@@ -211,7 +211,7 @@ public class CadytsConfigGroup extends Module {
 		return this.endTime;
 	}
 
-	public final Set<Id> getCalibratedItems() {
+	public final Set<Id<Link>> getCalibratedItems() {
 		return Collections.unmodifiableSet(this.calibratedItems);
 	}
 

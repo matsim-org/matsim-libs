@@ -41,7 +41,7 @@ public class TransitStopFacilityLookUp implements LookUp<TransitStopFacility> {
 	}
 
 	@Override
-	public TransitStopFacility lookUp(Id id) {
+	public TransitStopFacility lookUp(Id<TransitStopFacility> id) {
 		return this.schedule.getFacilities().get(id);
 	}
 

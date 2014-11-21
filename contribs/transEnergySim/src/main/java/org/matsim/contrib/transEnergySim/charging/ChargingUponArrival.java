@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.transEnergySim.charging;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -27,6 +29,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -43,10 +47,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-
-import java.util.HashMap;
 
 /**
  * This module is not compatible with parking search, but should be with parking
@@ -93,9 +94,9 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 	DoubleValueHashMap<Id<Vehicle>> previousCarArrivalTime;
 
 	HashMap<Id<Vehicle>, String> firstActivityTypeAfterCarArrival;
-	HashMap<Id<Vehicle>, Id> firstFacilityIdAfterCarArrival;
+	HashMap<Id<Vehicle>, Id<ActivityFacility>> firstFacilityIdAfterCarArrival;
 
-	HashMap<Id<Vehicle>, Id> previousCarArrivalLinkId;
+	HashMap<Id<Vehicle>, Id<Link>> previousCarArrivalLinkId;
 
 	private PowerAvalabilityParameters powerAvalabilityParameters;
 
@@ -117,9 +118,9 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 		firstDepartureTimeOfDay = new DoubleValueHashMap<Id<Vehicle>>();
 		previousCarArrivalTime = new DoubleValueHashMap<Id<Vehicle>>();
 		firstActivityTypeAfterCarArrival = new HashMap<Id<Vehicle>, String>();
-		firstFacilityIdAfterCarArrival = new HashMap<Id<Vehicle>, Id>();
+		firstFacilityIdAfterCarArrival = new HashMap<>();
 		setLog(new StationaryChargingOutputLog());
-		previousCarArrivalLinkId = new HashMap<Id<Vehicle>, Id>();
+		previousCarArrivalLinkId = new HashMap<>();
 	}
 
 	@Override
@@ -128,21 +129,22 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 			return;
 		}
 
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
+		Id<Vehicle> vehicleId = Id.create(personId, Vehicle.class);
 
-		if (event.getLegMode().equals(TransportMode.car) && vehicles.containsKey(personId)) {
-			if (isFirstCarDepartureOfDay(personId)) {
-				firstDepartureTimeOfDay.put(personId, event.getTime());
+		if (event.getLegMode().equals(TransportMode.car) && vehicles.containsKey(vehicleId)) {
+			if (isFirstCarDepartureOfDay(vehicleId)) {
+				firstDepartureTimeOfDay.put(vehicleId, event.getTime());
 			} else {
-				double carArrivalTime = previousCarArrivalTime.get(personId);
+				double carArrivalTime = previousCarArrivalTime.get(vehicleId);
 				double carDepartureTime = event.getTime();
 
-				chargeVehicle(personId, carArrivalTime, carDepartureTime);
+				chargeVehicle(vehicleId, carArrivalTime, carDepartureTime);
 			}
 		}
 	}
 
-	private void chargeVehicle(Id personId, double carArrivalTime, double carDepartureTime) {
+	private void chargeVehicle(Id<Vehicle> personId, double carArrivalTime, double carDepartureTime) {
 
 		double parkingDuration = GeneralLib.getIntervalDuration(carArrivalTime, carDepartureTime);
 		Double availablePowerInWatt = null;
@@ -170,12 +172,18 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 		if (energyToChargeInJoules > 0) {
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
+			
 			if (loggingEnabled) {
-				Id facilityId = firstFacilityIdAfterCarArrival.get(personId);
-                Id linkId = controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getLinkId();
+				Id<ActivityFacility> facilityId = firstFacilityIdAfterCarArrival.get(personId);
+				
+				if (facilityId != Id.create(facilityId, ActivityFacility.class)) {
+					System.out.println("id has wrong type");
+				}
+				
+				Id<Link> linkId = controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getLinkId();
 				
 				if (linkId==null){
-                    linkId = NetworkUtils.getNearestLink(((NetworkImpl) controller.getScenario().getNetwork()), controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord()).getId();
+                    linkId = NetworkUtils.getNearestLink((controller.getScenario().getNetwork()), controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord()).getId();
 				}
 				
 				ChargingLogRowFacilityLevel chargingLogRow = new ChargingLogRowFacilityLevel(personId, linkId,facilityId,

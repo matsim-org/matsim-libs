@@ -20,8 +20,12 @@
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
 import java.io.File;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -29,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 
 /**
  * From a events file, creates an occupancy analysis: configurable time bin size, selected lines, per stop zone 
@@ -55,7 +60,7 @@ public class AnalysisLauncher {
 		config.addModule(cadytsConfig);
 		
 		//read events
-		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(cadytsConfig.getCalibratedItems(), cadytsConfig.getTimeBinSize());
+		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(toTransitLineIdSet(cadytsConfig.getCalibratedItems()), cadytsConfig.getTimeBinSize());
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(occupancyAnalyzerAllDay);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
@@ -72,4 +77,15 @@ public class AnalysisLauncher {
 		kmzPtCountSimComparisonWritter.write(occupancyAnalyzerAllDay.getOccuAnalyzer(), itNum, doStopZoneConversion);
 	}
 
+	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<Id<Link>> list) {
+		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
+		
+		for (Id<Link> id : list) {
+			converted.add(Id.create(id, TransitLine.class));
+		}
+		
+		return converted;
+	}
+
+	
 }

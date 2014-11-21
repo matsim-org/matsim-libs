@@ -26,7 +26,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -47,7 +46,6 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
 
 /**
@@ -127,7 +125,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		Logger.getRootLogger().setLevel(Level.FATAL);
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/);
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 		Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	

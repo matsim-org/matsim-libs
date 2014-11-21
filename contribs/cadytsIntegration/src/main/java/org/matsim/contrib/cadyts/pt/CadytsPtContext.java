@@ -22,9 +22,15 @@ package org.matsim.contrib.cadyts.pt;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -82,7 +88,8 @@ CadytsContextI<TransitStopFacility> {
 
 		// === prepare the structure which extracts the measurements from the simulation:
 		// since there is already some other method, we just need to write a wrapper.
-		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedItems(), cadytsConfig.getTimeBinSize() );
+		
+		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(toTransitLineIdSet(cadytsConfig.getCalibratedItems()), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
 		this.simResults = new SimResults<TransitStopFacility>() {
@@ -124,13 +131,22 @@ CadytsContextI<TransitStopFacility> {
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) );
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<TransitStopFacility>(scenario, cadytsConfig.getCalibratedItems());
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<TransitStopFacility>(scenario, toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
 		events.addHandler(ptStep);
 	}
 
+	private Set<Id<TransitLine>> toTransitLineIdSet(Set<Id<Link>> list) {
+		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
+		
+		for (Id<Link> id : list) {
+			converted.add(Id.create(id, TransitLine.class));
+		}
+		
+		return converted;
+	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
@@ -143,7 +159,8 @@ CadytsContextI<TransitStopFacility> {
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
-		for (Id<TransitLine> lineId : this.cadytsConfig.getCalibratedItems()) {
+		for (Id<Link> pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
+			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
 			TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {

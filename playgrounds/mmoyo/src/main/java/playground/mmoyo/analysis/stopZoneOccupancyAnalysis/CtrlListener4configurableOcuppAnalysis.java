@@ -19,12 +19,18 @@
 
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 
 /**
  * Controler listener for stop zone analysis
@@ -42,7 +48,7 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 			controler.getConfig().addModule(ccc) ;
 		}
 		CadytsConfigGroup cptcg = (CadytsConfigGroup) controler.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
-		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer( cptcg.getCalibratedItems() ,  cptcg.getTimeBinSize());
+		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer( toTransitLineIdSet(cptcg.getCalibratedItems()) ,  cptcg.getTimeBinSize());
 		controler.getEvents().addHandler(configurableOccupAnalyzer);
 		
 		kmzPtCountSimComparisonWritter = new KMZPtCountSimComparisonWriter(controler);
@@ -69,5 +75,15 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 	
 	public void setStopZoneConversion(boolean stopZoneConversion){
 		this.stopZoneConversion = stopZoneConversion;
+	}
+	
+	private static Set<Id<TransitLine>> toTransitLineIdSet(Set<Id<Link>> list) {
+		Set<Id<TransitLine>> converted = new LinkedHashSet<>();
+		
+		for (Id<Link> id : list) {
+			converted.add(Id.create(id, TransitLine.class));
+		}
+		
+		return converted;
 	}
 }

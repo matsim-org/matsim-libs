@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.counts.OccupancyAnalyzer;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 
 class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler, 
 																PersonLeavesVehicleEventHandler,
@@ -45,14 +46,14 @@ class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler,
 	private static final Logger log = Logger.getLogger(ConfigurableOccupancyAnalyzer.class);
 	private OccupancyAnalyzer delegOccuAnalyzer;
 	private int maxTime = (int)Time.MIDNIGHT-1;
-	private final Set<Id> calibratedLines;
+	private final Set<Id<TransitLine>> calibratedLines;
 	private boolean stopZoneConversion;
 	
 	/**
 	 * Pt-occupancy analysis is configurable with StopZone conversion,  selected lines and time bin size. 
 	 */
 	
-	public ConfigurableOccupancyAnalyzer(Set<Id> calibratedLines, int timeBinSize_s) {
+	public ConfigurableOccupancyAnalyzer(Set<Id<TransitLine>> calibratedLines, int timeBinSize_s) {
 		this.calibratedLines = calibratedLines;
 		delegOccuAnalyzer = new OccupancyAnalyzer(timeBinSize_s, 	maxTime);
 	
