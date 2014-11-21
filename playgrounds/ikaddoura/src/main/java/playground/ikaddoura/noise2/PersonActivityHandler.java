@@ -240,14 +240,15 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 
 			
 			for (ReceiverPoint rp : receiverPoints.values()) {
-				Id<ReceiverPoint> rpId = rp.getId();
-				bw.write(rpId.toString());
+				bw.write(rp.getId().toString());
 				for(int i = 0 ; i < 30 ; i++) {
 					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
 					double affectedAgentUnits = 0.;
 					
 					if (rp.getTimeInterval2affectedAgentUnits() != null) {
-						affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits().get(timeInterval);
+						if (rp.getTimeInterval2affectedAgentUnits().get(timeInterval) != null) {
+							affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits().get(timeInterval);
+						}
 					}					
 					bw.write(";"+ affectedAgentUnits);	
 				}

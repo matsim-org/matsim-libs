@@ -23,7 +23,6 @@
 package playground.ikaddoura.noise2;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
 
 /**
  * @author ikaddoura

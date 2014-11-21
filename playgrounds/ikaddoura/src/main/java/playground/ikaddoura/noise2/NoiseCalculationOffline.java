@@ -149,7 +149,7 @@ public class NoiseCalculationOffline {
 		
 		log.info("Calculating each agent's activity durations...");
 		personActivityTracker.calculateDurationsOfStay(receiverPoints);
-//		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+		personActivityTracker.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv", receiverPoints);
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
