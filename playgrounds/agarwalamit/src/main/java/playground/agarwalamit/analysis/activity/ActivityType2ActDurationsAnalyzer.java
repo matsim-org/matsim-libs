@@ -46,9 +46,8 @@ public class ActivityType2ActDurationsAnalyzer extends AbstractAnalyisModule {
 		super(ActivityType2ActDurationsAnalyzer.class.getSimpleName());
 		String configFile = outputDir+"/output_config.xml";
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 		this.eventsFile = outputDir+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
-		this.actDurHandler = new ActivityType2DurationHandler(simEndTime);
+		this.actDurHandler = new ActivityType2DurationHandler(24*3600);
 	}
 	
 	private ActivityType2DurationHandler actDurHandler;

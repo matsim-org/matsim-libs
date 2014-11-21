@@ -43,15 +43,15 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class ActivityType2DurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler {
 
-	public ActivityType2DurationHandler(double simulationEndTime) {
+	public ActivityType2DurationHandler(double midNightTime) {
 		this.personId2ActInfo = new HashMap<>();
 		this.actTyps = new HashSet<>();
-		this.simulationEndTime = simulationEndTime;
+		this.midNightTime = midNightTime;
 	}
 
 	public static Logger log = Logger.getLogger(ActivityType2DurationHandler.class);
 	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
-	double simulationEndTime;
+	double midNightTime;
 	private Set<String> actTyps;
 
 	@Override
@@ -74,7 +74,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		actTyps.add(event.getActType());
-		
+
 		if(personId2ActInfo.containsKey(event.getPersonId())){
 			PersonActivityInfo perActInfo = personId2ActInfo.get(event.getPersonId());
 			Tuple<String, Double> actEndTime = new Tuple<String, Double>(event.getActType(), event.getTime());
@@ -115,21 +115,24 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	/**
 	 * @return person id to activity duration for each activity while 
 	 * reporting repetition of same activities differently. 
+	 * <p> End time of last activity will be mid night i.e. 24:00:00 not the simulation end time.
+	 * <p> It will also check for equality of first and last activity and if they are same, it will be considered as one activity and durations will be summed.
+	 * 
 	 */
 	public Map<Id<Person>, Map<String, List<Double>>> getPersonId2ActDurations(){
 		Map<Id<Person>, Map<String, List<Double>>> personId2ActType2ActDurations =
 				new HashMap<Id<Person>, Map<String,List<Double>>>();
-		
+
 		int warnCount =0;
 		for(Id<Person> personId : personId2ActInfo.keySet()){
 			List<Tuple<String, Double>> actEndTimes = personId2ActInfo.get(personId).getActType2EndTimes();
 			List<Tuple<String, Double>> actStartTimes = personId2ActInfo.get(personId).getActType2StartTimes();
-			
+
 			//store endTime of last activity if last activity do not have end time.
 			if(actStartTimes.size()!=actEndTimes.size()) {
 				int noOfActivities = actStartTimes.size();
 				String lastActType = actStartTimes.get(noOfActivities-1).getFirst();
-				actEndTimes.add(new Tuple<String, Double>(lastActType, simulationEndTime));
+				actEndTimes.add(new Tuple<String, Double>(lastActType, midNightTime));
 			} else {
 				if(warnCount==0){
 					log.warn("Person "+personId+" do not have any open ended activity and simulation ends."
@@ -140,6 +143,9 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 			}
 
 			Map<String, List<Double>> actType2ActDurations = new HashMap<String, List<Double>>();
+
+			Tuple<String, Double> firstActAndDur = null;
+
 			for(int i=0;i<actEndTimes.size();i++){
 				String actType = actEndTimes.get(i).getFirst();
 
@@ -151,15 +157,35 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 				}
 				double actStartTime = actStartTimes.get(i).getSecond();
 				double actEndTime = actEndTimes.get(i).getSecond();
-				double durationEndTime = actEndTime - actStartTime;
-				actDurations.add(durationEndTime);
+				double duration = actEndTime - actStartTime;
+
+				if(i==0){
+					firstActAndDur = new Tuple<String, Double>(actType, duration);
+				}
+
+				// check if first and last activity are same
+				int lastActIndex = actEndTimes.size()-1;
+				if(i==lastActIndex && i>0){
+					String firstAct = firstActAndDur.getFirst();
+					String lastAct = actEndTimes.get(lastActIndex).getFirst();
+					double firstActDur = firstActAndDur.getSecond();
+					if(firstAct.equals(lastAct)){
+						duration = firstActDur + duration;
+						actDurations.set(0,duration);
+					} else {
+						actDurations.add(duration);
+					}
+				}else {
+					actDurations.add(duration);
+				}
+
 				actType2ActDurations.put(actType, actDurations);
 			}
 			personId2ActType2ActDurations.put(personId, actType2ActDurations);
 		}
 		return personId2ActType2ActDurations;
 	}
-	
+
 	public Set<String> getActivityTypes(){
 		return this.actTyps;
 	}

@@ -63,7 +63,7 @@ public class ActivityType2UtilityOfPerforming {
 		this.outputDir = outputDir;
 		this.sortPersons = true;
 		this.userGroup = userGroup.toString();
-		ActivityType2DurationHandler.log.warn("Result will consider persons from "+this.userGroup+" sub population group.");
+		ActivityType2DurationHandler.log.warn("Result will consider only persons from "+this.userGroup+" sub population group.");
 	}
 
 	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
@@ -78,7 +78,7 @@ public class ActivityType2UtilityOfPerforming {
 	private int wrnCnt =0;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
 		new ActivityType2UtilityOfPerforming(outputDir,UserGroup.URBAN).run(runCases);
 	}
