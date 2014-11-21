@@ -118,7 +118,7 @@ public class NoiseCalculationOffline {
 		
 		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters, receiverPoints);
 		initialization.initialize();
-		initialization.writeReceiverPoints(outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(receiverPoints, outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
@@ -131,25 +131,25 @@ public class NoiseCalculationOffline {
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 		
-		log.info("Calculating noise emission...");
+		log.info("Calculating noise emissions...");
 		noiseEmissionHandler.calculateNoiseEmission();
-		noiseEmissionHandler.writeNoiseEmissionStats(outputFilePath + config.controler().getLastIteration() + ".emissionStats.csv");
-		noiseEmissionHandler.writeNoiseEmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".emissionStatsPerHour.csv");
-		log.info("Calculating noise emission... Done.");
+		NoiseWriter.writeNoiseEmissionsStats(noiseEmissionHandler, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".emissionStats.csv");
+		NoiseWriter.writeNoiseEmissionStatsPerHour(noiseEmissionHandler, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".emissionStatsPerHour.csv");
+		log.info("Calculating noise emissions... Done.");
 		
-		log.info("Calculating noise immission...");
+		log.info("Calculating noise immissions...");
 		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters, receiverPoints);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		noiseImmission.calculateNoiseImmission();
-		noiseImmission.writeNoiseImmissionStats(outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
-		noiseImmission.writeNoiseImmissionStatsPerHour(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
-		noiseImmission.writeNoiseImmissionStatsPerHourShapeFile(outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
-		log.info("Calculating noise immission... Done.");
+		NoiseWriter.writeNoiseImmissionStats(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
+		NoiseWriter.writeNoiseImmissionStatsPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
+		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
+		log.info("Calculating noise immissions... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
 		personActivityHandler.calculateDurationsOfStay();
-		personActivityHandler.writePersonActivityInfoPerHour(outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv", receiverPoints);
+		NoiseWriter.writePersonActivityInfoPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");

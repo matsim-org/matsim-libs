@@ -65,12 +65,11 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		
 		this.initialization = new NoiseInitialization(event.getControler().getScenario(), noiseParameters, this.receiverPoints);
 		this.initialization.initialize();
-		this.initialization.writeReceiverPoints(event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(this.receiverPoints, event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		log.info("Initialization... Done.");
 
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
-		
 		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseParameters, initialization, this.receiverPoints);
 		
 		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters, this.receiverPoints);
@@ -86,14 +85,14 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 				
 		log.info("Calculating noise emission...");
 		this.noiseEmissionHandler.calculateNoiseEmission();
-		this.noiseEmissionHandler.writeNoiseEmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStats.csv");
-		this.noiseEmissionHandler.writeNoiseEmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStatsPerHour.csv");
+		NoiseWriter.writeNoiseEmissionsStats(this.noiseEmissionHandler, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStats.csv");
+		NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseEmissionHandler, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/emissionStatsPerHour.csv");
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
 		noiseImmission.calculateNoiseImmission();
-		this.noiseImmission.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
-		this.noiseImmission.writeNoiseImmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
+		NoiseWriter.writeNoiseImmissionStats(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
+		NoiseWriter.writeNoiseImmissionStatsPerHour(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");

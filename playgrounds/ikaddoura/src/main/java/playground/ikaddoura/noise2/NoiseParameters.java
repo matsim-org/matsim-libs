@@ -44,53 +44,53 @@ public class NoiseParameters {
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
 
-	private String[] tunnelLinks = null;
+//	private String[] tunnelLinks = null;
 	
 	// for Berlin
-//	private String[] tunnelLinks = {
-//			"108041",
-//			"108142",
-//			"108970",
-//			"109085",
-//			"109757",
-//			"109919",
-//			"110060",
-//			"110226",
-//			"110164",
-//			"110399",
-//			"96503",
-//			"110389",
-//			"110116",
-//			"110355",
-//			"92604",
-//			"92603",
-//			"25651",
-//			"25654",
-//			"112540",
-//			"112556",
-//			"5052",
-//			"5053",
-//			"5380",
-//			"5381",
-//			"106309",
-//			"106308",
-//			"26103",
-//			"26102",
-//			"4376",
-//			"4377",
-//			"106353",
-//			"106352",
-//			"103793",
-//			"103792",
-//			"26106",
-//			"26107",
-//			"4580",
-//			"4581",
-//			"4988",
-//			"4989",
-//			"73496",
-//			"73497"
-//	};
+	private String[] tunnelLinks = {
+			"108041",
+			"108142",
+			"108970",
+			"109085",
+			"109757",
+			"109919",
+			"110060",
+			"110226",
+			"110164",
+			"110399",
+			"96503",
+			"110389",
+			"110116",
+			"110355",
+			"92604",
+			"92603",
+			"25651",
+			"25654",
+			"112540",
+			"112556",
+			"5052",
+			"5053",
+			"5380",
+			"5381",
+			"106309",
+			"106308",
+			"26103",
+			"26102",
+			"4376",
+			"4377",
+			"106353",
+			"106352",
+			"103793",
+			"103792",
+			"26106",
+			"26107",
+			"4580",
+			"4581",
+			"4988",
+			"4989",
+			"73496",
+			"73497"
+	};
 	
 	// for the entire area with activity locations
 	private double xMin = 0.;
@@ -98,13 +98,13 @@ public class NoiseParameters {
 	private double xMax = 0.;
 	private double yMax = 0.;
 	
-	// for the area around the city center of Berlin (Tiergarten)
+//	// for the area around the city center of Berlin (Tiergarten)
 //	private double xMin = 4590855.;
 //	private double yMin = 5819679.;
 //	private double xMax = 4594202.;
 //	private double yMax = 5821736.;
 	
-//	 for the area of Berlin
+//	//	 for the area of Berlin
 //	private double xMin = 4573258.;
 //	private double yMin = 5801225.;
 //	private double xMax = 4620323.;
