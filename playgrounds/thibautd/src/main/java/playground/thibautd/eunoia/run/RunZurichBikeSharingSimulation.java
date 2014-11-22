@@ -103,10 +103,17 @@ public class RunZurichBikeSharingSimulation {
 		// I expect pretty nasty stuff to silently happen.
 		// Matsim2030Utils.initializeLocationChoice( controler );
 
+		final double refBikeSpeed = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
+		final double utilGain_m =
+					sc.getConfig().planCalcScore().getModes().get( TransportMode.bike ).getMarginalUtilityOfTraveling() * 
+						(denivelationConfig.getEquivalentDistanceForAltitudeGain() /
+						refBikeSpeed);
+
 		controler.setTripRouterFactory(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
-					controler.getScenario() ) );
+					controler.getScenario(),
+					utilGain_m ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
@@ -119,13 +126,10 @@ public class RunZurichBikeSharingSimulation {
 			throw new RuntimeException();
 		}
 
-		final double refBikeSpeed = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 		controler.setScoringFunctionFactory(
 				new Matsim2010BikeSharingScoringFunctionFactory(
 					sc,
-					sc.getConfig().planCalcScore().getModes().get( TransportMode.bike ).getMarginalUtilityOfTraveling() * 
-						(denivelationConfig.getEquivalentDistanceForAltitudeGain() /
-						refBikeSpeed) ) );
+					utilGain_m ) );
 						
 		Matsim2030Utils.loadControlerListeners( controler );
 

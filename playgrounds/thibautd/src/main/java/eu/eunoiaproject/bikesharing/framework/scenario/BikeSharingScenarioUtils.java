@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
@@ -43,6 +44,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
+import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
 import playground.thibautd.utils.CollectionUtils;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
@@ -141,7 +143,8 @@ public class BikeSharingScenarioUtils {
 
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
 			final TravelDisutilityFactory disutilityFactory,
-			final Scenario scenario) {
+			final Scenario scenario,
+			final double utilityGain_m ) {
 		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
@@ -164,11 +167,30 @@ public class BikeSharingScenarioUtils {
 					scenario.getConfig(),
 					linkSlopes );
 	
-		return new AccessEgressMultimodalTripRouterFactory(
+		final AccessEgressMultimodalTripRouterFactory fact =
+			new AccessEgressMultimodalTripRouterFactory(
 				scenario,
 				multiModalTravelTimeFactory.createTravelTimes(),
 				disutilityFactory,
 				new BikeSharingTripRouterFactory( scenario ) );
+
+		if ( utilityGain_m != 0 ) {
+			final SlopeAwareTravelDisutilityFactory slopeDisutil =
+					new SlopeAwareTravelDisutilityFactory(
+						utilityGain_m,
+						linkSlopes,
+						disutilityFactory );
+
+			fact.setDisutilityFactoryForMode(
+					TransportMode.bike,
+					slopeDisutil );
+
+			fact.setDisutilityFactoryForMode(
+					BikeSharingConstants.MODE,
+					slopeDisutil );
+		}
+
+		return fact;
 	}
 }
 
