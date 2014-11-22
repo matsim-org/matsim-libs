@@ -29,7 +29,6 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runners.model.FrameworkMethod;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -65,7 +64,6 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
 
 /**
- * This pricing is based on Bucket-Brigade Algorithm.
  * @author amit
  */
 
@@ -75,8 +73,6 @@ public class MarginalCongestionPricingTest {
 
 	@Test
 	public final void delaysTest(){
-
-		testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV5QsimTest.class.getMethods()[0]));
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
