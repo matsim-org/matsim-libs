@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
@@ -31,23 +30,22 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
+import playground.thibautd.router.CachingRoutingModuleWrapper;
+import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
+import playground.thibautd.utils.SoftCache;
+
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
-import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
-
-import playground.thibautd.router.CachingRoutingModuleWrapper;
-import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
-import playground.thibautd.utils.SoftCache;
 
 /**
  * @author thibautd
@@ -63,11 +61,11 @@ public class RunZurichBikeSharingSimulation {
 		Logger.getLogger( SoftCache.class ).setLevel( Level.TRACE );
 
 		final Config config = BikeSharingScenarioUtils.loadConfig( configFile );
+		final DenivelationConfigGroup denivelationConfig = new DenivelationConfigGroup();
 		Matsim2030Utils.addDefaultGroups( config );
 		config.addModule( new StepBasedFareConfigGroup() );
-		final DenivelationScoringConfigGroup denivelationScoringGroup = new DenivelationScoringConfigGroup();
-		config.addModule( denivelationScoringGroup );
 		config.addModule( new MultiModalConfigGroup() );
+		config.addModule( denivelationConfig );
 
 		failIfExists( config.controler().getOutputDirectory() );
 
@@ -121,11 +119,14 @@ public class RunZurichBikeSharingSimulation {
 			throw new RuntimeException();
 		}
 
+		final double refBikeSpeed = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 		controler.setScoringFunctionFactory(
 				new Matsim2010BikeSharingScoringFunctionFactory(
 					sc,
-					denivelationScoringGroup.getParameters() ) );
-
+					sc.getConfig().planCalcScore().getModes().get( TransportMode.bike ).getMarginalUtilityOfTraveling() * 
+						(denivelationConfig.getEquivalentDistanceForAltitudeGain() /
+						refBikeSpeed) ) );
+						
 		Matsim2030Utils.loadControlerListeners( controler );
 
 		controler.run();
@@ -161,105 +162,25 @@ public class RunZurichBikeSharingSimulation {
 		}
 	}
 
-	/**
-	 * Better not to use non-flat config for EUNOIA stuff: we kind of need to do
-	 * a very specific config group or use the underscore approach...
-	 */
-	private static class DenivelationScoringConfigGroup extends ReflectiveModule {
-		public final static String GROUP_NAME = "denivelationScoring";
+	private static class DenivelationConfigGroup extends ReflectiveModule {
+		public static final String GROUP_NAME = "denivelationScoring";
 
-		/**
-		 * not sure it actually makes sense / is possible to get this from other models...
-		 */
-		private double bikeMarginalUtilityOfUphillDenivelation_m = 0;
-		private double walkMarginalUtilityOfUphillDenivelation_m = 0;
-		
-		private double bikeMarginalUtilityOfDownhillDenivelation_m = 0;
-		private double walkMarginalUtilityOfDownhillDenivelation_m = 0;
+		// from Gregory Erhardt: biking up 1 distance unit is equivalent to
+		// biking additional 316 units
+		private double equivalentDistanceForAltitudeGain = 316;
 
-		// quick fix facing crashes due to activities without facility Id.
-		private boolean scoreDenivelation = false;
-
-		public DenivelationScoringConfigGroup() {
+		public DenivelationConfigGroup( ) {
 			super( GROUP_NAME );
 		}
 
-
-		@StringGetter( "bikeMarginalUtilityOfUphillDenivelation_m" )
-		public double getBikeMarginalUtilityOfUphillDenivelation_m() {
-			return bikeMarginalUtilityOfUphillDenivelation_m;
+		@StringGetter( "equivalentDistanceForAltitudeGain" )
+		public double getEquivalentDistanceForAltitudeGain() {
+			return equivalentDistanceForAltitudeGain;
 		}
 
-		@StringSetter( "bikeMarginalUtilityOfUphillDenivelation_m" )
-		public void setBikeMarginalUtilityOfUphillDenivelation_m(
-				double bikeMarginalUtilityOfUphillDenivelation_m) {
-			this.bikeMarginalUtilityOfUphillDenivelation_m = bikeMarginalUtilityOfUphillDenivelation_m;
-		}
-
-		@StringGetter( "walkMarginalUtilityOfUphillDenivelation_m" )
-		public double getWalkMarginalUtilityOfUphillDenivelation_m() {
-			return walkMarginalUtilityOfUphillDenivelation_m;
-		}
-
-		@StringSetter( "walkMarginalUtilityOfUphillDenivelation_m" )
-		public void setWalkMarginalUtilityOfUphillDenivelation_m(
-				double walkMarginalUtilityOfUphillDenivelation_m) {
-			this.walkMarginalUtilityOfUphillDenivelation_m = walkMarginalUtilityOfUphillDenivelation_m;
-		}
-
-		@StringGetter( "bikeMarginalUtilityOfDownhillDenivelation_m" )
-		public double getBikeMarginalUtilityOfDownhillDenivelation_m() {
-			return bikeMarginalUtilityOfDownhillDenivelation_m;
-		}
-
-		@StringSetter( "bikeMarginalUtilityOfDownhillDenivelation_m" )
-		public void setBikeMarginalUtilityOfDownhillDenivelation_m(
-				double bikeMarginalUtilityOfDownhillDenivelation_m) {
-			this.bikeMarginalUtilityOfDownhillDenivelation_m = bikeMarginalUtilityOfDownhillDenivelation_m;
-		}
-
-		@StringGetter( "walkMarginalUtilityOfDownhillDenivelation_m" )
-		public double getWalkMarginalUtilityOfDownhillDenivelation_m() {
-			return walkMarginalUtilityOfDownhillDenivelation_m;
-		}
-
-		@StringSetter( "walkMarginalUtilityOfDownhillDenivelation_m" )
-		public void setWalkMarginalUtilityOfDownhillDenivelation_m(
-				double walkMarginalUtilityOfDownhillDenivelation_m) {
-			this.walkMarginalUtilityOfDownhillDenivelation_m = walkMarginalUtilityOfDownhillDenivelation_m;
-		}
-
-		@StringGetter( "scoreDenivelation" )
-		public boolean getScoreDenivelation() {
-			return scoreDenivelation;
-		}
-
-		@StringSetter( "scoreDenivelation" )
-		public void setScoreDenivelation(boolean scoreDenivelation) {
-			this.scoreDenivelation = scoreDenivelation;
-		}
-
-
-		public SimpleElevationScorerParameters getParameters() {
-			final SimpleElevationScorerParameters params = new SimpleElevationScorerParameters();
-
-			if ( scoreDenivelation ) {
-				params.addParams(
-						TransportMode.bike,
-						getBikeMarginalUtilityOfUphillDenivelation_m(),
-						getBikeMarginalUtilityOfDownhillDenivelation_m() );
-				params.addParams(
-						BikeSharingConstants.MODE,
-						getBikeMarginalUtilityOfUphillDenivelation_m(),
-						getBikeMarginalUtilityOfDownhillDenivelation_m() );
-
-				params.addParams(
-						TransportMode.walk,
-						getWalkMarginalUtilityOfUphillDenivelation_m(),
-						getWalkMarginalUtilityOfDownhillDenivelation_m() );
-			}
-
-			return params;
+		@StringSetter( "equivalentDistanceForAltitudeGain" )
+		public void setEquivalentDistanceForAltitudeGain( double equivalentDistanceForAltitudeGain ) {
+			this.equivalentDistanceForAltitudeGain = equivalentDistanceForAltitudeGain;
 		}
 	}
 }

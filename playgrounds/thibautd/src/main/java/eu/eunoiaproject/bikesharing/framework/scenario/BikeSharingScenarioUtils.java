@@ -44,6 +44,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
 import playground.thibautd.utils.CollectionUtils;
+
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 
@@ -55,6 +56,8 @@ import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactor
  * @author thibautd
  */
 public class BikeSharingScenarioUtils {
+	public static final String LINK_SLOPES_ELEMENT_NAME = "linkSlopes";
+
 	private  BikeSharingScenarioUtils() {}
 
 	public static Config loadConfig( final String fileName , final Module... additionalModules ) {
@@ -106,6 +109,19 @@ public class BikeSharingScenarioUtils {
 			throw new RuntimeException( "ids of bike sharing stations and activity facilities overlap. This will cause problems!"+
 					" Make sure Ids do not overlap, for instance by appending \"bs-\" at the start of all bike sharing facilities." );
 		}
+
+		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
+			sc.getConfig().getModule(
+					MultiModalConfigGroup.GROUP_NAME );
+
+		if ( multimodalConfigGroup != null ) {
+			final Map<Id<Link>, Double> linkSlopes =
+				new LinkSlopesReader().getLinkSlopes(
+						multimodalConfigGroup,
+						sc.getNetwork());
+			sc.addScenarioElement( LINK_SLOPES_ELEMENT_NAME , linkSlopes );
+		}
+
 	}
 
 	public static Scenario loadScenario( final String configFile , final Module... modules ) {
@@ -141,10 +157,8 @@ public class BikeSharingScenarioUtils {
 			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}
 
-		final Map<Id<Link>, Double> linkSlopes =
-			new LinkSlopesReader().getLinkSlopes(
-					multimodalConfigGroup,
-					scenario.getNetwork());
+		final Map<Id<Link>, Double> linkSlopes = (Map<Id<Link>, Double>)
+			scenario.getScenarioElement( LINK_SLOPES_ELEMENT_NAME );
 		final MultiModalTravelTimeFactory multiModalTravelTimeFactory =
 			new MultiModalTravelTimeFactory(
 					scenario.getConfig(),

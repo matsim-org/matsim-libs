@@ -60,6 +60,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 	private final Scenario scenario;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
+	private final Map<String, TravelDisutilityFactory> disutilityFactories = new HashMap< >();
 	private final TripRouterFactory delegateFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
@@ -100,9 +101,11 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 			 */
 
 			final TravelDisutility travelDisutility =
-							travelDisutilityFactory.createTravelDisutility(
-									travelTime,
-									scenario.getConfig().planCalcScore());
+							(disutilityFactories.containsKey( mode ) ?
+							 	disutilityFactories.get( mode ) :
+								travelDisutilityFactory ).createTravelDisutility(
+										travelTime,
+										scenario.getConfig().planCalcScore());
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
 						private final Person dummy = new PersonImpl( Id.create( "dummy" , Person.class ) );
@@ -205,6 +208,12 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 		}
 		
 		return subNetwork;
+	}
+
+	public void setDisutilityFactoryForMode(
+			final String mode,
+			final TravelDisutilityFactory factory ) {
+		this.disutilityFactories.put( mode , factory );
 	}
 }
 

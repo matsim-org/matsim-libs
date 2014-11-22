@@ -19,40 +19,40 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.scoring;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
 
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.thibautd.router.multimodal.DenivelationAlongRouteScoring;
+
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
-import eu.eunoiaproject.elevation.ElevationProvider;
-import eu.eunoiaproject.elevation.ObjectAttributesBasedElevationProvider;
-import eu.eunoiaproject.elevation.scoring.SimpleElevationScorer;
-import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters;
-
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 /**
  * @author thibautd
  */
 public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunctionFactory {
 	private final MATSim2010ScoringFunctionFactory delegate;
-	private final ElevationProvider<Id> elevationProvider;
-	private final Config config;
-	private final SimpleElevationScorerParameters params;
+	private final Scenario scenario;
+	private double betaGain_m;
 
 	public Matsim2010BikeSharingScoringFunctionFactory(
 			final Scenario scenario,
-			final SimpleElevationScorerParameters params) {
+			final double betaGain_m ) {
 		this.delegate =
 			new MATSim2010ScoringFunctionFactory(
 					scenario,
@@ -60,14 +60,8 @@ public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunct
 						TransitMultiModalAccessRoutingModule.DEPARTURE_ACTIVITY_TYPE,
 						PtConstants.TRANSIT_ACTIVITY_TYPE,
 						BikeSharingConstants.INTERACTION_TYPE ) ); 	
-		this.config = scenario.getConfig();
-		this.elevationProvider =
-			new ObjectAttributesBasedElevationProvider(
-					scenario.getActivityFacilities().getFacilityAttributes(),
-					((BikeSharingFacilities)
-					 scenario.getScenarioElement(
-						 BikeSharingFacilities.ELEMENT_NAME )).getFacilitiesAttributes() );
-		this.params = params;
+		this.scenario = scenario;
+		this.betaGain_m = betaGain_m;
 	}
 
 	@Override
@@ -75,15 +69,30 @@ public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunct
 		final SumScoringFunction function = (SumScoringFunction) delegate.createNewScoringFunction(person);
 		function.addScoringFunction(
 				new StepBasedFare(
-					config.planCalcScore(),
+					scenario.getConfig().planCalcScore(),
 					(StepBasedFareConfigGroup)
-						config.getModule(
+						scenario.getConfig().getModule(
 							StepBasedFareConfigGroup.GROUP_NAME ) ) );
 		function.addScoringFunction(
-				new SimpleElevationScorer(
-					params,
-					elevationProvider ) );
+				createDenivelationScoring(
+					person.getSelectedPlan(),
+					TransportMode.bike ) );
+		function.addScoringFunction(
+				createDenivelationScoring(
+					person.getSelectedPlan(),
+					BikeSharingConstants.MODE ) );
 		return function;
+	}
+
+	private DenivelationAlongRouteScoring createDenivelationScoring(
+			final Plan plan,
+			final String mode) {
+		return new DenivelationAlongRouteScoring(
+			scenario.getNetwork(),
+			(Map<Id<Link>, Double>) scenario.getScenarioElement( BikeSharingScenarioUtils.LINK_SLOPES_ELEMENT_NAME ),
+			plan,
+			mode,
+			betaGain_m );
 	}
 }
 
