@@ -16,9 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.marginalTesting;
+package playground.agarwalamit.congestionPricing;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runners.model.FrameworkMethod;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,12 +40,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -54,48 +54,120 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV6;
+import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
+import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
 
 /**
+ * This pricing is based on Bucket-Brigade Algorithm.
  * @author amit
  */
-public class StraightTrackExperiment {
-	final Logger log = Logger.getLogger(StraightTrackExperiment.class);
-	
-	
-	public static void main(String[] args) {
-		StraightTrackExperiment stTrEx = new StraightTrackExperiment();
-		stTrEx.test4MarginalCongestionCosts();
-	}
 
-	public void test4MarginalCongestionCosts(){
-		String outputDir = "./output/pop20/";
-		new File(outputDir).mkdirs();
+public class MarginalCongestionPricingTest {
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+
+	@Test
+	public final void delaysTest(){
+
+		testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV5QsimTest.class.getMethods()[0]));
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
 		Scenario sc = pseudoInputs.scenario;
-		sc.getConfig().controler().setWriteEventsInterval(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
-		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
-		events.addHandler(writer);
 
-		final boolean useOTFVis = true ;
-		QSim qSim = createQSim(sc, events,useOTFVis);
-		qSim.run();
-		writer.closeFile();
+		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+
+		events.addHandler( new MarginalCongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(MarginalCongestionEvent event) {
+				congestionEvents.add(event);
+			}
+
+		});
+
+		events.addHandler(new MarginalCongestionHandlerImplV6(events, (ScenarioImpl) sc));
+
+		QSim sim = createQSim(sc, events);
+		sim.run();
+
+		Assert.assertEquals("wrong number of congestion events" , 8, congestionEvents.size());
+
+		Set<String> affectedPersons = new HashSet<>();
+		Set<Integer> causingPersons = new HashSet<>();
+		int link2Delays=0;
+		int link3Delays=0;
+
+		for (MarginalCongestionEvent event : congestionEvents) {
+
+			affectedPersons.add(event.getAffectedAgentId().toString());
+			causingPersons.add(Integer.valueOf(event.getCausingAgentId().toString()));
+
+			if(event.getLinkId().equals(Id.createLinkId("3"))){
+
+				if (event.getCausingAgentId().toString().equals("0") && event.getAffectedAgentId().toString().equals("2")) {
+					Assert.assertEquals("wrong delay.", 9, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("2") && event.getAffectedAgentId().toString().equals("4")) {
+					Assert.assertEquals("wrong delay.", 17, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
+					Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
+					Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				}
+
+			} else if(event.getLinkId().equals(Id.createLinkId("2"))){
+				
+				if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
+					Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
+					link2Delays++;
+				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("7")) {
+					Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
+					link2Delays++;
+				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
+					Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+					link2Delays++;
+				} else if (event.getCausingAgentId().toString().equals("8") && event.getAffectedAgentId().toString().equals("9")) {
+					Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+					link2Delays++;
+				}
+				
+			} else throw new RuntimeException("Delay can not occur on this link - "+event.getLinkId().toString());
+		
+		}
+
+		// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
+		Assert.assertEquals("wrong number of affected persons" , 6, affectedPersons.size());
+
+		//causing agents set should not have any one from 1,3,5,7,9
+		for(int id :causingPersons){
+			Assert.assertEquals("Wrong causing person", 0, id%2);
+		}
+		
+		Assert.assertEquals("some events are not checked on link 2" , 4, link2Delays);
+		Assert.assertEquals("some events are not checked on link 3" , 4, link3Delays);
+
 	}
 
-	private QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
+	private QSim createQSim (Scenario sc, EventsManager manager){
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
@@ -119,15 +191,6 @@ public class StraightTrackExperiment {
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 
-		if ( useOTFVis ) {
-			// otfvis configuration.  There is more you can do here than via file!
-			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-			//				otfVisConfig.setShowParking(true) ; // this does not really work
-
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);
-			OTFClientLive.run(sc.getConfig(), server);
-		}
 		return qSim;
 	}
 

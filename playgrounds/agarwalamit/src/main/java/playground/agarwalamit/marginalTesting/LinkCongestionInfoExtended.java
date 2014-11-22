@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import playground.ikaddoura.internalizationCar.LinkCongestionInfo;
@@ -38,28 +39,53 @@ public class LinkCongestionInfoExtended extends LinkCongestionInfo{
 	private Map<Id,Map<WarmPollutant, Double>> personId2WarmEmissionsToPayFor = new HashMap<Id, Map<WarmPollutant,Double>>();
 	private Map<Id, Id> personId2CausingLinkId = new HashMap<Id, Id>();
 	private double storageCapacityCars;
-	
+	private Id<Person> lastEnteredAgent;
+	private double lastLeaveTime;
+
+	public double getLastLeaveTime() {
+		return lastLeaveTime;
+	}
+
+	public void setLastLeaveTime(double lastLeaveTime) {
+		this.lastLeaveTime = lastLeaveTime;
+	}
+
+	public Id<Person> getLastEnteredAgent() {
+		return lastEnteredAgent;
+	}
+
+	public void setLastEnteredAgent(Id<Person> lastEnteredAgent) {
+		this.lastEnteredAgent = lastEnteredAgent;
+	}
+
 	public List<Id> getEnteringAgents() {
 		return enteringAgents;
 	}
-	
+
 	public Map<Id , Double> getPersonId2DelaysToPayFor(){
 		return personId2DelaysToPayFor;
 	}
-	
+
 	public Map<Id,Map<WarmPollutant, Double>> getPersonId2WarmEmissionsToPayFor(){
 		return personId2WarmEmissionsToPayFor;
 	}
-	
+
 	public Map<Id, Id> getPersonId2CausingLinkId(){
 		return personId2CausingLinkId;
 	}
-	
+
 	public double getStorageCapacityCars() {
 		return storageCapacityCars;
 	}
-	
+
 	public void setStorageCapacityCars(double storageCapacityCars) {
 		this.storageCapacityCars = storageCapacityCars;
+	}
+
+	public boolean isLinkFree(double time){
+		double earliestLeaveTime = Math.floor(lastLeaveTime+super.getMarginalDelayPerLeavingVehicle_sec())+1;
+		if(time> earliestLeaveTime){
+			return true;
+		} else return false; 
 	}
 }
