@@ -48,7 +48,8 @@ public class MyMultiThreadChainExtractor {
 	 * 	<li> number of threads;
 	 * 	<li> threshold (seconds) to distinguish between minor and major activities;
 	 * 	<li> threshold (seconds) of minimum activity duration (we used 60 seconds);
-	 * 	<li> coordinate reference system, typically "WGS84_SA_Albers" for South Africa (as captured in {@link MGC}).
+	 * 	<li> coordinate reference system, typically "WGS84_SA_Albers" for South 
+	 * 		 Africa (as captured in {@link MGC}).
 	 * </ol>
 	 */
 	public static void main(String[] args) {
@@ -72,7 +73,7 @@ public class MyMultiThreadChainExtractor {
 		}
 		
 		/* Sample all sorted files from given folder. */
-		List<File> fileList = FileUtils.sampleFiles(outputFolder, Integer.MAX_VALUE, FileUtils.getFileFilter(".txt.gz"));
+		List<File> fileList = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".txt.gz"));
 		log.info("          Number of files: " + fileList.size());
 		log.info(" Number of threads to use: " + args[3]);
 		log.info("-------------------------------------------------------------------------------");
