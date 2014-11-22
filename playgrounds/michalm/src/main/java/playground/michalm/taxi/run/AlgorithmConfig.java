@@ -94,19 +94,19 @@ enum AlgorithmConfig
     }
 
 
-    final TravelTimeSource ttimeSource;
-    final Goal goal;
-    final TravelDisutilitySource tdisSource;
     final AlgorithmType algorithmType;
+    final Goal goal;
+    final TravelTimeSource ttimeSource;
+    final TravelDisutilitySource tdisSource;
 
 
     AlgorithmConfig(AlgorithmType algorithmType, Goal goal, TravelTimeSource ttimeSource,
             TravelDisutilitySource tdisSource)
     {
-        this.ttimeSource = ttimeSource;
-        this.goal = goal;
-        this.tdisSource = tdisSource;
         this.algorithmType = algorithmType;
+        this.goal = goal;
+        this.ttimeSource = ttimeSource;
+        this.tdisSource = tdisSource;
     }
 
 

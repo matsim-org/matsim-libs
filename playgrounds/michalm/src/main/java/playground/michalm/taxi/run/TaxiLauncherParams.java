@@ -10,14 +10,26 @@ class TaxiLauncherParams
 {
     static TaxiLauncherParams readParams(String paramFile)
     {
-        Map<String, String> params = ParameterFileReader.readParametersToMap(new File(paramFile));
-        params.put("dir", new File(paramFile).getParent() + '/');
+        Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
+        String dir = new File(paramFile).getParent() + '/';
+        params.put("inputDir", dir);
+        params.put("outputDir", dir);
         return new TaxiLauncherParams(params);
     }
 
+
+    static TaxiLauncherParams readParams(String paramFile, String inputDir, String outputDir)
+    {
+        Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
+        params.put("inputDir", inputDir);
+        params.put("outputDir", outputDir);
+        return new TaxiLauncherParams(params);
+    }
+
+
     Map<String, String> params;
-    
-    String dir;
+
+    String inputDir;
     String netFile;
     String plansFile;
     String taxiCustomersFile;
@@ -34,6 +46,7 @@ class TaxiLauncherParams
     Double pickupDuration;
     Double dropoffDuration;
     boolean otfVis;
+    String outputDir;
     String vrpOutDir;
     String histogramOutDir;
     String eventsOutFile;
@@ -42,17 +55,17 @@ class TaxiLauncherParams
     TaxiLauncherParams(Map<String, String> params)
     {
         this.params = params;
-        
-        dir = params.get("dir");
-        netFile = getFilePath("netFile");
-        plansFile = getFilePath("plansFile");
 
-        taxiCustomersFile = getFilePath("taxiCustomersFile");
-        ranksFile = getFilePath("ranksFile");
-        taxisFile = getFilePath("taxisFile");
+        inputDir = params.get("inputDir");
+        netFile = getInputPath("netFile");
+        plansFile = getInputPath("plansFile");
 
-        eventsFile = getFilePath("eventsFile");
-        changeEventsFile = getFilePath("changeEventsFile");
+        taxiCustomersFile = getInputPath("taxiCustomersFile");
+        ranksFile = getInputPath("ranksFile");
+        taxisFile = getInputPath("taxisFile");
+
+        eventsFile = getInputPath("eventsFile");
+        changeEventsFile = getInputPath("changeEventsFile");
 
         algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
 
@@ -68,13 +81,26 @@ class TaxiLauncherParams
 
         otfVis = getBoolean("otfVis");
 
-        vrpOutDir = getFilePath("vrpOutDir");
-        histogramOutDir = getFilePath("histogramOutDir");
-        eventsOutFile = getFilePath("eventsOutFile");
+        outputDir = params.get("outputDir");
+        vrpOutDir = getOutputPath("vrpOutDir");
+        histogramOutDir = getOutputPath("histogramOutDir");
+        eventsOutFile = getOutputPath("eventsOutFile");
     }
 
 
-    private String getFilePath(String key)
+    private String getInputPath(String key)
+    {
+        return getPath(inputDir, key);
+    }
+
+
+    private String getOutputPath(String key)
+    {
+        return getPath(outputDir, key);
+    }
+
+
+    private String getPath(String dir, String key)
     {
         String fileName = params.get(key);
         return fileName == null ? null : dir + fileName;

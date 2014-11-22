@@ -47,12 +47,13 @@ class MielecMultiThreadMultiRunTaxiLauncher
 
         for (int d : DEMANDS) {
             for (int s : SUPPLIES) {
-                final String paramFile = PATH + d + "-" + s + FILE;
+                String paramFile = PATH + d + "-" + s + FILE;
+                final TaxiLauncherParams params = TaxiLauncherParams.readParams(paramFile);
 
                 service.execute(new Runnable() {
                     public void run()
                     {
-                        MultiRunTaxiLauncher.runAll(RUNS, paramFile);
+                        MultiRunTaxiLauncher.runAll(RUNS, params);
                     }
                 });
             }

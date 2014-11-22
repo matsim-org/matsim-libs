@@ -27,31 +27,22 @@ public class ResultsPostProcessor
 {
     private static class Experiment
     {
-        private final int demand;
-        private final int taxis;
-        private final List<Stats> stats;
+        private final String id;
+        private final List<Stats> stats = new ArrayList<>();
 
 
-        private Experiment(int demand, int taxis)
+        private Experiment(String id)
         {
-            this.demand = demand;
-            this.taxis = taxis;
-            this.stats = new ArrayList<>();
+            this.id = id;
         }
     }
 
 
     private static class Stats
     {
-        private static final int TIME_WINDOW = 14 * 3600;// for the time being...:-/
-
-        // ============
-
         private String name;
         private int n;
         private int m;
-
-        // ============
 
         private double passengerWaitT;
         private double percentile95PassengerWaitT;
@@ -84,7 +75,7 @@ public class ResultsPostProcessor
         private double R_NI;
 
 
-        private void calcStats()
+        private void calcStats(int timeWindow)
         {
             T_W = passengerWaitT / n / 60;
             T_W_95 = percentile95PassengerWaitT / 60;
@@ -95,32 +86,19 @@ public class ResultsPostProcessor
             T_D = dropoffDriveT / n / 60;
             R_W = passengerWaitT / (passengerWaitT + pickupT + dropoffDriveT + dropoffT);
             R_P = pickupDriveT / (pickupDriveT + dropoffDriveT);
-            R_NI = (pickupDriveT + pickupT + dropoffDriveT + dropoffT) / (TIME_WINDOW * m);
+            R_NI = (pickupDriveT + pickupT + dropoffDriveT + dropoffT) / (timeWindow * m);
         }
     }
 
 
-    private Experiment[] experiments;
+    private final List<Experiment> experiments;
+    private final int timeWindow;
 
 
-    public ResultsPostProcessor()
+    public ResultsPostProcessor(List<Experiment> experiments, int timeWindow)
     {
-        experiments = new Experiment[14];
-        experiments[0] = new Experiment(10, 50);
-        experiments[1] = new Experiment(15, 50);
-        experiments[2] = new Experiment(20, 50);
-        experiments[3] = new Experiment(25, 50);
-        experiments[4] = new Experiment(30, 50);
-        experiments[5] = new Experiment(35, 50);
-        experiments[6] = new Experiment(40, 50);
-
-        experiments[7] = new Experiment(10, 25);
-        experiments[8] = new Experiment(15, 25);
-        experiments[9] = new Experiment(20, 25);
-        experiments[10] = new Experiment(25, 25);
-        experiments[11] = new Experiment(30, 25);
-        experiments[12] = new Experiment(35, 25);
-        experiments[13] = new Experiment(40, 25);
+        this.experiments = experiments;
+        this.timeWindow = timeWindow;
     }
 
 
@@ -131,8 +109,23 @@ public class ResultsPostProcessor
             // cfg n   m   PW  PWmax   PD  DD  PS  DS  W   Comp
             sc.nextLine();
 
+            int m0 = -1;
+            int n0 = -1;
             while (sc.hasNext()) {
-                experiment.stats.add(readLine(sc));
+                Stats stats = readLine(sc);
+
+                if (experiment.stats.size() == 0) {
+                    m0 = stats.m;
+                    n0 = stats.n;
+                }
+                else {
+                    if (stats.m != m0 || stats.n != n0) {
+                        throw new RuntimeException(
+                                "The file should contain result for the same 'm' and 'n'");
+                    }
+                }
+
+                experiment.stats.add(stats);
             }
         }
         catch (FileNotFoundException e) {
@@ -164,7 +157,7 @@ public class ResultsPostProcessor
         stats.waitT = sc.nextDouble();
         stats.compT = sc.nextDouble();
 
-        stats.calcStats();
+        stats.calcStats(timeWindow);
 
         return stats;
     }
@@ -176,29 +169,30 @@ public class ResultsPostProcessor
             pw.printf("%s", field);
 
             {
-                int prevTaxis = experiments[0].taxis;
+                int prevTaxis = experiments.get(0).stats.get(0).m;
 
                 for (Experiment e : experiments) {
-                    if (prevTaxis != e.taxis) {
-                        pw.print('\t');
-                    }
-                    prevTaxis = e.taxis;
+                    int m = e.stats.get(0).m;
 
-                    double ratio = (double)e.stats.get(0).n / e.taxis;
+                    if (prevTaxis != m) {
+                        pw.print('\t');//insert one empty column
+                    }
+                    prevTaxis = m;
+
+                    double ratio = (double)e.stats.get(0).n / m;
                     pw.printf("\t%f", ratio);
                 }
             }
 
             pw.println();
 
-            int count = experiments[0].stats.size();
+            int count = experiments.get(0).stats.size();
 
             for (int i = 0; i < count; i++) {
-                String name = experiments[0].stats.get(i).name;
-
+                Stats s0 = experiments.get(0).stats.get(i);
+                String name = s0.name;
                 pw.printf("%s", name);
-
-                int prevTaxis = experiments[0].taxis;
+                int prevTaxis = s0.m;
 
                 for (Experiment e : experiments) {
                     double value;
@@ -236,10 +230,10 @@ public class ResultsPostProcessor
                         throw new RuntimeException();
                     }
 
-                    if (prevTaxis != e.taxis) {
+                    if (prevTaxis != s.m) {
                         pw.print('\t');
                     }
-                    prevTaxis = e.taxis;
+                    prevTaxis = s.m;
 
                     pw.printf("\t%f", value);
                 }
@@ -254,29 +248,72 @@ public class ResultsPostProcessor
     }
 
 
-    private static final String DIR = "d:\\michalm\\2014_02\\";
-    private static final String SUBDIR_PREFIX = "mielec-2-peaks-new-";
-
-
-    public void go(String filename)
+    public void process(String dir, String subDirPrefix, String filename)
     {
         for (Experiment e : experiments) {
-            readFile(DIR + SUBDIR_PREFIX + e.demand + '-' + e.taxis + "\\" + filename, e);
+            readFile(dir + subDirPrefix + e.id + "/" + filename, e);
         }
 
-        writeValues(DIR + filename + ".T_W", "T_W");
-        writeValues(DIR + filename + ".T_W_95", "T_W_95");
-        writeValues(DIR + filename + ".T_W_MAX", "T_W_MAX");
-        writeValues(DIR + filename + ".T_P", "T_P");
-        writeValues(DIR + filename + ".T_P_95", "T_P_95");
-        writeValues(DIR + filename + ".T_P_MAX", "T_P_MAX");
-        writeValues(DIR + filename + ".T_W_T_P", "T_W-T_P");
-        writeValues(DIR + filename + ".R_NI", "R_NI");
+        writeValues(dir + filename + ".T_W", "T_W");
+        writeValues(dir + filename + ".T_W_95", "T_W_95");
+        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
+        writeValues(dir + filename + ".T_P", "T_P");
+        writeValues(dir + filename + ".T_P_95", "T_P_95");
+        writeValues(dir + filename + ".T_P_MAX", "T_P_MAX");
+        writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
+        writeValues(dir + filename + ".R_NI", "R_NI");
+    }
+
+
+    public static void processMielec()
+    {
+        List<Experiment> experiments = new ArrayList<>();
+        experiments.add(new Experiment("10-50"));
+        experiments.add(new Experiment("15-50"));
+        experiments.add(new Experiment("20-50"));
+        experiments.add(new Experiment("25-50"));
+        experiments.add(new Experiment("30-50"));
+        experiments.add(new Experiment("35-50"));
+        experiments.add(new Experiment("40-50"));
+
+        experiments.add(new Experiment("10-25"));
+        experiments.add(new Experiment("15-25"));
+        experiments.add(new Experiment("20-25"));
+        experiments.add(new Experiment("25-25"));
+        experiments.add(new Experiment("30-25"));
+        experiments.add(new Experiment("35-25"));
+        experiments.add(new Experiment("40-25"));
+
+        int timeWindow = 14 * 3600;//approx.
+
+        String dir = "d:/michalm/2014_02/";
+        String subDirPrefix = "mielec-2-peaks-new-";
+
+        new ResultsPostProcessor(experiments, timeWindow).process(dir, subDirPrefix, "stats");
+    }
+
+
+    public static void processBerlin()
+    {
+        List<Experiment> experiments = new ArrayList<>();
+        experiments.add(new Experiment("1.0"));
+        experiments.add(new Experiment("1.5"));
+        experiments.add(new Experiment("2.0"));
+        experiments.add(new Experiment("2.5"));
+        //experiments.add(new Experiment("2.9"));
+
+        int timeWindow = 14 * 3600;//approx.
+
+        String dir = "d:/michalm/Berlin_2014_11/";
+        String subDirPrefix = "demand_";
+
+        new ResultsPostProcessor(experiments, timeWindow).process(dir, subDirPrefix, "stats");
     }
 
 
     public static void main(String[] args)
     {
-        new ResultsPostProcessor().go("stats");
+        //processMielec();
+        processBerlin();
     }
 }

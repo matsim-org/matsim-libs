@@ -50,9 +50,9 @@ class MultiRunTaxiLauncher
     private PrintWriter pw3;
 
 
-    MultiRunTaxiLauncher(String paramFile)
+    MultiRunTaxiLauncher(TaxiLauncherParams params)
     {
-        params = TaxiLauncherParams.readParams(paramFile);
+        this.params = params;
         launcher = new TaxiLauncher(params);
 
         delaySpeedupStats = new TaxiDelaySpeedupStats();
@@ -66,12 +66,12 @@ class MultiRunTaxiLauncher
     void initOutputFiles(String outputFileSuffix)
     {
         try {
-            pw = new PrintWriter(params.dir + "stats" + outputFileSuffix);
+            pw = new PrintWriter(params.outputDir + "stats" + outputFileSuffix);
             pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
 
-            pw2 = new PrintWriter(params.dir + "timeUpdates" + outputFileSuffix);
+            pw2 = new PrintWriter(params.outputDir + "timeUpdates" + outputFileSuffix);
 
-            pw3 = new PrintWriter(params.dir + "cacheStats" + outputFileSuffix);
+            pw3 = new PrintWriter(params.outputDir + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
         }
         catch (IOException e) {
@@ -103,7 +103,8 @@ class MultiRunTaxiLauncher
         launcher.clearVrpPathCalculator();
 
         //warmup
-        if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS) {
+        if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS && //
+                !launcher.scenario.getConfig().network().isTimeVariantNetwork()) {
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
                 launcher.initVrpPathCalculator();
@@ -131,12 +132,15 @@ class MultiRunTaxiLauncher
         String cfg = params.algorithmConfig.name();
 
         multipleRunStats.printStats(pw, cfg, data);
+        pw.flush();
 
         delaySpeedupStats.printStats(pw2, params.algorithmConfig.name());
         delaySpeedupStats.clearStats();
+        pw2.flush();
 
         cacheStats.printStats(pw3, params.algorithmConfig.name());
         cacheStats.clearStats();
+        pw3.flush();
 
         //=========== stats & graphs for the last run
 
@@ -165,65 +169,58 @@ class MultiRunTaxiLauncher
 
 
     static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
-            NOS_TW_TD,
-            //NOS_TW_FF
-            //NOS_TW_24H,
-            NOS_TW_15M);
+    //        NOS_TW_TD,//
+    //        NOS_TW_FF
+    NOS_TW_15M
+            );
 
     static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
-            NOS_TP_TD,
-            //NOS_TP_FF
-            //NOS_TP_24H,
-            NOS_TP_15M);
+    //        NOS_TP_TD, //
+    //        NOS_TP_FF
+    NOS_TP_15M
+            );
 
     static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
-            NOS_DSE_TD,
-            //NOS_DSE_FF
-            //NOS_DSE_24H,
-            NOS_DSE_15M);
+    //        NOS_DSE_TD, //
+    //        NOS_DSE_FF
+    NOS_DSE_15M
+            );
 
     static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
             //OTS_TW_FF
-            //OTS_TW_24H,
             OTS_TW_15M);
 
     static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
             //OTS_TP_FF
-            //OTS_TP_24H,
             OTS_TP_15M);
 
     static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
             //RES_TW_FF
-            //RES_TW_24H,
             RES_TW_15M);
 
     static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
             //RES_TP_FF
-            //RES_TP_24H,
             RES_TP_15M);
 
     static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
             //APS_TW_TD,
             //APS_TW_FF
-            //APS_TW_24H,
             APS_TW_15M);
 
     static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
             //APS_TP_TD,
             //APS_TP_FF
-            //APS_TP_24H,
             APS_TP_15M);
 
     static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
             //APS_DSE_TD,
             //APS_DSE_FF
-            //APS_DSE_24H,
             APS_DSE_15M);
 
 
-    static void runAll(int runs, String paramFile)
+    static void runAll(int runs, TaxiLauncherParams params)
     {
-        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(paramFile);
+        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
         multiLauncher.initOutputFiles("");
 
         multiLauncher.run(NOS_TW_xx, runs);
@@ -247,11 +244,24 @@ class MultiRunTaxiLauncher
     }
 
 
-    // args: configIdx runs
     public static void main(String... args)
     {
         int runs = Integer.valueOf(args[0]);
         String paramFile = args[1];
-        runAll(runs, paramFile);
+        TaxiLauncherParams params;
+
+        if (args.length == 4) {
+            String inputDir = args[2];
+            String outputDir = args[3];
+            params = TaxiLauncherParams.readParams(paramFile, inputDir, outputDir);
+        }
+        else if (args.length == 2) {
+            params = TaxiLauncherParams.readParams(paramFile);
+        }
+        else {
+            throw new IllegalArgumentException();
+        }
+
+        runAll(runs, params);
     }
 }

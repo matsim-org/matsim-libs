@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
@@ -108,8 +109,10 @@ class TaxiLauncher
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
 
-        TimeDiscretizer timeDiscretizer = (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
-        !scenario.getConfig().network().isTimeVariantNetwork()) ? //
+        TimeDiscretizer timeDiscretizer = (params.algorithmConfig.tdisSource == TravelDisutilitySource.DISTANCE)
+                || //
+                (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
+                !scenario.getConfig().network().isTimeVariantNetwork()) ? //
                 TimeDiscretizer.CYCLIC_24_HOURS : //
                 TimeDiscretizer.CYCLIC_15_MIN;
 
@@ -229,7 +232,7 @@ class TaxiLauncher
                 params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
         return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
-                filterFactory, params.algorithmConfig.goal, params.dir);
+                filterFactory, params.algorithmConfig.goal, params.outputDir);
     }
 
 
