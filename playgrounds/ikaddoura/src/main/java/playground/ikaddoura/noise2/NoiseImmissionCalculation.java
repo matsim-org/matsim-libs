@@ -88,7 +88,8 @@ public class NoiseImmissionCalculation {
 			
 			 	for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 			 		if (tunnelLinks.contains(linkId)) {
-			 			// skip this link
+			 			// the immission resulting from this link is zero
+						noiseLinks2isolatedImmission.put(linkId, 0.);
 			 			
 			 		} else {
 			 			double noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission().get(linkId).get(timeInterval);
