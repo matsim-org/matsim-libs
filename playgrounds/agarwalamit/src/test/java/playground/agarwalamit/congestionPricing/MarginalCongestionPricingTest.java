@@ -59,8 +59,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV4;
-import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV6;
+import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV4;
+import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV6;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
 

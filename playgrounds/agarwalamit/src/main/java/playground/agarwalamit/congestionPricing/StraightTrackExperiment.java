@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.marginalTesting;
+package playground.agarwalamit.congestionPricing;
 
 import java.io.File;
 import java.util.ArrayList;

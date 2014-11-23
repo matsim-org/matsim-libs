@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.agarwalamit.marginalTesting;
+package playground.agarwalamit.congestionPricing;
 
 import java.io.BufferedWriter;
 import java.io.File;
