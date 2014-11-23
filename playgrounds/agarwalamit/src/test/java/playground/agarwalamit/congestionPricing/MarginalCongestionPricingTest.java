@@ -59,6 +59,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV4;
 import playground.agarwalamit.marginalTesting.MarginalCongestionHandlerImplV6;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
@@ -71,8 +72,100 @@ public class MarginalCongestionPricingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+		@Test
+		public final void implV6Test(){
+	
+			int numberOfPersonInPlan = 10;
+			createPseudoInputs pseudoInputs = new createPseudoInputs();
+			pseudoInputs.createNetwork();
+			pseudoInputs.createPopulation(numberOfPersonInPlan);
+			Scenario sc = pseudoInputs.scenario;
+	
+			EventsManager events = EventsUtils.createEventsManager();
+	
+			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+	
+			events.addHandler( new MarginalCongestionEventHandler() {
+	
+				@Override
+				public void reset(int iteration) {				
+				}
+	
+				@Override
+				public void handleEvent(MarginalCongestionEvent event) {
+					congestionEvents.add(event);
+				}
+	
+			});
+	
+			events.addHandler(new MarginalCongestionHandlerImplV6(events, (ScenarioImpl) sc));
+	
+			QSim sim = createQSim(sc, events);
+			sim.run();
+	
+			Assert.assertEquals("wrong number of congestion events" , 8, congestionEvents.size());
+	
+			Set<String> affectedPersons = new HashSet<>();
+			Set<Integer> causingPersons = new HashSet<>();
+			int link2Delays=0;
+			int link3Delays=0;
+	
+			for (MarginalCongestionEvent event : congestionEvents) {
+	
+				affectedPersons.add(event.getAffectedAgentId().toString());
+				causingPersons.add(Integer.valueOf(event.getCausingAgentId().toString()));
+	
+				if(event.getLinkId().equals(Id.createLinkId("3"))){
+	
+					if (event.getCausingAgentId().toString().equals("0") && event.getAffectedAgentId().toString().equals("2")) {
+						Assert.assertEquals("wrong delay.", 9, event.getDelay(), MatsimTestUtils.EPSILON);
+						link3Delays++;
+					} else if (event.getCausingAgentId().toString().equals("2") && event.getAffectedAgentId().toString().equals("4")) {
+						Assert.assertEquals("wrong delay.", 17, event.getDelay(), MatsimTestUtils.EPSILON);
+						link3Delays++;
+					} else if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
+						Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+						link3Delays++;
+					} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
+						Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+						link3Delays++;
+					}
+	
+				} else if(event.getLinkId().equals(Id.createLinkId("2"))){
+					
+					if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
+						Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
+						link2Delays++;
+					} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("7")) {
+						Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
+						link2Delays++;
+					} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
+						Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+						link2Delays++;
+					} else if (event.getCausingAgentId().toString().equals("8") && event.getAffectedAgentId().toString().equals("9")) {
+						Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+						link2Delays++;
+					}
+					
+				} else throw new RuntimeException("Delay can not occur on this link - "+event.getLinkId().toString());
+			
+			}
+	
+			// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
+			Assert.assertEquals("wrong number of affected persons" , 6, affectedPersons.size());
+	
+			//causing agents set should not have any one from 1,3,5,7,9
+			for(int id :causingPersons){
+				Assert.assertEquals("Wrong causing person", 0, id%2);
+			}
+			
+			Assert.assertEquals("some events are not checked on link 2" , 4, link2Delays);
+			Assert.assertEquals("some events are not checked on link 3" , 4, link3Delays);
+	
+		}
+
 	@Test
-	public final void delaysTest(){
+	public final void implV4Test(){
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
@@ -97,17 +190,22 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		events.addHandler(new MarginalCongestionHandlerImplV6(events, (ScenarioImpl) sc));
+		events.addHandler(new MarginalCongestionHandlerImplV4(events, (ScenarioImpl) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
 
-		Assert.assertEquals("wrong number of congestion events" , 8, congestionEvents.size());
+		Assert.assertEquals("wrong number of congestion events" , 15, congestionEvents.size());
 
 		Set<String> affectedPersons = new HashSet<>();
 		Set<Integer> causingPersons = new HashSet<>();
 		int link2Delays=0;
 		int link3Delays=0;
+
+		double link7Delay=0;
+		double link9Delay=0;
+		int repetationLink7Count=0;
+		int repetationLink9Count=0;
 
 		for (MarginalCongestionEvent event : congestionEvents) {
 
@@ -120,34 +218,57 @@ public class MarginalCongestionPricingTest {
 					Assert.assertEquals("wrong delay.", 9, event.getDelay(), MatsimTestUtils.EPSILON);
 					link3Delays++;
 				} else if (event.getCausingAgentId().toString().equals("2") && event.getAffectedAgentId().toString().equals("4")) {
-					Assert.assertEquals("wrong delay.", 17, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 10, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("0") && event.getAffectedAgentId().toString().equals("4")) {
+					Assert.assertEquals("wrong delay.", 7, event.getDelay(), MatsimTestUtils.EPSILON);
 					link3Delays++;
 				} else if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
-					Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 10, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("2") && event.getAffectedAgentId().toString().equals("6")) {
+					Assert.assertEquals("wrong delay.", 9, event.getDelay(), MatsimTestUtils.EPSILON);
 					link3Delays++;
 				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
-					Assert.assertEquals("wrong delay.", 19, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 10, event.getDelay(), MatsimTestUtils.EPSILON);
+					link3Delays++;
+				} else if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("8")) {
+					Assert.assertEquals("wrong delay.", 9, event.getDelay(), MatsimTestUtils.EPSILON);
 					link3Delays++;
 				}
 
 			} else if(event.getLinkId().equals(Id.createLinkId("2"))){
-				
+
 				if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("6")) {
 					Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
 					link2Delays++;
 				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("7")) {
-					Assert.assertEquals("wrong delay.", 6, event.getDelay(), MatsimTestUtils.EPSILON);
+					link7Delay+=event.getDelay();
+					repetationLink7Count++;
+					if(repetationLink7Count==2){
+						Assert.assertEquals("wrong delay.", 6, link7Delay, MatsimTestUtils.EPSILON);
+					}
 					link2Delays++;
 				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("8")) {
-					Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("wrong delay.", 10, event.getDelay(), MatsimTestUtils.EPSILON);
+					link2Delays++;
+				} else if (event.getCausingAgentId().toString().equals("4") && event.getAffectedAgentId().toString().equals("8")) {
+					Assert.assertEquals("wrong delay.", 4, event.getDelay(), MatsimTestUtils.EPSILON);
 					link2Delays++;
 				} else if (event.getCausingAgentId().toString().equals("8") && event.getAffectedAgentId().toString().equals("9")) {
-					Assert.assertEquals("wrong delay.", 14, event.getDelay(), MatsimTestUtils.EPSILON);
+					link9Delay+=event.getDelay();
+					repetationLink9Count++;
+					if(repetationLink9Count==2){
+						Assert.assertEquals("wrong delay.", 11, link9Delay, MatsimTestUtils.EPSILON);
+					}
+					link2Delays++;
+				} else if (event.getCausingAgentId().toString().equals("6") && event.getAffectedAgentId().toString().equals("9")) {
+					Assert.assertEquals("wrong delay.", 3, event.getDelay(), MatsimTestUtils.EPSILON);
 					link2Delays++;
 				}
-				
-			} else throw new RuntimeException("Delay can not occur on this link - "+event.getLinkId().toString());
-		
+
+			} else throw new RuntimeException("Delay can not occur on link id - "+event.getLinkId().toString());
+
 		}
 
 		// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
@@ -157,9 +278,9 @@ public class MarginalCongestionPricingTest {
 		for(int id :causingPersons){
 			Assert.assertEquals("Wrong causing person", 0, id%2);
 		}
-		
-		Assert.assertEquals("some events are not checked on link 2" , 4, link2Delays);
-		Assert.assertEquals("some events are not checked on link 3" , 4, link3Delays);
+
+		Assert.assertEquals("some events are not checked on link 2" , 8, link2Delays);
+		Assert.assertEquals("some events are not checked on link 3" , 7, link3Delays);
 
 	}
 
