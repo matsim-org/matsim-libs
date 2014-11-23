@@ -183,6 +183,8 @@ public class NoiseCalculationOffline {
 		
 		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
+		// yy Ihab, das, was Du "initialization" nennst, nennen wir an anderer Stelle "Context".  Und würden dann vielleicht auch noiseParameters, receiverPoints etc.
+		// gleich mit reinpacken.  VG Kai
 		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters, receiverPoints);
 		initialization.initialize();
 		NoiseWriter.writeReceiverPoints(receiverPoints, noiseParameters, outputFilePath + "/receiverPoints/");

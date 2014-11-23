@@ -61,6 +61,22 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	// output
 	private Map<Id<Link>,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id<Link>, Map<Double,Double>>();
 	
+	// yy M.E. braucht man die langen Namen nicht immer:
+	//
+	//    noiseEmissions.get( linkId ).get( timebin )
+	//
+	// ist gut lesbar.  Ich würde dann allerdings versuchen, die "Double" und "Integer" soweit möglich durch echte Typen zu ersetzen, dann hat man
+	// nämlich sowohl bei put wie auch bei get gleich die entsprechende Eingabehilfe.
+	// Also z.B. "timeInterval" nicht als double, sondern als echtes Objekt, wo man dann z.B. auch die Dauer zurück bekommt.
+	// (Noch besser wäre es, gleich Gunnars Konvention zu folgen, und Objekte zu definieren, die einfach den Anfang und das Ende des Messintervalls
+	// enthalten ... man kommt nämlich recht schnell auf Situationen, wo man über den Tag verteilt gerne unterschiedlich zeitlich auflösen würde.)
+	// kai, nov'14
+	
+	// yy Auf Dauer tut man sich vielleicht aber wirklich leichter mit den "selbstgebauten" keys:
+	// NoiseKey key = NoiseKey.mkKey( linkId, timeBin ) ;
+	// noiseEmissions.put( key, value ) ;
+	// kai, nov'14
+	
 	public NoiseEmissionHandler (Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
