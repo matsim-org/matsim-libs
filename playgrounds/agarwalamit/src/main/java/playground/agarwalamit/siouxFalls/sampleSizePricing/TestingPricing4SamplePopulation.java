@@ -43,7 +43,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
-import playground.agarwalamit.marginalTesting.MyEmissionControlerListner;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
@@ -110,7 +109,7 @@ public class TestingPricing4SamplePopulation {
 			controler.setCreateGraphs(true);				
 			controler.setDumpDataAtEnd(false);
 
-			controler.addControlerListener(new MyEmissionControlerListner());
+//			controler.addControlerListener(new EmissionControlerListner());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			//			controler.run();
 			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(ScenarioImpl) scenario );
