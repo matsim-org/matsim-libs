@@ -32,10 +32,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
@@ -134,14 +136,18 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final Route route,
 			final BikeSharingFacility startStation,
 			final BikeSharingFacility endStation) {
-		final BikeSharingRoute bsRoute = new BikeSharingRoute( startStation , endStation );
+		final BikeSharingRoute bsRoute =
+			route instanceof NetworkRoute ?
+				new BikeSharingRoute(
+						(NetworkRoute) route,
+						startStation.getId(),
+						endStation.getId() ) :
+				new BikeSharingRoute(
+						startStation,
+						endStation );
 
 		bsRoute.setDistance( route.getDistance() );
 		bsRoute.setTravelTime( route.getTravelTime() );
-
-		// not necessary (comes from stations anyway)
-		//bsRoute.setStartLinkId( route.getStartLinkId() );
-		//bsRoute.setEndLinkId( route.getEndLinkId() );
 
 		return bsRoute;
 	}

@@ -19,27 +19,31 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.GenericRoute;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Defines a route for bike sharing legs.
  * @author thibautd
  */
-public class BikeSharingRoute implements GenericRoute {
-	private final Route routeDelegate;
+public class BikeSharingRoute implements GenericRoute, NetworkRoute {
+	private final NetworkRoute routeDelegate;
 	private Id<ActivityFacility> originStation;
 	private Id<ActivityFacility> destinationStation;
 
 	public BikeSharingRoute(
 			final Facility originStation,
 			final Facility destinationStation) {
-		this( new GenericRouteImpl(
+		this( new LinkNetworkRouteImpl(
 					originStation.getLinkId(),
 					destinationStation.getLinkId() ) ,
 				originStation.getId(),
@@ -47,15 +51,7 @@ public class BikeSharingRoute implements GenericRoute {
 	}
 
 	public BikeSharingRoute(
-			final Id<ActivityFacility> originStation,
-			final Id<ActivityFacility> destinationStation) {
-		this( new GenericRouteImpl( null , null ) ,
-				originStation,
-				destinationStation );
-	}
-
-	public BikeSharingRoute(
-			final Route routeDelegate,
+			final NetworkRoute routeDelegate,
 			final Id<ActivityFacility> originStation,
 			final Id<ActivityFacility> destinationStation) {
 		this.routeDelegate = routeDelegate;
@@ -66,7 +62,7 @@ public class BikeSharingRoute implements GenericRoute {
 	@Override
 	public BikeSharingRoute clone() {
 		return new BikeSharingRoute(
-				routeDelegate.clone(),
+				(NetworkRoute) routeDelegate.clone(),
 				originStation,
 				destinationStation);
 	}
@@ -130,19 +126,62 @@ public class BikeSharingRoute implements GenericRoute {
 		this.routeDelegate.setStartLinkId( startLinkId );
 		this.routeDelegate.setEndLinkId( endLinkId );
 		final String[] stations = routeDescription.trim().split( " " );
-		if ( stations.length != 2 ) throw new IllegalArgumentException( routeDescription );
+		if ( stations.length < 2 ) throw new IllegalArgumentException( routeDescription );
 		this.originStation = Id.create( stations[ 0 ], ActivityFacility.class );
 		this.destinationStation = Id.create( stations[ 1 ], ActivityFacility.class );
+
+		final List<Id<Link>> links = new ArrayList<Id<Link>>( stations.length - 2 );
+		for ( int i=3; i < stations.length; i++ ) {
+			links.add( Id.createLinkId( stations[ i ] ) );
+		}
 	}
 
 	@Override
 	public String getRouteDescription() {
-		return originStation+" "+destinationStation;
+		final StringBuffer buff = new StringBuffer( originStation+" "+destinationStation );
+		for ( Id<Link> id : getLinkIds() ) buff.append( " "+id );
+		return buff.toString();
 	}
 
 	@Override
 	public String getRouteType() {
 		return "bikeSharing";
+	}
+
+	@Override
+	public void setLinkIds( Id<Link> startLinkId , List<Id<Link>> linkIds , Id<Link> endLinkId ) {
+		routeDelegate.setLinkIds( startLinkId, linkIds, endLinkId );	
+	}
+
+	@Override
+	public void setTravelCost( double travelCost ) {
+		routeDelegate.setTravelCost( travelCost );
+	}
+
+	@Override
+	public double getTravelCost() {
+		return routeDelegate.getTravelCost();
+	}
+
+	@Override
+	public List<Id<Link>> getLinkIds() {
+		return routeDelegate.getLinkIds();
+	}
+
+	@Override
+	public NetworkRoute getSubRoute( Id<Link> fromLinkId , Id<Link> toLinkId ) {
+		return routeDelegate.getSubRoute( fromLinkId, toLinkId );
+	}
+
+	@Override
+	public void setVehicleId( Id<Vehicle> vehicleId ) {
+		routeDelegate.setVehicleId( vehicleId );
+		
+	}
+
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		return routeDelegate.getVehicleId();
 	}
 }
 

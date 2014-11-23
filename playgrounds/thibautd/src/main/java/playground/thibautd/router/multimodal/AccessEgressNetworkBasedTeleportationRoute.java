@@ -29,13 +29,15 @@ import org.json.JSONTokener;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.utils.CollectionUtils;
 
 /**
  * @author thibautd
  */
-public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute /*, NetworkRoute */ {
+public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute , NetworkRoute {
 	private double accessTime = Double.NaN;
 	private double egressTime = Double.NaN;
 	private double linkTime = Double.NaN;
@@ -187,6 +189,44 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 		clone.setDistance( getDistance() );
 
 		return clone;
+	}
+
+	@Override
+	public void setLinkIds( Id<Link> startLinkId , List<Id<Link>> linkIds , Id<Link> endLinkId ) {
+		setStartLinkId( startLinkId );
+		setLinks( linkIds );
+		setEndLinkId( endLinkId );
+		
+	}
+
+	@Override
+	public void setTravelCost( double travelCost ) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public double getTravelCost() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Id<Link>> getLinkIds() {
+		return links;
+	}
+
+	@Override
+	public NetworkRoute getSubRoute( Id<Link> fromLinkId , Id<Link> toLinkId ) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setVehicleId( Id<Vehicle> vehicleId ) {
+		throw new UnsupportedOperationException();		
+	}
+
+	@Override
+	public Id<Vehicle> getVehicleId() {
+		throw new UnsupportedOperationException();
 	}
 }
 
