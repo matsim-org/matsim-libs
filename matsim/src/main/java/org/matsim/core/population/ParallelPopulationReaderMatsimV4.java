@@ -36,8 +36,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.config.Config;
+import org.matsim.households.Households;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -45,7 +48,7 @@ import org.xml.sax.helpers.AttributesImpl;
  * Parallel implementation of the PopulationReaderMatsimV4. The main thread only reads
  * the file and creates empty person objects which are added to the population to ensure
  * that their order is not changed. Note that this approach is not compatible with
- * population streaming. When this feature is activated, the non-parallel reader has is used.
+ * population streaming. When this feature is activated, the non-parallel reader is used.
  * 
  * The parallel threads interpret the xml data for each person.
  * 
@@ -179,26 +182,22 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 	}
 	
-	private static class CollectorScenario extends ScenarioImpl {
+	private static class CollectorScenario implements Scenario {
 		// yy I would very much prefer to make ScenarioImpl final.  Can some other solution be found? kai, nov'14
 		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so 
 		// what is the difference to using the underlying population directly?
 		
-		private final Scenario scenario;
+		private final Scenario delegate;
 		private final CollectorPopulation population;
 		
 		public CollectorScenario(Scenario scenario, CollectorPopulation population) {
-			super(scenario.getConfig());
-			this.scenario = scenario;
+			this.delegate = scenario;
 			this.population = population;
 		}
 		
 		@Override
 		public Network getNetwork() {
-			if (this.scenario != null) { // super-Constructor calls some init Methods which might call this method
-				return scenario.getNetwork();
-			}
-			return null;
+			return this.delegate.getNetwork();
 		}
 
 		@Override
@@ -208,12 +207,48 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		
 		@Override
 		public ActivityFacilities getActivityFacilities() {
-			return scenario.getActivityFacilities();
+			return this.delegate.getActivityFacilities();
 		}
 
 		@Override
 		public Coord createCoord(double x, double y) {
-			return scenario.createCoord(x, y);
+			return this.delegate.createCoord(x, y);
+		}
+
+		@Override
+		public TransitSchedule getTransitSchedule() {
+			return this.delegate.getTransitSchedule();
+		}
+
+		@Override
+		public Config getConfig() {
+			return this.delegate.getConfig();
+		}
+
+		@Override
+		public void addScenarioElement(String name, Object o) {
+			this.delegate.addScenarioElement(name, o);
+		}
+
+		@Override
+		public Object removeScenarioElement(String name) {
+			return this.delegate.removeScenarioElement(name);
+		}
+
+
+		@Override
+		public Object getScenarioElement(String name) {
+			return this.delegate.getScenarioElement(name);
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			return this.delegate.getVehicles();
+		}
+
+		@Override
+		public Households getHouseholds() {
+			return this.delegate.getHouseholds();
 		}
 	}
 	

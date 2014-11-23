@@ -40,7 +40,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -95,11 +94,7 @@ import org.xml.sax.Attributes;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		if (scenario instanceof ScenarioImpl) {
-			this.facilities = scenario.getActivityFacilities();
-		} else {
-            this.facilities = null;
-        }
+		this.facilities = scenario.getActivityFacilities();
 	}
 
 	@Override
