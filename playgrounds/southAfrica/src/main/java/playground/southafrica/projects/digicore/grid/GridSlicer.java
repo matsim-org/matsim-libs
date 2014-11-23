@@ -15,7 +15,8 @@ public class GridSlicer {
 	 * arguments:
 	 * @param args
 	 * <ol>
-	 * 		<li> the {@link DigiGrid} file, typically called <code>cellValuesAndRiskClasses.csv</code>;
+	 * 		<li> the folder where the {@link DigiGrid} file is found, typically 
+	 * 		     called <code>cellValuesAndRiskClasses.csv</code>;
 	 * 		<li> the scale of the original grid (in milli-g);
 	 * 		<li> the minimum level where slicing will start (in milli-g);
 	 * 		<li> the maximum level where slicing will end (in milli-g); and

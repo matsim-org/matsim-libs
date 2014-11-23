@@ -67,13 +67,14 @@ public class AccelOnlyDigiScorer implements DigiScorer{
 					double x = Double.parseDouble(sa[5]);
 					double y = Double.parseDouble(sa[6]);
 					double z = Double.parseDouble(sa[7]);
+					int road = Integer.parseInt(sa[9]);
 					
 					/* Put data conditions here. */
 					if(
 	//						id.equalsIgnoreCase("37ff9d8e04c164ee793e172a561c7b1e") &	/* Specific individual, A. */
 	//						id.equalsIgnoreCase("9a01080c086096aaaaff7504a01ea9e3") &	/* Specific individual, B. */
 	//						id.equalsIgnoreCase("0ae0c60759b410c2c38fa0ba135a8e16") &	/* Specific individual, C. */
-	//						road <= 2 & 												/* Road is a highway */
+							road <= 2 & 												/* Road is a highway */
 	//						speed <= 60.0 &												/* Low speed */
 	//						speed > 60.0 &												/* High speed */
 							true){

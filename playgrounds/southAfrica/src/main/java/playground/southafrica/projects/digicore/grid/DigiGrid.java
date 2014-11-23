@@ -535,7 +535,6 @@ public class DigiGrid  extends AbstractAnalysis {
 					} else{
 						bw.write(String.format("%.2f,%.2f,%d,%d\n", x, y, polyCounter, zone));
 					}
-					
 				}
 
 				poly.setFaceDisplayed(true);
