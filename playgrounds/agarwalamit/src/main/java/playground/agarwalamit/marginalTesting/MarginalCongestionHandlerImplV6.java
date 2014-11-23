@@ -32,9 +32,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -52,7 +54,8 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * it will idenstiy the bottelneck link (spill back causing link) and charge the person who just entered on that link.
  */
 
-public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+PersonStuckEventHandler{
 
 	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV6.class);
 
@@ -92,6 +95,12 @@ public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHand
 		}
 	}
 
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects "
+				+ "because there are no linkLeaveEvents for stucked agents.: \n" + event.toString());
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
@@ -217,7 +226,7 @@ public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHand
 		if(nextLinksInRoutes.size()==0) throw new RuntimeException("There is no next link in the route of person "+personId+". Check!!!");
 		else if(nextLinksInRoutes.size()==1) nextLinkInRoute = nextLinksInRoutes.get(0);
 		else {
-			for(int i=0; i < (activityEndTimes.size()-1);i++){
+			for(int i=0; i < (activityEndTimes.size()-1);){
 				if(activityEndTimes.get(i)<time && activityEndTimes.get(i+1)>0){
 					nextLinkInRoute =  nextLinksInRoutes.get(i);
 					break;

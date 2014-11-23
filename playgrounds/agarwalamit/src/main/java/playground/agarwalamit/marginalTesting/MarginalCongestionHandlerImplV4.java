@@ -53,12 +53,13 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 
@@ -72,7 +73,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * 
  * @author amit
  * 
- * warnings and structure is kept same as in previous implementation of congestion pricing.
+ * warnings and structure is kept same as in previous implementation of congestion pricing by ihab.
  *
  */
 
@@ -88,8 +89,8 @@ PersonStuckEventHandler
 	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
 	final Scenario scenario;
 	final EventsManager events;
-	final List<Id> ptVehicleIDs = new ArrayList<Id>();
-	final Map<Id, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfoExtended>();
+	final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
+	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<>();
 	private int roundingErrorWarnCount =0;
 
 	double totalInternalizedDelay = 0.0;
@@ -101,20 +102,29 @@ PersonStuckEventHandler
 		this.events = events;
 		this.scenario = scenario;
 
-		if (this.scenario.getNetwork().getCapacityPeriod() != 3600.) {
-			log.warn("Expecting a capacity period of 3600. Calculation might be wrong. Keep eyes open.");
-		}
-
-		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
-			log.warn("Flow capacity factor unequal 1.0 is not tested.");
-		}
-
 		if (this.scenario.getConfig().qsim().getStorageCapFactor() != 1.0) {
 			log.warn("Storage capacity factor unequal 1.0 is not tested.");
 		}
 
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
+		}
+
+		for(Link link : scenario.getNetwork().getLinks().values()){
+			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
+
+			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+			linkInfo.setLinkId(link.getId());
+			linkInfo.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
+
+			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
+			linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+
+			double storageCapacity_cars = (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
+			linkInfo.setStorageCapacityCars(storageCapacity_cars);
+
+			this.linkId2congestionInfo.put(link.getId(), linkInfo);
 		}
 	}
 
@@ -143,9 +153,6 @@ PersonStuckEventHandler
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				collectLinkInfos(event.getLinkId());
-			}
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
@@ -161,16 +168,12 @@ PersonStuckEventHandler
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.ptVehicleIDs.contains(event.getVehicleId())){
+		Id<Person> enteredPerson = Id.createPersonId(event.getVehicleId());
+		if (this.ptVehicleIDs.contains(enteredPerson)){
 			log.warn("Public transport mode and mixed traffic is not tested.");
 		} else { // car
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				// no one entered or left this link before
-				collectLinkInfos(event.getLinkId());
-			}
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.getEnteringAgents().add(event.getVehicleId());
-//			checkAndModifyLinkEnterAgentList(event);	
+			linkInfo.getEnteringAgents().add(enteredPerson);
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
 		}	
@@ -181,10 +184,6 @@ PersonStuckEventHandler
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode and mixed traffic is not implemented yet.");
 		} else {// car
-			if (this.linkId2congestionInfo.get(event.getLinkId()) == null){
-				// no one left this link before
-				collectLinkInfos(event.getLinkId());
-			}
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			if (linkInfo.getLeavingAgents().size() != 0) {
 				// Clear tracking of persons leaving that link previously.
@@ -198,7 +197,7 @@ PersonStuckEventHandler
 				}
 			}
 			startDelayProcessing(event);
-			
+
 			linkInfo.getEnteringAgents().remove(event.getVehicleId());
 			linkInfo.getLeavingAgents().add(event.getVehicleId());
 			linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
@@ -207,40 +206,20 @@ PersonStuckEventHandler
 		}
 	}
 
-//	private void checkAndModifyLinkEnterAgentList(LinkEnterEvent event){
-//		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-//		List<Id> linkEnterList = linkInfo.getEnteringAgents(); 
-//
-//		double maxVehiclesOnLink = linkInfo.getStorageCapacityCars();
-//		double noVehicleOnLinkNow = linkEnterList.size();
-//
-//		if(noVehicleOnLinkNow < maxVehiclesOnLink) {
-//			linkEnterList.add(event.getVehicleId());
-//		} else if (noVehicleOnLinkNow == (int) maxVehiclesOnLink){
-//			linkEnterList.remove(0);
-//			linkEnterList.add(event.getVehicleId());
-//		} 
-//
-//		if(linkEnterList.size() > maxVehiclesOnLink+1) {
-//			throw new RuntimeException ("Number of vehicle on the link is more than allowed. Aborting!!!");
-//		}
-//	}
-	
 	/**
 	 * @param event
 	 * This method first charge for flow storage delays  
 	 * and then if spill back delays are present, process them.
 	 */
 	private void startDelayProcessing(LinkLeaveEvent event) {
-		Id delayedPerson = event.getPersonId();
+		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId().toString());
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(delayedPerson);
 
 		if (delayOnThisLink==0) return; 
 		else if(delayOnThisLink<0) throw new RuntimeException("Delays can not be negative, do a consistency check.");
 		else {
-			linkInfo.getPersonId2DelaysToPayFor().put(event.getVehicleId(), delayOnThisLink);
-//			linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), stopAndGoWarmEmissionOnThisLink);
+			linkInfo.getPersonId2DelaysToPayFor().put(delayedPerson, delayOnThisLink);
 			this.totalDelay = this.totalDelay + delayOnThisLink;
 
 			List<Id> leavingAgentsList = new ArrayList<Id>(linkInfo.getLeavingAgents());
@@ -251,13 +230,15 @@ PersonStuckEventHandler
 				Iterator< Id> personIdListIterator = leavingAgentsList.iterator();
 
 				while (personIdListIterator.hasNext() && delayToPayFor>0){
-					Id personToBeChargedId = personIdListIterator.next();
+					Id<Person> personToBeChargedId = personIdListIterator.next();
 					double maxTimePerPersonToBeChargedOnLink = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+
 					chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, personToBeChargedId);
+
 					delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 				}
 			} else {//spill back delays
-				Id spillBackCausingLink = getNextLinkInRoute(delayedPerson, event.getLinkId(), event.getTime());
+				Id<Link> spillBackCausingLink = getNextLinkInRoute(delayedPerson, event.getLinkId(), event.getTime());
 				linkInfo.getPersonId2CausingLinkId().put(delayedPerson, spillBackCausingLink);
 			}
 
@@ -267,59 +248,54 @@ PersonStuckEventHandler
 			if(delayToPayFor > 0 && delayToPayFor <=1){
 				if(roundingErrorWarnCount<=5){
 					roundingErrorWarnCount++;
-					log.warn(delayToPayFor + " seconds are not internalized assuming these delays due to rounding errors. \n "
-							+ "\n Do check for emissions at this stage.");
+					log.warn(delayToPayFor + " seconds are not internalized assuming these delays due to rounding errors. \n ");
 					if(roundingErrorWarnCount==5) log.warn(Gbl.FUTURE_SUPPRESSED);
 				}
-//				log.info("Emissions to pay for at this point are "+this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2WarmEmissionsToPayFor().get(delayedPerson).toString());
 				delayToPayFor=0;
 				this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().put(delayedPerson, 0.0);
 				this.delayNotInternalized_roundingErrors +=delayToPayFor;
 				return;
 			} else {
-//				log.info("Person have spill back delays. Internalizing such delays.");
-				Id personInFrontOfQ = event.getPersonId();
-				Id personOnThisLink = event.getLinkId();
-				do{
-					Id [] personId2LinkId = processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
-					delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getPersonId());
-					personInFrontOfQ = personId2LinkId[0];
-					personOnThisLink = personId2LinkId[1];
-				}while(delayToPayFor>0);
+				//	Person have spill back delays. Internalizing such delays.
+				Id<Person> personInFrontOfQ = Id.createPersonId(event.getVehicleId().toString());
+				Id<Link> personOnThisLink = event.getLinkId();
+
+				processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
+
 			}
 		}
 	}
 
 	/**
-	 * @param event to throw money events/emission events and to get delayed person and its information.
+	 * @param event to throw money events and to get delayed person and its information.
 	 * @param personInFrontOfQ 
 	 * @param personOnThisLink
 	 * @return an array of size two; first element is person who is in front of the Q(link) 
 	 * and other is spill back causing link
 	 */
-	private Id [] processSpillBackDelays(LinkLeaveEvent event, Id personInFrontOfQ, Id personOnThisLink){
-		Id [] personId2LinkId = new Id[2];
+	private void processSpillBackDelays(LinkLeaveEvent event, Id<Person> personInFrontOfQ, Id<Link> personOnThisLink){
 
-		Id delayedPerson = event.getPersonId();
-		Id personDelayedOnLink = event.getLinkId();
+		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId().toString());
+		Id<Link> personDelayedOnLink = event.getLinkId();
 
 		//		identify delayed Person
-		Id spillBackCausingLink  = identifySpillBackCausingLink(personOnThisLink, personInFrontOfQ);
+		Id<Link> spillBackCausingLink  = identifySpillBackCausingLink(personOnThisLink, personInFrontOfQ);
 
 		LinkCongestionInfoExtended spillBackCausingLinkInfo = this.linkId2congestionInfo.get(spillBackCausingLink);
-		List<Id> personsEnteredOnSpillBackCausingLink = new ArrayList<Id>(spillBackCausingLinkInfo.getEnteringAgents()); 
-		personId2LinkId[0] = personsEnteredOnSpillBackCausingLink.get(0);
-		personId2LinkId[1] = spillBackCausingLink;
+
+		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillBackCausingLinkInfo.getEnteringAgents()); 
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
 
 		double delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 
-		Iterator<Id> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
+		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
 
 		while(enteredPersonsListIterator.hasNext() && delayToPayFor>0){
-			Id personToBeCharged = enteredPersonsListIterator.next();
+			Id<Person> personToBeCharged = enteredPersonsListIterator.next();
 			double maxTimePerPersonToBeChargedOnLink = this.linkId2congestionInfo.get(spillBackCausingLink).getMarginalDelayPerLeavingVehicle_sec();
+
 			chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, personToBeCharged);
+
 			delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 		}
 
@@ -329,13 +305,23 @@ PersonStuckEventHandler
 			Iterator<Id> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
 
 			while(prsnLftSpillBakCauinLinkItrtr.hasNext()&&delayToPayFor>0.){ // again charged for flow cap of link
-				Id chargedPersonId = prsnLftSpillBakCauinLinkItrtr.next();
+				Id<Person> chargedPersonId = prsnLftSpillBakCauinLinkItrtr.next();
 				double maxTimePerPersonToBeChargedOnLink = this.linkId2congestionInfo.get(spillBackCausingLink).getMarginalDelayPerLeavingVehicle_sec();
+
 				chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, chargedPersonId);
+
 				delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 			}
 		}
-		return personId2LinkId;
+
+		delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
+
+		while (delayToPayFor>0){
+			processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
+			delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
+			personInFrontOfQ = personsEnteredOnSpillBackCausingLink.get(0);
+			personOnThisLink = spillBackCausingLink;;
+		};
 	}
 
 
@@ -343,15 +329,15 @@ PersonStuckEventHandler
 	 * @param personOnThisLink
 	 * @return adjacent link, who caused spill back delays.
 	 */
-	private Id identifySpillBackCausingLink(Id personOnThisLink, Id thisPerson) {
-		Id spillBackCausingLink = Id.create("NA",Link.class);
+	private Id<Link> identifySpillBackCausingLink(Id<Link> personOnThisLink, Id<Person> thisPerson) {
+		Id<Link> spillBackCausingLink = Id.createLinkId("NA");
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(personOnThisLink);
 		if(linkInfo.getPersonId2CausingLinkId().containsKey(thisPerson)){//leaving agents list was empty
 			spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(thisPerson);
 		} else {
 			List<Id> personLeavingList = new ArrayList<Id>(linkInfo.getLeavingAgents());
 			Collections.reverse(personLeavingList);
-			for(Id id:personLeavingList){
+			for(Id<Person> id:personLeavingList){
 				if(linkInfo.getPersonId2CausingLinkId().containsKey(id)){
 					spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(id);
 					break;
@@ -362,13 +348,13 @@ PersonStuckEventHandler
 		return spillBackCausingLink;
 	}
 
-	private void chargingPersonAndThrowingEvents(double marginalDelaysPerLeavingVehicle, LinkLeaveEvent event, Id personToBeCharged){
+	private void chargingPersonAndThrowingEvents(double marginalDelaysPerLeavingVehicle, LinkLeaveEvent event, Id<Person> personToBeCharged){
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(event.getVehicleId());
-		Map<WarmPollutant, Double> emissionsToPayFor = linkInfo.getPersonId2WarmEmissionsToPayFor().get(event.getVehicleId());
+		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
+		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
 
 		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
-			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
+			if (delayedPerson.toString().equals(personToBeCharged.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
 				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
 				return;
@@ -376,26 +362,27 @@ PersonStuckEventHandler
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId(),this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, delayedPerson, marginalDelaysPerLeavingVehicle, event.getLinkId(),
+						this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
 		} else if(delayToPayFor > 0){
-			if (event.getVehicleId().toString().equals(personToBeCharged.toString())) {
+			if (delayedPerson.toString().equals(personToBeCharged.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
 				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId(), this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, delayedPerson, delayToPayFor, event.getLinkId(), this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = 0.;
-			emissionsToPayFor = new HashMap<WarmPollutant, Double>();
 		}
-		linkInfo.getPersonId2DelaysToPayFor().put(event.getVehicleId(), delayToPayFor);
-		linkInfo.getPersonId2WarmEmissionsToPayFor().put(event.getVehicleId(), emissionsToPayFor);
+		linkInfo.getPersonId2DelaysToPayFor().put(delayedPerson, delayToPayFor);
 	}
 
 	/**
@@ -403,15 +390,15 @@ PersonStuckEventHandler
 	 * activity end time to get the true 'next link in route'.
 	 * @return next link in the route of the person, which is currently on given link.
 	 */
-	private Id getNextLinkInRoute(Id personId, Id linkId, double time){
+	private Id<Link> getNextLinkInRoute(Id<Person> personId, Id<Link> linkId, double time){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 
-		Map<NetworkRoute, List<Id>> nRoutesAndLinkIds = new LinkedHashMap<NetworkRoute, List<Id>>(); // save all routes and links in each route
+		Map<NetworkRoute, List<Id<Link>>> nRoutesAndLinkIds = new LinkedHashMap<NetworkRoute, List<Id<Link>>>(); // save all routes and links in each route
 		List<Double> activityEndTimes = new ArrayList<Double>();
 		for(PlanElement pe :planElements){
 			if(pe instanceof Leg){
 				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
-				List<Id> linkIds = new ArrayList<Id>();
+				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 				linkIds.add(nRoute.getStartLinkId());
 				linkIds.addAll(nRoute.getLinkIds());  
 				linkIds.add(nRoute.getEndLinkId());
@@ -423,12 +410,12 @@ PersonStuckEventHandler
 			}
 		}
 
-		Id nextLinkInRoute =  Id.create("NA",Link.class);
-		List<Id> nextLinksInRoutes = new ArrayList<Id>();
+		Id<Link> nextLinkInRoute =  Id.create("NA",Link.class);
+		List<Id<Link>> nextLinksInRoutes = new ArrayList<Id<Link>>();
 
 		for(NetworkRoute nr:nRoutesAndLinkIds.keySet()){
-			List<Id>linkIds = nRoutesAndLinkIds.get(nr);
-			Iterator<Id> it = linkIds.iterator();
+			List<Id<Link>>linkIds = nRoutesAndLinkIds.get(nr);
+			Iterator<Id<Link>> it = linkIds.iterator();
 			do{
 				if(it.next().equals(linkId)&&it.hasNext()){
 					nextLinksInRoutes.add(it.next());
@@ -440,7 +427,7 @@ PersonStuckEventHandler
 		if(nextLinksInRoutes.size()==0) throw new RuntimeException("There is no next link in the route of person "+personId+". Check!!!");
 		else if(nextLinksInRoutes.size()==1) nextLinkInRoute = nextLinksInRoutes.get(0);
 		else {
-			for(int i=0; i < (activityEndTimes.size()-1);i++){
+			for(int i=0; i < (activityEndTimes.size()-1);){
 				if(activityEndTimes.get(i)<time && activityEndTimes.get(i+1)>0){
 					nextLinkInRoute =  nextLinksInRoutes.get(i);
 					break;
@@ -453,28 +440,9 @@ PersonStuckEventHandler
 		return nextLinkInRoute;
 	}
 
-
-	private void collectLinkInfos(Id linkId) {
-		LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
-
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-		Link link = network.getLinks().get(linkId);
-		linkInfo.setLinkId(link.getId());
-		linkInfo.setFreeTravelTime(Math.floor(link.getLength() / link.getFreespeed()));
-
-		double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-		double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
-
-		double storageCapacity_cars = (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
-		linkInfo.setStorageCapacityCars(storageCapacity_cars);
-
-		this.linkId2congestionInfo.put(link.getId(), linkInfo);
-	}
-
 	double getLastLeavingTime(Map<Id, Double> personId2LinkLeaveTime) {
 		double lastLeavingFromThatLink = Double.NEGATIVE_INFINITY;
-		for (Id id : personId2LinkLeaveTime.keySet()){
+		for (Id<Person> id : personId2LinkLeaveTime.keySet()){
 			if (personId2LinkLeaveTime.get(id) > lastLeavingFromThatLink) {
 				lastLeavingFromThatLink = personId2LinkLeaveTime.get(id);
 			}

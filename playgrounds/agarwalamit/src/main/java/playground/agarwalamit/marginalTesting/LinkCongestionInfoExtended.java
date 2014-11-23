@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import playground.ikaddoura.internalizationCar.LinkCongestionInfo;
 
@@ -34,10 +34,9 @@ import playground.ikaddoura.internalizationCar.LinkCongestionInfo;
  */
 public class LinkCongestionInfoExtended extends LinkCongestionInfo{
 
-	private List<Id> enteringAgents = new ArrayList<Id>();
-	private Map<Id, Double> personId2DelaysToPayFor = new HashMap<Id, Double>();
-	private Map<Id,Map<WarmPollutant, Double>> personId2WarmEmissionsToPayFor = new HashMap<Id, Map<WarmPollutant,Double>>();
-	private Map<Id, Id> personId2CausingLinkId = new HashMap<Id, Id>();
+	private List<Id<Person>> enteringAgents = new ArrayList<Id<Person>>();
+	private Map<Id<Person>, Double> personId2DelaysToPayFor = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Id<Link>> personId2CausingLinkId = new HashMap<>();
 	private double storageCapacityCars;
 	private Id<Person> lastEnteredAgent;
 	private double lastLeaveTime;
@@ -58,19 +57,15 @@ public class LinkCongestionInfoExtended extends LinkCongestionInfo{
 		this.lastEnteredAgent = lastEnteredAgent;
 	}
 
-	public List<Id> getEnteringAgents() {
+	public List<Id<Person>> getEnteringAgents() {
 		return enteringAgents;
 	}
 
-	public Map<Id , Double> getPersonId2DelaysToPayFor(){
+	public Map<Id<Person> , Double> getPersonId2DelaysToPayFor(){
 		return personId2DelaysToPayFor;
 	}
 
-	public Map<Id,Map<WarmPollutant, Double>> getPersonId2WarmEmissionsToPayFor(){
-		return personId2WarmEmissionsToPayFor;
-	}
-
-	public Map<Id, Id> getPersonId2CausingLinkId(){
+	public Map<Id<Person>, Id<Link>> getPersonId2CausingLinkId(){
 		return personId2CausingLinkId;
 	}
 
