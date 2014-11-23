@@ -1,7 +1,13 @@
 package org.matsim.core.scenario;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.households.Households;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 
 /**
@@ -52,6 +58,56 @@ public class ScenarioUtils {
 	 */
 	public static void loadScenario(final Scenario scenario) {
 		ScenarioLoaderImpl.loadScenario(scenario);
+	}
+	
+	public final static class ScenarioBuilder {
+		private ScenarioImpl scenario;
+		public ScenarioBuilder( Config config ) {
+			this.scenario = new ScenarioImpl( config ) ;
+		}
+		public void addScenarioElement(String name, Object o) {
+			scenario.addScenarioElement(name, o); 
+		}
+		/**
+		 * This is here if you want to instantiate the empty container
+		 */
+		public void createHouseholdsContainer() { 
+			scenario.createHouseholdsContainer() ;
+		}
+		/**
+		 * This is here if you want to instantiate the empty container
+		 */
+		public void createTransitSchedule() {
+			scenario.createTransitSchedule() ;
+		}
+		/**
+		 * This is here if you want to instantiate the empty container
+		 */
+		public void createVehicleContainer() {
+			scenario.createVehicleContainer() ;
+		}
+		public void setNetwork( Network network ) {
+			scenario.setNetwork(network);
+		}
+		public void setPopulation( Population population ) {
+			scenario.setPopulation(population);
+		}
+		public void setActivityFacilities( ActivityFacilities facilities ) {
+			scenario.setActivityFacilities(facilities);
+		}
+		public void setHouseholds( Households households ) {
+			scenario.setHouseholds(households);
+		}
+		public void setVehicles( Vehicles vehicles ) {
+			scenario.setVehicles(vehicles);
+		}
+		public void setTransitSchedule( TransitSchedule schedule ) {
+			scenario.setTransitSchedule(schedule);
+		}
+		public Scenario createScenario() {
+			this.scenario.setLocked(); // prevents that one can cast to ScenarioImpl and change the containers again. kai, nov'14
+			return this.scenario ;
+		}
 	}
 
 }

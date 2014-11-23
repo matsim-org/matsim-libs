@@ -156,4 +156,11 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 		this.vehicleId = vehicleId;
 	}
 
+	@Override
+	public String toString() {
+		String str = super.toString();
+		str += " linkIds=" + this.getLinkIds() ;
+		str += " travelCost=" + this.getTravelCost() ;
+		return str ;
+	}
 }

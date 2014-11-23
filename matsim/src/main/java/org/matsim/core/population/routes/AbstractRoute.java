@@ -86,10 +86,34 @@ public abstract class AbstractRoute implements Route {
 
 	@Override
 	public AbstractRoute clone() {
+		// "clone" is some automagic that, by itself, makes a copy of the "bit pattern" of the object.  That is:
+		// * the content of primitive types is copied
+		// * for objects the reference to the objects is copied.
+		// Consequences for matsim:
+		// * primitive types can be changed on the copy without affecting the original
+		// * the references to objects can be changed on the copy without affecting the original.  For example, a copy can
+		//    point to other links or nodes or persons or IDs.
+		// * One has to be careful with objects where the contents can be changed AND they are not shared between the 
+		//    original and the copy.  For example, changing the income of the person is not a problem since it is the same
+		//    for two plans pointing to the same person.  In contrast (and potentially quite dangerous): the contents of 
+		//    Customizable (currently not applicable for Route) would have to be explicitly deepcopied.
+		// The method can only be called if a class implements "Cloneable"; otherwise, it leads to a runtime exception (!).
+		// It is, however, sufficient to have clone available as protected.
 		try {
 			return (AbstractRoute) super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError(e);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		String str = "";
+		str +=  " startLinkId=" + startLinkId ;
+		str += " endLinkId=" + endLinkId ;
+		str += " travTime=" + travTime ;
+		str += " dist=" + dist ;
+		return str ;
+	}
+	
 }

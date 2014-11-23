@@ -71,7 +71,7 @@ final class PlanBasedDriverAgentImpl implements DriverAgent {
 	public final Id<Link> chooseNextLinkId() {
 		// To note: there is something really stupid going on here: A vehicle that is at the end of its route and on the destination link will arrive.
 		// However, a vehicle that is on the destination link BUT NOT AT THE END OF ITS ROUTE will NOT arrive.  This makes the whole thing
-		// very extremely messy.  kai, nov'14
+		// very extremely messy.  kai, nov'14 (This behavior is no longer there. kai, nov'14)
 
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.

@@ -180,6 +180,9 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	}
 	
 	private static class CollectorScenario extends ScenarioImpl {
+		// yy I would very much prefer to make ScenarioImpl final.  Can some other solution be found? kai, nov'14
+		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so 
+		// what is the difference to using the underlying population directly?
 		
 		private final Scenario scenario;
 		private final CollectorPopulation population;

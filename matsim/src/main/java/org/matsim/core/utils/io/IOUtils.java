@@ -397,6 +397,13 @@ public class IOUtils {
 	}
 	
 	/**
+	 * shortcut for deleteDirectory( dir, true ) 
+	 */
+	public static void deleteDirectory(final File dir ) {
+		deleteDirectory( dir, true ) ;
+	}
+
+		/**
 	 * This method recursively deletes the directory and all its contents. This
 	 * method will not follow symbolic links, i.e. if the directory or one of the
 	 * sub-directories contains a symbolic link, it will not delete this link. Thus
@@ -405,20 +412,23 @@ public class IOUtils {
 	 * @param dir
 	 *          File which must represent a directory; files or symbolic links are
 	 *          not permitted as arguments
+	 * @param checkForLinks
+	 *          Do not check if dir is a link.  This is helpful in cases when ./xyz or ../xyz is considered a link.
 	 *
 	 * @author dgrether
 	 */
-	public static void deleteDirectory(final File dir) {
+	public static void deleteDirectory(final File dir, boolean checkForLinks ) {
 		if (dir.isFile()) {
 			throw new IllegalArgumentException("Directory " + dir.getName()
 					+ " must not be a file!");
 		}
-		else if (isLink(dir)) {
+		else if ( checkForLinks && isLink(dir) ) {
+			// according to documentation, isLink has problems with pathnames of type ./xyz or ../xyz. kai, nov'14
 			throw new IllegalArgumentException("Directory " + dir.getName()
-					+ " doesn't exist or is a symbolic link!");
+					+ " doesn't exist or is a symbolic link or has a path name of type ./xyz or ../xyz !");
 		}
 		if (dir.exists()) {
-			IOUtils.deleteDir(dir);
+			IOUtils.deleteDir(dir, checkForLinks);
 		}
 		else {
 			throw new IllegalArgumentException("Directory " + dir.getName()
@@ -432,17 +442,18 @@ public class IOUtils {
 	 * neither the link nor its parent directories are deleted.
 	 *
 	 * @param dir The directory to be recursively deleted.
+	 * @param checkForLinks TODO
 	 *
 	 * @author dgrether
 	 */
-	private static void deleteDir(final File dir) {
+	private static void deleteDir(final File dir, boolean checkForLinks) {
 		File[] outDirContents = dir.listFiles();
 		for (int i = 0; i < outDirContents.length; i++) {
-			if (isLink(outDirContents[i])) {
+			if (checkForLinks && isLink(outDirContents[i])) {
 				continue;
 			}
 			if (outDirContents[i].isDirectory()) {
-				deleteDir(outDirContents[i]);
+				deleteDir(outDirContents[i], checkForLinks);
 			}
 			if (!outDirContents[i].delete() && outDirContents[i].exists()) {
 				// some file systems do not immediately delete directories (because of caches or whatever)

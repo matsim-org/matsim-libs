@@ -263,7 +263,7 @@ public class PlanImpl implements Plan {
 	 * </ul>
 	 * @param in a plan who's data will be loaded into this plan
 	 **/
-	public void copyFrom(final Plan in) {
+	public final void copyFrom(final Plan in) {
 		setScore(in.getScore());
 		this.setType(in.getType());
 		for (PlanElement pe : in.getPlanElements()) {

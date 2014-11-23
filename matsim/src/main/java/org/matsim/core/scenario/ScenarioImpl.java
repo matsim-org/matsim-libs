@@ -90,7 +90,7 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	 public boolean createVehicleContainer(){
+	 public final boolean createVehicleContainer(){
 		if ( this.vehicles != null ) return false;
 
 		if ( !this.config.scenario().isUseVehicles() ) {
@@ -108,7 +108,7 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	public boolean createHouseholdsContainer(){
+	public final boolean createHouseholdsContainer(){
 		if ( this.households != null ) return false;
 
 		if ( !this.config.scenario().isUseHouseholds() ) {
@@ -127,7 +127,7 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	 public boolean createTransitSchedule() {
+	 public final boolean createTransitSchedule() {
 		 if ( this.transitSchedule != null ) return false;
 
 		if ( !this.config.scenario().isUseTransit() ) {
@@ -159,22 +159,24 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public Config getConfig() {
+	public final Config getConfig() {
 		return this.config;
 	}
 
-	public void setNetwork(Network network) {
+	@Deprecated // please use ScenarioUtils.ScenarioBuilder
+	public final void setNetwork(Network network) {
 		testForLocked();
 		this.network = network;
 	}
 
-	public void setPopulation(Population population) {
+	@Deprecated // please use ScenarioUtils.ScenarioBuilder
+	public final void setPopulation(Population population) {
 		testForLocked();
 		this.population = population;
 	}
 
 	@Override
-	public Households getHouseholds() {
+	public final Households getHouseholds() {
 		if ( this.households == null ) {
 			if ( this.config.scenario().isUseHouseholds() ) {
 				this.createHouseholdsContainer();
@@ -194,7 +196,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public Vehicles getVehicles() {
+	public final Vehicles getVehicles() {
 		if ( this.vehicles == null ) {
 			if ( this.config.scenario().isUseVehicles() ) {
 				this.createVehicleContainer();
@@ -214,7 +216,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
     @Override
-	public TransitSchedule getTransitSchedule() {
+	public final TransitSchedule getTransitSchedule() {
 		if ( this.transitSchedule == null ) {
 			if ( this.config.scenario().isUseTransit() ) {
 				this.createTransitSchedule();
@@ -234,7 +236,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public void addScenarioElement(
+	public final void addScenarioElement(
 			final String name,
 			final Object o) {
 		// Once the "removal" operation is locked, you cannot add under the same name. kai, sep'14
@@ -246,17 +248,17 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public Object removeScenarioElement(final String name) {
+	public final Object removeScenarioElement(final String name) {
 		testForLocked();
 		return elements.remove( name );
 	}
 
 	@Override
-	public Object getScenarioElement(final String name) {
+	public final Object getScenarioElement(final String name) {
 		return elements.get( name );
 	}
 	
-	public void setLocked() {
+	public final void setLocked() {
 		this.locked = true ;
 	}
 	
@@ -273,6 +275,22 @@ public class ScenarioImpl implements Scenario {
 			 * kai, sep'14
 			 */
 		}
+	}
+	
+	// the following are there for ScenarioUtils.ScenarioBuilder.  They are deliberately package-private; please do not change. kai, nov'14
+	final void setActivityFacilities( ActivityFacilities facilities ) {
+		testForLocked() ;
+		this.facilities = facilities ;
+	}
+	final void setHouseholds( Households households ) {
+		testForLocked() ;
+		this.households = households ;
+	}
+	final void setTransitSchedule( TransitSchedule schedule ) {
+		this.transitSchedule = schedule ;
+	}
+	final void setVehicles( Vehicles vehicles ) {
+		this.vehicles = vehicles ;
 	}
 
 }

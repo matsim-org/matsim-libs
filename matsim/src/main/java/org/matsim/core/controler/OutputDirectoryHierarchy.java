@@ -22,6 +22,7 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -164,6 +165,7 @@ public class OutputDirectoryHierarchy {
 					log.warn("### " + outputPath);
 					log.warn("###########################################################");
 					System.err.flush();
+					// IOUtils.deleteDirectory( outputDir, false );
 				} else {
 					// the directory is not empty, we do not overwrite any
 					// files!
