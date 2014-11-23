@@ -190,7 +190,6 @@ public class NoiseDamageCalculation {
 		
 		Map<Id<ReceiverPoint>, Map<Double, Map<Id<Link>, Double>>> receiverPointIds2timeIntervals2noiseLinks2costShare = new HashMap<Id<ReceiverPoint>, Map<Double,Map<Id<Link>,Double>>>();
 
-		log.info("Initialization...");
 		int prepCounter = 0;
 		for (ReceiverPoint rp : this.receiverPoints.values()) {
 			Id<ReceiverPoint> coordId = rp.getId();
@@ -226,7 +225,6 @@ public class NoiseDamageCalculation {
 			receiverPointIds2timeIntervals2noiseLinks2costShare.put(coordId, timeIntervals2noiseLinks2costShare);
 			prepCounter++;
 		}
-		log.info("Initialization... Done.");
 		
 		//summing up the link-based-costs
 		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
@@ -244,8 +242,11 @@ public class NoiseDamageCalculation {
 			if (counter % 10000 == 0) {
 				log.info("receiver point # " + counter);
 			}
-			for(Id<Link> linkId : this.receiverPoints.get(id).getLinkId2distanceCorrection().keySet()) {
-				for(double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
+
+			for (Id<Link> linkId : this.receiverPoints.get(id).getLinkId2distanceCorrection().keySet()) {
+				
+				for (double timeInterval = this.noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + this.noiseParams.getTimeBinSizeNoiseComputation()) {
+					
 					if(!((rp.getTimeInterval2damageCosts().get(timeInterval)) == 0.)) {
 						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(id).get(timeInterval).get(linkId);
 						linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
