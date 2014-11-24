@@ -74,13 +74,21 @@ public class NoiseImmissionCalculation {
 	
 	public void calculateNoiseImmission() {
 		
-		calculateImmissionSharesPerReceiverPointPerTimeInterval();
+		calculateImmissionSharesPerLink();
 		calculateFinalNoiseImmissions();
 	}
 
-	private void calculateImmissionSharesPerReceiverPointPerTimeInterval() {
+	private void calculateImmissionSharesPerLink() {
+		
+		log.info("Calculating noise immission shares per link...");
+		int counter = 0;
 		
 		for (ReceiverPoint rp : this.receiverPoints.values()) {
+			
+			if (counter % 10000 == 0) {
+				log.info("receiver point # " + counter);
+			}
+			
 			Map<Double,Map<Id<Link>,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id<Link>,Double>>();
 		
 			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
@@ -103,7 +111,9 @@ public class NoiseImmissionCalculation {
 				timeIntervals2noiseLinks2isolatedImmission.put(timeInterval, noiseLinks2isolatedImmission);
 			}
 			rp.setTimeInterval2LinkId2IsolatedImmission(timeIntervals2noiseLinks2isolatedImmission);
+			counter ++;
 		}
+		log.info("Calculating noise immission shares per link... Done.");
 	}
 	
 	
@@ -121,25 +131,42 @@ public class NoiseImmissionCalculation {
 	}
 
 	private void calculateFinalNoiseImmissions() {
-		for(ReceiverPoint rp : this.receiverPoints.values()) {
+		
+		log.info("Calculating final noise immissions...");
+		int counter = 0;
+		
+		for (ReceiverPoint rp : this.receiverPoints.values()) {
+			
+			if (counter % 10000 == 0) {
+				log.info("receiver point # " + counter);
+			}
+			
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
-			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
+			
+			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
-				if(!(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval) == null)) {
-					for(Id<Link> linkId : rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval).keySet()) {
-						if(!(noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs().get(linkId).get(timeInterval).size() == 0.)) {
+				
+				if (!(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval) == null)) {
+				
+					for (Id<Link> linkId : rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval).keySet()) {
+						
+						if (!(noiseEmissionHandler.getLinkId2timeInterval2linkEnterVehicleIDs().get(linkId).get(timeInterval).size() == 0.)) {
 							noiseImmissions.add(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval).get(linkId));
 						}
 					}	
 					double resultingNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(noiseImmissions);
 					timeInterval2noiseImmission.put(timeInterval, resultingNoiseImmission);
+					
 				} else {
 					// if no link has to to be considered for the calculation due to too long distances
 					timeInterval2noiseImmission.put(timeInterval, 0.);
 				}
 			}
 			rp.setTimeInterval2immission(timeInterval2noiseImmission);
+			counter ++;
 		}
+
+		log.info("Calculating final noise immissions... Done.");
 	}
 	
 }
