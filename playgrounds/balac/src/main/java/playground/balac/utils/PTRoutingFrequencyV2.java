@@ -131,7 +131,7 @@ public class PTRoutingFrequencyV2 {
 	
 	public void run(String[] args) throws IOException {
 		
-		double timeStep = 300;
+		double timeStep = 60;
 		
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(16);	// for parallel population reading
@@ -153,6 +153,10 @@ public class PTRoutingFrequencyV2 {
 		//config.scenario().setUseKnowledge(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		
+		config.planCalcScore().setTravelingWalk_utils_hr(-12.0); // setting 2 times higher disutility of walking according to SImon's analysis
+		
 		
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
@@ -326,12 +330,22 @@ public class PTRoutingFrequencyV2 {
 						
 						if (!writtenAccessTime) {
 							
-							if (routeIter.size() == 1) 
+							if (routeIter.size() == 1) {
+								outLink.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+
+							
 								
 								outLink.write(Double.toString(0.0) + " "); //writing access time
+							}
 														
-							else
+							else {
+								outLink.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+								
 								outLink.write(Double.toString(((Leg) pe1).getTravelTime()) + " "); //writing access time
+								
+								
+
+							}
 							writtenAccessTime = true;
 						}
 						
@@ -354,7 +368,7 @@ public class PTRoutingFrequencyV2 {
 				outLink.write(Double.toString(lastArrival - ((Leg)routeIter.get(0)).getDepartureTime()) + " "); //writing the total travel time from door to door
 				
 				outLink.write(Double.toString(distance));
-				
+	
 				outLink.newLine();
 				
 				
@@ -429,12 +443,19 @@ public class PTRoutingFrequencyV2 {
 						
 						if (!writtenAccessTime) {
 							
-							if (routeIter.size() == 1) 
+							if (routeIter.size() == 1) {
+								outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+
+							
 								
 								outLinkF.write(Double.toString(0.0) + " "); //writing access time
-														
-							else
+							}						
+							else{			
+								outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+							
+
 								outLinkF.write(Double.toString(((Leg) pe1).getTravelTime()) + " "); //writing access time
+							}
 							writtenAccessTime = true;
 						}
 						
@@ -472,6 +493,15 @@ public class PTRoutingFrequencyV2 {
 			
 			outFrequency.newLine();
 			
+			}
+			
+			else {
+				
+				//TODO: write the pure walk trip
+				outLink.write(arr[0] + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(0.0)
+						 + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(((Leg)route.get(0)).getTravelTime()) + " " + Double.toString(0.0));	
+				outLink.newLine();
+				
 			}
 			
 		}
