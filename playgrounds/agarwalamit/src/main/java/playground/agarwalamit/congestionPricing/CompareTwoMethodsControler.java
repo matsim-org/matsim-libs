@@ -79,7 +79,7 @@ public class CompareTwoMethodsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new MarginalCostPricingControlerListner((ScenarioImpl) controler.getScenario(), tollHandler ));
+			controler.addControlerListener(new CongestionPricingContolerListner((ScenarioImpl) controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
 		}
 
 		controler.setOverwriteFiles(true);

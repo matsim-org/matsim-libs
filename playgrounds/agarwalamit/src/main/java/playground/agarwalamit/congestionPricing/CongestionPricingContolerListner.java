@@ -31,6 +31,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
@@ -43,18 +44,19 @@ import playground.ikaddoura.internalizationCar.TollHandler;
  *
  */
 
-public class MarginalCostPricingControlerListner implements StartupListener, IterationEndsListener {
-	private final Logger log = Logger.getLogger(MarginalCostPricingControlerListner.class);
+public class CongestionPricingContolerListner implements StartupListener, IterationEndsListener {
+	private final Logger log = Logger.getLogger(CongestionPricingContolerListner.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
-	private MarginalCongestionHandlerImplV4 congestionHandler;
+	private EventHandler congestionHandler;
 	private MarginalCostPricingCarHandler pricingHandler;
 	private ExtCostEventHandler extCostHandler;
 	
-	public MarginalCostPricingControlerListner(ScenarioImpl scenario, TollHandler tollHandler){
+	public CongestionPricingContolerListner(ScenarioImpl scenario, TollHandler tollHandler, EventHandler handler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
+		this.congestionHandler = handler;
 	}
 	
 	@Override
@@ -62,7 +64,7 @@ public class MarginalCostPricingControlerListner implements StartupListener, Ite
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		this.congestionHandler = new MarginalCongestionHandlerImplV4(eventsManager, this.scenario);
+//		this.congestionHandler = new MarginalCongestionHandlerImplV4(eventsManager, this.scenario);
 		this.pricingHandler = new MarginalCostPricingCarHandler(eventsManager, this.scenario);
 		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
@@ -81,7 +83,7 @@ public class MarginalCostPricingControlerListner implements StartupListener, Ite
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+//		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
 		writerCar.writeDetailedResults(TransportMode.car);
 		writerCar.writeAvgTollPerDistance(TransportMode.car);
