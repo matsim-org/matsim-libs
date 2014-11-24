@@ -49,6 +49,8 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 
 	private List<Id<Link>> links = Collections.emptyList();
 
+	private Id<Vehicle> vehicle = null;
+
 	public AccessEgressNetworkBasedTeleportationRoute() {
 	}
 	
@@ -220,13 +222,13 @@ public class AccessEgressNetworkBasedTeleportationRoute implements GenericRoute 
 	}
 
 	@Override
-	public void setVehicleId( Id<Vehicle> vehicleId ) {
-		throw new UnsupportedOperationException();		
+	public void setVehicleId( final Id<Vehicle> vehicleId ) {
+		this.vehicle = vehicleId;
 	}
 
 	@Override
 	public Id<Vehicle> getVehicleId() {
-		throw new UnsupportedOperationException();
+		return vehicle;
 	}
 }
 
