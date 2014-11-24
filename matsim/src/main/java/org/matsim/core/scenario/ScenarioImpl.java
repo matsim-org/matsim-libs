@@ -139,22 +139,22 @@ public class ScenarioImpl implements Scenario {
 	}
 	
 	@Override
-	public ActivityFacilities getActivityFacilities() {
+	public final ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 
 	@Override
-	public Network getNetwork() {
+	public final Network getNetwork() {
 		return this.network;
 	}
 
 	@Override
-	public Population getPopulation() {
+	public final Population getPopulation() {
 		return this.population;
 	}
 
 	@Override
-	public Coord createCoord(final double d, final double e) {
+	public final Coord createCoord(final double d, final double e) {
 		return new CoordImpl( d, e ) ;
 	}
 
