@@ -4,7 +4,7 @@
  * <li> As a starting point to construct a schedule for formal public transit.
  * <li> As paratransit supply for scenarios where no information about paratransit is available.
  * </ul>
- * Look into {@link playground.andreas.P2} to get started.
+ * Look into {@link org.matsim.contrib.minibus} to get started.
  * <p/>
  * Some publications (list not regularly updated):<ul>
  * 

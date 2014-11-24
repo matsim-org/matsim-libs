@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -55,8 +57,6 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
-import playground.andreas.P2.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import playground.andreas.utils.pt.transitSchedule2shape.DaShapeWriter;
 import playground.andreas.utils.pt.transitSchedule2shape.TransitSchedule2Shape;
 import playground.vsp.analysis.VspAnalyzer;

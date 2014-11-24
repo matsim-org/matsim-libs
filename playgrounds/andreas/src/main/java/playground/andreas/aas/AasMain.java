@@ -20,6 +20,7 @@
 package playground.andreas.aas;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -27,7 +28,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.andreas.P2.PConfigGroup;
 
 import java.util.Collection;
 

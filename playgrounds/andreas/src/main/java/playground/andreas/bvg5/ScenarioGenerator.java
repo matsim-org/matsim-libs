@@ -31,6 +31,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,7 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import playground.andreas.utils.pop.FilterPopulationByShape;
 import playground.andreas.utils.pt.TransitLineRemover;
 

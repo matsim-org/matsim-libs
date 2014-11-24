@@ -1,10 +1,10 @@
 package playground.andreas.utils.pt.transitSchedule2shape;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.minibus.PConstants;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import playground.andreas.P2.PConstants;
 
 import java.util.Arrays;
 import java.util.Set;
