@@ -47,7 +47,7 @@ public class PStatsOverviewReader implements TabularFileHandler {
 	private PStatsOverviewReader(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterTags(new String[] {PStatsOverview.DELIMITER}); // \t
+		tabFileParserConfig.setDelimiterTags(new String[] {PStatsOverviewDataContainer.DELIMITER}); // \t
 	}
 
 	public static List<PStatsOverviewDataContainer> readPStatsOverviewCSV(String filename) {

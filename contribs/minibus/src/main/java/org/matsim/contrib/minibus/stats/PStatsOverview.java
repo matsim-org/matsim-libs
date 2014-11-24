@@ -63,9 +63,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 
 	private final static Logger log = Logger.getLogger(PStatsOverview.class);
 	
-	protected final static String DELIMITER = "\t";
-	
-	public enum INDEX {
+	enum INDEX {
 		INDEX_NOPERATORS("N operators", "N operators", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
 		INDEX_NOPERATORSPOS("N pos operators", "N pos operators", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
 		INDEX_NROUTES("N routes", "N routes", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
@@ -110,15 +108,15 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			this.decimalFormat = decimalFormat;
 		}
 		
-		public String getEnName(){
+		private String getEnName(){
 			return this.enName;
 		}
 		
-		public String getDeName(){
+		private String getDeName(){
 			return this.deName;
 		}
 		
-		public DecimalFormat getDecimalFormat(){
+		private DecimalFormat getDecimalFormat(){
 			return this.decimalFormat;
 		}
 	}
@@ -146,12 +144,8 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			log.info("enabled");
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				StringBuffer strB = new StringBuffer();
-				for (FIELDS field : PStatsOverviewDataContainer.FIELDS.values()) {
-					strB.append(field.getEnName()).append(PStatsOverview.DELIMITER);
-				}
-				strB.append("\n");
-				this.pStatsWriter.write(strB.toString());
+				this.pStatsWriter.write(PStatsOverviewDataContainer.getHeaderLine());
+				this.pStatsWriter.newLine();
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -275,7 +269,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						value = field.getDecimalFormat().format(pStats.getData(field.ordinal()));
 					}
 					
-					strB.append(value).append(PStatsOverview.DELIMITER);
+					strB.append(value).append(PStatsOverviewDataContainer.DELIMITER);
 				}
 				strB.append("\n");
 				this.pStatsWriter.write(strB.toString());

@@ -37,44 +37,47 @@ public class PStatsOverviewDataContainer {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PStatsOverviewDataContainer.class);
 	
+	final static String COMMENTTAG = "#";
+	final static String DELIMITER = "\t";
+	
 	public enum FIELDS {
-		iteration("iter", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nOperators("operators", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nOperatorsInBusiness("+operators", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nRoutes("routes", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nRoutesOfInBusiness("+routes", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nPax("pax", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nPaxServedByInBusiness("+pax", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nVehicle("veh", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
-		nVehicleOfInBusiness("+veh", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		iteration("Iteration [ ]", "Iteration [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nOperators("Operators [ ]", "Operators [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nOperatorsInBusiness("Operators IB [ ]", "Operators IB [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nRoutes("Routes [ ]", "Routes [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nRoutesOfInBusiness("Routes IB [ ]", "Routes IB [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nPax("Pax served [ ]", "Pax served [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nPaxServedByInBusiness("Pax served by IB [ ]", "Pax served by IB [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nVehicle("Veh [ ]", "Veh [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
+		nVehicleOfInBusiness("Veh of IB [ ]", "Veh of IB [ ]", new DecimalFormat( "#########0", new DecimalFormatSymbols(Locale.US))),
 		
-		avgBudgetPerOperator("budget", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		avgBudgetPerInBusinessOperator("+budget", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		avgCashflowPerRoute("score", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		avgCashflowPerRouteOfInBusiness("+score", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		avgBudgetPerOperator("Avg. budget per operator [$]", "Avg. budget per operator [$]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		avgBudgetPerInBusinessOperator("Avg. budget per IB operator [$]", "Avg. budget per IB operator [$]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		avgCashflowPerRoute("Avg. cash flow per route [$]", "Avg. cash flow per route [$]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		avgCashflowPerRouteOfInBusiness("Avg. cash flow per route of IB [$]", "Avg. cash flow per route of IB [$]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
 		
-		shareOfInBusinessOperators("sharePosOperators", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		shareOfInBusinessRoutes("sharePosRoutes", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		shareOfPaxServedByInBusiness("sharePosPax", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		shareOfVehOfInBusiness("sharePosVeh", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		shareOfInBusinessOperators("Share of IB operators [%]", "Share of IB operators [%]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		shareOfInBusinessRoutes("Share of IB routes [%]", "Share of IB routes [%]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		shareOfPaxServedByInBusiness("Share of pax served by IB [%]", "Share of pax served by IB [%]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		shareOfVehOfInBusiness("Share of veh served by IB [%]", "Share of veh served by IB [%]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
 		
-		estimatedMeanOperatorsInBusiness("ESmeanOperators+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedSDOperatorsInBusiness("ESstdDevOperators+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedMeanRouteOfInBusiness("ESmeanRoutes+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedSDRouteOfInBusiness("ESstdDevRoutes+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedMeanPaxServedByInBusiness("ESmeanPax+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedSDPaxServedByInBusiness("ESstdDevPax+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedMeanVehicleOfInBusiness("ESmeanVeh+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		estimatedSDVehicleOfInBusiness("ESstdDevVeh+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedMeanOperatorsInBusiness("Estimated mean of IB operators [ ]", "Estimated mean of IB operators [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedSDOperatorsInBusiness("Estimated SD of IB operators [ ]", "Estimated SD of IB operators [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedMeanRouteOfInBusiness("Estimated mean of IB routes [ ]", "Estimated mean of IB routes [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedSDRouteOfInBusiness("Estimated SD of IB routes [ ]", "Estimated SD of IB routes [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedMeanPaxServedByInBusiness("Estimated mean of pax served by IB [ ]", "Estimated mean of pax served by IB [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedSDPaxServedByInBusiness("Estimated SD of pax served by IB [ ]", "Estimated SD of pax served by IB [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedMeanVehicleOfInBusiness("Estimated mean of IB veh [ ]", "Estimated mean of IB veh [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		estimatedSDVehicleOfInBusiness("Estimated SD of IB veh [ ]", "Estimated SD of IB veh [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
 		
-		exactMeanOperatorsInBusiness("meanOperators+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactSDOperatorsInBusiness("stdDevOperators+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactMeanRouteOfInBusiness("meanRoutes+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactSDRouteOfInBusiness("stdDevRoutes+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactMeanPaxServedByInBusiness("meanPax+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactSDPaxServedByInBusiness("stdDevPax+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactMeanVehicleOfInBusiness("meanVeh+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
-		exactSDVehicleOfInBusiness("stdDevVeh+", "Summe der Reisezeiten [s]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US)));
+		exactMeanOperatorsInBusiness("Exact mean of IB operators [ ]", "Exact mean of IB operators [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactSDOperatorsInBusiness("Exact SD of IB operators [ ]", "Exact SD of IB operators [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactMeanRouteOfInBusiness("Exact mean of IB routes [ ]", "Exact mean of IB routes [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactSDRouteOfInBusiness("Exact SD of IB routes [ ]", "Exact SD of IB routes [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactMeanPaxServedByInBusiness("Exact mean of pax served by IB [ ]", "Exact mean of pax served by IB [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactSDPaxServedByInBusiness("Exact SD of pax served by IB [ ]", "Exact SD of pax served by IB [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactMeanVehicleOfInBusiness("Exact mean of IB veh [ ]", "Exact mean of IB veh [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US))),
+		exactSDVehicleOfInBusiness("Exact SD of IB veh [ ]", "Exact SD of IB veh [ ]", new DecimalFormat( "#########0.0000000000", new DecimalFormatSymbols(Locale.US)));
 		
 		private String enName;
 		private String deName;
@@ -109,5 +112,20 @@ public class PStatsOverviewDataContainer {
 	
 	public double getData(int column){
 		return datafields[column];
+	}
+	
+	public static String getHeaderLine(){
+		StringBuffer strB = new StringBuffer();
+		boolean initialized = false;
+		for (FIELDS field : FIELDS.values()) {
+			if (!initialized) {
+				strB.append(COMMENTTAG + " ");
+				initialized = true;
+			} else {
+				strB.append(DELIMITER);
+			}
+			strB.append(field.getEnName());
+		}
+		return strB.toString();
 	}
 }

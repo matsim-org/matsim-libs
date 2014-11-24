@@ -41,9 +41,9 @@ public final class LogElement {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(LogElement.class);
 
-	public final static String COMMENTTAG = "#";
-	public final static String DELIMITER = "\t";
-	public final static String NOVALUE = "=====";
+	final static String COMMENTTAG = "#";
+	final static String DELIMITER = "\t";
+	final static String NOVALUE = "=====";
 	
 	private int iteration;
 	private Id<Operator> operatorId;
@@ -150,7 +150,7 @@ public final class LogElement {
 		this.linksServed = linksServed;
 	}
 	
-	public static String getHeaderLine(){
+	static String getHeaderLine(){
 		StringBuffer strB = new StringBuffer();
 		strB.append(COMMENTTAG + " ");
 		strB.append("iteration");
@@ -189,7 +189,7 @@ public final class LogElement {
 		return strB.toString();
 	}
 	
-	public String getTotalString(){
+	String getTotalString(){
 		StringBuffer strB = new StringBuffer();
 		strB.append(this.iteration);
 		strB.append(DELIMITER).append(this.operatorId.toString());
