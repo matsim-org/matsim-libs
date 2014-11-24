@@ -98,6 +98,7 @@ public class InputsForFDTestSetUp {
 		if(GenerateFundametalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_WITH_HOLES);
+			config.setParam("WITH_HOLE", "HOLE_SPEED", "15.");
 		}
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		scenario = ScenarioUtils.createScenario(config);

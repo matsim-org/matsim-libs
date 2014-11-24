@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -112,6 +112,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private double flowCapacityPerTimeStep;
 	private int bufferStorageCapacity;
 	private double usedBufferStorageCapacity = 0.0 ;
+	private double leftHolesStorageCapacity = 0.0 ;
 	private final Queue<MyQueueWithBuffer.Hole> holes = new LinkedList<>();
 	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
@@ -139,6 +140,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	static boolean VIS_HOLES = false ;
+	double hole_speed;
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
@@ -245,6 +247,27 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			this.isSeepModeStorageFree = Boolean.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "isSeepModeStorageFree"));
 			SeepQLinkImpl.log.info("Seepage is allowed. Seep mode is "+this.seepMode+".");
 			if(this.isSeepModeStorageFree) SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities.");
+		}
+		
+		//following are copied part from QNetSimEngine instead of copying the whole class.
+		QSimConfigGroup qsimConfigGroup = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
+		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+			MyQueueWithBuffer.HOLES=false ;
+		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+			MyQueueWithBuffer.HOLES = true ;
+		} else {
+			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
+					+ qsimConfigGroup.getTrafficDynamics() ) ;
+		}
+		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
+			MyQueueWithBuffer.VIS_HOLES = true ;
+		}
+		
+		if(MyQueueWithBuffer.HOLES){
+			hole_speed = Double.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("WITH_HOLE", "HOLE_SPEED"));
+			if (hole_speed!=15) {
+				SeepQLinkImpl.log.warn("Hole speed is set to "+hole_speed+". Default hardcoded value is 15.");
+			}
 		}
 		
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
@@ -360,8 +383,9 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 
 		if ( MyQueueWithBuffer.HOLES ) {
+			leftHolesStorageCapacity = this.storageCapacity;
 			// the number of holes really just needs to be the storage capacity!
-			for ( int ii=0 ; ii< this.storageCapacity ; ii++ ) {
+			for ( int ii=0 ; ii< this.storageCapacity *4 ; ii++ ) {
 				MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
 				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
 				holes.add( hole ) ;
@@ -440,9 +464,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( MyQueueWithBuffer.HOLES ) {
 			MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
-			double offset = length*3600./15./1000. ;
+			double offset = length*3600./hole_speed/1000. ;
 			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
 			holes.add( hole ) ;
+			leftHolesStorageCapacity = leftHolesStorageCapacity +veh2Remove.getSizeInEquivalents();
 		}
 		return veh ;
 	}
@@ -493,8 +518,8 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			return false ;
 		}
 		// at this point, storage is ok, so start checking holes:
-		QItem hole = holes.peek();
-		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+		HolesQItem hole = holes.peek();
+		if ( leftHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		}
@@ -651,6 +676,16 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.add(veh);
 		if ( MyQueueWithBuffer.HOLES ) {
 			holes.poll();
+			leftHolesStorageCapacity = leftHolesStorageCapacity -veh.getSizeInEquivalents();
+//			// here removing one hole of pcu size 1 but then extra removed holes are added again.
+//			if(veh.getSizeInEquivalents()<1){
+//				int holesMultiplication = (int) (1 / veh.getSizeInEquivalents());
+//				for (int jj=0; jj<holesMultiplication -1 ; jj++){
+//					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+//					hole2.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
+//					holes.add(hole2);
+//				}
+//			}
 		}
 	}
 
@@ -701,8 +736,9 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		return this.id;
 	}
 
-	static class Hole extends QItem {
+	static class Hole extends HolesQItem {
 		private double earliestLinkEndTime ;
+		private double pcu;
 
 		@Override
 		public double getEarliestLinkExitTime() {
@@ -712,6 +748,16 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		@Override
 		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
+		}
+
+		@Override
+		double getSizeInEquivalents() {
+			return this.pcu;
+		}
+
+		@Override
+		void setSizeInEquivalents(double pcuFactorOfHole) {
+			this.pcu = pcuFactorOfHole;
 		}
 	}
 
@@ -738,7 +784,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 				// holes:
 				if ( !holes.isEmpty() ) {
 					double spacing = snapshotInfoBuilder.calculateVehicleSpacing(length, holes.size(), getStorageCapacity() );
-					double freespeedTraveltime = length / (15.*1000./3600.) ;
+					double freespeedTraveltime = length / (hole_speed*1000./3600.);
 					double lastDistanceFromFromNode = Double.NaN;
 					for (Hole hole : holes) {
 						lastDistanceFromFromNode = createAndAddHolePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
@@ -746,7 +792,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 					}
 				}
 			}
-
 			return positions ;
 		}
 

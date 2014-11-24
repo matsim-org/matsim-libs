@@ -36,7 +36,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -50,9 +52,13 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
@@ -68,20 +74,24 @@ public class GenerateFundametalDiagramData {
 	//CONFIGURATION: static variables used for aggregating configuration options
 
 	public static final boolean PASSING_ALLOWED = false;
-	private static final String OUTPUT_FOLDER = "/run5/car/";
+	public static final boolean SEEPAGE_ALLOWED = false;
+	private final boolean SEEP_NETWORK_FACTORY = true;
+	private final boolean LIVE_OTFVis = false;
 	public static final boolean WITH_HOLES = true;
+	
+	private static final String OUTPUT_FOLDER = "/run5/motorbike/";
 	private static final String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/withHoles/";
 	private static final String OUTPUT_FILE = RUN_DIR+OUTPUT_FOLDER+"/data.txt"; //"pathto\\data.txt";
 	private static final String OUTPUT_EVENTS =RUN_DIR+OUTPUT_FOLDER+"/events.xml";// "pathto\\events.xml";
 	public static final boolean writeInputFiles = true; // includes config,network and plans
 
-	public final static String[] TRAVELMODES= {"car"};	//identification of the different modes
+	public final static String[] TRAVELMODES= {"motorbike"};	//identification of the different modes
 	public final static Double[] MODAL_SPLIT = {1.}; //modal split in PCU 
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 10;
+	private final int reduceDataPointsByFactor = 40;
 
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
@@ -94,12 +104,13 @@ public class GenerateFundametalDiagramData {
 
 	public GenerateFundametalDiagramData(){
 		createLogFile();
-	
+
 		if (TRAVELMODES.length != MODAL_SPLIT.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
 		if(PASSING_ALLOWED) log.info("=======Passing is allowed.========");
+		if(SEEPAGE_ALLOWED) log.info("=======Seepage is allowed.========");
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
 
 		inputs = new InputsForFDTestSetUp(RUN_DIR+OUTPUT_FOLDER);
@@ -107,7 +118,7 @@ public class GenerateFundametalDiagramData {
 		scenario = inputs.getScenario();
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 	}
-	
+
 	public static void main(String[] args) {
 		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
 		generateFDData.openFileAndWriteHeader(OUTPUT_FILE);
@@ -160,7 +171,7 @@ public class GenerateFundametalDiagramData {
 		for (int i=0; i<TRAVELMODES.length; i++){
 			minSteps.set(i, minSteps.get(i)/pgcd);
 		}
-		
+
 		if(minSteps.size()==1){
 			minSteps.set(0, 1);
 		}
@@ -169,7 +180,7 @@ public class GenerateFundametalDiagramData {
 		if(reduceDataPointsByFactor!=1) {
 			log.info("===============");
 			log.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
-			"Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
+					"Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
 			log.info("===============");
 			for(int index=0;index<minSteps.size();index++){
 				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);
@@ -298,7 +309,16 @@ public class GenerateFundametalDiagramData {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		QNetsimEngine netsimEngine ;
+
+		if(SEEP_NETWORK_FACTORY){
+			log.warn("Using modified \"QueueWithBuffer\". Keep eyes open.");
+			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
+			netsimEngine = new QNetsimEngine(qSim,seepNetFactory);
+		} else {
+			netsimEngine = new QNetsimEngine(qSim);
+		}
+
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
@@ -324,6 +344,17 @@ public class GenerateFundametalDiagramData {
 		agentSource.setModeVehicleTypes(travelModesTypes);
 
 		qSim.addAgentSource(agentSource);
+		
+		if ( LIVE_OTFVis ) {
+			// otfvis configuration.  There is more you can do here than via file!
+			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+			//				otfVisConfig.setShowParking(true) ; // this does not really work
+
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, qSim);
+			OTFClientLive.run(sc.getConfig(), server);
+		}
+		
 		return qSim;
 	}
 
@@ -394,11 +425,11 @@ public class GenerateFundametalDiagramData {
 		}
 		return gcd;
 	}
-	
+
 	private void createLogFile(){
 		PatternLayout layout = new PatternLayout();
-		 String conversionPattern = " %d %4p %c{1} %L %m%n";
-		 layout.setConversionPattern(conversionPattern);
+		String conversionPattern = " %d %4p %c{1} %L %m%n";
+		layout.setConversionPattern(conversionPattern);
 		FileAppender appender;
 		try {
 			appender = new FileAppender(layout, RUN_DIR+OUTPUT_FOLDER+"/logfile.log",false);
@@ -407,7 +438,7 @@ public class GenerateFundametalDiagramData {
 		}
 		log.addAppender(appender);
 	}
-	
+
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 
 		private MyPersonDriverAgentImpl delegate;
@@ -524,7 +555,7 @@ public class GenerateFundametalDiagramData {
 		public Id<Vehicle > getPlannedVehicleId() {
 			return delegate.getPlannedVehicleId();
 		}
-		
+
 		@Override
 		public boolean isWantingToArriveOnCurrentLink() {
 			// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
