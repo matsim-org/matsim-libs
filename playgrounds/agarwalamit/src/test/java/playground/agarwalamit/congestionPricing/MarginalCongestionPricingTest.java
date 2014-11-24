@@ -72,6 +72,9 @@ public class MarginalCongestionPricingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	private Map<Id<Person>, Double> affectedPerson2Delays_v4 = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> affectedPerson2Delays_v6 = new HashMap<Id<Person>, Double>();
+	
 		@Test
 		public final void implV6Test(){
 	
@@ -149,6 +152,11 @@ public class MarginalCongestionPricingTest {
 					
 				} else throw new RuntimeException("Delay can not occur on this link - "+event.getLinkId().toString());
 			
+				if(affectedPerson2Delays_v6.containsKey(event.getAffectedAgentId())){
+					double delaySoFar = affectedPerson2Delays_v6.get(event.getAffectedAgentId());
+					affectedPerson2Delays_v6.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
+				} else affectedPerson2Delays_v6.put(event.getAffectedAgentId(), event.getDelay());
+				
 			}
 	
 			// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
@@ -268,7 +276,11 @@ public class MarginalCongestionPricingTest {
 				}
 
 			} else throw new RuntimeException("Delay can not occur on link id - "+event.getLinkId().toString());
-
+			
+			if(affectedPerson2Delays_v4.containsKey(event.getAffectedAgentId())){
+				double delaySoFar = affectedPerson2Delays_v4.get(event.getAffectedAgentId());
+				affectedPerson2Delays_v4.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
+			} else affectedPerson2Delays_v4.put(event.getAffectedAgentId(), event.getDelay());
 		}
 
 		// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
@@ -281,7 +293,14 @@ public class MarginalCongestionPricingTest {
 
 		Assert.assertEquals("some events are not checked on link 2" , 8, link2Delays);
 		Assert.assertEquals("some events are not checked on link 3" , 7, link3Delays);
-
+	}
+	
+	@Test
+	public void compareTwoImplementations(){
+		// check if delays per person (affected) is same.
+		for(Id<Person> personId : affectedPerson2Delays_v4.keySet()){
+			Assert.assertEquals("wrong delay.", affectedPerson2Delays_v4.get(personId), affectedPerson2Delays_v6.get(personId), MatsimTestUtils.EPSILON);
+		}
 	}
 
 	private QSim createQSim (Scenario sc, EventsManager manager){

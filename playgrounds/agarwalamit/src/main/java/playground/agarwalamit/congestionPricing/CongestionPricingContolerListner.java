@@ -53,6 +53,11 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 	private MarginalCostPricingCarHandler pricingHandler;
 	private ExtCostEventHandler extCostHandler;
 	
+	/**
+	 * @param scenario
+	 * @param tollHandler
+	 * @param handler must be one of the implementation for congestion pricing 
+	 */
 	public CongestionPricingContolerListner(ScenarioImpl scenario, TollHandler tollHandler, EventHandler handler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
@@ -64,7 +69,6 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-//		this.congestionHandler = new MarginalCongestionHandlerImplV4(eventsManager, this.scenario);
 		this.pricingHandler = new MarginalCostPricingCarHandler(eventsManager, this.scenario);
 		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
