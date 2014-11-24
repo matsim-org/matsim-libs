@@ -480,7 +480,7 @@ public class Controler extends AbstractController {
 		sim.run();
 	}
 
-	/* package */ Mobsim getNewMobsim() {
+	private Mobsim getNewMobsim() {
 		// overridden once for a test case (not so bad since it is package protected). kai, jan'13
 		if (this.thisMobsimFactory != null) {
 			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());

@@ -42,49 +42,6 @@ public class ControlerMobsimIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testRunMobsim_qsim() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim("qsim");
-		cfg.controler().setWritePlansInterval(0);
-		FakeControler c = new FakeControler(cfg);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
-		c.getConfig().controler().setWriteEventsInterval(0);
-		c.run();
-		Assert.assertTrue(c.sim instanceof QSim);
-	}
-
-	@Test
-	public void testRunMobsim_qsim_parallel() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim("qsim");
-		cfg.controler().setWritePlansInterval(0);
-		cfg.qsim().setNumberOfThreads(3);
-		FakeControler c = new FakeControler(cfg);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
-		c.getConfig().controler().setWriteEventsInterval(0);
-		c.run();
-		Assert.assertTrue(c.sim instanceof QSim);
-	}
-
-	@Test
-	public void testRunMobsim_jdeqsim() {
-		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		cfg.controler().setLastIteration(0);
-		cfg.controler().setMobsim(MobsimType.JDEQSim.toString());
-		cfg.controler().setWritePlansInterval(0);
-		FakeControler c = new FakeControler(cfg);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
-		c.getConfig().controler().setWriteEventsInterval(0);
-		c.run();
-		Assert.assertTrue("sim is of wrong type " + c.sim.getClass().getCanonicalName(), c.sim instanceof JDEQSimulation);
-	}
-
-	@Test
 	public void testRunMobsim_customMobsim() {
 		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		cfg.controler().setLastIteration(0);
@@ -112,19 +69,6 @@ public class ControlerMobsimIntegrationTest {
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
         Assert.assertNotNull("expected exception, but there was none.", c.uncaughtException);
-	}
-
-	private static class FakeControler extends Controler {
-		/*package*/ Mobsim sim = null;
-		public FakeControler(final Config cfg) {
-			super(cfg);
-		}
-		@Override
-		Mobsim getNewMobsim() {
-			// remember the created sim, but return a dummy
-			this.sim = super.getNewMobsim();
-			return new FakeSimulation();
-		}
 	}
 
 	private static class CountingMobsimFactory implements MobsimFactory {
