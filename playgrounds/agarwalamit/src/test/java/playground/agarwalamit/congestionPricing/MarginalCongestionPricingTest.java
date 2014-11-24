@@ -72,8 +72,9 @@ public class MarginalCongestionPricingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	private Map<Id<Person>, Double> affectedPerson2Delays_v4 = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> affectedPerson2Delays_v6 = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2causedDelay_v4 = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2causedDelay_v6 = new HashMap<Id<Person>, Double>();
 	
 		@Test
 		public final void implV6Test(){
@@ -152,10 +153,10 @@ public class MarginalCongestionPricingTest {
 					
 				} else throw new RuntimeException("Delay can not occur on this link - "+event.getLinkId().toString());
 			
-				if(affectedPerson2Delays_v6.containsKey(event.getAffectedAgentId())){
-					double delaySoFar = affectedPerson2Delays_v6.get(event.getAffectedAgentId());
-					affectedPerson2Delays_v6.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
-				} else affectedPerson2Delays_v6.put(event.getAffectedAgentId(), event.getDelay());
+				if(personId2causedDelay_v6.containsKey(event.getCausingAgentId())){
+					double delaySoFar = personId2causedDelay_v6.get(event.getCausingAgentId());
+					personId2causedDelay_v6.put(event.getCausingAgentId(), event.getDelay()+delaySoFar);
+				} else personId2causedDelay_v6.put(event.getCausingAgentId(), event.getDelay());
 				
 			}
 	
@@ -277,10 +278,16 @@ public class MarginalCongestionPricingTest {
 
 			} else throw new RuntimeException("Delay can not occur on link id - "+event.getLinkId().toString());
 			
-			if(affectedPerson2Delays_v4.containsKey(event.getAffectedAgentId())){
-				double delaySoFar = affectedPerson2Delays_v4.get(event.getAffectedAgentId());
-				affectedPerson2Delays_v4.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
-			} else affectedPerson2Delays_v4.put(event.getAffectedAgentId(), event.getDelay());
+			if(personId2affectedDelay.containsKey(event.getAffectedAgentId())){
+				double delaySoFar = personId2affectedDelay.get(event.getAffectedAgentId());
+				personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
+			} else personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay());
+			
+			if(personId2causedDelay_v4.containsKey(event.getCausingAgentId())){
+				double delaySoFar = personId2causedDelay_v4.get(event.getCausingAgentId());
+				personId2causedDelay_v4.put(event.getCausingAgentId(), event.getDelay()+delaySoFar);
+			} else personId2causedDelay_v4.put(event.getCausingAgentId(), event.getDelay());
+			
 		}
 
 		// affected persons are 2,4,6,8 on link3 and 6,7,8,9 on link 2.
@@ -298,8 +305,10 @@ public class MarginalCongestionPricingTest {
 	@Test
 	public void compareTwoImplementations(){
 		// check if delays per person (affected) is same.
-		for(Id<Person> personId : affectedPerson2Delays_v4.keySet()){
-			Assert.assertEquals("wrong delay.", affectedPerson2Delays_v4.get(personId), affectedPerson2Delays_v6.get(personId), MatsimTestUtils.EPSILON);
+		System.out.println("PersonID \t Delay affected \t Delay caused (V4) \t Delay caused (V6) ");
+		for(Id<Person> personId : personId2affectedDelay.keySet()){
+			System.out.println(personId + "\t" + this.personId2affectedDelay.get(personId) + "\t" + this.personId2causedDelay_v4.get(personId) + "\t" + this.personId2causedDelay_v6.get(personId));
+//			Assert.assertEquals("wrong delay.", personId2affectedDelay.get(personId), affectedPerson2Delays_v6.get(personId), MatsimTestUtils.EPSILON);
 		}
 	}
 
