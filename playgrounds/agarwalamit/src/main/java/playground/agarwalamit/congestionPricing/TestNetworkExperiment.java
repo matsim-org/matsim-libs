@@ -61,16 +61,20 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
+import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
+import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
+
 /**
  * @author amit
  */
-public class StraightTrackExperiment {
-	final Logger log = Logger.getLogger(StraightTrackExperiment.class);
-	
-	
+public class TestNetworkExperiment {
+	final Logger log = Logger.getLogger(TestNetworkExperiment.class);
+
+
 	public static void main(String[] args) {
-		StraightTrackExperiment stTrEx = new StraightTrackExperiment();
-		stTrEx.test4MarginalCongestionCosts();
+		TestNetworkExperiment testEx = new TestNetworkExperiment();
+		//testEx.test4MarginalCongestionCosts();
+		testEx.printData();
 	}
 
 	public void test4MarginalCongestionCosts(){
@@ -93,6 +97,65 @@ public class StraightTrackExperiment {
 		QSim qSim = createQSim(sc, events,useOTFVis);
 		qSim.run();
 		writer.closeFile();
+	}
+
+
+	public void printData(){
+		Map<Id<Person>, Double> personId2AffectedDelays_v4 = getPersonId2Delays("v4", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v6 = getPersonId2Delays("v6", "affected");
+		Map<Id<Person>, Double> personId2CausingDelays_v4 = getPersonId2Delays("v4", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v6 = getPersonId2Delays("v6", "causing");
+
+		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V6) ");
+		for(Id<Person> personId : personId2AffectedDelays_v4.keySet()){
+			System.out.println(personId + "\t" + personId2AffectedDelays_v4.get(personId) + "\t" + personId2AffectedDelays_v6.get(personId) + "\t" + 
+					personId2CausingDelays_v4.get(personId) + "\t" + personId2CausingDelays_v6.get(personId));
+		}
+	}
+
+	public Map<Id<Person>, Double> getPersonId2Delays(String congestionPricingImpl, String affectedOrCausing){
+		int numberOfPersonInPlan = 10;
+		createPseudoInputs pseudoInputs = new createPseudoInputs();
+		pseudoInputs.createNetwork();
+		pseudoInputs.createPopulation(numberOfPersonInPlan);
+		Scenario sc = pseudoInputs.scenario;
+
+		EventsManager events = EventsUtils.createEventsManager();
+
+		Map<Id<Person>, Double> personId2Delay = new HashMap<Id<Person>, Double>();
+
+		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+
+		events.addHandler( new MarginalCongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(MarginalCongestionEvent event) {
+				congestionEvents.add(event);
+			}
+		});
+
+		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v5")) events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
+
+		QSim sim = createQSim(sc, events, false);
+		sim.run();
+
+		for (MarginalCongestionEvent event : congestionEvents) {
+			Id<Person> desiredPerson = null;
+			if(affectedOrCausing.equalsIgnoreCase("affected")) desiredPerson = event.getAffectedAgentId();
+			else if(affectedOrCausing.equalsIgnoreCase("causing")) desiredPerson = event.getCausingAgentId();
+
+			if(personId2Delay.containsKey(desiredPerson)){
+				double delaySoFar = personId2Delay.get(desiredPerson);
+				personId2Delay.put(desiredPerson, event.getDelay()+delaySoFar);
+			} else personId2Delay.put(desiredPerson, event.getDelay());
+		}
+		return personId2Delay;
 	}
 
 	private QSim createQSim (Scenario sc, EventsManager manager,boolean useOTFVis){
