@@ -219,7 +219,10 @@ public class FreightChainGenerator {
 				/* Generate the next node, given the current node. */
 				nextId = network.getPathDependentNode(currentId).sampleBiasedNextPathDependentNode(previousId);
 				String activityType = null;
-				if(chainLength == MAX_CHAIN_LENGTH || nextId == null || nextId.toString().equalsIgnoreCase("sink")){
+				
+				/*Uncomment the next line if you wish to enforce a maximum chain length when generating the chains.*/
+//				if(chainLength == MAX_CHAIN_LENGTH || nextId == null || nextId.toString().equalsIgnoreCase("sink")){
+				if(nextId == null || nextId.toString().equalsIgnoreCase("sink")){
 					activityType = "major";
 					chainEnd = true;
 				} else{
