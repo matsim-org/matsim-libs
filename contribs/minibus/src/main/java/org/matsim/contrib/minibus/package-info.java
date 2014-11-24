@@ -1,7 +1,19 @@
 /**
- * Look into:<ul>
- * <li> {@link org.matsim.contrib.minibus.PMain}
+ * 
+ * Package that takes demand and infrastructure (roads, ...) as input and runs an adaptive "minibus" model to serve that demand.
+ * The resulting minibus lines can for example be used as follows:<ul>
+ * <li> As a starting point to construct a schedule for formal public transit.
+ * <li> As paratransit supply for scenarios where no information about paratransit is available.
  * </ul>
+ * 
+ * Some publications (list not regularly updated):<ul>
+ * 
+ * <li> Ph.D. dissertation of Andreas Neumann, pdf-version available at <a href="http://nbn-resolving.de/urn/resolver.pl?urn:nbn:de:kobv:83-opus4-53866"> UB, TU Berlin </a>
+ * <li> Towards a simulation of minibuses in South Africa, preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-03/"> VSP, TU Berlin </a>
+ * </ul>
+ * 
+ * Look into {@link org.matsim.contrib.minibus.PMain} to get started.
+ * <p/>
  * 
  * Quickstart from command line (without eclipse):<ul>
  * <li> Create an empty directory and cd into it.
