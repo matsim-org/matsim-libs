@@ -59,8 +59,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV4;
-import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV6;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
 
@@ -71,10 +69,6 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
 public class MarginalCongestionPricingTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	private Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> personId2causedDelay_v4 = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> personId2causedDelay_v6 = new HashMap<Id<Person>, Double>();
 
 	@Test
 	public final void implV6Test(){
@@ -288,48 +282,32 @@ public class MarginalCongestionPricingTest {
 
 	@Test
 	public void compareTwoImplementations(){
-		// check if delays per person (affected) is same.
+
+		Map<Id<Person>, Double> personId2affectedDelay_v4  = getAffectedPersonId2Delays("v4");
+		Map<Id<Person>, Double> personId2affectedDelay_v5  = getAffectedPersonId2Delays("v5");
+		Map<Id<Person>, Double> personId2affectedDelay_v6  = getAffectedPersonId2Delays("v6");
+
+		for(Id<Person> personId : personId2affectedDelay_v4.keySet()){
+			Assert.assertEquals("wrong delay for person "+personId, personId2affectedDelay_v4.get(personId), personId2affectedDelay_v5.get(personId), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong delay for person "+personId, personId2affectedDelay_v4.get(personId), personId2affectedDelay_v6.get(personId), MatsimTestUtils.EPSILON);
+		}
+	}
+
+	private Map<Id<Person>, Double> getAffectedPersonId2Delays(String congestionPricingImpl){
+
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
 		Scenario sc = pseudoInputs.scenario;
 
-		EventsManager events_v6 = EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
-		final List<MarginalCongestionEvent> congestionEvents_v6 = new ArrayList<MarginalCongestionEvent>();
+		Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
 
-		events_v6.addHandler( new MarginalCongestionEventHandler() {
+		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-			@Override
-			public void reset(int iteration) {				
-			}
-
-			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
-				congestionEvents_v6.add(event);
-			}
-
-		});
-
-		events_v6.addHandler(new MarginalCongestionHandlerImplV6(events_v6, (ScenarioImpl) sc));
-
-		QSim sim_v6 = createQSim(sc, events_v6);
-		sim_v6.run();
-
-		for (MarginalCongestionEvent event : congestionEvents_v6) {
-			if(personId2causedDelay_v6.containsKey(event.getCausingAgentId())){
-				double delaySoFar = personId2causedDelay_v6.get(event.getCausingAgentId());
-				personId2causedDelay_v6.put(event.getCausingAgentId(), event.getDelay()+delaySoFar);
-			} else personId2causedDelay_v6.put(event.getCausingAgentId(), event.getDelay());
-
-		}
-		
-		EventsManager events_v4 = EventsUtils.createEventsManager();
-
-		final List<MarginalCongestionEvent> congestionEvents_v4 = new ArrayList<MarginalCongestionEvent>();
-
-		events_v4.addHandler( new MarginalCongestionEventHandler() {
+		events.addHandler( new MarginalCongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				
@@ -337,35 +315,28 @@ public class MarginalCongestionPricingTest {
 
 			@Override
 			public void handleEvent(MarginalCongestionEvent event) {
-				congestionEvents_v4.add(event);
+				congestionEvents.add(event);
 			}
 
 		});
 
-		events_v4.addHandler(new MarginalCongestionHandlerImplV4(events_v4, (ScenarioImpl) sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v5")) events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
 
-		QSim sim_v4 = createQSim(sc, events_v4);
-		sim_v4.run();
+		QSim sim = createQSim(sc, events);
+		sim.run();
 
-		for (MarginalCongestionEvent event : congestionEvents_v4) {
+		for (MarginalCongestionEvent event : congestionEvents) {
 			if(personId2affectedDelay.containsKey(event.getAffectedAgentId())){
 				double delaySoFar = personId2affectedDelay.get(event.getAffectedAgentId());
 				personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);
 			} else personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay());
+		}
 
-			if(personId2causedDelay_v4.containsKey(event.getCausingAgentId())){
-				double delaySoFar = personId2causedDelay_v4.get(event.getCausingAgentId());
-				personId2causedDelay_v4.put(event.getCausingAgentId(), event.getDelay()+delaySoFar);
-			} else personId2causedDelay_v4.put(event.getCausingAgentId(), event.getDelay());
-		}
-		
-		System.out.println("PersonID \t Delay affected \t Delay caused (V4) \t Delay caused (V6) ");
-		for(Id<Person> personId : personId2affectedDelay.keySet()){
-			System.out.println(personId + "\t" + this.personId2affectedDelay.get(personId) + "\t" + this.personId2causedDelay_v4.get(personId) + "\t" + this.personId2causedDelay_v6.get(personId));
-			//			Assert.assertEquals("wrong delay.", personId2affectedDelay.get(personId), affectedPerson2Delays_v6.get(personId), MatsimTestUtils.EPSILON);
-		}
+		return personId2affectedDelay;
 	}
-	
+
 	private QSim createQSim (Scenario sc, EventsManager manager){
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
