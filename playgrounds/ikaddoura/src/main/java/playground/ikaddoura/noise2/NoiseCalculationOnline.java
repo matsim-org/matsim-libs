@@ -22,11 +22,7 @@
  */
 package playground.ikaddoura.noise2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -46,14 +42,12 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	private NoiseParameters noiseParameters;
-	private NoiseInitialization initialization;
+	private NoiseContext noiseContext;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private NoiseImmissionCalculation noiseImmission;
 	private PersonActivityHandler personActivityTracker;
 	private NoiseDamageCalculation noiseDamageCosts;
-	
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
-	
+		
 	public NoiseCalculationOnline(NoiseParameters noiseParameters) {
 		this.noiseParameters = noiseParameters;
 	}
@@ -63,14 +57,14 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		
 		log.info("Initialization...");
 		
-		this.initialization = new NoiseInitialization(event.getControler().getScenario(), noiseParameters, this.receiverPoints);
-		this.initialization.initialize();
-		NoiseWriter.writeReceiverPoints(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
+		this.noiseContext = new NoiseContext(event.getControler().getScenario(), noiseParameters);
+		this.noiseContext.initialize();
+		NoiseWriter.writeReceiverPoints(this.noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		log.info("Initialization... Done.");
 
 		this.noiseEmissionHandler = new NoiseEmissionHandler(event.getControler().getScenario(), noiseParameters);
-		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseParameters, initialization, this.receiverPoints);
+		this.personActivityTracker = new PersonActivityHandler(event.getControler().getScenario(), noiseContext);
 						
 		event.getControler().getEvents().addHandler(noiseEmissionHandler);
 		event.getControler().getEvents().addHandler(personActivityTracker);
@@ -79,7 +73,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		log.info("Resetting noise immissions, activity information and damages...");
-		for (ReceiverPoint rp : this.receiverPoints.values()) {
+		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getTimeInterval2actInfos().clear();
 			rp.getTimeInterval2affectedAgentUnits().clear();
 			rp.getTimeInterval2damageCostPerAffectedAgentUnit().clear();
@@ -100,10 +94,10 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Calculating noise emission... Done.");
 		
 		log.info("Calculating noise immission...");
-		this.noiseImmission = new NoiseImmissionCalculation(this.initialization, this.noiseEmissionHandler, noiseParameters, this.receiverPoints);
+		this.noiseImmission = new NoiseImmissionCalculation(this.noiseContext, this.noiseEmissionHandler);
 		noiseImmission.calculateNoiseImmission();
-		NoiseWriter.writeNoiseImmissionStats(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
-		NoiseWriter.writeNoiseImmissionStatsPerHour(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
+		NoiseWriter.writeNoiseImmissionStats(this.noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStats.csv");
+		NoiseWriter.writeNoiseImmissionStatsPerHour(this.noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/immissionStatsPerHour.csv");
 		log.info("Calculating noise immission... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
@@ -111,9 +105,9 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Calculating each agent's activity durations... Done.");
 			
 		log.info("Calculating noise damage costs and throwing noise events...");
-		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), noiseParameters, noiseEmissionHandler, noiseImmission, this.receiverPoints);
+		this.noiseDamageCosts = new NoiseDamageCalculation(event.getControler().getScenario(), event.getControler().getEvents(), this.noiseContext, noiseEmissionHandler);
 		this.noiseDamageCosts.calculateNoiseDamageCosts();
-		NoiseWriter.writeDamageInfoPerHour(this.receiverPoints, this.noiseParameters, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/damageStatsPerHour.csv");
+		NoiseWriter.writeDamageInfoPerHour(this.noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/damageStatsPerHour.csv");
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 		
 	}
@@ -137,12 +131,8 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		return noiseDamageCosts;
 	}
 
-	NoiseInitialization getSpatialInfo() {
-		return initialization;
+	NoiseContext getNoiseContext() {
+		return noiseContext;
 	}
-
-	Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
-		return receiverPoints;
-	}
-		
+	
 }

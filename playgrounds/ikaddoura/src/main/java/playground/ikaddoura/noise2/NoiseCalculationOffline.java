@@ -179,19 +179,18 @@ public class NoiseCalculationOffline {
 		
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
-		
-		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
-		
+			
 		// yy Ihab, das, was Du "initialization" nennst, nennen wir an anderer Stelle "Context".  Und würden dann vielleicht auch noiseParameters, receiverPoints etc.
 		// gleich mit reinpacken.  VG Kai
-		NoiseInitialization initialization = new NoiseInitialization(scenario, noiseParameters, receiverPoints);
-		initialization.initialize();
-		NoiseWriter.writeReceiverPoints(receiverPoints, noiseParameters, outputFilePath + "/receiverPoints/");
+		// Ok, so ungefaehr? Gruß, ihab
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		noiseContext.initialize();
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 				
 		NoiseEmissionHandler noiseEmissionHandler = new NoiseEmissionHandler(scenario, noiseParameters);
 		events.addHandler(noiseEmissionHandler);
 
-		PersonActivityHandler personActivityHandler = new PersonActivityHandler(scenario, noiseParameters, initialization, receiverPoints);
+		PersonActivityHandler personActivityHandler = new PersonActivityHandler(scenario, noiseContext);
 		events.addHandler(personActivityHandler);
 				
 		log.info("Reading events file...");
@@ -206,23 +205,23 @@ public class NoiseCalculationOffline {
 		log.info("Calculating noise emissions... Done.");
 		
 		log.info("Calculating noise immissions...");
-		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(initialization, noiseEmissionHandler, noiseParameters, receiverPoints);
+		NoiseImmissionCalculation noiseImmission = new NoiseImmissionCalculation(noiseContext, noiseEmissionHandler);
 		noiseImmission.calculateNoiseImmission();
-		NoiseWriter.writeNoiseImmissionStats(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
-		NoiseWriter.writeNoiseImmissionStatsPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
+		NoiseWriter.writeNoiseImmissionStats(noiseContext, outputFilePath + config.controler().getLastIteration() + ".immissionStats.csv");
+		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.csv");
 //		NoiseWriter.writeNoiseImmissionStatsPerHourShapeFile(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".immissionStatsPerHour.shp");
 		log.info("Calculating noise immissions... Done.");
 		
 		log.info("Calculating each agent's activity durations...");
 		personActivityHandler.calculateDurationsOfStay();
-		NoiseWriter.writePersonActivityInfoPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputFilePath + config.controler().getLastIteration() + ".personActivityInfoPerHour.csv");
 		log.info("Calculating each agent's activity durations... Done.");
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
-		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, noiseParameters, noiseEmissionHandler, noiseImmission, receiverPoints);
+		NoiseDamageCalculation noiseDamageCosts = new NoiseDamageCalculation(scenario, events, noiseContext, noiseEmissionHandler);
 		noiseDamageCosts.setCollectNoiseEvents(false);
 		noiseDamageCosts.calculateNoiseDamageCosts();
-		NoiseWriter.writeDamageInfoPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".damageCostInfoPerHour.csv");
+		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputFilePath + config.controler().getLastIteration() + ".damageCostInfoPerHour.csv");
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
 		eventWriter.closeFile();

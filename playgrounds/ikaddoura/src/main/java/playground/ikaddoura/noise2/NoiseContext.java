@@ -45,9 +45,9 @@ import org.matsim.pt.PtConstants;
  * @author lkroeger, ikaddoura
  *
  */
-public class NoiseInitialization {
+public class NoiseContext {
 	
-	private static final Logger log = Logger.getLogger(NoiseInitialization.class);
+	private static final Logger log = Logger.getLogger(NoiseContext.class);
 			
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
@@ -74,10 +74,10 @@ public class NoiseInitialization {
 	
 	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 					
-	public NoiseInitialization(Scenario scenario, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
-		this.receiverPoints = receiverPoints;
+		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
 		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
@@ -582,6 +582,14 @@ public class NoiseInitialization {
 		return activityCoord2receiverPointId;
 	}
 	
+	public Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
+		return receiverPoints;
+	}
+	
+	public NoiseParameters getNoiseParams() {
+		return noiseParams;
+	}
+
 	// for testing purposes
 	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
 		return zoneTuple2listOfReceiverPointIds;

@@ -51,7 +51,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 
 	private Scenario scenario;
 	private NoiseParameters noiseParams;
-	private NoiseInitialization spatialInfo;
+	private NoiseContext spatialInfo;
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
@@ -59,11 +59,11 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 	private Map<Id<Person>, Map<Integer, PersonActivityInfo>> personId2actNr2actInfo = new HashMap<Id<Person>, Map<Integer, PersonActivityInfo>>();
 		
-	public PersonActivityHandler (Scenario scenario, NoiseParameters noiseParams, NoiseInitialization spatialInfo, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public PersonActivityHandler (Scenario scenario, NoiseContext noiseContext) {
 		this.scenario = scenario;
-		this.noiseParams = noiseParams;
-		this.spatialInfo = spatialInfo;
-		this.receiverPoints = receiverPoints;
+		this.noiseParams = noiseContext.getNoiseParams();
+		this.spatialInfo = noiseContext;
+		this.receiverPoints = noiseContext.getReceiverPoints();
 		
 		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {

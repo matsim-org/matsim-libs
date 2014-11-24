@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,19 +50,19 @@ import org.opengis.feature.simple.SimpleFeature;
 public class NoiseWriter {
 	private static final Logger log = Logger.getLogger(NoiseWriter.class);
 
-	public static void writeReceiverPoints(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParameters, String outputPath) {
+	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath) {
 
 		// csv file
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
 		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
-		for(Id<ReceiverPoint> id : receiverPoints.keySet()) {
+		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
 			c++;
 			if(c % 1000 == 0) {
 				log.info("Writing out receiver point # "+ c);
 			}
-			id2xCoord.put(id, receiverPoints.get(id).getCoord().getX());
-			id2yCoord.put(id, receiverPoints.get(id).getCoord().getY());
+			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
+			id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
 		}
 		List<String> headers = new ArrayList<String>();
 		headers.add("receiverPointId");
@@ -79,13 +78,13 @@ public class NoiseWriter {
 		// shape file	
 				
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(noiseParameters.getTransformationFactory()))
+		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
 		.setName("receiver point")
 		.addAttribute("Id", String.class)
 		.create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		for (ReceiverPoint rp : receiverPoints.values()) {
+		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 					
 			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
 			features.add(feature);
@@ -299,7 +298,8 @@ public class NoiseWriter {
 		}	
 	}
 
-	public static void writeNoiseImmissionStats(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParams, String fileName) {
+	public static void writeNoiseImmissionStats(NoiseContext noiseContext, String fileName) {
+				
 		File file = new File(fileName);
 		
 		try {
@@ -308,31 +308,31 @@ public class NoiseWriter {
 			bw.newLine();
 			
 			List<Double> day = new ArrayList<Double>();
-			for(double timeInterval = 6 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 6 * 3600 + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 22 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()){
 				day.add(timeInterval);
 			}
 			List<Double> night = new ArrayList<Double>();
-			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()){
 				if(!(day.contains(timeInterval))) {
 					night.add(timeInterval);
 				}
 			}
 			
 			List<Double> peak = new ArrayList<Double>();
-			for(double timeInterval = 7 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 7 * 3600 + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 9 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
-			for(double timeInterval = 15 * 3600 + noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = 15 * 3600 + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 18 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()){
 				peak.add(timeInterval);
 			}
 			List<Double> offPeak = new ArrayList<Double>();
-			for(double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()){
+			for(double timeInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 24 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()){
 				if(!(peak.contains(timeInterval))) {
 					offPeak.add(timeInterval);
 				}
 			}
 			
-			for (ReceiverPoint rp : receiverPoints.values()){
+			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()){
 				double avgNoise = 0.;
 				double avgNoiseDay = 0.;
 				double avgNoiseNight = 0.;
@@ -414,7 +414,7 @@ public class NoiseWriter {
 		
 	}
 
-	public static void writeNoiseImmissionStatsPerHour(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParams, String fileName) {
+	public static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String fileName) {
 		File file = new File(fileName);
 		
 		try {
@@ -423,16 +423,16 @@ public class NoiseWriter {
 			// column headers
 			bw.write("receiver point");
 			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				String time = Time.writeTime( (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
 				bw.write(";noise immission " + time);
 			}
 			bw.newLine();
 
 			
-			for (ReceiverPoint rp : receiverPoints.values()){
+			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()){
 				bw.write(rp.getId().toString());
 				for(int i = 0 ; i < 30 ; i++) {
-					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
+					double timeInterval = (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 					double noiseImmission = 0.;
 					
 					
@@ -474,17 +474,17 @@ public class NoiseWriter {
 		
 	}
 	
-	public static void writeNoiseImmissionStatsPerHourShapeFile(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParameters, String fileName){
+	public static void writeNoiseImmissionStatsPerHourShapeFile(NoiseContext noiseContext, String fileName){
 		
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(noiseParameters.getTransformationFactory()))
+		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
 		.setName("receiver point")
 		.addAttribute("Time", String.class)
 		.addAttribute("immissions", Double.class)
 		.create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		for (ReceiverPoint rp : receiverPoints.values()) {
+		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 			for (Double timeInterval : rp.getTimeInterval2immission().keySet()) {
 				if (timeInterval <= 23 * 3600.) {
 					String dateTimeString = convertSeconds2dateTimeFormat(timeInterval);
@@ -507,7 +507,7 @@ public class NoiseWriter {
 		return dateTimeString;
 	}	
 	
-	public static void writePersonActivityInfoPerHour(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParams, String fileName) {
+	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String fileName) {
 		File file = new File(fileName);
 			
 		try {
@@ -516,16 +516,16 @@ public class NoiseWriter {
 			// column headers
 			bw.write("receiver point");
 			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				String time = Time.writeTime( (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
 				bw.write(";agent units " + time);
 			}
 			bw.newLine();
 
 			
-			for (ReceiverPoint rp : receiverPoints.values()) {
+			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				bw.write(rp.getId().toString());
 				for(int i = 0 ; i < 30 ; i++) {
-					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
+					double timeInterval = (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 					double affectedAgentUnits = 0.;
 					
 					if (rp.getTimeInterval2affectedAgentUnits() != null) {
@@ -566,7 +566,7 @@ public class NoiseWriter {
 		}		
 	}
 	
-	public static void writeDamageInfoPerHour(Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints, NoiseParameters noiseParams, String fileName) {
+	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String fileName) {
 		File file = new File(fileName);
 			
 		try {
@@ -575,16 +575,16 @@ public class NoiseWriter {
 			// column headers
 			bw.write("receiver point");
 			for(int i = 0; i < 30 ; i++) {
-				String time = Time.writeTime( (i+1) * noiseParams.getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
+				String time = Time.writeTime( (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation(), Time.TIMEFORMAT_HHMMSS );
 				bw.write(";damage costs (EUR) " + time);
 			}
 			bw.newLine();
 
 			
-			for (ReceiverPoint rp : receiverPoints.values()) {
+			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				bw.write(rp.getId().toString());
 				for(int i = 0 ; i < 30 ; i++) {
-					double timeInterval = (i+1) * noiseParams.getTimeBinSizeNoiseComputation();
+					double timeInterval = (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 					double damage = 0.;
 					
 					if (rp.getTimeInterval2damageCosts() != null) {

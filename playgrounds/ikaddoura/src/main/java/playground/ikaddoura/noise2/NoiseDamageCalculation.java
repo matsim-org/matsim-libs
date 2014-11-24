@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -70,14 +71,14 @@ public class NoiseDamageCalculation {
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
-	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseParameters noiseParams, NoiseEmissionHandler noiseEmissionHandler, NoiseImmissionCalculation noiseImmission, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
+	public NoiseDamageCalculation (Scenario scenario , EventsManager events, NoiseContext noiseContext, NoiseEmissionHandler noiseEmissionHandler) {
 		this.scenario = scenario;
 		this.events = events;
-		this.noiseParams = noiseParams;
-		this.receiverPoints = receiverPoints;
+		this.noiseParams = noiseContext.getNoiseParams();
+		this.receiverPoints = noiseContext.getReceiverPoints();
 		this.noiseEmissionHandler = noiseEmissionHandler;												
 	}
-	
+
 	public void setCollectNoiseEvents(boolean collectNoiseEvents) {
 		this.collectNoiseEvents = collectNoiseEvents;
 		log.info("Collecting Noise Events is set to " + collectNoiseEvents);

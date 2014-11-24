@@ -43,7 +43,7 @@ public class NoiseImmissionCalculation {
 
 	private static final Logger log = Logger.getLogger(NoiseImmissionCalculation.class);
 	
-	private NoiseInitialization spatialInfo;
+	private NoiseContext spatialInfo;
 	private NoiseParameters noiseParams;
 	
 	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
@@ -53,10 +53,10 @@ public class NoiseImmissionCalculation {
 	private final List<Id<Link>> tunnelLinks;
 	private final List<Id<Link>> noiseBarrierLinks;
 		
-	public NoiseImmissionCalculation (NoiseInitialization spatialInfo, NoiseEmissionHandler noiseEmissionHandler, NoiseParameters noiseParams, Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints) {
-		this.spatialInfo = spatialInfo;
-		this.noiseParams = noiseParams;
-		this.receiverPoints = receiverPoints;
+	public NoiseImmissionCalculation (NoiseContext noiseContext, NoiseEmissionHandler noiseEmissionHandler) {
+		this.spatialInfo = noiseContext;
+		this.noiseParams = noiseContext.getNoiseParams();
+		this.receiverPoints = noiseContext.getReceiverPoints();
 		this.noiseEmissionHandler = noiseEmissionHandler;
 		
 		this.tunnelLinks = noiseParams.getTunnelLinkIDs();
@@ -117,7 +117,7 @@ public class NoiseImmissionCalculation {
 	}
 	
 	
-	private double emission2immission(NoiseInitialization spatialInfo, Id<Link> linkId, double noiseEmission, Id<ReceiverPoint> rpId) {
+	private double emission2immission(NoiseContext spatialInfo, Id<Link> linkId, double noiseEmission, Id<ReceiverPoint> rpId) {
 		double noiseImmission = 0.;
 			
 		noiseImmission = noiseEmission
