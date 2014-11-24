@@ -235,17 +235,19 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 	 */
 	private static class TestControler extends Controler {
 
+		private StrategyManager manager;
+
 		public TestControler(final Config config, final StrategyManager manager) {
 			super(config);
-			this.strategyManager = manager;
 			this.setCreateGraphs(false);
 			this.getConfig().controler().setWriteEventsInterval(1);
 			this.setDumpDataAtEnd(false);
+			this.manager = manager ;
 		}
 
 		@Override
 		protected StrategyManager loadStrategyManager() {
-			return this.strategyManager;
+			return this.manager ;
 		}
 	}
 }

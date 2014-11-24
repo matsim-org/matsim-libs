@@ -124,7 +124,7 @@ public class Controler extends AbstractController {
     private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
 
     protected ScoringFunctionFactory scoringFunctionFactory = null;
-	protected StrategyManager strategyManager = null;
+	private StrategyManager strategyManager = null;
 
 	protected boolean scenarioLoaded = false;
 
@@ -328,8 +328,8 @@ public class Controler extends AbstractController {
         PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.scoringFunctionFactory);
 		this.addCoreControlerListener(plansScoring);
 
-		this.strategyManager = loadStrategyManager();
-        this.addCoreControlerListener(new PlansReplanning(this.strategyManager, getScenario().getPopulation()));
+		this.strategyManager = loadStrategyManager() ;
+        this.addCoreControlerListener(new PlansReplanning(this.getStrategyManager(), getScenario().getPopulation()));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
@@ -759,7 +759,7 @@ public class Controler extends AbstractController {
 	// using the methods above.
 	// ******** --------- *******
 
-    public void setModules(AbstractModule... modules) {
+    public final void setModules(AbstractModule... modules) {
         this.modules = Arrays.asList(modules);
     }
 
