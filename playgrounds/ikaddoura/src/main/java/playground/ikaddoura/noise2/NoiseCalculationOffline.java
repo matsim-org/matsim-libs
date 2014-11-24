@@ -145,13 +145,13 @@ public class NoiseCalculationOffline {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
 		
-		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
 //		double xMin = 4590855.;
 //		double yMin = 5819679.;
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-		// Berlin Coordinates: Area of Berlin
+////		 Berlin Coordinates: Area of Berlin
 //		double xMin = 4573258.;
 //		double yMin = 5801225.;
 //		double xMax = 4620323.;
@@ -165,7 +165,6 @@ public class NoiseCalculationOffline {
 		// Berlin Activity Types
 //		String[] consideredActivities = {"home"};
 		String[] consideredActivities = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-
 		noiseParameters.setConsideredActivities(consideredActivities);
 				
 		log.info("Loading scenario...");
@@ -178,8 +177,8 @@ public class NoiseCalculationOffline {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
-//		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-//		events.addHandler(eventWriter);
+		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
 		
 		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
@@ -226,7 +225,7 @@ public class NoiseCalculationOffline {
 		NoiseWriter.writeDamageInfoPerHour(receiverPoints, noiseParameters, outputFilePath + config.controler().getLastIteration() + ".damageCostInfoPerHour.csv");
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 
-//		eventWriter.closeFile();
+		eventWriter.closeFile();
 	}
 }
 		
