@@ -90,8 +90,8 @@ public class EnergyFlowsController extends Controler {
 	 */
 	@Override
 	protected void setUp() {
-		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
+		if (this.getScoringFunctionFactory() == null) {
+			this.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario()));
 		}
 		super.setUp();
 	}

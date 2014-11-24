@@ -68,32 +68,32 @@ public final class CarSharingControler extends Controler
 
   @Override
   protected void loadData() {
-	if (!this.scenarioLoaded) {
+	if (!this.isScenarioLoaded()) {
 			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteFtInfo, this.ftConfigGroup);
 			loader.loadScenario();
-			this.scenarioLoaded = true;
+			this.setScenarioLoaded(true);
 	}
   }
   @Override
   protected void setUp(){
-  
-  {
-    if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
-      log.info("Using ftRouter");
-        this.plansCalcRouteFtInfo.prepare(getScenario().getNetwork());
-    }
 
-      FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
-      this.config, 
-      this.ftConfigGroup, 
-      ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-              getScenario().getActivityFacilities(), getScenario().getNetwork());
-    this.setScoringFunctionFactory(ftScoringFunctionFactory);
-//
-    FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
-    setTravelDisutilityFactory(costCalculatorFactory);
-    super.setUp();
-  	}
+	  {
+		  if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
+			  log.info("Using ftRouter");
+			  this.plansCalcRouteFtInfo.prepare(getScenario().getNetwork());
+		  }
+
+		  FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
+				  this.config, 
+				  this.ftConfigGroup, 
+				  ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+				  getScenario().getActivityFacilities(), getScenario().getNetwork());
+		  this.setScoringFunctionFactory(ftScoringFunctionFactory);
+		  //
+		  FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
+		  setTravelDisutilityFactory(costCalculatorFactory);
+		  super.setUp();
+	  }
   }
   
   @Override

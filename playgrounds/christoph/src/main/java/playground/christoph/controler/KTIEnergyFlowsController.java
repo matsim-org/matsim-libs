@@ -71,7 +71,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	
 	@Override
 	protected void loadData() {
-		if (!this.scenarioLoaded) {
+		if (!this.isScenarioLoaded()) {
 			
 			/*
 			 * The KTIConfigGroup is loaded as generic Module. We replace this
@@ -97,7 +97,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			if (this.config.scenario().isUseHouseholds()) {
 				this.loadHouseholds();
 			}
-			this.scenarioLoaded = true;
+			this.setScenarioLoaded(true);
 		}
 		
 		// connect facilities to links

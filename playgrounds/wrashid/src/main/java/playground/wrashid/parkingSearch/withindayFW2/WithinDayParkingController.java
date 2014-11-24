@@ -106,45 +106,45 @@ public class WithinDayParkingController extends WithinDayController implements R
 	
 	protected void setUp() {
 		super.setUp();
-		
-		
-// connect facilities to network
-        new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
-		
+
+
+		// connect facilities to network
+		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+
 		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
-		
-// ensure that all agents' plans have valid mode chains
+
+		// ensure that all agents' plans have valid mode chains
 		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
-		this.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-		this.getScenario().getActivityFacilities()
-		));
+				this.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+				this.getScenario().getActivityFacilities()
+				));
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
-		
+
 		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,null,null);
-		
+
 		// init parking facility capacities
-				IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
-				parkingInfrastructure.setFacilityCapacities(facilityCapacities);
-				for (ActivityFacility parkingFacility : parkingInfrastructure.getParkingFacilities()) {
-					facilityCapacities.incrementBy(parkingFacility.getId(), 10);
-				}
-		
-		
-//		Set<Id> parkingFacilityIds = parkingInfrastructure.getFacilityCapacities().getKeySet();
-//		for (Id id : parkingFacilityIds) parkingInfrastructure.getFacilityCapacities().incrementBy(id, 1000);
-		
+		IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
+		parkingInfrastructure.setFacilityCapacities(facilityCapacities);
+		for (ActivityFacility parkingFacility : parkingInfrastructure.getParkingFacilities()) {
+			facilityCapacities.incrementBy(parkingFacility.getId(), 10);
+		}
+
+
+		//		Set<Id> parkingFacilityIds = parkingInfrastructure.getFacilityCapacities().getKeySet();
+		//		for (Id id : parkingFacilityIds) parkingInfrastructure.getFacilityCapacities().incrementBy(id, 1000);
+
 		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
-		
+
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.config.planCalcScore());
-		
+
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
-		
+
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
 	}

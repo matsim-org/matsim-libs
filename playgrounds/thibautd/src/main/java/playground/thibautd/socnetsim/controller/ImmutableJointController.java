@@ -176,7 +176,7 @@ public final class ImmutableJointController extends AbstractController {
 	}
 
 	@Override
-	protected void runMobSim(int iteration) {
+	protected void runMobSim() {
 		registry.getMobsimFactory().createMobsim(
 				registry.getScenario(),
 				registry.getEvents() ).run();

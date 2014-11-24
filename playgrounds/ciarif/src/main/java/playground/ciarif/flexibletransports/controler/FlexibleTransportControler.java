@@ -67,10 +67,10 @@ public final class FlexibleTransportControler extends Controler
 
   @Override
   protected void loadData() {
-	if (!this.scenarioLoaded) {
+	if (!this.isScenarioLoaded()) {
 			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteFtInfo, this.ftConfigGroup);
 			loader.loadScenario();
-			this.scenarioLoaded = true;
+			this.setScenarioLoaded(true);
 	}
   }
   

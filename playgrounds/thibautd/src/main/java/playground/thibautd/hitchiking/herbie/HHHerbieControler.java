@@ -59,7 +59,7 @@ public class HHHerbieControler extends HitchHikingControler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.scenarioLoaded = true;
+		this.setScenarioLoaded(true);
 	}
 
 	@Override

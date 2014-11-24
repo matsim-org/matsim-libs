@@ -62,8 +62,7 @@ public abstract class AbstractController {
 
     private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
 
-    @Deprecated
-    /*package*/ Integer thisIteration = null;
+    private Integer thisIteration = null;
 
 
     protected AbstractController() {
@@ -151,7 +150,7 @@ public abstract class AbstractController {
 
     protected abstract void loadCoreListeners();
 
-    protected abstract void runMobSim(int iteration);
+    protected abstract void runMobSim();
 
     protected abstract void prepareForSim();
 
@@ -258,7 +257,7 @@ public abstract class AbstractController {
                 @Override
                 public void run() {
                     resetRandomNumbers(config.global().getRandomSeed(), iteration);
-                    runMobSim(iteration);
+                    runMobSim();
                 }
             });
         }
@@ -346,6 +345,11 @@ public abstract class AbstractController {
     public final OutputDirectoryHierarchy getControlerIO() {
         return controlerIO;
     }
+
+
+	public final Integer getIterationNumber() {
+		return this.thisIteration;
+	}
 
 
 }

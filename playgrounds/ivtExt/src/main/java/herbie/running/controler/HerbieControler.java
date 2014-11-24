@@ -59,7 +59,7 @@ public class HerbieControler extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.scenarioLoaded = true;
+		this.setScenarioLoaded(true);
 	}
 
 	@Override

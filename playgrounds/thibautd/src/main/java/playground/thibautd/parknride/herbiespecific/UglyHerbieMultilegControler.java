@@ -63,7 +63,7 @@ public class UglyHerbieMultilegControler extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		this.scenarioLoaded = true;
+		this.setScenarioLoaded(true);
 	}
 
 	public void setParkingPenaltyFactory(final ParkingPenaltyFactory factory) {

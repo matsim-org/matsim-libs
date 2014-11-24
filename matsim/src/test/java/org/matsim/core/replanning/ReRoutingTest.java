@@ -46,6 +46,7 @@ public class ReRoutingTest extends MatsimTestCase {
         config.qsim().setStuckTime(100.0);
         config.qsim().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
+		config.controler().setLastIteration(1);
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
@@ -60,7 +61,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	public void testReRoutingDijkstra() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -70,7 +71,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	public void testReRoutingFastDijkstra() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -83,7 +84,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	public void testReRoutingAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -93,7 +94,7 @@ public class ReRoutingTest extends MatsimTestCase {
 	public void testReRoutingFastAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -116,41 +117,4 @@ public class ReRoutingTest extends MatsimTestCase {
 				PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));		
 	}
 
-	static public class TestControler extends Controler {
-
-		boolean mobsimRan = false;
-		
-		public TestControler(final Scenario scenario) {
-			super(scenario);
-		}
-
-		@Override
-		protected void setUp() {
-			super.setUp();
-
-			// do some test to ensure the scenario is correct
-			int lastIter = this.config.controler().getLastIteration();
-			if (lastIter < 1) {
-				throw new IllegalArgumentException("Controler.lastIteration must be at least 1. Current value is " + lastIter);
-			}
-			if (lastIter > 1) {
-				log.error("Controler.lastIteration is currently set to " + lastIter + ". Only the first iteration will be analyzed.");
-			}
-		}
-
-		@Override
-		protected void runMobSim() {
-			if (!this.mobsimRan) {
-				/* only run mobsim once, afterwards we're no longer interested
-				 * in it as we have our plans-file to compare against to check the
-				 * replanning.
-				 */
-				super.runMobSim();
-				this.mobsimRan = true;
-			} else {
-				log.info("skipping mobsim, as it is not of interest in this iteration.");
-			}
-		}
-
-	}
 }

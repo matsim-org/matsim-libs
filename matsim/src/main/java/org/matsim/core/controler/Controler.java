@@ -20,6 +20,12 @@
 
 package org.matsim.core.controler;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -35,10 +41,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.controler.corelisteners.*;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -52,9 +61,20 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.LinkToLinkTripRouterFactory;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -66,8 +86,6 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
-
-import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -98,7 +116,7 @@ public class Controler extends AbstractController {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	protected final Config config;
+	protected final Config config; 
 	protected final Scenario scenarioData ;
 
 	protected final EventsManager events;
@@ -123,10 +141,10 @@ public class Controler extends AbstractController {
     // and only include what you want.
     private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
 
-    protected ScoringFunctionFactory scoringFunctionFactory = null;
+    private ScoringFunctionFactory scoringFunctionFactory = null;
 	private StrategyManager strategyManager = null;
 
-	protected boolean scenarioLoaded = false;
+	private boolean scenarioLoaded = false;
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
@@ -142,7 +160,7 @@ public class Controler extends AbstractController {
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
     private PlanSelectorFactoryRegister planSelectorFactoryRegister;
 
-	protected boolean dumpDataAtEnd = true;
+	private boolean dumpDataAtEnd = true; 
 	private boolean overwriteFiles = false;
 
 	private boolean routerCreated = false;
@@ -246,14 +264,12 @@ public class Controler extends AbstractController {
 	}
 
 	private void setupTransitSimulation() {
+		// yyyy this should go away somehow. :-)
+		
 		log.info("setting up transit simulation");
 		if (!this.config.scenario().isUseVehicles()) {
 			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
 		}
-
-		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
-		formats.add(EventsFileFormat.xml);
-		this.config.controler().setEventsFileFormats(formats);
 
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
@@ -277,6 +293,7 @@ public class Controler extends AbstractController {
 	 */
 	protected void loadData() {
 		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
+		// confirmed as evil. nov'14
 
 		if (!this.scenarioLoaded) {
 			ScenarioUtils.loadScenario(this.scenarioData );
@@ -306,8 +323,8 @@ public class Controler extends AbstractController {
 		}
 
 
-		if (this.scoringFunctionFactory == null) {
-			this.scoringFunctionFactory = ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData ) ;
+		if (this.getScoringFunctionFactory() == null) {
+			this.setScoringFunctionFactory(ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData )) ;
 		}
 
         this.injector = Injector.createInjector(
@@ -324,8 +341,8 @@ public class Controler extends AbstractController {
                         bindToInstance(Scenario.class, scenarioData);
                     }
                 });
-        this.injector.retrofitScoringFunctionFactory(this.scoringFunctionFactory);
-        PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.scoringFunctionFactory);
+        this.injector.retrofitScoringFunctionFactory(this.getScoringFunctionFactory());
+        PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.getScoringFunctionFactory());
 		this.addCoreControlerListener(plansScoring);
 
 		this.strategyManager = loadStrategyManager() ;
@@ -351,6 +368,7 @@ public class Controler extends AbstractController {
 		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
 		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
 		// The core controler listeners are separate, after all.  kai, feb'13
+		// yyyy should be possible to make this final. kn/mz, nov'14
 
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
@@ -396,7 +414,10 @@ public class Controler extends AbstractController {
 	 * including, say, factories."  kai, dec'12
 	 * </ul>
 	 */
+	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
 	protected void setUp() {
+		// yyyy MZ will, class by class, see if other constructs are possible.  kn/mz, nov'14
+		
 		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
         if ( tripRouterFactory == null ) {
 			// This builder is just for compatibility, in case somebody
@@ -426,9 +447,14 @@ public class Controler extends AbstractController {
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	protected StrategyManager loadStrategyManager() {
-		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
+		// yy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		// now about 20 locations.  kai, may'2013
 		// now about 15 locations.  kai, oct'14
+		
+		// this is not too bad since this is essentially a factory method.  So overwriting this method essentially means replacing the factory.
+		// With current coding standard, would need setStrategyManagerFactory(...).  However, with future coding standard, this
+		// will just be a module which can be replaced.  kai/mz, nov'14
+		
         for (final Map.Entry<String, PlanStrategy> entry : this.injector.getPlanStrategiesDeclaredByModules().entrySet()) {
             this.planStrategyFactoryRegister.register(entry.getKey(), new PlanStrategyFactory() {
                 @Override
@@ -448,11 +474,6 @@ public class Controler extends AbstractController {
 	}
 
 	@Override
-	protected final void runMobSim(int iteration) {
-		this.thisIteration = iteration; // yyyy this line should not be necessary any more. kai, feb'13
-		runMobSim();
-	}
-
 	protected void runMobSim() {
 		// yyyy cannot make this final: overridden at about 15 locations.  kai, jan'13
 		Mobsim sim = getNewMobsim();
@@ -469,7 +490,7 @@ public class Controler extends AbstractController {
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData , this.events);
 			simulation.setControlerIO(this.getControlerIO());
-			simulation.setIterationNumber(this.thisIteration);
+			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
 		} else {
 			MobsimFactory f = this.mobsimFactoryRegister.getInstance(this.config.controler().getMobsim());
@@ -485,13 +506,12 @@ public class Controler extends AbstractController {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 
-			int itNumber = this.thisIteration;
-			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
+			if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
 				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
 					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-					String fileName = this.getControlerIO().getIterationFilename(itNumber, baseFileName);
+					String fileName = this.getControlerIO().getIterationFilename(this.getIterationNumber(), baseFileName);
 					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData );
 					manager.addSnapshotWriter(snapshotWriter);
 				}
@@ -607,17 +627,6 @@ public class Controler extends AbstractController {
 
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
-	}
-
-	/**
-	 * @return The result of this function is not reliable. It is the iteration number, but it is only set  
-	 * before running the Mobsim, not at the proper start of the iteration.
-	 * If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.
-	 */
-	@Deprecated
-	public final Integer getIterationNumber() {
-		log.warn("Controler.getIterationNumber() is deprecated and wrong. If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.");
-		return this.thisIteration;
 	}
 
 	public final TransitRouterFactory getTransitRouterFactory() {
@@ -803,6 +812,18 @@ public class Controler extends AbstractController {
 	@Deprecated // see javadoc above
 	public final StrategyManager getStrategyManager() {
 		return this.strategyManager;
+	}
+
+	protected boolean isScenarioLoaded() {
+		return scenarioLoaded;
+	}
+
+	protected void setScenarioLoaded(boolean scenarioLoaded) {
+		this.scenarioLoaded = scenarioLoaded;
+	}
+
+	public boolean getDumpDataAtEnd() {
+		return dumpDataAtEnd;
 	}
 
 }

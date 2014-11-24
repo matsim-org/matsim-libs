@@ -230,7 +230,7 @@ public class RunMunichZone30Controller extends AbstractController {
 	}
 	
 	@Override
-	protected void runMobSim(int iteration) {
+	protected void runMobSim() {
 		QSim qSim = new QSim( this.scenario, this.eventsManager ) ;
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
@@ -243,13 +243,13 @@ public class RunMunichZone30Controller extends AbstractController {
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
-		if (config.controler().getWriteSnapshotsInterval() != 0 && iteration % config.controler().getWriteSnapshotsInterval() == 0) {
+		if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
 			SnapshotWriterManager manager = new SnapshotWriterManager(config);
 			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
 			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = getControlerIO().getIterationFilename(iteration, baseFileName);
+			String fileName = getControlerIO().getIterationFilename(this.getIterationNumber(), baseFileName);
 			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
