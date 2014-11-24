@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -275,6 +276,25 @@ public class NoiseTest {
 		controler.run();
 			
 		Assert.assertEquals("wrong number of hgv on linkA5 in timeInterval 11 * 3600.", 1, noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2numberOfLinkEnterHgv().get(Id.create("linkA5", Link.class)).get(11 * 3600.), 0.);	
-		// ...
+		// TODO: Gehen Lkw auch richtig in die Immissions und DamageCost Berechnung ein?
+		
 	}
+	
+	// tests different setups regarding the considered activities
+	@Ignore
+	@Test
+	public final void test4(){
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config4.xml";
+
+		Controler controler = new Controler(configFile);
+		NoiseCalculationOnline noiseControlerListener = new NoiseCalculationOnline(new NoiseParameters());
+		controler.addControlerListener(noiseControlerListener);
+				
+		controler.setOverwriteFiles(true);
+		controler.run();
+
+		// TODO
+	}
+	
+	
 }
