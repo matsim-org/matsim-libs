@@ -21,8 +21,9 @@ public class MultipleFreightPopulationGenerator {
 	 * @param the path to the path dependent complex network file, ending in ".xml.gz"
 	 * @param the number of plans to generate per population
 	 * @param the sub-population description, in this case it's "commercial"
-	 * @param the path to where the plans file should be written, ending in ".xml.gz"
-	 * @param the path to where the attribute file should be written, ending in ".xml.gz"
+	 * @param the path to where the plans file should be written, NOT including the file 
+	 * 		  extension .xml.gz.
+	 * @param the path to where the attribute file should be written, not including file extension
 	 * @param the number of threads to use for the multi-threaded part
 	 * @param the number of freight populations to generate
 	 */
@@ -46,8 +47,8 @@ public class MultipleFreightPopulationGenerator {
 		
 		
 		for(int i = 0; i < numberOfPopulations; i++){
-			String output = String.format("%s_%d.xml.gz", arguments[3], i);
-			String attributeFile = String.format("%s_%d.gml.gz", arguments[4], i);
+			String output = String.format("%d_%s.xml.gz", i, arguments[3]);
+			String attributeFile = String.format("%d_%s.xml.gz", i, arguments[4]);
 			
 			String[] appendedArguments = new String[]{arguments[0], arguments[1], 
 					arguments[2], output, attributeFile, arguments[5], arguments[6]};
