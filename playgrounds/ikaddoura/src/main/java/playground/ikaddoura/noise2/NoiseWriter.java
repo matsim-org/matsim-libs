@@ -58,7 +58,7 @@ public class NoiseWriter {
 		int c = 0;
 		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
 			c++;
-			if(c % 1000 == 0) {
+			if(c % 10000 == 0) {
 				log.info("Writing out receiver point # "+ c);
 			}
 			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());

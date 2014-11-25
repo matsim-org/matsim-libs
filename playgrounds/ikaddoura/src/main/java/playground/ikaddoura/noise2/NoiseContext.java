@@ -221,7 +221,7 @@ public class NoiseContext {
 		for (ReceiverPoint rp : this.receiverPoints.values()) {
 			counter++;
 			
-			if (counter % 1000. == 0.) {
+			if (counter % 10000. == 0.) {
 				log.info("Setting relevant link information for receiver point # " + counter);
 			}
 			
