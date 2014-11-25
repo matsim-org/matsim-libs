@@ -231,9 +231,8 @@ PersonStuckEventHandler
 
 				while (personIdListIterator.hasNext() && delayToPayFor>0){
 					Id<Person> personToBeChargedId = personIdListIterator.next();
-					double maxTimePerPersonToBeChargedOnLink = linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 
-					chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, personToBeChargedId);
+					chargingPersonAndThrowingEvents(event, personToBeChargedId,event.getLinkId());
 
 					delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 				}
@@ -292,9 +291,8 @@ PersonStuckEventHandler
 
 		while(enteredPersonsListIterator.hasNext() && delayToPayFor>0){
 			Id<Person> personToBeCharged = enteredPersonsListIterator.next();
-			double maxTimePerPersonToBeChargedOnLink = this.linkId2congestionInfo.get(spillBackCausingLink).getMarginalDelayPerLeavingVehicle_sec();
 
-			chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, personToBeCharged);
+			chargingPersonAndThrowingEvents(event, personToBeCharged,spillBackCausingLink);
 
 			delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 		}
@@ -306,9 +304,8 @@ PersonStuckEventHandler
 
 			while(prsnLftSpillBakCauinLinkItrtr.hasNext()&&delayToPayFor>0.){ // again charged for flow cap of link
 				Id<Person> chargedPersonId = prsnLftSpillBakCauinLinkItrtr.next();
-				double maxTimePerPersonToBeChargedOnLink = this.linkId2congestionInfo.get(spillBackCausingLink).getMarginalDelayPerLeavingVehicle_sec();
 
-				chargingPersonAndThrowingEvents(maxTimePerPersonToBeChargedOnLink, event, chargedPersonId);
+				chargingPersonAndThrowingEvents(event, chargedPersonId, spillBackCausingLink);
 
 				delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 			}
@@ -348,35 +345,38 @@ PersonStuckEventHandler
 		return spillBackCausingLink;
 	}
 
-	private void chargingPersonAndThrowingEvents(double marginalDelaysPerLeavingVehicle, LinkLeaveEvent event, Id<Person> personToBeCharged){
+	private void chargingPersonAndThrowingEvents(LinkLeaveEvent event, Id<Person> causingPerson, Id<Link> causingPersonOnLink){
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
 		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
-
+		
+		double marginalDelaysPerLeavingVehicle = this.linkId2congestionInfo.get(causingPersonOnLink).getMarginalDelayPerLeavingVehicle_sec();
+		
 		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
-			if (delayedPerson.toString().equals(personToBeCharged.toString())) {
+			if (delayedPerson.toString().equals(causingPerson.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
-				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
+				log.error("Causing agent and affected agents "+causingPerson.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
 				return;
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, delayedPerson, marginalDelaysPerLeavingVehicle, event.getLinkId(),
-						this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
+						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
 				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
 		} else if(delayToPayFor > 0){
-			if (delayedPerson.toString().equals(personToBeCharged.toString())) {
+			if (delayedPerson.toString().equals(causingPerson.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
-				log.error("Causing agent and affected agents "+personToBeCharged.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
+				log.error("Causing agent and affected agents "+causingPerson.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, delayedPerson, delayToPayFor, event.getLinkId(), this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
+						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
 				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
