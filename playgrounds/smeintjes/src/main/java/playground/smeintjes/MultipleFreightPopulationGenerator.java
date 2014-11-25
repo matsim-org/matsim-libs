@@ -28,7 +28,7 @@ public class MultipleFreightPopulationGenerator {
 	 * @param the number of freight populations to generate
 	 */
 	public static void main(String args[]){
-		Header.printHeader(MultipleFreightPopulationGenerator.class.toString(), args);
+//		Header.printHeader(MultipleFreightPopulationGenerator.class.toString(), args);
 		
 		String complexNetworkFile = args[0];
 		int numberOfPlans = Integer.parseInt(args[1]);
@@ -39,6 +39,10 @@ public class MultipleFreightPopulationGenerator {
 		int numberOfPopulations = Integer.parseInt(args[6]);
 		
 		generatePopulations(args, numberOfPopulations);
+		System.out.print("====================================");
+		System.out.print("Done");
+		System.out.print("====================================");
+
 		
 	}
 	
