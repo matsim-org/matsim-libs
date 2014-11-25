@@ -50,9 +50,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	private static final Logger log = Logger.getLogger(PersonActivityHandler.class);
 
 	private Scenario scenario;
-	private NoiseParameters noiseParams;
-	private NoiseContext spatialInfo;
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private NoiseContext noiseContext;
 	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 		
@@ -61,11 +59,9 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 		
 	public PersonActivityHandler (Scenario scenario, NoiseContext noiseContext) {
 		this.scenario = scenario;
-		this.noiseParams = noiseContext.getNoiseParams();
-		this.spatialInfo = noiseContext;
-		this.receiverPoints = noiseContext.getReceiverPoints();
+		this.noiseContext = noiseContext;
 		
-		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
+		String[] consideredActTypesArray = noiseContext.getNoiseParams().getConsideredActivities();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
 			this.consideredActivityTypes.add(consideredActTypesArray[i]);
 		}
@@ -156,7 +152,10 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 	}
 
 	public void calculateDurationsOfStay() {
-				
+		
+		// delete unnecessary information
+		this.personId2currentActNr.clear();
+		
 		// sort by receiver point
 		Map<Id<ReceiverPoint>, List<PersonActivityInfo>> rpId2actInfos = new HashMap<Id<ReceiverPoint>, List<PersonActivityInfo>>();
 		
@@ -164,8 +163,8 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 			
 			for (Integer actNr : this.personId2actNr2actInfo.get(personId).keySet()) {
 				
-				Coord coord = spatialInfo.getPersonId2listOfCoords().get(personId).get(actNr);
-				Id<ReceiverPoint> rpId = spatialInfo.getActivityCoord2receiverPointId().get(coord);
+				Coord coord = noiseContext.getPersonId2listOfCoords().get(personId).get(actNr);
+				Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
 				
 				if (rpId2actInfos.containsKey(rpId)) {
 					rpId2actInfos.get(rpId).add(this.personId2actNr2actInfo.get(personId).get(actNr));
@@ -177,13 +176,16 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 			}
 		}
 		
+		// delete unnecessary information
+		this.personId2actNr2actInfo.clear();
+		
 		// sort by time interval
-		for (ReceiverPoint rp : receiverPoints.values()) {
+		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 
 			if (rpId2actInfos.containsKey(rp.getId())) {
 				
-				for (double timeIntervalEnd = noiseParams.getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseParams.getTimeBinSizeNoiseComputation()) {
-					double timeIntervalStart = timeIntervalEnd - noiseParams.getTimeBinSizeNoiseComputation();
+				for (double timeIntervalEnd = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeIntervalEnd <= 30 * 3600. ; timeIntervalEnd = timeIntervalEnd + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
+					double timeIntervalStart = timeIntervalEnd - noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 
 					for (PersonActivityInfo actInfo : rpId2actInfos.get(rp.getId())) {
 
@@ -191,7 +193,7 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 							double durationInThisInterval = 0.;
 							
 							if ((actInfo.getStartTime() <= timeIntervalStart) && actInfo.getEndTime() >= timeIntervalEnd ) {
-								durationInThisInterval = noiseParams.getTimeBinSizeNoiseComputation();
+								durationInThisInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 							
 							} else if (actInfo.getStartTime() <= timeIntervalStart && actInfo.getEndTime() <= timeIntervalEnd) {
 								durationInThisInterval = actInfo.getEndTime() - timeIntervalStart;
@@ -208,12 +210,12 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 							
 							actInfo.setDurationWithinInterval(durationInThisInterval);
 							
-							double affectedUnitsThisAgent = durationInThisInterval / noiseParams.getTimeBinSizeNoiseComputation();
+							double affectedUnitsThisAgent = durationInThisInterval / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 							
 							if (rp.getTimeInterval2affectedAgentUnits().containsKey(timeIntervalEnd)){	
 								
 								Map<Double, Double> time2affectedAgentUnits = rp.getTimeInterval2affectedAgentUnits();
-								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + (noiseParams.getScaleFactor() * affectedUnitsThisAgent);
+								double affectedAgentUnitsSumNew = time2affectedAgentUnits.get(timeIntervalEnd) + (noiseContext.getNoiseParams().getScaleFactor() * affectedUnitsThisAgent);
 								time2affectedAgentUnits.put(timeIntervalEnd, affectedAgentUnitsSumNew);
 								rp.setTimeInterval2affectedAgentUnits(time2affectedAgentUnits);
 								

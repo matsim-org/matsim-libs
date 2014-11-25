@@ -43,10 +43,7 @@ public class NoiseImmissionCalculation {
 
 	private static final Logger log = Logger.getLogger(NoiseImmissionCalculation.class);
 	
-	private NoiseContext spatialInfo;
-	private NoiseParameters noiseParams;
-	
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private NoiseContext noiseContext;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	
 	// optional information for a more detailed calculation of noise immissions
@@ -54,12 +51,10 @@ public class NoiseImmissionCalculation {
 	private final List<Id<Link>> noiseBarrierLinks;
 		
 	public NoiseImmissionCalculation (NoiseContext noiseContext, NoiseEmissionHandler noiseEmissionHandler) {
-		this.spatialInfo = noiseContext;
-		this.noiseParams = noiseContext.getNoiseParams();
-		this.receiverPoints = noiseContext.getReceiverPoints();
+		this.noiseContext = noiseContext;
 		this.noiseEmissionHandler = noiseEmissionHandler;
 		
-		this.tunnelLinks = noiseParams.getTunnelLinkIDs();
+		this.tunnelLinks = noiseContext.getNoiseParams().getTunnelLinkIDs();
 		this.noiseBarrierLinks = null;
 		
 		if (tunnelLinks == null) {
@@ -83,7 +78,7 @@ public class NoiseImmissionCalculation {
 		log.info("Calculating noise immission shares per link...");
 		int counter = 0;
 		
-		for (ReceiverPoint rp : this.receiverPoints.values()) {
+		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			
 			if (counter % 10000 == 0) {
 				log.info("receiver point # " + counter);
@@ -91,7 +86,7 @@ public class NoiseImmissionCalculation {
 			
 			Map<Double,Map<Id<Link>,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id<Link>,Double>>();
 		
-			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
+			for (double timeInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
 			 	Map<Id<Link>,Double> noiseLinks2isolatedImmission = new HashMap<Id<Link>, Double>();
 			
 			 	for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
@@ -103,7 +98,7 @@ public class NoiseImmissionCalculation {
 			 			double noiseEmission = noiseEmissionHandler.getLinkId2timeInterval2noiseEmission().get(linkId).get(timeInterval);
 						double noiseImmission = 0.;
 						if (!(noiseEmission == 0.)) {
-							noiseImmission = emission2immission(this.spatialInfo , linkId , noiseEmission , rp.getId());						
+							noiseImmission = emission2immission(this.noiseContext , linkId , noiseEmission , rp.getId());						
 						}
 						noiseLinks2isolatedImmission.put(linkId,noiseImmission);
 			 		}
@@ -121,8 +116,8 @@ public class NoiseImmissionCalculation {
 		double noiseImmission = 0.;
 			
 		noiseImmission = noiseEmission
-				+ this.receiverPoints.get(rpId).getLinkId2distanceCorrection().get(linkId)
-				+ this.receiverPoints.get(rpId).getLinkId2angleCorrection().get(linkId);
+				+ this.noiseContext.getReceiverPoints().get(rpId).getLinkId2distanceCorrection().get(linkId)
+				+ this.noiseContext.getReceiverPoints().get(rpId).getLinkId2angleCorrection().get(linkId);
 		
 		if (noiseImmission < 0.) {
 			noiseImmission = 0.;
@@ -135,7 +130,7 @@ public class NoiseImmissionCalculation {
 		log.info("Calculating final noise immissions...");
 		int counter = 0;
 		
-		for (ReceiverPoint rp : this.receiverPoints.values()) {
+		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			
 			if (counter % 10000 == 0) {
 				log.info("receiver point # " + counter);
@@ -143,7 +138,7 @@ public class NoiseImmissionCalculation {
 			
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
 			
-			for (double timeInterval = noiseParams.getTimeBinSizeNoiseComputation() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + noiseParams.getTimeBinSizeNoiseComputation()) {
+			for (double timeInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
 				
 				if (!(rp.getTimeInterval2LinkId2IsolatedImmission().get(timeInterval) == null)) {
