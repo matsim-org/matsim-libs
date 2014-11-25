@@ -113,7 +113,9 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private int bufferStorageCapacity;
 	private double usedBufferStorageCapacity = 0.0 ;
 	private double leftHolesStorageCapacity = 0.0 ;
-	private final Queue<MyQueueWithBuffer.Hole> holes = new LinkedList<>();
+	
+	private final LinkedList<MyQueueWithBuffer.Hole> holes = new LinkedList<MyQueueWithBuffer.Hole>();
+	
 	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
@@ -385,9 +387,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if ( MyQueueWithBuffer.HOLES ) {
 			leftHolesStorageCapacity = this.storageCapacity;
 			// the number of holes really just needs to be the storage capacity!
-			for ( int ii=0 ; ii< this.storageCapacity *4 ; ii++ ) {
+			for ( int ii=0 ; ii< this.storageCapacity; ii++ ) {
 				MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
 				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
+				hole.setSizeInEquivalents(1.);
 				holes.add( hole ) ;
 			}
 		}
@@ -466,6 +469,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
 			double offset = length*3600./hole_speed/1000. ;
 			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
+			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
 			holes.add( hole ) ;
 			leftHolesStorageCapacity = leftHolesStorageCapacity +veh2Remove.getSizeInEquivalents();
 		}
@@ -519,11 +523,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// at this point, storage is ok, so start checking holes:
 		HolesQItem hole = holes.peek();
-		if ( leftHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+		if ( leftHolesStorageCapacity <=0 && hole==null) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
-		}
-		if ( hole.getEarliestLinkExitTime() > now ) {
+		} else if ( hole.getEarliestLinkExitTime() > now ) {
 			//						log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
@@ -674,18 +677,29 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		veh.setCurrentLink(link);
 		vehQueue.add(veh);
+
 		if ( MyQueueWithBuffer.HOLES ) {
-			holes.poll();
-			leftHolesStorageCapacity = leftHolesStorageCapacity -veh.getSizeInEquivalents();
-//			// here removing one hole of pcu size 1 but then extra removed holes are added again.
-//			if(veh.getSizeInEquivalents()<1){
-//				int holesMultiplication = (int) (1 / veh.getSizeInEquivalents());
-//				for (int jj=0; jj<holesMultiplication -1 ; jj++){
-//					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-//					hole2.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
-//					holes.add(hole2);
-//				}
-//			}
+			MyQueueWithBuffer.Hole removedHole = holes.poll();
+			leftHolesStorageCapacity = leftHolesStorageCapacity - veh.getSizeInEquivalents();
+			if(removedHole!=null){
+				double removedHolePCU = removedHole.getSizeInEquivalents();
+				double earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
+
+				if(removedHolePCU > veh.getSizeInEquivalents()){
+					int holesMultiplication = (int) (removedHolePCU / veh.getSizeInEquivalents());
+					for (int jj=0; jj<holesMultiplication -1 ; jj++){
+						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
+						hole2.setSizeInEquivalents(veh.getSizeInEquivalents());
+						holes.addFirst(hole2);
+					}
+				} else if(removedHolePCU < veh.getSizeInEquivalents()){
+					do{
+						removedHole = holes.poll();
+						removedHolePCU += removedHole.getSizeInEquivalents();
+					} while(removedHolePCU>=veh.getSizeInEquivalents());
+				}
+			}
 		}
 	}
 
