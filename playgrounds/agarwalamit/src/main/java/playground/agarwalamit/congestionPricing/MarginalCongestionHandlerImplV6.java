@@ -159,7 +159,6 @@ PersonStuckEventHandler{
 			
 			if (causingAgent==null) throw new RuntimeException("Delays are more than 0. and there is no causing agent."
 					+ "this should not happen.");
-//				new MarginalCongestionEvent(time, capacityConstraint, causingAgentId, affectedAgentId, externalDelay, linkId, emergenceTime)
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, congestionType, causingAgent, 
 					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
 			System.out.println(congestionEvent);
