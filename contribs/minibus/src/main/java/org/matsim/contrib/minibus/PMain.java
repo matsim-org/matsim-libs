@@ -40,7 +40,8 @@ public final class PMain {
 	public static void main(final String[] args) {
 		
 		if(args.length == 0){
-			log.info("Arg 1: config.xml");
+			log.info("Arg 1: config.xml is missing.");
+			log.info("Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/examples/countries/atlantis/minibus/ for an example.");
 			System.exit(1);
 		}
 		

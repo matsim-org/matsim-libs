@@ -18,7 +18,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>playground.andreas.P2.PMain</mainClass>
+              <mainClass>org.matsim.contrib.minibus.PMain</mainClass>
             </manifest>
           </archive>
         </configuration>

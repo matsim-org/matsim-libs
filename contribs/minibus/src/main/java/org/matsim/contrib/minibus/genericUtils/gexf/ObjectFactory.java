@@ -22,7 +22,7 @@ import org.matsim.contrib.minibus.genericUtils.gexf.viz.ThicknessContent;
 /**
  * This object contains factory methods for each 
  * Java content interface and Java element interface 
- * generated in the playground.andreas.P2.genericUtils.gexf package. 
+ * generated in the org.matsim.contrib.minibus.genericUtils.gexf package. 
  * <p>An ObjectFactory allows you to programatically 
  * construct new instances of the Java representation 
  * for XML content. The Java representation of XML 
@@ -59,7 +59,7 @@ public class ObjectFactory {
     private final static QName _Options_QNAME = new QName("http://www.gexf.net/1.2draft", "options");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: playground.andreas.P2.genericUtils.gexf
+     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.matsim.contrib.minibus.genericUtils.gexf
      * 
      */
     public ObjectFactory() {

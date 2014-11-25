@@ -15,16 +15,14 @@
  * Look into {@link org.matsim.contrib.minibus.PMain} to get started.
  * <p/>
  * 
- * Quickstart from command line (without eclipse):<ul>
+ * Quickstart from command line (without eclipse):<ol>
  * <li> Create an empty directory and cd into it.
- * <li> Download MATSim-rXXXXX.jar from http://matsim.org/files/builds/ into that directory.
- * <li> Download MATSim-libs.zip from ... into that directory and unzip.
- * <li> Download minibus...zip from ... into that directory and unzip.
- * <li> Get test scenario from ... .
- * <li> Type
- * <code> java -Xmx2000m -cp MATSim-rXXXXX.jar:minibus-0.X.0-SNAPSHOT-rXXXXX.jar playground.andreas.P2.PMain config.xml
+ * <li> Download minibus-0.X.0-SNAPSHOT-rXXXXX.zip from <a href="http://matsim.org/files/builds/"> matsim.org</a> into that directory and unzip its content.
+ * <li> Get the illustrative scenario from <a href="http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/examples/countries/atlantis/minibus/"> VSP, TU Berlin</a>, and place it in the same directory.
+ * <li> Run the scenario from the command line by typing <br>
+ * <code> java -Xmx2000m -jar minibus-0.X.0-SNAPSHOT.jar config.xml
  * </code>
- * </ul>
+ * </ol>
  *
  * @author aneumann
  */

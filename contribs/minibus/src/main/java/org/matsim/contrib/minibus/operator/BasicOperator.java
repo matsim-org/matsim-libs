@@ -73,7 +73,7 @@ public final class BasicOperator extends AbstractOperator{
 //			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
 
-		// THIS IS A COPY FROM playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
+		// THIS IS A COPY FROM org.matsim.contrib.minibus.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
 		// First buy vehicles
 		int vehicleBought = 0;
 		

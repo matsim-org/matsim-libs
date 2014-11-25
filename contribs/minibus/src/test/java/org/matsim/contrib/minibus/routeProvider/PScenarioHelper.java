@@ -424,9 +424,6 @@ class Route2111to2333 implements PStrategy{
 		return newPlan;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PStrategy#getName()
-	 */
 	@Override
 	public String getStrategyName() {
 		return "Route2111to2333";
@@ -461,9 +458,6 @@ class Route2333to2111 implements PStrategy{
 		return newPlan;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PStrategy#getName()
-	 */
 	@Override
 	public String getStrategyName() {
 		return "Route2333to2111";
@@ -497,9 +491,6 @@ class Route2414to3444 implements PStrategy{
 		return newPlan;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.andreas.P2.replanning.PStrategy#getName()
-	 */
 	@Override
 	public String getStrategyName() {
 		return "Route2414to3444";
