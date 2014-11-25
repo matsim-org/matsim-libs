@@ -2,6 +2,7 @@ package pedCA.agents;
 
 import java.util.ArrayList;
 
+import matsimConnector.utility.MathUtility;
 import pedCA.context.Context;
 import pedCA.environment.grid.FloorFieldsGrid;
 import pedCA.environment.grid.GridPoint;
@@ -9,8 +10,9 @@ import pedCA.environment.grid.Neighbourhood;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.grid.WeightedCell;
 import pedCA.environment.markers.Destination;
-import pedCA.utility.DirectionUtility.Heading;
 import pedCA.utility.Constants;
+import pedCA.utility.DirectionUtility;
+import pedCA.utility.DirectionUtility.Heading;
 import pedCA.utility.Lottery;
 
 public class Agent extends PhysicalObject{
@@ -18,10 +20,13 @@ public class Agent extends PhysicalObject{
 	private final int Id;
 	private final Context context;
 	private GridPoint nextpos; 
-	private Double speed;
 	private Heading heading;
 	private Destination destination;
 	private boolean arrived;
+	
+	private boolean wantToSwap;
+	private int stepToPerformSwap;
+	private boolean hasToSwitch;
 	
 	public Agent(int Id, GridPoint position, Destination destination, Context context){
 		this.Id = Id;
@@ -29,30 +34,48 @@ public class Agent extends PhysicalObject{
 		this.context = context;
 		this.destination = destination;
 		arrived = false;
-		//TODO NOT YET USED
+		//TODO ENSURE THAT X IS NEVER ASSUMED DURING THE SIMULATION
 		heading = Heading.X;
-		speed = 1.6;
-	}
-	
-	public void sequentialUpdate(){
-		updateChoice();
-		move();
+		wantToSwap = false;
+		stepToPerformSwap = 0;
+		hasToSwitch = false;
 	}
 	
 	public void updateChoice(){
-		percept();
-		if (!isArrived()){
-			ArrayList<WeightedCell> probabilityValues = evaluate();
-			choose(probabilityValues);
+		if (isWaitingToSwap()){
+			stepToPerformSwap--;
+			hasToSwitch = stepToPerformSwap==0;
+		}
+		else{
+			percept();
+			if (!isArrived()){
+				ArrayList<WeightedCell> probabilityValues = evaluate();
+				choose(probabilityValues);
+				checkBidirectionalSwitch();
+			}
 		}
 	}
 	
-	public void percept(){
+	private void checkBidirectionalSwitch() {
+		if(!nextpos.equals(position) && getUsedPedestrianGrid().isOccupied(nextpos))
+			wantToSwap = true;
+	}
+	
+	public PedestrianGrid getUsedPedestrianGrid() {
+		return getPedestrianGrid();
+	}
+
+	public void startBidirectionalSwitch(){
+		wantToSwap = false;
+		stepToPerformSwap = Constants.STEP_FOR_BIDIRECTIONAL_SWAPPING;
+	}
+
+	protected void percept(){
 		if (getStaticFFValue(position)==0.)
 			exit();
 	}
 	
-	public ArrayList<WeightedCell> evaluate(){
+	protected ArrayList<WeightedCell> evaluate(){
 		double myPositionValue = getStaticFFValue(position);
 		double neighbourValue;
 		double occupation = 0.0;
@@ -78,34 +101,83 @@ public class Agent extends PhysicalObject{
 		return probabilityValues;
 	}
 
-	public boolean checkOccupancy(GridPoint neighbour) {
-		return getPedestrianGrid().isOccupied(neighbour);
-	}
-
 	private double utilityFunction(double myPositionValue, double neighbourValue, double occupation) {
 		double utilityValue = Math.pow(Math.E, Constants.KS*(myPositionValue - neighbourValue));
 		utilityValue = utilityValue*(1-(Constants.PHI*occupation));				//FORMULA => Math.pow(Math.E, Constants.KS*(MyPositionValue - neighbourValue))*epsilon*(1-(Constants.PHI*n));	
 		return utilityValue;
 	}
 	
-	public void choose(ArrayList<WeightedCell> probabilityValues){
+	protected void choose(ArrayList<WeightedCell> probabilityValues){
 		WeightedCell winningCell = 	Lottery.pickWinner(probabilityValues);
 		if(winningCell == null)
 			nextpos = position;
 		else
 			nextpos = new GridPoint(winningCell.x, winningCell.y);
-		//Log.log("Pedestrian "+getID()+" chose "+nextpos.toString());
 	}
 	
 	public void move(){
-		if(!position.equals(nextpos))
-			getPedestrianGrid().moveTo(this, nextpos);
-		//Log.log("MOVED FROM "+position.toString()+" TO "+nextpos.toString());
-		setPosition(nextpos);
+		if(!isWaitingToSwap()&&!hasToSwitch){
+			if(!position.equals(nextpos)){
+				getPedestrianGrid().moveTo(this, nextpos);
+			}
+			updateHeading();
+			setPosition(nextpos);
+		}else if(!isWaitingToSwap()){
+			getPedestrianGrid().moveToWithoutShadow(this, nextpos);
+			setPosition(nextpos);
+			hasToSwitch = false;
+		}
+	}
+
+	protected boolean checkOccupancy(GridPoint neighbour) {
+		return checkOccupancy(neighbour, getPedestrianGrid());
+	}
+	
+	protected boolean checkOccupancy(GridPoint neighbour, PedestrianGrid pedestrianGrid){
+		if (pedestrianGrid.isOccupied(neighbour)) {
+			return !isSwitchable(neighbour, pedestrianGrid);
+		}
+		return false;
+	}
+
+	protected boolean isSwitchable(GridPoint neighbour, PedestrianGrid pedestrianGrid) {
+		if (pedestrianGrid.containsPedestrian(neighbour)){
+			Agent neighbourAgent = pedestrianGrid.getPedestrian(neighbour);
+			int deltaFF = (int)Math.round(neighbourAgent.getStaticFFValue(neighbour) - neighbourAgent.getStaticFFValue(position));
+			return deltaFF >0;
+		}
+		return false;
+		/**
+		if (pedestrianGrid.containsPedestrian(neighbour) && isInFrontCell(neighbour)){ 
+			Heading neighbourHeading = pedestrianGrid.getPedestrian(neighbour).getHeading();
+			return counterflowHeading(neighbourHeading);
+		}
+		return false;*/
+	}
+	/*
+	protected boolean isInFrontCell(GridPoint neighbour) {
+		//TODO MANAGE nextStepNeighbourhood
+		GridPoint deltaPosition = MathUtility.gridPointDifference(neighbour, position);
+		return DirectionUtility.convertGridPointToHeading(deltaPosition).equals(heading);
+	}
+
+	private boolean counterflowHeading(Heading neighbourHeading) {
+		if (getHeading().equals(Heading.X))
+			return false;
+		GridPoint directionSum = MathUtility.gridPointSum(DirectionUtility.convertHeadingToGridPoint(getHeading()), DirectionUtility.convertHeadingToGridPoint(neighbourHeading));
+		return directionSum.getX() == 0 && directionSum.getY() == 0;
+	}
+	*/
+	protected void updateHeading() {
+		if(!position.equals(nextpos)){
+			GridPoint positionDelta = MathUtility.gridPointDifference(nextpos, position);
+			heading = DirectionUtility.convertGridPointToHeading(positionDelta);
+		}else{
+			//heading = Lottery.extractHeading();
+		}
 	}
 
 	protected void setPosition(GridPoint position) {
-		
 		this.position = position;
 	}
 	
@@ -133,6 +205,11 @@ public class Agent extends PhysicalObject{
 	
 	public void revertChoice() {
 		nextpos = position;
+	}
+	
+	public void revertWillingToSwitch(){
+		revertChoice();
+		wantToSwap = false;
 	}
 
 	protected Double getStaticFFValue(GridPoint gridPoint) {
@@ -171,10 +248,14 @@ public class Agent extends PhysicalObject{
 		return heading;
 	}
 	
-	public double getSpeed(){
-		return speed;
+	public boolean isWillingToSwap() {
+		return wantToSwap;
 	}
 	
+	public boolean isWaitingToSwap() {
+		return stepToPerformSwap>0;
+	}
+
 	public String toString(){
 		return "Pedestrian "+getID();
 	}

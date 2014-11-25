@@ -24,6 +24,12 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 		addPedestrian(newPos,pedestrian);
 	}
 	
+	public void moveToWithoutShadow(Agent pedestrian, GridPoint newPos) {
+		GridPoint oldPos = pedestrian.getPosition();
+		removePedestrian(oldPos, pedestrian);
+		addPedestrian(newPos,pedestrian);
+	}
+	
 	@Override
 	protected void updateGrid() {
 		for (int i=0;i<shadows.size();i++)
@@ -77,5 +83,13 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 			if (!isOccupied(p))
 				result.add(p);
 		return result;
+	}
+
+	public Agent getPedestrian(GridPoint neighbour) {
+		return (Agent)get(neighbour).get(0);
+	}
+	
+	public boolean containsPedestrian(GridPoint gp){
+		return isOccupied(gp) && get(gp).get(0) instanceof Agent;
 	}
 }

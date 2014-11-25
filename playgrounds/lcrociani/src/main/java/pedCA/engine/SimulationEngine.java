@@ -44,7 +44,7 @@ public class SimulationEngine {
 	
 	//FOR MATSIM CONNECTOR
 	public void doSimStep(double time){
-		Log.log("STEP at: "+time);
+		//Log.log("STEP at: "+time);
 		agentUpdater.step();
 		conflictSolver.step();
 		agentMover.step(time);		

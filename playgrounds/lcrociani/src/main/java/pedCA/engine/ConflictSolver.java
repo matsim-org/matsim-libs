@@ -8,6 +8,7 @@ import matsimConnector.agents.Pedestrian;
 import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
+import pedCA.environment.grid.PedestrianGrid;
 import pedCA.output.Log;
 import pedCA.utility.Constants;
 import pedCA.utility.Lottery;
@@ -21,9 +22,33 @@ public class ConflictSolver {
 	}
 	
 	public void step(){
+		solveBidirectionalConflicts();
 		solveConflicts();
 	}
 	
+	private void solveBidirectionalConflicts() {
+		Iterable<Agent> pedsIt = getPedestrians();
+		for (Agent agent_a : pedsIt){
+			Pedestrian agent1 = (Pedestrian) agent_a;
+			if (agent1.isWillingToSwap()){
+				GridPoint chosenPosition = agent1.getNewPosition();
+				PedestrianGrid pedestrianGrid = agent1.getUsedPedestrianGrid();
+				Agent agent_b = pedestrianGrid.getPedestrian(chosenPosition);
+				Pedestrian agent2 = (Pedestrian) agent_b;
+				if (agent1 != agent2 && agent2.isWillingToSwap() && agent2.getRealNewPosition().equals(agent1.getRealPosition())){
+					startPedestrianSwitching(agent1, agent2);
+				}else{
+					agent1.revertWillingToSwitch();
+				}
+			}
+		}
+	}
+
+	private void startPedestrianSwitching(Agent agent1, Agent agent2) {
+		agent1.startBidirectionalSwitch();
+		agent2.startBidirectionalSwitch();		
+	}
+
 	private void solveConflicts(){
 		
 //		Ottengo tutti i pedestrian nel context
@@ -81,6 +106,8 @@ public class ConflictSolver {
         	if(!frictionCondition()){
         		int randomWinner = RandomExtractor.nextInt(sameGPPedList.size());
         		sameGPPedList.remove(randomWinner);
+        	}else{
+        		System.out.println("Friction!");
         	}
         	
         	for(Agent p:sameGPPedList){

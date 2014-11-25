@@ -39,11 +39,15 @@ import matsimConnector.events.debug.LineEvent;
 import matsimConnector.events.debug.LineEventHandler;
 import matsimConnector.events.debug.RectEvent;
 import matsimConnector.events.debug.RectEventHandler;
+import matsimConnector.scenario.CAEnvironment;
+import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
 import matsimConnector.utility.MathUtility;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+
+import pedCA.environment.network.Coordinates;
 
 
 
@@ -57,7 +61,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	private final CircleProperty defaultCp = new CircleProperty();
 
 
-	//private final Scenario sc;
+	private final Scenario sc;
 
 	private long lastUpdate = -1;
 	private final double dT;
@@ -69,7 +73,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	FrameSaver fs = null;
 
 	public EventBasedVisDebuggerEngine() {
-		//this.sc = sc;
+		this.sc = null;
 		this.dT = Constants.CA_STEP_DURATION;
 		this.vis = new EventsBasedVisDebugger(this.fs);
 
@@ -79,7 +83,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	}
 	
 	public EventBasedVisDebuggerEngine(Scenario sc) {
-		//this.sc = sc;
+		this.sc = sc;
 		this.dT = Constants.CA_STEP_DURATION;
 		this.vis = new EventsBasedVisDebugger(sc,this.fs);
 
@@ -102,18 +106,31 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		this.defaultCp.rr = .19f;
 
 		//Links
-		LineProperty lp = new LineProperty();
-		lp.r = 0; lp.g = 0; lp.b = 0; lp.a = 192;
+		
 		//lp.minScale = 10;
 
-		//CAScenario scenarioCA = (CAScenario) this.sc.getScenarioElement(Constants.CASCENARIO_NAME);
+		CAScenario scenarioCA = (CAScenario) this.sc.getScenarioElement(Constants.CASCENARIO_NAME);
 
-		//for (CAEnvironment env : scenarioCA.getEnvironments().values()) {
-			
-		//}
-		this.vis.addLineStatic(0, 2.4, 10, 2.4, lp.r,lp.g,lp.b,lp.a, 0);
-		this.vis.addLineStatic(0, 0, 10, 0, lp.r,lp.g,lp.b,lp.a, 0);
+		for (CAEnvironment environmentCA : scenarioCA.getEnvironments().values()) {
+			drawCAEnvironment(environmentCA);	
+		}
 		
+	}
+
+	public void drawCAEnvironment(CAEnvironment environmentCA) {
+		LineProperty lp = new LineProperty();
+		lp.r = 0; lp.g = 0; lp.b = 0; lp.a = 192;
+		int rows = environmentCA.getContext().getEnvironmentGrid().getRows();
+		int columns = environmentCA.getContext().getEnvironmentGrid().getColumns();
+		Coordinates c0 = new Coordinates(0, 0);
+		Coordinates c1 = new Coordinates(columns*Constants.CA_CELL_SIDE, 0);
+		Coordinates c2 = new Coordinates(0, rows*Constants.CA_CELL_SIDE);
+		Coordinates c3 = new Coordinates(columns*Constants.CA_CELL_SIDE, rows*Constants.CA_CELL_SIDE);
+		
+		this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+		this.vis.addLineStatic(c2.getX(), c2.getY(), c3.getX(), c3.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+		this.vis.addLineStatic(c0.getX(), c0.getY(), c2.getX(), c2.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+		this.vis.addLineStatic(c1.getX(), c1.getY(), c3.getX(), c3.getY(), lp.r,lp.g,lp.b,lp.a, 0);
 	}
 
 	@Override
@@ -135,28 +152,32 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		double from_y = MathUtility.convertGridCoordinate(event.getFrom_y());
 		double to_x = MathUtility.convertGridCoordinate(event.getTo_x());
 		double to_y = MathUtility.convertGridCoordinate(event.getTo_y());
-	
-		double dx = to_x - from_x;
-		double dy = to_y - from_y;
+
+		/*
+		GridPoint deltaPos = DirectionUtility.convertHeadingToGridPoint(event.getDirection());
+		double to_x_triangle = MathUtility.convertGridCoordinate(event.getFrom_x()+deltaPos.getX());
+		double to_y_triangle = MathUtility.convertGridCoordinate(event.getFrom_y()+deltaPos.getY());
+		double dx = (to_y_triangle - from_y);
+		double dy = -(to_x_triangle - from_x);
 		double length = Math.sqrt(dx*dx+dy*dy);
 		dx /= length;
 		dy /= length;
-		/*
-		double x0 = to_x;
-		double y0 = to_y;
+		
+		double x0 = to_x_triangle;
+		double y0 = to_y_triangle;
 		double al = .20;
 		double x1 = x0 + dy*al -dx*al/4;
 		double y1 = y0 - dx*al -dy*al/4;
 		double x2 = x0 + dy*al +dx*al/4;
 		double y2 = y0 - dx*al +dy*al/4;
 		*/
+		
 		double z = this.vis.zoomer.getZoomScale();
 		int a = 255;
 		if (z >= 48 && z < 80){
 			z -= 48;
 			a = (int)(255./32*z+.5);
 		}
-//		a=255;
 		this.vis.addLine(to_x, to_y, from_x, from_y, 0, 0, 0, a, 50);
 		//this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, a, 50, true);
 
@@ -166,7 +187,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		}
 
 		this.vis.addCircle(to_x,to_y,cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
-		this.vis.addText(to_x,to_y, event.getPedestrian().getId().toString(), 200);
+		this.vis.addText(to_x,to_y, event.getPedestrian().getId().toString()+ "."+ event.getDirection().toString(), 200);
 	}
 
 	private void update(double time2) {
@@ -213,8 +234,9 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		Pedestrian pedestrian = event.getPedestrian();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) (0.4/5.091);
-		int nr = pedestrian.getId().toString().hashCode()%100;
-		int color = (nr/10)%3;
+		//int nr = pedestrian.getId().toString().hashCode()%100;
+		int nr = pedestrian.getDestination().getLevel();
+		int color = nr;//(nr/10)%3;
 //		if (Integer.parseInt(a.getId().toString()) < 0) {
 //			color = 1;
 //		} else {

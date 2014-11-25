@@ -15,6 +15,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 
 import pedCA.context.Context;
 import pedCA.engine.AgentMover;
+import pedCA.environment.grid.GridPoint;
 import pedCA.output.Log;
 
 public class CAAgentMover extends AgentMover {
@@ -36,11 +37,13 @@ public class CAAgentMover extends AgentMover {
 				delete(pedestrian);
 				index--;
 			}else{
-				eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, pedestrian.getRealPosition(), pedestrian.getRealNewPosition()));
+				GridPoint oldPosition = pedestrian.getRealPosition();
+				GridPoint newPosition = pedestrian.getRealNewPosition();
 				moveAgent(pedestrian, now);
+				eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, oldPosition, newPosition));
 				if(pedestrian.isEnteringEnvironment()){
 					moveToCA(pedestrian, now);
-				}else if (pedestrian.isFinalDestinationReached() && !pedestrian.hasLeftEnvironment()){
+				}else if (!pedestrian.isWaitingToSwap()&& pedestrian.isFinalDestinationReached() && !pedestrian.hasLeftEnvironment()){
 					if(now>=Constants.CA_TEST_END_TIME){
 						moveToQ(pedestrian, now);
 					}

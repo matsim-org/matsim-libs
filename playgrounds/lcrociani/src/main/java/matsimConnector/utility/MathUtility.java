@@ -29,4 +29,11 @@ public class MathUtility {
 		return (monodimCoord+0.5)*Constants.CA_CELL_SIDE;
 	}
 	
+	public static GridPoint gridPointDifference(GridPoint gp1, GridPoint gp2){
+		return new GridPoint(gp1.getX()-gp2.getX(), gp1.getY()-gp2.getY());
+	}
+	
+	public static GridPoint gridPointSum(GridPoint gp1, GridPoint gp2){
+		return new GridPoint(gp1.getX()+gp2.getX(), gp1.getY()+gp2.getY());
+	}
 }

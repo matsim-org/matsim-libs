@@ -11,8 +11,10 @@ import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.Neighbourhood;
+import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.TacticalDestination;
+import pedCA.utility.NeighbourhoodUtility;
 
 public class Pedestrian extends Agent {
 
@@ -58,18 +60,20 @@ public class Pedestrian extends Agent {
 
 	public void move(double now){
 		if (transitionArea!=null){
-			if(!getPosition().equals(getNewPosition()))
+			if(!getPosition().equals(getNewPosition())){
 				transitionArea.moveTo(this, getNewPosition());
-			//Log.log("MOVED FROM "+getPosition().toString()+" TO "+getNewPosition().toString()+" INSIDE TRANSITION AREA");
+			}
+			updateHeading();
 			setPosition(getNewPosition());
 		}else {
-			if (finalDestinationReached && !getNewPosition().equals(getPosition()))
+			if (!isWaitingToSwap() && finalDestinationReached && !getNewPosition().equals(getPosition()))
 				lastTimeCheckAtExit = now;
 			super.move();
 			perceptIfFinalDestination(now);
 		}
 	}
 
+	@Override
 	protected Double getStaticFFValue(GridPoint gridPoint) {
 		if (transitionArea!=null)
 			return getTransitionAreaFieldValue(gridPoint);
@@ -97,6 +101,7 @@ public class Pedestrian extends Agent {
 		return vehicle;
 	}
 	
+	@Override
 	protected void setPosition(GridPoint position){
 		super.setPosition(position);
 	}
@@ -122,7 +127,16 @@ public class Pedestrian extends Agent {
 
 	//TODO TEST!!!
 	private void calculateNextStepNeighbourhood() {
-		nextStepNeighbourhood = new Neighbourhood(getPedestrianGrid().getFreePositions(originMarker.getCells()));
+		Neighbourhood neighbourhood = NeighbourhoodUtility.calculateMooreNeighbourhood(position);//getPedestrianGrid().getFreePositions(originMarker.getCells()));
+		nextStepNeighbourhood = new Neighbourhood();
+		for (GridPoint neighbour : neighbourhood.getObjects()){
+			if (neighbour.getX()>0)
+				neighbour.setX(neighbour.getX()%getPedestrianGrid().getColumns());
+			else
+				neighbour.setX(neighbour.getX()+getPedestrianGrid().getColumns());
+			if (originMarker.getCells().contains(neighbour))
+				nextStepNeighbourhood.add(neighbour);
+		}
 		if (nextStepNeighbourhood.size() == 0)
 			nextStepNeighbourhood.add(getPosition());
 	}	
@@ -152,6 +166,12 @@ public class Pedestrian extends Agent {
 		setPosition(null);
 	}
 	
+	public PedestrianGrid getUsedPedestrianGrid(){
+		if (transitionArea != null)
+			return transitionArea;
+		return getPedestrianGrid();
+	}
+	
 	@Override
 	public Neighbourhood getNeighbourhood(){
 		if (nextStepNeighbourhood != null && transitionArea == null){
@@ -166,19 +186,31 @@ public class Pedestrian extends Agent {
 			return super.getNeighbourhood();
 	}
 	
+	protected boolean isSwitchable(GridPoint neighbour, PedestrianGrid pedestrianGrid) {
+		if (finalDestinationReached && pedestrianGrid.containsPedestrian(neighbour)){
+		 	return ((Pedestrian)pedestrianGrid.getPedestrian(neighbour)).finalDestinationReached;
+		}			
+		return super.isSwitchable(neighbour, pedestrianGrid);
+	}
+	/*
+	protected boolean isInFrontCell(GridPoint neighbour) {
+		if (nextStepNeighbourhood != null)
+			return false;
+		return super.isInFrontCell(neighbour);
+	}*/
+	
 	@Override
-	public boolean checkOccupancy(GridPoint neighbour) {
+	protected boolean checkOccupancy(GridPoint neighbour) {
+		//TODO FIX THE PROBLEM WITH TRANSITION AREAS
 		if(isAtEnvironmentBorder(neighbour)){
 			if (transitionArea != null)
-				return transitionArea.isOccupied(neighbour) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));
+				return transitionArea.isOccupied(neighbour) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));//checkOccupancy(neighbour,transitionArea) || checkOccupancy(transitionArea.convertTAPosToEnvPos(neighbour),getPedestrianGrid());
 			else{
 				TransitionArea neighbourTA = getDestination(neighbour).getTransitionArea();
-				return neighbourTA.isOccupied(neighbourTA.convertEnvPosToTAPos(neighbour)) || getPedestrianGrid().isOccupied(neighbour);
+				return neighbourTA.isOccupied(neighbourTA.convertEnvPosToTAPos(neighbour)) || checkOccupancy(neighbour,getPedestrianGrid());//checkOccupancy(neighbourTA.convertEnvPosToTAPos(neighbour),neighbourTA) || checkOccupancy(neighbour,getPedestrianGrid());
 			}
 		}		
-		if (transitionArea != null)
-			return transitionArea.isOccupied(neighbour);
-		return getPedestrianGrid().isOccupied(neighbour);
+		return checkOccupancy(neighbour, getUsedPedestrianGrid());
 	}
 	
 	private TacticalDestination getDestination(GridPoint neighbour) {

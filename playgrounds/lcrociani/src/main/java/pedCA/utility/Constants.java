@@ -5,7 +5,7 @@ public class Constants {
 	public static final double SQRT2 = Math.sqrt(2);
 	
 	//Constant for the random seed
-	public static final long RANDOM_SEED = 1;
+	public static final long RANDOM_SEED = 3;
 	
 	//Constants for environment
 	public static final int ENV_OBSTACLE = -1;
@@ -13,13 +13,15 @@ public class Constants {
 	public static final double MAX_FF_VALUE = Double.POSITIVE_INFINITY;
 	
 	//Constants for Conflict Management
-	public static final double FRICTION_PROBABILITY = 0.7;
+	public static final double FRICTION_PROBABILITY = 0.;//0.7;
 
 	public static final double CELL_SIZE = matsimConnector.utility.Constants.CA_CELL_SIDE;
 
 	public static final int SHADOWS_LIFE = 1;
 
 	public static final double SHADOWS_PROBABILITY = 0.5;
+
+	public static final int STEP_FOR_BIDIRECTIONAL_SWAPPING = 2;
 	
 	//Constants for Pedestrian Model
 	public static Double KS = 6.0;

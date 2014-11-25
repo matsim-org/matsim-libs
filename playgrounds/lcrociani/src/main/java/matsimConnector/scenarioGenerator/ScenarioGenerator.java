@@ -37,10 +37,10 @@ public class ScenarioGenerator {
 	private static String outputDir = Constants.OUTPUT_PATH;
 
 	private static final Double DOOR_WIDTH = Constants.FAKE_LINK_WIDTH;
-	private static final Double CA_LENGTH = 10.;
+	private static final Double CA_LENGTH = Constants.CA_LINK_LENGTH;
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
-	private static Double TOTAL_DENSITY = 5.;
+	private static Double TOTAL_DENSITY = 4.75;
 	private static int POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
 	
 	public static void main(String [] args) {
@@ -216,8 +216,8 @@ public class ScenarioGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		int leftFlowProportion = 1;
-		int limit = POPULATION_SIZE/leftFlowProportion;
+		double leftFlowProportion = 0.5;
+		int limit = (int)(POPULATION_SIZE*leftFlowProportion);
 		for (int i = 0; i < limit; i++) {
 			Person pers = factory.createPerson(Id.create("b"+i,Person.class));
 			Plan plan = factory.createPlan();

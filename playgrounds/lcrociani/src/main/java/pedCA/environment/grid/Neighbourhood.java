@@ -24,4 +24,8 @@ public class Neighbourhood {
 	public int size(){
 		return neighbourhood.size();
 	}	
+	
+	public ArrayList<GridPoint> getObjects(){
+		return neighbourhood;
+	}
 }

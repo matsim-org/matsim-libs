@@ -26,25 +26,33 @@ public class TacticalDestination extends Destination  {
 
 	//TODO test!!!
 	private void calculateRotationAndRef() {
-		GridPoint first = getCells().get(0);
-		GridPoint second = getCells().get(1);
-		GridPoint last = getCells().get(getCells().size()-1);
-		if (first.getX()==second.getX() && first.getX() == 0){
-			rotation = 0;
-			environmentRef = first;
+		if (getCells().size()>1){
+			GridPoint first = getCells().get(0);
+			GridPoint second = getCells().get(1);
+			GridPoint last = getCells().get(getCells().size()-1);
+			if (first.getX()==second.getX() && first.getX() == 0){
+				rotation = 0;
+				environmentRef = first;
+			}
+			else if(first.getX()==second.getX() && first.getX() != 0){ //equal x but at the end of the environment grid
+				rotation = 180;
+				environmentRef = last; 
+			}
+			else if(first.getY()==second.getY() && first.getY() == 0){
+				rotation = 90;
+				environmentRef = last;
+			}
+			else if(first.getY()==second.getY() && first.getX() != 0) {//equal y but at the end of the environment grid
+				rotation = 270;
+				environmentRef = first;
+			}		
+		}else{
+			environmentRef = getCells().get(0); 
+			if(environmentRef.getX()==0)
+				rotation = 0;
+			else
+				rotation = 180;				
 		}
-		else if(first.getX()==second.getX() && first.getX() != 0){ //equal x but at the end of the environment grid
-			rotation = 180;
-			environmentRef = last; 
-		}
-		else if(first.getY()==second.getY() && first.getY() == 0){
-			rotation = 90;
-			environmentRef = last;
-		}
-		else if(first.getY()==second.getY() && first.getX() != 0) {//equal y but at the end of the environment grid
-			rotation = 270;
-			environmentRef = first;
-		}		
 	}
 
 	public int getID(){

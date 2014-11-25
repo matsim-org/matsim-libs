@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.WeightedCell;
+import pedCA.utility.DirectionUtility.Heading;
 
 public class Lottery {
 	
@@ -61,5 +62,12 @@ public class Lottery {
 			cellsCopy.remove(extracted_index);
 		}
 		return extracted;
+	}
+
+	public static Heading extractHeading() {
+		int extracted_index = (int)(RandomExtractor.nextDouble()*DirectionUtility.Heading.values().length);
+		if (DirectionUtility.Heading.values()[extracted_index] == DirectionUtility.Heading.X)
+			extracted_index--;
+		return DirectionUtility.Heading.values()[extracted_index];
 	}
 }
