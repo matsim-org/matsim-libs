@@ -267,7 +267,7 @@ public class ZoneCompleteness {
 
 		@Override
 		public Map<Id<Polygon>, Tuple<Integer, Integer>> call() throws Exception {
-			Map<Id<Polygon>, Tuple<Integer, Integer>> zoneMap = new TreeMap<>();
+			Map<Id<Polygon>, Tuple<Integer, Integer>> zoneMap = new TreeMap<Id<Polygon>, Tuple<Integer, Integer>>();
 			GeometryFactory gf = new GeometryFactory();
 
 			/* Parse the vehicle from file. */
