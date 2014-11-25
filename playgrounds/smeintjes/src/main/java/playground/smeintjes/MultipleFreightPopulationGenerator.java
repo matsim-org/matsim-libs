@@ -47,8 +47,8 @@ public class MultipleFreightPopulationGenerator {
 		
 		
 		for(int i = 0; i < numberOfPopulations; i++){
-			String output = String.format("%d_%s.xml.gz", i, arguments[3]);
-			String attributeFile = String.format("%d_%s.xml.gz", i, arguments[4]);
+			String output = String.format("%s_%d.xml.gz", arguments[3], i);
+			String attributeFile = String.format("%s_%d.xml.gz", arguments[4], i);
 			
 			String[] appendedArguments = new String[]{arguments[0], arguments[1], 
 					arguments[2], output, attributeFile, arguments[5], arguments[6]};
