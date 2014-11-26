@@ -63,7 +63,7 @@ import playground.southafrica.utilities.Header;
  */
 public class FreightChainGenerator {
 	private final static Logger LOG = Logger.getLogger(FreightChainGenerator.class);
-	private final static int MAX_CHAIN_LENGTH = 20;
+	private final static int MAX_CHAIN_LENGTH = 71;
 	private final static Random RANDOM = MatsimRandom.getRandom();
 	private final static Double AVERAGE_SPEED = 50.0/3.6;
 	
@@ -221,8 +221,8 @@ public class FreightChainGenerator {
 				String activityType = null;
 				
 				/*Uncomment the next line if you wish to enforce a maximum chain length when generating the chains.*/
-//				if(chainLength == MAX_CHAIN_LENGTH || nextId == null || nextId.toString().equalsIgnoreCase("sink")){
-				if(nextId == null || nextId.toString().equalsIgnoreCase("sink")){
+				if(chainLength == MAX_CHAIN_LENGTH || nextId == null || nextId.toString().equalsIgnoreCase("sink")){
+//				if(nextId == null || nextId.toString().equalsIgnoreCase("sink")){ this while loop creates an infinite loop when the generator is stuck in an area with no sink node
 					activityType = "major";
 					chainEnd = true;
 				} else{
