@@ -20,9 +20,13 @@
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -212,5 +216,21 @@ public class SpatialGrid {
 				}
 			}
 			return (sum/numberOfCellsX/numberOfCellsY);
+	}
+
+	public Map<Link, Cell> getLinks2GridCells(
+			Collection<? extends Link> links) {
+			HashMap<Id<Link>, Cell> linkIds2cells = new HashMap<Id<Link>, Cell>();
+			HashMap<Link, Cell> links2cells = new HashMap<Link, Cell>();
+			
+			for(Link link: links){
+				Cell cCell = this.getCellForCoordinate(link.getCoord());
+				if(cCell!=null){
+					links2cells.put(link, cCell);
+					linkIds2cells.put(link.getId(), cCell);
+				}
+			}		
+		
+	return links2cells;
 	}
 }

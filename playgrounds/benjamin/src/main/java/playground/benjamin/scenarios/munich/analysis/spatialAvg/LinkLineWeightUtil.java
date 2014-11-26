@@ -36,6 +36,10 @@ public class LinkLineWeightUtil implements LinkWeightUtil {
 		this.smoothingRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 		this.cellsize_m = cellSizeSquareMeter;
 	}
+	public LinkLineWeightUtil(SpatialAveragingInputData inputData, SpatialAveragingParameters parameter) {
+		this(parameter.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/parameter.getNoOfBins());
+	}
+	
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
 		Coord fromNodeCoord = link.getFromNode().getCoord();

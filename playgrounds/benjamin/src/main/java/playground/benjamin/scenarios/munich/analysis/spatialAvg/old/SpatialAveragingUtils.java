@@ -149,7 +149,7 @@ public class SpatialAveragingUtils {
 		return dateTimeString;
 	}
 	
-	double[][] normalizeArray(double[][] array) {
+	public double[][] normalizeArray(double[][] array) {
 		double [][] normalizedArray = new double[noOfXbins][noOfYbins];
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
@@ -171,7 +171,7 @@ public class SpatialAveragingUtils {
 		return xBinCenter ;
 	}
 
-	Coord findCellCentroid(int xIndex, int yIndex) {
+	public Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);
 		double yCentroid = findBinCenterY(yIndex);
 		Coord cellCentroid = new CoordImpl(xCentroid, yCentroid);
@@ -190,7 +190,7 @@ public class SpatialAveragingUtils {
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 	
-	double calculateWeightOfPointForCell(double x1, double y1, double x2, double y2) {
+	public double calculateWeightOfPointForCell(double x1, double y1, double x2, double y2) {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
@@ -218,7 +218,7 @@ public class SpatialAveragingUtils {
 		return isInMunichShape;
 	}
 	
-	boolean isInResearchArea(Coord coord) {
+	public boolean isInResearchArea(Coord coord) {
 		Double xCoord = coord.getX();
 		Double yCoord = coord.getY();
 		

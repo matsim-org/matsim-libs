@@ -177,10 +177,17 @@ public class SpatialAveragingInputData {
 	public String getEmissionFileForBaseCase() {
 		return this.emissionFile1;
 	}
-	
 
-	public String getAnalysisOutPathForCompareCase() {
+	public String getExposureOutPathForCompareCase(){
+		return(runDirectory1 + "analysis/exposure/data/" + runNumber2 + "." + lastIteration1);
+	}
+
+	public String getAnalysisOutPathForSpatialComparison() {
 		return (runDirectory1 + "analysis/spatialAveraging/data/" + runNumber2 + "." + lastIteration1 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta");
+	}
+	
+	public String getSpatialAveragingOutPathForCompareCase(){
+		return (runDirectory1 + "analysis/spatialAveraging/data/" + runNumber2 + "." + lastIteration1);
 	}
 
 	public String getEmissionFileForCompareCase() {

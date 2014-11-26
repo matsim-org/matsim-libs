@@ -82,7 +82,7 @@ public class SpatialAveragingWelfare {
 			SpatialGrid compareGrid = runCase(inputData.getPlansFileCompareCase());
 			
 			logger.info("Writing R output for differences to " + inputData.getAnalysisOutPathForBaseCase());
-			outputPathForR = inputData.getAnalysisOutPathForCompareCase() + ".Routput." ;
+			outputPathForR = inputData.getAnalysisOutPathForSpatialComparison() + ".Routput." ;
 						
 			SpatialGrid differences = compareGrid.getDifferencesAAverages(baseCaseGrid); //TODO document special average calculation this should result in weights =0
 			sar.writeRoutput(differences.getWeightedValuesOfGrid(), outputPathForR + "UserBenefitsDifferences.txt");

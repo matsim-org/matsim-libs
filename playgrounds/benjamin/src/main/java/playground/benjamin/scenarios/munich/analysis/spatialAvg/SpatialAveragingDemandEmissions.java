@@ -47,19 +47,16 @@ public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
 	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String compareCase = "zone30"; // zone30, pricing, exposurePricing, 983
-	
-	final int noOfXbins = 160;
-	final int noOfYbins = 120; 
+	/*
+	 * When 'base' is used no comparison to a policy case is calculated.
+	 */
+	private String compareCase = "zone30"; // base, zone30, pricing, exposurePricing, 983
 	
 	final int noOfTimeBins = 1;
-	final double smoothingRadius_m = 500.;
 	
 	final String pollutant2analyze = WarmPollutant.NOX.toString();
-	final boolean compareToBaseCase = true;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
-	final private boolean useVisBoundary = false;
 	
 	/* If both of the following booleans are false, the fallback solution
 	 * is to use the "pointMethod", i.e. mapping emissions to the center
@@ -68,6 +65,7 @@ public class SpatialAveragingDemandEmissions {
 	final boolean useLineMethod = true;
 	private boolean useCellMethod = false;
 
+	private SpatialAveragingParameters parameter;
 	private SpatialAveragingWriter saWriter;
 	private double simulationEndTime;
 	private Network network;
@@ -81,15 +79,15 @@ public class SpatialAveragingDemandEmissions {
 	private void run() throws IOException{
 		
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
+		parameter = new SpatialAveragingParameters();
 		
 		if(useLineMethod){
-			double cellSize_squareMeter = inputData.getBoundingboxSizeSquareMeter()/noOfXbins/noOfYbins;
-			linkWeightUtil = new LinkLineWeightUtil(smoothingRadius_m, cellSize_squareMeter);
+			linkWeightUtil = new LinkLineWeightUtil(inputData, parameter);
 		}else{
-			linkWeightUtil = new LinkPointWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
+			linkWeightUtil = new LinkPointWeightUtil(inputData, parameter);
 		}
 
-		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m, useVisBoundary);
+		this.saWriter = new SpatialAveragingWriter(inputData, parameter);
 		
 		this.simulationEndTime = inputData.getEndTime();
 		
@@ -97,7 +95,7 @@ public class SpatialAveragingDemandEmissions {
 		
 		runBaseCase();
 		
-		if(compareToBaseCase){
+		if(!(compareCase.equals("base"))){
 			runCompareCase(inputData.getEmissionFileForCompareCase());
 		}
 		
@@ -116,7 +114,7 @@ public class SpatialAveragingDemandEmissions {
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating grid values for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
-			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
+			SpatialGrid sGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
 			
 			if(useCellMethod){
 				linkWeightUtil = new CellWeightUtil((Collection<Link>) network.getLinks().values(), sGrid);
@@ -141,7 +139,7 @@ public class SpatialAveragingDemandEmissions {
 	private void runCompareCase(String emissionFile) throws IOException{
 	
 		logger.info("Starting with compare case.");
-		outPathStub = inputData.getAnalysisOutPathForCompareCase();
+		outPathStub = inputData.getAnalysisOutPathForSpatialComparison();
 		
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
 		
@@ -149,14 +147,14 @@ public class SpatialAveragingDemandEmissions {
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating differences to base case for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
-			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
+			SpatialGrid sGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
 			
 			for(Id<Link> linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor);
 			// calc differences
-			SpatialGrid differencesGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
+			SpatialGrid differencesGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
 			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
 			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
 			// print tables

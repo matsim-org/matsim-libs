@@ -60,10 +60,12 @@ public class SpatialAveragingParameters {
 		return targetCRS;
 	}
 	public Double getSmoothingRadius_m() {
-		// TODO Auto-generated method stub
 		return this.smoothingRadius_m;
 	}
 	public boolean IsUsingVisBoundary() {
 		return isUsingVisBoundary ;
+	}
+	public Double getNoOfBins() {
+		return new Double(numberOfXBins*numberOfYBins);
 	}
 }
