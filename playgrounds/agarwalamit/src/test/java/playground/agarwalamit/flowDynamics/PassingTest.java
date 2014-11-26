@@ -110,7 +110,7 @@ public class PassingTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
 
-		QSim qSim = createQSim(net,manager, true);
+		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
 		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes =  handler.getPersonId2LinkTravelTime();
@@ -179,14 +179,16 @@ public class PassingTest {
 		ap_w.setTypicalDuration(1*3600);
 		net.scenario.getConfig().planCalcScore().addActivityParams(ap_h);
 		net.scenario.getConfig().planCalcScore().addActivityParams(ap_w);
-
+		net.scenario.getConfig().controler().setWriteEventsInterval(0);
+		net.scenario.getConfig().controler().setLastIteration(0);
+		
 		Controler cntrlr = new Controler(net.scenario);
 		cntrlr.setOverwriteFiles(true);
 		cntrlr.setCreateGraphs(false);
 		cntrlr.setDumpDataAtEnd(false);
-		net.scenario.getConfig().controler().setWriteEventsInterval(0);
-		net.scenario.getConfig().controler().setLastIteration(0);
+		
 		TravelTimeControlerListner travelTimeCntrlrListner = new TravelTimeControlerListner();
+
 		cntrlr.addControlerListener(travelTimeCntrlrListner); 
 		cntrlr.run();
 
@@ -228,7 +230,7 @@ public class PassingTest {
 		}
 	}
 
-	private QSim createQSim (SimpleNetwork net, EventsManager manager, boolean useVehicleInfo){
+	private QSim createQSim (SimpleNetwork net, EventsManager manager){
 		Scenario sc = net.scenario;
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
@@ -242,12 +244,10 @@ public class PassingTest {
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 
-		if(useVehicleInfo){
-			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-			agentSource.setModeVehicleTypes(getVehicleTypeInfo());
-			qSim.addAgentSource(agentSource);
-		}
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		agentSource.setModeVehicleTypes(getVehicleTypeInfo());
+		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
 
