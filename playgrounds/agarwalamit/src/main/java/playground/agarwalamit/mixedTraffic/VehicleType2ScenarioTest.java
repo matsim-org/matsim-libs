@@ -94,7 +94,7 @@ public class VehicleType2ScenarioTest {
 		runTest.createPlans();
 		runTest.createConfig();
 
-		Controler cont = new Controler(runTest.scenario.getConfig());
+		Controler cont = new Controler(runTest.scenario);
 		cont.setOverwriteFiles(true);
 		if(useModifiedMobsimFactory){
 			cont.setMobsimFactory(new modifiedMobsimFactory());
@@ -130,7 +130,7 @@ public class VehicleType2ScenarioTest {
 		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
 
-		VehicleType [] vehTypes = {car, bike};
+		VehicleType [] vehTypes = {bike, car};
 
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
