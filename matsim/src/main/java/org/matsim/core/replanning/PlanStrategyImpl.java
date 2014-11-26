@@ -30,6 +30,13 @@ import java.util.ArrayList;
 /**
  * A strategy defines how an agent can be modified during re-planning.
  *
+ * This extends GenericPlanStrategyImpl instead of delegating to it
+ * because it should now actually be replaced by its supertype, together
+ * with the PlanStrategy interface. And those could be renamed
+ * so that the Generic prefix goes away. I am only looking for the
+ * correct refactoring to do that.
+ * If someone has it, please go ahead. michaz nov 14
+ *
  * @author mrieser
  * @see org.matsim.core.replanning
  */
