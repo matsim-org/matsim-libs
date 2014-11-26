@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CANode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +19,17 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-public interface CANode extends CANetworkEntity {
+import playground.gregor.casim.simulation.CANetsimEngine;
 
-	public abstract void addLink(CALink link);
+public class CAMultiLaneNetworkFactory implements CANetworkFactory {
 
-	public abstract Node getNode();
+	@Override
+	public CANetwork createCANetwork(Network net, EventsManager em,
+			CANetsimEngine engine) {
+		return new CAMultiLaneNetwork(net, em, engine);
+	}
 
 }

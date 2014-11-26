@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.casim.experiments;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,6 +45,16 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
+import playground.gregor.casim.simulation.physics.AbstractCANetwork;
+import playground.gregor.casim.simulation.physics.CAEvent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
+import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
+import playground.gregor.casim.simulation.physics.CANetwork;
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
+import playground.gregor.casim.simulation.physics.CASimDensityEstimator;
+import playground.gregor.casim.simulation.physics.CASimpleDynamicAgent;
+import playground.gregor.casim.simulation.physics.CASingleLaneLink;
+import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -64,6 +74,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 	// 0.90 0.90 1.20 1.20 1.60 1.60 2.00 2.00 2.50 2.50
 	private static final List<Setting> settings = new ArrayList<Setting>();
 
+	public final static boolean USE_MULTI_LANE_MODEL = false;
 	public static boolean VIS = false;
 	private static BufferedWriter bw2;
 	private static int it = 0;
@@ -347,15 +358,15 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 
 				double size = 500;
 				double width = bL;
-				double ratio = CANetworkDynamic.PED_WIDTH / width;
+				double ratio = AbstractCANetwork.PED_WIDTH / width;
 				double cellLength = ratio
-						/ (CANetworkDynamic.RHO_HAT * CANetworkDynamic.PED_WIDTH);
+						/ (AbstractCANetwork.RHO_HAT * AbstractCANetwork.PED_WIDTH);
 				double length = size * cellLength;
 
 				double width2 = bEx;
-				double ratio2 = CANetworkDynamic.PED_WIDTH / width2;
+				double ratio2 = AbstractCANetwork.PED_WIDTH / width2;
 				double cellLength2 = ratio2
-						/ (CANetworkDynamic.RHO_HAT * CANetworkDynamic.PED_WIDTH);
+						/ (AbstractCANetwork.RHO_HAT * AbstractCANetwork.PED_WIDTH);
 				double length2 = size / 2 * cellLength2;
 				l3ex3.setLength(length);
 				l3ex3.setCapacity(bL);
@@ -412,12 +423,21 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			vis.addAdditionalDrawer(new InfoBox(vis, sc));
 			vis.addAdditionalDrawer(qDbg);
 		}
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em, null);
+		CANetworkFactory fac;
+		if (USE_MULTI_LANE_MODEL) {
+			fac = new CAMultiLaneNetworkFactory();
+
+		} else {
+			fac = new CASingleLaneNetworkFactory();
+		}
+
+		CANetwork caNet = fac.createCANetwork(net, em, null);
 
 		int agents = 0;
 
 		{
-			CALink caLink = caNet.getCALink(linksLR.get(0).getId());
+			CASingleLaneLink caLink = (CASingleLaneLink) caNet.getCALink(linksLR.get(
+					0).getId());
 			CAMoveableEntity[] particles = caLink.getParticles();
 			System.out.println("part left:" + particles.length);
 			for (int i = 0; i < particles.length - 1; i++) {
@@ -439,7 +459,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 				// caLink.getLink().getId(), a.getId());
 				// em.processEvent(eee);
 				CAEvent e = new CAEvent(
-						1 / (CANetworkDynamic.V_HAT * CANetworkDynamic.RHO_HAT),
+						1 / (AbstractCANetwork.V_HAT * AbstractCANetwork.RHO_HAT),
 						a, caLink, CAEventType.TTA);
 				caNet.pushEvent(e);
 				caNet.registerAgent(a);
@@ -448,7 +468,9 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 		}
 
 		CALinkMonitorExact monitor = new CALinkMonitorExact(caNet.getCALink(Id
-				.createLinkId("2")), 7.);
+				.createLinkId("2")), 7., ((CASingleLaneLink) caNet.getCALink(Id
+				.createLinkId("2"))).getParticles(), caNet
+				.getCALink(Id.createLinkId("2")).getLink().getCapacity());
 		caNet.addMonitor(monitor);
 		monitor.init();
 		caNet.run();

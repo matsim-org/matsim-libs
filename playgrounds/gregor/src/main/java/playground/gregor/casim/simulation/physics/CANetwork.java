@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CANode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +19,29 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.api.core.v01.network.Node;
+import java.util.List;
 
-public interface CANode extends CANetworkEntity {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-	public abstract void addLink(CALink link);
+import playground.gregor.casim.monitoring.CALinkMonitorExact;
 
-	public abstract Node getNode();
+public interface CANetwork {
+
+	void doSimStep(double time);
+
+	void afterSim();
+
+	CALink getCALink(Id<Link> linkId);
+
+	void pushEvent(CAEvent e);
+
+	void registerAgent(CAMoveableEntity a);
+
+	void run();
+
+	void addMonitor(CALinkMonitorExact monitor);
+
+	public List<CALinkMonitorExact> getMonitors();
 
 }

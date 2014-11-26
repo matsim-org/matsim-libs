@@ -55,7 +55,8 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import playground.gregor.casim.run.CATripRouterFactory;
 import playground.gregor.casim.simulation.CAMobsimFactory;
-import playground.gregor.casim.simulation.physics.CANetworkDynamic;
+import playground.gregor.casim.simulation.physics.AbstractCANetwork;
+import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 
 public class BypassTest extends MatsimTestCase {
 
@@ -69,7 +70,8 @@ public class BypassTest extends MatsimTestCase {
 	}
 
 	private void createScenario(Config c, Scenario sc) {
-		CANetworkDynamic.NR_THREADS = 1; // only deterministic for single thread
+		AbstractCANetwork.NR_THREADS = 1; // only deterministic for single
+											// thread
 											// execution
 
 		createNetwork(sc);
@@ -131,6 +133,7 @@ public class BypassTest extends MatsimTestCase {
 		controller.setTripRouterFactory(tripRouter);
 
 		CAMobsimFactory factory = new CAMobsimFactory();
+		factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
 		controller.addMobsimFactory("casim", factory);
 		controller.run();
 

@@ -37,10 +37,6 @@ public interface CALink extends CANetworkEntity {
 
 	public abstract int getNumOfCells();
 
-	public abstract CAMoveableEntity[] getParticles();
-
-	public abstract double[] getTimes();
-
 	public abstract void fireDownstreamEntered(CAMoveableEntity a, double time);
 
 	public abstract void fireUpstreamEntered(CAMoveableEntity a, double time);
@@ -52,5 +48,7 @@ public interface CALink extends CANetworkEntity {
 	public abstract void reset();
 
 	public abstract void letAgentDepart(CAVehicle veh, double now);
+
+	public abstract int getSize();
 
 }

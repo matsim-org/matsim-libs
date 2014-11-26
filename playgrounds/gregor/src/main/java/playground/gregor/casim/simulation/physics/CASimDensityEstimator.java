@@ -19,6 +19,8 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,25 +31,33 @@ import org.matsim.api.core.v01.network.Link;
 public class CASimDensityEstimator {
 
 	// Laemmel Floetteroed constants
-	/* package */static int LOOK_AHEAD = 7;
+	public static int LOOK_AHEAD = 6;
 	/* package */static final int MX_TRAVERSE = 20;
 
 	public static int H = 13;
 	private static final int CUTTOFF_DIST = 2 * H;
 	private static final boolean USE_SPH = false;
 
-	private final CANetworkDynamic net;
+	private final AbstractCANetwork net;
 
 	private final int nrThreads = 8;
 	private final CyclicBarrier barrier = new CyclicBarrier(nrThreads + 1);
 	private final Worker[] workers = new Worker[nrThreads];
 
-	public CASimDensityEstimator(CANetworkDynamic net) {
+	private final Set<CALink> safeLinks = new HashSet<>();
+
+	public CASimDensityEstimator(AbstractCANetwork net) {
 		this.net = net;
 		init();
 	}
 
 	private void init() {
+		for (CALink l : net.getLinks().values()) {
+			if (l.getLink().getId().toString().contains("el")) {
+				this.safeLinks.add(l); // .getLink().getId()
+			}
+		}
+
 		for (int i = 0; i < nrThreads; i++) {
 			workers[i] = new Worker(barrier);
 			Thread t = new Thread(workers[i]);
@@ -59,15 +69,29 @@ public class CASimDensityEstimator {
 	}
 
 	private double estRho(CAMoveableEntity a) {
-		if (a.getCurrentCANetworkEntity() instanceof CANodeDynamic
-				|| a.getNextLinkId() == null) {
+		if (a.getCurrentCANetworkEntity() instanceof CASingleLaneNode
+				|| a.getNextLinkId() == null
+				|| a.getCurrentCANetworkEntity() instanceof CAMultiLaneNode) {
 			return a.getRho();
 		}
+		if (this.safeLinks.contains(a.getCurrentCANetworkEntity())) {
+			return 0;
+		}
 		CALink current = (CALink) a.getCurrentCANetworkEntity();
-		CAMoveableEntity[] currentParts = current.getParticles();
+		CAMoveableEntity[] currentParts = null;// = current.getParticles();
+		if (current instanceof CASingleLaneLink) {
+			currentParts = ((CASingleLaneLink) current).getParticles();
+		} else if (current instanceof CAMultiLaneLink) {
+			currentParts = ((CAMultiLaneLink) current)
+					.getParticles(a.getLane());
+		}
 		int pos = a.getPos();
 		int dir = a.getDir();
 		int[] spacings;// = new int []{0,0};
+		// if (currentParts.length <= pos) {
+		// Log.error("got you!" + a);
+		// throw new RuntimeException(a.toString());
+		// }
 		if (currentParts[pos] != a) {
 			// agent on node
 			// log.warn("not yet implemented!!");
@@ -88,10 +112,28 @@ public class CASimDensityEstimator {
 				} else {
 					n = current.getUpstreamCANode();
 				}
+				// TODO bSplineKernel needs to be updated here as well!!! [GL
+				// Nov. '12]
+
 				spacings[1]++;
-				if (n.peekForAgent() != null) {
-					spacings[0]++;
+				if (n instanceof CASingleLaneNode) {
+					if (((CASingleLaneNode) n).peekForAgent() != null) {
+						spacings[0]++;
+					}
+				} else if (n instanceof CAMultiLaneNode) {
+					CAMultiLaneNode npq = (CAMultiLaneNode) n;
+					// int lane = a.getDesiredLane(npq.getNRLanes());
+					int lane = 0;// it is not clear to which lane the agent will
+									// moved to, under the assumption of
+									// homogeneity over
+					// the lanes we can just assume any lane for density
+					// estimation [GL Nov. '14]
+					if (npq.peekForAgentInSlot(lane) != null) {
+						spacings[0]++;
+					}
+
 				}
+
 				// check next link(s)? TODO it would make sense to check all
 				// outgoing links not only the next one ...
 				if (USE_SPH && spacings[1] < CUTTOFF_DIST || !USE_SPH
@@ -102,7 +144,32 @@ public class CASimDensityEstimator {
 					CANode nn = next.getUpstreamCANode();
 					int nextDir;
 					int nextPos;
-					CAMoveableEntity[] nextParts = next.getParticles();
+					CAMoveableEntity[] nextParts = null;// =
+														// next.getParticles();
+					if (next instanceof CASingleLaneLink) {
+						nextParts = ((CASingleLaneLink) next).getParticles();
+					} else if (next instanceof CAMultiLaneLink) {
+						nextParts = ((CAMultiLaneLink) next).getParticles(0);// it
+																				// is
+																				// not
+																				// clear
+																				// to
+																				// which
+																				// lane
+																				// the
+																				// agent
+																				// will
+																				// moved
+																				// to,
+																				// under
+																				// the
+																				// assumption
+																				// of
+																				// homogeneity
+																				// over
+						// the lanes we can just assume any lane for density
+						// estimation [GL Nov. '14]
+					}
 					if (n == nn) {
 						nextDir = 1;
 						nextPos = 0;
@@ -115,7 +182,7 @@ public class CASimDensityEstimator {
 				}
 			}
 			double coeff = (double) spacings[0] / (double) spacings[1];
-			double cmp = CANetworkDynamic.RHO_HAT * coeff;
+			double cmp = AbstractCANetwork.RHO_HAT * coeff;
 			// rho *= RHO_HAT;
 			if (USE_SPH) {
 				return rho;

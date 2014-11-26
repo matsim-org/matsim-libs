@@ -112,7 +112,8 @@ public class QSim2CASimConverter {
 		c.global().setCoordinateSystem("EPSG:32747");
 
 		c.qsim().setEndTime(21 * 3600);
-
+		c.qsim().setNumberOfThreads(2);
+		c.global().setNumberOfThreads(8);
 		new ConfigWriter(c).write(outputDir + "/config.xml");
 
 	}
@@ -158,10 +159,12 @@ public class QSim2CASimConverter {
 			l.setAllowedModes(modes);
 			double cap = l.getNumberOfLanes() * 0.61;
 			l.setCapacity(cap);
-
+			if (l.getNumberOfLanes() > 20) {
+				l.setCapacity(20 / 0.61);
+			}
 			if (l.getId().toString().contains("el")) {
-				l.setLength(50);
-				l.setCapacity(10);
+				l.setLength(5);
+				l.setCapacity(80);
 			}
 		}
 

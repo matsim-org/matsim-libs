@@ -35,7 +35,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.CAMobsimFactory;
-import playground.gregor.casim.simulation.physics.CANetworkDynamic;
+import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -76,10 +76,11 @@ public class CARunner implements IterationStartsListener {
 		controller.setTripRouterFactory(tripRouter);
 
 		CAMobsimFactory factory = new CAMobsimFactory();
+		// factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
 		controller.addMobsimFactory("casim", factory);
 
 		if (args[1].equals("true")) {
-			CANetworkDynamic.EMIT_VIS_EVENTS = true;
+			AbstractCANetwork.EMIT_VIS_EVENTS = true;
 			// VIS only
 			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
 			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);

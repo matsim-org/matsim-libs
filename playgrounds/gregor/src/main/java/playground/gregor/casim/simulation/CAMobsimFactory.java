@@ -34,7 +34,12 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 
+import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
+
 public class CAMobsimFactory implements MobsimFactory {
+
+	private CANetworkFactory fac = new CAMultiLaneNetworkFactory();
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -49,7 +54,7 @@ public class CAMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		CANetsimEngineModule.configure(qSim);
+		CANetsimEngineModule.configure(qSim, fac);
 
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
@@ -73,6 +78,11 @@ public class CAMobsimFactory implements MobsimFactory {
 				sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
+	}
+
+	public void setCANetworkFactory(CANetworkFactory caNetworkFactory) {
+		this.fac = caNetworkFactory;
+
 	}
 
 }

@@ -39,6 +39,7 @@ public class CAEvent implements Comparable<CAEvent> {
 	public long cnt;
 	private boolean isObsolete = false;
 	private boolean innerLockOnly;
+	private String eventId;
 
 	public CAEvent(double time, CAMoveableEntity agent, CANetworkEntity entity,
 			CAEventType type) {
@@ -46,6 +47,7 @@ public class CAEvent implements Comparable<CAEvent> {
 		this.agent = agent;
 		this.entity = entity;
 		this.type = type;
+		this.eventId = Thread.currentThread().getName();
 	}
 
 	public CAEventType getCAEventType() {
@@ -54,24 +56,37 @@ public class CAEvent implements Comparable<CAEvent> {
 
 	@Override
 	public int compareTo(CAEvent o) {
-		if (this.getEventExcexutionTime() < o.getEventExcexutionTime()) {
-			return -1;
-		} else if (this.getEventExcexutionTime() > o.getEventExcexutionTime()) {
-			return 1;
-		} else if (this.getEventExcexutionTime() == o.getEventExcexutionTime()) {
-			int oDir = o.getCAAgent().getDir();
-			int dir = agent.getDir();
-			if (dir < oDir) {
-				return -1;
-			}
-			if (dir > oDir) {
-				return 1;
-			}
-			// return MatsimRandom.getRandom().nextBoolean() ? -1 : 1;
-			return 0;
+		double diff = this.getEventExcexutionTime()
+				- o.getEventExcexutionTime();
 
+		if (diff < 0) {
+			return -1;
+		} else if (diff > 0) {
+			return 1;
 		}
-		throw new RuntimeException("Invalid event excecution time!");
+		// int oDir = o.getCAAgent().getDir();
+		// int dir = agent.getDir();
+		// if (dir < oDir) {
+		// return -1;
+		// }
+		// if (dir > oDir) {
+		// return 1;
+		// }
+		// double ox = o.getCANetworkEntity().getX();
+		// double x = this.getCANetworkEntity().getX();
+		// double oy = o.getCANetworkEntity().getY();
+		// double y = this.getCANetworkEntity().getY();
+		// double d = x + y;
+		// double od = ox + oy;
+		// if (d < od) {
+		// return -1;
+		// }
+		// if (d > od) {
+		// return 1;
+		// }
+		// return MatsimRandom.getRandom().nextBoolean() ? -1 : 1;
+		return 0;
+
 	}
 
 	public double getEventExcexutionTime() {
@@ -86,27 +101,12 @@ public class CAEvent implements Comparable<CAEvent> {
 		return this.entity;
 	}
 
-	// public boolean isValid() {
-	// if (this.agent.getCurrentCANetworkEntity() != this.validState.e) {
-	// return false;
-	// }
-	// if (this.validState.e instanceof CANode) {
-	// return true;
-	// }
-	// if (this.agent.getPos() != this.validState.pos) {
-	// return false;
-	// }
-	// if (this.agent.getDir() != this.validState.dir) {
-	// return false;
-	// }
-	// return true;
-	// }
-
 	@Override
 	public String toString() {
 		return "time:" + this.time + " type:" + this.type + " obsolete:"
 				+ isObsolete() + " agent:" + this.agent.getId() + " pos:"
-				+ this.agent.getPos();
+				+ this.agent.getPos() + " entity:" + this.entity + " thread:"
+				+ this.eventId;
 	}
 
 	public void setObsolete() {
@@ -118,25 +118,25 @@ public class CAEvent implements Comparable<CAEvent> {
 		return this.isObsolete;
 	}
 
-	public boolean tryLock() {
-		if (this.entity instanceof CALinkDynamic) {
-			if (this.agent.getPos() > 1
-					&& this.agent.getPos() < ((CALinkDynamic) this.entity)
-							.getSize() - 2) {
-				this.innerLockOnly = true;
-				return ((CALinkDynamic) this.entity).lock.tryLock();
+	public synchronized int tryLock() {
+		if (this.entity instanceof CALink) {
+			if (this.agent.getPos() > 2
+					&& this.agent.getPos() < ((CALink) this.entity).getSize() - 3) {
+				return 0;
 			}
 
 		}
-		return this.entity.tryLock();
+		return this.entity.tryLock() ? 1 : -1;
 	}
 
 	public void unlock() {
-		if (this.innerLockOnly) {
-			((CALinkDynamic) this.entity).lock.unlock();
-
-		} else {
+		if (!innerLockOnly) {
 			this.entity.unlock();
 		}
+		// if (this.innerLockOnly) {
+		// ((CALinkDynamic) this.entity).lock.unlock();
+		//
+		// } else {
+		// }
 	}
 }

@@ -20,10 +20,12 @@ package playground.gregor.casim.simulation;
 
 import org.matsim.core.mobsim.qsim.QSim;
 
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
+
 public final class CANetsimEngineModule {
 
-	public static void configure(QSim qSim) {
-		CANetsimEngine cae = new CANetsimEngine(qSim);
+	public static void configure(QSim qSim, CANetworkFactory fac) {
+		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
 		qSim.addMobsimEngine(cae);
 		qSim.addDepartureHandler(cae.getDepartureHandler());
 

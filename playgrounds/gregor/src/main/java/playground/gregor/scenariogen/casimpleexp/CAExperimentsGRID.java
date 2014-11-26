@@ -45,12 +45,24 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-public class CAExperiments {
-	private static String inputDir = "/Users/laemmel/devel/casimpleexp/input";
-	private static String outputDir = "/Users/laemmel/devel/casimpleexp/output";
+public class CAExperimentsGRID {
+	private static String inputDir = "/Users/laemmel/devel/cagridexp/input";
+	private static String outputDir = "/Users/laemmel/devel/cagridexp/output";
 
-	private static final int nrAgents = 800;
+	private static final double WIDTH = 400;
+	private static final double HEIGHT = 300;
+
+	private static final int NR_ROWS = 3;
+	private static final int NR_COLS = 4;
+
+	private static final double minX = 0;
+	private static final double minY = 0;
+	private static final double maxX = minX + WIDTH;
+	private static final double maxY = minY + HEIGHT;
+
+	private static final int nrAgents = 1500;
 
 	public static void main(String[] args) {
 		Config c = ConfigUtils.createConfig();
@@ -126,35 +138,75 @@ public class CAExperiments {
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
-		for (int i = 0; i < nrAgents / 2; i++) {
+		for (int i = 0; i < nrAgents / 4; i++) {
 			Person pers = fac.createPerson(Id.create("b" + i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
+			String from = "n1_" + (NR_ROWS - 1) + "_0";
 			act0 = fac.createActivityFromLinkId("origin",
-					Id.create("l0", Link.class));
+					Id.create(from, Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("walkca");
 			plan.addLeg(leg);
+			String to = "0_" + (NR_COLS - 1) + "_n3";
 			Activity act1 = fac.createActivityFromLinkId("destination",
-					Id.create("l4", Link.class));
+					Id.create(to, Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
-		for (int i = nrAgents / 2; i < nrAgents; i++) {
+		for (int i = nrAgents / 4; i < nrAgents / 2; i++) {
 			Person pers = fac.createPerson(Id.create("a" + i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
+			String from = "n2_" + (NR_ROWS - 1) + "_" + (NR_COLS - 1);
 			act0 = fac.createActivityFromLinkId("origin",
-					Id.create("l4_rev", Link.class));
+					Id.create(from, Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("walkca");
 			plan.addLeg(leg);
+			String to = "0_0_n0";
 			Activity act1 = fac.createActivityFromLinkId("destination",
-					Id.create("l0_rev", Link.class));
+					Id.create(to, Link.class));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
+		for (int i = nrAgents / 2; i < 3 * nrAgents / 4; i++) {
+			Person pers = fac.createPerson(Id.create("c" + i, Person.class));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			String from = "n0_0_0";
+			act0 = fac.createActivityFromLinkId("origin",
+					Id.create(from, Link.class));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("walkca");
+			plan.addLeg(leg);
+			String to = (NR_ROWS - 1) + "_" + (NR_COLS - 1) + "_n2";
+			Activity act1 = fac.createActivityFromLinkId("destination",
+					Id.create(to, Link.class));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+		}
+		for (int i = 3 * nrAgents / 4; i < nrAgents; i++) {
+			Person pers = fac.createPerson(Id.create("d" + i, Person.class));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			String from = "n3_0_" + (NR_COLS - 1);
+			act0 = fac.createActivityFromLinkId("origin",
+					Id.create(from, Link.class));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("walkca");
+			plan.addLeg(leg);
+			String to = (NR_ROWS - 1) + "_0_n1";
+			Activity act1 = fac.createActivityFromLinkId("destination",
+					Id.create(to, Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -164,128 +216,110 @@ public class CAExperiments {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(
-				-40, 0));
+				minX, minY));
 		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(
-				-10, 0));
-		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(-5,
-				0));
-		Node n2b = fac.createNode(Id.create("n2b", Node.class), new CoordImpl(
-				0, 20));
-		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(5,
-				0));
-		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(10,
-				0));
-		Node n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(40,
-				0));
+				minX, maxY));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(
+				maxX, maxY));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(
+				maxX, minY));
+
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
-		net.addNode(n2b);
-		net.addNode(n4);
-		net.addNode(n5);
 		net.addNode(n3);
-		double flow = 2;
-		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
-		Link l2 = fac.createLink(Id.create("l2", Link.class), n2, n3);
-		Link l2b = fac.createLink(Id.create("l2b", Link.class), n1, n2b);
-		Link l2c = fac.createLink(Id.create("l2c", Link.class), n2b, n3);
-		Link l3 = fac.createLink(Id.create("l3", Link.class), n3, n4);
-		Link l4 = fac.createLink(Id.create("l4", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(Id.create("l0_rev", Link.class), n1, n0);
-		Link l1Rev = fac.createLink(Id.create("l1_rev", Link.class), n2, n1);
-		Link l2Rev = fac.createLink(Id.create("l2_rev", Link.class), n3, n2);
-		Link l3Rev = fac.createLink(Id.create("l3_rev", Link.class), n4, n3);
-		Link l4Rev = fac.createLink(Id.create("l4_rev", Link.class), n5, n4);
+		// nodes
+		Node[][] nodes = new Node[NR_ROWS][NR_COLS];
+		double dx = (WIDTH / 2) / (NR_ROWS - 1);
+		double dy = (HEIGHT / 2) / (NR_COLS - 1);
 
-		Set<String> modes = new HashSet<String>();
-		modes.add("walkca");
-		l0.setLength(30);
-		l1.setLength(5);
-		l2.setLength(10);
-		l3.setLength(5);
-		l4.setLength(30);
-		l2b.setLength(22.361);
-		l2c.setLength(20.616);
+		double width = dx * (NR_COLS - 1);
+		double height = dy * (NR_ROWS - 1);
 
-		l0Rev.setLength(30);
-		l1Rev.setLength(5);
-		l2Rev.setLength(10);
-		l3Rev.setLength(5);
-		l4Rev.setLength(30);
+		double y = minY + (HEIGHT - height) / 2;
+		for (int i = 0; i < NR_ROWS; i++) {
+			double x = minX + (WIDTH - width) / 2;
+			for (int j = 0; j < NR_COLS; j++) {
+				Node n = fac.createNode(Id.create(i + "_" + j, Node.class),
+						new CoordImpl(x, y));
+				net.addNode(n);
+				nodes[i][j] = n;
+				x += dx;
+			}
+			y += dy;
+		}
 
-		l0.setAllowedModes(modes);
-		l1.setAllowedModes(modes);
-		l2.setAllowedModes(modes);
-		l3.setAllowedModes(modes);
-		l4.setAllowedModes(modes);
+		// connector links
+		{
+			Node n = n0;
+			int i = 0;
+			int j = 0;
+			Node nR = nodes[i][j];
+			createLink(fac, n, nR, net, 10);
+			createLink(fac, nR, n, net, 10);
+		}
+		{
+			Node n = n1;
+			int i = NR_ROWS - 1;
+			int j = 0;
+			Node nR = nodes[i][j];
+			createLink(fac, n, nR, net, 10);
+			createLink(fac, nR, n, net, 10);
+		}
+		{
+			Node n = n2;
+			int i = NR_ROWS - 1;
+			int j = NR_COLS - 1;
+			Node nR = nodes[i][j];
+			createLink(fac, n, nR, net, 10);
+			createLink(fac, nR, n, net, 10);
+		}
+		{
+			Node n = n3;
+			int i = 0;
+			int j = NR_COLS - 1;
+			Node nR = nodes[i][j];
+			createLink(fac, n, nR, net, 10);
+			createLink(fac, nR, n, net, 10);
+		}
 
-		l0Rev.setAllowedModes(modes);
-		l1Rev.setAllowedModes(modes);
-		l2Rev.setAllowedModes(modes);
-		l3Rev.setAllowedModes(modes);
-		l4Rev.setAllowedModes(modes);
-
-		l0.setFreespeed(1.34);
-		l1.setFreespeed(1.34);
-		l2.setFreespeed(1.34);
-		l2b.setFreespeed(1.34);
-		l2c.setFreespeed(1.34);
-		l3.setFreespeed(1.34);
-		l4.setFreespeed(1.34);
-
-		l0Rev.setFreespeed(1.34);
-		l1Rev.setFreespeed(1.34);
-		l2Rev.setFreespeed(1.34);
-		l3Rev.setFreespeed(1.34);
-		l4Rev.setFreespeed(1.34);
-
-		l0.setCapacity(flow);
-		l1.setCapacity(flow);
-		l2.setCapacity(flow / 5);
-		l2b.setCapacity(flow);
-		l2c.setCapacity(flow);
-		l3.setCapacity(flow);
-		l4.setCapacity(flow);
-
-		l0Rev.setCapacity(flow);
-		l1Rev.setCapacity(flow);
-		l2Rev.setCapacity(flow / 5);
-		l3Rev.setCapacity(flow);
-		l4Rev.setCapacity(flow);
-
-		double lanes = 2 / 0.71;
-		l0.setNumberOfLanes(lanes);
-		l1.setNumberOfLanes(lanes);
-		l2.setNumberOfLanes(lanes / 5);
-		l2b.setNumberOfLanes(lanes);
-		l2c.setNumberOfLanes(lanes);
-		l3.setNumberOfLanes(lanes);
-		l4.setNumberOfLanes(lanes);
-
-		l0Rev.setNumberOfLanes(lanes);
-		l1Rev.setNumberOfLanes(lanes);
-		l2Rev.setNumberOfLanes(lanes / 5);
-		l3Rev.setNumberOfLanes(lanes);
-		l4Rev.setNumberOfLanes(lanes);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l2b);
-		net.addLink(l2c);
-		net.addLink(l3);
-		net.addLink(l4);
-
-		net.addLink(l0Rev);
-		net.addLink(l1Rev);
-		net.addLink(l2Rev);
-		net.addLink(l3Rev);
-		net.addLink(l4Rev);
+		// links
+		for (int i = 0; i < NR_ROWS; i++) {
+			for (int j = 0; j < NR_COLS; j++) {
+				if (j + 1 < NR_COLS) {
+					Node n = nodes[i][j];
+					Node nR = nodes[i][j + 1];
+					createLink(fac, n, nR, net, 1.2);
+					createLink(fac, nR, n, net, 1.2);
+				}
+				if (i + 1 < NR_ROWS) {
+					Node n = nodes[i][j];
+					Node nR = nodes[i + 1][j];
+					createLink(fac, n, nR, net, 1.2);
+					createLink(fac, nR, n, net, 1.2);
+				}
+			}
+		}
 
 		((NetworkImpl) net).setCapacityPeriod(1);
 		((NetworkImpl) net).setEffectiveCellSize(.26);
 		((NetworkImpl) net).setEffectiveLaneWidth(.71);
+	}
+
+	private static void createLink(NetworkFactory fac, Node n, Node nR,
+			Network net, double w) {
+		Link con1 = fac.createLink(
+				Id.create(n.getId() + "_" + nR.getId(), Link.class), n, nR);
+		double length = CoordUtils.calcDistance(n.getCoord(), nR.getCoord());
+		con1.setLength(length);
+		Set<String> modes = new HashSet<String>();
+		modes.add("walkca");
+		con1.setAllowedModes(modes);
+		con1.setFreespeed(1.34);
+		con1.setCapacity(w);
+		con1.setNumberOfLanes(w / 0.61);
+		net.addLink(con1);
+
 	}
 }

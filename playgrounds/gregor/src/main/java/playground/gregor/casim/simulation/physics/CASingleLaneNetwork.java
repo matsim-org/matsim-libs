@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CANode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +19,53 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-public interface CANode extends CANetworkEntity {
+import playground.gregor.casim.simulation.CANetsimEngine;
 
-	public abstract void addLink(CALink link);
+public class CASingleLaneNetwork extends AbstractCANetwork {
 
-	public abstract Node getNode();
+	public CASingleLaneNetwork(Network net, EventsManager em,
+			CANetsimEngine engine) {
+		super(net, em, engine);
+		init();
+	}
 
+	private void init() {
+		this.tFreeMin = Double.POSITIVE_INFINITY;
+		for (Node n : this.net.getNodes().values()) {
+			CASingleLaneNode caNode = new CASingleLaneNode(n, this);
+			this.caNodes.put(n.getId(), caNode);
+		}
+		for (Link l : this.net.getLinks().values()) {
+			CASingleLaneNode us = (CASingleLaneNode) this.caNodes.get(l.getFromNode()
+					.getId());
+			CASingleLaneNode ds = (CASingleLaneNode) this.caNodes.get(l.getToNode()
+					.getId());
+			Link rev = null;
+			for (Link ll : l.getToNode().getOutLinks().values()) {
+				if (ll.getToNode() == l.getFromNode()) {
+					rev = ll;
+				}
+			}
+			if (rev != null) {
+				CALink revCA = this.caLinks.get(rev.getId());
+				if (revCA != null) {
+					this.caLinks.put(l.getId(), revCA);
+					continue;
+				}
+			}
+			CASingleLaneLink caL = new CASingleLaneLink(l, rev, ds, us, this);
+			if (caL.getTFree() < this.tFreeMin) {
+				this.tFreeMin = caL.getTFree();
+			}
+			us.addLink(caL);
+			ds.addLink(caL);
+			this.caLinks.put(l.getId(), caL);
+		}
+
+	}
 }

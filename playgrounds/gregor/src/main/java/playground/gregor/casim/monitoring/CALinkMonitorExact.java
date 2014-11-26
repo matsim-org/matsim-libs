@@ -8,12 +8,12 @@ import java.util.List;
 
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CALink;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 
 public class CALinkMonitorExact {
 
-	private CALink l;
+	// private CALink l;
 	private CAMoveableEntity[] parts;
 	private int from;
 	private int to;
@@ -24,7 +24,6 @@ public class CALinkMonitorExact {
 	private CAMoveableEntity lastUsLv = null;
 	private CAMoveableEntity lastUsEnt = null;
 
-
 	private LinkedList<AgentInfo> dsl = new LinkedList<AgentInfo>();
 	private LinkedList<AgentInfo> usl = new LinkedList<AgentInfo>();
 	private double realRange;
@@ -32,19 +31,20 @@ public class CALinkMonitorExact {
 	private Measure lastM = new Measure(0);
 
 	private List<Measure> ms = new ArrayList<Measure>();
-	
+
 	private double lastTriggered = -1;
 
-	public CALinkMonitorExact(CALink l, double range) {
-		this.l = l;
-		this.parts = l.getParticles();
+	public CALinkMonitorExact(CALink l, double range, CAMoveableEntity[] parts,
+			double laneWidth) {
+		// this.l = l;
+		this.parts = parts;
 		int num = l.getNumOfCells();
-		double cellWidth = l.getLink().getLength()/num;
-		double cells = range/cellWidth;
-		this.from = (int) (num/2.-cells/2 +.5);
-		this.to = (int) (num/2.+cells/2 +.5);
-		this.realRange = (to-from)*cellWidth;
-		this.area = realRange*l.getLink().getCapacity();
+		double cellWidth = l.getLink().getLength() / num;
+		double cells = range / cellWidth;
+		this.from = (int) (num / 2. - cells / 2 + .5);
+		this.to = (int) (num / 2. + cells / 2 + .5);
+		this.realRange = (to - from) * cellWidth;
+		this.area = realRange * laneWidth;
 
 	}
 
@@ -63,9 +63,9 @@ public class CALinkMonitorExact {
 				this.dsl.add(ai);
 			}
 		}
-		//6. update
-		this.lastUsLv = this.parts[from-1];
-		this.lastDsLv = this.parts[to+1];
+		// 6. update
+		this.lastUsLv = this.parts[from - 1];
+		this.lastDsLv = this.parts[to + 1];
 		this.lastUsEnt = this.parts[to];
 		this.lastDsEnt = this.parts[from];
 		trigger(0);
@@ -76,7 +76,7 @@ public class CALinkMonitorExact {
 			return;
 		}
 		lastTriggered = time;
-		//1. check density
+		// 1. check density
 		int cnt = 0;
 		int dsCnt = 0;
 		int usCnt = 0;
@@ -90,36 +90,40 @@ public class CALinkMonitorExact {
 				}
 			}
 		}
-		double rho = cnt/this.area;
-		double dsRho = dsCnt/this.area;
-		double usRho = usCnt/this.area;
+		double rho = cnt / this.area;
+		double dsRho = dsCnt / this.area;
+		double usRho = usCnt / this.area;
 
-		//2. check ds left
+		// 2. check ds left
 		double dsTT = 0;
 		double dsSpd = 0;
-		if (this.parts[to+1] != null && this.parts[to+1] != lastDsLv && this.parts[to+1].getDir() ==1 ) {
+		if (this.parts[to + 1] != null && this.parts[to + 1] != lastDsLv
+				&& this.parts[to + 1].getDir() == 1) {
 			AgentInfo ai = dsl.pollFirst();
-			dsTT = time-ai.enterTime;
-			dsSpd = this.realRange/dsTT;
+			dsTT = time - ai.enterTime;
+			dsSpd = this.realRange / dsTT;
 		}
-		//3. check us left
+		// 3. check us left
 		double usTT = 0;
 		double usSpd = 0;
-		if (this.parts[from-1] != null && this.parts[from-1] != lastUsLv && this.parts[from-1].getDir() == -1 ) {
+		if (this.parts[from - 1] != null && this.parts[from - 1] != lastUsLv
+				&& this.parts[from - 1].getDir() == -1) {
 			AgentInfo ai = usl.pollFirst();
-			usTT = time-ai.enterTime;
-			usSpd = this.realRange/usTT;
+			usTT = time - ai.enterTime;
+			usSpd = this.realRange / usTT;
 		}
 
-		//4. check ds enter
-		if (this.parts[from] != null && this.parts[from].getDir() == 1 && this.parts[from] != lastDsEnt) {
+		// 4. check ds enter
+		if (this.parts[from] != null && this.parts[from].getDir() == 1
+				&& this.parts[from] != lastDsEnt) {
 			AgentInfo ai = new AgentInfo();
 			ai.enterTime = time;
 			this.dsl.add(ai);
 		}
 
-		//5. check us enter
-		if (this.parts[to] != null && this.parts[to].getDir() == -1 && this.parts[to] != lastUsEnt) {
+		// 5. check us enter
+		if (this.parts[to] != null && this.parts[to].getDir() == -1
+				&& this.parts[to] != lastUsEnt) {
 			AgentInfo ai = new AgentInfo();
 			ai.enterTime = time;
 			this.usl.add(ai);
@@ -130,11 +134,11 @@ public class CALinkMonitorExact {
 			this.lastDsEnt = this.parts[from];
 			return;
 		}
-		
+
 		if (dsTT == 0) {
 			dsSpd = lastM.dsSpd;
 			dsRho = lastM.dsRho;
-		} 
+		}
 		if (usTT == 0) {
 			usSpd = lastM.usSpd;
 			usRho = lastM.usRho;
@@ -148,9 +152,9 @@ public class CALinkMonitorExact {
 		this.ms.add(m);
 
 		lastM = m;
-		//6. update
-		this.lastUsLv = this.parts[from-1];
-		this.lastDsLv = this.parts[to+1];
+		// 6. update
+		this.lastUsLv = this.parts[from - 1];
+		this.lastDsLv = this.parts[to + 1];
 		this.lastUsEnt = this.parts[to];
 		this.lastDsEnt = this.parts[from];
 
@@ -163,58 +167,59 @@ public class CALinkMonitorExact {
 		double rho = -1;
 		double dsSpd = -1;
 		double usSpd = -1;
-		List<Tuple<Integer,Integer>> ranges = new ArrayList<Tuple<Integer,Integer>>();
+		List<Tuple<Integer, Integer>> ranges = new ArrayList<Tuple<Integer, Integer>>();
 		int from = 0;
 		int to = 0;
 		double mxDiff = 0.05;
-		int mnRange = 40;
-		for (Measure m : this.ms){
-			double usRhoDiff = Math.abs(usRho-m.usRho);
-			double dsRhoDiff = Math.abs(dsRho-m.dsRho);
-			double rhoDiff = Math.abs(rho-(m.dsRho+m.usRho));
-			double dsSpdDiff = Math.abs(dsSpd-m.dsSpd);
-			double usSpdDiff = Math.abs(usSpd-m.usSpd);
-			if (rhoDiff > rho*mxDiff || usRhoDiff > usRho*mxDiff || dsRhoDiff > dsRho*mxDiff || dsSpdDiff > dsSpd*mxDiff || usSpdDiff > usSpd*mxDiff) {
-				int range = to-from;
+		int mnRange = 5;
+		for (Measure m : this.ms) {
+			double usRhoDiff = Math.abs(usRho - m.usRho);
+			double dsRhoDiff = Math.abs(dsRho - m.dsRho);
+			double rhoDiff = Math.abs(rho - (m.dsRho + m.usRho));
+			double dsSpdDiff = Math.abs(dsSpd - m.dsSpd);
+			double usSpdDiff = Math.abs(usSpd - m.usSpd);
+			if (rhoDiff > rho * mxDiff || usRhoDiff > usRho * mxDiff
+					|| dsRhoDiff > dsRho * mxDiff || dsSpdDiff > dsSpd * mxDiff
+					|| usSpdDiff > usSpd * mxDiff) {
+				int range = to - from;
 				if (range >= mnRange) {
-					ranges.add(new Tuple<Integer,Integer>(from,to));
+					ranges.add(new Tuple<Integer, Integer>(from, to));
 				}
 				from = to;
 				dsRho = m.dsRho;
 				usRho = m.usRho;
-				rho = (m.usRho+m.dsRho);
+				rho = (m.usRho + m.dsRho);
 				usSpd = m.usSpd;
 				dsSpd = m.dsSpd;
 			}
-			
+
 			to++;
 		}
 		for (Tuple<Integer, Integer> t : ranges) {
-			
-			double range = t.getSecond()-t.getFirst();
+
+			double range = t.getSecond() - t.getFirst();
 			Measure m = new Measure(0);
 			for (int i = t.getFirst(); i < t.getSecond(); i++) {
 				Measure c = this.ms.get(i);
-				m.dsRho += c.dsRho/range;
-				m.dsSpd += c.dsSpd/range;
-				m.usRho += c.usRho/range;
-				m.usSpd += c.usSpd/range;
+				m.dsRho += c.dsRho / range;
+				m.dsSpd += c.dsSpd / range;
+				m.usRho += c.usRho / range;
+				m.usSpd += c.usSpd / range;
 			}
-			bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho + " " + m.usSpd +"\n");
+			bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho
+					+ " " + m.usSpd + "\n");
 		}
 		bw.flush();
-//		for (Measure m : this.ms){
-////			if (m.time<20 || m.time >100) {
-//////				return;
-////				continue;
-////			}
-//			bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho + " " + m.usSpd +"\n");
-//		}
-
+		// for (Measure m : this.ms){
+		// // if (m.time<20 || m.time >100) {
+		// //// return;
+		// // continue;
+		// // }
+		// bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho +
+		// " " + m.usSpd +"\n");
+		// }
 
 	}
-
-
 
 	private static final class AgentInfo {
 		double enterTime;
@@ -224,6 +229,7 @@ public class CALinkMonitorExact {
 		public Measure(double time) {
 			this.time = time;
 		}
+
 		double dsSpd;
 		double dsRho;
 		double usSpd;

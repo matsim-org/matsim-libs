@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.casim.experiments;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,6 +46,15 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
 import playground.gregor.casim.monitoring.CALinkMonitorII;
+import playground.gregor.casim.simulation.physics.CAEvent;
+import playground.gregor.casim.simulation.physics.CAMoveableEntity;
+import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
+import playground.gregor.casim.simulation.physics.CANetwork;
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
+import playground.gregor.casim.simulation.physics.CASimDensityEstimator;
+import playground.gregor.casim.simulation.physics.CASimpleDynamicAgent;
+import playground.gregor.casim.simulation.physics.CASingleLaneLink;
+import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -62,6 +71,8 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 	private static final List<Setting> settings = new ArrayList<Setting>();
 
 	public static final boolean VIS = false;
+
+	private static final boolean USE_MULTI_LANE_MODEL = false;
 
 	private static BufferedWriter bw2;
 	private static int it = 0;
@@ -228,11 +239,20 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 			vis.addAdditionalDrawer(new InfoBox(vis, sc));
 			vis.addAdditionalDrawer(qDbg);
 		}
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em, null);
+		CANetworkFactory fac;
+		if (USE_MULTI_LANE_MODEL) {
+			fac = new CAMultiLaneNetworkFactory();
+
+		} else {
+			fac = new CASingleLaneNetworkFactory();
+		}
+
+		CANetwork caNet = fac.createCANetwork(net, em, null);
 
 		int agents = 0;
 		{
-			CALink caLinkLR = caNet.getCALink(linksLR.get(0).getId());
+			CASingleLaneLink caLinkLR = (CASingleLaneLink) caNet.getCALink(linksLR
+					.get(0).getId());
 			CAMoveableEntity[] particles = caLinkLR.getParticles();
 			System.out.println("part left:" + particles.length);
 
@@ -308,7 +328,9 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 		// IdImpl("2")));
 
 		CALinkMonitorExact monitor = new CALinkMonitorExact(caNet.getCALink(Id
-				.createLinkId("0")), 10.);
+				.createLinkId("0")), 10., ((CASingleLaneLink) caNet.getCALink(Id
+				.createLinkId("0"))).getParticles(), caNet
+				.getCALink(Id.createLinkId("0")).getLink().getCapacity());
 		caNet.addMonitor(monitor);
 		monitor.init();
 		caNet.run();

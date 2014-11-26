@@ -1,0 +1,1048 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CALink.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.gregor.casim.simulation.physics;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
+
+import playground.gregor.casim.events.CASimAgentConstructEvent;
+import playground.gregor.casim.simulation.CANetsimEngine;
+import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+
+/**
+ * This link models the dynamics for pedestrian streams (uni- and bidirectional)
+ * 
+ * @author laemmel
+ *
+ */
+public class CAMultiLaneLink implements CANetworkEntity, CALink {
+
+	private static final Logger log = Logger
+			.getLogger(CAMultiLaneLink.class);
+
+	private final Link dsl;
+	private final Link usl;
+
+	private final CAMoveableEntity[][] particles;
+	private final double[][] lastLeftTimes;
+
+	private final int size;
+
+	private final CAMultiLaneNode ds;
+
+	private final CAMultiLaneNode us;
+
+	private final AbstractCANetwork net;
+
+	// private final double cellLength;
+
+	private double width;
+
+	private final double tFree;
+
+	private double ratio;
+	private final double epsilon; // TODO check if this is still needed [GL Nov.
+									// '14]
+
+	final ReentrantLock lock = new ReentrantLock();
+
+	private int threadNr;
+
+	private final int lanes;
+
+	private double laneWidth;
+
+	private double laneCellLength;
+
+	private final double x;
+
+	private final double y;
+
+	private static int EXP_WARN_CNT = 0;
+
+	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
+			CAMultiLaneNode us, AbstractCANetwork net) {
+
+		this.threadNr = MatsimRandom.getRandom().nextInt(
+				AbstractCANetwork.NR_THREADS);
+
+		this.width = dsl.getCapacity();// TODO this is a misuse of the link's
+										// capacity attribute. Needs to be
+										// fixed!
+		this.lanes = (int) (this.width / (AbstractCANetwork.PED_WIDTH / 4) + 0.5);
+		this.laneWidth = this.width / lanes;
+		this.ratio = AbstractCANetwork.PED_WIDTH / this.laneWidth;
+		this.laneCellLength = this.ratio
+				/ (AbstractCANetwork.RHO_HAT * AbstractCANetwork.PED_WIDTH);
+		this.size = (int) (0.5 + dsl.getLength() / this.laneCellLength);
+
+		this.dsl = dsl;
+		this.usl = usl;
+		this.particles = new CAMoveableEntity[lanes][this.size];
+		this.lastLeftTimes = new double[lanes][this.size];
+		this.ds = ds;
+		this.us = us;
+		this.tFree = this.laneCellLength / AbstractCANetwork.V_HAT;
+		this.epsilon = tFree / 1000;
+		this.net = net;
+
+		x = this.getLink().getToNode().getCoord().getX();
+		y = this.getLink().getToNode().getCoord().getY();
+	}
+
+	public void setThreadNr(int thread) {
+		this.threadNr = thread;
+	}
+
+	public double getLaneWidth() {
+		return laneWidth;
+	}
+
+	/* package */static double getD(CAMoveableEntity a) {
+		final double rho = a.getRho();
+		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
+				AbstractCANetwork.GAMMA);
+		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
+		return d;
+	}
+
+	/* package */static double getZ(CAMoveableEntity a) {
+		double d = getD(a);
+		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
+				+ d;
+		// double z = this.tFree + d;
+		return z;
+	}
+
+	@Override
+	public void handleEvent(CAEvent e) {
+		CAMoveableEntity a = e.getCAAgent();
+		if (this.particles[a.getLane()][a.getPos()] != a) {
+			// log.warn("Agent: " + a + " not on expected position!!");
+			return;
+		}
+		double time = e.getEventExcexutionTime();
+		if (e.getCAEventType() == CAEventType.SWAP) {
+			handelSwap(a, time);
+		} else if (e.getCAEventType() == CAEventType.TTA) {
+			handleTTA(a, time);
+		} else if (e.getCAEventType() == CAEventType.TTE) {
+			throw new RuntimeException("not implemented yet");
+		} else {
+			throw new RuntimeException("Unknown event type: "
+					+ e.getCAEventType());
+		}
+	}
+
+	private void handleTTA(CAMoveableEntity a, double time) {
+
+		int idx = a.getPos();
+		int dir = a.getDir();
+		int nextIdx = idx + dir;
+		if (nextIdx < 0) {
+			handleTTAUpStreamNode(a, time);
+		} else if (nextIdx >= this.size) {
+			handleTTADownStreamNode(a, time);
+		} else {
+			handleTTAOnLink(a, time, dir);
+		}
+
+	}
+
+	private void handleTTAOnLink(CAMoveableEntity a, double time, int dir) {
+		if (dir == -1) {
+			handleTTAOnLinkUpStream(a, time);
+		} else {
+			handleTTAOnLinkDownStream(a, time);
+		}
+	}
+
+	private void handleTTAOnLinkDownStream(CAMoveableEntity a, double time) {
+		int idx = a.getPos();
+		int lane = a.getLane();
+
+		// check pre-condition
+		if (this.particles[lane][idx + 1] == null) {
+			double z = getZ(a);
+			z *= this.ratio;
+			if (this.lastLeftTimes[lane][idx + 1] <= (time - z + epsilon)) {
+				handleTTAOnLinkDownStreamOnPreCondition1(a, time, idx, lane);
+			} else {
+				handleTTAOnLinkDownStreamOnPreCondition2(a, time, idx, lane);
+			}
+		} else {
+			handleTTAOnLinkDownStreamOnPreCondition3(a, time);
+		}
+
+	}
+
+	private void handleTTAOnLinkDownStreamOnPreCondition1(CAMoveableEntity a,
+			double time, int idx, int lane) {
+
+		this.lastLeftTimes[lane][idx] = time;
+		this.particles[lane][idx] = null;
+		this.particles[lane][idx + 1] = a;
+		a.proceed();
+
+		// check post-condition and generate events
+		// first for persons behind
+		checkPostConditionForPersonBehindOnDownStreamAdvance(idx, time, lane);
+
+		// second for oneself
+		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, lane);
+
+	}
+
+	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx,
+			double time, int lane) {
+		if (idx - 1 < 0) {
+			this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(),
+					time);
+		} else {
+			CAMoveableEntity toBeTriggered = this.particles[lane][idx - 1];
+			if (toBeTriggered != null) {
+				if (toBeTriggered.getDir() == 1) {
+					double z = getZ(toBeTriggered);
+					z *= this.ratio;
+					triggerTTA(toBeTriggered, this, time + z);
+				}
+			}
+		}
+	}
+
+	private void checkPostConditionForAgentOnDownStreamAdvance(int idx,
+			CAMoveableEntity a, double time, int lane) {
+		if (idx + 2 >= this.size) {
+			checkPostConditionForAgentOnDownStreamAdvanceWhoIsInFrontOfNode(a,
+					time);
+
+		} else {
+			CAMoveableEntity inFrontOfMe = this.particles[lane][idx + 2];
+			if (inFrontOfMe != null) {
+				if (inFrontOfMe.getDir() == -1) { // oncoming
+					double d = getD(a);
+					d *= this.ratio;
+					triggerSWAP(a, this, time + d + this.tFree);
+				}
+			} else {
+				triggerTTA(a, this, time + this.tFree);
+			}
+		}
+
+	}
+
+	private void checkPostConditionForAgentOnDownStreamAdvanceWhoIsInFrontOfNode(
+			CAMoveableEntity a, double time) {
+
+		// See discussion in
+		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
+		// and adapt accordingly [GL Nov '14]
+
+		// count options (SWAP and TTA) and make choice
+		// according to the shares of SWAP and TTA
+		int optTTA = 0;
+		int optSWAP = 0;
+
+		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
+			CAMoveableEntity cand = ds.peekForAgentInSlot(slot);
+			if (cand == null) {
+				optTTA++;
+			} else if (this.usl != null
+					&& cand.getNextLinkId().equals(this.usl.getId())) {
+				optSWAP++;
+			}
+		}
+
+		if (optTTA + optSWAP == 0) {
+			return;
+		}
+
+		// There are likely situations where TTA and SWAP are possible. The
+		// action should be chosen so that the overall flow composition gets not
+		// disturbed. For now the option with most opportunities is chosen to
+		// increase the likelihood that it is still valid when the create event
+		// will be executed. If this does not work out well we could try making
+		// this probabilistic. [GL Nov '14]
+
+		if (optSWAP >= optTTA) {
+			double d = CAMultiLaneLink.getD(a);
+			d *= this.ds.getNodeRatio();
+			triggerSWAP(a, this, time + d + this.tFree);
+		} else {
+			triggerTTA(a, this, time + this.tFree);
+		}
+
+	}
+
+	private void handleTTAOnLinkDownStreamOnPreCondition2(CAMoveableEntity a,
+			double time, int idx, int lane) {
+
+		double z = getZ(a);
+		z *= this.ratio;
+		double zStar = z - (time - this.lastLeftTimes[lane][idx + 1]);
+		double nextTime = time + zStar;
+		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
+		this.net.pushEvent(e);
+	}
+
+	private void handleTTAOnLinkDownStreamOnPreCondition3(CAMoveableEntity a,
+			double time) {
+		// nothing to be done here.
+	}
+
+	private void handleTTAOnLinkUpStream(CAMoveableEntity a, double time) {
+		int idx = a.getPos();
+		int lane = a.getLane();
+
+		// check pre-condition
+		if (this.particles[lane][idx - 1] == null) {
+			double z = getZ(a);
+			z *= this.ratio;
+			if (this.lastLeftTimes[lane][idx - 1] <= (time - z + epsilon)) {
+				handleTTAOnLinkUpStreamOnPreCondition1(a, time, idx, lane);
+			} else {
+				handleTTAOnLinkUpStreamOnPreCondition2(a, time, idx, lane);
+			}
+		} else {
+			handleTTAOnLinkUpStreamOnPreCondition3(a, time);
+		}
+
+	}
+
+	private void handleTTAOnLinkUpStreamOnPreCondition1(CAMoveableEntity a,
+			double time, int idx, int lane) {
+
+		this.lastLeftTimes[lane][idx] = time;
+		this.particles[lane][idx] = null;
+		this.particles[lane][idx - 1] = a;
+		a.proceed();
+
+		// check post-condition and generate events
+		// first for persons behind
+		checkPostConditionForPersonBehindOnUpStreamAdvance(idx, time, lane);
+
+		// second for oneself
+		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, lane);
+
+	}
+
+	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx,
+			double time, int lane) {
+		if (idx + 1 >= this.size) {
+			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
+					time);
+		} else {
+			CAMoveableEntity toBeTriggered = this.particles[lane][idx + 1];
+			if (toBeTriggered != null) {
+				if (toBeTriggered.getDir() == -1) {
+					double z = getZ(toBeTriggered);
+					z *= this.ratio;
+					triggerTTA(toBeTriggered, this, time + z);
+				}
+			}
+		}
+	}
+
+	private void checkPostConditionForAgentOnUpStreamAdvance(int idx,
+			CAMoveableEntity a, double time, int lane) {
+		if (idx - 2 < 0) {
+			checkPostConditionForAgentOnUpStreamAdvanceWhoIsInFrontOfNode(a,
+					time);
+		} else {
+			CAMoveableEntity inFrontOfMe = this.particles[lane][idx - 2];
+			if (inFrontOfMe != null) {
+				if (inFrontOfMe.getDir() == 1) { // oncoming
+					double d = getD(a);
+					d *= this.ratio;
+					triggerSWAP(a, this, time + d + this.tFree);
+				}
+			} else {
+				triggerTTA(a, this, time + this.tFree);
+			}
+		}
+
+	}
+
+	private void checkPostConditionForAgentOnUpStreamAdvanceWhoIsInFrontOfNode(
+			CAMoveableEntity a, double time) {
+
+		// See discussion in
+		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
+		// and adapt accordingly [GL Nov '14]
+
+		// count options (SWAP and TTA) and make choice
+		// according to the shares of SWAP and TTA
+		int optTTA = 0;
+		int optSWAP = 0;
+
+		for (int slot = 0; slot < us.getNRLanes(); slot++) {
+			CAMoveableEntity cand = us.peekForAgentInSlot(slot);
+			if (cand == null) {
+				optTTA++;
+			} else if (cand.getNextLinkId().equals(this.dsl.getId())) {
+				optSWAP++;
+			}
+		}
+
+		if (optTTA + optSWAP == 0) {
+			return;
+		}
+		// There are likely situations where TTA and SWAP are possible. The
+		// action should be chosen so that the overall flow composition gets not
+		// disturbed. For now the option with most opportunities is chosen to
+		// increase the likelihood that it is still valid when the create event
+		// will be executed. If this does not work out well we could try making
+		// this probabilistic. [GL Nov '14]
+
+		if (optSWAP >= optTTA) {
+			double d = CAMultiLaneLink.getD(a);
+			d *= this.us.getNodeRatio();
+			triggerSWAP(a, this, time + d + this.tFree);
+		} else {
+			triggerTTA(a, this, time + this.tFree);
+		}
+
+	}
+
+	private void handleTTAOnLinkUpStreamOnPreCondition2(CAMoveableEntity a,
+			double time, int idx, int lane) {
+		double z = getZ(a);
+		z *= this.ratio;
+		double zStar = z - (time - this.lastLeftTimes[lane][idx - 1]);
+		double nextTime = time + zStar;
+		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
+		this.net.pushEvent(e);
+	}
+
+	private void handleTTAOnLinkUpStreamOnPreCondition3(CAMoveableEntity a,
+			double time) {
+		// nothing to be done here.
+	}
+
+	private void triggerSWAP(CAMoveableEntity a, CANetworkEntity ne, double time) {
+		CAEvent e = new CAEvent(time, a, ne, CAEventType.SWAP);
+		this.net.pushEvent(e);
+
+	}
+
+	private void triggerTTA(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
+			double time) {
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTA);
+		this.net.pushEvent(e);
+
+	}
+
+	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
+		if (a.getNextLinkId() == null) {
+			letAgentArrive(a, time, this.size - 1, a.getLane());
+			checkPostConditionForPersonBehindOnDownStreamAdvance(this.size - 1,
+					time, a.getLane());
+			return;
+		}
+
+		// check pre-condition
+		double z = CAMultiLaneLink.getZ(a);
+		z *= ds.getNodeRatio();
+		// 1. try to find empty slot with last left time < time - z
+		double[] exitTimes = ds.getLastNodeExitTimeForAgent(a);
+		List<Integer> cands = new ArrayList<Integer>(ds.getNRLanes());
+		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
+			if (ds.peekForAgentInSlot(slot) == null) {
+				if (exitTimes[slot] <= (time - z + epsilon)) {
+					cands.add(slot);
+				}
+			}
+		}
+		if (cands.size() > 0) {
+			Integer slot = cands.get(MatsimRandom.getRandom().nextInt(
+					cands.size()));
+			handleTTADownStreamNodeOnPreCondition1(a, time, slot);
+			return;
+		}
+		// 2.try to find empty slot with last left time >= time -z
+		// maybe we should look for slow with that minimizes (last left time -
+		// time -z)
+		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
+			if (ds.peekForAgentInSlot(slot) == null) {
+				handleTTANodeOnPreCondition2(a, time, this.ds, slot);
+				return;
+			}
+		}
+
+	}
+
+	private void handleTTADownStreamNodeOnPreCondition1(CAMoveableEntity a,
+			double time, int nodeLane) {
+
+		int lane = a.getLane();
+		this.lastLeftTimes[lane][this.size - 1] = time;
+		this.particles[lane][this.size - 1] = null;
+		this.ds.putAgentInSlot(nodeLane, a);
+		a.materialize(Integer.MAX_VALUE, Integer.MAX_VALUE, nodeLane);
+
+		fireDownstreamLeft(a, time);
+
+		// check post-condition and generate events
+		// first for persons behind or on node
+		if (this.usl != null) {
+			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
+					time);
+		}
+		// || !this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(lane,
+		// this.usl.getId(), lanes, time)) {
+
+		checkPostConditionForPersonBehindOnDownStreamAdvance(this.size - 1,
+				time, lane);
+		// }
+
+		// second for oneself
+		checkPostConditionForOneSelfOnNodeAdvance(this.ds, a, time);
+
+		// throw new RuntimeException("maybe trigger someone on the link");
+	}
+
+	private void checkPostConditionForOneSelfOnNodeAdvance(
+			CAMultiLaneNode n, CAMoveableEntity a, double time) {
+		Id<Link> nextCALinkId = a.getNextLinkId();
+		CAMultiLaneLink nextCALink = (CAMultiLaneLink) this.net
+				.getCALink(nextCALinkId);
+		if (nextCALink.getUpstreamCANode() == n) {
+			n.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd(
+					a, nextCALink, time);
+		} else if (nextCALink.getDownstreamCANode() == n) {
+			n.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromDownstreamEnd(
+					a, nextCALink, time);
+		} else {
+			log.warn("inconsitent network, agent:" + a + " becomes stuck!");
+			return;
+		}
+
+	}
+
+	private void handleTTANodeOnPreCondition2(CAMoveableEntity a, double time,
+			CAMultiLaneNode n, int slot) {
+
+		double z = getZ(a);
+		z *= n.getNodeRatio();
+
+		double zStar = z - (time - n.getLastNodeExitTimeForAgent(a)[slot]);
+		double nextTime = time + zStar;
+		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
+		this.net.pushEvent(e);
+
+	}
+
+	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
+		if (a.getNextLinkId() == null) {
+			int lane = a.getLane();
+			this.lastLeftTimes[lane][0] = time;
+			this.particles[lane][0] = null;
+			letAgentArrive(a, time, 0, lane);
+			// check post-condition and generate events
+			// first for persons behind
+			checkPostConditionForPersonBehindOnUpStreamAdvance(0, time, lane);
+			return;
+		}
+
+		// check pre-condition
+		double z = CAMultiLaneLink.getZ(a);
+		z *= us.getNodeRatio();
+		// 1. try to find empty slot with last left time < time - z
+		double[] exitTimes = us.getLastNodeExitTimeForAgent(a);
+		List<Integer> cands = new ArrayList<Integer>(us.getNRLanes());
+		for (int slot = 0; slot < us.getNRLanes(); slot++) {
+			if (us.peekForAgentInSlot(slot) == null) {
+				if (exitTimes[slot] <= (time - z + epsilon)) {
+					cands.add(slot);
+				}
+			}
+		}
+		if (cands.size() > 0) {
+			Integer slot = cands.get(MatsimRandom.getRandom().nextInt(
+					cands.size()));
+			handleTTAUpStreamNodeOnPreCondition1(a, time, slot);
+			return;
+		}
+		// 2.try to find empty slot with last left time >= time -z
+		// maybe we should look for slow with that minimizes (last left time -
+		// time -z)
+		for (int slot = 0; slot < us.getNRLanes(); slot++) {
+			if (us.peekForAgentInSlot(slot) == null) {
+				handleTTANodeOnPreCondition2(a, time, this.us, slot);
+				return;
+			}
+		}
+
+	}
+
+	private void handleTTAUpStreamNodeOnPreCondition1(CAMoveableEntity a,
+			double time, int nodeSlot) {
+
+		int lane = a.getLane();
+		this.lastLeftTimes[lane][0] = time;
+		this.particles[lane][0] = null;
+		this.us.putAgentInSlot(nodeSlot, a);
+
+		a.materialize(Integer.MAX_VALUE, Integer.MAX_VALUE, nodeSlot);
+
+		fireUpstreamLeft(a, time);
+
+		// check post-condition and generate events
+		// first for persons behind or on node
+		// if (!this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(lane,
+		// this.dsl.getId(), lanes, time)) {
+		this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(), time);
+		checkPostConditionForPersonBehindOnUpStreamAdvance(0, time, lane);
+		// }
+
+		// second for oneself
+		checkPostConditionForOneSelfOnNodeAdvance(this.us, a, time);
+
+		// throw new RuntimeException("maybe trigger someone on node!");
+	}
+
+	private void handelSwap(CAMoveableEntity a, double time) {
+		int idx = a.getPos();
+		int dir = a.getDir();
+		int nbIdx = idx + dir;
+		if (nbIdx < 0) {
+			swapWithUpStreamNode(a, time);
+		} else if (nbIdx >= this.size) {
+			swapWithDownStreamNode(a, time);
+		} else {
+			int lane = a.getLane();
+			swapOnLink(a, idx, dir, time, lane);
+		}
+
+	}
+
+	private void swapWithDownStreamNode(CAMoveableEntity a, double time) {
+
+		if (usl == null) {
+			log.warn(a);
+		}
+
+		CAMoveableEntity peek = this.ds
+				.peekForAgentWhoWantsToEnterLaneOnLink(this.usl.getId());
+		if (peek == null) {
+			// log.info("situation for agent: " + a
+			// + " at downstream node has changed, dropping event.");
+			return;
+		}
+
+		int lane = a.getLane();
+		int nodeSlot = peek.getLane();
+		CAMoveableEntity swapA = this.ds.pollAgentFromSlot(nodeSlot);
+
+		swapA.invalidate();
+
+		swapA.materialize(this.size - 1, -1, lane);
+		swapA.moveOverNode(this, time);
+
+		this.particles[lane][this.size - 1] = swapA;
+		this.lastLeftTimes[lane][this.size - 1] = time;
+		this.ds.putAgentInSlot(nodeSlot, a);
+		a.materialize(Integer.MIN_VALUE, Integer.MIN_VALUE, nodeSlot);
+
+		fireDownstreamLeft(a, time);
+		fireDownstreamEntered(swapA, time);
+
+		// check post-condition and generate events
+		// first for swapA
+		checkPostConditionForAgentOnUpStreamAdvance(this.size, swapA, time,
+				lane);
+
+		// second for oneself
+		checkPostConditionForOneSelfOnNodeAdvance(this.ds, a, time);
+	}
+
+	private void swapWithUpStreamNode(CAMoveableEntity a, double time) {
+
+		CAMoveableEntity peek = this.us
+				.peekForAgentWhoWantsToEnterLaneOnLink(dsl.getId());
+
+		// validate situation
+		if (peek == null) {
+			// log.info("situation for: " + a
+			// + " at upstream node has changed, dropping event.");
+			return;
+		}
+		int nodeLane = peek.getLane();
+		int lane = a.getLane();
+
+		CAMoveableEntity swapA = this.us.pollAgentFromSlot(nodeLane);
+
+		this.particles[lane][0] = swapA;
+		this.lastLeftTimes[lane][0] = time;
+		this.us.putAgentInSlot(nodeLane, a);
+		a.materialize(Integer.MIN_VALUE, Integer.MIN_VALUE, nodeLane);
+		swapA.materialize(0, 1, lane);
+		swapA.moveOverNode(this, time);
+		swapA.invalidate();
+
+		fireUpstreamLeft(a, time);
+		fireUpstreamEntered(swapA, time);
+
+		// check post-condition and generate events
+		// first for swapA
+		checkPostConditionForAgentOnDownStreamAdvance(-1, swapA, time, lane);
+
+		// second for oneself
+		checkPostConditionForOneSelfOnNodeAdvance(this.us, a, time);
+	}
+
+	// TODO us generic ids for event firing
+	@Override
+	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.usl.getId(), a.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("down");
+
+	}
+
+	@Override
+	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.dsl.getId(), a.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("up");
+	}
+
+	@Override
+	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.dsl.getId(), a.getId());
+		this.net.getEventsManager().processEvent(e);
+
+	}
+
+	@Override
+	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.usl.getId(), a.getId());
+		this.net.getEventsManager().processEvent(e);
+	}
+
+	@Override
+	public int getNumOfCells() {
+		return this.size;
+	}
+
+	private void swapOnLink(CAMoveableEntity a, int idx, int dir, double time,
+			int lane) {
+
+		if (dir == 1) {
+			swapOnLinkDownStream(a, idx, time, lane);
+		} else {
+			swapOnLinkUpStream(a, idx, time, lane);
+		}
+
+	}
+
+	private void swapOnLinkDownStream(CAMoveableEntity a, int idx, double time,
+			int lane) {
+
+		int nbIdx = idx + 1;
+		CAMoveableEntity nb = this.particles[lane][nbIdx];
+		this.particles[lane][nbIdx] = a;
+		this.particles[lane][idx] = nb;
+
+		this.lastLeftTimes[lane][nbIdx] = time;
+		this.lastLeftTimes[lane][idx] = time;
+
+		nb.invalidate();
+		nb.proceed();
+		a.proceed();
+
+		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, lane);
+		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time, lane);
+
+	}
+
+	private void swapOnLinkUpStream(CAMoveableEntity a, int idx, double time,
+			int lane) {
+
+		int nbIdx = idx - 1;
+		CAMoveableEntity nb = this.particles[lane][nbIdx];
+		this.particles[lane][nbIdx] = a;
+		this.particles[lane][idx] = nb;
+
+		this.lastLeftTimes[lane][nbIdx] = time;
+		this.lastLeftTimes[lane][idx] = time;
+
+		nb.invalidate();
+		nb.proceed();
+		a.proceed();
+
+		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, lane);
+		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time, lane);
+
+	}
+
+	@Override
+	public CANode getUpstreamCANode() {
+		return this.us;
+	}
+
+	@Override
+	public CANode getDownstreamCANode() {
+		return this.ds;
+	}
+
+	public CAMoveableEntity[] getParticles(int lane) {
+		return this.particles[lane];
+	}
+
+	@Override
+	public int getSize() {
+		return this.size;
+	}
+
+	public double[] getLastLeftTimes(int lane) {
+		return this.lastLeftTimes[lane];
+	}
+
+	@Override
+	public Link getLink() {
+		return this.dsl;
+	}
+
+	@Override
+	public Link getUpstreamLink() {
+		return this.usl;
+	}
+
+	public Link getDownstreamLink() {
+		return this.dsl;
+	}
+
+	@Override
+	public String toString() {
+		return this.dsl.getId().toString();
+	}
+
+	public double getWidth() {
+		return this.width;
+	}
+
+	public double getTFree() {
+		return this.tFree;
+	}
+
+	public final int getNrLanes() {
+		return this.lanes;
+	}
+
+	@Override
+	public void letAgentDepart(CAVehicle veh, double now) {
+		Id<Link> currentLinkId = veh.getDriver().getCurrentLinkId();
+		Link link = this.net.getNetwork().getLinks().get(currentLinkId);
+		Node toNode = link.getToNode();
+		CANode toCANode = this.net.getNodes().get(toNode.getId());
+
+		int dir;
+		if (this.ds == toCANode) {
+			dir = 1;
+		} else if (this.us == toCANode) {
+			dir = -1;
+		} else {
+			throw new RuntimeException("inconsitent network or plan!");
+		}
+		int pos = -1;
+		int lane = 0;
+		for (int i = this.size - 1; i > 1; i--) {
+			boolean found = false;
+			for (lane = 0; lane < this.lanes; lane++) {
+				if (this.particles[lane][i] == null) {
+					pos = i;
+					found = true;
+					break;
+				}
+			}
+			if (found) {
+				break;
+			}
+		}
+		// lane--;
+		if (pos == -1) {
+			if (EXP_WARN_CNT++ < 10) {
+				log.warn("could not find a free spot for agent: " + veh
+						+ ". Dropping it!");
+				if (EXP_WARN_CNT == 10) {
+					log.info(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
+
+			this.net.getEventsManager().processEvent(
+					new PersonStuckEvent(now, veh.getDriver().getId(),
+							currentLinkId, veh.getDriver().getMode()));
+
+			net.getEngine().getMobsim().getAgentCounter().incLost();
+			net.getEngine().getMobsim().getAgentCounter().decLiving();
+			return;
+		}
+		this.particles[lane][pos] = veh;
+		veh.materialize(pos, dir, lane);
+
+		net.registerAgent(veh);
+
+		// fire
+		if (dir == 1) {
+			fireUpstreamEntered(veh, now);
+		} else {
+			fireDownstreamEntered(veh, now);
+		}
+
+		double rnd = MatsimRandom.getRandom().nextDouble() / 100.;
+		if (this.particles[lane][pos + dir] == null) {
+			triggerTTA(veh, this, now + tFree + rnd);
+		} else if (this.particles[lane][pos + dir].getDir() != dir) {
+			triggerSWAP(veh, this, now + getD(this.particles[lane][pos + dir])
+					+ tFree + rnd);
+		}
+
+		// VIS only
+		if (AbstractCANetwork.EMIT_VIS_EVENTS) {
+			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(now, veh);
+			this.net.getEventsManager().processEvent(ee);
+		}
+		// System.out.println(next);
+		// throw new RuntimeException("not yet implemented!");
+	}
+
+	private void letAgentArrive(CAMoveableEntity a, double time, int idx,
+			int lane) {
+		this.lastLeftTimes[lane][idx] = time;
+		this.particles[lane][idx] = null;
+		CANetsimEngine engine = this.net.getEngine();
+		if (engine != null) {
+			engine.letVehicleArrive((CAVehicle) a);
+		}
+		this.net.unregisterAgent(a);
+	}
+
+	@Override
+	public void reset() {
+		for (int i = 0; i < this.lanes; i++) {
+			for (int j = 0; j < this.size; j++) {
+				lastLeftTimes[i][j] = 0;
+				if (particles[i][j] != null) {
+					CAMoveableEntity part = particles[i][j];
+					this.net.unregisterAgent(part);
+					particles[i][j] = null;
+					if (part instanceof CAVehicle) {
+						double now = net.getEngine().getMobsim().getSimTimer()
+								.getTimeOfDay();
+						CAVehicle veh = (CAVehicle) part;
+
+						Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
+								.getId() : this.usl.getId();
+						this.net.getEventsManager().processEvent(
+								new PersonStuckEvent(now, veh.getDriver()
+										.getId(), currentLinkId, veh
+										.getDriver().getMode()));
+
+						net.getEngine().getMobsim().getAgentCounter().incLost();
+						net.getEngine().getMobsim().getAgentCounter()
+								.decLiving();
+					}
+				}
+			}
+		}
+
+	}
+
+	@Override
+	public void lock() {
+		this.ds.lock.lock();
+		this.us.lock.lock();
+		this.lock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		this.ds.unlock();
+		this.us.unlock();
+		// this.lock.unlock();
+	}
+
+	@Override
+	public boolean tryLock() {
+		if (!this.ds.tryLock()) {
+			// log.warn("ds lock failed");
+			return false;
+		}
+		if (!this.us.tryLock()) {
+			this.ds.unlock();
+			// log.warn("us lock failed");
+			return false;
+		}
+
+		// if (!this.lock.tryLock()) {
+		// this.ds.lock.unlock();
+		// this.us.lock.unlock();
+		// return false;
+		// }
+
+		return true;
+	}
+
+	@Override
+	public boolean isLocked() {
+		if (this.ds.lock.isLocked()) {
+			return true;
+		}
+		if (this.us.lock.isLocked()) {
+			return true;
+		}
+		if (this.lock.isLocked()) {
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int threadNR() {
+		return this.threadNr;
+	}
+
+	@Override
+	public double getX() {
+		return x;
+	}
+
+	@Override
+	public double getY() {
+		return y;
+	}
+}

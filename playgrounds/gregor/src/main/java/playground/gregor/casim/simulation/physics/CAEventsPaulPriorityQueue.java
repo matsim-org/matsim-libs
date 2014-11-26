@@ -19,12 +19,8 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -42,8 +38,6 @@ public class CAEventsPaulPriorityQueue {
 
 	private static final Logger log = Logger
 			.getLogger(CAEventsPaulPriorityQueue.class);
-
-	private static final int DESIRED_PQ_SZ = 30;
 
 	private double dT = 0.0001;
 	private final PriorityQueue<CAEvent> pQ = new PriorityQueue<>();
@@ -100,35 +94,6 @@ public class CAEventsPaulPriorityQueue {
 			}
 			currentIdx++;
 		}
-		// if (this.dT > D_T_MIN && pQ.size() > 2 * DESIRED_PQ_SZ) {
-		// log.info("PQ size = " + pQ.size() + " performing calibration...");
-		// calibrate();
-		// }
-		// log.info("Calibration done. New dT = " + this.dT + " PQ size = "
-		// + this.pQ.size());
-		// System.out.println(pQ.size());
 	}
 
-	public void rebuilt() {
-		List<CAEvent> pseudoSortedCAEvents = new ArrayList<CAEvent>();
-		pseudoSortedCAEvents.addAll(pQ);
-
-		int currentIdx = (int) (tLast / dT);
-		while (largeQ.size() > 0) {
-			LinkedList<CAEvent> next = largeQ.remove(currentIdx);
-			if (next != null) {
-				pseudoSortedCAEvents.addAll(next);
-			}
-			currentIdx++;
-		}
-		Collections.sort(pseudoSortedCAEvents);
-		this.tLast = pQ.peek().getEventExcexutionTime();
-		pQ.clear();
-		Iterator<CAEvent> it = pseudoSortedCAEvents.iterator();
-		while (it.hasNext()) {
-			CAEvent next = it.next();
-			it.remove();
-			add(next);
-		}
-	}
 }

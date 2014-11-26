@@ -34,4 +34,8 @@ public interface CANetworkEntity {
 
 	public int threadNR();
 
+	public double getX();
+
+	public double getY();
+
 }

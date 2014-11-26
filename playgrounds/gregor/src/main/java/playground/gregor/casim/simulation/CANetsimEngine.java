@@ -29,7 +29,8 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.gregor.casim.simulation.physics.CANetworkDynamic;
+import playground.gregor.casim.simulation.physics.CANetwork;
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.casim.simulation.physics.CAVehicle;
 
 public class CANetsimEngine implements MobsimEngine {
@@ -41,13 +42,15 @@ public class CANetsimEngine implements MobsimEngine {
 
 	private final DepartureHandler dpHandler;
 
-	private CANetworkDynamic caNet;
+	private CANetwork caNet;
 
 	private InternalInterface internalInterface;
 
-	public CANetsimEngine(QSim sim) {
-		this.scenario = sim.getScenario();
+	private final CANetworkFactory fac;
 
+	public CANetsimEngine(QSim sim, CANetworkFactory fac) {
+		this.scenario = sim.getScenario();
+		this.fac = fac;
 		this.sim = sim;
 		this.dpHandler = new CAWalkerDepatureHandler(this, this.scenario);
 
@@ -62,7 +65,7 @@ public class CANetsimEngine implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 		log.info("prepare");
-		this.caNet = new CANetworkDynamic(sim.getScenario().getNetwork(),
+		this.caNet = fac.createCANetwork(sim.getScenario().getNetwork(),
 				sim.getEventsManager(), this);
 
 	}
@@ -99,7 +102,7 @@ public class CANetsimEngine implements MobsimEngine {
 		return this.dpHandler;
 	}
 
-	public CANetworkDynamic getCANetwork() {
+	public CANetwork getCANetwork() {
 		return this.caNet;
 	}
 

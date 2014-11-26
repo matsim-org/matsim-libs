@@ -28,39 +28,51 @@ public abstract class CAMoveableEntity {
 	private int dir;
 	private int pos;
 	private CAEvent currentEvent;
-	
+
 	private double rho;
-	
-	
-	
+	private int lane;
+
 	public void proceed() {
 		this.pos += this.dir;
 	}
-	
+
 	public int getPos() {
 		return this.pos;
 	}
-	
+
 	public int getDir() {
 		return this.dir;
 	}
-	
-	public void materialize(int pos,int dir) {
+
+	public int getLane() {
+		return this.lane;
+	}
+
+	public void materialize(int pos, int dir) {
 		this.pos = pos;
 		this.dir = dir;
 	}
-	
+
+	public void materialize(int pos, int dir, int lane) {
+		this.pos = pos;
+		this.dir = dir;
+		this.lane = lane;
+	}
+
 	abstract Id<Link> getNextLinkId();
-	
-	abstract void moveOverNode(CALink nextLink,double time);
-	
-	//TODO add generic 
+
+	abstract void moveOverNode(CALink nextLink, double time);
+
+	// TODO add generic
 	public abstract Id getId();
 
-	
 	public abstract CANetworkEntity getCurrentCANetworkEntity();
-	
+
 	public abstract void moveToNode(CANode n);
+
+	public CAEvent getCurrentEvent() {
+		return this.currentEvent;
+	}
 
 	public void setCurrentEvent(CAEvent event) {
 		if (this.currentEvent != null) {
@@ -68,21 +80,28 @@ public abstract class CAMoveableEntity {
 		}
 		this.currentEvent = event;
 	}
-	
+
+	public void invalidate() {
+		if (this.currentEvent != null) {
+			this.currentEvent.setObsolete();
+		}
+	}
+
 	public abstract Link getCurrentLink();
-	
-	
+
 	@Override
 	public String toString() {
-		String a = "agent: " + getId() + " next event:" + this.currentEvent + "\n";
+		String a = "agent: " + getId() + " next event:" + this.currentEvent
+				+ "\n";
 		return a;
 	}
+
 	public double getRho() {
 		return this.rho;
 	}
+
 	public void setRho(double rho) {
 		this.rho = rho;
 	}
-	
-	
+
 }

@@ -42,9 +42,9 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
  * @author laemmel
  *
  */
-public class CALinkDynamic implements CANetworkEntity, CALink {
+public class CASingleLaneLink implements CANetworkEntity, CALink {
 
-	private static final Logger log = Logger.getLogger(CALinkDynamic.class);
+	private static final Logger log = Logger.getLogger(CASingleLaneLink.class);
 
 	private final Link dsl;
 	private final Link usl;
@@ -64,11 +64,11 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 
 	private final int size;
 
-	private final CANodeDynamic ds;
+	private final CASingleLaneNode ds;
 
-	private final CANodeDynamic us;
+	private final CASingleLaneNode us;
 
-	private final CANetworkDynamic net;
+	private final AbstractCANetwork net;
 
 	private final double cellLength;
 
@@ -83,21 +83,25 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 
 	private final int threadNr;
 
+	private double x;
+
+	private double y;
+
 	private static int EXP_WARN_CNT = 0;
 
-	public CALinkDynamic(Link dsl, Link usl, CANodeDynamic ds,
-			CANodeDynamic us, CANetworkDynamic net) {
+	public CASingleLaneLink(Link dsl, Link usl, CASingleLaneNode ds,
+			CASingleLaneNode us, AbstractCANetwork net) {
 
 		this.threadNr = MatsimRandom.getRandom().nextInt(
-				CANetworkDynamic.NR_THREADS);
+				AbstractCANetwork.NR_THREADS);
 
 		this.width = dsl.getCapacity();// TODO this is a misuse of the link's
 										// capacity attribute. Needs to be
 										// fixed!
 
-		this.ratio = CANetworkDynamic.PED_WIDTH / this.width;
+		this.ratio = AbstractCANetwork.PED_WIDTH / this.width;
 		this.cellLength = this.ratio
-				/ (CANetworkDynamic.RHO_HAT * CANetworkDynamic.PED_WIDTH);
+				/ (AbstractCANetwork.RHO_HAT * AbstractCANetwork.PED_WIDTH);
 		this.dsl = dsl;
 		this.usl = usl;
 		this.size = (int) (0.5 + dsl.getLength() / this.cellLength);
@@ -105,28 +109,32 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 		this.lastLeftTimes = new double[this.size];
 		this.ds = ds;
 		this.us = us;
-		this.tFree = this.cellLength / CANetworkDynamic.V_HAT;
+		this.tFree = this.cellLength / AbstractCANetwork.V_HAT;
 		this.epsilon = tFree / 1000;
 		this.net = net;
+
+		x = this.getLink().getToNode().getCoord().getX();
+		y = this.getLink().getToNode().getCoord().getY();
 	}
 
 	// bottleneck experiment
 	public void changeWidth(double width) {
 		this.width = width;
-		this.ratio = CANetworkDynamic.PED_WIDTH / this.width;
+		this.ratio = AbstractCANetwork.PED_WIDTH / this.width;
 	}
 
 	/* package */double getD(CAMoveableEntity a) {
 		final double rho = a.getRho();
-		final double tmp = Math.pow(rho * CANetworkDynamic.PED_WIDTH,
-				CANetworkDynamic.GAMMA);
-		final double d = CANetworkDynamic.ALPHA + CANetworkDynamic.BETA * tmp;
+		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
+				AbstractCANetwork.GAMMA);
+		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
 		return d;
 	}
 
 	/* package */double getZ(CAMoveableEntity a) {
 		double d = getD(a);
-		double z = 1 / (CANetworkDynamic.RHO_HAT + CANetworkDynamic.V_HAT) + d;
+		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
+				+ d;
 		// double z = this.tFree + d;
 		return z;
 	}
@@ -430,10 +438,11 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 
 	}
 
-	private void checkPostConditionForOneSelfOnNodeAdvance(CANodeDynamic n,
+	private void checkPostConditionForOneSelfOnNodeAdvance(CASingleLaneNode n,
 			CAMoveableEntity a, double time) {
 		Id<Link> nextCALinkId = a.getNextLinkId();
-		CALink nextCALink = this.net.getCALink(nextCALinkId);
+		CASingleLaneLink nextCALink = (CASingleLaneLink) this.net
+				.getCALink(nextCALinkId);
 		int nextNextA;
 		int nextRevDir;
 		if (nextCALink.getUpstreamCANode() == n) {
@@ -461,7 +470,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTANodeOnPreCondition2(CAMoveableEntity a, double time,
-			CANodeDynamic n) {
+			CASingleLaneNode n) {
 
 		double z = getZ(a);
 		z *= this.ratio;
@@ -677,18 +686,13 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 		return this.ds;
 	}
 
-	@Override
 	public CAMoveableEntity[] getParticles() {
 		return this.particles;
 	}
 
+	@Override
 	public int getSize() {
 		return this.size;
-	}
-
-	@Override
-	public double[] getTimes() {
-		throw new RuntimeException("deprecated");
 	}
 
 	public double[] getLastLeftTimes() {
@@ -729,8 +733,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 	@Override
 	public void letAgentDepart(CAVehicle veh, double now) {
 		Id<Link> currentLinkId = veh.getDriver().getCurrentLinkId();
-		Link link = this.net.getEngine().getMobsim().getScenario().getNetwork()
-				.getLinks().get(currentLinkId);
+		Link link = this.net.getNetwork().getLinks().get(currentLinkId);
 		Node toNode = link.getToNode();
 		CANode toCANode = this.net.getNodes().get(toNode.getId());
 
@@ -786,7 +789,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 		}
 
 		// VIS only
-		if (CANetworkDynamic.EMIT_VIS_EVENTS) {
+		if (AbstractCANetwork.EMIT_VIS_EVENTS) {
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(now, veh);
 			this.net.getEventsManager().processEvent(ee);
 		}
@@ -880,5 +883,15 @@ public class CALinkDynamic implements CANetworkEntity, CALink {
 	@Override
 	public int threadNR() {
 		return this.threadNr;
+	}
+
+	@Override
+	public double getX() {
+		return x;
+	}
+
+	@Override
+	public double getY() {
+		return y;
 	}
 }
