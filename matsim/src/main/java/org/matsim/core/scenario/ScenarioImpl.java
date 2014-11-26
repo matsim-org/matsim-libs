@@ -226,9 +226,14 @@ public class ScenarioImpl implements Scenario {
 				// but it requires some testing (there may be places in the code
 				// which are happy with getting a null pointer, and would then
 				// not work anymore)
-				// throw new IllegalStateException(
-				log.warn(
+//				 throw new IllegalStateException(
+				log.info(
 						"no transit schedule, and transit not activated from config. You must first call the create method of ScenarioImpl." );
+				// yyyy Could we please avoid warnings in logfiles that one cannot get rid of?
+				// Why is returning null such a problem?  If you do as you are doing here, there is no way to test of the transit schedule exists:
+				// you could have created it but it is switched off in the config.
+				// ???
+				// kai, nov'14
 			}
 		}
 
