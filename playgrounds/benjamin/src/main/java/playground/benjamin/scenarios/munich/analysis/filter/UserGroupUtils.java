@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich.analysis.filter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -41,7 +42,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class UserGroupUtils {
 	private static final Logger logger = Logger.getLogger(UserGroupUtils.class);
 	
-	PersonFilter personFilter = new PersonFilter();
+	public PersonFilter personFilter = new PersonFilter();
 
 	public UserGroupUtils() {
 		this.personFilter = new PersonFilter();
@@ -133,6 +134,10 @@ public class UserGroupUtils {
 			userGroup2TollPayments.put(userGroup, tollPayments);
 		}
 		return userGroup2TollPayments;
+	}
+
+	public Set<UserGroup> getUserGroups(Population pop){
+	return getSizePerGroup(pop).keySet();
 	}
 
 }
