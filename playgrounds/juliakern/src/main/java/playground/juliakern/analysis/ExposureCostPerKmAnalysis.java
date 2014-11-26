@@ -41,6 +41,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.CarDistanceEventHandler;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.MultiAnalyzerWriter;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.TravelTimePerModeEventHandler;
@@ -113,6 +114,9 @@ public class ExposureCostPerKmAnalysis {
 	private static String finalIterationNo = "1500";	
 	
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	
+	private String scenarioName = "exposureInternalization"; // exposureInternalization, latsis, 981
+	private String analysisCase = "exposurePricing"; // base, zone30, pricing, exposurePricing, 983
 	
 	private static String netFile;
 	private static String configFile;

@@ -19,12 +19,10 @@
 
 package playground.juliakern.analysis;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
@@ -38,27 +36,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.CellWeightUtil;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkLineWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
 public class EmissionCostsBySubgroupAnalysis {
 	private static final Logger logger = Logger.getLogger(EmissionCostsBySubgroupAnalysis.class);
 
-	final static int noOfXbins = 160;
-	final static int noOfYbins = 120; 
-	
-	final static int numberOfTimeBins = 1;
-	final double smoothingRadius_m = 500.;
-	
 	private String scenarioName = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String analysisCase = "base"; // base, zone30, pricing, exposurePricing, 983
-	private double timeBinSize = 30.0*60.0*60.0;
+	private String analysisCase = "exposurePricing"; // base, zone30, pricing, exposurePricing, 983
+	final static int numberOfTimeBins = 1;
+	
+	private SpatialAveragingParameters sap;
+	private double timeBinSize;
 	private LinkWeightUtil linkweightUtil;
-	private EmissionCostsByGroupsAndTimeBinsHandler emissionCostsByGroupsAndTimeBinsHandler;
 	private SpatialAveragingInputData inputData;
-	private Map<Id<Link>, Cell> linkIds2cells;
 	private Map<Link, Cell> links2cells;
 	private Scenario scenario;
 	private Map<Integer, Map<UserGroup, SpatialGrid>> groupDurations;
@@ -76,9 +71,10 @@ public class EmissionCostsBySubgroupAnalysis {
 	}
 	
 	private void initialize(){
-		// calculate durations per cell for each usergroup (and in total)
+		sap = new SpatialAveragingParameters();
 		
 		inputData = new SpatialAveragingInputData(scenarioName, analysisCase);
+		timeBinSize = inputData.getEndTime()/numberOfTimeBins;
 		
 		logger.info(inputData.getScenarioInformation());
 		
@@ -87,33 +83,33 @@ public class EmissionCostsBySubgroupAnalysis {
 		config.plans().setInputFile(inputData.getPlansFileCompareCase());
 		scenario = ScenarioUtils.loadScenario(config);
 		
-		sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
+		sGrid = new SpatialGrid(inputData, sap.getNoOfXbins(), sap.getNoOfYbins());
 		// map links to cells
-		mapLinksToGridCells(scenario.getNetwork().getLinks().values(), sGrid );
-		logger.info("Mapped " + linkIds2cells.size() + " links to cells. ");
+		links2cells = sGrid.getLinks2GridCells(scenario.getNetwork().getLinks().values());
+		logger.info("Mapped " + links2cells.size() + " links to cells. ");
 	}
 	
-	private void calculateDurations(){
+	private void calculateDurations(){	
+		// calculate durations per cell for each usergroup (and in total)
 		logger.info("Starting to calculate durations...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);
-		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, linkIds2cells);
+		IntervalHandlerGroups intervalHandlerGroups = new IntervalHandlerGroups(numberOfTimeBins, inputData, links2cells, sap);
 		eventsManager.addHandler(intervalHandlerGroups);
 		eventsReader.parse(inputData.getEventsFileCompareCase());
 		
 		totalDurations = intervalHandlerGroups.getTotalDurations();
 		groupDurations = intervalHandlerGroups.getGroupDurations();
 		
-		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData.getMinX(), inputData.getMaxX(), inputData.getMinY(), inputData.getMaxY(),
-				noOfXbins, noOfYbins, smoothingRadius_m, inputData.getMunichShapeFile(), inputData.getTargetCRS(), false);
-
+		SpatialAveragingWriter saw = new SpatialAveragingWriter(inputData, sap, false);
+		
 		for(int timeBin =0; timeBin<numberOfTimeBins; timeBin++){
 			logger.info(inputData.getScenarioInformation());
 			logger.info("Writing duration output for time interval " + timeBin + " of " + numberOfTimeBins + " time intervals.");
 			String timeIntervalEnd = Double.toString(((timeBin+1.0)*timeBinSize));
-			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForCompareCase()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+			saw.writeRoutput(totalDurations.get(timeBin).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+".totalDurations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			for(UserGroup ug: UserGroup.values()){
-				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForCompareCase()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
+				saw.writeRoutput(groupDurations.get(timeBin).get(ug).getWeightedValuesOfGrid(), inputData.getAnalysisOutPathForSpatialComparison()+"."+ug.toString()+"durations.timeIntervalEnd."+ timeIntervalEnd +".txt");
 			}
 		}
 		logger.info("Done calculating and writing durations.");
@@ -124,13 +120,11 @@ public class EmissionCostsBySubgroupAnalysis {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		// calculate flat emission costs per link for each causing usergroup	
-		emissionCostsByGroupsAndTimeBinsHandler = new EmissionCostsByGroupsAndTimeBinsHandler(timeBinSize , numberOfTimeBins);
+		EmissionCostsByGroupsAndTimeBinsHandler emissionCostsByGroupsAndTimeBinsHandler = new EmissionCostsByGroupsAndTimeBinsHandler(timeBinSize , numberOfTimeBins);
 		
 		eventsManager.addHandler(emissionCostsByGroupsAndTimeBinsHandler);
 		emissionReader.parse(inputData.getEmissionFileForCompareCase());
 		timeBin2causingUserGroup2links2flatEmissionCosts = emissionCostsByGroupsAndTimeBinsHandler.getAllFlatCosts();
-
-		// write output? TODO
 		logger.info("Done calculating flat emission costs.");
 	}
 	
@@ -139,42 +133,19 @@ public class EmissionCostsBySubgroupAnalysis {
 		// calculate scaled (relative duration density, scenario scaling factor)
 		// emission costs -> timebin x subgroup x subgroup matrix
 		
-//		linkweightUtil = new LinkLineWeightUtil(500., inputData.getBoundingboxSizeSquareMeter()/noOfXbins/noOfYbins);
+		linkweightUtil = new LinkLineWeightUtil(sap.getSmoothingRadius_m(), inputData.getBoundingboxSizeSquareMeter()/sap.getNoOfBins());
 		linkweightUtil = new CellWeightUtil(links2cells, sGrid);
 		HashMap<Integer, GroupXGroupExposureCosts> timeBin2GroupEmissionCostMatrix = new HashMap<Integer, GroupXGroupExposureCosts>();
 		for(int i=0; i<numberOfTimeBins; i++){
 			logger.info("Calculating group specific emission costs for time interval " + (i+1) + ".");
-			Double averageDurationPerCell = getAverageDurationPerCell(totalDurations.get(i));
+			Double averageDurationPerCell = totalDurations.get(i).getAverageWeightedValuePerCell();
 			timeBin2GroupEmissionCostMatrix.put(i, new GroupXGroupExposureCosts(inputData.getScalingFactor()));
 			timeBin2GroupEmissionCostMatrix.get(i).calculateGroupCosts(timeBin2causingUserGroup2links2flatEmissionCosts.get(i),
 					groupDurations.get(i), linkweightUtil, averageDurationPerCell,
 					scenario.getNetwork().getLinks());
 			logger.info(inputData.getScenarioInformation());
-			timeBin2GroupEmissionCostMatrix.get(i).print();
+			Double intervalEndTime = (1.0+i)*timeBinSize;
+			timeBin2GroupEmissionCostMatrix.get(i).writeOutputFile(inputData.getExposureOutPathForCompareCase()+"."+intervalEndTime+".");
 		}
-	}
-
-	//TODO verschieben
-	private static Double getAverageDurationPerCell(SpatialGrid spatialGrid) {
-		Double sum = 0.0;
-		for(Double[] db: spatialGrid.getWeightedValuesOfGrid()){
-			for(Double dd: db){
-				sum +=dd;
-			}
-		}
-		return (sum/noOfXbins/noOfYbins);
-	}
-
-	private void mapLinksToGridCells(Collection<? extends Link> links, SpatialGrid grid) {
-		linkIds2cells = new HashMap<Id<Link>, Cell>();
-		links2cells = new HashMap<Link, Cell>();
-		
-		for(Link link: links){
-			Cell cCell = grid.getCellForCoordinate(link.getCoord());
-			if(cCell!=null){
-				links2cells.put(link, cCell);
-				linkIds2cells.put(link.getId(), cCell);
-			}
-		}		
 	}
 }

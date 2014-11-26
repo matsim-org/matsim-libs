@@ -22,14 +22,11 @@ package playground.juliakern.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import playground.benjamin.internalization.EmissionCostModule;
@@ -45,7 +42,6 @@ public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEven
 	private int numberOfTimeBins;
 
 	public EmissionCostsByGroupsAndTimeBinsHandler(double timeBinSize, int numberOfTimeBins){
-		System.out.println(" created handler");
 		this.timeBinSize = timeBinSize;
 		this.numberOfTimeBins = numberOfTimeBins;
 		this.personFilter = new PersonFilter();

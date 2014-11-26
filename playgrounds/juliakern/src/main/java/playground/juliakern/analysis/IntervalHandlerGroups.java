@@ -27,7 +27,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -35,37 +34,43 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
 public class IntervalHandlerGroups implements ActivityStartEventHandler, ActivityEndEventHandler{
 
-//	private int noOfxCells;
-//	private int noOfyCells;
 	private Set<Id<Person>> recognisedPersons;
-	private Map<Id<Link>, Cell> links2cells;
+	private Map<Id<Link>, Cell> linkIds2cells;
 	private int numberOfTimeBins;
 	private PersonFilter personFilter;
 	private Map<Integer, SpatialGrid> timeBin2totalDurations;
 	private Map<Integer, Map<UserGroup, SpatialGrid>> timeBin2userGroup2durations;
 	private SpatialAveragingInputData inputData;
-	private int noOfXbins = 160;
-	private int noOfYbins = 120;
-	private double timeBinSize = 108000.0; //TODO
+	private int noOfXbins, noOfYbins;
+	private double timeBinSize;
 
 	
-	public IntervalHandlerGroups(int numberOfTimeBins, SpatialAveragingInputData inputData, Map<Id<Link>,Cell> links2cells){
+	public IntervalHandlerGroups(int numberOfTimeBins, SpatialAveragingInputData inputData, Map<Link,Cell> links2cells, SpatialAveragingParameters parameter){
 		this.numberOfTimeBins = numberOfTimeBins;
-		this.links2cells = links2cells;
+		mapLinksById(links2cells);
 		this.inputData = inputData;
 		this.personFilter = new PersonFilter();
 		recognisedPersons = new HashSet<Id<Person>>();
 		this.timeBinSize = inputData.getEndTime()/numberOfTimeBins;
+		this.noOfXbins = parameter.getNoOfXbins();
+		this.noOfYbins = parameter.getNoOfYbins();
 		this.reset(0);
 	}
-	
+
+	private void mapLinksById(Map<Link, Cell> links2cells2) {
+		linkIds2cells = new HashMap<Id<Link>, Cell>();
+		for(Link link: links2cells2.keySet()){
+			linkIds2cells.put(link.getId(), links2cells2.get(link));
+		}
+	}
+
 	@Override
 	public void reset(int iteration) {
 		recognisedPersons = new HashSet<Id<Person>>();
@@ -87,8 +92,8 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 			
 		Id<Link> linkId = event.getLinkId();
 		Id<Person> personId = event.getPersonId();
-		if(links2cells.containsKey(linkId)){
-		Cell cell = links2cells.get(linkId);
+		if(linkIds2cells.containsKey(linkId)){
+		Cell cell = linkIds2cells.get(linkId);
 		
 		UserGroup userGroupOfEvent = getUserGroupFromPersonId(personId);
 		
@@ -131,8 +136,8 @@ public class IntervalHandlerGroups implements ActivityStartEventHandler, Activit
 
 		Id<Link> linkId = event.getLinkId(); 
 		Id<Person> personId = event.getPersonId();
-		if(links2cells.containsKey(linkId)){
-		Cell cell = links2cells.get(linkId);
+		if(linkIds2cells.containsKey(linkId)){
+		Cell cell = linkIds2cells.get(linkId);
 
 			UserGroup userGroupOfEvent = getUserGroupFromPersonId(personId);
 			if (!recognisedPersons.contains(event.getPersonId()))
