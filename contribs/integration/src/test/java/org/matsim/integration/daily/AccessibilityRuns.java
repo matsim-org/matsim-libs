@@ -117,21 +117,17 @@ public class AccessibilityRuns {
 			}
 		}
 		
-		
-		log.warn( "found activity types: " + activityTypes ); 
-		
-		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
-		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
-		
 		// new
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
 		// end new
 
-		for ( String actType : activityTypes ) {
-			
-			
+		log.warn( "found activity types: " + activityTypes );
+		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
+		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+		
+		for ( String actType : activityTypes ) {			
 //			if ( !actType.equals("w") ) {
 //				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //				continue ;
@@ -166,7 +162,7 @@ public class AccessibilityRuns {
 			listener.generateGridsAndMeasuringPointsByNetwork(1000.);
 			
 			// new
-			listener.useSubdirectoryWithName(actType);
+			listener.writeToSubdirectoryWithName(actType);
 			// end new
 			
 			controler.addControlerListener(listener);
@@ -174,8 +170,13 @@ public class AccessibilityRuns {
 					
 		controler.run();
 
-		
+				
 		for (String actType : activityTypes) {
+//			if ( !actType.equals("w") ) {
+//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//				continue ;
+//			}
+			
 			Boolean doPopulationWeightedPlot = true;
 			Boolean doNonPopulationWeightedPlot = false;		
 	
@@ -183,6 +184,7 @@ public class AccessibilityRuns {
 				throw new RuntimeException("At least one plot (pop-weighted or non-pop-weighted) needs to be activated.");
 			}
 			
+			// produce gnuplot scripts
 			try {
 				BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/" + actType + "/t.gpl" ) ;
 				// pm3d is an splot style for drawing palette-mapped 3d and 4d data as color/gray maps and surfaces (docu p.134)
@@ -204,7 +206,7 @@ public class AccessibilityRuns {
 				
 				// Palette is a color storage for use by pm3d, filled color contours or polygons, color histograms, color gradient
 				// background, and whatever it is or it will be implemented (docu p.137)
-				// Gray-to-rgb mapping can be manually set by use of palette defined: A color gradient is dened and used
+				// Gray-to-rgb mapping can be manually set by use of palette defined: A color gradient is defined and used
 				// to give the rgb values. Such a gradient is a piecewise linear mapping from gray values in [0,1] to the RGB
 				// space [0,1]x[0,1]x[0,1]. You must specify the gray values and the corresponding RGB values between which
 				// linear interpolation will be done (docu p.139)
@@ -264,7 +266,7 @@ public class AccessibilityRuns {
 						
 						// By default, screens are displayed to the standard output. The set output command redirects the display
 						// to the specified file or device (docu p.132)
-						writer.write("set out 'accessibility-pw.pdf'\n");
+						writer.write("set out 'accessibility-pop-weighted.pdf'\n");
 						
 						// The set title command produces a plot title that is centered at the top of the plot. set title is a special
 						// case of set label (docu p.155)
@@ -274,8 +276,9 @@ public class AccessibilityRuns {
 						
 					} else if (doNonPopulationWeightedPlot == true) {
 						writer.write("val(dens) = 0. ; # unset this comment to get the non-pop-weighted version (for paper)\n");
-						writer.write("set out 'accessibility-npw.pdf'\n");
+						writer.write("set out 'accessibility.pdf'\n");
 						writer.write("set title 'accessibility to " + actType + " (non-population-weighted)'\n") ;
+						
 						doNonPopulationWeightedPlot = false;
 					}
 					writer.write("\n") ;
@@ -296,13 +299,15 @@ public class AccessibilityRuns {
 					writer.write("unset colorbox ; # useless with lc rgb variable\n") ;
 					writer.write("\n") ;  // end new
 					
-					// plot csv file based on three values; first two are coordinates; third takes into account accessibility and population density and is
-					// calculated based on above-defined rgb formula
-					// The "lc rgbcolor variable" tells the program to read RGB color information for each line in the data file. This requires a
-					// corresponding	additional column in the using specifier. The extra column is interpreted as a 24-bit packed RGB triple (docu p.35)
+					// plot csv file based on three values; first two are coordinates; third takes into account accessibility and 
+					// population density and is calculated based on above-defined rgb formula
+					// The "lc rgbcolor variable" tells the program to read RGB color information for each line in the data file.
+					// This requires a corresponding additional column in the using specifier. The extra column is interpreted as a
+					// 24-bit packed RGB triple (docu p.35)
 					// writer.write("splot \"<awk '!/access/{print $0}' doAccessibilityTest/w/accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n") ;
 					// writer.write("splot \"<awk '!/access/{print $0}' accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n");
-					writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n");
+					// writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) lc rgb variable\n");
+					writer.write("splot \"accessibilities.csv\" u 1:2:(rgb($3,$8)) notitle lc rgb variable\n");
 				}
 					
 				writer.close();
@@ -317,7 +322,7 @@ public class AccessibilityRuns {
 			// If working on a Windows system, it is important that the environment variable PATH includes the gnuplot folder
 			// so that gnuplot can be run from the folder where the data is stored (otherwise the relative paths won't work)
 			String cmd = "gnuplot t.gpl";
-			
+						
 			// Doesn't work if root of directory is not passed
 			String stdoutFileName = config.controler().getOutputDirectory() + "/" + actType + "/gnuplot.log";
 			// String stdoutFileName = config.controler().getOutputDirectory() + "gnuplot.log";
