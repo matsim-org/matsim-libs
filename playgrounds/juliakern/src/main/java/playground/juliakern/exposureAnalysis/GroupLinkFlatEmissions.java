@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +27,11 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
+/**
+ * 
+ * @author julia
+ *
+ */
 public class GroupLinkFlatEmissions {
 
 	private HashMap<UserGroup, HashMap<Id<Link>, Double>> userGroup2link2flatEmissionCosts;

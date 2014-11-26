@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -33,6 +33,11 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.Cell;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
+/**
+ * 
+ * @author julia
+ *
+ */
 public class GroupXGroupExposureCosts {
 	
 	Double [][] groupXgroupMatrix;

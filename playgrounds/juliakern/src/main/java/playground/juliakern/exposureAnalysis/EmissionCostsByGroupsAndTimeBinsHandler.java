@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.util.HashMap;
 
@@ -32,6 +32,12 @@ import org.matsim.vehicles.Vehicle;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+
+/**
+ * 
+ * @author julia
+ *
+ */
 
 public class EmissionCostsByGroupsAndTimeBinsHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler{
 

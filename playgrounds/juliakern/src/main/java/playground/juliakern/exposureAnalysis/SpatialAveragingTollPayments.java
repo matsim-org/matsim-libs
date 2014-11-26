@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.io.IOException;
 import java.util.Map;

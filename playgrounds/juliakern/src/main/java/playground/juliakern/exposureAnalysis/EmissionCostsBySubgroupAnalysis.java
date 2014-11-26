@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +42,12 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveraging
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+
+/**
+ * 
+ * @author julia
+ *
+ */
 
 public class EmissionCostsBySubgroupAnalysis {
 	private static final Logger logger = Logger.getLogger(EmissionCostsBySubgroupAnalysis.class);

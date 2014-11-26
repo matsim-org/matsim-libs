@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.analysis;
+package playground.juliakern.exposureAnalysis;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +39,11 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveraging
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 
+/**
+ * 
+ * @author julia
+ *
+ */
 public class IntervalHandlerGroups implements ActivityStartEventHandler, ActivityEndEventHandler{
 
 	private Set<Id<Person>> recognisedPersons;
