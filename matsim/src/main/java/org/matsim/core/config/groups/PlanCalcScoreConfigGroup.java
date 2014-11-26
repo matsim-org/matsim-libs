@@ -106,9 +106,6 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
 
-	// erase defaults if parametes for one mode are added
-	private boolean clearDefaultsBeforeAddingMode = false;
-
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
 
@@ -117,7 +114,6 @@ public class PlanCalcScoreConfigGroup extends Module {
 		this.addParameterSet( new ModeParams( TransportMode.walk ) );
 		this.addParameterSet( new ModeParams( TransportMode.bike ) );
 		this.addParameterSet( new ModeParams( TransportMode.other ) );
-		this.clearDefaultsBeforeAddingMode = true;
 	}
 
 
@@ -301,7 +297,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 				"implemented correctly, but not tested.") ;
 		map.put(WAITING_PT, "[utils/hr] additional marginal utility for waiting for a pt vehicle. normally negative. this comes on top of the opportunity cost " +
 				"of time. Default: if not set explicitly, it is equal to traveling_pt!!!" ) ;
-		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
+		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 1.  Has name and default value for historical reasons " +
 				"(see Bryan Raney's phd thesis).") ;
 		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
 				"close to zero emulate score averaging, but slow down initial convergence") ;
