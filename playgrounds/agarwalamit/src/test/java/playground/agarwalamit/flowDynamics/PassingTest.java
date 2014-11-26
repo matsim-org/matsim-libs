@@ -42,7 +42,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -54,24 +60,24 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 
 /**
  * Tests that a faster vehicle can pass slower vehicle on the same link
- * 
  */
 public class PassingTest {
 
-
-	/* a bike enters at t=0; and a car at t=5sec link length = 1000m
-	 *Assume car speed = 20 m/s, bike speed = 5 m/s
-	 *tt_car = 50 sec; tt_bike = 200 sec
+	/**
+	 * A bike enters at t=0; and a car at t=5sec link length = 1000m
+	 * Assume car speed = 20 m/s, bike speed = 5 m/s
+	 * tt_car = 50 sec; tt_bike = 200 sec
 	 */
-
 	@Test 
 	public void test4PassingInFreeFlowState(){
 
@@ -94,20 +100,20 @@ public class PassingTest {
 			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
 			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
 			leg.setRoute(route);
-			
+
 			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
 			plan.addActivity(a2);
 			net.population.addPerson(p);
 		}
 
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
-
+		PersonLinkTravelTimeEventHandler handler = new PersonLinkTravelTimeEventHandler();
 		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
+		manager.addHandler(handler);
 
-
-		QSim qSim = createQSim(net,manager);
+		QSim qSim = createQSim(net,manager, true);
 		qSim.run();
+
+		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes =  handler.getPersonId2LinkTravelTime();
 
 		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
 		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
@@ -115,13 +121,114 @@ public class PassingTest {
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
-		//		Assert.assertEquals("wrong number of links.", 3, net.network.getLinks().size());
-		//		Assert.assertEquals("wrong number of persons.", 2, net.population.getPersons().size());
+		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
+		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
 		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
 
 	}
 
-	private QSim createQSim (SimpleNetwork net, EventsManager manager){
+	/**
+	 * This is the same test as above. The only difference is way of inserting vehicle type info. 
+	 * Here, vehicle types are inserted into scenario.
+	 */
+	@Test 
+	public void test4VehicleTypesInScenario(){
+
+		SimpleNetwork net = new SimpleNetwork();
+
+		((ScenarioImpl)net.scenario).createVehicleContainer();
+		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
+
+		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
+
+		for(String str:mode2VehType.keySet()){
+			net.scenario.getVehicles().addVehicleType(mode2VehType.get(str));
+		}
+
+		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
+		String transportModes [] = new String [] {"bike","car"};
+
+		for(int i=0;i<2;i++){
+			Id<Person> id = Id.create(i, Person.class);
+			Person p = net.population.getFactory().createPerson(id);
+			Plan plan = net.population.getFactory().createPlan();
+			p.addPlan(plan);
+			Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
+			a1.setEndTime(8*3600+i*5);
+			Leg leg = net.population.getFactory().createLeg(transportModes[i]);
+			plan.addActivity(a1);
+			plan.addLeg(leg);
+			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
+			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
+			leg.setRoute(route);
+
+			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
+			plan.addActivity(a2);
+			net.population.addPerson(p);
+
+			Id<Vehicle> vehId = Id.create(i,Vehicle.class);
+			Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, mode2VehType.get(transportModes[i]));
+			net.scenario.getVehicles().addVehicle(veh);
+
+		}
+
+		ActivityParams ap_h = new ActivityParams("h");
+		ActivityParams ap_w = new ActivityParams("w");
+		ap_h.setTypicalDuration(1*3600);
+		ap_w.setTypicalDuration(1*3600);
+		net.scenario.getConfig().planCalcScore().addActivityParams(ap_h);
+		net.scenario.getConfig().planCalcScore().addActivityParams(ap_w);
+
+		Controler cntrlr = new Controler(net.scenario);
+		cntrlr.setOverwriteFiles(true);
+		cntrlr.setCreateGraphs(false);
+		cntrlr.setDumpDataAtEnd(false);
+		net.scenario.getConfig().controler().setWriteEventsInterval(0);
+		net.scenario.getConfig().controler().setLastIteration(0);
+		TravelTimeControlerListner travelTimeCntrlrListner = new TravelTimeControlerListner();
+		cntrlr.addControlerListener(travelTimeCntrlrListner); 
+		cntrlr.run();
+
+		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = travelTimeCntrlrListner.getPersonId2Time();
+
+		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
+		Map<Id<Link>, Double> travelTime2 = personLinkTravelTimes.get(Id.create("1", Person.class));
+
+		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
+		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
+
+		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
+		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
+
+		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
+
+	}
+
+	private class TravelTimeControlerListner implements StartupListener, IterationEndsListener {
+
+		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
+		PersonLinkTravelTimeEventHandler hand;
+
+		@Override
+		public void notifyStartup(StartupEvent event) {
+
+			EventsManager eventsManager = event.getControler().getEvents();
+			hand = new PersonLinkTravelTimeEventHandler();
+			eventsManager.addHandler(hand);
+		}
+
+		public Map<Id<Person>, Map<Id<Link>, Double>> getPersonId2Time(){
+			return this.personLinkTravelTimes;
+		}
+
+		@Override
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			this.personLinkTravelTimes = this.hand.getPersonId2LinkTravelTime();
+		}
+	}
+
+	private QSim createQSim (SimpleNetwork net, EventsManager manager, boolean useVehicleInfo){
 		Scenario sc = net.scenario;
 		QSim qSim1 = new QSim(sc, manager);
 		ActivityEngine activityEngine = new ActivityEngine();
@@ -134,9 +241,17 @@ public class PassingTest {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 
+		if(useVehicleInfo){
+			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+			agentSource.setModeVehicleTypes(getVehicleTypeInfo());
+			qSim.addAgentSource(agentSource);
+		}
+		return qSim;
+	}
+
+	private Map<String, VehicleType> getVehicleTypeInfo() {
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
@@ -148,9 +263,7 @@ public class PassingTest {
 		bike.setMaximumVelocity(5);
 		bike.setPcuEquivalents(0.25);
 		modeVehicleTypes.put("bike", bike);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-		qSim.addAgentSource(agentSource);
-		return qSim;
+		return modeVehicleTypes;
 	}
 
 
@@ -193,8 +306,8 @@ public class PassingTest {
 
 		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
-			this.personLinkTravelTimes = agentTravelTimes;
+		public PersonLinkTravelTimeEventHandler() {
+			this.personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
 		}
 
 		@Override
@@ -221,6 +334,10 @@ public class PassingTest {
 
 		@Override
 		public void reset(int iteration) {
+		}
+
+		public Map<Id<Person>, Map<Id<Link>, Double>> getPersonId2LinkTravelTime(){
+			return this.personLinkTravelTimes;
 		}
 	}
 }
