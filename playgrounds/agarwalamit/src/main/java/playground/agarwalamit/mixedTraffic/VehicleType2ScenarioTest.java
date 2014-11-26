@@ -73,6 +73,7 @@ public class VehicleType2ScenarioTest {
 
 	public VehicleType2ScenarioTest() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
 		if(! useModifiedMobsimFactory){
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
 			((ScenarioImpl) scenario).createVehicleContainer();
@@ -96,6 +97,7 @@ public class VehicleType2ScenarioTest {
 
 		Controler cont = new Controler(runTest.scenario);
 		cont.setOverwriteFiles(true);
+		
 		if(useModifiedMobsimFactory){
 			cont.setMobsimFactory(new modifiedMobsimFactory());
 		}
@@ -133,6 +135,7 @@ public class VehicleType2ScenarioTest {
 		VehicleType [] vehTypes = {bike, car};
 
 		for(int i=0;i<2;i++){
+
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = population.getFactory().createPerson(id);
 			Plan plan = population.getFactory().createPlan();
@@ -154,7 +157,10 @@ public class VehicleType2ScenarioTest {
 			if(! useModifiedMobsimFactory){
 				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
 				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
-				scenario.getVehicles().addVehicleType(vehTypes[i]);
+			
+				if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					scenario.getVehicles().addVehicleType(vehTypes[i]);
+				}
 				scenario.getVehicles().addVehicle(v);
 			}
 		}
