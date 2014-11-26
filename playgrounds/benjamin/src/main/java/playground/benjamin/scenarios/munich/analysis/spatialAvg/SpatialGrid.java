@@ -203,4 +203,14 @@ public class SpatialGrid {
 		}
 		return differences;
 	}
+
+	public Double getAverageWeightedValuePerCell() {
+			Double sum = 0.0;
+			for(int i=0; i<numberOfCellsX; i++){
+				for(int j=0; j<numberOfCellsY; j++){
+					sum +=grid[i][j].getWeightedValue();
+				}
+			}
+			return (sum/numberOfCellsX/numberOfCellsY);
+	}
 }
