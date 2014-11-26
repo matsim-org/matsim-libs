@@ -20,14 +20,14 @@
 
 package org.matsim.core.replanning;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
+
+import java.util.List;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -40,7 +40,7 @@ public class StrategyManager implements MatsimManager {
 	protected final GenericStrategyManager<Plan, Person> delegate;
 
 	public StrategyManager() {
-		this.delegate = new GenericStrategyManager<Plan, Person>();
+		this.delegate = new GenericStrategyManager<>();
 	}
 
 	public StrategyManager(GenericStrategyManager<Plan, Person> delegate) {
@@ -59,7 +59,7 @@ public class StrategyManager implements MatsimManager {
 	public final void addStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy,
 			final double weight) {
-		addStrategy( strategy , null , weight );
+		addStrategy(strategy, null, weight);
 	}
 
 	/**
@@ -67,8 +67,6 @@ public class StrategyManager implements MatsimManager {
 	 * compared to the sum of weights of all strategies in this manager defines
 	 * the probability this strategy will be used for an agent.
 	 *
-	 * @param strategy
-	 * @param weight
 	 */
 	public final void addStrategy(
 			final PlanStrategy strategy,
@@ -81,7 +79,7 @@ public class StrategyManager implements MatsimManager {
 	@Deprecated
 	public final boolean removeStrategyForDefaultSubpopulation(
 			final PlanStrategy strategy) {
-		return removeStrategy( strategy , null );
+		return removeStrategy(strategy, null);
 	}
 
 	/**
@@ -102,14 +100,12 @@ public class StrategyManager implements MatsimManager {
 	public final boolean changeWeightOfStrategyForDefaultSubpopulation(
 			final GenericPlanStrategy<Plan, Person> strategy,
 			final double newWeight) {
-		return changeWeightOfStrategy( strategy , null , newWeight );
+		return changeWeightOfStrategy(strategy, null, newWeight);
 	}
 
 	/**
 	 * changes the weight of the specified strategy
 	 *
-	 * @param strategy
-	 * @param newWeight
 	 * @return true if the strategy is part of this manager and the weight could
 	 * 		be changed successfully, false otherwise.
 	 */
@@ -125,9 +121,7 @@ public class StrategyManager implements MatsimManager {
 	 * strategy on the person, after adapting the strategies to any pending change
 	 * requests for the specified iteration.
 	 *
-	 * @param population
 	 * @param iteration the current iteration we're handling
-	 * @param replanningContext
 	 */
 	public final void run(final Population population, final int iteration, final ReplanningContext replanningContext) {
 		// (this is not directly delegated since the run method of this StrategyManager includes two "hooks").
@@ -143,8 +137,6 @@ public class StrategyManager implements MatsimManager {
 	 * Randomly chooses for each person of the population a strategy and uses that
 	 * strategy on the person.
 	 *
-	 * @param population
-	 * @param replanningContext
 	 */
 	public final void run(final Population population, final ReplanningContext replanningContext) {
 		beforePopulationRunHook(population, replanningContext);
@@ -173,14 +165,13 @@ public class StrategyManager implements MatsimManager {
 	 * Agents can have up to maxPlansPerAgent plans plus one additional one with the
 	 * currently modified plan they're trying out.
 	 *
-	 * @param maxPlansPerAgent
 	 */
 	public final void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		delegate.setMaxPlansPerAgent(maxPlansPerAgent);
 	}
 
 	public final int getMaxPlansPerAgent() {
-		return delegate.getMaxPlansPerAgent() ;
+		return delegate.getMaxPlansPerAgent();
 	}
 
 	@Deprecated
@@ -188,16 +179,13 @@ public class StrategyManager implements MatsimManager {
 			final int iteration,
 			final PlanStrategy strategy,
 			final double newWeight) {
-		addChangeRequest( iteration , strategy , null , newWeight );
+		addChangeRequest(iteration, strategy, null, newWeight);
 	}
 
 	/**
 	 * Schedules a command for a later iteration. The
 	 * change will take place before the strategies are applied.
 	 *
-	 * @param iteration
-	 * @param strategy
-	 * @param newWeight
 	 */
 	public final void addChangeRequest(
 			final int iteration,
@@ -230,7 +218,6 @@ public class StrategyManager implements MatsimManager {
 	 * <p/>
 	 * The path size version still needs to be tested (both for choice and for plans removal).
 	 *
-	 * @param planSelector
 	 *
 	 * @see #setMaxPlansPerAgent(int)
 	 */
@@ -240,10 +227,10 @@ public class StrategyManager implements MatsimManager {
 
 	@Deprecated
 	public final List<GenericPlanStrategy<Plan, Person>> getStrategiesOfDefaultSubpopulation() {
-		return getStrategies( null );
+		return getStrategies(null);
 	}
 
-	public final List<GenericPlanStrategy<Plan, Person>> getStrategies( final String subpopulation ) {
+	public final List<GenericPlanStrategy<Plan, Person>> getStrategies(final String subpopulation) {
 		return delegate.getStrategies(subpopulation) ;
 	}
 
@@ -252,13 +239,13 @@ public class StrategyManager implements MatsimManager {
 	 */
 	@Deprecated
 	public final List<Double> getWeightsOfDefaultSubpopulation() {
-		return getWeights( null );
+		return getWeights(null);
 	}
 
 	/**
 	 * @return the weights of the strategies for the given subpopulation, in the same order as the strategies returned by {@link #getStrategies(java.lang.String)}
 	 */
-	public final List<Double> getWeights( final String subpopulation ) {
-		return delegate.getWeights( subpopulation ) ;
+	public final List<Double> getWeights(final String subpopulation) {
+		return delegate.getWeights(subpopulation);
 	}
 }

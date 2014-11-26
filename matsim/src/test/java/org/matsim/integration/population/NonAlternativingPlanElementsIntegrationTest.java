@@ -19,20 +19,13 @@
 
 package org.matsim.integration.population;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -40,19 +33,15 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests that a simple simulation can be run with plans where
@@ -63,52 +52,6 @@ import org.matsim.testcases.MatsimTestUtils;
 public class NonAlternativingPlanElementsIntegrationTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	
-	@Test
-	public void test_Controler_QueueSimulation_Timechoice_acts() {
-		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(10);
-		config.strategy().addParam("Module_2", "TimeAllocationMutator");
-		config.strategy().addParam("ModuleProbability_2", "1.0");
-		
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
-		
-		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
-		person.addPlan(plan);
-		scenario.getPopulation().addPerson(person);
-		
-		Controler controler = new Controler(scenario);
-		controler.setDumpDataAtEnd(false);
-		controler.setCreateGraphs(false);
-		controler.run();
-		
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
-	}
-
-	@Test
-	public void test_Controler_QueueSimulation_Timechoice_legs() {
-		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setLastIteration(10);
-		config.strategy().addParam("Module_2", "TimeAllocationMutator");
-		config.strategy().addParam("ModuleProbability_2", "1.0");
-		
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
-		
-		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
-		person.addPlan(plan);
-		scenario.getPopulation().addPerson(person);
-		
-		Controler controler = new Controler(scenario);
-		controler.setDumpDataAtEnd(false);
-		controler.setCreateGraphs(false);
-		controler.run();
-		
-		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
-	}
 
 	@Test
 	public void test_Controler_QSim_Routechoice_acts() {
@@ -120,19 +63,19 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
-		
+
 		addSimpleTransitServices(scenario);
-		
+
 		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
-		
+
 		Controler controler = new Controler(scenario);
 		controler.setDumpDataAtEnd(false);
 		controler.setCreateGraphs(false);
 		controler.run();
-		
+
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
 
@@ -146,22 +89,22 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
-		
+
 		addSimpleTransitServices(scenario);
-		
+
 		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
-		
+
 		Controler controler = new Controler(scenario);
 		controler.setDumpDataAtEnd(false);
 		controler.setCreateGraphs(false);
 		controler.run();
-		
+
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
-	
+
 	// TODO: make more complicated plans when testing subtour mode choice
 	private static Plan createPlanWithConsecutiveLegsForEquilNet(final Scenario scenario) {
 		PopulationFactory pf = scenario.getPopulation().getFactory();

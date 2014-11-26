@@ -18,14 +18,14 @@
  * *********************************************************************** */
 package org.matsim.core.replanning;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
+
+import java.util.ArrayList;
 
 /**
  * @author nagel
@@ -35,8 +35,8 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 
 	private GenericPlanSelector<T, I> planSelector = null;
 	private GenericPlanStrategyModule<T> firstModule = null;
-	private final ArrayList<GenericPlanStrategyModule<T>> modules = new ArrayList<GenericPlanStrategyModule<T>>();
-	private final ArrayList<T> plans = new ArrayList<T>();
+	private final ArrayList<GenericPlanStrategyModule<T>> modules = new ArrayList<>();
+	private final ArrayList<T> plans = new ArrayList<>();
 	private long counter = 0;
 	private ReplanningContext replanningContext;
 	private final static Logger log = Logger.getLogger(PlanStrategyImpl.class);
@@ -44,7 +44,6 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 	/**
 	 * Creates a new strategy using the specified planSelector.
 	 *
-	 * @param planSelector
 	 */
 	public GenericPlanStrategyImpl(final GenericPlanSelector<T, I> planSelector) {
 		this.planSelector = planSelector;
@@ -70,7 +69,6 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 		this.counter++;
 		
 		// if there is at least one unscored plan, find that one:
-//		T plan = ((PersonImpl) person).getRandomUnscoredPlan();
 		T plan = new RandomUnscoredPlanSelector<T, I>().selectPlan(person) ;
 		
 		// otherwise, find one according to selector (often defined in PlanStrategy ctor):
@@ -80,21 +78,17 @@ public class GenericPlanStrategyImpl<T extends BasicPlan, I> implements GenericP
 		
 		// "select" that plan:
 		if ( plan != null ) {
-//			((PersonImpl) person).setSelectedPlan(plan);
 			person.setSelectedPlan(plan);
 		}
 		else {
 			log.error( planSelector+" returned no plan: not changing selected plan for person "+person );
 		}
 
-
 		// if there is a "module" (i.e. "innovation"):
 		if (this.firstModule != null) {
 			
 			// set the working plan to a copy of the selected plan:
-//			plan = ((PersonImpl) person).copySelectedPlan();
 			plan = person.createCopyOfSelectedPlanAndMakeSelected();
-			// (this makes, as a side effect, the _new_ plan selected)
 			
 			// add new plan to container that contains the plans that are handled by this PlanStrategy:
 			this.plans.add(plan);
