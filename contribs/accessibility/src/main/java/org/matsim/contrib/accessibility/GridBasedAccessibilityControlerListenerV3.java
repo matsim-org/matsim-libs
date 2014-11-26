@@ -199,7 +199,8 @@ implements ShutdownListener, StartupListener {
 		// new ... testing
 		} else {
 			File file = new File(config.controler().getOutputDirectory() + "/" + subdirectory);
-			file.mkdir();
+//			file.mkdir();
+			file.mkdirs();
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
 					config.controler().getOutputDirectory() + "/" + subdirectory);
 		}
@@ -517,5 +518,4 @@ implements ShutdownListener, StartupListener {
 		this.subdirectory = subdirectory;
 	}
 	// end new
-
 }
