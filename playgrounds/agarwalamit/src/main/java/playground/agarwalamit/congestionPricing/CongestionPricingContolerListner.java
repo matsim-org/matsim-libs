@@ -25,6 +25,7 @@
 package playground.agarwalamit.congestionPricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -58,8 +59,8 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 	 * @param tollHandler
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
-	public CongestionPricingContolerListner(ScenarioImpl scenario, TollHandler tollHandler, EventHandler handler){
-		this.scenario = scenario;
+	public CongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, EventHandler handler){
+		this.scenario = (ScenarioImpl) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = handler;
 	}

@@ -103,7 +103,6 @@ PersonStuckEventHandler{
 	
 	@Override
 	public void reset(int iteration) {
-		this.linkId2congestionInfo.clear();
 		this.personId2LegMode.clear();
 	}
 

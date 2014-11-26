@@ -84,7 +84,6 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2congestionInfo.clear();
 		this.personId2LegMode.clear();
 	}
 

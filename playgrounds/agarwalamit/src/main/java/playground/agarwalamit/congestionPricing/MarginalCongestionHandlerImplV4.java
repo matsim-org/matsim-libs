@@ -90,7 +90,7 @@ PersonStuckEventHandler
 	final Scenario scenario;
 	final EventsManager events;
 	final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
-	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<>();
+	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo;
 	private int roundingErrorWarnCount =0;
 
 	double totalInternalizedDelay = 0.0;
@@ -109,7 +109,11 @@ PersonStuckEventHandler
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
+		
+		if (this.scenario.getNetwork().getLinks().size()==0) throw new RuntimeException("There are no links in scenario thus aborting...");
 
+		this.linkId2congestionInfo = new HashMap<>();
+		
 		for(Link link : scenario.getNetwork().getLinks().values()){
 			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
 
@@ -130,7 +134,6 @@ PersonStuckEventHandler
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2congestionInfo.clear();
 		this.ptVehicleIDs.clear();
 		this.totalDelay = 0.0;
 		this.totalInternalizedDelay = 0.0;
