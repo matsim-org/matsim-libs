@@ -2,6 +2,8 @@ package pedCA.environment.grid;
 
 import java.io.IOException;
 
+import pedCA.environment.grid.neighbourhood.Neighbourhood;
+
 public class DFFGrid extends Grid <Double>{
 
 	final int radius;

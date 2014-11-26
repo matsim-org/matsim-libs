@@ -10,10 +10,12 @@ import pedCA.utility.Lottery;
 
 public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	private ArrayList<Shadow> shadows;
+	private final DensityGrid densityGrid;
 	
 	public PedestrianGrid(int rows, int cols){
 		super(rows, cols);		
 		this.shadows = new ArrayList<Shadow>();
+		this.densityGrid = new DensityGrid(rows, cols);
 	}
 		
 	public void moveTo(Agent pedestrian, GridPoint newPos) {
@@ -39,12 +41,18 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 			}
 	}
 	
+	public double getPedestrianDensity(GridPoint position){
+		return densityGrid.getDensityAt(position);
+	}
+	
 	public void addPedestrian(GridPoint position, Agent pedestrian){
 		get(position.getY(),position.getX()).add(pedestrian);
+		densityGrid.diffuse(position);
 	}
 	
 	public void removePedestrian(GridPoint position, Agent pedestrian){
 		get(position.getY(),position.getX()).remove(pedestrian);
+		densityGrid.remove(position);
 	}
 	
 	private void generateShadow(Agent pedestrian) {
@@ -66,15 +74,6 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	
 	public boolean isOccupied(GridPoint p){
 		return get(p).size()>0;
-	}
-	
-	public ArrayList<GridPoint> getAllFreePositions(){
-		ArrayList<GridPoint> result = new ArrayList<GridPoint>();
-		for (int i=0;i<cells.size();i++)
-			for (int j=0;j<cells.get(i).size();j++)
-				if (!isOccupied(i,j))
-					result.add(new GridPoint(j,i));
-		return result;
 	}
 	
 	public ArrayList<GridPoint> getFreePositions(ArrayList<GridPoint> cells){

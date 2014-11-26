@@ -13,7 +13,7 @@ public class Constants {
 	public static final double MAX_FF_VALUE = Double.POSITIVE_INFINITY;
 	
 	//Constants for Conflict Management
-	public static final double FRICTION_PROBABILITY = 0.;//0.7;
+	public static final double FRICTION_PROBABILITY = 0.7;
 
 	public static final double CELL_SIZE = matsimConnector.utility.Constants.CA_CELL_SIDE;
 
@@ -22,6 +22,8 @@ public class Constants {
 	public static final double SHADOWS_PROBABILITY = 0.5;
 
 	public static final int STEP_FOR_BIDIRECTIONAL_SWAPPING = 2;
+
+	public static final double DENSITY_GRID_RADIUS = .8;
 	
 	//Constants for Pedestrian Model
 	public static Double KS = 6.0;

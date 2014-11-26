@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import matsimConnector.agents.Pedestrian;
+import matsimConnector.utility.MathUtility;
 import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
@@ -38,15 +39,16 @@ public class ConflictSolver {
 				if (agent1 != agent2 && agent2.isWillingToSwap() && agent2.getRealNewPosition().equals(agent1.getRealPosition())){
 					startPedestrianSwitching(agent1, agent2);
 				}else{
-					agent1.revertWillingToSwitch();
+					agent1.revertWillingToSwap();
 				}
 			}
 		}
 	}
 
 	private void startPedestrianSwitching(Agent agent1, Agent agent2) {
-		agent1.startBidirectionalSwitch();
-		agent2.startBidirectionalSwitch();		
+		int stepToPerformSwap = (int)MathUtility.average(agent1.calculateStepToPerformSwap(), agent2.calculateStepToPerformSwap());		
+		agent1.startBidirectionalSwitch(stepToPerformSwap);
+		agent2.startBidirectionalSwitch(stepToPerformSwap);		
 	}
 
 	private void solveConflicts(){
@@ -106,8 +108,6 @@ public class ConflictSolver {
         	if(!frictionCondition()){
         		int randomWinner = RandomExtractor.nextInt(sameGPPedList.size());
         		sameGPPedList.remove(randomWinner);
-        	}else{
-        		System.out.println("Friction!");
         	}
         	
         	for(Agent p:sameGPPedList){

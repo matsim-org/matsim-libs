@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import pedCA.environment.grid.neighbourhood.Neighbourhood;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.utility.Constants;

@@ -36,4 +36,8 @@ public class MathUtility {
 	public static GridPoint gridPointSum(GridPoint gp1, GridPoint gp2){
 		return new GridPoint(gp1.getX()+gp2.getX(), gp1.getY()+gp2.getY());
 	}
+	
+	public static double average(double x1, double x2){
+		return (x1+x2)/2;
+	}
 }

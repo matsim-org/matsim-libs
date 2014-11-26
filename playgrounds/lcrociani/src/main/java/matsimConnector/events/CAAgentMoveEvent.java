@@ -7,7 +7,6 @@ import matsimConnector.agents.Pedestrian;
 import org.matsim.api.core.v01.events.Event;
 
 import pedCA.environment.grid.GridPoint;
-import pedCA.utility.DirectionUtility.Heading;
 
 
 public class CAAgentMoveEvent extends Event {
@@ -18,7 +17,7 @@ public class CAAgentMoveEvent extends Event {
 	public static final String ATTRIBUTE_FROM_Y = "from_y";
 	public static final String ATTRIBUTE_TO_X = "to_x";
 	public static final String ATTRIBUTE_TO_Y = "to_y";
-	public static final String ATTRIBUTE_DIRECTION = "direction";
+	public static final String ATTRIBUTE_DENSITY = "density";
 	
 	private Pedestrian pedestrian;
 	private final double realTime;	
@@ -26,7 +25,7 @@ public class CAAgentMoveEvent extends Event {
 	private final int from_y;
 	private final int to_x;
 	private final int to_y;
-	private final Heading direction;
+	private final double density;
 	
 
 
@@ -38,7 +37,7 @@ public class CAAgentMoveEvent extends Event {
 		this.from_y = position.getY();
 		this.to_x = nextPosition.getX();
 		this.to_y = nextPosition.getY();
-		this.direction = pedestrian.getHeading();
+		this.density = pedestrian.getUsedPedestrianGrid().getPedestrianDensity(pedestrian.getPosition());
 	}
 
 	@Override
@@ -55,7 +54,7 @@ public class CAAgentMoveEvent extends Event {
 		attr.put(ATTRIBUTE_FROM_Y, Double.toString(this.from_y));
 		attr.put(ATTRIBUTE_TO_X, Double.toString(this.to_x));
 		attr.put(ATTRIBUTE_TO_Y, Double.toString(this.to_y));
-		attr.put(ATTRIBUTE_DIRECTION, direction.toString());
+		attr.put(ATTRIBUTE_DENSITY, ""+density);
 		
 		return attr;
 	}
@@ -84,7 +83,7 @@ public class CAAgentMoveEvent extends Event {
 		return pedestrian;
 	}
 	
-	public Heading getDirection(){
-		return direction;
+	public double getDensity(){
+		return (int)(density*100)/100.;
 	}
 }

@@ -3,6 +3,8 @@ package pedCA.environment.grid;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import pedCA.environment.grid.neighbourhood.Neighbourhood;
+
 public abstract class Grid <T>{
 	protected ArrayList<ArrayList<GridCell<T>>> cells;
 	

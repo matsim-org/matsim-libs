@@ -10,8 +10,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import pedCA.agents.Agent;
 import pedCA.context.Context;
 import pedCA.environment.grid.GridPoint;
-import pedCA.environment.grid.Neighbourhood;
 import pedCA.environment.grid.PedestrianGrid;
+import pedCA.environment.grid.neighbourhood.Neighbourhood;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.TacticalDestination;
 import pedCA.utility.NeighbourhoodUtility;
@@ -186,11 +186,11 @@ public class Pedestrian extends Agent {
 			return super.getNeighbourhood();
 	}
 	
-	protected boolean isSwitchable(GridPoint neighbour, PedestrianGrid pedestrianGrid) {
+	protected boolean canSwap(GridPoint neighbour, PedestrianGrid pedestrianGrid) {
 		if (finalDestinationReached && pedestrianGrid.containsPedestrian(neighbour)){
 		 	return ((Pedestrian)pedestrianGrid.getPedestrian(neighbour)).finalDestinationReached;
 		}			
-		return super.isSwitchable(neighbour, pedestrianGrid);
+		return super.canSwap(neighbour, pedestrianGrid);
 	}
 	/*
 	protected boolean isInFrontCell(GridPoint neighbour) {

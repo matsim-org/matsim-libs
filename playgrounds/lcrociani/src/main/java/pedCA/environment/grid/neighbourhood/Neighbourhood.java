@@ -1,6 +1,8 @@
-package pedCA.environment.grid;
+package pedCA.environment.grid.neighbourhood;
 
 import java.util.ArrayList;
+
+import pedCA.environment.grid.GridPoint;
 
 public class Neighbourhood {
 	private ArrayList<GridPoint> neighbourhood;

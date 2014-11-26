@@ -13,4 +13,12 @@ public class Distances {
 		return Math.sqrt(Math.pow(c1.getX()-c2.getX(),2)+Math.pow(c1.getY()-c2.getY(),2));
 	}
 
+	public static GridPoint gridPointDifference(GridPoint gp1, GridPoint gp2){
+		return new GridPoint(gp1.getX()-gp2.getX(), gp1.getY()-gp2.getY());
+	}
+	
+	public static GridPoint gridPointSum(GridPoint gp1, GridPoint gp2){
+		return new GridPoint(gp1.getX()+gp2.getX(), gp1.getY()+gp2.getY());
+	}
+	
 }
