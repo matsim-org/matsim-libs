@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -79,11 +80,9 @@ class PSim implements Mobsim {
 	private final static double MIN_LEG_DURATION = 0.0;
 
 	private final SimThread[] threads;
-
-	private final Future<?>[] futures;
 	private boolean isUseTransit;
+    AtomicInteger numThreads;
 
-	private final ExecutorService executor;
 	private final double beelineWalkSpeed;
 
 	private final TravelTime carLinkTravelTimes;
@@ -98,12 +97,10 @@ class PSim implements Mobsim {
 		this.scenario = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global", "numberOfThreads"));
-		executor = Executors.newFixedThreadPool(numThreads);
 		threads = new SimThread[numThreads];
 		for (int i = 0; i < numThreads; i++)
 			threads[i] = new SimThread();
 
-		futures = new Future[numThreads];
 
 		PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
 		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / pcrConfig.getBeelineDistanceFactor();
@@ -137,45 +134,52 @@ class PSim implements Mobsim {
 		/*
 		 * submit tasks
 		 */
+        numThreads = new AtomicInteger(threads.length);
 		for (int i = 0; i < segments.length; i++) {
 			threads[i].init(segments[i], network, eventManager);
-			futures[i] = executor.submit(threads[i]);
+			new Thread(threads[i]).start();
 		}
 		/*
 		 * wait for threads
 		 */
-		for (int i = 0; i < segments.length; i++) {
-			try {
-				futures[i].get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				Logger.getLogger(this.getClass()).error("Something went wrong");
-				Logger.getLogger(this.getClass()).error(e.getMessage());
-				e.printStackTrace();
-			}
-		}
+		while (numThreads.get()>0) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 	}
 
-	public class SimThread implements Callable {
+	public class SimThread implements Runnable {
 
-		private Collection<Plan> plans;
+		private Collection<Plan> threadPlans;
 
 		private EventsManager eventManager;
 
 		private Network network;
 
 		public void init(Collection<Plan> plans, Network network, EventsManager eventManager) {
-			this.plans = plans;
+			this.threadPlans = plans;
 			this.network = network;
 			this.eventManager = eventManager;
 		}
 
 		@Override
-		public Boolean call() {
-			Queue<Event> eventQueue = new LinkedList<>();
-			PLANS: for (Plan plan : plans) {
-				Id personId = plan.getPerson().getId();
+		public void run() {
+			for (Plan plan : threadPlans) {
+			    Queue<Event> eventQueue = new LinkedList<>();
+                Id personId = null;
+                try {
+                    personId = plan.getPerson().getId();
+                }catch (NullPointerException e){
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                        continue;
+                    }
+                }
 				List<PlanElement> elements = plan.getPlanElements();
 
 				double prevEndTime = 0;
@@ -283,13 +287,12 @@ class PSim implements Mobsim {
 
 					prevEndTime = actEndTime;
 				}
+                for (Event event : eventQueue) {
+                    eventManager.processEvent(event);
+                }
 			}
 
-			for (Event event : eventQueue) {
-				eventManager.processEvent(event);
-			}
-			return true;
-
+            numThreads.decrementAndGet();
 		}
 
 		private double findTransitTravelTime(ExperimentalTransitRoute route, double prevEndTime) {
@@ -385,11 +388,6 @@ class PSim implements Mobsim {
 		}
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		executor.shutdown();
-	}
 
 	class TransitWalkTimeAndDistance {
 		final double time;

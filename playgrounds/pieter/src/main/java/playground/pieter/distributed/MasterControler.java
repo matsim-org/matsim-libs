@@ -170,21 +170,21 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         //split the population to be sent to the slaves
 
-        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(matsimControler.getScenario().getPopulation().getPersons().values(), numSlaves);
+
         double[] totalIterationTime = new double[numSlaves];
         int[] personsPerSlave = new int[numSlaves];
         long[] usedMemoryPerSlave = new long[numSlaves];
         long[] maxMemoryPerSlave = new long[numSlaves];
         int j = 0;
         for (int i : slaves.keySet()) {
-            totalIterationTime[j] = 1/slaves.get(i).numThreadsOnSlave;
-            personsPerSlave[j] = personSplit[j].size();
+            totalIterationTime[j] = 1/(double)slaves.get(i).numThreadsOnSlave;
+            personsPerSlave[j] = scenario.getPopulation().getPersons().size()/numSlaves;
             usedMemoryPerSlave[j] = slaves.get(i).usedMemory;
             maxMemoryPerSlave[j] = slaves.get(i).maxMemory;
             j++;
         }
         int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave, bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
-        personSplit = (List<PersonImpl>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
+        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
         j = 0;
         for (int i : slaves.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
@@ -536,7 +536,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         double fastestTimePerPlan = Double.POSITIVE_INFINITY;
 
         for (int i = 0; i < numSlaves; i++) {
-            if (personsPerSlave[i] > 0) {
+            if (personsPerSlave[i] > 0 && totalIterationTime[i]>0) {
                 timesPerPlan[i] = (totalIterationTime[i] / personsPerSlave[i]);
                 if (timesPerPlan[i] < fastestTimePerPlan)
                     fastestTimePerPlan = timesPerPlan[i];
@@ -546,6 +546,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             maxMemory[i] = maxMemory[i] - bytesPerSlaveBuffer;
             overheadMemory[i] = usedMemory[i] - (personsPerSlave[i] * bytesPerPerson);
         }
+        fastestTimePerPlan = fastestTimePerPlan>0 && !new Double(fastestTimePerPlan).equals(Double.POSITIVE_INFINITY)?fastestTimePerPlan:1;
         for(int i: newSlaves)
                 timesPerPlan[i] = fastestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaves
@@ -848,6 +849,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             for(int i:slavesToDrop) hydraSlaves.remove(i);
             slaveBatch = hydraSlaves;
+            hydraSlaves.clear();
             accessingMap.set(false);
             return slaveBatch;
         }

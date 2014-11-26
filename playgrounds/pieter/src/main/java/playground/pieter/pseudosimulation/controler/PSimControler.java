@@ -94,10 +94,6 @@ public class PSimControler {
 	 * Goes through the list of plan strategies and substitutes qualifying strategies with their PSim equivalents
 	 */
 	private void substituteStrategies() {
-//		ArrayList<String> nonMutatingStrategies = new ArrayList<String>();
-//		for(PlanStrategyRegistrar.Selector selector:PlanStrategyRegistrar.Selector.values()){
-//			nonMutatingStrategies.add(selector.toString());
-//		}
 		for (StrategyConfigGroup.StrategySettings settings : matsimControler.getConfig().strategy().getStrategySettings()) {
 
 			String classname = settings.getModuleName();

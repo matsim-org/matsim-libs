@@ -14,8 +14,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -32,6 +34,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
@@ -48,15 +51,23 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener, Runnable {
+public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, Runnable {
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
-    private int numberOfPSimIterations;
+    public static int numberOfPSimIterationsPerCycle;
     private int numberOfIterations = -1;
+    private boolean travelTimesUpdated = true;
+    private Collection<Plan> plansForPSim;
+    private int executedPlanCount;
+
+    public Config getConfig() {
+        return config;
+    }
+
     private Config config;
     private double totalIterationTime;
     private Controler matsimControler;
@@ -104,19 +115,20 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //The following line will make the controler use the events manager that doesn't check for event order
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
-        int numThreadsForEventsHandling = 1;
+        int numThreads = 1;
         if (commandLine.hasOption("t"))
             try {
-                numThreadsForEventsHandling = Integer.parseInt(commandLine.getOptionValue("t"));
+                numThreads = Integer.parseInt(commandLine.getOptionValue("t"));
             } catch (NumberFormatException e) {
-                System.err.println("Number of event handling threads should be integer.");
+                System.err.println("Number of threads should be int.");
                 System.out.println(options.toString());
                 System.exit(1);
             }
         else {
-            System.err.println("Will use the default of a single thread for events handling.");
+            System.err.println("Will use the number of threads in config for simulation.");
         }
-        config.parallelEventHandling().setNumberOfThreads(numThreadsForEventsHandling);
+        config.global().setNumberOfThreads(numThreads);
+        config.parallelEventHandling().setNumberOfThreads(1);
 
         String hostname = "localhost";
         if (commandLine.hasOption("h")) {
@@ -150,8 +162,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         myNumber = reader.readInt();
         slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
 
-        numberOfPSimIterations = reader.readInt();
-        slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
+        numberOfPSimIterationsPerCycle = reader.readInt();
+        slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
 
         initialRouting = reader.readBoolean();
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
@@ -174,7 +186,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         loadScenario();
 
 
+        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config);
         matsimControler = new Controler(scenario);
+        new DistributedPlanStrategyTranslationAndRegistration(this);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
         linkTravelTimes = new FreeSpeedTravelTime();
@@ -272,11 +286,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         Scanner in = new Scanner(System.in);
         String s;
         boolean running = true;
-        do{
+        do {
             s = in.nextLine();
-            if(s.equals("KILL"))
-                running=false;
-        }while(running);
+            if (s.equals("KILL"))
+                running = false;
+        } while (running);
         slave.requestShutDown();
     }
 
@@ -287,7 +301,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         matsimControler.run();
     }
 
-    public void requestShutDown(){
+    public void requestShutDown() {
         isOkForNextIter = false;
     }
 
@@ -296,7 +310,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (numberOfIterations >= 0 || initialRouting)
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
 
-        if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
+        if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterationsPerCycle == 0)) {
             this.totalIterationTime = getTotalIterationTime();
             communications();
             if (somethingWentWrong) Runtime.getRuntime().halt(0);
@@ -313,25 +327,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
             }
         }
-        Collection<Plan> plans = new ArrayList<>();
-        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
-            plans.add(person.getSelectedPlan());
-        pSimFactory.setPlans(plans);
+        plansForPSim = new ArrayList<>();
         numberOfIterations++;
     }
 
-    private void removeNonSimulatedAgents(List<String> idStrings) {
-        Set<Id<Person>> noIds = new HashSet<>(matsimControler.getScenario().getPopulation().getPersons().keySet());
-        Set<String> noIdStrings = new HashSet<>();
-        for (Id<Person> id : noIds)
-            noIdStrings.add(id.toString());
-        noIdStrings.removeAll(idStrings);
-        slaveLogger.warn("removing ids");
-        for (String idString : noIdStrings) {
-            matsimControler.getScenario().getPopulation().getPersons().remove(Id.create(idString, Person.class));
-        }
 
-    }
 
     public double getTotalIterationTime() {
         double sumTimes = 0;
@@ -340,6 +340,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         return sumTimes;
     }
+
+
 
 
     private void addPersons(List<PersonSerializable> persons) {
@@ -387,8 +389,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public void transmitPerformance() throws IOException {
         if (totalIterationTime > 0) {
             slaveLogger.warn("Spent a total of " + totalIterationTime +
-                    " running " + plansCopyForSending.size() +
-                    " person plans for " + numberOfPSimIterations +
+                    " running " + executedPlanCount +
+                    " person plans for " + numberOfPSimIterationsPerCycle +
                     " PSim iterations.");
         }
         writer.writeDouble(totalIterationTime);
@@ -428,6 +430,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public void distributePersons() throws IOException, ClassNotFoundException {
         addPersons((List<PersonSerializable>) reader.readObject());
         iterationTimes = new ArrayList<>();
+        executedPlanCount = 0;
         slaveLogger.warn("Load balancing done. waiting for others to finish...");
     }
 
@@ -455,6 +458,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         break;
                     case TRANSMIT_TRAVEL_TIMES:
                         transmitTravelTimes();
+                        //all plans in agent memory should be executed against updated traveltimes
+                        travelTimesUpdated = true;
                         break;
                     case POOL_PERSONS:
                         poolPersons();
@@ -501,17 +506,36 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     public void notifyStartup(StartupEvent event) {
         communications();
     }
+
+    public Controler getMATSimControler() {
+        return matsimControler;
+    }
+
+    public void addPlansForPsim(Plan plan){
+        plansForPSim.add(plan);
+    }
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        if (travelTimesUpdated) {
+            plansForPSim.clear();
+            for (Person person : scenario.getPopulation().getPersons().values())
+                plansForPSim.addAll(person.getPlans());
+            travelTimesUpdated = false;
+        }
+        executedPlanCount += plansForPSim.size();
+        pSimFactory.setPlans(plansForPSim);
+    }
 }
 
-class ReplaceableTravelTime implements TravelTime{
+class ReplaceableTravelTime implements TravelTime {
     private TravelTime delegate;
 
     @Override
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-        return this.delegate.getLinkTravelTime(link,time,person,vehicle);
+        return this.delegate.getLinkTravelTime(link, time, person, vehicle);
     }
 
     public void setTravelTime(TravelTime linkTravelTimes) {
-        this.delegate =linkTravelTimes;
+        this.delegate = linkTravelTimes;
     }
 }
