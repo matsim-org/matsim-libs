@@ -165,9 +165,13 @@ public class RoadPricingSchemeImpl implements RoadPricingScheme {
 		// Now also added vehicleId as an argument, which is also ignored at the default level. kai, apr'14
 
 		if (this.cacheIsInvalid) buildCache(); //(*)
+
 		if (this.linkIds.containsKey(linkId)) {
+			// (linkId is in contained in list of tolled links)
+			
 			List<Cost> linkSpecificCosts = this.linkIds.get(linkId);
 			if (linkSpecificCosts == null) {
+				// (It is expected to have links in the map with null as "value")
 				// no link specific info found, apply "general" cost (which is in costCache after (*)):
 				for (Cost cost : this.costCache) {
 					if ((time >= cost.startTime) && (time < cost.endTime)) {

@@ -127,7 +127,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 			this.normalization = 1./Math.exp( this.sigma*this.sigma/2 );
 			if ( normalisationWrnCnt < 10 ) {
 				normalisationWrnCnt++ ;
-				log.warn(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
+				log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
 			}
 		} else {
 			this.normalization = 1. ;

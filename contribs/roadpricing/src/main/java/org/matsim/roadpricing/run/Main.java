@@ -27,25 +27,28 @@ import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
+ * Basic "script" to use roadpricing.
+ * 
  * @author nagel
  *
  */
 public class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-
+		// load the config, telling it to "materialize" the road pricing section:
 		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
 		
+		// load the scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+
+		// instantiate the controler:
 		Controler controler = new Controler(scenario) ;
-		{		
-			RoadPricing roadPricing = new RoadPricing() ;
-			controler.addControlerListener( roadPricing ) ;
-		}
+
+		// instantiate road pricing and add it as controler listener:
+		RoadPricing roadPricing = new RoadPricing() ;
+		controler.addControlerListener( roadPricing ) ;
+
+		// run the controler:
 		controler.run() ;
 	}
 

@@ -1,14 +1,13 @@
 /**
  * This package provides functionality to simulate different road-pricing scenarios in MATSim.
- * It provides support for different toll schemes, namely distance tolls, cordon tolls and area tolls. The
- * MATSim {@link org.matsim.core.controler.Controler} has support for the roadpricing package built in, so it
- * only needs to be activated with the corresponding config-settings (<a href="#controler">see below</a>).
+ * It provides support for different toll schemes, for example distance tolls, cordon tolls and area tolls. 
  * The toll schemes are described in special XML files (<a href="#schemes">see below</a>). All supported toll
- * schemes can be limited upon a part of the network and can be time-dependent (that means that the amount
+ * schemes can be limited to a part of the network and can be time-dependent (that means that the amount
  * agents have to pay for the toll can differ during the simulated day).
  * <br>
- * The specified toll amount should be in respect to the scoring function used. Best practice is that the
- * scoring function monetizes the the utility, in that case monetary values can be used for the toll amount.
+ * The specified toll amount should be in respect to the scoring function used. Typically, the 
+ * scoring function contains a parameter that defines the marginal utility of money; that parameter is
+ * used to convert toll amounts into utilities.
  *
  * <h3><a name="schemes">Supported Toll Schemes</a></h3>
  * <h4>Distance Toll</h4>
@@ -52,9 +51,9 @@
  *   (in the router).  kai, apr'13 </strike></li>
  *   <li><b>Only the links that build the cordon are listed.</b> In this case, agents have to pay each time
  *   they cross the cordon, no matter if from the outside or from the inside (assuming both links, incoming and
- *   outgoing links are listed).</li>
+ *   outgoing, are listed).</li>
  * </ul>
- * Each time an agent enters a tolled link, while being on an not-tolled link before, the agent has to pay the
+ * Each time an agent enters a tolled link, while having been on an not-tolled link before, the agent has to pay the
  * specified amount. The time the agent enters a link is determining the costs.
  * <br>
  * Example Road-Pricing File for a cordon toll:
@@ -94,8 +93,20 @@
  *  &lt;/links>
  * </pre></blockquote>
  * 
+ * [[I read the above text as if the "amount" entry has, with distance toll, different interpretations when used per link than when used in the 
+ * general section.  But when looking through the code, this cannot be substantiated; a per-link amount is multiplied with the link-length
+ * with distance toll, and charged as is with the other toll schemes.  kai, nov'14]]
+ * 
+ * <h4>Link Toll</h4>
+ * 
+ * In order to reduce the margin of error with some of the schemes, there is now also a "link" scheme (i.e. <code>type="link"</code>), 
+ * which just charges per link the amount that is in the file.  This is possibly quite similar to "cordon", except that with cordon is it not
+ * clear what happens if you have two links in a sequence that are both tolled (the code might then decide that you are driving "inside"
+ * and not charge you on the second link).
+ * 
  * <h4><strike>Area Toll</strike></h4>
- * [[Area toll currently does not work.  The reason is that the AreaTollControler (see below) currently does not work.  kn, apr'13]]
+ * [[Area toll does not work.  The reason is that PlansCalcAreaTollRoute made too many assumptions about plans which are no longer correct, and
+ * in consequence the class would need to be re-implemented with current infrastructure.  kn, apr'13 & nov'14]]
  * <strike>In the case of an area toll, agents have to pay a fixed amount when they drive on one of the tolled links,
  * but they have to pay the amount at most once during the simulation. The type must be set to "area" in the
  * roadpricing file. The links listed in the file are the tolled links. The time an agent enters a link is
@@ -133,59 +144,46 @@
  * road pricing XML file (more details and examples can be found with the description of each
  * <a href="#schemes">supported toll scheme</a>). Then add the following part to your configuration:
  * <pre>
- * &lt;module name="scenario"&gt;
- *   &lt;param name="useRoadpricing" value="true" /&gt;
- * &lt;/module&gt; </pre>
- * <pre>
  * &lt;module name="roadpricing"&gt;
  *   &lt;param name="tollLinksFile" value="path/to/your/roadpricing-file.xml" /&gt;
  * &lt;/module&gt; </pre>
  * 
- * As soon as road pricing is switched on in the scenario config module and the parameter <code>tollLinksFile</code> is set, start MATSim using the following lines of code if you don't use area tolls: 
+ *Start MATSim using the following lines of code (check {@link org.matsim.roadpricing.run.Main} in the roadpricing contrib for an up-to-date example):
  * <code>
  * <pre>
- * public static void main(String[] args) {
- * 		Controler c = new Controler(args)
- *		c.addControlerListener(new Roadpricing());
- *		c.run();
- * }
+ * 	public static void main(String[] args) {
+
+		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
+
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		Controler controler = new Controler(scenario) ;
+		RoadPricing roadPricing = new RoadPricing() ;
+		controler.addControlerListener( roadPricing ) ;
+		controler.run() ;
+	}
  * </pre>
  * </code>
  * 
- * [[AreaTollControler is broken.  kn, apr'13]]<strike>
- * If area tolls are used, start MATSim by calling
- * <code><pre>
- * public static void main(String[] args) {
- * 		AreaTollControler c = new AreaTollControler(args)
- *		c.run();
- * }
- * </pre></code>
- * </strike>
- *
- * <h3><a name="no-controler"><strike>Use RoadPricing without the Controler</strike></a></h3>
- * [[this is not supported.  The following hints may help, but they may be out of data and/or are probably incomplete.  kn, apr'13]]
- * <strike>
- * If you plan to use the provided road pricing functionality outside of the Controler, please
- * carefully read the following remarks to correctly setup your road pricing scenario:
- * <ul>
- *   <li>When using a distance or cordon toll scheme, use {@link org.matsim.roadpricing.TravelDisutilityIncludingToll}
- *    as {@link org.matsim.core.router.util.TravelDisutility}-object for routers.</li>
- *   <li>When using an area toll, make sure you use {@link org.matsim.roadpricing.PlansCalcAreaTollRoute} as
- *    routing algorithm, together with a non-toll TravelCost.</li>
- * </ul>
- * The {@link org.matsim.core.controler.Controler} takes care of all of these details, so you only have to care about
- * this if you're not using (or are using a modified version of) the {@link org.matsim.core.controler.Controler}.
- *</strike>
- *
+ * You can also call this from the command line with a release or a nightly build; the syntax is approximately
+ * <pre>
+ * java -Xmx2000m -cp MATSim.jar:roadpricing-.../roadpricing-...jar org.matsim.roadpricing.run.Main config.xml
+ * </pre>
+ * 
+ * 
  * <h3><a name="limitations">Limitations</a></h3>
  * Currently, the package has the following limitations:
  * <ul>
  *   <li>Only one toll scheme can be simulated at a time.</li>
- *   <li>As far as I understand, there neither a consistent nor a "random mutation" way to deal with the "flat fee" issue of
+ *   <li>As far as I understand, there is neither a consistent nor a "random mutation" way to deal with the "flat fee" issue of
  *   a daily area toll: If it makes sense for all <i>individual</i> trips during a day to drive around a toll area, the implementation
- *   will probably not find out that it might have made sense to pay the daily fee for all trips together.  kai, mar'11</li>
+ *   will probably not find out that it might have made sense to pay the daily fee for all trips together.  kai, mar'11 -- 
+ *   No, this is not entirely correct.  There was originally a provision that enumerated the possible options.  It was, however,
+ *   too brittle to work under somewhat arbitrary circumstances, and so did not survive the many changes that this code 
+ *   underwent. kai, nov'14</li>
  * </ul>
  *
  * @author mrieser
  */
 package org.matsim.roadpricing;
+

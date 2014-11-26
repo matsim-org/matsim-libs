@@ -126,7 +126,7 @@ IterationEndsListener, ShutdownListener {
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		log.info("The sum of all paid tolls : " + this.calcPaidToll.getAllAgentsToll() + " Euro.");
+		log.info("The sum of all paid tolls : " + this.calcPaidToll.getAllAgentsToll() + " monetary units.");
 		log.info("The number of people who paid toll : " + this.calcPaidToll.getDraweesNr());
 		log.info("The average paid trip length : " + this.cattl.getAverageTripLength() + " m.");
 	}
