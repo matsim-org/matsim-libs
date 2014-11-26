@@ -43,9 +43,12 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 		this.hash = (vehicleId.toString() + "CAVehicle").hashCode();
 	}
 
+	public Id<Vehicle> getVehicleId() {
+		return this.id;
+	}
+
 	@Override
 	public Vehicle getVehicle() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

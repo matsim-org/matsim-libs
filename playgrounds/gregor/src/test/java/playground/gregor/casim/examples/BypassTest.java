@@ -135,6 +135,7 @@ public class BypassTest extends MatsimTestCase {
 		CAMobsimFactory factory = new CAMobsimFactory();
 		factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
 		controller.addMobsimFactory("casim", factory);
+
 		controller.run();
 
 		String ref = getInputDirectory() + "/20.events.xml.gz";

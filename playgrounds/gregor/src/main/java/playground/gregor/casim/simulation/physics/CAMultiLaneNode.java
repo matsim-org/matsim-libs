@@ -43,8 +43,7 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
  */
 public class CAMultiLaneNode implements CANode {
 
-	private static final Logger log = Logger
-			.getLogger(CAMultiLaneNode.class);
+	private static final Logger log = Logger.getLogger(CAMultiLaneNode.class);
 
 	private final Node node;
 	private final AbstractCANetwork net;
@@ -90,7 +89,7 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		this.width = width;
-		this.lanes = (int) (width / (AbstractCANetwork.PED_WIDTH / 4) + 0.5);
+		this.lanes = (int) (width / (AbstractCANetwork.PED_WIDTH / 1) + 0.5);
 		double laneWidth = width / lanes;
 		this.ratio = AbstractCANetwork.PED_WIDTH / laneWidth;
 		double laneCellLength = this.ratio
@@ -268,8 +267,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition1(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 
 		int nodeSlot = a.getLane();
 		this.towardsLinkLastExitTimes.get(nextLink)[nodeSlot] = time;
@@ -292,8 +290,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void checkPostConditionForAgentEnteredLinkFromUpstreamEnd(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 		CAMoveableEntity inFrontOfMe = nextLink.getParticles(lane)[1];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) { // oncoming
@@ -308,8 +305,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition2(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 		double z = CAMultiLaneLink.getZ(a);
 		z *= this.ratio;
 		double zStar = z - (time - nextLink.getLastLeftTimes(lane)[0]);
@@ -359,8 +355,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition1(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 
 		int nodeSlot = a.getLane();
 
@@ -384,8 +379,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void checkPostConditionForAgentEnteredLinkFromDownstreamEnd(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 		CAMoveableEntity inFrontOfMe = nextLink.getParticles(lane)[nextLink
 				.getNumOfCells() - 2];
 		if (inFrontOfMe != null) {
@@ -401,8 +395,7 @@ public class CAMultiLaneNode implements CANode {
 	}
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition2(
-			CAMultiLaneLink nextLink, CAMoveableEntity a, double time,
-			int lane) {
+			CAMultiLaneLink nextLink, CAMoveableEntity a, double time, int lane) {
 		double z = CAMultiLaneLink.getZ(a);
 		z *= this.ratio;
 		double zStar = z
@@ -678,8 +671,7 @@ public class CAMultiLaneNode implements CANode {
 
 	public double[] getLastNodeExitTimeForAgent(CAMoveableEntity a) {
 		Id<Link> n = a.getNextLinkId();
-		CAMultiLaneLink nextLink = (CAMultiLaneLink) this.net
-				.getCALink(n);
+		CAMultiLaneLink nextLink = (CAMultiLaneLink) this.net.getCALink(n);
 		return this.towardsLinkLastExitTimes.get(nextLink);
 	}
 

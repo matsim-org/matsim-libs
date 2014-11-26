@@ -20,16 +20,20 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
@@ -88,6 +92,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private double y;
 
 	private static int EXP_WARN_CNT = 0;
+
+	private final Queue<CAMoveableEntity> dsWaitQ = new ArrayDeque<>();
+	private final Queue<CAMoveableEntity> usWaitQ = new ArrayDeque<>();
 
 	public CASingleLaneLink(Link dsl, Link usl, CASingleLaneNode ds,
 			CASingleLaneNode us, AbstractCANetwork net) {
@@ -149,11 +156,60 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		} else if (e.getCAEventType() == CAEventType.TTA) {
 			handleTTA(a, time);
 		} else if (e.getCAEventType() == CAEventType.TTE) {
-			throw new RuntimeException("not implemented yet");
+			handleTTE(a, time);
 		} else {
 			throw new RuntimeException("Unknown event type: "
 					+ e.getCAEventType());
 		}
+	}
+
+	private void handleTTE(CAMoveableEntity a, double time) {
+		int dir = a.getDir();
+		int desiredPos = -1;
+		if (dir == 1) {
+			desiredPos = this.size - 1;
+		} else if (dir == -1) {
+			desiredPos = 0;
+		}
+
+		if (dir == 1 && this.particles[desiredPos] == null) {
+			handleTTEDownStream(a, time, desiredPos);
+		} else if (dir == -1 && this.particles[desiredPos] == null) {
+			handleTTEUpStream(a, time, desiredPos);
+		}
+
+	}
+
+	private void handleTTEUpStream(CAMoveableEntity a, double time,
+			int desiredPos) {
+
+		this.net.registerAgent(a);
+		this.usWaitQ.poll();
+		this.particles[desiredPos] = a;
+		a.materialize(desiredPos, -1);
+		if (a instanceof CAVehicle) {
+			this.net.getEventsManager().processEvent(
+					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+							.getId(), this.usl.getId(), ((CAVehicle) a)
+							.getVehicleId()));
+		}
+		checkPostConditionForAgentOnUpStreamAdvance(desiredPos + 1, a, time);
+
+	}
+
+	private void handleTTEDownStream(CAMoveableEntity a, double time,
+			int desiredPos) {
+		this.net.registerAgent(a);
+		this.dsWaitQ.poll();
+		this.particles[desiredPos] = a;
+		a.materialize(desiredPos, 1);
+		if (a instanceof CAVehicle) {
+			this.net.getEventsManager().processEvent(
+					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+							.getId(), this.dsl.getId(), ((CAVehicle) a)
+							.getVehicleId()));
+		}
+		checkPostConditionForAgentOnDownStreamAdvance(desiredPos - 1, a, time);
 	}
 
 	private void handleTTA(CAMoveableEntity a, double time) {
@@ -217,6 +273,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx,
 			double time) {
 		if (idx - 1 < 0) {
+			if (this.usWaitQ.peek() != null) {
+				triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+			}
+
 			CAMoveableEntity toBeTriggered = this.us.peekForAgent();
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getNextLinkId().equals(this.dsl.getId())) {
@@ -319,6 +379,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx,
 			double time) {
 		if (idx + 1 >= this.size) {
+			if (this.dsWaitQ.peek() != null) {
+				triggerTTE(this.dsWaitQ.peek(), this, time);// move wait first
+			}
+
 			CAMoveableEntity toBeTriggered = this.ds.peekForAgent();
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getNextLinkId().equals(this.usl.getId())) {
@@ -396,6 +460,13 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 	}
 
+	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
+			double time) {
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
+		this.net.pushEvent(e);
+
+	}
+
 	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
 		if (a.getNextLinkId() == null) {
 			letAgentArrive(a, time, this.size - 1);
@@ -430,6 +501,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 		// check post-condition and generate events
 		// first for persons behind
+		if (dsWaitQ.peek() != null) {
+			triggerTTE(dsWaitQ.peek(), this, time);// move wait first
+		}
+
 		checkPostConditionForPersonBehindOnDownStreamAdvance(this.size - 1,
 				time);
 
@@ -523,6 +598,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 		// check post-condition and generate events
 		// first for persons behind
+		if (this.usWaitQ.peek() != null) {
+			triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+		}
 		checkPostConditionForPersonBehindOnUpStreamAdvance(0, time);
 
 		// second for oneself
@@ -737,64 +815,29 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		Node toNode = link.getToNode();
 		CANode toCANode = this.net.getNodes().get(toNode.getId());
 
-		int dir;
 		if (this.ds == toCANode) {
-			dir = 1;
+			if (this.dsWaitQ.peek() == null) {
+				triggerTTE(veh, this, now);
+			}
+			veh.materialize(-1, 1);// moves ds
+			this.dsWaitQ.add(veh);
 		} else if (this.us == toCANode) {
-			dir = -1;
+			if (this.usWaitQ.peek() == null) {
+				triggerTTE(veh, this, now);
+			}
+			veh.materialize(-1, -1);// moves us;
+			this.usWaitQ.add(veh);
 		} else {
 			throw new RuntimeException("inconsitent network or plan!");
 		}
-		int pos = -1;
-		for (int i = 1; i < this.size - 1; i++) {
-			if (this.particles[i] == null) {
-				pos = i;
-			}
-		}
-		if (pos == -1) {
-			if (EXP_WARN_CNT++ < 10) {
-				log.warn("could not find a free spot for agent: " + veh
-						+ ". Dropping it!");
-				if (EXP_WARN_CNT == 10) {
-					log.info(Gbl.FUTURE_SUPPRESSED);
-				}
-			}
-
-			this.net.getEventsManager().processEvent(
-					new PersonStuckEvent(now, veh.getDriver().getId(),
-							currentLinkId, veh.getDriver().getMode()));
-
-			net.getEngine().getMobsim().getAgentCounter().incLost();
-			net.getEngine().getMobsim().getAgentCounter().decLiving();
-			return;
-		}
-		this.particles[pos] = veh;
-		veh.materialize(pos, dir);
-
-		net.registerAgent(veh);
-
-		// fire
-		if (dir == 1) {
-			fireUpstreamEntered(veh, now);
-		} else {
-			fireDownstreamEntered(veh, now);
-		}
-
-		double rnd = MatsimRandom.getRandom().nextDouble() / 100.;
-		if (this.particles[pos + dir] == null) {
-			triggerTTA(veh, this, now + tFree + rnd);
-		} else if (this.particles[pos + dir].getDir() != dir) {
-			triggerSWAP(veh, this, now + getD(this.particles[pos + dir])
-					+ tFree + rnd);
-		}
-
+		EventsManager eventsManager = this.net.getEventsManager();
+		eventsManager.processEvent(new PersonEntersVehicleEvent(now, veh
+				.getDriver().getId(), veh.getId()));
 		// VIS only
 		if (AbstractCANetwork.EMIT_VIS_EVENTS) {
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(now, veh);
 			this.net.getEventsManager().processEvent(ee);
 		}
-		// System.out.println(next);
-		// throw new RuntimeException("not yet implemented!");
 	}
 
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx) {

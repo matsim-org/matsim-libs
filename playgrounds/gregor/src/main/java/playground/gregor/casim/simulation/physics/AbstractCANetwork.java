@@ -129,7 +129,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	@Override
-	public void registerAgent(CAMoveableEntity a) {
+	public synchronized void registerAgent(CAMoveableEntity a) {
 		if (!this.agents.add(a)) {
 			throw new RuntimeException("Agent: " + a
 					+ " has already been registered!");
@@ -138,7 +138,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	/* package */void unregisterAgent(CAMoveableEntity a) {
 		if (!this.agents.remove(a)) {
-			throw new RuntimeException("Could not unregister agent: " + a + "!");
+			throw new RuntimeException("Could not unregister agent: " + a + "!"
+					+ " has already been removed:");
 		}
 	}
 
@@ -491,7 +492,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 			this.barrier2 = barrier2;
 		}
 
-		public void addLocalEvent(CAEvent event) {
+		synchronized public void addLocalEvent(CAEvent event) {
 			if (event.getEventExcexutionTime() <= this.endOfFrame) {
 				this.local.add(event);
 			} else {

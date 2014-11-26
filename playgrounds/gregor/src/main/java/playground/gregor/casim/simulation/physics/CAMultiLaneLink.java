@@ -20,18 +20,22 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
@@ -46,8 +50,7 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
  */
 public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
-	private static final Logger log = Logger
-			.getLogger(CAMultiLaneLink.class);
+	private static final Logger log = Logger.getLogger(CAMultiLaneLink.class);
 
 	private final Link dsl;
 	private final Link usl;
@@ -89,6 +92,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private static int EXP_WARN_CNT = 0;
 
+	private final Queue<CAMoveableEntity> dsWaitQ = new ArrayDeque<>();
+	private final Queue<CAMoveableEntity> usWaitQ = new ArrayDeque<>();
+
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
 			CAMultiLaneNode us, AbstractCANetwork net) {
 
@@ -98,7 +104,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		this.width = dsl.getCapacity();// TODO this is a misuse of the link's
 										// capacity attribute. Needs to be
 										// fixed!
-		this.lanes = (int) (this.width / (AbstractCANetwork.PED_WIDTH / 4) + 0.5);
+		this.lanes = (int) (this.width / (AbstractCANetwork.PED_WIDTH / 1) + 0.5);
 		this.laneWidth = this.width / lanes;
 		this.ratio = AbstractCANetwork.PED_WIDTH / this.laneWidth;
 		this.laneCellLength = this.ratio
@@ -146,7 +152,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	@Override
 	public void handleEvent(CAEvent e) {
 		CAMoveableEntity a = e.getCAAgent();
-		if (this.particles[a.getLane()][a.getPos()] != a) {
+		if (e.getCAEventType() != CAEventType.TTE
+				&& this.particles[a.getLane()][a.getPos()] != a) {
 			// log.warn("Agent: " + a + " not on expected position!!");
 			return;
 		}
@@ -156,11 +163,71 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		} else if (e.getCAEventType() == CAEventType.TTA) {
 			handleTTA(a, time);
 		} else if (e.getCAEventType() == CAEventType.TTE) {
-			throw new RuntimeException("not implemented yet");
+			handleTTE(a, time);
 		} else {
 			throw new RuntimeException("Unknown event type: "
 					+ e.getCAEventType());
 		}
+	}
+
+	private void handleTTE(CAMoveableEntity a, double time) {
+		int dir = a.getDir();
+		int desiredPos = -1;
+		if (dir == 1) {
+			desiredPos = this.size - 1;
+		} else if (dir == -1) {
+			desiredPos = 0;
+		}
+		List<Integer> cands = new ArrayList<>();
+		for (int lane = 0; lane < lanes; lane++) {
+			if (this.particles[lane][desiredPos] == null) {
+				cands.add(lane);
+			}
+		}
+		if (cands.size() > 0) {
+			int cand = cands
+					.get(MatsimRandom.getRandom().nextInt(cands.size()));
+			if (dir == 1) {
+				handleTTEDownStream(a, time, cand, desiredPos);
+			} else {
+				handleTTEUpStream(a, time, cand, desiredPos);
+			}
+		}
+
+	}
+
+	private void handleTTEUpStream(CAMoveableEntity a, double time, int lane,
+			int desiredPos) {
+
+		this.net.registerAgent(a);
+		this.usWaitQ.poll();
+		this.particles[lane][desiredPos] = a;
+		a.materialize(desiredPos, -1, lane);
+		if (a instanceof CAVehicle) {
+			this.net.getEventsManager().processEvent(
+					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+							.getId(), this.usl.getId(), ((CAVehicle) a)
+							.getVehicleId()));
+		}
+		checkPostConditionForAgentOnUpStreamAdvance(desiredPos + 1, a, time,
+				lane);
+
+	}
+
+	private void handleTTEDownStream(CAMoveableEntity a, double time, int lane,
+			int desiredPos) {
+		this.net.registerAgent(a);
+		this.dsWaitQ.poll();
+		this.particles[lane][desiredPos] = a;
+		a.materialize(desiredPos, 1, lane);
+		if (a instanceof CAVehicle) {
+			this.net.getEventsManager().processEvent(
+					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+							.getId(), this.dsl.getId(), ((CAVehicle) a)
+							.getVehicleId()));
+		}
+		checkPostConditionForAgentOnDownStreamAdvance(desiredPos - 1, a, time,
+				lane);
 	}
 
 	private void handleTTA(CAMoveableEntity a, double time) {
@@ -225,6 +292,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx,
 			double time, int lane) {
 		if (idx - 1 < 0) {
+			if (this.usWaitQ.peek() != null) {
+				triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+			}
 			this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(),
 					time);
 		} else {
@@ -358,6 +428,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx,
 			double time, int lane) {
 		if (idx + 1 >= this.size) {
+			if (this.dsWaitQ.peek() != null) {
+				triggerTTE(this.dsWaitQ.peek(), this, time);// move wait first
+			}
 			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
 					time);
 		} else {
@@ -461,6 +534,13 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	}
 
+	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
+			double time) {
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
+		this.net.pushEvent(e);
+
+	}
+
 	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
 		if (a.getNextLinkId() == null) {
 			letAgentArrive(a, time, this.size - 1, a.getLane());
@@ -513,6 +593,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// check post-condition and generate events
 		// first for persons behind or on node
+
+		if (dsWaitQ.peek() != null) {
+			triggerTTE(dsWaitQ.peek(), this, time);// move wait first
+		}
+
 		if (this.usl != null) {
 			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
 					time);
@@ -530,8 +615,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		// throw new RuntimeException("maybe trigger someone on the link");
 	}
 
-	private void checkPostConditionForOneSelfOnNodeAdvance(
-			CAMultiLaneNode n, CAMoveableEntity a, double time) {
+	private void checkPostConditionForOneSelfOnNodeAdvance(CAMultiLaneNode n,
+			CAMoveableEntity a, double time) {
 		Id<Link> nextCALinkId = a.getNextLinkId();
 		CAMultiLaneLink nextCALink = (CAMultiLaneLink) this.net
 				.getCALink(nextCALinkId);
@@ -618,8 +703,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// check post-condition and generate events
 		// first for persons behind or on node
-		// if (!this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(lane,
-		// this.dsl.getId(), lanes, time)) {
+
+		if (this.usWaitQ.peek() != null) {
+			triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+		}
+
 		this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(), time);
 		checkPostConditionForPersonBehindOnUpStreamAdvance(0, time, lane);
 		// }
@@ -870,74 +958,30 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		Node toNode = link.getToNode();
 		CANode toCANode = this.net.getNodes().get(toNode.getId());
 
-		int dir;
 		if (this.ds == toCANode) {
-			dir = 1;
+			if (this.dsWaitQ.size() < this.lanes) {
+				triggerTTE(veh, this, now);
+			}
+			veh.materialize(-1, 1, -1);// moves ds
+			this.dsWaitQ.add(veh);
 		} else if (this.us == toCANode) {
-			dir = -1;
+			if (this.usWaitQ.size() < this.lanes) {
+				triggerTTE(veh, this, now);
+			}
+			veh.materialize(-1, -1, -1);// moves us;
+			this.usWaitQ.add(veh);
 		} else {
 			throw new RuntimeException("inconsitent network or plan!");
 		}
-		int pos = -1;
-		int lane = 0;
-		for (int i = this.size - 1; i > 1; i--) {
-			boolean found = false;
-			for (lane = 0; lane < this.lanes; lane++) {
-				if (this.particles[lane][i] == null) {
-					pos = i;
-					found = true;
-					break;
-				}
-			}
-			if (found) {
-				break;
-			}
-		}
-		// lane--;
-		if (pos == -1) {
-			if (EXP_WARN_CNT++ < 10) {
-				log.warn("could not find a free spot for agent: " + veh
-						+ ". Dropping it!");
-				if (EXP_WARN_CNT == 10) {
-					log.info(Gbl.FUTURE_SUPPRESSED);
-				}
-			}
-
-			this.net.getEventsManager().processEvent(
-					new PersonStuckEvent(now, veh.getDriver().getId(),
-							currentLinkId, veh.getDriver().getMode()));
-
-			net.getEngine().getMobsim().getAgentCounter().incLost();
-			net.getEngine().getMobsim().getAgentCounter().decLiving();
-			return;
-		}
-		this.particles[lane][pos] = veh;
-		veh.materialize(pos, dir, lane);
-
-		net.registerAgent(veh);
-
-		// fire
-		if (dir == 1) {
-			fireUpstreamEntered(veh, now);
-		} else {
-			fireDownstreamEntered(veh, now);
-		}
-
-		double rnd = MatsimRandom.getRandom().nextDouble() / 100.;
-		if (this.particles[lane][pos + dir] == null) {
-			triggerTTA(veh, this, now + tFree + rnd);
-		} else if (this.particles[lane][pos + dir].getDir() != dir) {
-			triggerSWAP(veh, this, now + getD(this.particles[lane][pos + dir])
-					+ tFree + rnd);
-		}
-
+		EventsManager eventsManager = this.net.getEventsManager();
+		eventsManager.processEvent(new PersonEntersVehicleEvent(now, veh
+				.getDriver().getId(), veh.getId()));
 		// VIS only
 		if (AbstractCANetwork.EMIT_VIS_EVENTS) {
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(now, veh);
 			this.net.getEventsManager().processEvent(ee);
 		}
-		// System.out.println(next);
-		// throw new RuntimeException("not yet implemented!");
+
 	}
 
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx,
