@@ -172,39 +172,62 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		}
 		
 		if (time > this.currentTimeBinEndTime) {
-			
-			log.info("###############################################");
-			log.info("Computing noise for time interval " + Time.writeTime(this.currentTimeBinEndTime, Time.TIMEFORMAT_HHMM));
-					
-			// remove person activity information which is no longer required
-			for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-				
-				for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
-					List<Integer> removeActivityInfo = new ArrayList<Integer>();
+			// All events of the current time bin are processed.
 
-					int actInfoIndex = 0;
-					for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
-						
-						if (actInfo.getEndTime() < (this.currentTimeBinEndTime - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation())) {
-							removeActivityInfo.add(actInfoIndex);
-						}
-						actInfoIndex++;
-					}
-					
-					if (!removeActivityInfo.isEmpty()) {
-						for (Integer i : removeActivityInfo) {
-							rp.getPersonId2actInfos().get(personId).remove((int) i);
-						}
-					}
-				}				
-			}
-			
+			log.info("##############################################");
+			log.info("# Computing noise for time interval " + Time.writeTime(this.currentTimeBinEndTime, Time.TIMEFORMAT_HHMMSS) + " #");
+			log.info("##############################################");
+
+			updateActivityInformation();
 			computeCurrentTimeInterval();
-			// Maybe write out all time intervals instead of only those with at least one link enter event...
 			updateCurrentTimeInterval(time);
-						
 			resetCurrentTimeIntervalInfo();
 		}
+	}
+	
+	private void updateActivityInformation() {
+		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+			
+			for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
+				List<Integer> removeActivityInfo = new ArrayList<Integer>();
+
+				int actInfoIndex = 0;
+				for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
+					
+					if (actInfo.getEndTime() < (this.currentTimeBinEndTime - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation())) {
+						removeActivityInfo.add(actInfoIndex);
+					}
+					actInfoIndex++;
+				}
+				
+				if (!removeActivityInfo.isEmpty()) {
+					for (Integer i : removeActivityInfo) {
+						rp.getPersonId2actInfos().get(personId).remove((int) i);
+					}
+				}
+			}				
+		}
+	}
+
+	private void computeCurrentTimeInterval() {
+		
+		log.info("Calculating noise emissions...");
+		Map<Id<Link>, Double> emissions = calculateNoiseEmission();
+		NoiseWriter.writeNoiseEmissionStatsPerHour(emissions, this.linkId2Cars, this.linkId2Hgv, this.noiseContext, outputDirectory, this.currentTimeBinEndTime);
+		log.info("Calculating noise emissions... Done.");
+		
+		log.info("Calculating noise immissions...");
+		calculateNoiseImmission(emissions);
+		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
+		log.info("Calculating noise immissions... Done.");
+		
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
+		
+		log.info("Calculating noise damage costs and throwing noise events...");
+		calculateNoiseDamageCosts();
+		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
+		log.info("Calculating noise damage costs and throwing noise events... Done.");
+	
 	}
 	
 	private void updateCurrentTimeInterval(double time) {
@@ -268,7 +291,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 
 	public void handleEvent(ActivityStartEvent event) {
 		
-//		checkTime(event.getTime());
+		checkTime(event.getTime());
 		
 		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
@@ -303,7 +326,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		
-//		checkTime(event.getTime());
+		checkTime(event.getTime());
 		
 		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
@@ -325,27 +348,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				}
 			} 
 		}		
-	}
-
-	private void computeCurrentTimeInterval() {
-		
-		log.info("Calculating noise emissions...");
-		Map<Id<Link>, Double> emissions = calculateNoiseEmission();
-		NoiseWriter.writeNoiseEmissionStatsPerHour(emissions, this.linkId2Cars, this.linkId2Hgv, this.noiseContext, outputDirectory, this.currentTimeBinEndTime);
-		log.info("Calculating noise emissions... Done.");
-		
-		log.info("Calculating noise immissions...");
-		calculateNoiseImmission(emissions);
-		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
-		log.info("Calculating noise immissions... Done.");
-		
-		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
-		
-		log.info("Calculating noise damage costs and throwing noise events...");
-		calculateNoiseDamageCosts();
-		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory, currentTimeBinEndTime);
-		log.info("Calculating noise damage costs and throwing noise events... Done.");
-	
 	}
 
 	private void calculateNoiseDamageCosts() {
