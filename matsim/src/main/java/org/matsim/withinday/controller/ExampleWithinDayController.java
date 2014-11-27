@@ -128,7 +128,7 @@ public class ExampleWithinDayController implements StartupListener {
 		this.initReplanners();
 	}
 	
-	public void initReplanners() {
+	private final void initReplanners() {
 		
 		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory()
 				.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
