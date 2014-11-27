@@ -73,25 +73,25 @@ public class GenerateFundametalDiagramData {
 
 	//CONFIGURATION: static variables used for aggregating configuration options
 
-	public static final boolean PASSING_ALLOWED = false;
-	public static final boolean SEEPAGE_ALLOWED = false;
+	public static final boolean PASSING_ALLOWED = true;
+	public static final boolean SEEPAGE_ALLOWED = true;
 	private final boolean SEEP_NETWORK_FACTORY = true;
 	private final boolean LIVE_OTFVis = false;
 	public static final boolean WITH_HOLES = true;
 	
-	private static final String OUTPUT_FOLDER = "/run5/motorbike/";
-	private static final String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/withHoles/";
+	private static final String OUTPUT_FOLDER = "/run305/";
+	private static final String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
 	private static final String OUTPUT_FILE = RUN_DIR+OUTPUT_FOLDER+"/data.txt"; //"pathto\\data.txt";
 	private static final String OUTPUT_EVENTS =RUN_DIR+OUTPUT_FOLDER+"/events.xml";// "pathto\\events.xml";
 	public static final boolean writeInputFiles = true; // includes config,network and plans
 
-	public final static String[] TRAVELMODES= {"motorbike"};	//identification of the different modes
-	public final static Double[] MODAL_SPLIT = {1.}; //modal split in PCU 
+	public final static String[] TRAVELMODES= {"car","bike"};	//identification of the different modes
+	public final static Double[] MODAL_SPLIT = {0.5,0.5}; //modal split in PCU 
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 40;
+	private final int reduceDataPointsByFactor = 1;
 
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];

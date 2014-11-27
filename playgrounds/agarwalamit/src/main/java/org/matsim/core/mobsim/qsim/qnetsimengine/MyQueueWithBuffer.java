@@ -523,7 +523,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// at this point, storage is ok, so start checking holes:
 		HolesQItem hole = holes.peek();
-		if ( leftHolesStorageCapacity <=0 && hole==null) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+		if ( leftHolesStorageCapacity <=0 || hole==null) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		} else if ( hole.getEarliestLinkExitTime() > now ) {
@@ -694,10 +694,11 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 						holes.addFirst(hole2);
 					}
 				} else if(removedHolePCU < veh.getSizeInEquivalents()){
-					do{
+					double totalRemovedPCU = removedHolePCU;
+					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
 						removedHole = holes.poll();
-						removedHolePCU += removedHole.getSizeInEquivalents();
-					} while(removedHolePCU>=veh.getSizeInEquivalents());
+						totalRemovedPCU += removedHole.getSizeInEquivalents();
+					};
 				}
 			}
 		}
@@ -836,9 +837,9 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private boolean seepageAllowed;
-	private String seepMode ; 
-	private boolean isSeepModeStorageFree;
+	private boolean seepageAllowed = false;
+	private String seepMode = null; 
+	private boolean isSeepModeStorageFree = false;
 
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();

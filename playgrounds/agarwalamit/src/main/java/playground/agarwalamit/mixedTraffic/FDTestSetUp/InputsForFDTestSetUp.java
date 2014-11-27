@@ -98,7 +98,13 @@ public class InputsForFDTestSetUp {
 		if(GenerateFundametalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_WITH_HOLES);
-			config.setParam("WITH_HOLE", "HOLE_SPEED", "15.");
+			config.setParam("WITH_HOLE", "HOLE_SPEED", "27.");
+		}
+		
+		if(GenerateFundametalDiagramData.SEEPAGE_ALLOWED){
+			config.setParam("seepage", "isSeepageAllowed", "true");
+			config.setParam("seepage", "seepMode","bike");
+			config.setParam("seepage", "isSeepModeStorageFree", "false");
 		}
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		scenario = ScenarioUtils.createScenario(config);
