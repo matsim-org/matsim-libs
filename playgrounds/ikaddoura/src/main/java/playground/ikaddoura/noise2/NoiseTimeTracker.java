@@ -233,7 +233,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	private void updateCurrentTimeInterval(double time) {
 		for (int i = 0; i < 30 ; i++) {
 			double timeIntervalEnd = (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-			if ((timeIntervalEnd - time) < noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
+			if ((timeIntervalEnd - time) <= noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
 				this.currentTimeBinEndTime = timeIntervalEnd;
 			}
 		}
@@ -290,15 +290,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
-		
-		checkTime(event.getTime());
-		
+				
 		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
 		
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
 				if (this.consideredActivityTypes.contains(event.getActType())) {
+					
+					checkTime(event.getTime());
 					
 					int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
 					this.personId2currentActNr.put(event.getPersonId(), newActNr);
@@ -325,15 +325,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		
-		checkTime(event.getTime());
-		
+				
 		if (!(this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
 			
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
 				if (this.consideredActivityTypes.contains(event.getActType())) {
+					
+					checkTime(event.getTime());
 					
 					Coord coord = noiseContext.getPersonId2listOfCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
 					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
