@@ -35,6 +35,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -250,7 +251,19 @@ public class NoiseWriter2 {
 			
 			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
-				bw.write(rp.getId() + ";" + rp.getConsideredAgentUnitsCurrentTimeInterval());
+				double affectedAgentUnits = 0.;
+				if (!(rp.getPersonId2actInfos().isEmpty())) {
+					
+					for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
+						
+						for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
+							double unitsThisPersonActivityInfo = actInfo.getDurationWithinInterval(timeInterval, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+							affectedAgentUnits = affectedAgentUnits + unitsThisPersonActivityInfo;
+						}
+					}
+				}
+				
+				bw.write(rp.getId() + ";" + rp.getPersonId2actInfos());
 				bw.newLine();
 			}
 			

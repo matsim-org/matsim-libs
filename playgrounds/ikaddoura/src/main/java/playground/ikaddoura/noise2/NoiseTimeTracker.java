@@ -115,7 +115,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		this.linkId2damageCostPerCar.clear();
 		this.linkId2damageCostPerHgv.clear();
 		
-		// TODO: clear time interval specific information in noiseContext.getReceiverPoints()
+		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+			// TODO: clear time interval specific information in noiseContext.getReceiverPoints()
+		}
 	}
 	
 	private void setFirstActivities() {
@@ -135,7 +137,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 					PersonActivityInfo actInfo = new PersonActivityInfo();
 					actInfo.setStartTime(0.);
 					actInfo.setEndTime(30 * 3600.);
-					actInfo.setPersonId(person.getId());
 					actInfo.setActivityType(firstActivity.getType());
 					
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
@@ -145,10 +146,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 						personActivityInfos.add(actInfo);
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(person.getId(), personActivityInfos);
 					}
-		
-					double newConsideredAgentUnits = this.noiseContext.getReceiverPoints().get(rpId).getConsideredAgentUnitsNextTimeInterval() + (noiseContext.getNoiseParams().getScaleFactor() * 1.);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsNextTimeInterval(newConsideredAgentUnits);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsCurrentTimeInterval(newConsideredAgentUnits);
 				}
 			}
 		}
@@ -196,10 +193,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 			// Maybe write out all time intervals instead of only those with at least one link enter event...
 			updateCurrentTimeInterval(time);
 						
-			for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-				rp.setConsideredAgentUnitsCurrentTimeInterval(rp.getConsideredAgentUnitsNextTimeInterval());
-			}
-			
 			resetCurrentTimeIntervalInfo();
 		}
 	}
@@ -283,7 +276,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 					PersonActivityInfo actInfo = new PersonActivityInfo();
 					actInfo.setStartTime(event.getTime());
 					actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
-					actInfo.setPersonId(event.getPersonId());
 					actInfo.setActivityType(event.getActType());
 					
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
@@ -293,16 +285,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 						personActivityInfos.add(actInfo);
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(event.getPersonId(), personActivityInfos);
 					}
-										
-					// current time interval
-					double unitsToAdd = ( this.currentTimeIntervalEnd - event.getTime() ) / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-					double newConsideredAgentUnitsCurrentTimeInterval = this.noiseContext.getReceiverPoints().get(rpId).getConsideredAgentUnitsCurrentTimeInterval() + (noiseContext.getNoiseParams().getScaleFactor() * unitsToAdd);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsCurrentTimeInterval(newConsideredAgentUnitsCurrentTimeInterval);
-				
-					// for the next time interval
-					double newConsideredAgentUnitsPreviousTimeInterval = this.noiseContext.getReceiverPoints().get(rpId).getConsideredAgentUnitsNextTimeInterval() + (noiseContext.getNoiseParams().getScaleFactor() * 1.);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsNextTimeInterval(newConsideredAgentUnitsPreviousTimeInterval);
-				
 				}
 			}
 		}
@@ -327,21 +309,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 						for (PersonActivityInfo actInfo : this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId())) {
 							if (actInfo.getEndTime() == 30 * 3600.) {
 								actInfo.setEndTime(event.getTime());
-								// TODO: jump out of for loop
 							}
 						}	
 					}
-														
-					double unitsToDeduct = ( this.currentTimeIntervalEnd - event.getTime() ) / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-					
-					// current time interval
-					double newConsideredAgentUnitsCurrentTimeInterval = this.noiseContext.getReceiverPoints().get(rpId).getConsideredAgentUnitsCurrentTimeInterval() - (noiseContext.getNoiseParams().getScaleFactor() * unitsToDeduct);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsCurrentTimeInterval(newConsideredAgentUnitsCurrentTimeInterval);
-					
-					// for the next time interval
-					double newConsideredAgentUnitsNextTimeInterval = this.noiseContext.getReceiverPoints().get(rpId).getConsideredAgentUnitsNextTimeInterval() - (noiseContext.getNoiseParams().getScaleFactor() * 1.);
-					this.noiseContext.getReceiverPoints().get(rpId).setConsideredAgentUnitsNextTimeInterval(newConsideredAgentUnitsNextTimeInterval);
-				
 				}
 			} 
 		}		
@@ -404,21 +374,17 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				
 			double noiseImmission = rp.getFinalImmission();
 				
-			double affectedAgentUnits = rp.getConsideredAgentUnitsCurrentTimeInterval();
-			// TODO: delete... the second calculation method even though it is the much shorter and nicer one.
-
-			double affectedAgentUnits2 = 0.;
+			double affectedAgentUnits = 0.;
 			if (!(rp.getPersonId2actInfos().isEmpty())) {
 				
 				for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
 					
 					for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
 						double unitsThisPersonActivityInfo = actInfo.getDurationWithinInterval(this.currentTimeIntervalEnd, this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-						affectedAgentUnits2 = affectedAgentUnits2 + unitsThisPersonActivityInfo;
+						affectedAgentUnits = affectedAgentUnits + unitsThisPersonActivityInfo;
 					}
 				}
 			}	
-
 			
 			double damageCost = NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, this.currentTimeIntervalEnd, this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 			double damageCostPerAffectedAgentUnit = NoiseEquations.calculateDamageCosts(noiseImmission, 1., this.currentTimeIntervalEnd, this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
@@ -463,7 +429,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 			prepCounter++;
 		}
 		
-		//summing up the link-based-costs
+		// summing up the link-based costs
 		log.info("Going through all receiver points... Total number: " + this.noiseContext.getReceiverPoints().keySet().size());
 		int counter = 0;
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
@@ -636,7 +602,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 			
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 				if (this.noiseContext.getNoiseParams().getTunnelLinkIDs().contains(linkId)) {
-			 		// the immission resulting from this link is zero
 					linkId2isolatedImmission.put(linkId, 0.);
 			 			
 			 	} else {

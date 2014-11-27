@@ -49,7 +49,7 @@ public class NoiseParameters {
 	private String[] consideredActivities = {"home", "work"};
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
-	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which activities are found.
+	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which any considered activities are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;

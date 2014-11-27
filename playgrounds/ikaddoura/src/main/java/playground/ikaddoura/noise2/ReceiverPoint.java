@@ -22,7 +22,6 @@
  */
 package playground.ikaddoura.noise2;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,26 +45,13 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
 	
 	// immission
-	private Map<Double, Map<Id<Link>, Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
-	private Map<Double, Double> timeInterval2immission = new HashMap<Double, Double>();
-	// new implementation:
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
 	private double finalImmission;
 	
-	// activity tracker
-	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
-	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
-	// new implementation:
+	// considered activities
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, List<PersonActivityInfo>>();
-	private List<Id<Person>> personIdsToRemoveNextTimeInterval = new ArrayList<Id<Person>>();
-	
-	private double consideredAgentUnitsCurrentTimeInterval;
-	private double consideredAgentUnitsNextTimeInterval;
 	
 	// damages
-	private Map<Double, Double> timeInterval2damageCosts = new HashMap<Double, Double>();
-	private Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Double, Double>();
-	// new implementation:
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
 
@@ -103,57 +89,6 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 		this.linkId2angleCorrection = linkId2angleCorrection;
 	}
 
-	public Map<Double,Map<Id<Link>,Double>> getTimeInterval2LinkId2IsolatedImmission() {
-		return timeInterval2LinkId2IsolatedImmission;
-	}
-
-	public void setTimeInterval2LinkId2IsolatedImmission(
-			Map<Double,Map<Id<Link>,Double>> timeInterval2LinkId2IsolatedImmission) {
-		this.timeInterval2LinkId2IsolatedImmission = timeInterval2LinkId2IsolatedImmission;
-	}
-
-	public Map<Double,Double> getTimeInterval2immission() {
-		return timeInterval2immission;
-	}
-
-	public void setTimeInterval2immission(Map<Double,Double> timeInterval2immission) {
-		this.timeInterval2immission = timeInterval2immission;
-	}
-
-	public Map<Double, List<PersonActivityInfo>> getTimeInterval2actInfos() {
-		return timeInterval2actInfos;
-	}
-
-	public void setTimeInterval2actInfos(Map<Double, List<PersonActivityInfo>> timeInterval2actInfos) {
-		this.timeInterval2actInfos = timeInterval2actInfos;
-	}
-
-	public Map<Double, Double> getTimeInterval2affectedAgentUnits() {
-		return timeInterval2affectedAgentUnits;
-	}
-
-	public void setTimeInterval2affectedAgentUnits(
-			Map<Double, Double> timeInterval2affectedAgentUnits) {
-		this.timeInterval2affectedAgentUnits = timeInterval2affectedAgentUnits;
-	}
-
-	public Map<Double, Double> getTimeInterval2damageCosts() {
-		return timeInterval2damageCosts;
-	}
-
-	public void setTimeInterval2damageCosts(Map<Double, Double> timeInterval2damageCosts) {
-		this.timeInterval2damageCosts = timeInterval2damageCosts;
-	}
-
-	public Map<Double,Double> getTimeInterval2damageCostPerAffectedAgentUnit() {
-		return timeInterval2damageCostPerAffectedAgentUnit;
-	}
-
-	public void setTimeInterval2damageCostPerAffectedAgentUnit(
-			Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit) {
-		this.timeInterval2damageCostPerAffectedAgentUnit = timeInterval2damageCostPerAffectedAgentUnit;
-	}
-
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
 		return linkId2IsolatedImmission;
 	}
@@ -168,23 +103,6 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 
 	public void setFinalImmission(double finalImmission) {
 		this.finalImmission = finalImmission;
-	}
-
-	public double getConsideredAgentUnitsCurrentTimeInterval() {
-		return consideredAgentUnitsCurrentTimeInterval;
-	}
-
-	public void setConsideredAgentUnitsCurrentTimeInterval(double consideredAgentUnits) {
-		this.consideredAgentUnitsCurrentTimeInterval = consideredAgentUnits;
-	}
-
-	public double getConsideredAgentUnitsNextTimeInterval() {
-		return consideredAgentUnitsNextTimeInterval;
-	}
-
-	public void setConsideredAgentUnitsNextTimeInterval(
-			double consideredAgentUnitsFromPreviousTimeInterval) {
-		this.consideredAgentUnitsNextTimeInterval = consideredAgentUnitsFromPreviousTimeInterval;
 	}
 
 	public double getDamageCosts() {
@@ -210,15 +128,6 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 
 	public void setPersonId2actInfos(Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos) {
 		this.personId2actInfos = personId2actInfos;
-	}
-
-	public List<Id<Person>> getPersonIdsToRemoveNextTimeInterval() {
-		return personIdsToRemoveNextTimeInterval;
-	}
-
-	public void setPersonIdsToRemoveNextTimeInterval(
-			List<Id<Person>> personIdsToRemoveNextTimeInterval) {
-		this.personIdsToRemoveNextTimeInterval = personIdsToRemoveNextTimeInterval;
 	}
 
 }

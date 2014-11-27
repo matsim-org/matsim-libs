@@ -22,8 +22,6 @@
  */
 package playground.ikaddoura.noise2;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -32,18 +30,10 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PersonActivityInfo {
 	
-	private Id<Person> personId; // not required in new implementation TODO	
 	private String activityType;
 	private double startTime;
 	private double endTime;
-	private double durationWithinInterval; // not required in new implementation TODO	
 	
-	public Id<Person> getPersonId() {
-		return personId;
-	}
-	public void setPersonId(Id<Person> personId) {
-		this.personId = personId;
-	}
 	public String getActivityType() {
 		return activityType;
 	}
@@ -62,16 +52,10 @@ public class PersonActivityInfo {
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}	
-	public double getDurationWithinInterval() {
-		return durationWithinInterval;
-	}
-	public void setDurationWithinInterval(double durationWithinInterval) {
-		this.durationWithinInterval = durationWithinInterval;
-	}
 	
 	@Override
 	public String toString() {
-		return "PersonId: " + personId + " / activityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
+		return "ActivityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
 	}
 	
 	public double getDurationWithinInterval(double timeIntervalEnd, double timeBinSize) {
