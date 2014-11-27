@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author ikaddoura
@@ -55,7 +56,9 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
 	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
 	// new implementation:
-	private List<PersonActivityInfo> actInfos = new ArrayList<PersonActivityInfo>();
+	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, List<PersonActivityInfo>>();
+	private List<Id<Person>> personIdsToRemoveNextTimeInterval = new ArrayList<Id<Person>>();
+	
 	private double consideredAgentUnitsCurrentTimeInterval;
 	private double consideredAgentUnitsNextTimeInterval;
 	
@@ -201,12 +204,21 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 		this.damageCostsPerAffectedAgentUnit = damageCostsPerAffectedAgentUnit;
 	}
 
-	public List<PersonActivityInfo> getActInfos() {
-		return actInfos;
+	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
+		return personId2actInfos;
 	}
 
-	public void setActInfos(List<PersonActivityInfo> actInfos) {
-		this.actInfos = actInfos;
+	public void setPersonId2actInfos(Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos) {
+		this.personId2actInfos = personId2actInfos;
+	}
+
+	public List<Id<Person>> getPersonIdsToRemoveNextTimeInterval() {
+		return personIdsToRemoveNextTimeInterval;
+	}
+
+	public void setPersonIdsToRemoveNextTimeInterval(
+			List<Id<Person>> personIdsToRemoveNextTimeInterval) {
+		this.personIdsToRemoveNextTimeInterval = personIdsToRemoveNextTimeInterval;
 	}
 
 }

@@ -32,11 +32,11 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PersonActivityInfo {
 	
-	private Id<Person> personId;
+	private Id<Person> personId; // not required in new implementation TODO	
 	private String activityType;
 	private double startTime;
 	private double endTime;
-	private double durationWithinInterval;
+	private double durationWithinInterval; // not required in new implementation TODO	
 	
 	public Id<Person> getPersonId() {
 		return personId;
@@ -72,5 +72,31 @@ public class PersonActivityInfo {
 	@Override
 	public String toString() {
 		return "PersonId: " + personId + " / activityType: " + activityType + " / startTime: " + Time.writeTime(startTime, Time.TIMEFORMAT_HHMMSS) + " / endTime: " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS);
+	}
+	
+	public double getDurationWithinInterval(double timeIntervalEnd, double timeBinSize) {
+		
+		double durationInThisInterval = 0.;
+		double timeIntervalStart = timeIntervalEnd - timeBinSize;
+		
+		if (( this.getStartTime() < timeIntervalEnd ) && ( this.getEndTime() >=  timeIntervalStart )) {
+			if ((this.getStartTime() <= timeIntervalStart) && this.getEndTime() >= timeIntervalEnd ) {
+				durationInThisInterval = timeBinSize;
+			
+			} else if (this.getStartTime() <= timeIntervalStart && this.getEndTime() <= timeIntervalEnd) {
+				durationInThisInterval = this.getEndTime() - timeIntervalStart;
+			
+			} else if (this.getStartTime() >= timeIntervalStart && this.getEndTime() >= timeIntervalEnd) {
+				durationInThisInterval = timeIntervalEnd - this.getStartTime();
+			
+			} else if (this.getStartTime() >= timeIntervalStart && this.getEndTime() <= timeIntervalEnd) {
+				durationInThisInterval = this.getEndTime() - this.getStartTime();
+		
+			} else {
+				throw new RuntimeException("Unknown case. Aborting...");
+			}
+		}
+		
+		return durationInThisInterval;
 	}
 }
