@@ -36,6 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
+import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -51,7 +52,7 @@ public class CARunner implements IterationStartsListener {
 	private QSimDensityDrawer qSimDrawer;
 
 	public static void main(String[] args) {
-		if (args.length != 2) {
+		if (args.length != 3) {
 			printUsage();
 			System.exit(-1);
 		}
@@ -76,10 +77,12 @@ public class CARunner implements IterationStartsListener {
 		controller.setTripRouterFactory(tripRouter);
 
 		CAMobsimFactory factory = new CAMobsimFactory();
-		// factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
+		if (args[1].equals("false")) {
+			factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
+		}
 		controller.addMobsimFactory("casim", factory);
 
-		if (args[1].equals("true")) {
+		if (args[2].equals("true")) {
 			AbstractCANetwork.EMIT_VIS_EVENTS = true;
 			// VIS only
 			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
@@ -140,9 +143,10 @@ public class CARunner implements IterationStartsListener {
 		System.out.println("CARunner");
 		System.out.println("Controller for ca (pedestrian) simulations.");
 		System.out.println();
-		System.out.println("usage : CARunner config visualize");
+		System.out.println("usage : CARunner config multilane_mode visualize");
 		System.out.println();
 		System.out.println("config:   A MATSim config file.");
+		System.out.println("multilane_mode:   one of {true,false}.");
 		System.out.println("visualize:   one of {true,false}.");
 		System.out.println();
 		System.out.println("---------------------");
