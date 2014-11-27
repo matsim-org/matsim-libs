@@ -58,18 +58,18 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	private final NoiseContext noiseContext;
 	private final String outputDirectory;
 	private final EventsManager events;
+	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 	
 	// time interval overlapping information
 	private double currentTimeIntervalEnd = Double.NEGATIVE_INFINITY;
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 	
-	private double totalCausedNoiseCost = 0.;
-	private double totalAffectedNoiseCost = 0.;
-	
 	private boolean collectNoiseEvents = true;
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
+	private double totalCausedNoiseCost = 0.;
+	private double totalAffectedNoiseCost = 0.;
 	
 	// time interval specific information
 	private final Map<Id<Link>,List<Id<Vehicle>>> linkId2enteringVehicleIds = new HashMap<Id<Link>, List<Id<Vehicle>>>();
@@ -99,15 +99,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 
 	@Override
 	public void reset(int iteration) {
-
+		
 		this.personId2currentActNr.clear();
 		this.currentTimeIntervalEnd = Double.NEGATIVE_INFINITY;
 		
+		this.totalCausedNoiseCost = 0.;
+		this.totalAffectedNoiseCost = 0.;
+		this.noiseEventsCaused.clear();
+		this.noiseEventsAffected.clear();
+		
 		setFirstActivities();
-				
 	}
 	
 	private void resetCurrentTimeIntervalInfo() {
+		
 		this.linkId2Cars.clear();
 		this.linkId2Hgv.clear();
 		this.linkId2enteringVehicleIds.clear();
@@ -116,7 +121,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		this.linkId2damageCostPerHgv.clear();
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			// TODO: clear time interval specific information in noiseContext.getReceiverPoints()
+			rp.getLinkId2IsolatedImmission().clear();
+			rp.setFinalImmission(0.);
+			rp.getPersonId2actInfos().clear();
+			rp.setDamageCosts(0.);
+			rp.setDamageCostsPerAffectedAgentUnit(0.);
 		}
 	}
 	
@@ -677,6 +686,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	}
 	
 	public void computeFinalTimeInterval() {
+		
 		log.info("+++++++++++++++++++++++++++++++++++++++++++++++");
 		log.info("Computing noise for final time interval " + Time.writeTime(this.currentTimeIntervalEnd, Time.TIMEFORMAT_HHMM) + "...");
 		
@@ -690,6 +700,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 
 	public List<NoiseEventAffected> getNoiseEventsAffected() {
 		return noiseEventsAffected;
+	}
+
+	public double getTotalCausedNoiseCost() {
+		return totalCausedNoiseCost;
+	}
+
+	public double getTotalAffectedNoiseCost() {
+		return totalAffectedNoiseCost;
 	}
 	
 }

@@ -46,7 +46,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
 	// immission
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
-	private double finalImmission;
+	private double finalImmission = 0.;
 	
 	// considered activities
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, List<PersonActivityInfo>>();
