@@ -49,7 +49,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 
-public class NoiseTest2 {
+public class NoiseTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
