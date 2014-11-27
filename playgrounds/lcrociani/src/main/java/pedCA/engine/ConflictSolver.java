@@ -46,7 +46,7 @@ public class ConflictSolver {
 	}
 
 	private void startPedestrianSwitching(Agent agent1, Agent agent2) {
-		int stepToPerformSwap = (int)MathUtility.average(agent1.calculateStepToPerformSwap(), agent2.calculateStepToPerformSwap());		
+		int stepToPerformSwap = (int)Math.round(MathUtility.average(agent1.calculateStepToPerformSwap(), agent2.calculateStepToPerformSwap()));		
 		agent1.startBidirectionalSwitch(stepToPerformSwap);
 		agent2.startBidirectionalSwitch(stepToPerformSwap);		
 	}

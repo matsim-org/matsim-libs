@@ -49,6 +49,10 @@ public class PedestrianFootprint extends Grid<Double>{
 		return valuesMap;
 	}
 
+	public double getArea() {
+		return area;
+	}
+	
 	@Override
 	protected void loadFromCSV(String fileName) throws IOException {
 		// TODO Auto-generated method stub

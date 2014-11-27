@@ -40,7 +40,18 @@ public class DensityGrid extends Grid<Double> {
 	}
 	
 	public double getDensityAt(GridPoint position){
-		return get(position).get(0);
+		double deltaArea = 0;
+		double cellArea = Math.pow(Constants.CELL_SIZE, 2);
+		for (GridPoint shift : pedestrianFootprint.getValuesMap().keySet()){
+			GridPoint positionToWrite = Distances.gridPointDifference(position, shift);
+			if (!neighbourCondition(positionToWrite.getY(), positionToWrite.getX())){
+				deltaArea+=cellArea;
+			}
+		}
+		double densityValue = get(position).get(0);
+		double footprintArea = pedestrianFootprint.getArea();
+		densityValue = densityValue*footprintArea/(footprintArea-deltaArea);
+		return densityValue;
 	}
 	
 	@Override

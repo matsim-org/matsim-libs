@@ -66,13 +66,19 @@ public class Agent extends PhysicalObject{
 	}
 
 	public int calculateStepToPerformSwap(){
-		double pedestrianDensity = getUsedPedestrianGrid().getPedestrianDensity(position);
-		double delay = pedestrianDensity;	
+		double pedestrianDensity = calculatePerceivedDensity();
+		double delay_seconds = Math.pow(pedestrianDensity*.61,1.45)*0.4;//Math.pow(pedestrianDensity*.61,1.43)*0.39;
+		double delay = delay_seconds/Constants.STEP_DURATION;
 		int result = (int)delay;//Constants.STEP_FOR_BIDIRECTIONAL_SWAPPING;
 		double probability = delay-result;
 		if (Lottery.simpleExtraction(probability))
 			result++;
 		return result;
+	}
+
+	public double calculatePerceivedDensity() {
+		double pedestrianDensity = getUsedPedestrianGrid().getPedestrianDensity(position);
+		return pedestrianDensity;
 	}
 	
 	public void startBidirectionalSwitch(int stepToPerformSwap){
