@@ -180,7 +180,7 @@ public class NoiseCalculationOffline {
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter2.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 		
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);

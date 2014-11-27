@@ -49,8 +49,8 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author ikaddoura
  *
  */
-public class NoiseWriter2 {
-	private static final Logger log = Logger.getLogger(NoiseWriter2.class);
+public class NoiseWriter {
+	private static final Logger log = Logger.getLogger(NoiseWriter.class);
 
 	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath) {
 

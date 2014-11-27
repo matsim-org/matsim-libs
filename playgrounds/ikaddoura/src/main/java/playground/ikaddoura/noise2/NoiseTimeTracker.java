@@ -151,7 +151,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		}
 		log.info("Receiving first activities from the selected plans... Done.");
 		
-		NoiseWriter2.writePersonActivityInfoPerHour(noiseContext, outputDirectory, 0.);
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, 0.);
 
 	}
 
@@ -321,19 +321,19 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		
 		log.info("Calculating noise emissions...");
 		Map<Id<Link>, Double> emissions = calculateNoiseEmission();
-		NoiseWriter2.writeNoiseEmissionStatsPerHour(emissions, this.linkId2Cars, this.linkId2Hgv, this.noiseContext, outputDirectory, this.currentTimeIntervalEnd);
+		NoiseWriter.writeNoiseEmissionStatsPerHour(emissions, this.linkId2Cars, this.linkId2Hgv, this.noiseContext, outputDirectory, this.currentTimeIntervalEnd);
 		log.info("Calculating noise emissions... Done.");
 		
 		log.info("Calculating noise immissions...");
 		calculateNoiseImmission(emissions);
-		NoiseWriter2.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
+		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
 		log.info("Calculating noise immissions... Done.");
 		
-		NoiseWriter2.writePersonActivityInfoPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
 		
 		log.info("Calculating noise damage costs and throwing noise events...");
 		calculateNoiseDamageCosts();
-		NoiseWriter2.writeDamageInfoPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
+		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory, currentTimeIntervalEnd);
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 	
 	}
