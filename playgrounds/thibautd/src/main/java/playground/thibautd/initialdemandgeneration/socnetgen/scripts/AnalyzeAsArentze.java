@@ -76,17 +76,18 @@ public class AnalyzeAsArentze {
 				outputDirectory+"/components.dat",
 				SnaUtils.identifyConnectedComponents( socialNetwork ) );
 
-		log.info( "creating distance table" );
-		ComputeSocialDistanceBetweenRandomIndividuals.writeRandomDistances(
-				outputDirectory+"/distances.dat",
-				socialNetwork,
-				10000 );
 
 		log.info( "creating homophily table" );
 		writeHomophilyDataset(
 				outputDirectory+"/homophily.dat",
 				RunTRBModel.parsePopulation( populationFile ),
 				socialNetwork );
+
+		log.info( "creating distance table" );
+		ComputeSocialDistanceBetweenRandomIndividuals.writeRandomDistances(
+				outputDirectory+"/distances.dat",
+				socialNetwork,
+				10000 );
 
 	}
 
