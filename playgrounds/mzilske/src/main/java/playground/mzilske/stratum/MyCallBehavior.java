@@ -62,11 +62,6 @@ class MyCallBehavior implements CallBehavior {
     }
 
     @Override
-    public boolean makeACall(Id id, double time) {
-        return false;
-    }
-
-    @Override
     public boolean makeACallAtMorningAndNight(Id<Person> id) {
         return true;
     }

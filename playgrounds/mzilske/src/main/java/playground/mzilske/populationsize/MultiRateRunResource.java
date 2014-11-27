@@ -456,11 +456,6 @@ class MultiRateRunResource {
             }
 
             @Override
-            public boolean makeACall(Id id, double time) {
-                return false;
-            }
-
-            @Override
             public boolean makeACallAtMorningAndNight(Id<Person> id) {
                 Person person = baseScenario.getPopulation().getPersons().get(id);
                 return (Integer) person.getCustomAttributes().get("phonerate") == 50;
@@ -546,13 +541,6 @@ class MultiRateRunResource {
         @Override
         public boolean makeACall(ActivityStartEvent event) {
             return false;
-        }
-
-        @Override
-        public boolean makeACall(Id id, double time) {
-            Person person = baseScenario.getPopulation().getPersons().get(id);
-            double secondlyProbability = (Integer) person.getCustomAttributes().get("phonerate") / (double) (24 * 60 * 60);
-            return Math.random() < secondlyProbability;
         }
 
         @Override

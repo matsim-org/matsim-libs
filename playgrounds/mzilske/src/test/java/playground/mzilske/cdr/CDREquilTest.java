@@ -33,13 +33,6 @@ public class CDREquilTest {
         }
 
         @Override
-        public boolean makeACall(Id id, double time) {
-            double dailyRate = 0;
-            double secondlyProbability = dailyRate / (24*60*60);
-            return Math.random() < secondlyProbability;
-        }
-
-        @Override
         public boolean makeACallAtMorningAndNight(Id<Person> id) {
             return true;
         }

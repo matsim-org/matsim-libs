@@ -11,8 +11,6 @@ public interface CallBehavior {
 
 	boolean makeACall(ActivityStartEvent event);
 
-	boolean makeACall(Id id, double time);
-
-	boolean makeACallAtMorningAndNight(Id<Person> id);
+    boolean makeACallAtMorningAndNight(Id<Person> id);
 
 }

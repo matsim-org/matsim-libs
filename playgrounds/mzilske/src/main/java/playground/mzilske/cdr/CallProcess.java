@@ -9,6 +9,9 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.mobsim.jdeqsim.Message;
+import org.matsim.core.mobsim.jdeqsim.MessageQueue;
+import playground.mzilske.jdeqsimengine.SteppableScheduler;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -20,12 +23,40 @@ import java.util.Map;
 public class CallProcess implements ActivityStartEventHandler, ActivityEndEventHandler, Steppable {
 
     private final Sightings sightings;
+    private final MessageQueue mq;
 
     public class CallingAgent {
 
 		public int nCalls;
 
-	}
+        public double rate;
+
+        Person person;
+
+        double getNextCallTime() {
+            return lastTime + (- Math.log(Math.random()) / (rate / (24*60*60)));
+        }
+    }
+
+    class NextCallMessage extends Message {
+
+        CallingAgent agent;
+
+        @Override
+        public void processEvent() {
+
+        }
+
+        @Override
+        public void handleMessage() {
+            call(lastTime, agent.person.getId());
+            NextCallMessage nextCallMessage = new NextCallMessage();
+            nextCallMessage.agent = agent;
+            nextCallMessage.setMessageArrivalTime(agent.getNextCallTime());
+            mq.putMessage(nextCallMessage);
+        }
+
+    }
 
 	private Population population;
 
@@ -33,9 +64,11 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	final private ZoneTracker zoneTracker;
 
-	private double lastTime;
+	private double lastTime = 0.0;
 
 	private CallBehavior callBehavior;
+
+    private SteppableScheduler scheduler;
 
 	@Inject
     CallProcess(Scenario scenario, Sightings sightings, final ZoneTracker zoneTracker, CallBehavior callBehavior) {
@@ -43,9 +76,21 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
         this.population = scenario.getPopulation();
 		this.zoneTracker = zoneTracker;
 		this.callBehavior = callBehavior;
+        mq = new MessageQueue();
 		for (Person p : population.getPersons().values()) {
-			agents.put(p.getId(), new CallingAgent());
+            CallingAgent agent = new CallingAgent();
+            agent.person = p;
+            Object phonerate = p.getCustomAttributes().get("phonerate");
+            agents.put(p.getId(), agent);
+            if (phonerate != null) {
+                agent.rate = (double) phonerate;
+                NextCallMessage m = new NextCallMessage();
+                m.agent = agent;
+                m.setMessageArrivalTime(agent.getNextCallTime());
+                mq.putMessage(m);
+            }
 		}
+        this.scheduler = new SteppableScheduler(mq);
 	}
 
 	public void finish() {
@@ -57,6 +102,7 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 	}
 
 	public void doSimStep(double time) {
+        lastTime = time;
         if (time == 0.0) {
                 for (Person p : population.getPersons().values()) {
                     if (callBehavior.makeACallAtMorningAndNight(p.getId())) {
@@ -64,14 +110,14 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
                 }
 			}
 		}
-		for (Person p : population.getPersons().values()) {
-			CallingAgent agent = agents.get(p.getId());
-			if (callBehavior.makeACall(p.getId(), time)) { // Let's make a call!
-				agent.nCalls++;
-				call(time, p.getId());
-			}
-		}
-		lastTime = time;
+//		for (Person p : population.getPersons().values()) {
+//			CallingAgent agent = agents.get(p.getId());
+//			if (callBehavior.makeACall(p.getId(), time)) { // Let's make a call!
+//				agent.nCalls++;
+//				call(time, p.getId());
+//			}
+//		}
+        scheduler.doSimStep(time);
 	}
 
 	private void handleNight(Person p) {

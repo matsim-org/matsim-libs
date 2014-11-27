@@ -177,11 +177,6 @@ class MultiRateRunResource {
             }
 
             @Override
-            public boolean makeACall(Id id, double time) {
-                return false;
-            }
-
-            @Override
             public boolean makeACallAtMorningAndNight(Id<Person> id) {
                 return true;
             }
@@ -219,12 +214,6 @@ class MultiRateRunResource {
             @Override
             public boolean makeACall(ActivityStartEvent event) {
                 return false;
-            }
-
-            @Override
-            public boolean makeACall(Id id, double time) {
-                double secondlyProbability = dailyRate / (double) (24 * 60 * 60);
-                return Math.random() < secondlyProbability;
             }
 
             @Override

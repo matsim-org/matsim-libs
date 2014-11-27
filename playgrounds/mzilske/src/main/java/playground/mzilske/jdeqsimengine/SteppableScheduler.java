@@ -5,7 +5,7 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.jdeqsim.Scheduler;
 
-class SteppableScheduler extends Scheduler implements Steppable {
+public class SteppableScheduler extends Scheduler implements Steppable {
 
     private Message lookahead;
     private boolean finished = false;

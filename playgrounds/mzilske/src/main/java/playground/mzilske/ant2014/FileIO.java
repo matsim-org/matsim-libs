@@ -8,18 +8,10 @@ import java.util.concurrent.*;
 public class FileIO {
 
 	public static void readFromFile(String string, Reading si) {
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(string));
+		try(BufferedReader br = new BufferedReader(new FileReader(string))) {
 			si.read(br);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} finally {
-			try {
-				if (br != null) br.close();
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
 		}
 	}
 
@@ -38,15 +30,11 @@ public class FileIO {
 	}
 
 	public static void writeToFile(String string, StreamingOutput so) {
-		PrintWriter pw = null;
-		try {
-			pw = new PrintWriter(new BufferedWriter(new FileWriter(string)));
-			so.write(pw);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		} finally {
-			pw.close();
-		}
+        try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(string)))) {
+            so.write(pw);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 	}
 
 	public static void readFromResponse(final StreamingOutput response, Reading si) {
@@ -65,9 +53,7 @@ public class FileIO {
 			executor.shutdown();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (ExecutionException e) {
+		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		} finally {
 			try {
