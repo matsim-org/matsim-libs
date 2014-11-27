@@ -52,6 +52,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -232,17 +233,19 @@ public class PassingTest {
 
 	private QSim createQSim (SimpleNetwork net, EventsManager manager){
 		Scenario sc = net.scenario;
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
+//		QSim qSim1 = new QSim(sc, manager);
+//		ActivityEngine activityEngine = new ActivityEngine();
+//		qSim1.addMobsimEngine(activityEngine);
+//		qSim1.addActivityHandler(activityEngine);
+//
+//		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
+//		qSim1.addMobsimEngine(netsimEngine);
+//		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+//		TeleportationEngine teleportationEngine = new TeleportationEngine();
+//		qSim1.addMobsimEngine(teleportationEngine);
+//		QSim qSim = qSim1;
+		
+		QSim qSim = (QSim) (new QSimFactory()).createMobsim(sc, manager) ;
 
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
