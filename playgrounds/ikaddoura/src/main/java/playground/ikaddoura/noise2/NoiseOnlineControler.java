@@ -73,7 +73,7 @@ public class NoiseOnlineControler {
 		
 		Controler controler = new Controler(configFile);
 		
-		controler.addControlerListener(new NoiseCalculationOnline2(noiseParameters));
+		controler.addControlerListener(new NoiseCalculationOnline(noiseParameters));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);

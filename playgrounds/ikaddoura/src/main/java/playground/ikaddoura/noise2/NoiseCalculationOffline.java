@@ -43,8 +43,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author ikaddoura
  *
  */
-public class NoiseCalculationOffline2 {
-	private static final Logger log = Logger.getLogger(NoiseCalculationOffline2.class);
+public class NoiseCalculationOffline {
+	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
 	
 	private static String runDirectory;
 	private static String outputDirectory;
@@ -81,7 +81,7 @@ public class NoiseCalculationOffline2 {
 			receiverPointGap = 250.;
 		}
 		
-		NoiseCalculationOffline2 noiseCalculation = new NoiseCalculationOffline2();
+		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
 		noiseCalculation.run();
 	}
 

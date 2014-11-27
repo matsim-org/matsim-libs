@@ -36,14 +36,14 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 
-public class NoiseCalculationOnline2 implements BeforeMobsimListener, AfterMobsimListener , StartupListener {
-	private static final Logger log = Logger.getLogger(NoiseCalculationOnline2.class);
+public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener , StartupListener {
+	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	private NoiseParameters noiseParameters;
 	private NoiseContext noiseContext;
 	private NoiseTimeTracker timeTracker;
 			
-	public NoiseCalculationOnline2(NoiseParameters noiseParameters) {
+	public NoiseCalculationOnline(NoiseParameters noiseParameters) {
 		this.noiseParameters = noiseParameters;
 	}
 
