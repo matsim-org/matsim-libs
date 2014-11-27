@@ -690,9 +690,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	
 	public void computeFinalTimeInterval() {
 		
-		log.info("+++++++++++++++++++++++++++++++++++++++++++++++");
-		log.info("Computing noise for final time interval " + Time.writeTime(this.currentTimeBinEndTime, Time.TIMEFORMAT_HHMM) + "...");
+		log.info("######################################################");
+		log.info("# Computing noise for (final) time interval " + Time.writeTime(this.currentTimeBinEndTime, Time.TIMEFORMAT_HHMMSS) + " #");
+		log.info("######################################################");
 		
+		updateActivityInformation();
 		computeCurrentTimeInterval();
 		resetCurrentTimeIntervalInfo();
 	}

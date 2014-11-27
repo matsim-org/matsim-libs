@@ -149,16 +149,16 @@ public class NoiseCalculationOffline {
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-//      // Berlin Coordinates: Area of Berlin
-//		double xMin = 4573258.;
-//		double yMin = 5801225.;
-//		double xMax = 4620323.;
-//		double yMax = 5839639.;
-//		
-//		noiseParameters.setReceiverPointsGridMinX(xMin);
-//		noiseParameters.setReceiverPointsGridMinY(yMin);
-//		noiseParameters.setReceiverPointsGridMaxX(xMax);
-//		noiseParameters.setReceiverPointsGridMaxY(yMax);
+      // Berlin Coordinates: Area of Berlin
+		double xMin = 4573258.;
+		double yMin = 5801225.;
+		double xMax = 4620323.;
+		double yMax = 5839639.;
+		
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Berlin Activity Types
 //		String[] consideredActivities = {"home"};
