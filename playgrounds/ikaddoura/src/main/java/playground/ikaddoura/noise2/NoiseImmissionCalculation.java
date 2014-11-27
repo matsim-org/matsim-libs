@@ -117,7 +117,8 @@ public class NoiseImmissionCalculation {
 			
 		noiseImmission = noiseEmission
 				+ this.noiseContext.getReceiverPoints().get(rpId).getLinkId2distanceCorrection().get(linkId)
-				+ this.noiseContext.getReceiverPoints().get(rpId).getLinkId2angleCorrection().get(linkId);
+				+ this.noiseContext.getReceiverPoints().get(rpId).getLinkId2angleCorrection().get(linkId)
+				;
 		
 		if (noiseImmission < 0.) {
 			noiseImmission = 0.;

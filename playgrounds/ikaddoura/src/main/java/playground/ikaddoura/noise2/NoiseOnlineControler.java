@@ -58,7 +58,7 @@ public class NoiseOnlineControler {
 			
 			configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/noiseTestScenario/input/config.xml";
 			receiverPointGap = 250.;
-			scaleFactor = 1.;
+			scaleFactor = 10.;
 		}
 				
 		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();

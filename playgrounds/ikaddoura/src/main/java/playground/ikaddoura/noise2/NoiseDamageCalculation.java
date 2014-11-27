@@ -350,7 +350,7 @@ public class NoiseDamageCalculation {
 				
 					NoiseVehicleType carOrHdv = NoiseVehicleType.car;
 					if (isHdv == true) {
-						carOrHdv = NoiseVehicleType.hdv;
+						carOrHdv = NoiseVehicleType.hgv;
 					}
 
 					NoiseEventCaused noiseEvent = new NoiseEventCaused(timeInterval, agentId, id, amount, linkId, carOrHdv);

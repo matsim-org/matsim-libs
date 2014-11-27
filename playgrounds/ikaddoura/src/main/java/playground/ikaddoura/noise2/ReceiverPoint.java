@@ -22,6 +22,7 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +47,24 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	// immission
 	private Map<Double, Map<Id<Link>, Double>> timeInterval2LinkId2IsolatedImmission = new HashMap<Double, Map<Id<Link>, Double>>();
 	private Map<Double, Double> timeInterval2immission = new HashMap<Double, Double>();
+	// new implementation:
+	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
+	private double finalImmission;
 	
 	// activity tracker
 	private Map<Double, List<PersonActivityInfo>> timeInterval2actInfos = new HashMap<Double, List<PersonActivityInfo>>();
 	private Map<Double, Double> timeInterval2affectedAgentUnits = new HashMap<Double, Double>();
+	// new implementation:
+	private List<PersonActivityInfo> actInfos = new ArrayList<PersonActivityInfo>();
+	private double consideredAgentUnitsCurrentTimeInterval;
+	private double consideredAgentUnitsNextTimeInterval;
 	
 	// damages
 	private Map<Double, Double> timeInterval2damageCosts = new HashMap<Double, Double>();
 	private Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Double, Double>();
+	// new implementation:
+	private double damageCosts;
+	private double damageCostsPerAffectedAgentUnit;
 
 	public ReceiverPoint(Id<ReceiverPoint> id) {
 		this.id = id;
@@ -138,6 +149,64 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	public void setTimeInterval2damageCostPerAffectedAgentUnit(
 			Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit) {
 		this.timeInterval2damageCostPerAffectedAgentUnit = timeInterval2damageCostPerAffectedAgentUnit;
+	}
+
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
+		return linkId2IsolatedImmission;
+	}
+
+	public void setLinkId2IsolatedImmission(Map<Id<Link>, Double> linkId2IsolatedImmission) {
+		this.linkId2IsolatedImmission = linkId2IsolatedImmission;
+	}
+
+	public double getFinalImmission() {
+		return finalImmission;
+	}
+
+	public void setFinalImmission(double finalImmission) {
+		this.finalImmission = finalImmission;
+	}
+
+	public double getConsideredAgentUnitsCurrentTimeInterval() {
+		return consideredAgentUnitsCurrentTimeInterval;
+	}
+
+	public void setConsideredAgentUnitsCurrentTimeInterval(double consideredAgentUnits) {
+		this.consideredAgentUnitsCurrentTimeInterval = consideredAgentUnits;
+	}
+
+	public double getConsideredAgentUnitsNextTimeInterval() {
+		return consideredAgentUnitsNextTimeInterval;
+	}
+
+	public void setConsideredAgentUnitsNextTimeInterval(
+			double consideredAgentUnitsFromPreviousTimeInterval) {
+		this.consideredAgentUnitsNextTimeInterval = consideredAgentUnitsFromPreviousTimeInterval;
+	}
+
+	public double getDamageCosts() {
+		return damageCosts;
+	}
+
+	public void setDamageCosts(double damageCosts) {
+		this.damageCosts = damageCosts;
+	}
+
+	public double getDamageCostsPerAffectedAgentUnit() {
+		return damageCostsPerAffectedAgentUnit;
+	}
+
+	public void setDamageCostsPerAffectedAgentUnit(
+			double damageCostsPerAffectedAgentUnit) {
+		this.damageCostsPerAffectedAgentUnit = damageCostsPerAffectedAgentUnit;
+	}
+
+	public List<PersonActivityInfo> getActInfos() {
+		return actInfos;
+	}
+
+	public void setActInfos(List<PersonActivityInfo> actInfos) {
+		this.actInfos = actInfos;
 	}
 
 }

@@ -102,6 +102,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		
 		log.info("Calculating each agent's activity durations...");
 		this.personActivityTracker.calculateDurationsOfStay();
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/consideredAgentUnitsPerHour.csv");
 		log.info("Calculating each agent's activity durations... Done.");
 			
 		log.info("Calculating noise damage costs and throwing noise events...");

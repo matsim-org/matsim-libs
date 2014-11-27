@@ -49,13 +49,13 @@ public class NoiseContext {
 	
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
 			
-	private Scenario scenario;
-	private NoiseParameters noiseParams;
+	private final Scenario scenario;
+	private final NoiseParameters noiseParams;
 	
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	
-	private Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
-	private List <Coord> populationActivityCoords = new ArrayList <Coord>();
+	private final Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
+	private final List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 	
@@ -64,15 +64,15 @@ public class NoiseContext {
 	private double yCoordMin = Double.MAX_VALUE;
 	private double yCoordMax = Double.MIN_VALUE;
 	
-	private Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>>();
-	private Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
+	private final Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>>();
+	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
 	
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
-	private Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
+	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 					
 	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
@@ -574,6 +574,10 @@ public class NoiseContext {
 		return nearestReceiverPointId;
 	}
 	
+	public Scenario getScenario() {
+		return scenario;
+	}
+
 	public Map<Id<Person>, List<Coord>> getPersonId2listOfCoords() {
 		return personId2activityCoords;
 	}

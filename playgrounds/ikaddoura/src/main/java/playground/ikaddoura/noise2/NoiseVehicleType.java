@@ -27,5 +27,5 @@ package playground.ikaddoura.noise2;
  *
  */
 public enum NoiseVehicleType {
-	car , hdv
+	car , hgv
 }

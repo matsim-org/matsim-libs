@@ -22,7 +22,7 @@
  */
 package playground.ikaddoura.noise2;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * 
@@ -66,17 +66,19 @@ public class NoiseEquations {
 		return geschwindigkeitskorrekturDv;
 	}
 			
-	public static double calculateResultingNoiseImmission (List<Double> noiseImmissions){
+	public static double calculateResultingNoiseImmission (Collection<Double> collection){
 		
 		double resultingNoiseImmission = 0.;
 		
-		if (noiseImmissions.size() > 0) {
+		if (collection.size() > 0) {
 			double sumTmp = 0.;
-			for(double noiseImmission : noiseImmissions){
-				sumTmp = sumTmp + (Math.pow(10, (0.1 * noiseImmission)));
+			for (double noiseImmission : collection) {
+				if (noiseImmission > 0.) {
+					sumTmp = sumTmp + (Math.pow(10, (0.1 * noiseImmission)));
+				}
 			}
 			resultingNoiseImmission = 10 * Math.log10(sumTmp);
-			if(resultingNoiseImmission < 0) {
+			if (resultingNoiseImmission < 0) {
 				resultingNoiseImmission = 0.;
 			}
 		}
@@ -116,5 +118,42 @@ public class NoiseEquations {
 		double angleCorrection = 10 * Math.log10((angle) / (180));
 		return angleCorrection;
 	}	
-	
+
+	public static double calculateDamageCosts(double noiseImmission, double affectedAgentUnits, double timeInterval, double annualCostRate, double timeBinSize) {
+
+		String daytimeType = "NIGHT";
+		
+		if (timeInterval > 6 * 3600 && timeInterval <= 18 * 3600) {
+			daytimeType = "DAY";
+		} else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
+			daytimeType = "EVENING";
+		}
+		
+		double lautheitsgewicht = 0;
+		
+		if (daytimeType == "DAY"){
+			if (noiseImmission < 50){
+			} else {
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
+			}
+		} else if (daytimeType == "EVENING"){
+			if (noiseImmission < 45){
+			} else {
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
+			}
+		} else if (daytimeType == "NIGHT"){
+			if (noiseImmission < 40){
+			} else {
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
+			}
+			
+		} else {
+			throw new RuntimeException("Neither day, evening nor night. Aborting...");
+		}
+		
+		double laermEinwohnerGleichwert = lautheitsgewicht * affectedAgentUnits;
+		double damageCosts = ( annualCostRate * laermEinwohnerGleichwert / 365. ) * ( timeBinSize / (24.0 * 3600) );
+		
+		return damageCosts;
+	}
 }
