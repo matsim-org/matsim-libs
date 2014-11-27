@@ -22,6 +22,7 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private double finalImmission = 0.;
 	
 	// considered activities
-	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, List<PersonActivityInfo>>();
+	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, ArrayList<PersonActivityInfo>>();
 	
 	// damages
 	private double damageCosts;
@@ -122,11 +123,11 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 		this.damageCostsPerAffectedAgentUnit = damageCostsPerAffectedAgentUnit;
 	}
 
-	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
+	public Map<Id<Person>, ArrayList<PersonActivityInfo>> getPersonId2actInfos() {
 		return personId2actInfos;
 	}
 
-	public void setPersonId2actInfos(Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos) {
+	public void setPersonId2actInfos(Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos) {
 		this.personId2actInfos = personId2actInfos;
 	}
 

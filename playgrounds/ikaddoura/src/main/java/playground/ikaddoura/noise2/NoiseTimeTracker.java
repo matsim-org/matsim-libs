@@ -94,7 +94,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		}	
 		
 		setFirstActivities();
-
 	}
 
 	@Override
@@ -151,7 +150,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
 					} else {
-						List<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
+						ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
 						personActivityInfos.add(actInfo);
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(person.getId(), personActivityInfos);
 					}
@@ -314,7 +313,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()).add(actInfo);
 					} else {
-						List<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
+						ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
 						personActivityInfos.add(actInfo);
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(event.getPersonId(), personActivityInfos);
 					}

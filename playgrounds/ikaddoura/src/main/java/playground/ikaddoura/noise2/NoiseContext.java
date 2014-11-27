@@ -197,7 +197,7 @@ public class NoiseContext {
 		
 		int counter = 0;
 		for (Coord coord : populationActivityCoords) {
-			if (counter % 20000 == 0) {
+			if (counter % 100000 == 0) {
 				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
 			}
 			
