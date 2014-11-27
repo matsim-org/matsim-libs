@@ -127,6 +127,9 @@ public abstract class OutputDirectoryLogging {
 	 * @author dgrether
 	 */
 	public static void initLoggingWithOutputDirectory(final String outputDirectory) throws IOException {
+		if (collectLogMessagesAppender != null) {
+			Logger.getRootLogger().removeAppender(collectLogMessagesAppender);
+		}
 		String logfilename = outputDirectory + System.getProperty("file.separator") + LOGFILE;
 		String warnlogfilename = outputDirectory + System.getProperty("file.separator") + WARNLOGFILE;
 		initLogging(logfilename, warnlogfilename);
