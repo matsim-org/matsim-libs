@@ -3,15 +3,15 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/playground/ikaddoura/noise2/NoiseTest2/network2.xml" />
+		<param name="inputNetworkFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/network2.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/playground/ikaddoura/noise2/NoiseTest2/population2.xml" />
+		 <param name="inputPlansFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/population2.xml" />
 	</module>
 	
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/playground/ikaddoura/noise2/NoiseTest2/test2" />
+		<param name="outputDirectory" value="test/output/playground/ikaddoura/noise2/NoiseTest/test2" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 		<param name="firstIteration" value="0" />
