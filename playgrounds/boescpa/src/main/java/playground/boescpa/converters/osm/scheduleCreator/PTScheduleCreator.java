@@ -19,35 +19,38 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm.procedures;
+package playground.boescpa.converters.osm.scheduleCreator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * Abstract contract for the creation of a multimodal network from an osmFile.
- * Hereby "multimodal" is understood in the sense of
- * 	"private and public transport modes that use the street network".
+ * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
+ * which are corrected by a given schedule-file.
+ * The stops are linked to a given network.
  *
  * @author boescpa
  */
-public abstract class MultimodalNetworkCreator {
+public abstract class PTScheduleCreator {
 
-	protected static Logger log = Logger.getLogger(MultimodalNetworkCreator.class);
+	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
 
-	protected final Network network;
+	protected final TransitSchedule schedule;
 
-	protected MultimodalNetworkCreator(Network network) {
-		this.network = network;
+	protected PTScheduleCreator(TransitSchedule schedule) {
+		this.schedule = schedule;
 	}
 
 	/**
-	 * Creates a multimodal network from the provided osmFile.
-	 * Hereby "multimodal" is understood in the sense of
-	 *	"private and public transport modes that use the street network".
+	 * This method creates pt lines (stops and scheduled times, no routes) from the OSM network,
+	 * which are corrected by the given schedule-file.
+	 * The stops are linked to the given network.
 	 *
 	 * @param osmFile
+	 * @param scheduleFile
+	 * @param network
 	 */
-	public abstract void createMultimodalNetwork(String osmFile);
+	public abstract void createSchedule(String osmFile, String scheduleFile, Network network);
 
 }

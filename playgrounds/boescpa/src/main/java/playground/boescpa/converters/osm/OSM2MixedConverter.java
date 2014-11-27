@@ -26,7 +26,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import playground.boescpa.converters.osm.procedures.*;
+import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreator;
+import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorDefault;
+import playground.boescpa.converters.osm.scheduleCreator.*;
+import playground.boescpa.converters.osm.ptRouter.PTLineRouter;
+import playground.boescpa.converters.osm.ptRouter.PTLineRouterDefault;
 
 /**
  * Provides the main body for the OSM to multimodal network conversion.

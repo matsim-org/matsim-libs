@@ -19,13 +19,13 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm.procedures;
+package playground.boescpa.converters.osm.scheduleCreator;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
- * The default implementation of PTStationCreator.
+ * The default implementation of PTStationCreator (using the Swiss-HAFAS-Schedule).
  *
  * @author boescpa
  */
