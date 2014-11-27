@@ -58,7 +58,7 @@ public class NoiseTest2 {
 	@Test
 	public final void test1(){
 		
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest2/config1.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		NoiseContext noiseContext = new NoiseContext(scenario, new NoiseParameters());
@@ -114,7 +114,7 @@ public class NoiseTest2 {
 	@Test
 	public final void test2(){
 		
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest2/config2.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 
 		Controler controler = new Controler(configFile);
 		
