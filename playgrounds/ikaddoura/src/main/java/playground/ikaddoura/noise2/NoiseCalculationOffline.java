@@ -180,10 +180,13 @@ public class NoiseCalculationOffline {
 		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
-		
+				
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
-				
+		
+		NoiseActivityTracker actTracker = new NoiseActivityTracker(noiseContext, outputFilePath);
+		events.addHandler(actTracker);
+		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");

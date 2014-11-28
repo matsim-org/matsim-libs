@@ -53,6 +53,7 @@ public class NoiseContext {
 	private final NoiseParameters noiseParams;
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private double currentTimeBinEndTime = Double.NEGATIVE_INFINITY;
 	
 	private final Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
 	private final List <Coord> populationActivityCoords = new ArrayList <Coord>();
@@ -596,6 +597,14 @@ public class NoiseContext {
 	
 	public NoiseParameters getNoiseParams() {
 		return noiseParams;
+	}
+
+	public double getCurrentTimeBinEndTime() {
+		return currentTimeBinEndTime;
+	}
+
+	public void setCurrentTimeBinEndTime(double currentTimeBinEndTime) {
+		this.currentTimeBinEndTime = currentTimeBinEndTime;
 	}
 
 //	// for testing purposes
