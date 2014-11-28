@@ -101,7 +101,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);
-			rp.getPersonId2actInfos().clear();
 			rp.setDamageCosts(0.);
 			rp.setDamageCostsPerAffectedAgentUnit(0.);
 		}
@@ -110,22 +109,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private void checkTime(double time) {
 		// Check for every event that is thrown if the current interval has changed.
 		
-		if (this.noiseContext.getCurrentTimeBinEndTime() <= 0.) {
-			updateCurrentTimeInterval(time);
-			log.info("The first time interval is set to " + this.noiseContext.getCurrentTimeBinEndTime());
-		}
-		
 		if (time > this.noiseContext.getCurrentTimeBinEndTime()) {
 			// All events of the current time bin are processed.
 
-			log.info("##############################################");
-			log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-			log.info("##############################################");
+			while (time > this.noiseContext.getCurrentTimeBinEndTime()) {
 
-			updateActivityInformation();
-			computeCurrentTimeInterval();
-			updateCurrentTimeInterval(time);
-			resetCurrentTimeIntervalInfo();
+				log.info("##############################################");
+				log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+				log.info("##############################################");
+
+				updateActivityInformation(); // remove activities that were completed in the previous time interval
+				computeCurrentTimeInterval(); // compute noise emissions, immissions and damages for the current time interval				
+				updateCurrentTimeInterval(); // new time bin = previous time bin + time bin size
+				resetCurrentTimeIntervalInfo(); // reset all time-specific information from the previous time interval
+			}
 		}
 	}
 	
@@ -164,23 +161,19 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, noiseContext.getCurrentTimeBinEndTime());
 		log.info("Calculating noise immissions... Done.");
-				
-		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, noiseContext.getCurrentTimeBinEndTime());
-		
+						
 		log.info("Calculating noise damage costs and throwing noise events...");
 		calculateNoiseDamageCosts();
 		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory, noiseContext.getCurrentTimeBinEndTime());
 		log.info("Calculating noise damage costs and throwing noise events... Done.");
 	
+		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory, noiseContext.getCurrentTimeBinEndTime());
+		
 	}
-	
-	private void updateCurrentTimeInterval(double time) {
-		for (int i = 0; i < 30 ; i++) {
-			double timeIntervalEnd = (i+1) * noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-			if ((timeIntervalEnd - time) <= noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) {
-				this.noiseContext.setCurrentTimeBinEndTime(timeIntervalEnd);
-			}
-		}
+		
+	private void updateCurrentTimeInterval() {
+		double newTimeInterval = this.noiseContext.getCurrentTimeBinEndTime() + this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+		this.noiseContext.setCurrentTimeBinEndTime(newTimeInterval);
 	}
 	
 	@Override
@@ -212,14 +205,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				
 				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgv();
 				hgv++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgv(hgv); // TODO: remove this line?!
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgv(hgv);
 				
 			} else {
 				// Car
 				
 				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCars();
 				cars++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCars(cars); // TODO: remove this line?!			
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCars(cars);			
 			}
 		}
 	}
@@ -309,7 +302,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				for (Id<Link> linkId : this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().keySet()) {
 					if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 						double sum = this.noiseContext.getNoiseLinks().get(linkId).getDamageCost() + rpId2linkId2costShare.get(rp.getId()).get(linkId);
-						this.noiseContext.getNoiseLinks().get(linkId).setDamageCost(sum); // TODO: necessary?
+						this.noiseContext.getNoiseLinks().get(linkId).setDamageCost(sum);
 					}		
 				}
 			}
@@ -531,13 +524,18 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	public void computeFinalTimeInterval() {
 		
-		log.info("######################################################");
-		log.info("# Computing noise for (final) time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-		log.info("######################################################");
-		
-		updateActivityInformation();
-		computeCurrentTimeInterval();
-		resetCurrentTimeIntervalInfo();
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= 24 * 3600.) {
+			log.info("##############################################");
+			log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+			log.info("##############################################");
+			
+			updateActivityInformation(); // remove activities that were completed in the previous time interval
+			computeCurrentTimeInterval(); // compute noise emissions, immissions and damages for the current time interval				
+			updateCurrentTimeInterval(); // new time bin = previous time bin + time bin size
+			resetCurrentTimeIntervalInfo(); // reset all time-specific information from the previous time interval
+			
+		}
+	
 	}
 
 	public List<NoiseEventCaused> getNoiseEventsCaused() {

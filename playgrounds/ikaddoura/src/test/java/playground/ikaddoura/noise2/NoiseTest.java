@@ -61,7 +61,14 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		NoiseContext noiseContext = new NoiseContext(scenario, new NoiseParameters());
+		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setReceiverPointGap(250.);
+		noiseParameters.setScaleFactor(1.);
+		String[] consideredActivities = {"home", "work"};
+		noiseParameters.setConsideredActivities(consideredActivities);
+		
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		
 		noiseContext.initialize();
 		

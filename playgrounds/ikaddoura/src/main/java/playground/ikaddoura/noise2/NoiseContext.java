@@ -74,13 +74,15 @@ public class NoiseContext {
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	
 	// time interval specific information
-	private double currentTimeBinEndTime = Double.NEGATIVE_INFINITY;
+	private double currentTimeBinEndTime;
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	private final Map<Id<Link>, NoiseLink> noiseLinks;
 					
 	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
+		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
+		
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
 		
@@ -103,6 +105,8 @@ public class NoiseContext {
 		// delete unnecessary information
 		this.zoneTuple2listOfLinkIds.clear();
 		this.zoneTuple2listOfReceiverPointIds.clear();
+		this.allActivityCoords.clear();
+		this.consideredActivityCoords.clear();
 	}
 	
 	private void setActivityCoords () {

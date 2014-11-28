@@ -72,7 +72,6 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);
-			rp.getPersonId2actInfos().clear();
 			rp.setDamageCosts(0.);
 			rp.setDamageCostsPerAffectedAgentUnit(0.);
 		}

@@ -39,19 +39,16 @@ import org.matsim.api.core.v01.population.Person;
 public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
 	// initialization
-	private Id<ReceiverPoint> id;
+	private final Id<ReceiverPoint> id;
 	private Coord coord;
 	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<Id<Link>, Double>();
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
-	
-	// immission
-	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
-	private double finalImmission = 0.;
-	
-	// activity information
+		
 	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, ArrayList<PersonActivityInfo>>();
 	
-	// damages
+	// time-specific information
+	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
+	private double finalImmission = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
 
@@ -67,7 +64,6 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	public Coord getCoord() {
 		return coord;
 	}
-
 	public void setCoord(Coord coord) {
 		this.coord = coord;
 	}
