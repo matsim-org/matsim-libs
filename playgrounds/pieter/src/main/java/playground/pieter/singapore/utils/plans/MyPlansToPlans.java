@@ -20,8 +20,11 @@
 package playground.pieter.singapore.utils.plans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -30,6 +33,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+
+import static java.lang.Math.random;
 
 /**
  * Notes:
@@ -45,18 +50,22 @@ public class MyPlansToPlans {
 	void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
 		Scenario scenario;
 		MatsimRandom.reset(123);
-		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 //		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+//		new MatsimNetworkReader(scenario).readFile(args[0]);
 		new MatsimPopulationReader(scenario)
-		.readFile(args[1]);
+		.readFile(scenario.getConfig().plans().getInputFile());
 		System.out.println(scenario.getPopulation().getPersons().size());
+        new PlanResetter(scenario).run();
+        new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
+
+
 //		new MatsimFacilitiesReader((ScenarioImpl) scenario).readFile(args[1]);
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
-		Population pop = scenario.getPopulation();
-
-		PlansFilterNoRoute pf = new PlansFilterNoRoute();
-		pf.run(pop,args[2],scenario.getNetwork());
+//		Population pop = scenario.getPopulation();
+//
+//		PlansFilterNoRoute pf = new PlansFilterNoRoute();
+//		pf.run(pop,args[2],scenario.getNetwork());
 
 //		PlansAddCarAvailability pca = new PlansAddCarAvailability();
 //		pca.run(pop);
@@ -83,4 +92,42 @@ public class MyPlansToPlans {
 		app.run(args);
 	}
 
+}
+
+class PlanResetter{
+    Config config;
+    Population population;
+    Scenario scenario;
+
+
+    PlanResetter(Scenario scenario) {
+        this.scenario=scenario;
+        this.config=scenario.getConfig();
+        this.population=scenario.getPopulation();
+    }
+    public void run(){
+        for(Person person:population.getPersons().values()){
+            for(Plan plan:person.getPlans()){
+                double lastDepartureTime = 0;
+                for(PlanElement planElement:plan.getPlanElements()){
+                    if(planElement instanceof Activity){
+                        Activity act = (Activity) planElement;
+                        String type = act.getType();
+                        PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
+                        if(lastDepartureTime>0) {
+                            act.setStartTime(lastDepartureTime + random() * 3600);
+                        }
+                            act.setEndTime(Math.max(0,act.getStartTime()) + Math.max(random() * 3600, random()*params.getTypicalDuration()));
+                        lastDepartureTime = act.getEndTime();
+                    }
+                    if(planElement instanceof Leg){
+                        Leg leg = (Leg) planElement;
+                        leg.setRoute(null);
+                        leg.setDepartureTime(lastDepartureTime);
+                        leg.setMode(TransportMode.car);
+                    }
+                }
+            }
+        }
+    }
 }

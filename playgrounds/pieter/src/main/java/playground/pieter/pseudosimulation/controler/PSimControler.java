@@ -22,8 +22,8 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
 import playground.pieter.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
-import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
-import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 /**
  * @author fouriep

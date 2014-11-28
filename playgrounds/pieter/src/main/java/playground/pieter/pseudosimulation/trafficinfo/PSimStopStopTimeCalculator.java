@@ -7,6 +7,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 
 public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
 

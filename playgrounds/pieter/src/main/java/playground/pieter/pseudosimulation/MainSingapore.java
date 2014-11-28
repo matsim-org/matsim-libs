@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 
 
 public class MainSingapore {

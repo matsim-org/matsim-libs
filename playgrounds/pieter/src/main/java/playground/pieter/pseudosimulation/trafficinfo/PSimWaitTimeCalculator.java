@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
-import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 /**
  * @author fouriep

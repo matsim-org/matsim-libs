@@ -28,8 +28,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
-import others.sergioo.util.dataBase.DataBaseAdmin;
-import others.sergioo.util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.*;
 
 class PlanFindLegDistances {
 	private final ScenarioImpl scenario;

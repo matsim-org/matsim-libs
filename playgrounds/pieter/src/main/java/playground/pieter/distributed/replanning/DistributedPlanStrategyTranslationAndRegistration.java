@@ -82,6 +82,11 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         }
 
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
+            if(e.getKey().equals( "TransitLocationChoice")){
+                TransitLocationChoiceFactory factory = new TransitLocationChoiceFactory(slave);
+                slave.getMATSimControler().addPlanStrategyFactory("TransitLocationChoicePSIM", factory);
+                continue;
+            }
             try {
                 slave.getMATSimControler().addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanMutatorStrategyFactory<>(slave,

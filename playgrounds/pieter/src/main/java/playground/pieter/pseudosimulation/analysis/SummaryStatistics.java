@@ -576,7 +576,7 @@ public class SummaryStatistics {
 	private int getMaxIter(String simulationPath) {
 		// TODO Auto-generated method stub
 		File dir = new File(simulationPath);
-		FileFilter fileFilter = new WildcardFileFilter("*scorestats.txt");
+		FileFilter fileFilter = new WildcardFileFilter("*instrumentation.txt");
 		File[] files = dir.listFiles(fileFilter);
 		if (files == null || files.length == 0)
 			return 0;

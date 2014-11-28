@@ -2,7 +2,6 @@ package playground.pieter.distributed;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -16,9 +15,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -35,6 +36,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -52,7 +54,7 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, Runnable {
+public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener,Runnable {
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
@@ -84,6 +86,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean somethingWentWrong = false;
     private long fSLEEP_INTERVAL = 100;
     private boolean isOkForNextIter = true;
+    private Map<Id<Person>, Double> selectedPlanScoreMemory;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -198,7 +201,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         matsimControler.setModules(new AbstractModule() {
             @Override
             public void install() {
-                include(new ScoreStatsModule());
+//                include(new ScoreStatsModule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });
@@ -272,7 +275,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private void loadScenario() {
         slaveLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
         new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-        new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
+        if(config.facilities().getInputFile()!=null)new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
         if (config.scenario().isUseTransit()) {
             new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
             if (this.config.scenario().isUseVehicles()) {
@@ -372,7 +375,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
         plansCopyForSending = tempPlansCopyForSending;
-        slaveLogger.warn("Sending plans...");
+        slaveLogger.warn("Sending " + plansCopyForSending.size()+" plans...");
         writer.writeObject(plansCopyForSending);
         slaveLogger.warn("Sending completed.");
 
@@ -471,6 +474,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         break;
                     case TRANSMIT_PLANS_TO_MASTER:
                         transmitPlans();
+                        transmitScores();
                         slaveIsOKForNextIter();
                         break;
                     case TRANSMIT_PERFORMANCE:
@@ -503,6 +507,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger.warn("Communications completed.");
     }
 
+    private void transmitScores() throws IOException {
+        writer.writeObject(new SlaveScoreStatsCalculator().calculateScoreStats(scenario.getPopulation()));
+    }
+
     private void dumpPlans() throws IOException {
         List<PersonSerializable> temp = new ArrayList<>();
         for(Person p: scenario.getPopulation().getPersons().values())
@@ -528,19 +536,37 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        if (travelTimesUpdated) {
-            plansForPSim.clear();
-            for (Person person : scenario.getPopulation().getPersons().values())
-                plansForPSim.add(person.getSelectedPlan());
-            travelTimesUpdated = false;
-        }
-//        else{
+//        if (travelTimesUpdated) {
 //            plansForPSim.clear();
 //            for (Person person : scenario.getPopulation().getPersons().values())
 //                plansForPSim.add(person.getSelectedPlan());
+//            travelTimesUpdated = false;
 //        }
+        selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
+        if (event.getIteration()==0) {
+            for (Person person : scenario.getPopulation().getPersons().values()) {
+                plansForPSim.add(person.getSelectedPlan());
+            }
+        }else{
+            for (Person person : scenario.getPopulation().getPersons().values()) {
+                selectedPlanScoreMemory.put(person.getId(),person.getSelectedPlan().getScore());
+            }
+            for(Plan plan:plansForPSim){
+                selectedPlanScoreMemory.remove(plan.getPerson().getId());
+            }
+        }
+
         executedPlanCount += plansForPSim.size();
         pSimFactory.setPlans(plansForPSim);
+    }
+
+    @Override
+    public void notifyIterationEnds(IterationEndsEvent event) {
+        Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry<Id<Person>, Double> entry = iterator.next();
+            scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
@@ -23,6 +24,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
+import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStats;
+import playground.pieter.distributed.listeners.SlaveScoreWriter;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -64,12 +67,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     public static double planAllocationLimiter = 10.0;
     public static final long bytesPerSlaveBuffer = (long) 2e8;
     public int slaveUniqueNumber = 0;
+    SlaveScoreStats slaveScoreStats;
 
     /**
      * value between 0 and 1; increasing it increases the dampening effect of preventing
      * large transfers of persons during load balance iterations
      */
     private static final double loadBalanceDampeningFactor = 0.4;
+    private int currentIteration;
 
     public MasterControler(String[] args) throws NumberFormatException, IOException, ParseException, InterruptedException {
         startMillis = System.currentTimeMillis();
@@ -133,8 +138,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             System.out.println(options.toString());
             System.exit(1);
         }
-
-
+        slaveScoreStats = new SlaveScoreStats(config);
 //        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
@@ -168,6 +172,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
+        matsimControler.addControlerListener(new SlaveScoreWriter(this));
 
         this.writeFullPlansInterval = config.controler().getWritePlansInterval();
         if (commandLine.hasOption("w")) {
@@ -261,7 +266,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private void loadScenario() {
         masterLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
         new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-        new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
+        if(config.facilities().getInputFile()!=null)new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
         if (this.config.scenario().isUseTransit()) {
             new TransitScheduleReader(scenario).readFile(this.config.transit().getTransitScheduleFile());
             if (this.config.scenario().isUseVehicles()) {
@@ -339,6 +344,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
+        this.currentIteration = event.getIteration();
         //wait for previous transmissions to complete, if necessary
         waitForSlaveThreads();
         //start receiving plans from slaves as the QSim runs
@@ -668,6 +674,19 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     }
 
+    public double[][] getSlaveScoreHistory() {
+
+        return this.slaveScoreStats.getHistory();
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public Controler getMATSimControler() {
+        return matsimControler;
+    }
+
 
     private class Slave implements Runnable {
         final Logger slaveLogger = Logger.getLogger(this.getClass());
@@ -698,10 +717,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             plans.clear();
             slaveLogger.warn("Waiting to receive plans from slave number " + myNumber);
             Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
-            slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
+            slaveLogger.warn("RECEIVED " + serialPlans.size()+ " plans from slave number " + myNumber);
             for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
                 plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getScenario().getPopulation()));
             }
+            this.currentPopulationSize = plans.size();
         }
 
         public void transmitPerformance() throws IOException {
@@ -739,7 +759,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         public void transmitInitialPlans() throws IOException {
             writer.writeObject(slavePersonPool);
             writer.flush();
-
+            this.currentPopulationSize = slavePersonPool.size();
         }
 
         @Override
@@ -765,6 +785,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     case TRANSMIT_PLANS_TO_MASTER:
                         writer.reset();
                         transmitPlans();
+                        transmitScores();
                         slaveIsOKForNextIter();
                         break;
                     case TRANSMIT_PERFORMANCE:
@@ -792,6 +813,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             //end of a successful Thread.run()
             numThreads.decrementAndGet();
             slaveLogger.warn("Slave " + myNumber + " leaving comms mode: " + communicationsMode.toString());
+        }
+
+        private void transmitScores() throws IOException, ClassNotFoundException {
+            slaveScoreStats.insertEntry(currentIteration,currentPopulationSize,scenario.getPopulation().getPersons().size(), (double[]) reader.readObject());
         }
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
