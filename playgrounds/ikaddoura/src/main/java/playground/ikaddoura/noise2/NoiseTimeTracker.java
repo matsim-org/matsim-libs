@@ -24,6 +24,7 @@ package playground.ikaddoura.noise2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -132,23 +133,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 
 	private void updateActivityInformation() {
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			
+						
 			for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
-				List<Integer> removeActivityInfo = new ArrayList<Integer>();
-
-				int actInfoIndex = 0;
-				for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
-					
-					if (actInfo.getEndTime() < (this.noiseContext.getCurrentTimeBinEndTime() - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation())) {
-						removeActivityInfo.add(actInfoIndex);
-					}
-					actInfoIndex++;
-				}
-				
-				if (!removeActivityInfo.isEmpty()) {
-					for (Integer i : removeActivityInfo) {
-						rp.getPersonId2actInfos().get(personId).remove((int) i);
-					}
+				List<PersonActivityInfo> actInfos = rp.getPersonId2actInfos().get(personId);
+				Iterator<PersonActivityInfo> it = actInfos.iterator();
+				while (it.hasNext()) {
+				    if ( it.next().getEndTime() < ( this.noiseContext.getCurrentTimeBinEndTime() - this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation() ) ) {
+				        it.remove();
+				    }
 				}
 			}				
 		}
