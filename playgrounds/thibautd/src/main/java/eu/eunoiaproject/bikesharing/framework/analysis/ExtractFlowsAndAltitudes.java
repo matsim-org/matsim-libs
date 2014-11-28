@@ -25,20 +25,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-
 import playground.ivt.utils.MapUtils;
+
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesReader;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
 /**
  * @author thibautd
@@ -48,6 +55,7 @@ public class ExtractFlowsAndAltitudes {
 		final ArgParser parser = new ArgParser();
 		parser.setDefaultValue( "-e" , "--events-file" , null );
 		parser.setDefaultValue( "-a" , "--attributes-file" , null );
+		parser.setDefaultValue( "-s" , "--stations-file" , null );
 		parser.setDefaultValue( "-n" , "--altitude-attribute-name" , "alt_dhm25" );
 		parser.setDefaultValue( "-o" , "--output" , null );
 		parser.setDefaultValue( "-oa" , "--output-aggregated" , null );
@@ -57,9 +65,12 @@ public class ExtractFlowsAndAltitudes {
 	private static void main(final Args args) throws IOException {
 		final String eventsFile = args.getValue( "-e" );
 		final String attributesFile = args.getValue( "-a" );
+		final String stationsFile = args.getValue( "-s" );
 		final String attributeName = args.getValue( "-n" );
 		final String outputFile = args.getValue( "-o" );
 		final String outputFlowsFile = args.getValue( "-oa" );
+
+		final BikeSharingFacilities stations = readStations( stationsFile );
 
 		final ObjectAttributes atts = new ObjectAttributes();
 		new ObjectAttributesXmlReader( atts ).parse( attributesFile );
@@ -76,7 +87,7 @@ public class ExtractFlowsAndAltitudes {
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(
 				new ActivityStartEventHandler() {
-					final Map<Id, Id> departureStationForAgent = new HashMap<Id, Id>();
+					final Map<Id<Person>, Id<BikeSharingFacility>> departureStationForAgent = new HashMap< >();
 
 					@Override
 					public void reset(int iteration) {}
@@ -84,15 +95,21 @@ public class ExtractFlowsAndAltitudes {
 					@Override
 					public void handleEvent(ActivityStartEvent event) {
 						if ( !event.getActType().equals( BikeSharingConstants.INTERACTION_TYPE ) ) return;
-						final Id departureStation = departureStationForAgent.remove( event.getPersonId() );
+						final Id<BikeSharingFacility> departureStation = departureStationForAgent.remove( event.getPersonId() );
 
+						final Id<BikeSharingFacility> eventFacilityId =
+								Id.create(
+									event.getFacilityId(),
+									BikeSharingFacility.class );
 						if ( departureStation == null ) {
 							// no departure: it must be one
-							departureStationForAgent.put( event.getPersonId() , event.getFacilityId() );
+							departureStationForAgent.put(
+								event.getPersonId(),
+								eventFacilityId );
 							return;
 						}
 
-						final Od od = getOd( new Od( departureStation , event.getFacilityId() ) );
+						final Od od = getOd( new Od( departureStation , eventFacilityId ) );
 						od.incFlow( departureStation , event.getFacilityId() );
 						MapUtils.getArbitraryObject(
 							departureStation,
@@ -117,12 +134,16 @@ public class ExtractFlowsAndAltitudes {
 		if ( outputFile != null ) {
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
 
-			writer.write( "station1\tstation2\talt1\talt2\tflow12\tflow21" );
+			writer.write( "station1\tx1\ty1\tstation2\tx2\ty2\talt1\talt2\tflow12\tflow21" );
 			for ( Od od : flows.keySet() ) {
 				final double altO = (Double) atts.getAttribute( od.o.toString() , attributeName );
 				final double altD = (Double) atts.getAttribute( od.d.toString() , attributeName );
 				writer.newLine();
-				writer.write( od.o+"\t"+od.d+"\t"+altO+"\t"+altD+"\t"+od.odFlow+"\t"+od.doFlow );
+				final BikeSharingFacility stationO = stations.getFacilities().get( od.o );
+				final BikeSharingFacility stationD = stations.getFacilities().get( od.d );
+				writer.write( od.o+"\t"+stationO.getCoord().getX()+"\t"+stationO.getCoord().getY()+"\t"+
+						od.d+"\t"+stationD.getCoord().getX()+"\t"+stationD.getCoord().getY()+"\t"+
+						altO+"\t"+altD+"\t"+od.odFlow+"\t"+od.doFlow );
 			}
 			writer.close();
 		}
@@ -130,15 +151,28 @@ public class ExtractFlowsAndAltitudes {
 		if ( outputFlowsFile != null ) {
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outputFlowsFile );
 
-			writer.write( "station\talt\toutFlow\tinFlow" );
+			writer.write( "station\tx\ty\talt\toutFlow\tinFlow\toutExcess" );
 			for ( Map.Entry<Id, AggregatedFlow> e : aggFlows.entrySet() ) {
 				final double alt = (Double) atts.getAttribute( e.getKey().toString() , attributeName );
+				final BikeSharingFacility station = stations.getFacilities().get( e.getKey() );
 				writer.newLine();
-				writer.write( e.getKey()+"\t"+alt+"\t"+e.getValue().outFlow+"\t"+e.getValue().inFlow );
+				writer.write( e.getKey()+"\t"+
+						station.getCoord().getX()+"\t"+station.getCoord().getY()+"\t"+
+						alt+"\t"+
+						e.getValue().outFlow+"\t"+e.getValue().inFlow+"\t"+
+						( e.getValue().outFlow - e.getValue().inFlow ) );
 			}
 			writer.close();
 		}
 
+	}
+
+	public static BikeSharingFacilities readStations( final String stationsFile ) {
+		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new BikeSharingFacilitiesReader( scenario ).parse( stationsFile );
+		return (BikeSharingFacilities)
+				scenario.getScenarioElement(
+					BikeSharingFacilities.ELEMENT_NAME );
 	}
 
 	private static class AggregatedFlow {
@@ -147,13 +181,13 @@ public class ExtractFlowsAndAltitudes {
 	}
 
 	private static class Od {
-		private final Id o,d;
+		private final Id<BikeSharingFacility> o,d;
 		private int odFlow = 0;
 		private int doFlow = 0;
 
 		public Od(
-				final Id o,
-				final Id d) {
+				final Id<BikeSharingFacility> o,
+				final Id<BikeSharingFacility> d) {
 			this.o = o;
 			this.d = d;
 		}
