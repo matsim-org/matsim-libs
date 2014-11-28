@@ -7,6 +7,7 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.*;
 import playground.pieter.distributed.SlaveControler;
 import playground.pieter.distributed.replanning.factories.DistributedPlanMutatorStrategyFactory;
+import playground.pieter.distributed.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import playground.pieter.distributed.replanning.factories.TransitLocationChoiceFactory;
 
 import java.lang.reflect.InvocationTargetException;
@@ -70,6 +71,16 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     public DistributedPlanStrategyTranslationAndRegistration(SlaveControler slave) {
 
+        for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
+            try {
+                slave.getMATSimControler().addPlanStrategyFactory(e.getKey() + SUFFIX,
+                        new DistributedPlanSelectorStrategyFactory<>(slave,
+                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance()));
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
+                e1.printStackTrace();
+            }
+        }
+
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
             try {
                 slave.getMATSimControler().addPlanStrategyFactory(e.getKey() + SUFFIX,
@@ -107,7 +118,11 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             } else {
                 if (SupportedMutators.containsKey(classname))
                     settings.setModuleName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
+                if (SupportedSelectors.containsKey(classname))
+                    settings.setModuleName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
             }
+
+
         }
 
     }

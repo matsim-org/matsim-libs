@@ -169,17 +169,7 @@ class PSim implements Mobsim {
 		public void run() {
 			for (Plan plan : threadPlans) {
 			    Queue<Event> eventQueue = new LinkedList<>();
-                Id personId = null;
-                try {
-                    personId = plan.getPerson().getId();
-                }catch (NullPointerException e){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                        continue;
-                    }
-                }
+                Id personId = plan.getPerson().getId();
 				List<PlanElement> elements = plan.getPlanElements();
 
 				double prevEndTime = 0;

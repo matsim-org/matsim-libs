@@ -3,24 +3,23 @@ package playground.pieter.distributed;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -43,6 +42,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final long startMillis;
     private final Hydra hydra;
+    private int writeFullPlansInterval;
     private long bytesPerPerson;
     private Scenario scenario;
     private long scenarioMemoryUse;
@@ -82,6 +82,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("i", true, "Number of PSim iterations for every QSim iteration.");
         options.addOption("r", false, "Perform initial routing of plans on slaves.");
         options.addOption("l", true, "Number of iterations between load balancing. Default = 5");
+        options.addOption("w", true, "Number of iterations between dumping plans from all slaves. Defaults to the value in the config (so disabled if set to zero).");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         int numSlaves = 1;
@@ -167,6 +168,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
+
+        this.writeFullPlansInterval = config.controler().getWritePlansInterval();
+        if (commandLine.hasOption("w")) {
+            writeFullPlansInterval = Integer.parseInt(commandLine.getOptionValue("w"));
+            masterLogger.warn("Will dump all plans from all slaves every  " + writeFullPlansInterval + " cycles.");
+        } else {
+            masterLogger.warn("No interval defined for writing all plans from all slaves to disk.");
+            masterLogger.warn("Will use the interval from the config " + writeFullPlansInterval);
+        }
 
         //split the population to be sent to the slaves
 
@@ -333,11 +343,27 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         waitForSlaveThreads();
         //start receiving plans from slaves as the QSim runs
         startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
+        IterationStopWatch stopwatch = matsimControler.stopwatch ;
+        int firstIteration = config.controler().getFirstIteration();
+        if ((writeFullPlansInterval > 0) && ((event.getIteration() % writeFullPlansInterval== 0) && event.getIteration()>0
+                || (event.getIteration() == (firstIteration + 1)))) {
+            stopwatch.beginOperation("dump all plans from all slaves");
+            masterLogger.info("dumping ALL plans from slaves, can be re-assembled afterwards into a single file...");
+            waitForSlaveThreads();
+            startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
+            waitForSlaveThreads();
+            startSlavesInMode(CommunicationsMode.DUMP_PLANS);
+            waitForSlaveThreads();
+            startSlavesInMode( CommunicationsMode.CONTINUE);
+
+            masterLogger.info("finished FULL plans dump.");
+            stopwatch.endOperation("dump all plans from all slaves");
+        }
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        //wating for slaves to receive plans from notifyIterationStarts()
+        //wating for slaves to receive plans or finish plans dumping
         waitForSlaveThreads();
         mergePlansFromSlaves();
         isLoadBalanceIteration = event.getIteration() % loadBalanceInterval == 0 || slavesHaveRequestedShutdown() || hydra.hydraSlaves.size()>0;
@@ -642,6 +668,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
     }
 
+
     private class Slave implements Runnable {
         final Logger slaveLogger = Logger.getLogger(this.getClass());
         final Map<String, Plan> plans = new HashMap<>();
@@ -743,6 +770,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
                         break;
+                    case DUMP_PLANS:
+                        dumpPlans(matsimControler.getIterationNumber());
+                        break;
                     case TRANSMIT_SCENARIO:
                         transmitInitialPlans();
                         reader.readBoolean();
@@ -762,6 +792,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             //end of a successful Thread.run()
             numThreads.decrementAndGet();
             slaveLogger.warn("Slave " + myNumber + " leaving comms mode: " + communicationsMode.toString());
+        }
+
+        private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
+            Population temp = PopulationUtils.createPopulation(config);
+            OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
+            slaveLogger.warn("Dumping population of "+currentPopulationSize+" agents on slave number " + myNumber);
+            List<PersonSerializable> tempPax = (List<PersonSerializable>) reader.readObject();
+            for(PersonSerializable p : tempPax){
+                temp.addPerson(p.getPerson());
+            }
+            new PopulationWriter(temp, scenario.getNetwork()).write(controlerIO.getIterationFilename(iteration, "FULLplans_slave_"+myNumber+".xml.gz"));
+            slaveLogger.warn("Done writing on slave number " + myNumber);
         }
 
         private void slaveIsOKForNextIter() throws IOException {
@@ -849,7 +891,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             for(int i:slavesToDrop) hydraSlaves.remove(i);
             slaveBatch = hydraSlaves;
-            hydraSlaves.clear();
+            hydraSlaves = new TreeMap<>();
             accessingMap.set(false);
             return slaveBatch;
         }
@@ -885,4 +927,5 @@ class MemoryUsageCalculator {
         }
     }
 }
+
 

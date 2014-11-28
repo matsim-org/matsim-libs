@@ -2,6 +2,7 @@ package playground.pieter.distributed;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -197,6 +198,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         matsimControler.setModules(new AbstractModule() {
             @Override
             public void install() {
+                include(new ScoreStatsModule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });
@@ -483,6 +485,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         slaveLogger.error("Got the kill signal from MASTER. Bye.");
                         Runtime.getRuntime().halt(0);
                         break;
+                    case DUMP_PLANS:
+                        dumpPlans();
+                        break;
                 }
                 // sending a boolean forces the thread on the master to wait
                 writer.writeBoolean(true);
@@ -496,6 +501,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             return;
         }
         slaveLogger.warn("Communications completed.");
+    }
+
+    private void dumpPlans() throws IOException {
+        List<PersonSerializable> temp = new ArrayList<>();
+        for(Person p: scenario.getPopulation().getPersons().values())
+            temp.add(new PersonSerializable((PersonImpl) p));
+        writer.writeObject(temp);
     }
 
     private void slaveIsOKForNextIter() throws IOException {
@@ -519,9 +531,14 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (travelTimesUpdated) {
             plansForPSim.clear();
             for (Person person : scenario.getPopulation().getPersons().values())
-                plansForPSim.addAll(person.getPlans());
+                plansForPSim.add(person.getSelectedPlan());
             travelTimesUpdated = false;
         }
+//        else{
+//            plansForPSim.clear();
+//            for (Person person : scenario.getPopulation().getPersons().values())
+//                plansForPSim.add(person.getSelectedPlan());
+//        }
         executedPlanCount += plansForPSim.size();
         pSimFactory.setPlans(plansForPSim);
     }
