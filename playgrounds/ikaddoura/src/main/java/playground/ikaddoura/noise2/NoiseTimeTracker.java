@@ -215,17 +215,17 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 
 	private void calculateNoiseDamageCosts() {
 		
-		log.info("Calculating noise exposure costs for each receiver point...");
+		log.info("Calculating noise damage costs for each receiver point...");
 		calculateDamagePerReceiverPoint();
-		log.info("Calculating noise exposure costs for each receiver point... Done.");
+		log.info("Calculating noise damage costs for each receiver point... Done.");
 
-		log.info("Allocating the total exposure cost (per receiver point) to the relevant links...");
+		log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 		calculateCostSharesPerLinkPerTimeInterval();
-		log.info("Allocating the total exposure cost (per receiver point) to the relevant links... Done.");
+		log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
 		
-		log.info("Allocating the exposure cost per link to the vehicle categories and vehicles...");
+		log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
-		log.info("Allocating the exposure cost per link to the vehicle categories and vehicles... Done.");
+		log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
 		
 		log.info("Throwing noise events (caused)...");
 		throwNoiseEventsCaused();

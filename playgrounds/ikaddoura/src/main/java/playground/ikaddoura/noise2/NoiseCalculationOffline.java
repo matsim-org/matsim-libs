@@ -195,6 +195,7 @@ public class NoiseCalculationOffline {
 		timeTracker.computeFinalTimeIntervals();
 
 		eventWriter.closeFile();
+		log.info("Noise calculation completed.");
 	}
 }
 		

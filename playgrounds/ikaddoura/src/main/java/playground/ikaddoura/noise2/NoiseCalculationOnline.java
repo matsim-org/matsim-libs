@@ -82,6 +82,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 				
 		timeTracker.computeFinalTimeIntervals();
+		log.info("Noise calculation completed.");
 	}
 
 	NoiseContext getNoiseContext() {

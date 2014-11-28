@@ -134,7 +134,7 @@ public class NoiseWriter {
 
 	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
 		
-		String outputPathEmissions = outputPath + "/emissions/";
+		String outputPathEmissions = outputPath + "emissions/";
 		File dir = new File(outputPathEmissions);
 		dir.mkdirs();
 		
@@ -188,7 +188,7 @@ public class NoiseWriter {
 
 	public static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
 		
-		String outputPathImmissions = outputPath + "/immissions/";
+		String outputPathImmissions = outputPath + "immissions/";
 		File dir = new File(outputPathImmissions);
 		dir.mkdirs();
 		
@@ -234,7 +234,7 @@ public class NoiseWriter {
 	
 	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
 		
-		String outputPathActivityInfo = outputPath + "/consideredAgentUnits/";
+		String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
 		File dir = new File(outputPathActivityInfo);
 		dir.mkdirs();
 		
@@ -291,7 +291,7 @@ public class NoiseWriter {
 	
 	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
 	
-		String outputPathDamages = outputPath + "/damages/";
+		String outputPathDamages = outputPath + "damages/";
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
