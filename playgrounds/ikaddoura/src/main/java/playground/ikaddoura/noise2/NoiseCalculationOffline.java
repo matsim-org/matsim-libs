@@ -160,9 +160,12 @@ public class NoiseCalculationOffline {
 //		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Berlin Activity Types
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivities = {"home"};
-		String[] consideredActivities = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivities(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		noiseParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 				
 		log.info("Loading scenario...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);

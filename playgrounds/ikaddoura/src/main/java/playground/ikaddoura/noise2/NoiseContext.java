@@ -53,10 +53,11 @@ public class NoiseContext {
 	private final NoiseParameters noiseParams;
 		
 	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
-	private final List <Coord> consideredActivityCoords = new ArrayList <Coord>();
-	private final List <Coord> allActivityCoords = new ArrayList <Coord>();
+	private final List <Coord> consideredActivityCoordsForDamages = new ArrayList <Coord>();
+	private final List <Coord> consideredActivityCoordsForReceiverPointGrid = new ArrayList <Coord>();
 	
-	private final List<String> consideredActivityTypes = new ArrayList<String>();
+	private final List<String> consideredActivitiesForDamages = new ArrayList<String>();
+	private final List<String> consideredActivitiesForReceiverPointGrid = new ArrayList<String>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
 	private double xCoordMax = Double.MIN_VALUE;
@@ -86,13 +87,29 @@ public class NoiseContext {
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
 		
-		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
-		for (int i = 0; i < consideredActTypesArray.length; i++) {
-			this.consideredActivityTypes.add(consideredActTypesArray[i]);
+		String[] consideredActTypesForDamagesArray = noiseParams.getConsideredActivitiesForDamages();
+		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
+			this.consideredActivitiesForDamages.add(consideredActTypesForDamagesArray[i]);
 		}
 		
-		if (this.consideredActivityTypes.size() == 0) {
+		String[] consideredActTypesForReceiverPointGridArray = noiseParams.getConsideredActivitiesForReceiverPointGrid();
+		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
+			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
+		}
+		
+		if (this.consideredActivitiesForDamages.size() == 0) {
 			log.warn("Not considering any activity type for the noise damage computation.");
+		}
+		
+		if (this.consideredActivitiesForReceiverPointGrid.size() == 0) {
+			log.warn("Not considering any activity type for the minimum and maximum coordinates of the receiver point grid area.");
+		}
+		
+		for (String type : this.consideredActivitiesForDamages) {
+			if (!this.consideredActivitiesForReceiverPointGrid.contains(type)) {
+				throw new RuntimeException("An activity type which is considered for the damage calculation (" + type
+						+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
+			}
 		}
 	}	
 	
@@ -105,8 +122,8 @@ public class NoiseContext {
 		// delete unnecessary information
 		this.zoneTuple2listOfLinkIds.clear();
 		this.zoneTuple2listOfReceiverPointIds.clear();
-		this.allActivityCoords.clear();
-		this.consideredActivityCoords.clear();
+		this.consideredActivityCoordsForReceiverPointGrid.clear();
+		this.consideredActivityCoordsForDamages.clear();
 	}
 	
 	private void setActivityCoords () {
@@ -119,7 +136,7 @@ public class NoiseContext {
 					
 					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						
-						if (this.consideredActivityTypes.contains(activity.getType())) {
+						if (this.consideredActivitiesForDamages.contains(activity.getType())) {
 							List<Coord> activityCoordinates = new ArrayList<Coord>();
 							
 							if (personId2consideredActivityCoords.containsKey(person.getId())) {
@@ -129,9 +146,12 @@ public class NoiseContext {
 							activityCoordinates.add(activity.getCoord());
 							personId2consideredActivityCoords.put(person.getId(), activityCoordinates);
 							
-							consideredActivityCoords.add(activity.getCoord());
+							consideredActivityCoordsForDamages.add(activity.getCoord());
 						}
-						allActivityCoords.add(activity.getCoord());
+						
+						if (this.consideredActivitiesForReceiverPointGrid.contains(activity.getType())) {
+							consideredActivityCoordsForReceiverPointGrid.add(activity.getCoord());
+						}
 					}
 				}
 			}
@@ -144,7 +164,7 @@ public class NoiseContext {
 			
 			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates of all activity locations.");
 						
-			for (Coord coord : allActivityCoords) {
+			for (Coord coord : consideredActivityCoordsForReceiverPointGrid) {
 				if (coord.getX() < xCoordMin) {
 					xCoordMin = coord.getX();
 				}
@@ -207,7 +227,7 @@ public class NoiseContext {
 	private void setActivityCoord2NearestReceiverPointId () {
 		
 		int counter = 0;
-		for (Coord coord : consideredActivityCoords) {
+		for (Coord coord : consideredActivityCoordsForDamages) {
 			if (counter % 100000 == 0) {
 				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
 			}

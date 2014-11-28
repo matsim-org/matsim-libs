@@ -46,14 +46,15 @@ public class NoiseParameters {
 	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private String[] consideredActivities = {"home", "work"};
+	private String[] consideredActivitiesForDamages = {"home", "work"};
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
-	// Min/Max X/Y Coordinate means the receiver points are computed for the entire area for which any considered activities are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
+	// Setting MinX/MaxX/MinY/MaxY coordinates to 0.0 means the receiver points are computed for the entire area for which any of the following activities are found.
+	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
 
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 			
@@ -128,16 +129,16 @@ public class NoiseParameters {
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
 	}
 
-	public String[] getConsideredActivities() {		
-		return consideredActivities;
+	public String[] getConsideredActivitiesForDamages() {		
+		return consideredActivitiesForDamages;
 	}
 
-	public void setConsideredActivities(String[] consideredActivities) {
+	public void setConsideredActivitiesForDamages(String[] consideredActivities) {
 		log.info("Setting considered activities to: ");
 		for (int i = 0; i < consideredActivities.length; i++) {
 			log.info(consideredActivities[i]);
 		}
-		this.consideredActivities = consideredActivities;
+		this.consideredActivitiesForDamages = consideredActivities;
 	}
 	
 	public double getAnnualCostRate() {
@@ -174,6 +175,15 @@ public class NoiseParameters {
 
 	public void setTransformationFactory(String transformationFactory) {
 		this.transformationFactory = transformationFactory;
+	}
+
+	public String[] getConsideredActivitiesForReceiverPointGrid() {
+		return consideredActivitiesForReceiverPointGrid;
+	}
+
+	public void setConsideredActivitiesForReceiverPointGrid(
+			String[] consideredActivitiesForReceiverPointGrid) {
+		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;
 	}
 	
 }

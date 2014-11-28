@@ -66,7 +66,7 @@ public class NoiseTest {
 		noiseParameters.setReceiverPointGap(250.);
 		noiseParameters.setScaleFactor(1.);
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivities(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamages(consideredActivities);
 		
 		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		
@@ -143,7 +143,7 @@ public class NoiseTest {
 		noiseParameters.setScaleFactor(1.);
 		
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivities(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamages(consideredActivities);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		

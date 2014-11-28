@@ -65,7 +65,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		this.outputDirectory = outputDirectory;
 		this.events = events;
 		
-		String[] consideredActTypesArray = noiseContext.getNoiseParams().getConsideredActivities();
+		String[] consideredActTypesArray = noiseContext.getNoiseParams().getConsideredActivitiesForDamages();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
 			this.consideredActivityTypes.add(consideredActTypesArray[i]);
 		}
