@@ -52,8 +52,9 @@ public class NoiseContext {
 	private final Scenario scenario;
 	private final NoiseParameters noiseParams;
 		
-	private final Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
-	private final List <Coord> populationActivityCoords = new ArrayList <Coord>();
+	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
+	private final List <Coord> consideredActivityCoords = new ArrayList <Coord>();
+	private final List <Coord> allActivityCoords = new ArrayList <Coord>();
 	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 	
@@ -117,15 +118,16 @@ public class NoiseContext {
 						if (this.consideredActivityTypes.contains(activity.getType())) {
 							List<Coord> activityCoordinates = new ArrayList<Coord>();
 							
-							if (personId2activityCoords.containsKey(person.getId())) {
-								activityCoordinates = personId2activityCoords.get(person.getId());
+							if (personId2consideredActivityCoords.containsKey(person.getId())) {
+								activityCoordinates = personId2consideredActivityCoords.get(person.getId());
 							}
 							
 							activityCoordinates.add(activity.getCoord());
-							personId2activityCoords.put(person.getId(), activityCoordinates);
+							personId2consideredActivityCoords.put(person.getId(), activityCoordinates);
 							
-							populationActivityCoords.add(activity.getCoord());
+							consideredActivityCoords.add(activity.getCoord());
 						}
+						allActivityCoords.add(activity.getCoord());
 					}
 				}
 			}
@@ -136,11 +138,9 @@ public class NoiseContext {
 		
 		if (this.noiseParams.getReceiverPointsGridMinX() == 0. || this.noiseParams.getReceiverPointsGridMinY() == 0. || this.noiseParams.getReceiverPointsGridMaxX() == 0. || this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
 			
-			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates.");
-			
-			log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates...");
-			
-			for (Coord coord : populationActivityCoords) {
+			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates of all activity locations.");
+						
+			for (Coord coord : allActivityCoords) {
 				if (coord.getX() < xCoordMin) {
 					xCoordMin = coord.getX();
 				}
@@ -154,7 +154,6 @@ public class NoiseContext {
 					yCoordMax = coord.getY();
 				}
 			}
-			log.info("Getting the minimum and maximum x and y activity coordinates from the population's activity coordinates... Done.");
 			
 		} else {
 			
@@ -204,7 +203,7 @@ public class NoiseContext {
 	private void setActivityCoord2NearestReceiverPointId () {
 		
 		int counter = 0;
-		for (Coord coord : populationActivityCoords) {
+		for (Coord coord : consideredActivityCoords) {
 			if (counter % 100000 == 0) {
 				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
 			}
@@ -586,8 +585,8 @@ public class NoiseContext {
 		return scenario;
 	}
 
-	public Map<Id<Person>, List<Coord>> getPersonId2listOfCoords() {
-		return personId2activityCoords;
+	public Map<Id<Person>, List<Coord>> getPersonId2listOfConsideredActivityCoords() {
+		return personId2consideredActivityCoords;
 	}
 
 	public Map<Coord, Id<ReceiverPoint>> getActivityCoord2receiverPointId() {

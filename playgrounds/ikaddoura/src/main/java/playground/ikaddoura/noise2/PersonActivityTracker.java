@@ -67,6 +67,14 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 		}	
 		
 		setFirstActivities();
+		
+		if (this.noiseContext.getNoiseParams().getReceiverPointsGridMaxX() != 0.
+				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMinX() != 0.
+				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMaxY() != 0.
+				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMinY() != 0.) {
+			throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
+					+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
+		}
 	}
 
 	@Override
@@ -87,7 +95,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 
 				if (this.consideredActivityTypes.contains(firstActivity.getType())) {
 					
-					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(noiseContext.getPersonId2listOfCoords().get(person.getId()).get(0));
+					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(noiseContext.getPersonId2listOfConsideredActivityCoords().get(person.getId()).get(0));
 					this.personId2currentActNr.put(person.getId(), 0);
 					
 					PersonActivityInfo actInfo = new PersonActivityInfo();
@@ -124,7 +132,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
 					this.personId2currentActNr.put(event.getPersonId(), newActNr);
 										
-					Coord coord = noiseContext.getPersonId2listOfCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
+					Coord coord = noiseContext.getPersonId2listOfConsideredActivityCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
 					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
 					
 					PersonActivityInfo actInfo = new PersonActivityInfo();
@@ -154,7 +162,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 				
 				if (this.consideredActivityTypes.contains(event.getActType())) {
 										
-					Coord coord = noiseContext.getPersonId2listOfCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
+					Coord coord = noiseContext.getPersonId2listOfConsideredActivityCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
 					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
 
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
