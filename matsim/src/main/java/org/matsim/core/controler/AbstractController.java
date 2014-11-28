@@ -121,7 +121,7 @@ public abstract class AbstractController {
             doIterations(config);
         } catch (UnexpectedShutdownException e) {
             // Doesn't matter. Just shut down.
-        } catch (RuntimeException e) {
+        } catch (Throwable e) {
             // Don't let it fall through to the UncaughtExceptionHandler. We want to first log the Exception,
             // then shut down.
             logMemorizeAndRequestShutdown(Thread.currentThread(), e);
