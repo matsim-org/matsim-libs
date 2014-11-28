@@ -45,16 +45,16 @@ import org.matsim.pt.PtConstants;
  *
  */
 
-public class NoiseActivityTracker implements ActivityEndEventHandler , ActivityStartEventHandler {
+public class PersonActivityTracker implements ActivityEndEventHandler , ActivityStartEventHandler {
 
-	private static final Logger log = Logger.getLogger(NoiseActivityTracker.class);
+	private static final Logger log = Logger.getLogger(PersonActivityTracker.class);
 	
 	private final NoiseContext noiseContext;
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 	
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 		
-	public NoiseActivityTracker(NoiseContext noiseContext) {
+	public PersonActivityTracker(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		
 		String[] consideredActTypesArray = noiseContext.getNoiseParams().getConsideredActivities();
