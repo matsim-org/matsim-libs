@@ -113,9 +113,9 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private int bufferStorageCapacity;
 	private double usedBufferStorageCapacity = 0.0 ;
 	private double leftHolesStorageCapacity = 0.0 ;
-	
+
 	private final LinkedList<MyQueueWithBuffer.Hole> holes = new LinkedList<MyQueueWithBuffer.Hole>();
-	
+
 	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
@@ -242,7 +242,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.timeStepSize = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getTimeStepSize() ;
 
 		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
-		
+
 		if(isSeeping != null && isSeeping.equals("true")){
 			this.seepageAllowed = true;
 			this.seepMode = this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "seepMode");
@@ -250,7 +250,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			SeepQLinkImpl.log.info("Seepage is allowed. Seep mode is "+this.seepMode+".");
 			if(this.isSeepModeStorageFree) SeepQLinkImpl.log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities.");
 		}
-		
+
 		//following are copied part from QNetSimEngine instead of copying the whole class.
 		QSimConfigGroup qsimConfigGroup = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
 		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
@@ -264,14 +264,14 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
 			MyQueueWithBuffer.VIS_HOLES = true ;
 		}
-		
+
 		if(MyQueueWithBuffer.HOLES){
 			hole_speed = Double.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("WITH_HOLE", "HOLE_SPEED"));
 			if (hole_speed!=15) {
 				SeepQLinkImpl.log.warn("Hole speed is set to "+hole_speed+". Default hardcoded value is 15.");
 			}
 		}
-		
+
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
@@ -460,7 +460,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
 		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
-		
+
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
@@ -686,13 +686,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 				double earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
 
 				if(removedHolePCU > veh.getSizeInEquivalents()){
-					int holesMultiplication = (int) (removedHolePCU / veh.getSizeInEquivalents());
-					for (int jj=0; jj<holesMultiplication -1 ; jj++){
-						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
-						hole2.setSizeInEquivalents(veh.getSizeInEquivalents());
-						holes.addFirst(hole2);
-					}
+					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+					hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
+					hole2.setSizeInEquivalents(removedHolePCU-veh.getSizeInEquivalents());
+					holes.addFirst(hole2);
 				} else if(removedHolePCU < veh.getSizeInEquivalents()){
 					double totalRemovedPCU = removedHolePCU;
 					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
@@ -700,7 +697,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 						earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
 						totalRemovedPCU += removedHole.getSizeInEquivalents();
 					};
-					// check again, how much more PCUs are removed, add them once again.
 					if(totalRemovedPCU > veh.getSizeInEquivalents()){
 						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
 						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
