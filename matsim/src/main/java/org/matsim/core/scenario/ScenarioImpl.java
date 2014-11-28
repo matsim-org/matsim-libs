@@ -187,7 +187,7 @@ public class ScenarioImpl implements Scenario {
 				// which are happy with getting a null pointer, and would then
 				// not work anymore)
 				// throw new IllegalStateException(
-				log.warn(
+				log.info(
 						"no households, and households not activated from config. You must first call the create method of ScenarioImpl." );
 			}
 		}
@@ -207,7 +207,7 @@ public class ScenarioImpl implements Scenario {
 				// which are happy with getting a null pointer, and would then
 				// not work anymore)
 				// throw new IllegalStateException(
-				log.warn(
+				log.info(
 						"no vehicles container, and vehicles not activated from config. You must first call the create method of ScenarioImpl." );
 			}
 		}
