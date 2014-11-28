@@ -157,7 +157,7 @@ public class NoiseWriter {
 				
 				int hgv = 0;
 				if (linkId2Hgv.containsKey(linkId)) {
-					cars = linkId2Hgv.get(linkId);
+					hgv = linkId2Hgv.get(linkId);
 				}
 				
 				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + emissions.get(linkId));

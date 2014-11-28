@@ -138,14 +138,25 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				Activity firstActivity = (Activity) plan.getPlanElements().get(0);
 
 				if (this.consideredActivityTypes.contains(firstActivity.getType())) {
-					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(firstActivity.getCoord());
 					
+					Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(noiseContext.getPersonId2listOfCoords().get(person.getId()).get(0));
 					this.personId2currentActNr.put(person.getId(), 0);
 					
 					PersonActivityInfo actInfo = new PersonActivityInfo();
 					actInfo.setStartTime(0.);
 					actInfo.setEndTime(30 * 3600.);
 					actInfo.setActivityType(firstActivity.getType());
+					
+					if (rpId == null) {
+						System.out.println("Person: " + person.getId());
+						System.out.println("coord from list: " + noiseContext.getPersonId2listOfCoords().get(person.getId()).get(0));
+						System.out.println("coord from activity: " + firstActivity.getCoord());
+						System.out.println("RP: " + rpId);
+						
+						System.out.println(this.noiseContext.getReceiverPoints().get(rpId));
+						System.out.println(this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos());
+						System.out.println(this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()));
+					}
 					
 					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
 						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
@@ -374,14 +385,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	}
 	
 	private void calculateDamagePerReceiverPoint() {
-		int counter = 0;
-		log.info("Calculating noise exposure costs for a total of " + this.noiseContext.getReceiverPoints().size() + " receiver points.");
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			
-			if (counter % 10000 == 0) {
-				log.info("receiver point # " + counter);
-			}
 				
 			double noiseImmission = rp.getFinalImmission();
 				
@@ -402,8 +407,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				
 			rp.setDamageCosts(damageCost);
 			rp.setDamageCostsPerAffectedAgentUnit(damageCostPerAffectedAgentUnit);
-			
-			counter++;
 		}
 	}
 
@@ -411,12 +414,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 		
 		Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> rpId2linkId2costShare = new HashMap<Id<ReceiverPoint>, Map<Id<Link>,Double>>();
 
-		int prepCounter = 0;
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			
-			if (prepCounter % 10000 == 0) {
-				log.info("receiver point # " + prepCounter);
-			}
 										
 			Map<Id<Link>,Double> linkId2costShare = new HashMap<Id<Link>, Double>();
 			
@@ -437,17 +435,10 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				}
 			
 			rpId2linkId2costShare.put(rp.getId(), linkId2costShare);
-			prepCounter++;
 		}
 		
 		// summing up the link-based costs
-		log.info("Going through all receiver points... Total number: " + this.noiseContext.getReceiverPoints().keySet().size());
-		int counter = 0;
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
-			if (counter % 10000 == 0) {
-				log.info("receiver point # " + counter);
-			}
 
 			for (Id<Link> linkId : this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().keySet()) {
 		
@@ -462,20 +453,12 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 				}
 				
 			}
-			counter++;
 		}
-		log.info("Going through all receiver points... Done.");
 	}
 
 	private void calculateCostsPerVehiclePerLinkPerTimeInterval() {
 		
-		log.info("Going through all links... Total number: " + this.noiseContext.getScenario().getNetwork().getLinks().keySet().size());
-		int counter = 0;
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
-			
-			if (counter % 10000 == 0) {
-				log.info("link # " + counter);
-			}
 			
 			double damageCostPerCar = 0.;
 			double damageCostPerHgv = 0.;
@@ -527,7 +510,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 			linkId2damageCostPerCar.put(linkId, damageCostPerCar);
 			linkId2damageCostPerHgv.put(linkId, damageCostPerHgv);
 			
-			counter++;
 		}
 	}
 
@@ -601,13 +583,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 	}
 
 	private void calculateNoiseImmission(Map<Id<Link>, Double> emissions) {
-		int counter = 0;
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			
-			if (counter % 10000 == 0) {
-				log.info("receiver point # " + counter);
-			}
 					
 			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
 			
@@ -638,7 +615,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, ActivityEndEvent
 			
 			rp.setFinalImmission(finalNoiseImmission);
 			rp.setLinkId2IsolatedImmission(linkId2isolatedImmission);
-			counter ++;
 		}
 	}
 	

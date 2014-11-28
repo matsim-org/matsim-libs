@@ -94,6 +94,10 @@ public class NoiseContext {
 		createGrid();
 		setActivityCoord2NearestReceiverPointId();
 		setRelevantLinkInfo();
+		
+		// delete unnecessary information
+		this.zoneTuple2listOfLinkIds.clear();
+		this.zoneTuple2listOfReceiverPointIds.clear();
 	}
 	
 	private void setActivityCoords () {
@@ -594,9 +598,9 @@ public class NoiseContext {
 		return noiseParams;
 	}
 
-	// for testing purposes
-	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
-		return zoneTuple2listOfReceiverPointIds;
-	}
+//	// for testing purposes
+//	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
+//		return zoneTuple2listOfReceiverPointIds;
+//	}
 
 }

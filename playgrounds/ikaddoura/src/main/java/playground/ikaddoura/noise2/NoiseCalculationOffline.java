@@ -69,16 +69,15 @@ public class NoiseCalculationOffline {
 			
 		} else {
 			
-//			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
-//			lastIteration = 100;
-//			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
-//			receiverPointGap = 100.;
-//			scaleFactor = 10.;
+			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+			lastIteration = 100;
+			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
+			receiverPointGap = 100.;
 			
-			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-			lastIteration = 5;
-			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-			receiverPointGap = 250.;
+//			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+//			lastIteration = 5;
+//			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+//			receiverPointGap = 250.;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -149,16 +148,16 @@ public class NoiseCalculationOffline {
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-      // Berlin Coordinates: Area of Berlin
-		double xMin = 4573258.;
-		double yMin = 5801225.;
-		double xMax = 4620323.;
-		double yMax = 5839639.;
-		
-		noiseParameters.setReceiverPointsGridMinX(xMin);
-		noiseParameters.setReceiverPointsGridMinY(yMin);
-		noiseParameters.setReceiverPointsGridMaxX(xMax);
-		noiseParameters.setReceiverPointsGridMaxY(yMax);
+//      // Berlin Coordinates: Area of Berlin
+//		double xMin = 4573258.;
+//		double yMin = 5801225.;
+//		double xMax = 4620323.;
+//		double yMax = 5839639.;
+//		
+//		noiseParameters.setReceiverPointsGridMinX(xMin);
+//		noiseParameters.setReceiverPointsGridMinY(yMin);
+//		noiseParameters.setReceiverPointsGridMaxX(xMax);
+//		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Berlin Activity Types
 //		String[] consideredActivities = {"home"};
