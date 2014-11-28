@@ -50,7 +50,6 @@ public class NoiseActivityTracker implements ActivityEndEventHandler , ActivityS
 	private static final Logger log = Logger.getLogger(NoiseActivityTracker.class);
 	
 	private final NoiseContext noiseContext;
-	
 	private final List<String> consideredActivityTypes = new ArrayList<String>();
 	
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
