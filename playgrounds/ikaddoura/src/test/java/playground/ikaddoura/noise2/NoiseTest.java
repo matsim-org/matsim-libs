@@ -153,7 +153,7 @@ public class NoiseTest {
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 		
-		NoiseActivityTracker actTracker = new NoiseActivityTracker(noiseContext, outputFilePath);
+		NoiseActivityTracker actTracker = new NoiseActivityTracker(noiseContext);
 		events.addHandler(actTracker);
 		
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);

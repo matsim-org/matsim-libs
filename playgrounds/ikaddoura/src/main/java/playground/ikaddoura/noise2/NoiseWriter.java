@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -133,7 +132,7 @@ public class NoiseWriter {
 		}
 	}
 
-	public static void writeNoiseEmissionStatsPerHour(Map<Id<Link>, Double> emissions, Map<Id<Link>, Integer> linkId2Cars, Map<Id<Link>, Integer> linkId2Hgv, NoiseContext noiseContext, String outputPath, double timeInterval) {
+	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
 		
 		String outputPathEmissions = outputPath + "/emissions/";
 		File dir = new File(outputPathEmissions);
@@ -148,19 +147,19 @@ public class NoiseWriter {
 			bw.write("Link Id;Demand (Car) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Demand (HGV) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";Noise Emission "  + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
-			for (Id<Link> linkId : emissions.keySet()){
+			for (Id<Link> linkId : noiseContext.getNoiseLinks().keySet()){
 				
 				int cars = 0;
-				if (linkId2Cars.containsKey(linkId)) {
-					cars = linkId2Cars.get(linkId);
+				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+					cars = noiseContext.getNoiseLinks().get(linkId).getCars();
 				}
 				
 				int hgv = 0;
-				if (linkId2Hgv.containsKey(linkId)) {
-					hgv = linkId2Hgv.get(linkId);
+				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+					hgv = noiseContext.getNoiseLinks().get(linkId).getHgv();
 				}
 				
-				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + emissions.get(linkId));
+				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + noiseContext.getNoiseLinks().get(linkId).getEmission());
 				bw.newLine();
 			}
 			

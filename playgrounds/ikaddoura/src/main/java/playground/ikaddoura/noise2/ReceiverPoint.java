@@ -24,7 +24,6 @@ package playground.ikaddoura.noise2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -49,7 +48,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
 	private double finalImmission = 0.;
 	
-	// considered activities
+	// activity information
 	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, ArrayList<PersonActivityInfo>>();
 	
 	// damages

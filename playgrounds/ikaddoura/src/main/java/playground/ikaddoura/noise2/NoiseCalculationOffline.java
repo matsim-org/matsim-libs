@@ -184,7 +184,7 @@ public class NoiseCalculationOffline {
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
 		
-		NoiseActivityTracker actTracker = new NoiseActivityTracker(noiseContext, outputFilePath);
+		NoiseActivityTracker actTracker = new NoiseActivityTracker(noiseContext);
 		events.addHandler(actTracker);
 		
 		log.info("Reading events file...");

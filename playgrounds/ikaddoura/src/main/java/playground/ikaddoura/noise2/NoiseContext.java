@@ -51,10 +51,7 @@ public class NoiseContext {
 			
 	private final Scenario scenario;
 	private final NoiseParameters noiseParams;
-	
-	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
-	private double currentTimeBinEndTime = Double.NEGATIVE_INFINITY;
-	
+		
 	private final Map<Id<Person>, List<Coord>> personId2activityCoords = new HashMap<Id<Person>, List<Coord>>();
 	private final List <Coord> populationActivityCoords = new ArrayList <Coord>();
 	
@@ -74,11 +71,17 @@ public class NoiseContext {
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
 	
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
+	
+	// time interval specific information
+	private double currentTimeBinEndTime = Double.NEGATIVE_INFINITY;
+	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private final Map<Id<Link>, NoiseLink> noiseLinks;
 					
 	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
 		this.noiseParams = noiseParams;
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
+		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
 		
 		String[] consideredActTypesArray = noiseParams.getConsideredActivities();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
@@ -607,9 +610,8 @@ public class NoiseContext {
 		this.currentTimeBinEndTime = currentTimeBinEndTime;
 	}
 
-//	// for testing purposes
-//	Map<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>> getZoneTuple2listOfReceiverPointIds() {
-//		return zoneTuple2listOfReceiverPointIds;
-//	}
+	public Map<Id<Link>, NoiseLink> getNoiseLinks() {
+		return noiseLinks;
+	}
 
 }

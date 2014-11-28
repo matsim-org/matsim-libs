@@ -59,14 +59,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private double totalCausedNoiseCost = 0.;
 	private double totalAffectedNoiseCost = 0.;
 	
-	// time interval specific information
-	private final Map<Id<Link>,List<Id<Vehicle>>> linkId2enteringVehicleIds = new HashMap<Id<Link>, List<Id<Vehicle>>>();
-	private final Map<Id<Link>, Integer> linkId2Cars = new HashMap<Id<Link>, Integer>();
-	private final Map<Id<Link>, Integer> linkId2Hgv = new HashMap<Id<Link>, Integer>();
-	private Map<Id<Link>, Double> linkId2damageCost = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2damageCostPerCar = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2damageCostPerHgv = new HashMap<Id<Link>, Double>();
-		
 	public NoiseTimeTracker(NoiseContext noiseContext, EventsManager events, String outputDirectory) {
 		this.noiseContext = noiseContext;
 		this.outputDirectory = outputDirectory;
@@ -94,12 +86,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	private void resetCurrentTimeIntervalInfo() {
 		
-		this.linkId2Cars.clear();
-		this.linkId2Hgv.clear();
-		this.linkId2enteringVehicleIds.clear();
-		this.linkId2damageCost.clear();
-		this.linkId2damageCostPerCar.clear();
-		this.linkId2damageCostPerHgv.clear();
+		this.noiseContext.getNoiseLinks().clear();
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
@@ -158,12 +145,12 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private void computeCurrentTimeInterval() {
 		
 		log.info("Calculating noise emissions...");
-		Map<Id<Link>, Double> emissions = calculateNoiseEmission();
-		NoiseWriter.writeNoiseEmissionStatsPerHour(emissions, this.linkId2Cars, this.linkId2Hgv, this.noiseContext, outputDirectory, this.noiseContext.getCurrentTimeBinEndTime());
+		calculateNoiseEmission();
+		NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory, this.noiseContext.getCurrentTimeBinEndTime());
 		log.info("Calculating noise emissions... Done.");
 		
 		log.info("Calculating noise immissions...");
-		calculateNoiseImmission(emissions);
+		calculateNoiseImmission();
 		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory, noiseContext.getCurrentTimeBinEndTime());
 		log.info("Calculating noise immissions... Done.");
 				
@@ -194,48 +181,37 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			// probably public transit
 			
 		} else {
+			
+			// for all vehicle types
+			if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
+			
+			} else {
+				
+				NoiseLink noiseLink = new NoiseLink(event.getLinkId());
+				List<Id<Vehicle>> enteringVehicleIds = new ArrayList<Id<Vehicle>>();
+				enteringVehicleIds.add(event.getVehicleId());
+				noiseLink.setEnteringVehicleIds(enteringVehicleIds);
+				
+				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
+			}
 		
 			if (event.getVehicleId().toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
 				// HGV
 				
-				if (linkId2Hgv.containsKey(event.getLinkId())) {
-					int hgv = this.linkId2Hgv.get(event.getLinkId());
-					hgv++;
-					this.linkId2Hgv.put(event.getLinkId(), hgv); // TODO: remove this line?!
-					
-				} else {
-					linkId2Hgv.put(event.getLinkId(), 1);
-				}
+				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgv();
+				hgv++;
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgv(hgv); // TODO: remove this line?!
 				
 			} else {
-				// car
+				// Car
 				
-				if (linkId2Cars.containsKey(event.getLinkId())) {
-					int cars = this.linkId2Cars.get(event.getLinkId());
-					cars++;
-					linkId2Cars.put(event.getLinkId(), cars); // TODO: remove this line?!
-					
-				} else {
-					linkId2Cars.put(event.getLinkId(), 1);
-				}
-			}
-			
-			// for all vehicle types
-			if (linkId2enteringVehicleIds.containsKey(event.getLinkId())) {
-				List<Id<Vehicle>> listTmp = linkId2enteringVehicleIds.get(event.getLinkId());
-				listTmp.add(event.getVehicleId());
-				linkId2enteringVehicleIds.put(event.getLinkId(), listTmp);
-				
-			} else {
-				List<Id<Vehicle>> listTmp = new ArrayList<Id<Vehicle>>();
-				listTmp.add(event.getVehicleId());
-				linkId2enteringVehicleIds.put(event.getLinkId(), listTmp);
+				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCars();
+				cars++;
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCars(cars); // TODO: remove this line?!			
 			}
 		}
-		
 	}
-
-	
 
 	private void calculateNoiseDamageCosts() {
 		
@@ -317,18 +293,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		// summing up the link-based costs
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 
-			for (Id<Link> linkId : this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().keySet()) {
-		
-				if(rp.getDamageCosts() != 0.) {
-					
-					if (linkId2damageCost.containsKey(linkId)) {
-						double sum = linkId2damageCost.get(linkId) + rpId2linkId2costShare.get(rp.getId()).get(linkId);
-						linkId2damageCost.put(linkId, sum);
-					} else {
-						linkId2damageCost.put(linkId, rpId2linkId2costShare.get(rp.getId()).get(linkId));
-					}
-				}
+			if (rp.getDamageCosts() != 0.) {
 				
+				for (Id<Link> linkId : this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().keySet()) {
+					if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+						double sum = this.noiseContext.getNoiseLinks().get(linkId).getDamageCost() + rpId2linkId2costShare.get(rp.getId()).get(linkId);
+						this.noiseContext.getNoiseLinks().get(linkId).setDamageCost(sum); // TODO: necessary?
+					}		
+				}
 			}
 		}
 	}
@@ -342,18 +314,18 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			
 			double damageCostSum = 0.;
 				
-			if (linkId2damageCost.containsKey(linkId)) {					
-				damageCostSum = linkId2damageCost.get(linkId);
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {					
+				damageCostSum = this.noiseContext.getNoiseLinks().get(linkId).getDamageCost();
 			}
 				
 			int nCar = 0;
-			if (this.linkId2Cars.containsKey(linkId)) {
-				nCar = this.linkId2Cars.get(linkId);
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				nCar = this.noiseContext.getNoiseLinks().get(linkId).getCars();
 			}
 			
 			int nHdv = 0;
-			if (this.linkId2Hgv.containsKey(linkId)) {
-				nHdv = this.linkId2Hgv.get(linkId);
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				nHdv = this.noiseContext.getNoiseLinks().get(linkId).getHgv();
 			}
 			
 			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -384,25 +356,29 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				damageCostPerHgv = damageCostSumHdv/nHdv;
 			}
 			
-			linkId2damageCostPerCar.put(linkId, damageCostPerCar);
-			linkId2damageCostPerHgv.put(linkId, damageCostPerHgv);
-			
+			if (damageCostPerCar > 0.) {
+				this.noiseContext.getNoiseLinks().get(linkId).setDamageCostPerCar(damageCostPerCar);
+			}
+			if (damageCostPerHgv > 0.) {
+				this.noiseContext.getNoiseLinks().get(linkId).setDamageCostPerHgv(damageCostPerHgv);			
+			}
 		}
 	}
 
 	private void throwNoiseEventsCaused() {
 		
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
-			double amountCar = (linkId2damageCostPerCar.get(linkId)) / (this.noiseContext.getNoiseParams().getScaleFactor());
-			double amountHdv = (linkId2damageCostPerHgv.get(linkId)) / (this.noiseContext.getNoiseParams().getScaleFactor());
-								
-			if (this.linkId2enteringVehicleIds.containsKey(linkId)){
-				for(Id<Vehicle> id : this.linkId2enteringVehicleIds.get(linkId)) {
+											
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)){
+				double amountCar = (this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerCar()) / (this.noiseContext.getNoiseParams().getScaleFactor());
+				double amountHdv = (this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerHgv()) / (this.noiseContext.getNoiseParams().getScaleFactor());
+				
+				for(Id<Vehicle> vehicleId : this.noiseContext.getNoiseLinks().get(linkId).getEnteringVehicleIds()) {
 					
 					double amount = 0.;
 					boolean isHdv = false;
 					
-					if(!(id.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix()))) {
+					if(!(vehicleId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix()))) {
 						amount = amountCar;
 					} else {
 						amount = amountHdv;
@@ -416,7 +392,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 						}
 						
 						// The person Id is assumed to be equal to the vehicle Id.
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getCurrentTimeBinEndTime(), Id.create(id, Person.class), id, amount, linkId, carOrHdv);
+						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getCurrentTimeBinEndTime(), Id.create(vehicleId, Person.class), vehicleId, amount, linkId, carOrHdv);
 						events.processEvent(noiseEvent);
 						
 						if (this.collectNoiseEvents) {
@@ -459,7 +435,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		}
 	}
 
-	private void calculateNoiseImmission(Map<Id<Link>, Double> emissions) {
+	private void calculateNoiseImmission() {
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 					
@@ -470,17 +446,22 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					linkId2isolatedImmission.put(linkId, 0.);
 			 			
 			 	} else {
-					double noiseImmission = 0.;
-					if (!(emissions.get(linkId) == 0.)) {
-						noiseImmission = emissions.get(linkId)
-								+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().get(linkId)
-								+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2angleCorrection().get(linkId)
-								;
-						
-						if (noiseImmission < 0.) {
-							noiseImmission = 0.;
+				
+			 		double noiseImmission = 0.;
+					
+			 		if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmission() == 0.)) {
+							noiseImmission = this.noiseContext.getNoiseLinks().get(linkId).getEmission()
+									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().get(linkId)
+									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2angleCorrection().get(linkId)
+									;
+							
+							if (noiseImmission < 0.) {
+								noiseImmission = 0.;
+							}
 						}
 					}
+			 		
 					linkId2isolatedImmission.put(linkId, noiseImmission);
 			 	}
 			}
@@ -495,10 +476,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		}
 	}
 	
-	private Map<Id<Link>, Double> calculateNoiseEmission() {
-		
-		Map<Id<Link>, Double> linkID2emission = new HashMap<Id<Link>, Double>();
-		
+	private void calculateNoiseEmission() {
+				
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()){
 			
 			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -507,13 +486,13 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			double noiseEmission = 0.;
 
 			int n_car = 0;
-			if (this.linkId2Cars.containsKey(linkId)) {
-				n_car = this.linkId2Cars.get(linkId);
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCars();
 			}
 			
 			int n_hgv = 0;
-			if (this.linkId2Hgv.containsKey(linkId)) {
-				n_hgv = this.linkId2Hgv.get(linkId);
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgv();
 			}
 			int n = n_car + n_hgv;
 			double p = 0.;
@@ -533,11 +512,10 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 				double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 				noiseEmission = mittelungspegel + Dv;					
-			}	
 			
-			linkID2emission.put(linkId, noiseEmission);			
+				this.noiseContext.getNoiseLinks().get(linkId).setEmission(noiseEmission);		
+			}				
 		}
-		return linkID2emission;
 	}
 	
 	public void computeFinalTimeInterval() {
