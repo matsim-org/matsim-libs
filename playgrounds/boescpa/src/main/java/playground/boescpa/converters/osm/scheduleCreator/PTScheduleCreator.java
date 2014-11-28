@@ -24,6 +24,7 @@ package playground.boescpa.converters.osm.scheduleCreator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
 /**
  * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
@@ -37,9 +38,11 @@ public abstract class PTScheduleCreator {
 	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
 
 	protected final TransitSchedule schedule;
+	protected final TransitScheduleFactory scheduleBuilder;
 
 	protected PTScheduleCreator(TransitSchedule schedule) {
 		this.schedule = schedule;
+		this.scheduleBuilder = this.schedule.getFactory();
 	}
 
 	/**
