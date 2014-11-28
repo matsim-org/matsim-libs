@@ -697,8 +697,16 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 					double totalRemovedPCU = removedHolePCU;
 					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
 						removedHole = holes.poll();
+						earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
 						totalRemovedPCU += removedHole.getSizeInEquivalents();
 					};
+					// check again, how much more PCUs are removed, add them once again.
+					if(totalRemovedPCU > veh.getSizeInEquivalents()){
+						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
+						hole2.setSizeInEquivalents(totalRemovedPCU-veh.getSizeInEquivalents());
+						holes.addFirst(hole2);
+					}
 				}
 			}
 		}
