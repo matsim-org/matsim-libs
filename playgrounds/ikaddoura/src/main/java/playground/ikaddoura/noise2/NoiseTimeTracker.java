@@ -113,19 +113,23 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			// All events of the current time bin are processed.
 
 			while (time > this.noiseContext.getCurrentTimeBinEndTime()) {
-
-				log.info("##############################################");
-				log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-				log.info("##############################################");
-
-				updateActivityInformation(); // remove activities that were completed in the previous time interval
-				computeCurrentTimeInterval(); // compute noise emissions, immissions and damages for the current time interval				
-				updateCurrentTimeInterval(); // new time bin = previous time bin + time bin size
-				resetCurrentTimeIntervalInfo(); // reset all time-specific information from the previous time interval
+				processTimeBin();
 			}
 		}
 	}
 	
+	private void processTimeBin() {
+		
+		log.info("##############################################");
+		log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+		log.info("##############################################");
+
+		updateActivityInformation(); // remove activities that were completed in the previous time interval
+		computeNoiseForCurrentTimeInterval(); // compute noise emissions, immissions and damages for the current time interval				
+		updateCurrentTimeInterval(); // new time bin = previous time bin + time bin size
+		resetCurrentTimeIntervalInfo(); // reset all time-specific information from the previous time interval
+	}
+
 	private void updateActivityInformation() {
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			
@@ -150,7 +154,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		}
 	}
 
-	private void computeCurrentTimeInterval() {
+	private void computeNoiseForCurrentTimeInterval() {
 		
 		log.info("Calculating noise emissions...");
 		calculateNoiseEmission();
@@ -515,27 +519,25 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					
 				double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 				double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
-				noiseEmission = mittelungspegel + Dv;					
+				noiseEmission = mittelungspegel + Dv;	
+			}
 			
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 				this.noiseContext.getNoiseLinks().get(linkId).setEmission(noiseEmission);		
-			}				
+			} else {
+				// also saving zero emissions
+				NoiseLink noiseLink = new NoiseLink(linkId);
+				noiseLink.setEmission(noiseEmission);
+				this.noiseContext.getNoiseLinks().put(linkId, noiseLink );
+			}
 		}
 	}
 	
-	public void computeFinalTimeInterval() {
+	public void computeFinalTimeIntervals() {
 		
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= 24 * 3600.) {
-			log.info("##############################################");
-			log.info("# Computing noise for time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-			log.info("##############################################");
-			
-			updateActivityInformation(); // remove activities that were completed in the previous time interval
-			computeCurrentTimeInterval(); // compute noise emissions, immissions and damages for the current time interval				
-			updateCurrentTimeInterval(); // new time bin = previous time bin + time bin size
-			resetCurrentTimeIntervalInfo(); // reset all time-specific information from the previous time interval
-			
+			processTimeBin();			
 		}
-	
 	}
 
 	public List<NoiseEventCaused> getNoiseEventsCaused() {

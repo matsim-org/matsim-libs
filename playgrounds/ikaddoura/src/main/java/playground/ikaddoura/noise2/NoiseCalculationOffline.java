@@ -192,7 +192,7 @@ public class NoiseCalculationOffline {
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 		
-		timeTracker.computeFinalTimeInterval();
+		timeTracker.computeFinalTimeIntervals();
 
 		eventWriter.closeFile();
 	}

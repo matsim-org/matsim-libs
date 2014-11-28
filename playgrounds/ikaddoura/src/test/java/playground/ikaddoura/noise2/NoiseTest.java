@@ -169,7 +169,7 @@ public class NoiseTest {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
 		
-		timeTracker.computeFinalTimeInterval();
+		timeTracker.computeFinalTimeIntervals();
 
 		eventWriter.closeFile();
 		
