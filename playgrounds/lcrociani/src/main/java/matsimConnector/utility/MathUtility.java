@@ -3,6 +3,7 @@ package matsimConnector.utility;
 import org.matsim.api.core.v01.Coord;
 
 import pedCA.environment.grid.GridPoint;
+import pedCA.environment.network.Coordinates;
 
 public class MathUtility {
 	public static double EuclideanDistance(Coord c1, Coord c2) {
@@ -10,6 +11,10 @@ public class MathUtility {
 	}
 	
 	public static void rotate(GridPoint point, double degrees){
+		rotate(point, degrees, 0, 0);
+	}
+	
+	public static void rotate(Coordinates point, double degrees){
 		rotate(point, degrees, 0, 0);
 	}
 	
@@ -23,6 +28,18 @@ public class MathUtility {
 		
 		point.setX((int)x_res);
 	    point.setY((int)y_res);
+	}
+	
+	public static void rotate(Coordinates point, double degrees, double x_center, double y_center){
+		double x = point.getX();
+		double y = point.getY();
+		degrees = Math.toRadians(degrees);
+		
+		double x_res = ((x - x_center) * Math.cos(degrees)) - ((y - y_center) * Math.sin(degrees)) + x_center;
+		double y_res = ((y - y_center) * Math.cos(degrees)) + ((x - x_center) * Math.sin(degrees)) + y_center;
+		
+		point.setX(x_res);
+	    point.setY(y_res);
 	}
 	
 	public static double convertGridCoordinate(int monodimCoord){

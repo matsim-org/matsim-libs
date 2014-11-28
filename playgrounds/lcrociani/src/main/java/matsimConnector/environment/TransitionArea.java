@@ -3,10 +3,12 @@ package matsimConnector.environment;
 import java.util.ArrayList;
 
 import matsimConnector.agents.Pedestrian;
+import matsimConnector.utility.Constants;
 import matsimConnector.utility.MathUtility;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.network.Coordinates;
 import pedCA.utility.Lottery;
 
 public class TransitionArea extends PedestrianGrid {
@@ -37,7 +39,7 @@ public class TransitionArea extends PedestrianGrid {
 	
 	//TODO OPTIMIZE THIS
 	public boolean acceptPedestrians(){
-		return getFreePositions(positionsForGeneration).size()>1;
+		return getFreePositions(positionsForGeneration).size()>2;
 	}
 	
 	public boolean isAtBorder(Pedestrian pedestrian){
@@ -67,6 +69,19 @@ public class TransitionArea extends PedestrianGrid {
 		MathUtility.rotate(result, 360-rotation);
 		return result;
 	}
+	
+	public Coordinates convertCoordinates(Coordinates tACoordinates){
+		Coordinates result = new Coordinates(tACoordinates.getX(),tACoordinates.getY());
+		Coordinates shift = new Coordinates(0,0);
+		MathUtility.rotate(result, rotation);
+		MathUtility.rotate(shift, rotation, Constants.CA_CELL_SIDE*0.5, Constants.CA_CELL_SIDE*0.5);
+		Coordinates transAreaRef = new Coordinates(this.transAreaRef);
+		Coordinates environmentRef = new Coordinates(this.environmentRef);
+		double x_r = result.getX()-transAreaRef.getX()+environmentRef.getX()+shift.getX();
+		double y_r = result.getY()-transAreaRef.getY()+environmentRef.getY()+shift.getY();
+		result.setX(x_r); result.setY(y_r);
+		return result;
+	}
 
 	public GridPoint calculateEnterPosition(){
 		GridPoint result = Lottery.extractObject(getFreePositions(positionsForGeneration));
@@ -94,9 +109,5 @@ public class TransitionArea extends PedestrianGrid {
 			for (int j=0;j<cells.get(i).size()-1;j++)
 				positionsForGeneration.add(new GridPoint(j,i));
 		return positionsForGeneration;
-	}
-
-	public ArrayList<GridPoint> getPositionsForGeneration() {
-			return positionsForGeneration;
 	}
 }

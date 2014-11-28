@@ -19,7 +19,7 @@ public class ContextGenerator {
 	
 	private static Context getBidCorridorContext(int rows, int cols, int populationSize) {
 		EnvironmentGrid environmentGrid = new EnvironmentGrid(rows, cols);
-		EnvironmentGenerator.initCorridor(environmentGrid);
+		EnvironmentGenerator.initCorridorWithObstacles(environmentGrid);
 		MarkerConfiguration markerConfiguration = new MarkerConfiguration();
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorEastDestination(environmentGrid));
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorWestDestination(environmentGrid));

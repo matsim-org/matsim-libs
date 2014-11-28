@@ -61,7 +61,7 @@ public class CAScenario {
 		Context context;
 		try {
 			context = new Context(path);
-			addCAEnvironment(new CAEnvironment(""+0, context));
+			addCAEnvironment(new CAEnvironment(""+environments.size(), context));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

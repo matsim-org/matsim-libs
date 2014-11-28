@@ -22,10 +22,12 @@ package matsimConnector.visualizer.debugger.eventsbaseddebugger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import matsimConnector.agents.Pedestrian;
+import matsimConnector.environment.TransitionArea;
 import matsimConnector.events.CAAgentConstructEvent;
 import matsimConnector.events.CAAgentEnterEnvironmentEvent;
 import matsimConnector.events.CAAgentExitEvent;
@@ -47,6 +49,9 @@ import matsimConnector.utility.MathUtility;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 
+import pedCA.environment.grid.EnvironmentGrid;
+import pedCA.environment.grid.GridPoint;
+import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.network.Coordinates;
 
 
@@ -71,6 +76,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	private int nrAgents;
 
 	FrameSaver fs = null;
+	boolean environmentInit= false;
 
 	public EventBasedVisDebuggerEngine() {
 		this.sc = null;
@@ -79,7 +85,6 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 		this.keyControl = new Control(this.vis.zoomer,90,this.fs);
 		this.vis.addKeyControl(this.keyControl);
-		init();
 	}
 	
 	public EventBasedVisDebuggerEngine(Scenario sc) {
@@ -89,7 +94,6 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 		this.keyControl = new Control(this.vis.zoomer,90,this.fs);
 		this.vis.addKeyControl(this.keyControl);
-		init();
 	}
 
 	public void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
@@ -99,16 +103,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		}
 	}
 
-	private void init() {
-
-		this.defaultCp.a = 255;
-		this.defaultCp.minScale = 0;
-		this.defaultCp.rr = .19f;
-
-		//Links
-		
-		//lp.minScale = 10;
-
+	private void drawCAEnvironments() {
 		CAScenario scenarioCA = (CAScenario) this.sc.getScenarioElement(Constants.CASCENARIO_NAME);
 
 		for (CAEnvironment environmentCA : scenarioCA.getEnvironments().values()) {
@@ -118,19 +113,59 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	}
 
 	public void drawCAEnvironment(CAEnvironment environmentCA) {
+		drawObstacles(environmentCA.getContext().getEnvironmentGrid());
+		for (PedestrianGrid pedestrianGrid : environmentCA.getContext().getPedestrianGrids())
+			drawPedestrianGridBorders(pedestrianGrid);
+	}
+
+	private void drawObstacles(EnvironmentGrid environmentGrid) {
+		for (int y=0; y<environmentGrid.getRows(); y++)
+			for(int x=0; x<environmentGrid.getColumns();x++)
+				if (environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_OBSTACLE)
+					drawObstacle(new GridPoint(x,y));		
+	}
+
+	private void drawObstacle(GridPoint gridPoint) {
+		Coordinates bottomLeft = new Coordinates(new GridPoint(gridPoint.getX(),gridPoint.getY()));
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 255, 0, 0, 192, 0, true);
+	}
+
+	private void drawPedestrianGridBorders(PedestrianGrid pedestrianGrid) {
 		LineProperty lp = new LineProperty();
 		lp.r = 0; lp.g = 0; lp.b = 0; lp.a = 192;
-		int rows = environmentCA.getContext().getEnvironmentGrid().getRows();
-		int columns = environmentCA.getContext().getEnvironmentGrid().getColumns();
-		Coordinates c0 = new Coordinates(0, 0);
-		Coordinates c1 = new Coordinates(columns*Constants.CA_CELL_SIDE, 0);
-		Coordinates c2 = new Coordinates(0, rows*Constants.CA_CELL_SIDE);
-		Coordinates c3 = new Coordinates(columns*Constants.CA_CELL_SIDE, rows*Constants.CA_CELL_SIDE);
 		
-		this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
-		this.vis.addLineStatic(c2.getX(), c2.getY(), c3.getX(), c3.getY(), lp.r,lp.g,lp.b,lp.a, 0);
-		this.vis.addLineStatic(c0.getX(), c0.getY(), c2.getX(), c2.getY(), lp.r,lp.g,lp.b,lp.a, 0);
-		this.vis.addLineStatic(c1.getX(), c1.getY(), c3.getX(), c3.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+		int rows = pedestrianGrid.getRows();
+		int columns = pedestrianGrid.getColumns();
+		ArrayList<Coordinates> gridCoordinates = new ArrayList<Coordinates>();
+		gridCoordinates.add(calculateCoordinates(0, 0, pedestrianGrid));
+		gridCoordinates.add(calculateCoordinates(columns, 0, pedestrianGrid));
+		gridCoordinates.add(calculateCoordinates(columns, rows, pedestrianGrid));
+		gridCoordinates.add(calculateCoordinates(0, rows, pedestrianGrid));
+		gridCoordinates.add(calculateCoordinates(0, 0, pedestrianGrid));
+		
+		Iterator <Coordinates> it = gridCoordinates.iterator();
+		Coordinates c0;
+		Coordinates c1 = it.next();
+		
+		while (it.hasNext()){
+			c0 = c1;
+			c1 = it.next();
+			if (pedestrianGrid instanceof TransitionArea)
+				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), 255,lp.g,lp.b,lp.a, 0, .3, 0.15);
+			else
+				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
+		}
+	}
+	
+	private Coordinates calculateCoordinates(int x, int y, PedestrianGrid pedestrianGrid){
+		Coordinates result;
+		if (pedestrianGrid instanceof TransitionArea){
+			result = new Coordinates(new GridPoint(x,y));
+			result =((TransitionArea)pedestrianGrid).convertCoordinates(result);
+		}
+		else
+			result = new Coordinates(new GridPoint(x,y));
+		return result;
 	}
 
 	@Override
@@ -229,8 +264,11 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	}
 	
 	
-	public void handleEvent(CAAgentConstructEvent event) {
-		
+	public void handleEvent(CAAgentConstructEvent event) {		
+		if (!environmentInit){
+			drawCAEnvironments();
+			environmentInit = true;
+		}
 		Pedestrian pedestrian = event.getPedestrian();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) (0.4/5.091);

@@ -24,12 +24,11 @@ public class CASimulationRunner implements IterationStartsListener{
 
 	private Controler controller;
 	
+	@SuppressWarnings("deprecation")
 	public static void main(String [] args) {
 		String inputPath= Constants.INPUT_PATH;
-		String outputPath = Constants.OUTPUT_PATH;
 		if (args.length>0){
 			 inputPath = Constants.FD_TEST_PATH+args[0]+"/input";
-			 outputPath = Constants.FD_TEST_PATH+args[0]+"/output";
 		}
 		Config c = ConfigUtils.loadConfig(inputPath+"/config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(c);
@@ -44,11 +43,8 @@ public class CASimulationRunner implements IterationStartsListener{
 		c.qsim().setEndTime(Constants.CA_TEST_END_TIME+100);
 		
 		Controler controller = new Controler(scenario);
-		try{
-			org.matsim.core.utils.io.IOUtils.deleteDirectory(new java.io.File(outputPath));
-		}catch(IllegalArgumentException e){
-			
-		}
+		
+		controller.setOverwriteFiles(true);
 		
 		CAMobsimFactory factoryCA = new CAMobsimFactory();
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);

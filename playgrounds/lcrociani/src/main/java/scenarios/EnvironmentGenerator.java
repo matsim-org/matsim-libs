@@ -21,10 +21,15 @@ public class EnvironmentGenerator {
 	public static void initCorridorWithWalls(EnvironmentGrid environment){
 		for (int row = 0; row<environment.getRows(); row++)
 			for(int col = 0; col<environment.getColumns();col++)
-				if (row==0||row==environment.getRows()-1)
+				if ((col!=0&&col!=environment.getColumns()-1)&&(row==0||row==environment.getRows()-1))
 					environment.setCellValue(row, col, Constants.ENV_OBSTACLE);
 				else
 					environment.setCellValue(row, col, Constants.ENV_WALKABLE_CELL);
+	}
+	
+	public static void initCorridorWithObstacles(EnvironmentGrid environment){
+		initCorridor(environment);
+		environment.setCellValue(environment.getRows()/2, environment.getColumns()/2, Constants.ENV_OBSTACLE);
 	}
 
 	public static Destination getCorridorEastDestination(EnvironmentGrid environment){

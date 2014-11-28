@@ -246,6 +246,8 @@ public class EventsBasedVisDebugger extends PApplet {
 					drawLine((Line) el);
 				} else if (el instanceof Circle) {
 					drawCircle((Circle) el);
+				}else if (el instanceof Rect) {
+					drawRect((Rect) el);
 				} else if (el instanceof Polygon) {
 					drawPolygon((Polygon)el);
 				}
@@ -307,11 +309,6 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 
 	}
-
-	//	private void drawText(Text text) {
-	//		
-	//	}
-
 
 	private void drawTile(Tile tile) {
 		PImage pImage = null;
@@ -561,7 +558,23 @@ public class EventsBasedVisDebugger extends PApplet {
 		rect.fill = fill;
 
 		addElement(rect);
+	}
+	
+	/*package*/ void addRectStatic(double tx, double ty, double sx, double sy, int r,
+			int g, int b, int a, int minScale, boolean fill) {
+		Rect rect = new Rect();
+		rect.tx = (float) (tx + this.offsetX);
+		rect.ty = (float) -(ty + this.offsetY);
+		rect.sx = (float)sx;
+		rect.sy = (float)sy;
+		rect.a = a;
+		rect.r = r;
+		rect.g = g;
+		rect.b = b;
+		rect.minScale = minScale;
+		rect.fill = fill;
 
+		addElementStatic(rect);
 	}
 
 	public void addPolygonStatic(double [] x, double [] y, int r, int g, int b, int a, int minScale) {
