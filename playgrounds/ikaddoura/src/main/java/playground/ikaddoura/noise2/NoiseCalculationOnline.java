@@ -64,11 +64,19 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+
 		log.info("Resetting noise immissions, activity information and damages...");
+
+		this.noiseContext.getNoiseLinks().clear();
+		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			// TODO
+			rp.getLinkId2IsolatedImmission().clear();
+			rp.setFinalImmission(0.);
+			rp.getPersonId2actInfos().clear();
+			rp.setDamageCosts(0.);
+			rp.setDamageCostsPerAffectedAgentUnit(0.);
 		}
-		log.info("Resetting noise immissions, activity information and damages... Done.");
+		
 	}
 	
 	@Override
