@@ -108,6 +108,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	}
 	
 	private void checkTime(double time) {
+		// Check for every event that is thrown if the current interval has changed.
 		
 		if (this.noiseContext.getCurrentTimeBinEndTime() <= 0.) {
 			updateCurrentTimeInterval(time);
