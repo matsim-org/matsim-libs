@@ -263,7 +263,7 @@ public class NoiseWriter {
 					}
 				}
 				
-				bw.write(rp.getId() + ";" + rp.getPersonId2actInfos());
+				bw.write(rp.getId() + ";" + affectedAgentUnits);
 				bw.newLine();
 			}
 			
