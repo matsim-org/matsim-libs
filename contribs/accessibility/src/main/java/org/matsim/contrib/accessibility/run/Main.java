@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  *
  */
-final class Main {
+public final class Main {
 
 
 	private static final Logger log = Logger.getLogger(Main.class);
@@ -53,6 +53,14 @@ final class Main {
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		// the run method is extracted so that a test can operate on it.
+		run( scenario);
+		
+		
+	}
+
+	public static void run(Scenario scenario) {
 		
 		List<String> activityTypes = new ArrayList<String>() ;
 		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
@@ -69,29 +77,21 @@ final class Main {
 			}
 		}
 		
-		
 		log.warn( "found activity types: " + activityTypes ); 
 		
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
-		// new
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
-		// end new
 
 		for ( String actType : activityTypes ) {
-			
 			
 //			if ( !actType.equals("w") ) {
 //				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //				continue ;
 //			}
-			
-//			config.controler().setOutputDirectory( utils.getOutputDirectory());
-			// utils is a functionality coming from teh test environment ... which does not exist here any more.  take from config. 
-			System.exit(-1) ;
 			
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
 			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
@@ -102,34 +102,26 @@ final class Main {
 				}
 			}
 			
-			activityFacilitiesMap.put(actType, opportunities);
-					
-//			Controler controler = new Controler(scenario) ;
-//			// yy it is a bit annoying to have to run the controler separately for every act type, or even to run it at all.
-//			// But the computation uses too much infrastructure which is plugged together in the controler.
-//			// (Might be able to get away with ONE controler run if we manage to write the accessibility results
-//			// in subdirectories of the controler output directory.) kai, feb'14
-//			
-//			controler.setOverwriteFiles(true);
-		
 			GridBasedAccessibilityControlerListenerV3 listener = 
-				new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
+				new GridBasedAccessibilityControlerListenerV3(opportunities, scenario.getConfig(), scenario.getNetwork());
+
 			// define the modes that will be considered
 			// the following modes are available (see AccessibilityControlerListenerImpl): freeSpeed, car, bike, walk, pt
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+
+			// this has to do with the additional population density column:
 			listener.addAdditionalFacilityData(homes) ;
-			listener.generateGridsAndMeasuringPointsByNetwork(1000.);
+
+			listener.generateGridsAndMeasuringPointsByNetwork(100.);
+			// yy todo: meaningful error message if this is not set
+			// yy todo: make sure that cell size is taken from config.
 			
-			// new
 			listener.writeToSubdirectoryWithName(actType);
-			// end new
 			
 			controler.addControlerListener(listener);
 		}
 					
 		controler.run();
-		
-		
 	}
 
 }

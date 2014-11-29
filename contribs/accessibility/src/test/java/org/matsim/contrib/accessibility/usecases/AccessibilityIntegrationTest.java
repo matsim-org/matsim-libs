@@ -33,6 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -49,6 +50,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -63,6 +66,41 @@ public class AccessibilityIntegrationTest {
 	private static final Logger log = Logger.getLogger(AccessibilityIntegrationTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+	public void testMainMethod() {
+		Config config = ConfigUtils.createConfig();
+		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
+		acg.setCellSizeCellBasedAccessibility(100);
+		config.addModule( acg);
+		
+		config.controler().setLastIteration(1);
+		
+		Network network = CreateTestNetwork.createTestNetwork();
+		
+		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
+		builder.setNetwork(network);
+		Scenario sc = builder.createScenario() ;
+
+		// creating test opportunities (facilities)
+		ActivityFacilities opportunities = sc.getActivityFacilities();
+		for ( Link link : sc.getNetwork().getLinks().values() ) {
+			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
+			Coord coord = link.getCoord();
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			{
+				ActivityOption option = new ActivityOptionImpl("w") ;
+				facility.addActivityOption(option);
+			}
+			{
+				ActivityOption option = new ActivityOptionImpl("h") ;
+				facility.addActivityOption(option);
+			}
+			opportunities.addActivityFacility(facility);
+		}
+
+		org.matsim.contrib.accessibility.run.Main.run(sc);
+	}
 
 	@Test
 	public void testWithBoundingBox() {
