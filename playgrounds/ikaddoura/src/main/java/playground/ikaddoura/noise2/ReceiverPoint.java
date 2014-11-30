@@ -33,6 +33,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
 /**
+ * 
+ * Contains the relevant information for a single receiver point, i.e. spatial data, and time-specific data such as noise immissions or damages.
+ * 
  * @author ikaddoura
  *
  */
@@ -49,6 +52,7 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	// time-specific information
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
 	private double finalImmission = 0.;
+	private double affectedAgentUnits = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
 
@@ -124,6 +128,14 @@ public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 
 	public void setPersonId2actInfos(Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos) {
 		this.personId2actInfos = personId2actInfos;
+	}
+
+	public double getAffectedAgentUnits() {
+		return affectedAgentUnits;
+	}
+
+	public void setAffectedAgentUnits(double affectedAgentsUnits) {
+		this.affectedAgentUnits = affectedAgentsUnits;
 	}
 
 }

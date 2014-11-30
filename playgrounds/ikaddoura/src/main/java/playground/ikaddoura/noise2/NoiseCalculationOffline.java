@@ -36,9 +36,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * (1) Computes noise emissions and immissions based on a standard events file.
- * (2) Optionally throws noise immission damage events.
- * (2) Writes out some analysis.
+ * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
+ * (2) Optionally throws noise immission damage events for the causing agent and the affected agent.
  * 
  * @author ikaddoura
  *

@@ -30,6 +30,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
+ * 
+ * Contains the relevant information for a single link, i.e. time-specific data such as number of vehicles, noise emission or damages.
+ * 
  * @author ikaddoura
  *
  */

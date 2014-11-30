@@ -40,7 +40,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 
 /**
- * Contains all spatial information for the RLS approach 'Lange gerade Fahrstreifen' to calculate noise immissions.
+ * Computes a grid of receiver points and further spatial data which is required during the computation of noise immissions and damages.
+ * Contains the spatial data as well as time-specific data.
  * 
  * @author lkroeger, ikaddoura
  *

@@ -41,6 +41,9 @@ import org.matsim.pt.PtConstants;
 
 /**
  * 
+ * A handler which keeps track of each agent's activities throughout the day if the activity is of a certain predefined activity type (considered activity type).
+ * This handler is required for the calculation of noise damages.
+ * 
  * @author ikaddoura
  *
  */
@@ -63,7 +66,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 		}
 		
 		if (this.consideredActivityTypes.size() == 0) {
-			log.warn("Not considering any activity type for the noise damage computation.");
+			log.warn("Not considering any activity type for the noise damage computation. This event handler can be disabled.");
 		}	
 		
 		setFirstActivities();

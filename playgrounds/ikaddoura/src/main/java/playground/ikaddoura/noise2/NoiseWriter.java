@@ -132,7 +132,8 @@ public class NoiseWriter {
 		}
 	}
 
-	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
+	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathEmissions = outputPath + "emissions/";
 		File dir = new File(outputPathEmissions);
@@ -186,7 +187,8 @@ public class NoiseWriter {
 		}	
 	}
 
-	public static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
+	public static void writeNoiseImmissionStatsPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathImmissions = outputPath + "immissions/";
 		File dir = new File(outputPathImmissions);
@@ -232,7 +234,8 @@ public class NoiseWriter {
 		
 	}
 	
-	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
+	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
 		File dir = new File(outputPathActivityInfo);
@@ -250,19 +253,7 @@ public class NoiseWriter {
 			
 			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
-				double affectedAgentUnits = 0.;
-				if (!(rp.getPersonId2actInfos().isEmpty())) {
-					
-					for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
-						
-						for (PersonActivityInfo actInfo : rp.getPersonId2actInfos().get(personId)) {
-							double unitsThisPersonActivityInfo = actInfo.getDurationWithinInterval(timeInterval, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-							affectedAgentUnits = affectedAgentUnits + unitsThisPersonActivityInfo;
-						}
-					}
-				}
-				
-				bw.write(rp.getId() + ";" + affectedAgentUnits);
+				bw.write(rp.getId() + ";" + rp.getAffectedAgentUnits());
 				bw.newLine();
 			}
 			
@@ -289,7 +280,8 @@ public class NoiseWriter {
 		}		
 	}
 	
-	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath, double timeInterval) {
+	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 	
 		String outputPathDamages = outputPath + "damages/";
 		File dir = new File(outputPathDamages);
