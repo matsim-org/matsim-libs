@@ -68,8 +68,8 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
  * Marginal congestion events can be used for internalization.
  * 1) At link Leave event, delay is calculated which is the difference of actual leaving time and the leaving time according to free speed.
- * 2) Persons leaving that link is identified and these are charged until delay =0; if there is no leaving agents (=spill back delays), spill back causing link and person are stored
- * 3) Subsequently spill back delays are processed by identifying person in front of queue and charging entering agents and leaving agents alternatively untill delay=0;
+ * 2) Persons leaving link are identified and these are charged until delay =0; if there is no leaving agents (=spill back delays), spill back causing link and person are stored
+ * 3) Subsequently spill back delays are processed by identifying person in front of queue and charging entering agents (i.e. persons currently on the link) and leaving agents alternatively until delay=0;
  * 
  * @author amit
  * 
@@ -90,7 +90,7 @@ PersonStuckEventHandler
 	final Scenario scenario;
 	final EventsManager events;
 	final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
-	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo;
+	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<>();
 	private int roundingErrorWarnCount =0;
 
 	double totalInternalizedDelay = 0.0;
@@ -109,11 +109,25 @@ PersonStuckEventHandler
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
-		
-		if (this.scenario.getNetwork().getLinks().size()==0) throw new RuntimeException("There are no links in scenario thus aborting...");
 
-		this.linkId2congestionInfo = new HashMap<>();
-		
+		if (this.scenario.getNetwork().getLinks().size()==0) {
+			throw new RuntimeException("There are no links in scenario thus aborting...");
+		}
+	}
+
+	@Override
+	public void reset(int iteration) {
+		this.ptVehicleIDs.clear();
+		this.totalDelay = 0.0;
+		this.totalInternalizedDelay = 0.0;
+		this.delayNotInternalized_roundingErrors = 0.0;
+		this.linkId2congestionInfo.clear();
+
+		storeLinkInfo();
+
+	}
+
+	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
 			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
 
@@ -130,14 +144,6 @@ PersonStuckEventHandler
 
 			this.linkId2congestionInfo.put(link.getId(), linkInfo);
 		}
-	}
-
-	@Override
-	public void reset(int iteration) {
-		this.ptVehicleIDs.clear();
-		this.totalDelay = 0.0;
-		this.totalInternalizedDelay = 0.0;
-		this.delayNotInternalized_roundingErrors = 0.0;
 	}
 
 	@Override
@@ -352,9 +358,9 @@ PersonStuckEventHandler
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
 		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
-		
+
 		double marginalDelaysPerLeavingVehicle = this.linkId2congestionInfo.get(causingPersonOnLink).getMarginalDelayPerLeavingVehicle_sec();
-		
+
 		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
 			if (delayedPerson.toString().equals(causingPerson.toString())) {
 				System.out.println("\n \n \t \t Error \n \n");
@@ -366,7 +372,7 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-				System.out.println(congestionEvent.toString());
+				//				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
@@ -380,7 +386,7 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-				System.out.println(congestionEvent.toString());
+				//				System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = 0.;

@@ -63,8 +63,8 @@ PersonStuckEventHandler{
 	private final Scenario scenario;
 
 	private final List<String> congestedModes = new ArrayList<String>();
-	private final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo;
-	private final Map<Id<Person>, String> personId2LegMode;
+	private final Map<Id<Link>, LinkCongestionInfoExtended> 	linkId2congestionInfo = new HashMap<>();
+	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
 	private double totalDelay = 0;
 
 	/**
@@ -81,18 +81,6 @@ PersonStuckEventHandler{
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
-
-		linkId2congestionInfo = new HashMap<>();
-		personId2LegMode = new HashMap<>();
-
-		for(Link link : scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();
-			linkInfo.setLinkId(link.getId());
-			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-			linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
-			linkId2congestionInfo.put(link.getId(), linkInfo);
-		}
 	}
 
 	@Override
@@ -104,6 +92,20 @@ PersonStuckEventHandler{
 	@Override
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
+		this.linkId2congestionInfo.clear();
+		
+		storeLinkInfo();
+	}
+	
+	private void storeLinkInfo(){
+		for(Link link : scenario.getNetwork().getLinks().values()){
+			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();
+			linkInfo.setLinkId(link.getId());
+			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
+			linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+			linkId2congestionInfo.put(link.getId(), linkInfo);
+		}
 	}
 
 	@Override
