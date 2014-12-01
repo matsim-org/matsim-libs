@@ -422,7 +422,6 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 					// reflection
 					Field aField = getClass().getDeclaredField(property);
 					aField.set(this, propertyValue);
-					setComponentValues();
 				} catch (NullPointerException e) {
 					e.printStackTrace();
 				} catch (IllegalArgumentException e) {
@@ -436,6 +435,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 					e.printStackTrace();
 				}
 			}
+					setComponentValues();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
