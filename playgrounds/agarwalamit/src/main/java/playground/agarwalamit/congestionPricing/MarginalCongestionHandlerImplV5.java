@@ -71,6 +71,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
+		storeLinkInfo();
 	}
 
 	@Override

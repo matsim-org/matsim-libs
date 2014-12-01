@@ -113,6 +113,8 @@ PersonStuckEventHandler
 		if (this.scenario.getNetwork().getLinks().size()==0) {
 			throw new RuntimeException("There are no links in scenario thus aborting...");
 		}
+		
+		storeLinkInfo();
 	}
 
 	@Override
