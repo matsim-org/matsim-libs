@@ -52,7 +52,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
 	private MarginalCostPricingCarHandler pricingHandler;
-	private ExtCostEventHandler extCostHandler;
+//	private ExtCostEventHandler extCostHandler;
 	
 	/**
 	 * @param scenario
@@ -71,12 +71,12 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 		EventsManager eventsManager = event.getControler().getEvents();
 		
 		this.pricingHandler = new MarginalCostPricingCarHandler(eventsManager, this.scenario);
-		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
+//		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(this.pricingHandler);
 		eventsManager.addHandler(this.tollHandler);
-		eventsManager.addHandler(this.extCostHandler);
+//		eventsManager.addHandler(this.extCostHandler);
 	}
 
 	@Override
@@ -89,10 +89,10 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
 //		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
-		writerCar.writeDetailedResults(TransportMode.car);
-		writerCar.writeAvgTollPerDistance(TransportMode.car);
-		writerCar.writeAvgTollPerTimeBin(TransportMode.car);
+//		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+//		writerCar.writeDetailedResults(TransportMode.car);
+//		writerCar.writeAvgTollPerDistance(TransportMode.car);
+//		writerCar.writeAvgTollPerTimeBin(TransportMode.car);
 	}
 
 }
