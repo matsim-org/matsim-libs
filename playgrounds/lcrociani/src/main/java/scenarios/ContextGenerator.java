@@ -8,6 +8,25 @@ import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.environment.markers.Start;
 
 public class ContextGenerator {
+	
+	public static Context loadEnvironmentAndSaveContext(String path){
+		EnvironmentGrid environmentGrid = null;
+		MarkerConfiguration markerConfiguration = null;
+		try {
+			environmentGrid = new EnvironmentGrid(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		markerConfiguration = EnvironmentGenerator.generateBorderDestinations(environmentGrid);
+		Context context = new Context(environmentGrid, markerConfiguration);
+		try {
+			context.saveConfiguration(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return context;
+	}
+	
 	public static void createAndSaveBidCorridorContext(String path, int rows, int cols, int populationSize){
 		Context context = getBidCorridorContext(rows, cols, populationSize);
 		try {

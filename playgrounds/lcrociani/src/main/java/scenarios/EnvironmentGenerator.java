@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.markers.Destination;
+import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.environment.markers.Start;
 import pedCA.environment.markers.TacticalDestination;
 import pedCA.environment.network.Coordinates;
 import pedCA.utility.Constants;
 
 public class EnvironmentGenerator {
+	
+	
+	
 
 	public static void initCorridor(EnvironmentGrid environment){
 		for (int row = 0; row<environment.getRows(); row++)
@@ -86,5 +90,57 @@ public class EnvironmentGenerator {
 		result.setX(result.getX()/cells.size());
 		result.setY(result.getY()/cells.size());
 		return result;
+	}
+
+	public static MarkerConfiguration generateBorderDestinations(EnvironmentGrid environmentGrid) {
+		MarkerConfiguration markerConfiguration = new MarkerConfiguration();
+		boolean found = false;
+		ArrayList<GridPoint> cells = null;
+		for (int i=0;i<environmentGrid.getRows();i+=environmentGrid.getRows()-1){
+			for (int j=0;j<environmentGrid.getColumns();j++){
+				GridPoint cell = new GridPoint(j, i);
+				if(environmentGrid.belongsToExit(cell) && !found){
+					found = true;
+					cells = new ArrayList<GridPoint>();
+					cells.add(cell);
+				}else if(environmentGrid.belongsToExit(cell) && found){
+					cells.add(cell);
+				}else if (found){
+					if (j>1) //skip corner
+						markerConfiguration.addDestination(new TacticalDestination(generateCoordinates(cells), cells));
+					found = false;
+				}
+			}
+			if (found){
+				if (cells.size()>1) //skip corner for the moment
+					markerConfiguration.addDestination(new TacticalDestination(generateCoordinates(cells), cells));
+				found = false;
+			}
+		}
+		cells = null;
+		for (int j=0;j<environmentGrid.getColumns();j+=environmentGrid.getColumns()-1){
+			for (int i=0;i<environmentGrid.getRows();i++){
+				GridPoint cell = new GridPoint(j, i);
+				if(environmentGrid.belongsToExit(cell) && !found){
+					found = true;
+					cells = new ArrayList<GridPoint>();
+					cells.add(cell);
+				}else if(environmentGrid.belongsToExit(cell) && found){
+					cells.add(cell);
+				}else if (found){
+					if (i==1){ //add corner if it has not been added before
+						if	(!markerConfiguration.getDestinations().get(markerConfiguration.getDestinations().size()-1).getCells().contains(cells.get(0)))
+							markerConfiguration.addDestination(new TacticalDestination(generateCoordinates(cells), cells));
+					}else
+						markerConfiguration.addDestination(new TacticalDestination(generateCoordinates(cells), cells));
+					found = false;
+				}
+			}
+			if (found){
+				markerConfiguration.addDestination(new TacticalDestination(generateCoordinates(cells), cells));
+				found = false;
+			}
+		}
+		return markerConfiguration;
 	}
 }

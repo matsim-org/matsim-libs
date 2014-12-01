@@ -30,6 +30,10 @@ public class MathUtility {
 	    point.setY((int)y_res);
 	}
 	
+	public static void rotate(Coordinates point, double degrees, Coordinates center){
+		rotate(point, degrees, center.getX(), center.getY());
+	}
+	
 	public static void rotate(Coordinates point, double degrees, double x_center, double y_center){
 		double x = point.getX();
 		double y = point.getY();

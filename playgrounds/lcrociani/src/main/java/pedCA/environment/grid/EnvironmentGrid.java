@@ -43,6 +43,10 @@ public class EnvironmentGrid extends Grid<Integer>{
 		return getCellValue(row, col)!=Constants.ENV_OBSTACLE;
 	}
 	
+	private boolean isWalkable(GridPoint cell) {
+		return isWalkable(cell.getY(),cell.getX());
+	}
+	
 	@Override
 	protected void loadFromCSV(String fileName) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -80,4 +84,10 @@ public class EnvironmentGrid extends Grid<Integer>{
 		}		
 		bw.close();
 	}
+	
+	public boolean belongsToExit(GridPoint cell){
+		return (cell.getY()==0 || cell.getX()==0 || cell.getY() == getRows()-1 || cell.getX() == getColumns()-1) && isWalkable(cell);
+	}
+
+
 }
