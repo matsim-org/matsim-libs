@@ -208,7 +208,7 @@ public class InputsForFDTestSetUp {
 			VehicleCapacity cap = new VehicleCapacityImpl();
 			cap.setSeats(3);//this is default for now, could be improved with mode-dependent vehicle capacity
 			vehicleType.setCapacity(cap);
-			TravelModesFlowDynamicsUpdator modeData = new TravelModesFlowDynamicsUpdator(modeId, vehicleType);
+			TravelModesFlowDynamicsUpdator modeData = new TravelModesFlowDynamicsUpdator(vehicleType);
 			vehicle2TravelModesData.put(modeId, modeData);
 		}
 	}

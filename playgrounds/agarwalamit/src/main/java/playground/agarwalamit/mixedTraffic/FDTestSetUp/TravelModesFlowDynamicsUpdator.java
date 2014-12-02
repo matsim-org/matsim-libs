@@ -62,9 +62,9 @@ import org.matsim.vehicles.VehicleType;
 	
 	public TravelModesFlowDynamicsUpdator(){}
 	
-	public TravelModesFlowDynamicsUpdator(Id<VehicleType> id, VehicleType vT){
-		this.modeId = id;
+	public TravelModesFlowDynamicsUpdator(VehicleType vT){
 		this.vehicleType = vT;
+		this.modeId = this.vehicleType.getId();
 	}
 	
 	public void handle(LinkEnterEvent event){
