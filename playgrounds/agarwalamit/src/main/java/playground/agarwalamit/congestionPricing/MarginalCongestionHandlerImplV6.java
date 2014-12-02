@@ -66,6 +66,7 @@ PersonStuckEventHandler{
 	private final Map<Id<Link>, LinkCongestionInfoExtended> 	linkId2congestionInfo = new HashMap<>();
 	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
 	private double totalDelay = 0;
+	private double roundingErrors =0;
 
 	/**
 	 * @param events
@@ -89,15 +90,15 @@ PersonStuckEventHandler{
 		log.warn("An agent is stucking. No garantee for right calculation of external congestion effects "
 				+ "because there are no linkLeaveEvents for stucked agents.: \n" + event.toString());
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
 		this.linkId2congestionInfo.clear();
-		
+
 		storeLinkInfo();
 	}
-	
+
 	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
 			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();
@@ -120,6 +121,9 @@ PersonStuckEventHandler{
 			linkInfo.setLastEnteredAgent(event.getPersonId());
 		}
 		this.personId2LegMode.put(event.getPersonId(), travelMode);
+		if(event.getPersonId().toString().equals("16310_1")){
+			System.out.println(event.getPersonId().toString()+event.toString());
+		}
 	}
 
 	@Override
@@ -144,26 +148,36 @@ PersonStuckEventHandler{
 
 		if(delay > 0.){
 			totalDelay += delay;
-			
+
 			Id<Person> causingAgent;
 			Id<Link> causingLink;
 			String congestionType;
-			
+
 			if(linkInfo.isLinkFree(linkLeaveTime)){
 				causingLink = getNextLinkInRoute(personId, linkId, linkLeaveTime);
 				causingAgent = linkId2congestionInfo.get(causingLink).getLastEnteredAgent(); 
+
+				if (causingAgent==null ) {
+					if(delay==1){
+						roundingErrors+=delay;
+						log.warn("Delays are more than 0 for person "+personId+" but there is no causing agent. This should not happen.");
+						return;
+					}else {
+						throw new RuntimeException("Delay for person "+personId+" is"+delay+" sec. But causing agent could not be located. Aborting...");
+					}
+				} 
+
 				congestionType = CongestionType.SpillbackDelay.toString();
+
 			} else {
 				causingLink = linkId;
 				causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
 				congestionType = CongestionType.FlowDelay.toString();
 			}
-			
-			if (causingAgent==null) throw new RuntimeException("Delays are more than 0. and there is no causing agent."
-					+ "this should not happen.");
+
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, congestionType, causingAgent, 
 					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
-			System.out.println(congestionEvent);
+			//			System.out.println(congestionEvent);
 			this.events.processEvent(congestionEvent);
 		}
 		linkInfo.setLastLeavingAgent(personId);
@@ -237,10 +251,20 @@ PersonStuckEventHandler{
 				}
 			}
 		}
+		if(nextLinkInRoute==null || nextLinkInRoute.equals(Id.create("NA",Link.class))){
+			log.warn("Next link in route of person "+personId+ " on link "+linkId+" at time "+time+" is null. Routes are \n"+nRoutesAndLinkIds.toString());
+		}
 		return nextLinkInRoute;
 	}
 
 	public double getTotalDelay() {
 		return totalDelay;
+	}
+	
+	/**
+	 * @return delays which are not internalized because causing agent could not be located or other rounding errors.
+	 */
+	public double getRoundingDelays(){
+		return this.roundingErrors;
 	}
 }

@@ -43,7 +43,17 @@ public class PricingControler {
 		String congestionPricing = args[2];
 		
 		Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		
+//		String configFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/config_congestionPricing.xml";//args[0];
+//		String outputDir = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run205/";//args[1];
+//		String congestionPricing = "implV6";//args[2];
+//		String networkFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/SiouxFalls_networkWithRoadType.xml.gz";
+//		String plansFIle = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/selectedPlansOnly_plans.xml";
+//		
+//		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFIle, networkFile, configFile);
+		
 		sc.getConfig().controler().setOutputDirectory(outputDir);
+		sc.getConfig().controler().setWriteEventsInterval(1);
 		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
