@@ -62,10 +62,6 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 public class InputsForFDTestSetUp {
 	private String outputFolder;
 
-	public InputsForFDTestSetUp(String outputFolder) {
-		this.outputFolder= outputFolder;
-	}
-
 	public static final int SUBDIVISION_FACTOR=1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
 	public static final double NO_OF_LANES = 1;//in m, length of one the triangle sides.
@@ -78,6 +74,7 @@ public class InputsForFDTestSetUp {
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 	
 	void run(){
+		this.outputFolder= GenerateFundametalDiagramData.RUN_DIR;
 		setUpConfig();
 		createTriangularNetwork();
 		//Initializing modeData objects//TODO [AA]: should be initialized when instancing FundamentalDiagrams, no workaround still found
@@ -269,11 +266,11 @@ public class InputsForFDTestSetUp {
 			population.addPerson(person);
 		}
 	}
-	public Scenario getScenario(){
+	Scenario getScenario(){
 		return scenario;
 	}
 	
-	public Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
+	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
 	}
 	

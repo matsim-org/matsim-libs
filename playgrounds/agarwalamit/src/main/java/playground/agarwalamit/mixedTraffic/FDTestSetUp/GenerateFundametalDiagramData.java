@@ -73,37 +73,59 @@ public class GenerateFundametalDiagramData {
 
 	//CONFIGURATION: static variables used for aggregating configuration options
 
-	public static final boolean PASSING_ALLOWED = true;
-	public static final boolean SEEPAGE_ALLOWED = true;
-	private final boolean SEEP_NETWORK_FACTORY = true;
+	static boolean PASSING_ALLOWED = false;
+	static boolean SEEPAGE_ALLOWED = false;
+	private boolean SEEP_NETWORK_FACTORY = false;
 	private final boolean LIVE_OTFVis = false;
-	public static final boolean WITH_HOLES = true;
-	
-	private static final String OUTPUT_FOLDER = "/run305/";
-	private static final String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
-	private static final String OUTPUT_FILE = RUN_DIR+OUTPUT_FOLDER+"/data.txt"; //"pathto\\data.txt";
-	private static final String OUTPUT_EVENTS =RUN_DIR+OUTPUT_FOLDER+"/events.xml";// "pathto\\events.xml";
-	public static final boolean writeInputFiles = true; // includes config,network and plans
+	static boolean WITH_HOLES = false;
 
-	public final static String[] TRAVELMODES= {"car","bike"};	//identification of the different modes
-	public final static Double[] MODAL_SPLIT = {0.5,0.5}; //modal split in PCU 
+	static String RUN_DIR ;
+	
+	private static String OUTPUT_FD_DATA ;
+	static boolean writeInputFiles = true; // includes config,network and plans
+
+	static String[] TRAVELMODES;	//identification of the different modes
+	static Double[] MODAL_SPLIT; //modal split in PCU 
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 1;
+	private int reduceDataPointsByFactor = 1;
 
-	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
-	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
+	private int flowUnstableWarnCount [] ;
+	private int speedUnstableWarnCount [] ;
 
 	private static InputsForFDTestSetUp inputs;
 	private PrintStream writer;
 	private Scenario scenario;
-	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
-	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 
-	public GenerateFundametalDiagramData(){
-		createLogFile();
+	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
+
+	public static void main(String[] args) {
+		
+		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
+		String OUTPUT_FOLDER ="/run306/";
+		String [] travelModes= {"car","bike"};
+		Double [] modalSplit = {0.5,0.5};
+		
+		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
+		generateFDData.setTravelModes(travelModes);
+		generateFDData.setModalSplit(modalSplit);
+		generateFDData.setPassingAllowed(true);
+		generateFDData.setSeepageAllowed(true);
+		generateFDData.setOutputFDDataFile(RUN_DIR+OUTPUT_FOLDER+"data.txt");
+		generateFDData.setWriteInputFiles(true);
+		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
+		generateFDData.setUseHoles(true);
+		generateFDData.setUsingSeepNetworkFactory(true);
+		generateFDData.run();
+	}
+	
+	private void consistencyCheckAndInitialize(){
+		if(writeInputFiles) {
+			createLogFile();
+		}
 
 		if (TRAVELMODES.length != MODAL_SPLIT.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
@@ -113,19 +135,70 @@ public class GenerateFundametalDiagramData {
 		if(SEEPAGE_ALLOWED) log.info("=======Seepage is allowed.========");
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
 
-		inputs = new InputsForFDTestSetUp(RUN_DIR+OUTPUT_FOLDER);
+		if(writeInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
+		if(OUTPUT_FD_DATA==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+		
+		flowUnstableWarnCount = new int [TRAVELMODES.length];
+		speedUnstableWarnCount = new int [TRAVELMODES.length];
+	}
+
+	/**
+	 * @param outputFile final data will be written to this file
+	 */
+	public void run(){
+		
+		consistencyCheckAndInitialize();
+		
+		inputs = new InputsForFDTestSetUp();
 		inputs.run();
 		scenario = inputs.getScenario();
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
-	}
-
-	public static void main(String[] args) {
-		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
-		generateFDData.openFileAndWriteHeader(OUTPUT_FILE);
-		generateFDData.parametricRunAccordingToGivenModalSplit();
+		
+		openFileAndWriteHeader(OUTPUT_FD_DATA);
+		parametricRunAccordingToGivenModalSplit();
 		//		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
-		generateFDData.closeFile();
+		closeFile();
+	}
+
+	public void setRunDirectory(String runDir) {
+		RUN_DIR = runDir;
+	}
+
+	public void setOutputFDDataFile(String outFdDataFile) {
+		OUTPUT_FD_DATA = outFdDataFile;
+	}
+	
+	public void setPassingAllowed(boolean isPassingAllowed) {
+		PASSING_ALLOWED = isPassingAllowed;
+	}
+
+	public void setSeepageAllowed(boolean isSeepageAllowed) {
+		SEEPAGE_ALLOWED = isSeepageAllowed;
+	}
+
+	public void setWriteInputFiles(boolean writeInputFiles) {
+		GenerateFundametalDiagramData.writeInputFiles = writeInputFiles;
+	}
+
+	public void setTravelModes(String[] travelModes) {
+		TRAVELMODES = travelModes;
+	}
+
+	public void setModalSplit(Double[] modalSplit) {
+		MODAL_SPLIT = modalSplit;
+	}
+
+	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
+		this.reduceDataPointsByFactor = reduceDataPointsByFactor;
+	}
+
+	public void setUseHoles(boolean isUsingHole) {
+		WITH_HOLES = isUsingHole;
+	}
+	
+	private void setUsingSeepNetworkFactory(boolean isUsingMySeepNetworkFactory){
+		SEEP_NETWORK_FACTORY = isUsingMySeepNetworkFactory;
 	}
 
 	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
@@ -254,8 +327,11 @@ public class GenerateFundametalDiagramData {
 		//		this.modesData = fundiN.getModesData();
 		//		funfunfun = fundiN;
 		events.addHandler(globalFlowDynamicsUpdator);
-		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
-
+		
+		if(writeInputFiles){
+			events.addHandler(new EventWriterXML(RUN_DIR+"/events.xml"));
+		}
+		
 		Netsim qSim = createModifiedQSim(this.scenario, events);
 
 		qSim.run();
@@ -344,7 +420,7 @@ public class GenerateFundametalDiagramData {
 		agentSource.setModeVehicleTypes(travelModesTypes);
 
 		qSim.addAgentSource(agentSource);
-		
+
 		if ( LIVE_OTFVis ) {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
@@ -354,7 +430,7 @@ public class GenerateFundametalDiagramData {
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 		}
-		
+
 		return qSim;
 	}
 
@@ -432,7 +508,7 @@ public class GenerateFundametalDiagramData {
 		layout.setConversionPattern(conversionPattern);
 		FileAppender appender;
 		try {
-			appender = new FileAppender(layout, RUN_DIR+OUTPUT_FOLDER+"/logfile.log",false);
+			appender = new FileAppender(layout, RUN_DIR+"/logfile.log",false);
 		} catch (IOException e1) {
 			throw new RuntimeException("File not found.");
 		}
