@@ -546,6 +546,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		public String getActivityType() {
 			return this.type;
 		}
+
 		@StringSetter( "activityType" )
 		public void setActivityType(final String type) {
 			this.type = type;
@@ -555,27 +556,45 @@ public class PlanCalcScoreConfigGroup extends Module {
 		public double getPriority() {
 			return this.priority;
 		}
+
 		@StringSetter( "priority" )
 		public void setPriority(final double priority) {
 			this.priority = priority;
 		}
 
 		@StringGetter( "typicalDuration" )
+		private String getTypicalDurationString() {
+			return Time.writeTime( getTypicalDuration() );
+		}
+
 		public double getTypicalDuration() {
 			return this.typicalDuration;
 		}
+
 		@StringSetter( "typicalDuration" )
+		private void setTypicalDuration(final String typicalDuration) {
+			setTypicalDuration( Time.parseTime( typicalDuration ) );
+		}
+
 		public void setTypicalDuration(final double typicalDuration) {
 			this.typicalDuration = typicalDuration;
 		}
 
 		@StringGetter( "minimalDuration" )
+		private String getMinimalDurationString() {
+			return Time.writeTime( getMinimalDuration() );
+		}
+
 		public double getMinimalDuration() {
 			return this.minimalDuration;
 		}
 
-		private static int minDurCnt=0 ;
 		@StringSetter( "minimalDuration" )
+		private void setMinimalDuration(final String minimalDuration) {
+			setMinimalDuration( Time.parseTime( minimalDuration ) );
+		}
+
+		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
 			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
 				minDurCnt++ ;
@@ -586,37 +605,69 @@ public class PlanCalcScoreConfigGroup extends Module {
 		}
 
 		@StringGetter( "openingTime" )
+		private String getOpeningTimeString() {
+			return Time.writeTime( getOpeningTime() );
+		}
+
 		public double getOpeningTime() {
 			return this.openingTime;
 		}
 		@StringSetter( "openingTime" )
+		private void setOpeningTime(final String openingTime) {
+			setOpeningTime( Time.parseTime( openingTime ) );
+		}
+
 		public void setOpeningTime(final double openingTime) {
 			this.openingTime = openingTime;
 		}
 
 		@StringGetter( "latestStartTime" )
+		private String getLatestStartTimeString() {
+			return Time.writeTime( getLatestStartTime() );
+		}
+
 		public double getLatestStartTime() {
 			return this.latestStartTime;
 		}
 		@StringSetter( "latestStartTime" )
+		private void setLatestStartTime(final String latestStartTime) {
+			setLatestStartTime( Time.parseTime( latestStartTime ) );
+		}
+
 		public void setLatestStartTime(final double latestStartTime) {
 			this.latestStartTime = latestStartTime;
 		}
 
 		@StringGetter( "earliestEndTime" )
+		private String getEarliestEndTimeString() {
+			return Time.writeTime( getEarliestEndTime() );
+		}
+
 		public double getEarliestEndTime() {
 			return this.earliestEndTime;
 		}
 		@StringSetter( "earliestEndTime" )
+		private void setEarliestEndTime(final String earliestEndTime) {
+			setEarliestEndTime( Time.parseTime( earliestEndTime ) );
+		}
+
 		public void setEarliestEndTime(final double earliestEndTime) {
 			this.earliestEndTime = earliestEndTime;
 		}
 
 		@StringGetter( "closingTime" )
+		private String getClosingTimeString() {
+			return Time.writeTime( getClosingTime() );
+		}
+
 		public double getClosingTime() {
 			return this.closingTime;
 		}
 		@StringSetter( "closingTime" )
+		private void setClosingTime(final String closingTime) {
+			setClosingTime( Time.parseTime( closingTime ) );
+		}
+
 		public void setClosingTime(final double closingTime) {
 			this.closingTime = closingTime;
 		}

@@ -292,13 +292,13 @@ public class PlanCalcScoreConfigGroupTest {
 		for ( int i=0; i < 10; i++ ) {
 			final ActivityParams settings = new ActivityParams();
 			settings.setActivityType( "activity-type-"+i );
-			settings.setClosingTime( random.nextDouble()*24*3600 );
-			settings.setEarliestEndTime( random.nextDouble()*24*3600 );
-			settings.setLatestStartTime( random.nextDouble()*24*3600 );
-			settings.setMinimalDuration( random.nextDouble()*24*3600 );
-			settings.setOpeningTime( random.nextDouble()*24*3600 );
+			settings.setClosingTime( random.nextInt( 24*3600 ) );
+			settings.setEarliestEndTime( random.nextInt( 24*3600 ) );
+			settings.setLatestStartTime( random.nextInt( 24*3600 ) );
+			settings.setMinimalDuration( random.nextInt( 24*3600 ) );
+			settings.setOpeningTime( random.nextInt( 24*3600 ) );
 			settings.setPriority( random.nextInt( 10 ) );
-			settings.setTypicalDuration( random.nextDouble()*24*3600 );
+			settings.setTypicalDuration( random.nextInt( 24*3600 ) );
 
 			group.addActivityParams( settings );
 		}
