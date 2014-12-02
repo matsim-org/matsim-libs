@@ -149,7 +149,12 @@ class MyAgent implements MobsimDriverAgent {
 		return 0. ;  // what does this matter for?
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return TransportMode.car ; // either car or nothing
 	}

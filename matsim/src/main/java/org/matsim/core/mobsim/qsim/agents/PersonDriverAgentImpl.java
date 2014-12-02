@@ -23,11 +23,7 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
@@ -94,7 +90,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
 
-	@Override
+    @Override
+    public final Double getExpectedTravelDistance() {
+        return basicAgentDelegate.getExpectedTravelDistance();
+    }
+
+    @Override
 	public String toString() {
 		return basicAgentDelegate.toString();
 	}

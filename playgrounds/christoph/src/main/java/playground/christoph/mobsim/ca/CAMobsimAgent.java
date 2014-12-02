@@ -79,7 +79,12 @@ public class CAMobsimAgent implements MobsimAgent {
 		return null;
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		// TODO Auto-generated method stub
 		return null;

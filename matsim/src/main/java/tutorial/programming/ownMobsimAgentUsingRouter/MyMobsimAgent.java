@@ -1,8 +1,5 @@
 package tutorial.programming.ownMobsimAgentUsingRouter;
 
-import java.util.Map;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -14,6 +11,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Map;
+import java.util.Random;
+
 /**
  * MobsimDriverAgent that (1) selects a random destination; (2) computes best path to it at every turn; (3) at destination selects a new random 
  * destination.
@@ -22,6 +22,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author nagel
  */
+
 class MyMobsimAgent implements MobsimDriverAgent {
 	private Id<Person> id;
 	private MyGuidance guidance;
@@ -86,7 +87,12 @@ class MyMobsimAgent implements MobsimDriverAgent {
 		return null ;
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return TransportMode.car ;
 	}

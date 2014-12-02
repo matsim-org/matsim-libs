@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim;
 
-import java.util.Iterator;
-
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -33,7 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import java.util.Iterator;
 
 /**
  * An agent driving around randomly to relocate bikes.
@@ -154,7 +152,12 @@ public class SimplisticRelocationAgent implements MobsimDriverAgent /*MobsimAgen
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return TransportMode.car;
 	}

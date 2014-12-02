@@ -41,42 +41,33 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class Main {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		
-		final Controler ctrl = new Controler("abd") ;
-		
-		ctrl.setMobsimFactory(new MobsimFactory(){
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				
-				MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance( MobsimType.qsim.toString() ) ;
-				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
-				// von mir aus ok so.  Aber ist es der empfohlene Weg?
-				
-				// yy Wäre schön, wenn diese "angenehmere Variante" enrichSimulation irgendwie enthalten würde.
-				
-				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
-				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
-				// sure that this is appropriately delayed.
-				qsim.addAgentSource(new AgentSource(){
-					@Override
-					public void insertAgentsIntoMobsim() {
-						// insert traveler agent:
-						final MobsimAgent ag = new MyMobsimAgent() ;
-						qsim.insertAgentIntoMobsim(ag) ;
-						
-						// insert vehicle:
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType() );
-						Id<Link> linkId4VehicleInsertion = null ;
-						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
-					}
-				}) ;
-				return qsim ;
-			}
-		}) ;
+		final Controler controler = new Controler("examples/tutorial/config/example5-config.xml");
+        controler.setMobsimFactory(new MobsimFactory() {
+            @Override
+            public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+                sc.getConfig().qsim().setEndTime(25*60*60);
+                sc.getConfig().controler().setLastIteration(0);
+                sc.getPopulation().getPersons().clear();
+                MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance(MobsimType.qsim.toString());
+                final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager);
+                qsim.addAgentSource(new AgentSource() {
+                    @Override
+                    public void insertAgentsIntoMobsim() {
+                        // insert traveler agent:
+                        final MobsimAgent ag = new MyMobsimAgent(qsim.getScenario(), qsim.getSimTimer());
+                        qsim.insertAgentIntoMobsim(ag);
+
+                        // insert vehicle:
+                        final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+                        Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
+                        qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+                    }
+                });
+                return qsim;
+            }
+        });
+        controler.run();
 	}
 
 }

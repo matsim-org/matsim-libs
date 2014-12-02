@@ -7,12 +7,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -23,7 +18,6 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions.HasBasePerson;
@@ -164,7 +158,13 @@ public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, Ha
 	public Double getExpectedTravelTime() {
 		return ((Leg)getCurrentPlanElement()).getTravelTime();
 	}
-	@Override
+
+    @Override
+    public Double getExpectedTravelDistance() {
+        return ((Leg)getCurrentPlanElement()).getRoute().getDistance();
+    }
+
+    @Override
 	public String getMode() {
 		return ((Leg)getCurrentPlanElement()).getMode();
 	}

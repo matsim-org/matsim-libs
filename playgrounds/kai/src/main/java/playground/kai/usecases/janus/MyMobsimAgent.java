@@ -18,10 +18,6 @@
  * *********************************************************************** */
 package playground.kai.usecases.janus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.janusproject.kernel.agent.Kernels;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +29,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 class MyMobsimAgent implements MobsimDriverAgent {
 	
@@ -102,7 +102,13 @@ class MyMobsimAgent implements MobsimDriverAgent {
 		throw new RuntimeException("not implemented"); // should not be needed since agent does not teleport
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        // TODO Auto-generated method stub
+        throw new RuntimeException("not implemented"); // should not be needed since agent does not teleport
+    }
+
+    @Override
 	public String getMode() {
 		return TransportMode.car ; 
 	}

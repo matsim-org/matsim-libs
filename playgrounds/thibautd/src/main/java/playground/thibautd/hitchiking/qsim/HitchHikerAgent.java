@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,9 +35,10 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
+
+import java.util.List;
 
 /**
  * Agent for simulating casual car-pooling.
@@ -232,7 +231,12 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 		return delegate.getExpectedTravelTime();
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return delegate.getExpectedTravelDistance();
+    }
+
+    @Override
 	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 		delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 	}

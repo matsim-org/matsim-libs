@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +36,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * @author mrieser
@@ -102,7 +102,12 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
 
-	@Override
+    @Override
+    public final Double getExpectedTravelDistance() {
+        return basicAgentDelegate.getExpectedTravelDistance();
+    }
+
+    @Override
 	public final PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
 	}

@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.wagonSim.mobsim.qsim.agents;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,6 +39,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 /**
  * The functionality of this class is no longer necessary, due to changes assumptions
@@ -164,7 +164,12 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 		return this.delegate.getExpectedTravelTime();
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return delegate.getExpectedTravelDistance();
+    }
+
+    @Override
 	public String getMode() {
 		return this.delegate.getMode();
 	}

@@ -20,35 +20,25 @@
 
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * @author ssix
@@ -416,7 +406,16 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 		return ((Leg) currentPlanElement).getTravelTime();
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        PlanElement currentPlanElement = this.getCurrentPlanElement();
+        if (!(currentPlanElement instanceof Leg)) {
+            return null;
+        }
+        return ((Leg) currentPlanElement).getRoute().getDistance();
+    }
+
+    @Override
 	public final String getMode() {
 		if( this.currentPlanElementIndex >= this.plan.getPlanElements().size() ) {
 			// just having run out of plan elements it not an argument for not being able to answer the "mode?" question.
@@ -476,10 +475,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 		currentLinkIdIndex = index;
 	}
 	
-	
-	/**
-	 * copy of {@link ActivityDurationUtils.calculateDepartureTime}
-	 */
+
 	private double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10

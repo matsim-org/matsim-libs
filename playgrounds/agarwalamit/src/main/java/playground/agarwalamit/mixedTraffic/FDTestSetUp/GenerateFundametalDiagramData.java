@@ -20,14 +20,6 @@
 
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -59,8 +51,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * @author amit after ssix
@@ -560,7 +555,12 @@ public class GenerateFundametalDiagramData {
 			return delegate.getExpectedTravelTime();
 		}
 
-		@Override
+        @Override
+        public Double getExpectedTravelDistance() {
+            return delegate.getExpectedTravelDistance();
+        }
+
+        @Override
 		public final String getMode() {
 			return delegate.getMode();
 		}

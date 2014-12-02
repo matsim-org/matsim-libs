@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,12 +47,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 
 /**
  * @author thibautd
@@ -295,7 +294,12 @@ public class BikeSharingEngineTest {
 			return leg.getTravelTime();
 		}
 
-		@Override
+        @Override
+        public Double getExpectedTravelDistance() {
+            return leg.getRoute().getDistance();
+        }
+
+        @Override
 		public String getMode() {
 			return leg.getMode();
 		}

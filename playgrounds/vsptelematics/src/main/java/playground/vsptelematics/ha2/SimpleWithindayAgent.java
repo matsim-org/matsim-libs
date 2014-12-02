@@ -109,7 +109,12 @@ public class SimpleWithindayAgent implements MobsimDriverAgent {
 		return delegate.getExpectedTravelTime();
 	}
 
-	public final String getMode() {
+    @Override
+    public Double getExpectedTravelDistance() {
+        return delegate.getExpectedTravelDistance();
+    }
+
+    public final String getMode() {
 		return delegate.getMode();
 	}
 

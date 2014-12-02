@@ -31,11 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -124,8 +120,13 @@ public class TransitDriver extends AbstractTransitDriver {
 	public Double getExpectedTravelTime() {
 		return this.currentLeg.getTravelTime() ;
 	}
-	
-	@Override 
+
+    @Override
+    public Double getExpectedTravelDistance() {
+        return this.currentLeg.getRoute().getDistance();
+    }
+
+    @Override
 	public String getMode() {
 		return this.currentLeg.getMode();
 	}

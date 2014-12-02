@@ -136,7 +136,12 @@ public class GuidanceWithindayAgent implements MobsimDriverAgent {
 		return delegate.getExpectedTravelTime();
 	}
 
-	public String getMode() {
+    @Override
+    public Double getExpectedTravelDistance() {
+        return delegate.getExpectedTravelDistance();
+    }
+
+    public String getMode() {
 		return delegate.getMode();
 	}
 

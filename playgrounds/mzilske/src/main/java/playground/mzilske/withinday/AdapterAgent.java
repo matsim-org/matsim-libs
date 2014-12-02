@@ -1,7 +1,5 @@
 package playground.mzilske.withinday;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -21,6 +19,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.List;
 
 public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSimStepListener {
 	
@@ -306,8 +306,13 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 	public Double getExpectedTravelTime() {
 		return null ; 	
 	}
-    
-	@Override
+
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return this.mode ;
 	}

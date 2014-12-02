@@ -70,7 +70,12 @@ class MyMobsimAgent implements MobsimDriverAgent {
 		return null ;
 	}
 
-	@Override
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return TransportMode.car ;
 	}

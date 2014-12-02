@@ -763,6 +763,7 @@ public class TransitQueueSimulationTest {
         Leg leg1 = pb.createLeg(TransportMode.walk);
         Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
         route1.setTravelTime(10.0);
+        route1.setDistance(10.0);
         leg1.setRoute(route1);
         Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act2.setEndTime(0.0);
@@ -775,6 +776,7 @@ public class TransitQueueSimulationTest {
         Leg leg3 = pb.createLeg(TransportMode.walk);
         Route route3 = new GenericRouteImpl(link2.getId(), link2.getId());
         route3.setTravelTime(10.0);
+        route3.setDistance(10.0);
         leg3.setRoute(route3);
         Activity act4 = pb.createActivityFromLinkId("w", link2.getId());
 
@@ -831,12 +833,12 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent); // zero activity duration, waiting at stop is considered as leg
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // walk
+        assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent); // pt-driver
+        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);
         assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent);
         assertTrue(allEvents.get(++idx) instanceof ActivityStartEvent);
         assertEquals("w", ((ActivityStartEvent) allEvents.get(idx)).getActType());
-        assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);
-        assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent); // pt-driver
-        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent); // pt-driver
     }
 }

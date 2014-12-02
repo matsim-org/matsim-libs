@@ -21,8 +21,6 @@
 package org.matsim.pt.fakes;
 
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -44,6 +42,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 
 /**
@@ -96,8 +96,13 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		// since the class does not tell what it is supposed to do I do not know what is a reasonable answer here.  kai, jun'11
 		return null;
 	}
-	
-	@Override
+
+    @Override
+    public Double getExpectedTravelDistance() {
+        return null;
+    }
+
+    @Override
 	public String getMode() {
 		return this.dummyLeg.getMode();
 	}

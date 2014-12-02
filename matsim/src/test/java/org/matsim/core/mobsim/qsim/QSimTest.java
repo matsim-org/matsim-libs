@@ -199,9 +199,9 @@ public class QSimTest {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg("other");
-		Route route = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute("undefined", f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
-		leg.setRoute(route);
-		leg.setTravelTime(15.0);
+		Route route = f.scenario.getPopulation().getFactory().createRoute("undefined", f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
+        route.setTravelTime(15.0);
+        leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
 		f.plans.addPerson(person);
 
@@ -1223,8 +1223,8 @@ public class QSimTest {
 		act1.setEndTime(7.0*3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
 		GenericRoute route = new GenericRouteImpl(link.getId(), link.getId());
-		leg.setRoute(route);
-		leg.setTravelTime(5.0*3600);
+        route.setTravelTime(5.0*3600);
+        leg.setRoute(route);
 		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
 		plan.addActivity(act1);
 		plan.addLeg(leg);
@@ -1240,7 +1240,7 @@ public class QSimTest {
 		QSim sim = createQSim(scenario, events);
 		sim.run();
 		Assert.assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times

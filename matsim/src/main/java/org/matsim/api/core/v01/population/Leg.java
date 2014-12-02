@@ -23,35 +23,31 @@ package org.matsim.api.core.v01.population;
 
 public interface Leg extends PlanElement {
 
-	public String getMode();
+    public String getMode();
 
-	/**Sets the mode of the leg. No consistency check is done; in particular, the route or travel time info from
-	 * a different mode may remain in place.
-	 */
-	public void setMode(String mode);
+    /**
+     * Sets the mode of the leg. No consistency check is done; in particular, the route or travel time info from
+     * a different mode may remain in place.
+     */
+    public void setMode(String mode);
 
-	public Route getRoute();
+    public Route getRoute();
 
-	public void setRoute(Route route);
+    public void setRoute(Route route);
 
-	public double getDepartureTime();
+    public double getDepartureTime();
 
-	public void setDepartureTime(final double seconds);
+    public void setDepartureTime(final double seconds);
 
-	/**Design thoughts:<ul>
-	 * <li>There is also a get/set(Expected)TravelTime in the route.  One of these should go.  Given that there is also an
-	 * get/set(Expected)Distance in the Route, but not in the leg, it is maybe more pragmatic to remove it from the leg?
-	 * kai/benjamin, jun'11
-	 * </ul>
-	 */
-	public double getTravelTime();
+    /**
+     * Design thoughts:<ul>
+     * <li>There is also a getTravelTime in the route.  One of these should go.  Given that there is also an
+     * getDistance in the Route, but not in the leg, it is maybe more pragmatic to remove it from the leg?
+     * kai/benjamin, jun'11
+     * </ul>
+     */
+    public double getTravelTime();
 
-	/**Design thoughts:<ul>
-	 * <li>There is also a get/set(Expected)TravelTime in the route.  One of these should go.  Given that there is also an
-	 * get/set(Expected)Distance in the Route, but not in the leg, it is maybe more pragmatic to remove it from the leg?
-	 * kai/benjamin, jun'11
-	 * </ul>
-	 */
-	public void setTravelTime(final double seconds);
+    public void setTravelTime(final double seconds);
 
 }

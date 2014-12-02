@@ -25,14 +25,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 
 /**
  * @author nagel
- *
  */
 public interface PlanAgent extends MobsimAgentMarkerInterface {
 
-	public PlanElement getCurrentPlanElement() ;
+    public PlanElement getCurrentPlanElement();
 
-	public PlanElement getNextPlanElement() ;
-	
-	public Plan getCurrentPlan() ;
-	
+    public PlanElement getNextPlanElement();
+
+    public Plan getCurrentPlan();
+
 }

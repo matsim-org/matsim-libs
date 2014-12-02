@@ -19,16 +19,16 @@
 
 package org.matsim.core.api.experimental.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
+import java.util.Map;
+
 /**
  * This is similar to the VehicleArrival and PersonArrival events.
- * It is at the moment used for the scoring of teleported legs. 
+ * It is used for scoring teleported legs.
  */
 public class TeleportationArrivalEvent extends Event implements HasPersonId {
 
