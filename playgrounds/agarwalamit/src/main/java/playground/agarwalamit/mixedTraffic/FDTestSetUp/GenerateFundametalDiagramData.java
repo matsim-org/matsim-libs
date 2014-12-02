@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -73,10 +74,9 @@ public class GenerateFundametalDiagramData {
 	private boolean SEEP_NETWORK_FACTORY = false;
 	private final boolean LIVE_OTFVis = false;
 	static boolean WITH_HOLES = false;
-
+	boolean WRITE_FD_DATA = true;
 	static String RUN_DIR ;
-	
-	private static String OUTPUT_FD_DATA ;
+
 	static boolean writeInputFiles = true; // includes config,network and plans
 
 	static String[] TRAVELMODES;	//identification of the different modes
@@ -97,26 +97,33 @@ public class GenerateFundametalDiagramData {
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 
+	/**
+	 * Overall density to vehicular flow and speed.
+	 */
+	private Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
+
 	public static void main(String[] args) {
-		
+
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
 		String OUTPUT_FOLDER ="/run306/";
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
-		
+
 		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
+		
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
 		generateFDData.setSeepageAllowed(true);
-		generateFDData.setOutputFDDataFile(RUN_DIR+OUTPUT_FOLDER+"data.txt");
-		generateFDData.setWriteInputFiles(true);
+		generateFDData.setIsWritingFinalFdData(true);
+		generateFDData.setWriteInputFiles(false);
 		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
 		generateFDData.setUseHoles(true);
 		generateFDData.setUsingSeepNetworkFactory(true);
+		
 		generateFDData.run();
 	}
-	
+
 	private void consistencyCheckAndInitialize(){
 		if(writeInputFiles) {
 			createLogFile();
@@ -131,8 +138,8 @@ public class GenerateFundametalDiagramData {
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
 
 		if(writeInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
-		if(OUTPUT_FD_DATA==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
-		
+		if(WRITE_FD_DATA && RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+
 		flowUnstableWarnCount = new int [TRAVELMODES.length];
 		speedUnstableWarnCount = new int [TRAVELMODES.length];
 	}
@@ -141,29 +148,25 @@ public class GenerateFundametalDiagramData {
 	 * @param outputFile final data will be written to this file
 	 */
 	public void run(){
-		
+
 		consistencyCheckAndInitialize();
-		
+
 		inputs = new InputsForFDTestSetUp();
 		inputs.run();
 		scenario = inputs.getScenario();
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
-		
-		openFileAndWriteHeader(OUTPUT_FD_DATA);
+
+		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
 		parametricRunAccordingToGivenModalSplit();
 		//		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
-		closeFile();
+		if(WRITE_FD_DATA) closeFile();
 	}
 
 	public void setRunDirectory(String runDir) {
 		RUN_DIR = runDir;
 	}
 
-	public void setOutputFDDataFile(String outFdDataFile) {
-		OUTPUT_FD_DATA = outFdDataFile;
-	}
-	
 	public void setPassingAllowed(boolean isPassingAllowed) {
 		PASSING_ALLOWED = isPassingAllowed;
 	}
@@ -191,9 +194,17 @@ public class GenerateFundametalDiagramData {
 	public void setUseHoles(boolean isUsingHole) {
 		WITH_HOLES = isUsingHole;
 	}
-	
+
 	private void setUsingSeepNetworkFactory(boolean isUsingMySeepNetworkFactory){
 		SEEP_NETWORK_FACTORY = isUsingMySeepNetworkFactory;
+	}
+
+	public Map<Double, Map<String, Tuple<Double, Double>>> getOutData() {
+		return outData;
+	}
+
+	public void setIsWritingFinalFdData(boolean isWritingFinalData) {
+		WRITE_FD_DATA = isWritingFinalData;
 	}
 
 	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
@@ -322,11 +333,11 @@ public class GenerateFundametalDiagramData {
 		//		this.modesData = fundiN.getModesData();
 		//		funfunfun = fundiN;
 		events.addHandler(globalFlowDynamicsUpdator);
-		
+
 		if(writeInputFiles){
 			events.addHandler(new EventWriterXML(RUN_DIR+"/events.xml"));
 		}
-		
+
 		Netsim qSim = createModifiedQSim(this.scenario, events);
 
 		qSim.run();
@@ -352,26 +363,38 @@ public class GenerateFundametalDiagramData {
 			}
 		}
 
-		writer.format("%d\t\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
-		for (int i=0; i < TRAVELMODES.length; i++){
-			writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
+		if(WRITE_FD_DATA) {
+			writer.format("%d\t\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
+			for (int i=0; i < TRAVELMODES.length; i++){
+				writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
+			}
+			writer.print("\t");
+			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
+			for (int i=0; i < TRAVELMODES.length; i++){
+				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentDensity());
+			}
+			writer.print("\t");
+			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentFlow());
+			for (int i=0; i < TRAVELMODES.length; i++){
+				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow());
+			}
+			writer.print("\t");
+			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentAverageVelocity());
+			for (int i=0; i < TRAVELMODES.length; i++){
+				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
+			}
+			writer.print("\n");
 		}
-		writer.print("\t");
-		writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
-		for (int i=0; i < TRAVELMODES.length; i++){
-			writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentDensity());
+		//storing data in map
+		Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<String, Tuple<Double,Double>>();
+		for(int i=0; i < TRAVELMODES.length; i++){
+
+			Tuple<Double, Double> flowSpeed = 
+					new Tuple<Double, Double>(this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow(),
+							this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
+			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
+			outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 		}
-		writer.print("\t");
-		writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentFlow());
-		for (int i=0; i < TRAVELMODES.length; i++){
-			writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow());
-		}
-		writer.print("\t");
-		writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentAverageVelocity());
-		for (int i=0; i < TRAVELMODES.length; i++){
-			writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
-		}
-		writer.print("\n");
 	}
 
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
@@ -559,8 +582,8 @@ public class GenerateFundametalDiagramData {
         public Double getExpectedTravelDistance() {
             return delegate.getExpectedTravelDistance();
         }
-
-        @Override
+        
+		@Override
 		public final String getMode() {
 			return delegate.getMode();
 		}
