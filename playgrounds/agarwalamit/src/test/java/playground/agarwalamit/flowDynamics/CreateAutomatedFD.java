@@ -81,6 +81,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import playground.agarwalamit.mixedTraffic.FDTestSetUp.MyPersonDriverAgentImpl;
+
 /**
  * @author amit
  */
@@ -889,4 +891,5 @@ public class CreateAutomatedFD {
 		}
 
 	}
+	
 }
