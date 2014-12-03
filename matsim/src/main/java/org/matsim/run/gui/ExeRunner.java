@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * @author mrieser
  */
-public class ExeRunner {
+/*package*/ class ExeRunner {
 
 	/*package*/ final static Logger log = Logger.getLogger(ExeRunner.class);
 	

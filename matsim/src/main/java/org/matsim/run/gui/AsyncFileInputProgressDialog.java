@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * 
  * @author mrieser / Senozon AG
  */
-public class AsyncFileInputProgressDialog extends JDialog {
+/*package*/ class AsyncFileInputProgressDialog extends JDialog {
 
 	private final static Logger log = Logger.getLogger(AsyncFileInputProgressDialog.class);
 	
