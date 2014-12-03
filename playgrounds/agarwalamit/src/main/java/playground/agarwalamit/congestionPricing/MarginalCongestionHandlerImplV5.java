@@ -131,6 +131,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, "Delay", causingAgent, 
 					personId, delay, linkId, linkInfo.getPersonId2linkEnterTime().get(causingAgent));
 			this.events.processEvent(congestionEvent);
+			System.out.println(congestionEvent.toString());
 		}
 		linkInfo.setLastLeavingAgent(personId);
 	}

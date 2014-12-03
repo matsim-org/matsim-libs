@@ -177,7 +177,7 @@ PersonStuckEventHandler{
 
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, congestionType, causingAgent, 
 					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
-			//			System.out.println(congestionEvent);
+						System.out.println(congestionEvent);
 			this.events.processEvent(congestionEvent);
 		}
 		linkInfo.setLastLeavingAgent(personId);

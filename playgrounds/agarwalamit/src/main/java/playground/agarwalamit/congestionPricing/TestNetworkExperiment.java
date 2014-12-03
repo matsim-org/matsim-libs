@@ -73,7 +73,7 @@ public class TestNetworkExperiment {
 
 	public static void main(String[] args) {
 		TestNetworkExperiment testEx = new TestNetworkExperiment();
-		//testEx.test4MarginalCongestionCosts();
+//		testEx.test4MarginalCongestionCosts();
 		testEx.printData();
 	}
 
@@ -94,7 +94,7 @@ public class TestNetworkExperiment {
 		events.addHandler(writer);
 
 		final boolean useOTFVis = true ;
-		QSim qSim = createQSim(sc, events,useOTFVis);
+		QSim qSim = createQSim(sc, events, useOTFVis);
 		qSim.run();
 		writer.closeFile();
 	}
@@ -102,14 +102,23 @@ public class TestNetworkExperiment {
 
 	public void printData(){
 		Map<Id<Person>, Double> personId2AffectedDelays_v4 = getPersonId2Delays("v4", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelays_v5 = getPersonId2Delays("v5", "affected");
 		Map<Id<Person>, Double> personId2AffectedDelays_v6 = getPersonId2Delays("v6", "affected");
 		Map<Id<Person>, Double> personId2CausingDelays_v4 = getPersonId2Delays("v4", "causing");
+		Map<Id<Person>, Double> personId2CausingDelays_v5 = getPersonId2Delays("v5", "causing");
 		Map<Id<Person>, Double> personId2CausingDelays_v6 = getPersonId2Delays("v6", "causing");
 
-		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V6) ");
-		for(Id<Person> personId : personId2AffectedDelays_v4.keySet()){
-			System.out.println(personId + "\t" + personId2AffectedDelays_v4.get(personId) + "\t" + personId2AffectedDelays_v6.get(personId) + "\t" + 
-					personId2CausingDelays_v4.get(personId) + "\t" + personId2CausingDelays_v6.get(personId));
+		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) ");
+		
+		Set<Id<Person>> personIds = new HashSet<Id<Person>>();
+		personIds.addAll(personId2AffectedDelays_v4.keySet());
+		personIds.addAll(personId2CausingDelays_v4.keySet());
+		personIds.addAll(personId2AffectedDelays_v5.keySet());
+		personIds.addAll(personId2CausingDelays_v5.keySet());
+		
+		for(Id<Person> personId : personIds){
+			System.out.println(personId + "\t" + personId2AffectedDelays_v4.get(personId) + "\t"+ personId2AffectedDelays_v5.get(personId) + "\t"  + personId2AffectedDelays_v6.get(personId) + "\t" + 
+					personId2CausingDelays_v4.get(personId) + "\t" +personId2CausingDelays_v5.get(personId) + "\t" + personId2CausingDelays_v6.get(personId));
 		}
 	}
 
