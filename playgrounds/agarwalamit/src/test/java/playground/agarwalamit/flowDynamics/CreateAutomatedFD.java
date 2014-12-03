@@ -81,8 +81,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.mixedTraffic.FDTestSetUp.MyPersonDriverAgentImpl;
-
 /**
  * @author amit
  */
@@ -187,18 +185,8 @@ public class CreateAutomatedFD {
 				outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 			}
 		}
-		
-		//		GenerateFundametalDiagramData fds = new GenerateFundametalDiagramData();
-		//		fds.setTravelModes(travelModes);
-		//		fds.setModalSplit(modalSplit);
-		//		fds.setWriteInputFiles(false);
-		//		fds.setIsWritingFinalFdData(false);
-		//		fds.setReduceDataPointsByFactor(50);
-		//		fds.run();
-		//		
-				scatterPlot(outData,"./output/"+linkDynamics+".png");
+		scatterPlot(outData,"./output/"+linkDynamics+".png");
 	}
-
 
 	private void createPopulationAndVehicles(Map<String, Integer> point2run){
 		Population pop = scenario.getPopulation();
@@ -229,12 +217,10 @@ public class CreateAutomatedFD {
 
 				p.addPlan(plan);
 				pop.addPerson(p);
-
 //				Id<Vehicle> vehId = Id.create(p.getId(),Vehicle.class);
 //				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, modeVehicleTypes.get(mode));
 //				scenario.getVehicles().getVehicles().remove(veh); // removing pre-existing veh /
 //				scenario.getVehicles().addVehicle(veh);
-				
 			}
 		}
 	}
@@ -259,7 +245,6 @@ public class CreateAutomatedFD {
 		mode2FlowData.put(bike.getId(), modeUpdator);
 //		scenario.getVehicles().addVehicleType(bike);
 	}
-
 
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -290,7 +275,6 @@ public class CreateAutomatedFD {
 		XYSeries bikeFlow = new XYSeries("Bike flow");
 		XYSeries carSpeed = new XYSeries("Car speed");
 		XYSeries bikeSpeed = new XYSeries("Bike speed");
-
 
 		for(double d :inputData.keySet()){
 			carFlow.add(d, inputData.get(d).get(travelModes[0]).getFirst());
@@ -336,6 +320,8 @@ public class CreateAutomatedFD {
 			throw new RuntimeException("Data is not plotted. Reason "+e);
 		}
 	}
+	
+	//==============================================
 
 	class TravelModesFlowDynamicsUpdator {
 
@@ -535,14 +521,6 @@ public class CreateAutomatedFD {
 		}
 
 		//Getters/Setters
-		public VehicleType getVehicleType(){
-			return this.vehicleType;
-		}
-
-		public Id<VehicleType> getModeId(){
-			return this.modeId;
-		}
-
 		public double getActualAverageVelocity(){
 			double nowSpeed = 0.;
 			for (int i=0; i<this.speedTableSize; i++){
@@ -605,16 +583,7 @@ public class CreateAutomatedFD {
 		public int getNumberOfDrivingAgents() {
 			return this.lastSeenOnStudiedLinkEnter.size();
 		}
-
-		public Map<Id<Person>, Double> getLastSeenOnStudiedLinkEnter() {
-			return lastSeenOnStudiedLinkEnter;
-		}
-
-		public List<Double> getSpeedTable() {
-			return this.speedTable;
-		}
 	}
-	
 	
 	//=======================================
 	
@@ -772,7 +741,6 @@ public class CreateAutomatedFD {
 	
 	//=======================================
 	
-	
 	class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 	
 		private Scenario scenario;
@@ -782,8 +750,6 @@ public class CreateAutomatedFD {
 		private boolean permanentRegime;
 
 		/**
-		 * @param sc
-		 * @param travelModeFlowDataContainer
 		 * container to store static properties of vehicles and dynamic flow properties during simulation 
 		 */
 		public GlobalFlowDynamicsUpdator(Scenario sc, Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
@@ -806,7 +772,6 @@ public class CreateAutomatedFD {
 			this.globalFlowData.reset();
 			this.permanentRegime = false;
 		}
-
 
 		public void handleEvent(LinkEnterEvent event) {
 			if (!(permanentRegime)){
@@ -885,11 +850,6 @@ public class CreateAutomatedFD {
 		public TravelModesFlowDynamicsUpdator getGlobalData(){
 			return this.globalFlowData;
 		}
-
-		public Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getModesData() {
-			return travelModesFlowData;
-		}
-
 	}
 	
 }
