@@ -66,7 +66,7 @@ public class InputsForFDTestSetUp {
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
 	public static final double NO_OF_LANES = 1;//in m, length of one the triangle sides.
 	private  final int LINK_CAPACITY = 2700;//in PCU/h
-	private  final double END_TIME = 14*3600;
+	private  final double END_TIME = 24*3600;
 	private final  double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
 	private final  double STUCK_TIME = 60;
 	
@@ -95,7 +95,7 @@ public class InputsForFDTestSetUp {
 		if(GenerateFundametalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_WITH_HOLES);
-			config.setParam("WITH_HOLE", "HOLE_SPEED", "27.");
+			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundametalDiagramData.HOLE_SPEED);
 		}
 		
 		if(GenerateFundametalDiagramData.SEEPAGE_ALLOWED){

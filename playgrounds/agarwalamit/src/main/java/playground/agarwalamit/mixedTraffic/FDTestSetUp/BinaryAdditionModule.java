@@ -37,19 +37,10 @@ public class BinaryAdditionModule {
 				add1To(point, index-1);
 			}
 		} else {
-			throw new RuntimeException("Tried too many additions! Exceeding point size.");
+			GenerateFundametalDiagramData.log.info("Already tried too many combinations!!!");
+			return;
 		}
 	}
-	
-	public List<Integer> getMaxValues() {
-		return maxValues;
-	}
-	
-
-	public List<Integer> getSteps() {
-		return steps;
-	}
-	
 
 	public Integer[] getPoint() {
 		return point;

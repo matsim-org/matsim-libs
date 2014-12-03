@@ -52,6 +52,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 import java.io.IOException;
@@ -82,7 +83,7 @@ public class GenerateFundametalDiagramData {
 	static String[] TRAVELMODES;	//identification of the different modes
 	static Double[] MODAL_SPLIT; //modal split in PCU 
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
-	private final static Integer[] STARTING_POINT = {0,0,0};
+	private final static Integer[] STARTING_POINT = {0,0,};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
 	private int reduceDataPointsByFactor = 1;
@@ -101,11 +102,12 @@ public class GenerateFundametalDiagramData {
 	 * Overall density to vehicular flow and speed.
 	 */
 	private Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
-
+	public static String HOLE_SPEED;
+	
 	public static void main(String[] args) {
 
-		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
-		String OUTPUT_FOLDER ="/run306/";
+//		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
+//		String OUTPUT_FOLDER ="/run306/";
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
 
@@ -114,13 +116,13 @@ public class GenerateFundametalDiagramData {
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
-		generateFDData.setSeepageAllowed(true);
+		generateFDData.setSeepageAllowed(Boolean.valueOf(args[0]));
 		generateFDData.setIsWritingFinalFdData(true);
-		generateFDData.setWriteInputFiles(false);
-		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
-		generateFDData.setUseHoles(true);
-		generateFDData.setUsingSeepNetworkFactory(true);
-		
+		generateFDData.setWriteInputFiles(true);
+		generateFDData.setRunDirectory(args[1]);
+		generateFDData.setUseHoles(Boolean.valueOf(args[2]));
+		generateFDData.setUsingSeepNetworkFactory(Boolean.valueOf(args[3]));
+		HOLE_SPEED = args[4];
 		generateFDData.run();
 	}
 
@@ -148,7 +150,8 @@ public class GenerateFundametalDiagramData {
 	 * @param outputFile final data will be written to this file
 	 */
 	public void run(){
-
+		Integer[] MaxAgentDistribution = {150, 600};
+		Integer[] Steps = {1, 1};
 		consistencyCheckAndInitialize();
 
 		inputs = new InputsForFDTestSetUp();
@@ -157,9 +160,8 @@ public class GenerateFundametalDiagramData {
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
 		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
-		parametricRunAccordingToGivenModalSplit();
-		//		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
-		//		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
+//		parametricRunAccordingToGivenModalSplit();
+		parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		if(WRITE_FD_DATA) closeFile();
 	}
 
@@ -293,6 +295,8 @@ public class GenerateFundametalDiagramData {
 	}
 
 	private List<List<Integer>> createPointsToRun(List<Integer> maxValues, List<Integer> steps) {
+		
+		
 		//calculate number of points and creating starting point:
 		int numberOfPoints = 1; 
 		//TODO: set this back. Integer[] startingPoint = new Integer[maxValues.size()];
@@ -300,7 +304,7 @@ public class GenerateFundametalDiagramData {
 		//	numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
 		//	startingPoint[i] = new Integer(0);
 		//}
-		numberOfPoints = 13920;
+		numberOfPoints = 14000;
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, STARTING_POINT);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
