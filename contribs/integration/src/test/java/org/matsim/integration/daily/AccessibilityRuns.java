@@ -189,6 +189,10 @@ public class AccessibilityRuns {
 					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
 					continue ;
 				}
+				
+				
+				Boolean doPopulationWeightedPlot = this.doPopulationWeightedPlot;
+				Boolean doNonPopulationWeightedPlot = this.doNonPopulationWeightedPlot;	
 
 				
 				if (doPopulationWeightedPlot == false && doNonPopulationWeightedPlot == false) {
