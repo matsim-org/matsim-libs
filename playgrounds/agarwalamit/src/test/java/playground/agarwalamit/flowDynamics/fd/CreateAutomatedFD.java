@@ -141,6 +141,9 @@ public class CreateAutomatedFD {
 		Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
 		
 		for(Map<String, Integer> point2run : points2Run){
+			
+			System.out.println("\n \n \t \t Running points "+point2run.toString()+"\n \n");
+			
 			createPopulationAndVehicles(point2run);
 
 			for(String mode : point2run.keySet()){
@@ -230,7 +233,7 @@ public class CreateAutomatedFD {
 		mode2FlowData = new HashMap<>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
+		car.setMaximumVelocity(16.667);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
 		TravelModesFlowDynamicsUpdator modeUpdator = new TravelModesFlowDynamicsUpdator(car);
@@ -238,7 +241,7 @@ public class CreateAutomatedFD {
 //		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-		bike.setMaximumVelocity(5);
+		bike.setMaximumVelocity(4.167);
 		bike.setPcuEquivalents(0.25);
 		modeVehicleTypes.put("bike", bike);
 		modeUpdator = new TravelModesFlowDynamicsUpdator(bike);
@@ -511,7 +514,7 @@ public class CreateAutomatedFD {
 
 		private void saveDynamicVariables(){
 			//NB: Should not be called upon a modeData without a vehicleType, as this.vehicleType will be null and will throw an exception.
-			this.permanentDensity = this.numberOfAgents / (1000*3) *1000 * this.vehicleType.getPcuEquivalents();
+			this.permanentDensity = this.numberOfAgents / (1000.*3) *1000. * this.vehicleType.getPcuEquivalents();
 			this.permanentAverageVelocity = this.getActualAverageVelocity();
 			log.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 			//this.permanentFlow = this.getActualFlow();
