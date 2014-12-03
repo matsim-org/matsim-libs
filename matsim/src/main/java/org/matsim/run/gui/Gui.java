@@ -12,6 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -43,6 +46,11 @@ public class Gui extends JFrame {
 	private JScrollPane scrollPane;
 	
 	private ExeRunner exeRunner = null;
+	private JMenuBar menuBar;
+	private JMenu mnTools;
+	private JMenuItem mntmCompressFile;
+	private JMenuItem mntmUncompressFile;
+	private JMenuItem mntmCreateSamplePopulation;
 
 	public Gui() {
 		setTitle("MATSim");
@@ -270,6 +278,30 @@ public class Gui extends JFrame {
 		);
 
 		getContentPane().setLayout(groupLayout);
+		
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		mnTools = new JMenu("Tools");
+		menuBar.add(mnTools);
+		
+		mntmCompressFile = new JMenuItem("Compress File…");
+		mnTools.add(mntmCompressFile);
+		mntmCompressFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GUnZipper.gzipFile();
+			}
+		});
+		
+		mntmUncompressFile = new JMenuItem("Uncompress File…");
+		mnTools.add(mntmUncompressFile);
+		mntmUncompressFile.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GUnZipper.gunzipFile();
+			}
+		});
 	}
 	
 	public void startMATSim() {
@@ -344,6 +376,9 @@ public class Gui extends JFrame {
 	}
 	
 	public static void main(String[] args) {
+		
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
+		
 		Gui gui = new Gui();
 		gui.pack();
 		gui.setLocationByPlatform(true);
