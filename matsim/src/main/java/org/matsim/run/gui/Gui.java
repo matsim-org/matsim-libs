@@ -32,6 +32,9 @@ import org.matsim.core.utils.io.IOUtils;
  * @author mrieser / Senozon AG
  */
 public class Gui extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	
 	private JTextField txtConfigfilename;
 	private JTextField txtMatsimversion;
 	private JTextField txtRam;
@@ -52,6 +55,8 @@ public class Gui extends JFrame {
 	private JMenuItem mntmUncompressFile;
 	private JMenuItem mntmCreateSamplePopulation;
 
+	private PopulationSampler popSampler = null;
+	
 	public Gui() {
 		setTitle("MATSim");
 		
@@ -300,6 +305,21 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				GUnZipper.gunzipFile();
+			}
+		});
+		
+		mnTools.addSeparator();
+		
+		mntmCreateSamplePopulation = new JMenuItem("Create Sample Population…");
+		mnTools.add(mntmCreateSamplePopulation);
+		mntmCreateSamplePopulation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (popSampler == null) {
+					popSampler = new PopulationSampler();
+					popSampler.pack();
+				}
+				popSampler.setVisible(true);
 			}
 		});
 	}

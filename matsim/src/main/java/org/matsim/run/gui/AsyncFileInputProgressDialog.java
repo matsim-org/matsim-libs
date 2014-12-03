@@ -27,7 +27,11 @@ import org.apache.log4j.Logger;
 	private static final long serialVersionUID = 1L;
 	
 	public AsyncFileInputProgressDialog(final FileInputStream fis) {
-		setTitle("Operation in Progress…");
+		this(fis, "Operation in Progress…");
+	}
+
+	public AsyncFileInputProgressDialog(final FileInputStream fis, final String title) {
+		setTitle(title);
 		final JProgressBar progressbar = new JProgressBar(0, 1000);
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
