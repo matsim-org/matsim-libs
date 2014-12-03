@@ -7,26 +7,26 @@
 	<person id="1_1" employed="no">
 		<plan selected="yes">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -35,26 +35,26 @@
 
 		<plan selected="no">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M43===M43_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -70,26 +70,26 @@
 	<person id="1_2" employed="no">
 		<plan selected="yes">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -98,26 +98,26 @@
 
 		<plan selected="no">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M43===M43_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -132,26 +132,26 @@
 	<person id="1_3" employed="no">
 		<plan selected="no">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -160,26 +160,26 @@
 
 		<plan selected="yes">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M43===M43_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -194,26 +194,26 @@
 	<person id="1_4" employed="no">
 		<plan selected="no">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M44===M44_Route2===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
@@ -222,26 +222,26 @@
 
 		<plan selected="yes">
 			<act type="h" link="1" x="-25000.0" y="0.0" end_time="06:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="pt interaction" link="1" x="-24900.0" y="0.0" dur="00:00:00" />
-			<leg mode="pt" trav_time="00:18:00">
-				<route>
+			<leg mode="pt">
+				<route trav_time="00:18:00">
 					PT1===stop1===M43===M43_Route10===stop12 
 				</route>
 			</leg>
 			<act type="pt interaction" link="20" x="9900.0" y="0.0" dur="00:00:00" />
-			<leg mode="transit_walk" trav_time="00:02:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="00:02:00">
 					 
 				</route>
 			</leg>
 			<act type="w" link="20" x="10000.0" y="0.0" dur="00:10:00" />
-			<leg mode="transit_walk" trav_time="11:40:00">
-				<route>
+			<leg mode="transit_walk">
+				<route trav_time="11:40:00">
 					 
 				</route>
 			</leg>
