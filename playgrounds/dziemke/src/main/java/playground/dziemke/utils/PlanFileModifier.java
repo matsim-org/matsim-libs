@@ -27,19 +27,25 @@ public class PlanFileModifier {
 	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
-	static boolean onlyConsiderPeopleAlwaysGoingByCar = true;
-	static int maxNumberOfAgentsConsidered = 1000000;
-	static String runId = "run_171";
-	static int iteration = 300;
+	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
+	static int maxNumberOfAgentsConsidered = 100;
+	static String runId = "run_145";
+	static int iteration = 150;
 	
 	
 	// Input and output files
-//	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans.xml.gz";
-//	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
-	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans_car.xml.gz";
+	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans.xml.gz";
+	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans_reduced.xml.gz";
+			
+//	if (onlyTransferSelectedPlan == true) {
+//		outputPlansFile = outputPlansFile + "_selected";
+//	}
+//	
+//	outputPlansFile = outputPlansFile + ".xml.gz";
+//	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans_car.xml.gz";
 	
 	
 	public static void main(String[] args) {

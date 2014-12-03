@@ -23,14 +23,15 @@ public class DemandGeneratorOnePersonV2 {
 
 	public static void main(String[] args) {
 		// main parameters
-		double scalingFactor = 0.01;
+		//double scalingFactor = 0.01;
+		double scalingFactor = 0.1;
 		double carShareBE = 0.37;
 		double carShareBB = 0.55;
 		double allWorkersToSociallySecuredWorkersRatio = 1.52;
 		double adultsToWorkersRatio = 1.9;
 		double expansionFactor = 1.;
 		//int numberOfPlansPerPerson = 10;
-		int numberOfPlansPerPerson = 7;
+		int numberOfPlansPerPerson = 3;
 		// Gemeindeschluessel of Berlin is 11000000
 		Integer planningAreaId = 11000000;
 		
@@ -42,7 +43,7 @@ public class DemandGeneratorOnePersonV2 {
 		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test2/";
+		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/";
 		
 		initLogging(outputBase);
 		

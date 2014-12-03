@@ -25,7 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_170c";
+	static String runId = "run_190";
 	static int numberOfIterations = 300;
 	//static int plansFileInterval = 50;
 	static int plansFileInterval = 300;
@@ -40,6 +40,7 @@ public class SelectedPlansAnalyzer {
 	static Map<Integer, Integer> otherPlansMap = new HashMap<Integer, Integer>();
 	static Map<Integer, Integer> carPlansMap = new HashMap<Integer, Integer>();
 	static Map<Integer, Integer> ptPlansMap = new HashMap<Integer, Integer>();
+	static Map<Integer, Integer> walkPlansMap = new HashMap<Integer, Integer>();
 		
 	public static void main(String[] args) {
 		if (useInterimPlans == true) {
@@ -80,6 +81,7 @@ public class SelectedPlansAnalyzer {
 		int counterOtherPlans = 0;
 		int counterCarPlans = 0;
 		int counterPtPlans = 0;
+		int counterWalkPlans = 0;
 		String mode;
 		
 		// iterate over persons
@@ -104,8 +106,10 @@ public class SelectedPlansAnalyzer {
 							counterCarPlans++;
 						} else if (mode == "pt") {
 							counterPtPlans++;
+						} else if (mode == "walk") {
+							counterWalkPlans++;
 						} else {
-							throw new RuntimeException("In current implementation leg mode must either be car or pt");
+							throw new RuntimeException("In current implementation leg mode must either be car, pt, or walk");
 						}
 						
 						// Break bricht die aktuelle Schleife ab; Continue leitet einen neuen Durchlauf ein.
@@ -125,6 +129,7 @@ public class SelectedPlansAnalyzer {
 		otherPlansMap.put(iteration, counterOtherPlans);
 		carPlansMap.put(iteration, counterCarPlans);
 		ptPlansMap.put(iteration, counterPtPlans);
+		walkPlansMap.put(iteration, counterWalkPlans);
 	}
 
 	
@@ -139,7 +144,7 @@ public class SelectedPlansAnalyzer {
 			
 			for (int key : stayHomePlansMap.keySet()) {
     			bufferedWriter.write(key + "\t" + stayHomePlansMap.get(key) + "\t" + otherPlansMap.get(key) + "\t" 
-    					+ carPlansMap.get(key) + "\t" + ptPlansMap.get(key));
+    					+ carPlansMap.get(key) + "\t" + ptPlansMap.get(key) + "\t" + walkPlansMap.get(key));
     			bufferedWriter.newLine();
     		}    		
 	    } catch (FileNotFoundException ex) {

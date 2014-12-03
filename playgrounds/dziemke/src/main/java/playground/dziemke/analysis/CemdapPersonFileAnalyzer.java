@@ -37,8 +37,10 @@ public class CemdapPersonFileAnalyzer {
 //		Integer minAge = 66;
 		Integer maxAge = 65;	
 		
-		String runId = "run_145";
-		String usedIteration = "150"; // most frequently used value: 150 
+//		String runId = "run_145";
+//		String usedIteration = "150"; // most frequently used value: 150 
+		String runId = "run_184";
+		String usedIteration = "300"; // most frequently used value: 150 
 
 	    
 	    // Input files
@@ -46,7 +48,8 @@ public class CemdapPersonFileAnalyzer {
 //	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
 	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
-	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
+//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
+	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
 	    
 	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
@@ -140,6 +143,8 @@ public class CemdapPersonFileAnalyzer {
 //	    		}
 	    		
 	    		
+	    		//--------------------------------------------------------------------------------------------------------------------
+	    		
 	    		// person-specific attributes
 				String personId = trip.getPersonId().toString();
 				int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
@@ -148,25 +153,27 @@ public class CemdapPersonFileAnalyzer {
 //					considerTrip = false;
 //				}
 				
-				if (age > maxAge) {
-					considerTrip = false;
-				}
+//				if (age > maxAge) {
+//					considerTrip = false;
+//				}
 				
 				int employed = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "employed");
-				if (employed == 0) { // can be varied
+				if (employed == 1) { // can be varied
 					considerTrip = false;
 				}
 				
 				
 				// (further) trip-specific attributes
-//				boolean doesWorkTrip = false;
-//	    		if (trip.getActivityEndActType().equals("work")) {
-//	    			doesWorkTrip = true;	    			
-//	    		}
-//	    		
-//				if (doesWorkTrip == false) { // can be varied
-//	    			considerTrip = false;
-//	    		}
+				boolean doesWorkTrip = false;
+	    		if (trip.getActivityEndActType().equals("work")) {
+	    			doesWorkTrip = true;	    			
+	    		}
+	    		
+				if (doesWorkTrip == true) { // can be varied
+	    			considerTrip = false;
+	    		}
+				
+				//--------------------------------------------------------------------------------------------------------------------
 	    		
 				
 				// counter

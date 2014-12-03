@@ -36,6 +36,9 @@ public class DemandGeneratorOnePersonV3 {
 		// Since traffic would, thus, be too low by these unconsidered commuting relations, a factor to balance this
 		// effect needs to be applied. By only looking at people living in Berlin (i.e. setting "commuterFileIn" to
 		// a dummy file that does not produce any relations) this factor has been determined as 1.06.
+		// Calculation: 1,002,809 outward commuters from Berlin accoridng to Penderstatistik 2009 * 0.01 (scale)
+		// * 1.54 (get all workers) * 1.9 (get all adults) = 28961 (SOLL)
+		// If said facot (1.06) is used we get 28916 (IST), which meets the intended number quite well.
 		double factorToBalanceLeftOutRelations = 1.06;
 		double carShareExterior = 1/(allWorkersToSociallySecuredWorkersRatio * adultsToWorkersRatio
 				* factorToBalanceLeftOutRelations);

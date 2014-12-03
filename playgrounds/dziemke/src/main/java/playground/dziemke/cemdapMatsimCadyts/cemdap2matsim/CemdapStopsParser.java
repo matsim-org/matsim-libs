@@ -78,7 +78,7 @@ public class CemdapStopsParser {
 
 	
 	// parse method
-	public final void parse(String cemdapStopsFile, int planNumber, Map<String, String> tourAttributesMap,
+	public final void parse(String cemdapStopsFile, int planNumber, //Map<String, String> tourAttributesMap,
 			Scenario scenario, ObjectAttributes personObjectAttributes, boolean stayHomePlan) {
 		Population population = scenario.getPopulation();
 		int lineCount = 0;
@@ -105,14 +105,14 @@ public class CemdapStopsParser {
 				Id<Person> agentId = Id.create(householdId+"_"+personId, Person.class);
 				String combinedId = householdId.toString() + "_" + personId.toString() + "_" + tourId.toString();
 				
-				if (!tourAttributesMap.containsKey(combinedId)) {
-					throw new RuntimeException("Tour attributes map does not contain tour with ID: " + combinedId);
-				} else {
-//					if (tourAttributesMap.get(combinedId).equals("car")) {
-//					} else {
-//						continue;
-//					}
-				}
+//				if (!tourAttributesMap.containsKey(combinedId)) {
+//					throw new RuntimeException("Tour attributes map does not contain tour with ID: " + combinedId);
+//				} else {
+////					if (tourAttributesMap.get(combinedId).equals("car")) {
+////					} else {
+////						continue;
+////					}
+//				}
 		
 				// create a person if a person with that agentId does not already exist
 				Person person = population.getPersons().get(agentId);
@@ -149,7 +149,7 @@ public class CemdapStopsParser {
 					Leg leg = population.getFactory().createLeg(TransportMode.car);
 					leg.setDepartureTime(departureTime);
 					
-					leg.setMode(tourAttributesMap.get(combinedId));
+//					leg.setMode(tourAttributesMap.get(combinedId));
 					
 					plan.addLeg(leg);
 					
@@ -180,6 +180,45 @@ public class CemdapStopsParser {
 	}
 	
 	
+//	private final String transformActType(int activityTypeNumber) {
+//		switch (activityTypeNumber) {
+//		case 0: return "shop";
+//		case 1: return "other";
+//		case 2: return "other";
+//		case 3: return "leis";
+//		case 4: return "other";
+//		case 5: return "leis";
+//		//case 6: return "leis";
+//		case 6: return "home";
+//		//case 7: return "other";
+//		case 7: return "work";
+//		case 8: return "work";
+//		case 9: return "other";
+//		case 10: return "other";
+//		case 11: return "other";
+//		//case 12: return "home";
+//		case 12: return "leis";
+//		//case 13: return "work";
+//		case 13: return "home";
+//		//case 14: return "home";
+//		case 14: return "educ";
+//		//case 15: return "educ";
+//		case 15: return "leis";
+//		case 16: return "leis";
+//		case 17: return "work";
+//		case 18: return "home";
+//		case 19: return "educ";
+//		//case 20: return "leis";
+//		//case 21: return "leis";
+//		default:
+//			log.error(new IllegalArgumentException("actTypeNo="+activityTypeNumber+" not allowed."));
+//			//Gbl.errorMsg(new IllegalArgumentException("activityTypeNumber="+activityTypeNumber+" is not allowed."));
+//			return null;
+//		}
+//	}
+	
+	
+	// used for cemdap2matsim/30
 	private final String transformActType(int activityTypeNumber) {
 		switch (activityTypeNumber) {
 		case 0: return "shop";
@@ -188,28 +227,22 @@ public class CemdapStopsParser {
 		case 3: return "leis";
 		case 4: return "other";
 		case 5: return "leis";
-		//case 6: return "leis";
-		case 6: return "home";
-		//case 7: return "other";
-		case 7: return "work";
+		case 6: return "leis";
+		case 7: return "other";
 		case 8: return "work";
 		case 9: return "other";
 		case 10: return "other";
 		case 11: return "other";
-		//case 12: return "home";
-		case 12: return "leis";
-		//case 13: return "work";
-		case 13: return "home";
-		//case 14: return "home";
-		case 14: return "educ";
-		//case 15: return "educ";
-		case 15: return "leis";
+		case 12: return "home";
+		case 13: return "work";
+		case 14: return "home";
+		case 15: return "educ";
 		case 16: return "leis";
 		case 17: return "work";
 		case 18: return "home";
 		case 19: return "educ";
-		//case 20: return "leis";
-		//case 21: return "leis";
+		case 20: return "leis";
+		case 21: return "leis";
 		default:
 			log.error(new IllegalArgumentException("actTypeNo="+activityTypeNumber+" not allowed."));
 			//Gbl.errorMsg(new IllegalArgumentException("activityTypeNumber="+activityTypeNumber+" is not allowed."));
