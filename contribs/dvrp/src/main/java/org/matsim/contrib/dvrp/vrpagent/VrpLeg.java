@@ -102,13 +102,6 @@ public class VrpLeg
 
 
     @Override
-    public Id<Link> getCurrentLinkId()
-    {
-        return path.getLink(currentLinkIdx).getId();
-    }
-
-
-    @Override
     public Id<Link> getNextLinkId()
     {
         askedAboutNextLink = true;
@@ -159,5 +152,12 @@ public class VrpLeg
     public Double getExpectedTravelTime()
     {
         return tracker.getPlannedEndTime() - tracker.getBeginTime();
+    }
+
+
+    @Override
+    public Double getExpectedTravelDistance()
+    {
+        return null;//TODO
     }
 }

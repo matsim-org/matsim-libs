@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,21 +22,10 @@ package org.matsim.contrib.dynagent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-
-public interface DynLeg
-    extends DynAction
+public interface DriverDynLeg extends DynLeg
 {
-    String getMode();
+    Id<Link> getNextLinkId();
 
 
-    void arrivedOnLinkByNonNetworkMode(Id<Link> linkId);
-
-
-    Id<Link> getDestinationLinkId();
-
-
-    Double getExpectedTravelTime();
-
-
-    Double getExpectedTravelDistance();
+    void movedOverNode(Id<Link> newLinkId);
 }

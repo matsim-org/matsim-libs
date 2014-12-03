@@ -26,15 +26,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
 
 
-public class StaticDynLegImpl
-    implements DynLeg
+public class StaticDriverDynLeg
+    implements DriverDynLeg
 {
     private final NetworkRoute route;
     private int currentLinkIdx;
     private final String mode;
 
 
-    public StaticDynLegImpl(String mode, NetworkRoute route)
+    public StaticDriverDynLeg(String mode, NetworkRoute route)
     {
         this.mode = mode;
         this.route = route;
@@ -46,23 +46,6 @@ public class StaticDynLegImpl
     public void movedOverNode(Id<Link> newLinkId)
     {
         currentLinkIdx++;
-    }
-
-
-    @Override
-    public Id<Link> getCurrentLinkId()
-    {
-        if (currentLinkIdx == -1) {
-            return route.getStartLinkId();
-        }
-
-        List<Id<Link>> linkIds = route.getLinkIds();
-
-        if (currentLinkIdx == linkIds.size()) {
-            return route.getEndLinkId();
-        }
-
-        return linkIds.get(currentLinkIdx);
     }
 
 
@@ -118,5 +101,12 @@ public class StaticDynLegImpl
     {
         //TODO add travel time of the destination link??
         return route.getTravelTime();
+    }
+
+
+    public Double getExpectedTravelDistance()
+    {
+        //TODO add length of the destination link??
+        return route.getDistance();
     }
 }

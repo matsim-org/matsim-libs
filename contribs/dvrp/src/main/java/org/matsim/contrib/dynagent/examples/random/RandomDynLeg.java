@@ -23,12 +23,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dynagent.DynLeg;
+import org.matsim.contrib.dynagent.DriverDynLeg;
 import org.matsim.core.gbl.MatsimRandom;
 
 
 public class RandomDynLeg
-    implements DynLeg
+    implements DriverDynLeg
 {
     private final Network network;
 
@@ -56,13 +56,6 @@ public class RandomDynLeg
     {
         currentLinkId = newLinkId;
         doRandomChoice();
-    }
-
-
-    @Override
-    public Id<Link> getCurrentLinkId()
-    {
-        return currentLinkId;
     }
 
 
@@ -119,5 +112,12 @@ public class RandomDynLeg
     public Double getExpectedTravelTime()
     {
         return MatsimRandom.getRandom().nextDouble() * 3600;
+    }
+
+
+    @Override
+    public Double getExpectedTravelDistance()
+    {
+        return MatsimRandom.getRandom().nextDouble() * 3600 / 15;
     }
 }

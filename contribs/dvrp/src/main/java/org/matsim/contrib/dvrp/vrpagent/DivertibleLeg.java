@@ -20,11 +20,11 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dynagent.DynLeg;
+import org.matsim.contrib.dynagent.DriverDynLeg;
 
 
 public interface DivertibleLeg
-    extends DynLeg
+    extends DriverDynLeg
 {
     VrpPath getPath();
 

@@ -19,24 +19,23 @@
 
 package org.matsim.contrib.dynagent;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import java.util.List;
+
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
 
 public class DynAgent
-    implements MobsimDriverAgent
+    implements MobsimDriverPassengerAgent
 {
     private DynAgentLogic agentLogic;
 
@@ -75,7 +74,7 @@ public class DynAgent
             state = MobsimAgent.State.ACTIVITY;
         }
         else {
-            state = MobsimAgent.State.ABORT;// ??????
+            state = MobsimAgent.State.ABORT;
         }
     }
 
@@ -157,6 +156,7 @@ public class DynAgent
     }
 
 
+    //VehicleUsingAgent
     @Override
     public final Id<Vehicle> getPlannedVehicleId()
     {
@@ -170,6 +170,7 @@ public class DynAgent
     }
 
 
+    //VehicleUsingAgent
     @Override
     public void setVehicle(MobsimVehicle veh)
     {
@@ -177,6 +178,7 @@ public class DynAgent
     }
 
 
+    //VehicleUsingAgent
     @Override
     public MobsimVehicle getVehicle()
     {
@@ -184,6 +186,7 @@ public class DynAgent
     }
 
 
+    //NetworkAgent
     @Override
     public Id<Link> getCurrentLinkId()
     {
@@ -191,6 +194,7 @@ public class DynAgent
     }
 
 
+    //NetworkAgent (used only for teleportation)
     @Override
     public Id<Link> getDestinationLinkId()
     {
@@ -198,21 +202,24 @@ public class DynAgent
     }
 
 
+    //DriverAgent
     @Override
     public Id<Link> chooseNextLinkId()
     {
-        return dynLeg.getNextLinkId();
+        return ((DriverDynLeg)dynLeg).getNextLinkId();
     }
 
 
+    //DriverAgent
     @Override
     public void notifyMoveOverNode(Id<Link> newLinkId)
     {
-        dynLeg.movedOverNode(newLinkId);
+        ((DriverDynLeg)dynLeg).movedOverNode(newLinkId);
         currentLinkId = newLinkId;
     }
 
 
+    //MobsimAgent
     @Override
     public double getActivityEndTime()
     {
@@ -220,12 +227,14 @@ public class DynAgent
     }
 
 
+    //DynAgent
     public void doSimStep(double now)
     {
         dynActivity.doSimStep(now);
     }
 
 
+    //MobsimAgent
     @Override
     public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId)
     {
@@ -234,23 +243,68 @@ public class DynAgent
     }
 
 
+    //MobsimAgent
     @Override
     public Double getExpectedTravelTime()
     {
         return dynLeg.getExpectedTravelTime();
     }
 
+
+    //MobsimAgent
     @Override
-    public Double getExpectedTravelDistance() {
-        return null;
+    public Double getExpectedTravelDistance()
+    {
+        return dynLeg.getExpectedTravelDistance();
     }
 
 
+    //DriverAgent
     @Override
     public boolean isWantingToArriveOnCurrentLink()
     {
-        // The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
-        // kai, nov'14
         return chooseNextLinkId() == null;
+    }
+
+
+    //PTPassengerAgent
+    @Override
+    public boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute,
+            List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle)
+    {
+        return ((PTPassengerDynLeg)dynLeg).getEnterTransitRoute(line, transitRoute, stopsToCome,
+                transitVehicle);
+    }
+
+
+    //PTPassengerAgent
+    @Override
+    public boolean getExitAtStop(TransitStopFacility stop)
+    {
+        return ((PTPassengerDynLeg)dynLeg).getExitAtStop(stop);
+    }
+
+
+    //PTPassengerAgent
+    @Override
+    public Id<TransitStopFacility> getDesiredAccessStopId()
+    {
+        return ((PTPassengerDynLeg)dynLeg).getDesiredAccessStopId();
+    }
+
+
+    //PTPassengerAgent
+    @Override
+    public Id<TransitStopFacility> getDesiredDestinationStopId()
+    {
+        return ((PTPassengerDynLeg)dynLeg).getDesiredDestinationStopId();
+    }
+
+
+    //PTPassengerAgent
+    @Override
+    public double getWeight()
+    {
+        return 1;
     }
 }
