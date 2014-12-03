@@ -59,7 +59,7 @@ import pedCA.environment.network.Coordinates;
 public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler{
 
 	double time;
-	private final EventsBasedVisDebugger vis;
+	private EventsBasedVisDebugger vis;
 
 	@SuppressWarnings("rawtypes")
 	private final Map<Id,CircleProperty> circleProperties = new HashMap<Id,CircleProperty>();
@@ -70,11 +70,11 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 	private long lastUpdate = -1;
 	private final double dT;
-	private final  Control keyControl;
+	private  Control keyControl;
 
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
-
+	
 	FrameSaver fs = null;
 	boolean environmentInit= false;
 
@@ -94,6 +94,16 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 		this.keyControl = new Control(this.vis.zoomer,90,this.fs);
 		this.vis.addKeyControl(this.keyControl);
+	}
+	
+	@SuppressWarnings("unused")
+	public void startIteration(int iteration){
+		if ((iteration!=0 && iteration != 9) || !Constants.SAVE_FRAMES)
+			fs = null;
+		else
+			fs = new FrameSaver(Constants.PATH+"/videos/frames/it"+iteration, "png", 3);
+		this.vis.fs = fs;
+		this.keyControl.fs = fs;
 	}
 
 	public void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
@@ -222,7 +232,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		}
 
 		this.vis.addCircle(to_x,to_y,cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
-		this.vis.addText(to_x,to_y, ""+event.getDensity(), 200);
+		this.vis.addText(to_x,to_y, ""+event.getPedestrian().getID(), 200);
 	}
 
 	private void update(double time2) {

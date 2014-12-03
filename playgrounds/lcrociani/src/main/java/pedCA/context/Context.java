@@ -76,4 +76,11 @@ public class Context {
 		return network;
 	}
 	
+	public int getRows(){
+		return environmentGrid.getRows();
+	}
+	
+	public int getColumns(){
+		return environmentGrid.getColumns();
+	}
 }

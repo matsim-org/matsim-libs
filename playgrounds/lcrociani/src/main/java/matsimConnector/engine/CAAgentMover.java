@@ -41,7 +41,7 @@ public class CAAgentMover extends AgentMover {
 				GridPoint newPosition = pedestrian.getRealNewPosition();
 				moveAgent(pedestrian, now);
 				eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, oldPosition, newPosition));
-				if(pedestrian.isEnteringEnvironment()){
+				if(!pedestrian.isWaitingToSwap() && pedestrian.isEnteringEnvironment()){
 					moveToCA(pedestrian, now);
 				}else if (!pedestrian.isWaitingToSwap()&& pedestrian.isFinalDestinationReached() && !pedestrian.hasLeftEnvironment()){
 					if(now>=Constants.CA_TEST_END_TIME){

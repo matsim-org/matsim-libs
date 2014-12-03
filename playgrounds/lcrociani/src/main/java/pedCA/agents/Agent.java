@@ -143,7 +143,7 @@ public class Agent extends PhysicalObject{
 			updateHeading();
 			setPosition(nextpos);
 		}else if(!isWaitingToSwap()){
-			getPedestrianGrid().moveToWithoutShadow(this, nextpos);
+			getUsedPedestrianGrid().moveToWithoutShadow(this, nextpos);
 			setPosition(nextpos);
 			hasToSwap = false;
 		}

@@ -187,7 +187,7 @@ public class Pedestrian extends Agent {
 	}
 	
 	protected boolean canSwap(GridPoint neighbour, PedestrianGrid pedestrianGrid) {
-		if (finalDestinationReached && pedestrianGrid.containsPedestrian(neighbour)){
+		if (finalDestinationReached && pedestrianGrid.containsPedestrian(neighbour) && transitionArea == null){
 		 	return ((Pedestrian)pedestrianGrid.getPedestrian(neighbour)).finalDestinationReached;
 		}			
 		return super.canSwap(neighbour, pedestrianGrid);
@@ -204,7 +204,7 @@ public class Pedestrian extends Agent {
 		//TODO FIX THE PROBLEM WITH TRANSITION AREAS
 		if(isAtEnvironmentBorder(neighbour)){
 			if (transitionArea != null)
-				return transitionArea.isOccupied(neighbour) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));//checkOccupancy(neighbour,transitionArea) || checkOccupancy(transitionArea.convertTAPosToEnvPos(neighbour),getPedestrianGrid());
+				return checkOccupancy(neighbour,transitionArea) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));						//transitionArea.isOccupied(neighbour) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));//checkOccupancy(neighbour,transitionArea) || checkOccupancy(transitionArea.convertTAPosToEnvPos(neighbour),getPedestrianGrid());
 			else{
 				TransitionArea neighbourTA = getDestination(neighbour).getTransitionArea();
 				return neighbourTA.isOccupied(neighbourTA.convertEnvPosToTAPos(neighbour)) || checkOccupancy(neighbour,getPedestrianGrid());//checkOccupancy(neighbourTA.convertEnvPosToTAPos(neighbour),neighbourTA) || checkOccupancy(neighbour,getPedestrianGrid());

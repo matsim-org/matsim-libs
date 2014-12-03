@@ -100,7 +100,7 @@ public class CAScenario {
 
 	private void plugNode(Node n, Network scNet, CAEnvironment environmentCA) {
 		Node pivot = null;
-		double radius = Constants.TRANSITION_LINK_LENGTH;
+		double radius = .4;
 		Set<String> modesToCA = new HashSet<String>();
 		modesToCA.add("car");
 		modesToCA.add("walk");

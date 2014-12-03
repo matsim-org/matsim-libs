@@ -59,8 +59,11 @@ public class Control implements KeyListener, MouseWheelListener {
 	private Map<Integer,Zoom> zooms = new HashMap<Integer,Zoom>();
 	private static Zoom staticZoom = new Zoom();
 	static {
-		staticZoom.z =63.49;
-		staticZoom.o = new PVector(31960,23712);
+		staticZoom.z = 40.92622;
+		staticZoom.o = new PVector(20853,15407);
+		
+		//staticZoom.z =63.49;
+		//staticZoom.o = new PVector(31960,23712);
 	}
 	private boolean makeScreenshot = false;
 
@@ -77,7 +80,7 @@ public class Control implements KeyListener, MouseWheelListener {
 	
 	private Map<Integer,CameraMovement> movements = new HashMap<Integer,CameraMovement>();
 	
-	private final FrameSaver fs;
+	FrameSaver fs;
 	private final int cameraTrackFrameSkip;
 	private TileMap tileMap;
 

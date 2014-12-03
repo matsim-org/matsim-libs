@@ -22,7 +22,8 @@ import pedCA.output.OutputManager;
 
 public class CASimulationRunner implements IterationStartsListener{
 
-	private Controler controller;
+	//private Controler controller;
+	private static EventBasedVisDebuggerEngine dbg;
 	
 	@SuppressWarnings("deprecation")
 	public static void main(String [] args) {
@@ -39,8 +40,8 @@ public class CASimulationRunner implements IterationStartsListener{
 		//new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
 		
 		c.controler().setWriteEventsInterval(1);
-		c.controler().setLastIteration(0);
-		c.qsim().setEndTime(Constants.CA_TEST_END_TIME+100);
+		c.controler().setLastIteration(Constants.SIMULATION_ITERATIONS-1);
+		c.qsim().setEndTime(Constants.SIMULATION_DURATION);
 		
 		Controler controller = new Controler(scenario);
 		
@@ -50,7 +51,7 @@ public class CASimulationRunner implements IterationStartsListener{
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 		
 		if (args.length==0){
-			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(scenario);
+			dbg = new EventBasedVisDebuggerEngine(scenario);
 			InfoBox iBox = new InfoBox(dbg, scenario);
 			dbg.addAdditionalDrawer(iBox);
 			controller.getEvents().addHandler(dbg);
@@ -62,22 +63,14 @@ public class CASimulationRunner implements IterationStartsListener{
 			controller.getEvents().addHandler(new OutputManager(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
 		}
 		
+		CASimulationRunner runner = new CASimulationRunner();
+		controller.addControlerListener(runner);
 		controller.run();
 	}
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
-//			this.factory.debug(this.visDebugger);
-			//this.controller.getEvents().addHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(true);
-		} else {
-//			this.factory.debug(null);
-			//this.controller.getEvents().removeHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(false);
-		}
-//		this.visDebugger.setIteration(event.getIteration());
-		
+		dbg.startIteration(event.getIteration()); 
 	}
 
 }

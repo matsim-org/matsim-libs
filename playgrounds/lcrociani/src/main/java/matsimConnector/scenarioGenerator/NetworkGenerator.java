@@ -26,6 +26,13 @@ public class NetworkGenerator {
 
 	private static final Double DOOR_WIDTH = Constants.FAKE_LINK_WIDTH;
 	private static final Double CA_LENGTH = Constants.CA_LINK_LENGTH;
+	private static double LINK_LENGTH = 10.;
+	private static double FLOW = Constants.FLOPW_CAP_PER_METER_WIDTH * DOOR_WIDTH;
+	private static double LANES = DOOR_WIDTH/0.71;
+	private static Set<String> MODES = new HashSet<String>();
+	static{
+		MODES.add("walk"); MODES.add("car");
+	}
 	
 	protected static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
@@ -71,7 +78,7 @@ public class NetworkGenerator {
 		
 		l0.setAllowedModes(modes);
 		l1.setAllowedModes(modes);
-		l2.setAllowedModes(modes);
+		l2.setAllowedModes(modes); 
 		l3.setAllowedModes(modes);
 
 		l0Rev.setAllowedModes(modes);
@@ -128,11 +135,6 @@ public class NetworkGenerator {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		int nLinks = 3;
-		double linkLength = 10.;
-		double flow = Constants.FLOPW_CAP_PER_METER_WIDTH * DOOR_WIDTH;
-		double lanes = DOOR_WIDTH/0.71;
-		Set<String> modes = new HashSet<String>();
-		modes.add("walk");modes.add("car");
 		int nodeCount = 0;
 		int linkCount = 0;
 		for (Destination dest : contextCA.getMarkerConfiguration().getDestinations()){
@@ -141,7 +143,7 @@ public class NetworkGenerator {
 			for (int i=0; i<nLinks;i++){
 				double x = destinationCA.getCoordinates().getX();
 				double y = destinationCA.getCoordinates().getY();
-				Coordinates coord = new Coordinates(x-(linkLength*i)-0.2,y);
+				Coordinates coord = new Coordinates(x-(LINK_LENGTH*i)-0.2,y);
 				MathUtility.rotate(coord, destinationCA.getRotation(), destinationCA.getCoordinates());
 				nodes.add(fac.createNode(Id.create("n"+nodeCount,Node.class), new CoordImpl(coord.getX(),coord.getY())));
 				net.addNode(nodes.get(nodes.size()-1));
@@ -150,25 +152,107 @@ public class NetworkGenerator {
 			for (int i=1; i<nLinks;i++){
 				Link linkOut = fac.createLink(Id.create("l"+linkCount,Link.class), nodes.get(i-1), nodes.get(i));
 				Link linkIn = fac.createLink(Id.create("l"+(linkCount+1),Link.class), nodes.get(i), nodes.get(i-1));
-				linkOut.setLength(linkLength);
-				linkOut.setAllowedModes(modes);
-				linkOut.setFreespeed(Constants.PEDESTRIAN_SPEED);
-				linkOut.setCapacity(flow);
-				linkOut.setNumberOfLanes(lanes);
-				linkIn.setLength(linkLength);
-				linkIn.setAllowedModes(modes);
-				linkIn.setFreespeed(Constants.PEDESTRIAN_SPEED);
-				linkIn.setCapacity(flow);
-				linkIn.setNumberOfLanes(lanes);
+				initLink(linkOut);
+				initLink(linkIn);
 				net.addLink(linkOut);
 				net.addLink(linkIn);
 				linkCount+=2;
 			}
 			
 		}
+		
+		Double x_min=null;
+		Double y_min=null;
+		Double x_max=null;
+		Double y_max=null;
+		boolean firstIt = true;		
+		for (Node node : net.getNodes().values()){
+			if (firstIt){
+				x_min = node.getCoord().getX();
+				x_max = node.getCoord().getX();
+				y_min = node.getCoord().getY();
+				y_max = node.getCoord().getY();
+				firstIt = false;
+			}
+			else if(node.getCoord().getY() < y_min)
+				y_min = node.getCoord().getY();
+			else if(node.getCoord().getY() > y_max)
+				y_max = node.getCoord().getY();
+			else if(node.getCoord().getX() < x_min)
+				x_min = node.getCoord().getX();
+			else if(node.getCoord().getX() > x_max)
+				x_max = node.getCoord().getX();
+		}
+		ArrayList<Node> south = new ArrayList<Node>();
+		ArrayList<Node> north = new ArrayList<Node>();
+		ArrayList<Node> east = new ArrayList<Node>();
+		ArrayList<Node> west = new ArrayList<Node>();
+		for (Node node : net.getNodes().values()){
+			if (node.getCoord().getY() == y_min && y_min < 0)
+				south.add(node);
+			if (node.getCoord().getY() == y_max && y_max > contextCA.getRows()*Constants.CA_CELL_SIDE)
+				north.add(node);
+			if (node.getCoord().getX() == x_min && x_min < 0)
+				west.add(node);
+			if (node.getCoord().getX() == x_max && x_max > contextCA.getColumns()*Constants.CA_CELL_SIDE)
+				east.add(node);
+		}
+		if (south.size()>0){
+			Coordinates centroid = Distances.centroid(south);
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX(),centroid.getY()-LINK_LENGTH));
+			net.addNode(orDestNode);
+			connect(orDestNode, south, net, fac,'s');
+		
+		}
+		if (north.size()>0){
+			Coordinates centroid = Distances.centroid(north);
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX(),centroid.getY()+LINK_LENGTH));
+			net.addNode(orDestNode);
+			connect(orDestNode, north, net, fac,'n');
+		}
+		if (west.size()>0){
+			Coordinates centroid = Distances.centroid(west);
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX()-LINK_LENGTH,centroid.getY()));
+			net.addNode(orDestNode);
+			connect(orDestNode, west, net, fac, 'w');
+		}
+		if (east.size()>0){
+			Coordinates centroid = Distances.centroid(east);
+			Node orDestNode = fac.createNode(Id.create("n"+net.getNodes().size(),Node.class), new CoordImpl(centroid.getX()+LINK_LENGTH,centroid.getY()));
+			net.addNode(orDestNode);
+			connect(orDestNode, east, net, fac, 'e');
+		}
 		((NetworkImpl)net).setCapacityPeriod(1);
 		((NetworkImpl)net).setEffectiveCellSize(.26);
 		((NetworkImpl)net).setEffectiveLaneWidth(.71);		
+	}
+
+	private static void connect(Node orDestNode, ArrayList<Node> nodes, Network net, NetworkFactory fac, char direction) {
+		for (Node node : nodes){
+			Link linkOut = fac.createLink(Id.create("l"+net.getLinks().size(),Link.class), node, orDestNode);
+			Link linkIn = fac.createLink(Id.create("l"+(net.getLinks().size()+1),Link.class), orDestNode, node);
+			initLink(linkOut);
+			initLink(linkIn);
+			net.addLink(linkOut);
+			net.addLink(linkIn);
+		}
+		Node firstNode = fac.createNode(Id.create("n_"+direction,Node.class), new CoordImpl(orDestNode.getCoord().getX(),orDestNode.getCoord().getY()+LINK_LENGTH));
+		Link linkOut = fac.createLink(Id.create("l"+net.getLinks().size(),Link.class), orDestNode, firstNode);
+		Link linkIn = fac.createLink(Id.create("l"+(net.getLinks().size()+1),Link.class), firstNode, orDestNode);
+		net.addNode(firstNode);
+		initLink(linkOut);
+		initLink(linkIn);
+		net.addLink(linkOut);
+		net.addLink(linkIn);
+		
+	}
+
+	private static void initLink(Link link) {
+		link.setLength(LINK_LENGTH);
+		link.setAllowedModes(MODES);
+		link.setFreespeed(Constants.PEDESTRIAN_SPEED);
+		link.setCapacity(FLOW);
+		link.setNumberOfLanes(LANES);
 	}
 	
 }

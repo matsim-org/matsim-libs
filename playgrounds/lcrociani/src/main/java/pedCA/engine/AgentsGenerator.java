@@ -19,9 +19,11 @@ import pedCA.utility.Lottery;
 
 public class AgentsGenerator {
 	private Context context;
+	private int pedestrianCounter;
 	
 	public AgentsGenerator(Context context){
 		this.context = context;
+		pedestrianCounter = 0;
 	}
 	
 	public void step(){
@@ -55,13 +57,15 @@ public class AgentsGenerator {
 
 	//FOR MATSIM CONNECTOR
 	public Pedestrian generatePedestrian(GridPoint initialPosition, int destinationId, QVehicle vehicle, TransitionArea transitionArea){
-		int pedID = getPopulation().getPedestrians().size();
+		int pedID = pedestrianCounter;
 		Destination destination = context.getMarkerConfiguration().getDestination(destinationId);
 		Agent agent = new Agent(pedID,initialPosition,destination,context);
 		Pedestrian pedestrian = new Pedestrian(agent, vehicle, transitionArea);
 		getPopulation().addPedestrian(pedestrian);
 		//context.getPedestrianGrid().addPedestrian(initialPosition, pedestrian);
+		pedestrianCounter++;
 		return pedestrian;
+		
 	}
 	
 	//FOR MATSIM CONNECTOR

@@ -46,7 +46,7 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	private static final long serialVersionUID = 1L;
 
-	private final JFrame fr;
+	protected final JFrame fr;
 
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
 	private List<Text> elementsText = Collections.synchronizedList(new ArrayList<Text>());
@@ -70,7 +70,7 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	int dummy = 0;
 
-	private final FrameSaver fs;
+	FrameSaver fs;
 	//	private final FrameSaver fs = null;
 	private String it;
 	
