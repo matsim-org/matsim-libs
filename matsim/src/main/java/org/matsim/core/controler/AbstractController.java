@@ -19,6 +19,11 @@
 
 package org.matsim.core.controler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
@@ -26,12 +31,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractController {
 
@@ -99,7 +98,8 @@ public abstract class AbstractController {
         });
         final Thread controllerThread = Thread.currentThread();
         Thread shutdownHook = new Thread() {
-            public void run() {
+            @Override
+						public void run() {
                 log.error("received unexpected shutdown request.");
                 // Request shutdown from the controllerThread.
                 unexpectedShutdown.set(true);
@@ -172,15 +172,21 @@ public abstract class AbstractController {
 
     private void shutdown() {
         log.info("S H U T D O W N   ---   start shutdown.");
-        this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
-        if (this.uncaughtException != null) {
-            log.error("Shutdown possibly caused by the following Exception:", this.uncaughtException);
+        if (this.unexpectedShutdown.get()) {
+        	log.error("ERROR --- This is an unexpected shutdown!");
         }
+        if (this.uncaughtException != null) {
+        	log.error("Shutdown possibly caused by the following Exception:", this.uncaughtException);
+        }
+        this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
         if (this.unexpectedShutdown.get()) {
             log.error("ERROR --- MATSim unexpectedly terminated. Please check the output or the logfile with warnings and errors for hints.");
             log.error("ERROR --- results should not be used for further analysis.");
         }
         log.info("S H U T D O W N   ---   shutdown completed.");
+        if (this.unexpectedShutdown.get()) {
+        	log.error("ERROR --- This was an unexpected shutdown! See the log file for a possible reason.");
+        }
         OutputDirectoryLogging.closeOutputDirLogging();
     }
 
