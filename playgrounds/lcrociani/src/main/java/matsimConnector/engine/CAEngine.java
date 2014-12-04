@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.CALink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QCALink;
 
@@ -30,6 +31,7 @@ public class CAEngine implements MobsimEngine{
 	
 	private final Map<Id<Link>,QCALink> linkToQCALink = new HashMap<Id<Link>,QCALink>();
 	private final Map<Id<Link>,CAQLink> linkToCAQLink = new HashMap<Id<Link>,CAQLink>();
+	private final Map<Id<Link>, CALink> linkToCALink = new HashMap<Id<Link>,CALink>();
 	private double simCATime;
 	
 	public CAEngine(QSim qSim, CAAgentFactory agentFactoryCA){
@@ -92,6 +94,10 @@ public class CAEngine implements MobsimEngine{
 		linkToCAQLink.put(lowResLink.getLink().getId(), lowResLink);
 		//lowResLinks.add(lowResLink);
 	}
+
+	public void registerCALink(CALink linkCA) {
+		linkToCALink.put(linkCA.getLink().getId(), linkCA);
+	}
 	
 	public QCALink getQCALink(Id<Link> linkId){
 		return linkToQCALink.get(linkId);
@@ -99,6 +105,10 @@ public class CAEngine implements MobsimEngine{
 	
 	public CAQLink getCAQLink(Id<Link> linkId){
 		return linkToCAQLink.get(linkId); 
+	}
+
+	public CALink getCALink(Id<Link> linkId) {
+		return linkToCALink.get(linkId);
 	}
 	
 }

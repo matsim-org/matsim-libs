@@ -54,10 +54,16 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 			return qLink;
 		}
 		else if (isCALink){
-			//TODO FIND THE GOOD WAY TO DO THIS
+			createCALink(network, qLink);
 			return qLink;
 		}
 		return qLink;
+	}
+
+	private CALink createCALink(QNetwork network, QLinkInternalI qLink) {
+		CALink linkCA = new CALink(network, qLink);
+		this.engineCA.registerCALink(linkCA);
+		return linkCA;
 	}
 
 	protected CAQLink createCAQLink(QNetwork network, QLinkInternalI qLink) {

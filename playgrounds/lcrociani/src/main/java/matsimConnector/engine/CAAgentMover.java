@@ -11,6 +11,7 @@ import matsimConnector.utility.Constants;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.qsim.qnetsimengine.CALink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 
 import pedCA.context.Context;
@@ -44,7 +45,11 @@ public class CAAgentMover extends AgentMover {
 				if(!pedestrian.isWaitingToSwap() && pedestrian.isEnteringEnvironment()){
 					moveToCA(pedestrian, now);
 				}else if (!pedestrian.isWaitingToSwap()&& pedestrian.isFinalDestinationReached() && !pedestrian.hasLeftEnvironment()){
-					if(now>=Constants.CA_TEST_END_TIME){
+					Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
+					if (engineCA.getCALink(nextLinkId) != null){
+						changeLinkInsideEnvironment(pedestrian, now);
+					}
+					else if(now>=Constants.CA_TEST_END_TIME){
 						moveToQ(pedestrian, now);
 					}
 				}	
@@ -83,6 +88,8 @@ public class CAAgentMover extends AgentMover {
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		CAQLink lowResLink = engineCA.getCAQLink(nextLinkId);
+		if (lowResLink == null)
+			System.out.println("ERROR IN MOVING TO Q!!!");
 		lowResLink.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
 		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
 		lowResLink.addFromUpstream(pedestrian.getVehicle());
@@ -91,5 +98,20 @@ public class CAAgentMover extends AgentMover {
 		
 		TransitionArea transitionArea = lowResLink.getTransitionArea();
 		pedestrian.moveToTransitionArea(transitionArea);
+	}	
+	
+	private void changeLinkInsideEnvironment(Pedestrian pedestrian, double time) {
+		Log.log(pedestrian.toString()+" changing CALink.");
+		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
+		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
+		CALink linkCA = engineCA.getCALink(nextLinkId);
+		linkCA.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
+		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
+			
+		//TODO CHANGE THE COLOR OF THE AGENT
+		//eventManager.processEvent(new CAAgentLeaveEnvironmentEvent(time, pedestrian));
+		
+		//TODO CHANGE THE DESTINATION OF THE AGENT
+		//pedestrian.refreshDestination();
 	}	
 }

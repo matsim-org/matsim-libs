@@ -12,7 +12,7 @@ public class Constants {
 	public static final Double PEDESTRIAN_SPEED = CA_CELL_SIDE/CA_STEP_DURATION;
 	public static final Double CA_TEST_END_TIME = 0.; //1200
 	public static final double SIMULATION_DURATION = 2000;
-	public static final int SIMULATION_ITERATIONS = 10;
+	public static final int SIMULATION_ITERATIONS = 2;
 	public static final boolean SAVE_FRAMES = false;
 	
 	/** name to use to add CAScenario to a matsim scenario as a scenario element **/ 

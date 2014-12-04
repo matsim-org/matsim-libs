@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import pedCA.environment.grid.GridPoint;
+import pedCA.utility.FileUtility;
 
 public class MarkerConfiguration {
 	private ArrayList<Start> starts;
@@ -59,6 +60,7 @@ public class MarkerConfiguration {
 
 	public void saveConfiguration(String path) throws IOException{
 		path = path+"/input/markers";
+		FileUtility.deleteDirectory(new File(path));
 		new File(path+"/starts").mkdirs();
 		new File(path+"/destinations").mkdirs();
 		FileOutputStream fout;
