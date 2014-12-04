@@ -26,7 +26,14 @@ public class Constants {
 	public static final Double TRANSITION_LINK_LENGTH = 5.;//TRANSITION_AREA_LENGTH/2.;
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);
 	
-	public static final String PATH = "/tmp/TestCA";
+	public static final String PATH;
+	static {
+		String OS = System.getProperty("os.name").toLowerCase();
+		if (OS.indexOf("win") >= 0)
+			PATH = "C:/Users/Luca/Documents/uni/Dottorato/Juelich/developing_stuff/Test";
+		else
+			PATH = "/tmp/TestCA";
+	}
 	public static final String DEBUG_TEST_PATH = PATH+"/debug";
 	public static final String FD_TEST_PATH = PATH+"/FD/";
 	public static final String INPUT_PATH = DEBUG_TEST_PATH+"/input";

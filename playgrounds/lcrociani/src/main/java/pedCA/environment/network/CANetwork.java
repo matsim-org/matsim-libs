@@ -2,30 +2,34 @@ package pedCA.environment.network;
 
 import java.util.ArrayList;
 
+import matsimConnector.utility.MathUtility;
+import pedCA.environment.grid.FloorFieldsGrid;
+import pedCA.environment.grid.GridPoint;
 import pedCA.environment.markers.Destination;
 import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.environment.markers.TacticalDestination;
+import pedCA.utility.Constants;
 
 public class CANetwork{
 	private ArrayList <CANode> nodes;
 	private ArrayList <CAEdge> edges;
 	
-	public CANetwork(MarkerConfiguration markerConfiguration){
+	public CANetwork(MarkerConfiguration markerConfiguration, FloorFieldsGrid floorFieldsGrid){
 		nodes = new ArrayList <CANode>();
 		edges = new ArrayList <CAEdge>();
-		buildNetwork(markerConfiguration);
+		buildNetwork(markerConfiguration, floorFieldsGrid);
 	}
 	
 	private void addNode(CANode node){
 		nodes.add(node);
 	}
 	
-	private void createBidirectionalEdge(CANode n1, CANode n2){
-		edges.add(new CAEdge(n1,n2));
-		edges.add(new CAEdge(n2,n1));
+	private void createBidirectionalEdge(CANode n1, CANode n2, double ffDistance){
+		edges.add(new CAEdge(n1,n2, ffDistance));
+		edges.add(new CAEdge(n2,n1, ffDistance));
 	}
 	
-	public void buildNetwork(MarkerConfiguration markerConfiguration){
+	public void buildNetwork(MarkerConfiguration markerConfiguration, FloorFieldsGrid floorFieldsGrid){
 		for (Destination destination : markerConfiguration.getDestinations())
 			if (destination instanceof TacticalDestination){
 				TacticalDestination td = (TacticalDestination) destination;
@@ -34,10 +38,23 @@ public class CANetwork{
 			}
 			
 		for(int i=0;i<nodes.size();i++)
-			for(int j=i+1; j<nodes.size();j++)
-				createBidirectionalEdge(nodes.get(i),nodes.get(j));
+			for(int j=i+1; j<nodes.size();j++) {
+				double ffDistance = getFFDistance(nodes.get(i), nodes.get(j), markerConfiguration, floorFieldsGrid);
+				if (ffDistance!= Constants.MAX_FF_VALUE){
+					ffDistance = MathUtility.average(ffDistance, getFFDistance(nodes.get(j), nodes.get(i), markerConfiguration, floorFieldsGrid));
+					createBidirectionalEdge(nodes.get(i),nodes.get(j), ffDistance*Constants.CELL_SIZE);
+				}
+			}
 	}
 	
+	private double getFFDistance(CANode caNode1, CANode caNode2, MarkerConfiguration markerConfiguration, FloorFieldsGrid floorFieldsGrid) {
+		int fieldLevel1 = caNode1.getDestinationId();
+		int fieldLevel2 = caNode2.getDestinationId();
+		TacticalDestination td = (TacticalDestination)markerConfiguration.getDestination(fieldLevel2);
+		GridPoint td_center = td.getCells().get(td.getCells().size()/2);
+		return floorFieldsGrid.getCellValue(fieldLevel1, td_center);
+	}
+
 	public ArrayList <CANode> getNodes(){
 		return nodes;
 	}

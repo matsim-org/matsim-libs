@@ -22,7 +22,7 @@ public class Context {
 	public Context(EnvironmentGrid environmentGrid, MarkerConfiguration markerConfiguration){
 		initializeGrids(environmentGrid, markerConfiguration);
 		population = new Population();
-		network = new CANetwork(markerConfiguration);
+		network = new CANetwork(markerConfiguration, floorFieldsGrid);
 	}
 	
 	public Context(String path) throws IOException{

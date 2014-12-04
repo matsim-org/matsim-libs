@@ -1,21 +1,14 @@
 package pedCA.environment.network;
 
-import pedCA.utility.Distances;
-
 public class CAEdge {
 	private CANode n1;
 	private CANode n2;
 	private double length;
 	
-	public CAEdge(CANode n1, CANode n2){
+	public CAEdge(CANode n1, CANode n2, double ffDistance){
 		this.n1 = n1;
 		this.n2 = n2;
-		calculateLength();
-	}
-
-	private void calculateLength() {
-		//TODO Take the distance from the floor field
-		length = Distances.EuclideanDistance(n1.getCoordinates(), n2.getCoordinates());
+		this.length = ffDistance;
 	}
 
 	public double getLength(){
@@ -37,6 +30,4 @@ public class CAEdge {
 		result += "LENGTH: "+length;
 		return result;
 	}
-	
-	
 }

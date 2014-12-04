@@ -11,6 +11,7 @@ public class CANode {
 		this.id = id;
 		this.coordinates = coordinates;
 		this.width = width;
+		setDestinationId(id);
 	}
 
 	public int getId() {
