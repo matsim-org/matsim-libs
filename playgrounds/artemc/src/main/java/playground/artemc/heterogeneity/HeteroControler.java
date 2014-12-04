@@ -46,7 +46,7 @@ public class HeteroControler {
 
 		if(args.length>2){
 			simulationType = args[2];
-			if(args[2].equals("hetero"))
+			if(args[2].equals("hetero")|| args[2].equals("heteroAlpha") || args[2].equals("heteroGamma"))
 				heteroSwitch=true;
 		}
 
