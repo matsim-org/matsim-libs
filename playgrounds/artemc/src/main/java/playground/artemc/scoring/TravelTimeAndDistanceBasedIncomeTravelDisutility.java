@@ -63,7 +63,7 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
-		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+		this.marginalCostOfTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0)  * factorMean + (cnScoringGroup.getPerforming_utils_hr() / 3600.0) * factorMean;
 
 //		this.marginalUtlOfDistance = cnScoringGroup.getMarginalUtlOfDistanceCar();
 		this.marginalCostOfDistance = - cnScoringGroup.getMonetaryDistanceCostRateCar() * cnScoringGroup.getMarginalUtilityOfMoney() ;
@@ -85,7 +85,7 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 //		}
 		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
 		
-		return this.marginalCostOfTime * (1.0/ (this.incomeFactors.get(person.getId()) / factorMean) ) * travelTime + this.marginalCostOfDistance * link.getLength();
+		return this.marginalCostOfTime * (1.0/ this.incomeFactors.get(person.getId())) * travelTime + this.marginalCostOfDistance * link.getLength();
 	}
 
 	@Override

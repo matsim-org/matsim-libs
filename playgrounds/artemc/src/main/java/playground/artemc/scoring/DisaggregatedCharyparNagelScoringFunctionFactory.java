@@ -144,9 +144,27 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			}
 		}
 		else if(simulationType.equals("heteroAlpha") ){
-			params.marginalUtilityOfLateArrival_s = params.marginalUtilityOfPerforming_s;
-			params.marginalUtilityOfEarlyDeparture_s= 0.0;
+			if(incomeFactors!=null){
+				/*Calculate the mean in order to adjust the utility parameters*/
+				Double factorSum=0.0;
+				Double factorMean = 0.0;
+				for(Double incomeFactor:this.incomeFactors.values()){
+					factorSum = factorSum + incomeFactor;
+				}
+				factorMean = factorSum / (double) incomeFactors.size();
+				
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * params.marginalUtilityOfPerforming_s * incomeFactors.get(person.getId());
+				params.marginalUtilityOfEarlyDeparture_s = params.marginalUtilityOfLateArrival_s;
+				
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * incomeFactors.get(person.getId());
+
+				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
+				}
+			}
 			
+
 		}
 		return params;
 	}
