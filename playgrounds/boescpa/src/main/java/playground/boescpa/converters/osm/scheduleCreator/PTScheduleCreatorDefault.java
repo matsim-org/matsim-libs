@@ -153,35 +153,23 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 							23−25 INT16 Taktanzahl; gibt die Anzahl der noch folgenden Takte
 							an.
 							27−29 INT16 Taktzeit in Minuten (Abstand zwischen zwei Fahrten).*/
-
 							// Get the appropriate transit line...
-							PtLineFPLAN lineFPLAN = getPtLineFPLAN(Id.create(newLine.substring(9,15), TransitLine.class));
-
+							Id<TransitLine> lineId = Id.create(newLine.substring(9,15), TransitLine.class);
+							PtLineFPLAN lineFPLAN;
+							if (linesFPLAN.containsKey(lineId)) {
+								lineFPLAN = linesFPLAN.get(lineId);
+							} else {
+								lineFPLAN = new PtLineFPLAN(lineId.toString());
+								linesFPLAN.put(lineId, lineFPLAN);
+							}
 							// Create the new route in this line...
 							String routeId = newLine.substring(3, 8);
 							int numberOfDepartures = Integer.parseInt(newLine.substring(22, 25));
 							int cycleTime = Integer.parseInt(newLine.substring(26, 29));
-							lineFPLAN.addPtRouteFPLAN(new PtRouteFPLAN(routeId,PtRouteFPLAN.TYPE_Z, numberOfDepartures, cycleTime));
-
+							lineFPLAN.addPtRouteFPLAN(new PtRouteFPLAN(routeId, numberOfDepartures, cycleTime));
 							break;
-						case 'T': // Initialzeile neue Fahrt (Unterschied zu Z-Zeile: Flexible Abfahrtszeiten <-> AwaitDeparture = False)
-							/*Spalte Typ Bedeutung
-							1−2 CHAR *T
-							4−8 INT32 Fahrtnummer
-							10−15 CHAR Verwaltung (6-stellig); Die Verwaltungsangabe darf
-							keine Leerzeichen enthalten.
-							17−20 INT16 Fahrtzeitraum in Minuten
-							22−25 INT16 Taktdichte in Sekunden (Abstand zweier Fahrten).*/
-
-							// Get the appropriate transit line...
-							lineFPLAN = getPtLineFPLAN(Id.create(newLine.substring(9,15), TransitLine.class));
-
-							// Create the new route in this line...
-							routeId = newLine.substring(3, 8);
-							int timeOfService = Integer.parseInt(newLine.substring(16, 20));
-							cycleTime = Integer.parseInt(newLine.substring(21, 25));
-							lineFPLAN.addPtRouteFPLAN(new PtRouteFPLAN(routeId,PtRouteFPLAN.TYPE_T, timeOfService, cycleTime));
-
+						case 'T': // Freie Fahrten (Linien welche nicht nach Taktfahrplan fahren...)
+							log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
 							break;
 						case 'G': // Verkehrsmittelzeile
 							/*Spalte Typ Bedeutung
@@ -233,17 +221,6 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		}
 	}
 
-	private PtLineFPLAN getPtLineFPLAN(Id<TransitLine> lineId) {
-		PtLineFPLAN lineFPLAN;
-		if (linesFPLAN.containsKey(lineId)) {
-			lineFPLAN = linesFPLAN.get(lineId);
-		} else {
-			lineFPLAN = new PtLineFPLAN(lineId.toString());
-			linesFPLAN.put(lineId, lineFPLAN);
-		}
-		return lineFPLAN;
-	}
-
 	private class PtLineFPLAN {
 		public final Id<TransitLine> lineId;
 		private final List<PtRouteFPLAN> routesFPLAN = new ArrayList<>();
@@ -266,17 +243,12 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	}
 
 	private class PtRouteFPLAN {
-		public static final boolean TYPE_Z = true;
-		public static final boolean TYPE_T = false;
-
 		private final Id<TransitRoute> routeId;
-		private final boolean type;
 		private final int numberOfDepartures;
 		private final int cycleTime; // [sec]
 		private final List<TransitRouteStop> stops = new ArrayList<>();
 
 		private int firstDepartureTime = -1; //[sec]
-
 		public void setFirstDepartureTime(int hour, int minute) {
 			if (firstDepartureTime < 0) {
 				this.firstDepartureTime = (hour * 3600) + (minute * 60);
@@ -284,7 +256,6 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		}
 
 		private Id<Vehicle> usedVehicle = null;
-
 		public void setUsedVehicle(String usedVehicle) {
 			if (this.usedVehicle == null) {
 				this.usedVehicle = Id.create(usedVehicle, Vehicle.class);
@@ -292,15 +263,10 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			vehicles.add(Id.create(usedVehicle, Vehicle.class));
 		}
 
-		public PtRouteFPLAN(String lineId, boolean type, int numberOfDepartures, int cycleTime) {
+		public PtRouteFPLAN(String lineId, int numberOfDepartures, int cycleTime) {
 			this.routeId = Id.create(lineId, TransitRoute.class);
-			this.type = type;
 			this.numberOfDepartures = numberOfDepartures;
-			if (type) { // <=> If is TYPE_Z, then given cycleTime in [min] and we have to change it...
-				this.cycleTime = cycleTime * 60;
-			} else { // <=> If is TYPE_T, then given cycleTime already in [sec]...
-				this.cycleTime = cycleTime;
-			}
+			this.cycleTime = cycleTime * 60; // Cycle time is given in minutes in HAFAS -> Have to change it here...
 		}
 
 		public TransitRoute getRoute() {
@@ -328,18 +294,17 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			} else if (arrivalDelay > 0) {
 				departureDelay = arrivalDelay + 1;
 			}
-			stops.add(createRouteStop(stopFacility, arrivalDelay, departureDelay, type));
+			stops.add(createRouteStop(stopFacility, arrivalDelay, departureDelay));
 		}
 
 		/**
-		 *
-		 * @return A list of all departures of this route. If firstDepartureTime or usedVehicle are not set before this is called, null is returned.
+		 * @return A list of all departures of this route.
+		 * If firstDepartureTime or usedVehicle are not set before this is called, null is returned.
 		 */
 		private List<Departure> getDepartures() {
 			if (firstDepartureTime < 0 || usedVehicle == null) {
 				return null;
 			}
-
 			List<Departure> departures = new ArrayList<>();
 			for (int i = 0; i < numberOfDepartures; i++) {
 				Id<Departure> departureId = Id.create(routeId.toString() + "_" + (i + 1), Departure.class);
@@ -349,9 +314,9 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			return departures;
 		}
 
-		private TransitRouteStop createRouteStop(TransitStopFacility stopFacility, double arrivalDelay, double departureDelay, boolean awaitDepartureTime) {
+		private TransitRouteStop createRouteStop(TransitStopFacility stopFacility, double arrivalDelay, double departureDelay) {
 			TransitRouteStop routeStop = scheduleBuilder.createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
-			routeStop.setAwaitDepartureTime(awaitDepartureTime);
+			routeStop.setAwaitDepartureTime(true); // Only *T-Lines (currently not implemented) would have this as false...
 			return routeStop;
 		}
 
