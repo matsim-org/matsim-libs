@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+option java_outer_classname="ProtoFrame";
+option java_package = "playground.gregor.proto";
+
+message Frame {
+	required double time = 1;
+	message Event {
+		enum Type {
+			POS = 0;
+
+			LINK_INF = 1;
+		}
+		optional Type evntType = 1 [default = POS];
+	}
+
+	repeated Event evnt = 16;
+}
