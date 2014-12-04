@@ -251,10 +251,6 @@ public class NoiseTest {
 		
 		BufferedReader br = IOUtils.getBufferedReader(pathToConsideredAgentUnitsFile);
 		
-		Scenario justForTesting = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimPopulationReader populationReader = new MatsimPopulationReader(justForTesting);
-		populationReader.readFile("test/output/playground/ikaddoura/noise2/noiseTest/test2/output_plans.xml.gz");
-		
 		try {
 			
 			line = br.readLine();
