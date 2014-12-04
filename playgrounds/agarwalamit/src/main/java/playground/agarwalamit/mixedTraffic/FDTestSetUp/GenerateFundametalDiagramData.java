@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -77,14 +78,12 @@ public class GenerateFundametalDiagramData {
 	static boolean WITH_HOLES = false;
 	boolean WRITE_FD_DATA = true;
 	static String RUN_DIR ;
+	public boolean isPlottingDistribution = false;
 
 	static boolean writeInputFiles = true; // includes config,network and plans
 
 	static String[] TRAVELMODES;	//identification of the different modes
 	static Double[] MODAL_SPLIT; //modal split in PCU 
-	//	private final static Integer[] Steps = {40,40,5/*,10*/};
-	private final static Integer[] STARTING_POINT = {0,0,};
-	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
 	private int reduceDataPointsByFactor = 1;
 
@@ -96,23 +95,29 @@ public class GenerateFundametalDiagramData {
 	private Scenario scenario;
 
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
-	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
+	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
+
+	private Integer[] STARTING_POINT;
+	private Integer [] MAX_AGENT_DISTRIBUTION;
+	private Integer [] Step_Size;
 
 	/**
 	 * Overall density to vehicular flow and speed.
 	 */
 	private Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
 	public static String HOLE_SPEED;
-	
+
 	public static void main(String[] args) {
 
-//		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
-//		String OUTPUT_FOLDER ="/run306/";
+		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
+		String OUTPUT_FOLDER ="/run306/";
+		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
+
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
 
 		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
-		
+
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
@@ -121,8 +126,10 @@ public class GenerateFundametalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(args[1]);
 		generateFDData.setUseHoles(Boolean.valueOf(args[2]));
+		generateFDData.setReduceDataPointsByFactor(10);
 		generateFDData.setUsingSeepNetworkFactory(Boolean.valueOf(args[3]));
 		HOLE_SPEED = args[4];
+		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
 		generateFDData.run();
 	}
 
@@ -150,8 +157,7 @@ public class GenerateFundametalDiagramData {
 	 * @param outputFile final data will be written to this file
 	 */
 	public void run(){
-		Integer[] MaxAgentDistribution = {150, 600};
-		Integer[] Steps = {1, 1};
+
 		consistencyCheckAndInitialize();
 
 		inputs = new InputsForFDTestSetUp();
@@ -160,8 +166,11 @@ public class GenerateFundametalDiagramData {
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
 		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
-//		parametricRunAccordingToGivenModalSplit();
-		parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
+
+		if(isPlottingDistribution){
+			parametricRunAccordingToDistribution();	
+		} else parametricRunAccordingToGivenModalSplit();
+
 		if(WRITE_FD_DATA) closeFile();
 	}
 
@@ -201,25 +210,16 @@ public class GenerateFundametalDiagramData {
 		SEEP_NETWORK_FACTORY = isUsingMySeepNetworkFactory;
 	}
 
+	public void setIsPlottingDistribution(boolean isPlottingDistribution) {
+		this.isPlottingDistribution = isPlottingDistribution;
+	}
+
 	public Map<Double, Map<String, Tuple<Double, Double>>> getOutData() {
 		return outData;
 	}
 
 	public void setIsWritingFinalFdData(boolean isWritingFinalData) {
 		WRITE_FD_DATA = isWritingFinalData;
-	}
-
-	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
-		//Check for size
-		if ((maxAgentDistribution.size() != TRAVELMODES.length) || (steps.size() != TRAVELMODES.length)){ throw new RuntimeException("There should be as many maxValues and/or steps in the two given lists as there are modes in the simulation.");}
-
-		List<List<Integer>> pointsToRun = this.createPointsToRun(maxAgentDistribution, steps);
-		System.out.println(pointsToRun);
-		for ( int i=0; i<pointsToRun.size(); i++){
-			List<Integer> pointToRun = pointsToRun.get(i);
-			System.out.println("Going into run "+pointToRun);
-			this.singleRun(pointToRun);
-		}
 	}
 
 	private void parametricRunAccordingToGivenModalSplit(){
@@ -268,7 +268,7 @@ public class GenerateFundametalDiagramData {
 			}
 		}
 		//set up number of Points to run.
-		double cellSizePerPCU = 7.5;
+		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 		double sumOfPCUInEachStep = 0;
 		for(int index=0;index<TRAVELMODES.length;index++){
@@ -294,23 +294,50 @@ public class GenerateFundametalDiagramData {
 		}
 	}
 
-	private List<List<Integer>> createPointsToRun(List<Integer> maxValues, List<Integer> steps) {
+	private void parametricRunAccordingToDistribution(){
+
+		this.STARTING_POINT = new Integer [TRAVELMODES.length];
+		this.Step_Size = new Integer [TRAVELMODES.length];
 		
+		for(int ii=0;ii<TRAVELMODES.length;ii++){
+			this.STARTING_POINT [ii] =0;
+			this.Step_Size [ii] = this.reduceDataPointsByFactor*1;
+		}
 		
-		//calculate number of points and creating starting point:
+		MAX_AGENT_DISTRIBUTION = new Integer [TRAVELMODES.length];
+		for(int ii=0;ii<MAX_AGENT_DISTRIBUTION.length;ii++){
+			double pcu = this.mode2FlowData.get(Id.create(TRAVELMODES[ii],VehicleType.class)).getVehicleType().getPcuEquivalents();
+			double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
+			double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+			int maxNumberOfVehicle = (int) Math.floor(networkDensity/pcu)+1;
+			MAX_AGENT_DISTRIBUTION[ii] = maxNumberOfVehicle;
+		}
+
+		List<List<Integer>> pointsToRun = this.createPointsToRun();
+
+		for ( int i=0; i<pointsToRun.size(); i++){
+			List<Integer> pointToRun = pointsToRun.get(i);
+			System.out.println("Going into run "+pointToRun);
+			this.singleRun(pointToRun);
+		}
+	}
+	
+	private List<List<Integer>> createPointsToRun() {
+
 		int numberOfPoints = 1; 
-		//TODO: set this back. Integer[] startingPoint = new Integer[maxValues.size()];
-		//for (int i=0; i<maxValues.size(); i++){
-		//	numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
-		//	startingPoint[i] = new Integer(0);
-		//}
-		numberOfPoints = 14000;
+
+		for(int jj=0;jj<TRAVELMODES.length;jj++){
+			numberOfPoints *= (int) Math.floor((MAX_AGENT_DISTRIBUTION[jj]-STARTING_POINT[jj])/Step_Size[jj])+1;
+		}
+		
+		if(numberOfPoints > 1000) log.warn("Total number of points to run is "+numberOfPoints+". This may take long time. For lesser time to get the data reduce data points by some factor.");
+
 		//Actually going through the n-dimensional grid
-		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, STARTING_POINT);
+		BinaryAdditionModule iterationModule = new BinaryAdditionModule(Arrays.asList(MAX_AGENT_DISTRIBUTION), Arrays.asList(Step_Size), STARTING_POINT);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
 		for (int i=0; i<numberOfPoints; i++){
-			Integer[] newPoint = new Integer[maxValues.size()];
-			for (int j=0; j<maxValues.size(); j++){
+			Integer[] newPoint = new Integer[MAX_AGENT_DISTRIBUTION.length];
+			for (int j=0; j<newPoint.length; j++){
 				newPoint[j] = (iterationModule.getPoint())[j];
 			}
 			pointsToRun.add(Arrays.asList(newPoint));
@@ -582,11 +609,11 @@ public class GenerateFundametalDiagramData {
 			return delegate.getExpectedTravelTime();
 		}
 
-        @Override
-        public Double getExpectedTravelDistance() {
-            return delegate.getExpectedTravelDistance();
-        }
-        
+		@Override
+		public Double getExpectedTravelDistance() {
+			return delegate.getExpectedTravelDistance();
+		}
+
 		@Override
 		public final String getMode() {
 			return delegate.getMode();
