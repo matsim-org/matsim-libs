@@ -20,20 +20,10 @@
 
 package playground.imob.feathers2forWithinDayReplanning;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -42,11 +32,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 /**
  * This class should give an example what is needed to run
@@ -144,28 +131,17 @@ final class ExampleWithinDayController implements StartupListener {
 		this.initReplanners();
 	}
 	
-	private final void initReplanners() {
-		
+	private void initReplanners() {
 		final TravelTime travelTimeCollector = this.withinDayControlerListener.getTravelTimeCollector();
 		final TravelDisutilityFactory travelDisutilityFactory = this.withinDayControlerListener.getTravelDisutilityFactory();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTimeCollector, this.scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTimeCollector);
-		
-//		ActivityEndIdentifierFactory duringActivityIdentifierFactory = new ActivityEndIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
-//		DuringActivityIdentifier duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
-
-		NextActivityAppendingReplannerFactory duringActivityReplannerFactory = 
+		ActivityEndIdentifierFactory activityEndIdentifierFactory = new ActivityEndIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		NextActivityAppendingReplannerFactory duringActivityReplannerFactory =
 				new NextActivityAppendingReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
 				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
-//		duringActivityReplannerFactory.addIdentifier(duringActivityIdentifier);
-		duringActivityReplannerFactory.addIdentifier( new DuringActivityIdentifier() {
-			@Override
-			public Set<MobsimAgent> getAgentsToReplan(double time) {
-				return new HashSet<MobsimAgent>(	withinDayControlerListener.getMobsimDataProvider().getAgents().values() ) ;
-			}}  ) ;
-		
+		duringActivityReplannerFactory.addIdentifier(activityEndIdentifierFactory.createIdentifier());
 		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(duringActivityReplannerFactory);
-		
 	}
 
 }

@@ -20,14 +20,6 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.TreeMap;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,6 +31,14 @@ import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.TreeMap;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 /*
  * Typical Replanner Implementations should be able to use this 
@@ -69,8 +69,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 * same Agent.
 	 */
 	protected Map<Id<WithinDayReplanner>, Queue<ReplanningTask>> replanningTasks = new TreeMap<>();
-	protected WithinDayReplanner<Identifier> withinDayReplanner;
-	protected EventsManager eventsManager;
+    protected EventsManager eventsManager;
 	
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier betweenReplannerBarrier;
@@ -134,7 +133,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 * Typical Replanner Implementations should be able to use 
 	 * this method without any Changes.
 	 */
-	private final void doReplanning() throws InterruptedException, BrokenBarrierException {
+	private void doReplanning() throws InterruptedException, BrokenBarrierException {
 
 		for (Entry<Id<WithinDayReplanner>, Queue<ReplanningTask>> entry : this.replanningTasks.entrySet()) {
 			
@@ -154,7 +153,7 @@ public abstract class ReplanningRunnable implements Runnable {
 			// set time once per replanner and time step
 			withinDayReplanner.setTime(time);
 			
-			ReplanningTask replanningTask = null;
+			ReplanningTask replanningTask;
 			while (true) {
 				replanningTask = queue.poll();
 				
@@ -219,13 +218,11 @@ public abstract class ReplanningRunnable implements Runnable {
 				}
 				
 				doReplanning();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException | BrokenBarrierException e) {
 				throw new RuntimeException(e);
-			} catch (BrokenBarrierException e) {
-            	throw new RuntimeException(e);
-            }
+			}
 
-		}	// while Simulation Running
+        }	// while Simulation Running
 
 	}	// run()
 	
