@@ -114,6 +114,8 @@ final class ExampleWithinDayController implements StartupListener {
 //					return qsim ;
 //				}
 //			} );
+			controler.setOverwriteFiles(true);
+			
 			controler.run();
 		}
 		System.exit(0);
