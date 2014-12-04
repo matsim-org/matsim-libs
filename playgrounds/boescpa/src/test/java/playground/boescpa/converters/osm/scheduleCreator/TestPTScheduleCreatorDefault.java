@@ -66,4 +66,11 @@ public class TestPTScheduleCreatorDefault {
         assertEquals("Correct Reading of Coordinates.", 250450.4833905114, schedule.getFacilities().get(facility2Id).getCoord().getY(), 0.0);
         assertEquals("Correct Reading of Names.", "Test Bahnhof 1", schedule.getFacilities().get(facility1Id).getName());
     }
+
+    @Test
+    public void testReadLines() {
+        scheduleCreator.readStops(utils.getClassInputDirectory()+"BFKOORD_GEO");
+        scheduleCreator.readLines(utils.getClassInputDirectory()+"FPLAN");
+        // TODO-boescpa Finish tests...
+    }
 }

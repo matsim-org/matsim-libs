@@ -131,65 +131,70 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	protected void readLines(String FPLAN) {
 		try {
 			Map<Id<TransitLine>,PtLineFPLAN> linesFPLAN = new HashMap<>();
+			PtRouteFPLAN currentRouteFPLAN = null;
+
 			FileReader reader = new FileReader(FPLAN);
 			BufferedReader readsLines = new BufferedReader(reader);
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
-				PtRouteFPLAN currentRouteFPLAN = null;
 				if (newLine.charAt(0) == '*') {
-					switch (newLine.charAt(1)) {
-						case 'Z': // Initialzeile neue Fahrt
-							/*Spalte Typ Bedeutung
-							1−2 CHAR *Z
-							4−8 INT32 Fahrtnummer
-							10−15 CHAR Verwaltung (6-stellig); Die Verwaltungsangabe darf
-							keine Leerzeichen enthalten.
-							17−21 INT16 leer
-							23−25 INT16 Taktanzahl; gibt die Anzahl der noch folgenden Takte
-							an.
-							27−29 INT16 Taktzeit in Minuten (Abstand zwischen zwei Fahrten).*/
-							// Get the appropriate transit line...
-							Id<TransitLine> lineId = Id.create(newLine.substring(9,15), TransitLine.class);
-							PtLineFPLAN lineFPLAN;
-							if (linesFPLAN.containsKey(lineId)) {
-								lineFPLAN = linesFPLAN.get(lineId);
-							} else {
-								lineFPLAN = new PtLineFPLAN(lineId.toString());
-								linesFPLAN.put(lineId, lineFPLAN);
-							}
-							// Create the new route in this line...
-							String routeId = newLine.substring(3, 8);
-							int numberOfDepartures = Integer.parseInt(newLine.substring(22, 25));
-							int cycleTime = Integer.parseInt(newLine.substring(26, 29));
-							currentRouteFPLAN = new PtRouteFPLAN(lineId, routeId, numberOfDepartures, cycleTime);
-							lineFPLAN.addPtRouteFPLAN(currentRouteFPLAN);
-							break;
-						case 'T': // Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
-							log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
-							break;
-						case 'G': // Verkehrsmittelzeile
-							/*Spalte Typ Bedeutung
-							1−2 CHAR *G
-							4−6 CHAR Verkehrsmittel bzw. Gattung
-							8−14 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer,
-								ab der die Gattung gilt.
-							16−22 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer,
-								bis zu der die Gattung gilt.
-							24−29 [#]INT32 (optional) Index für das x. Auftreten oder
-							Abfahrtszeitpunkt // 26-27 hour, 28-29 minute
-							31−36 [#]INT32 (optional) Index für das x. Auftreten oder
-							Ankunftszeitpunkt*/
-							if (currentRouteFPLAN != null) {
-								// Vehicle Id:
-								currentRouteFPLAN.setUsedVehicle(newLine.substring(3, 6));
-								// First Departure:
-								int hourFirstDeparture = Integer.parseInt(newLine.substring(25, 27));
-								int minuteFirstDeparture = Integer.parseInt(newLine.substring(27, 29));
-								currentRouteFPLAN.setFirstDepartureTime(hourFirstDeparture, minuteFirstDeparture);
-							} else {
-								log.error("*G-Line before appropriate *Z-Line.");
-							}
-							break;
+					if (newLine.charAt(1) == 'Z') {
+						// Initialzeile neue Fahrt
+						/*Spalte Typ Bedeutung
+						1−2 CHAR *Z
+						4−8 INT32 Fahrtnummer
+						10−15 CHAR Verwaltung (6-stellig); Die Verwaltungsangabe darf
+						keine Leerzeichen enthalten.
+						17−21 INT16 leer
+						23−25 INT16 Taktanzahl; gibt die Anzahl der noch folgenden Takte
+						an.
+						27−29 INT16 Taktzeit in Minuten (Abstand zwischen zwei Fahrten).*/
+						// Get the appropriate transit line...
+						Id<TransitLine> lineId = Id.create(newLine.substring(9, 15), TransitLine.class);
+						PtLineFPLAN lineFPLAN;
+						if (linesFPLAN.containsKey(lineId)) {
+							lineFPLAN = linesFPLAN.get(lineId);
+						} else {
+							lineFPLAN = new PtLineFPLAN(lineId.toString());
+							linesFPLAN.put(lineId, lineFPLAN);
+						}
+						// Create the new route in this line...
+						String routeId = newLine.substring(3, 8);
+						int numberOfDepartures = 0;
+						int cycleTime = 0;
+						try {
+							numberOfDepartures = Integer.parseInt(newLine.substring(22, 25));
+							cycleTime = Integer.parseInt(newLine.substring(26, 29));
+						} catch (Exception e) {
+						}
+						currentRouteFPLAN = new PtRouteFPLAN(lineId, routeId, numberOfDepartures, cycleTime);
+						lineFPLAN.addPtRouteFPLAN(currentRouteFPLAN);
+					} else if (newLine.charAt(1) == 'T') {
+						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
+						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
+					} else if (newLine.charAt(1) == 'G') {
+						// Verkehrsmittelzeile
+						/*Spalte Typ Bedeutung
+						1−2 CHAR *G
+						4−6 CHAR Verkehrsmittel bzw. Gattung
+						8−14 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer,
+							ab der die Gattung gilt.
+						16−22 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer,
+							bis zu der die Gattung gilt.
+						24−29 [#]INT32 (optional) Index für das x. Auftreten oder
+						Abfahrtszeitpunkt // 26-27 hour, 28-29 minute
+						31−36 [#]INT32 (optional) Index für das x. Auftreten oder
+						Ankunftszeitpunkt*/
+						if (currentRouteFPLAN != null) {
+							// Vehicle Id:
+							currentRouteFPLAN.setUsedVehicle(newLine.substring(3, 6));
+							// First Departure:
+							int hourFirstDeparture = Integer.parseInt(newLine.substring(25, 27));
+							int minuteFirstDeparture = Integer.parseInt(newLine.substring(27, 29));
+							currentRouteFPLAN.setFirstDepartureTime(hourFirstDeparture, minuteFirstDeparture);
+						} else {
+							log.error("*G-Line before appropriate *Z-Line.");
+						}
 					}
 				} else if (newLine.charAt(0) == '+') { // Regionszeile (Bedarfsfahrten)
 					// We don't have this transport mode in  MATSim (yet). => Delete Route and if Line now empty, delete Line.
@@ -225,6 +230,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						log.error("Laufweg-Line before appropriate *Z-Line.");
 					}
 				}
+				newLine = readsLines.readLine();
 			}
 			readsLines.close();
 			// Create lines:
@@ -285,7 +291,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		public PtRouteFPLAN(Id<TransitLine> idOwnerLine, String lineId, int numberOfDepartures, int cycleTime) {
 			this.idOwnerLine = idOwnerLine;
 			this.routeId = Id.create(lineId, TransitRoute.class);
-			this.numberOfDepartures = numberOfDepartures;
+			this.numberOfDepartures = numberOfDepartures + 1; // Number gives all occurrences of route additionally to first... => +1
 			this.cycleTime = cycleTime * 60; // Cycle time is given in minutes in HAFAS -> Have to change it here...
 		}
 
