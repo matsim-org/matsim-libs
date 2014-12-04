@@ -69,6 +69,8 @@ public class HeteroControler {
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
 
+		
+		log.info("Simulation type: "+simulationType);
 		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType);
 		if(heteroSwitch)
 		{

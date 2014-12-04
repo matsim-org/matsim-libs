@@ -126,7 +126,6 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	public PersonalScoringParameters adjustParametersForHeterogeneity(String simulationType, Person person, PersonalScoringParameters params){
 		if(simulationType.equals("hetero")){
 			if(incomeFactors!=null){
-				log.info("Simulation type: hetero (proportional). Adjusting utility parameters...");
 				/*Calculate the mean in order to adjust the utility parameters*/
 				Double factorSum=0.0;
 				Double factorMean = 0.0;
@@ -146,7 +145,6 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		}
 		else if(simulationType.equals("heteroAlpha") ){
 			if(incomeFactors!=null){
-				log.info("Simulation type: hetero (alpha). Adjusting utility parameters...");
 				/*Calculate the mean in order to adjust the utility parameters*/
 				Double factorSum=0.0;
 				Double factorMean = 0.0;
