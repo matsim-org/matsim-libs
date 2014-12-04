@@ -19,9 +19,6 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.text.ParseException;
-import java.util.Date;
-
 import org.joda.time.DateTime;
 
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -68,14 +65,14 @@ public class InfereVacationsType implements ProxyPlanTask {
 				if (end.getDayOfYear() - start.getDayOfYear() > 3) {
 					isLong = true;
 				}
-
-				for (ProxyObject act : plan.getActivities()) {
-					if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						if (isLong) {
-							act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
-						} else {
-							act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
-						}
+			}
+			
+			for (ProxyObject act : plan.getActivities()) {
+				if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					if (isLong) {
+						act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
+					} else {
+						act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");
 					}
 				}
 			}

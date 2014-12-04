@@ -19,53 +19,69 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
-
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class PopulationWriter implements SamplerListener {
+public class ErrorTargetDistanceLogger implements SamplerListener {
 
-	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
-
-	private final String outputDir;
-
-	private final XMLWriter writer;
-
-	private final long interval;
-
-	private final AtomicLong iteration = new AtomicLong();
-
-	public PopulationWriter(String outputDir, long interval) {
-		this.outputDir = outputDir;
-		this.interval = interval;
-		writer = new XMLWriter();
-
+	private final long logInterval;
+	
+	private final AtomicLong iter;
+	
+	private final TargetDistanceHamiltonian h;
+	
+	private final String outdir;
+	
+	public ErrorTargetDistanceLogger(long logInterval, String outdir) {
+		this.logInterval = logInterval;
+		this.iter = new AtomicLong();
+		this.h = new TargetDistanceHamiltonian();
+		this.outdir = outdir;
 	}
-
+	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
-		if (iteration.get() % interval == 0) {
-			/*
-			 * The use of synchronized should be avoided by using a
-			 * BlockinkSamplerListener, however, for some unknown reasons there
-			 * are rare situation where this does not work.
-			 */
-			synchronized (this) {
-				if (iteration.get() % interval == 0) {
-				logger.info("Dumping population...");
-				writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), population);
-				logger.info("Done.");
+		if(iter.get() % logInterval == 0) {
+			long iterNow = iter.get();
+			double[] err = new double[population.size()];
+			double[] dist = new double[population.size()];
+			int i = 0;
+			for(ProxyPerson person : population) {
+				err[i] = h.evaluate(person);
+				double sum = 0;
+				for(ProxyObject leg : person.getPlans().get(0).getLegs()) {
+					String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					if(val != null) {
+						sum += Double.parseDouble(val);
+					}
 				}
+				dist[i] = sum;
+				i++;
+			}
+			
+			TDoubleDoubleHashMap hist = Correlations.mean(dist, err, FixedSampleSizeDiscretizer.create(dist, 100, 100));
+			try {
+				TXTWriter.writeMap(hist, "distance", "error", String.format("%s/%s.errorDistance.txt", outdir, iterNow));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
-		iteration.incrementAndGet();
+
+		iter.getAndIncrement();
 	}
+
 }

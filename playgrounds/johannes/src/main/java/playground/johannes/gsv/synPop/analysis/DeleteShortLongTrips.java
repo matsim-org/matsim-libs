@@ -30,71 +30,79 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class DeleteShortTrips implements ProxyPlanTask {
+public class DeleteShortLongTrips implements ProxyPlanTask {
 
 	private final double threshold;
-	
-	public DeleteShortTrips(double threshold) {
+
+	private final boolean shortTrips;
+
+	public DeleteShortLongTrips(double threshold, boolean shortTrips) {
 		this.threshold = threshold;
+		this.shortTrips = shortTrips;
 	}
-	
+
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(int i = 0; i < plan.getLegs().size(); i++) {
+		for (int i = 0; i < plan.getLegs().size(); i++) {
 			ProxyObject leg = plan.getLegs().get(i);
 			String value = leg.getAttribute(CommonKeys.LEG_DISTANCE);
-			if(value != null) {
+			if (value != null) {
 				double dist = Double.parseDouble(value);
-				if(dist < threshold) {
-					leg.setAttribute(CommonKeys.DELETE, "true");
+				if (shortTrips) {
+					if (dist < threshold) {
+						leg.setAttribute(CommonKeys.DELETE, "true");
+					}
+				} else {
+					if (dist > threshold) {
+						leg.setAttribute(CommonKeys.DELETE, "true");
+					}
 				}
 			}
 		}
-		
-		for(int i = 0; i < plan.getLegs().size(); i++) {
+
+		for (int i = 0; i < plan.getLegs().size(); i++) {
 			ProxyObject leg = plan.getLegs().get(i);
-			if("true".equalsIgnoreCase(leg.getAttribute(CommonKeys.DELETE))) {
+			if ("true".equalsIgnoreCase(leg.getAttribute(CommonKeys.DELETE))) {
 				ProxyObject prev = plan.getActivities().get(i);
-				ProxyObject next = plan.getActivities().get(i+1);
-				
-				if(ActivityType.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-					if(plan.getActivities().size() > i+2) {
-						ProxyObject act = plan.getActivities().get(i+2);
-						if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				ProxyObject next = plan.getActivities().get(i + 1);
+
+				if (ActivityType.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					if (plan.getActivities().size() > i + 2) {
+						ProxyObject act = plan.getActivities().get(i + 2);
+						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							next.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
-				} else if(ActivityType.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-					if(i-1 >= 0) {
-						ProxyObject act = plan.getActivities().get(i-1);
-						if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+				} else if (ActivityType.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+					if (i - 1 >= 0) {
+						ProxyObject act = plan.getActivities().get(i - 1);
+						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							prev.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
 				}
 			}
 		}
-		
+
 		boolean flag = true;
-		while(flag) {
-			for(int i = 0; i < plan.getActivities().size(); i++) {
+		while (flag) {
+			for (int i = 0; i < plan.getActivities().size(); i++) {
 				ProxyObject act = plan.getActivities().get(i);
-				if("true".equalsIgnoreCase(act.getAttribute(CommonKeys.DELETE))) {
+				if ("true".equalsIgnoreCase(act.getAttribute(CommonKeys.DELETE))) {
 					flag = true;
-					
-					
-					ProxyObject nextAct = plan.getActivities().get(i+1);
-					ProxyObject thisAct = plan.getActivities().get(i-1);
-					
+
+					ProxyObject nextAct = plan.getActivities().get(i + 1);
+					ProxyObject thisAct = plan.getActivities().get(i - 1);
+
 					plan.getActivities().remove(i);
 					plan.getActivities().remove(i);
-					plan.getLegs().remove(i-1);
-					plan.getLegs().remove(i-1);
-					
+					plan.getLegs().remove(i - 1);
+					plan.getLegs().remove(i - 1);
+
 					thisAct.setAttribute(CommonKeys.ACTIVITY_END_TIME, nextAct.getAttribute(CommonKeys.ACTIVITY_END_TIME));
-					
+
 					break;
 				} else {
 					flag = false;
@@ -106,48 +114,53 @@ public class DeleteShortTrips implements ProxyPlanTask {
 	private boolean isReturnLeg(ProxyPlan plan, int current, int candidate) {
 		ProxyObject prevAct = plan.getActivities().get(current);
 		ProxyObject nextAct = plan.getActivities().get(current + 1);
-		
-		if(candidate > 0 && candidate < plan.getLegs().size()) {
+
+		if (candidate > 0 && candidate < plan.getLegs().size()) {
 			ProxyObject prevAct2 = plan.getActivities().get(candidate);
 			ProxyObject nextAct2 = plan.getActivities().get(candidate + 1);
-			
-			if(prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME) &&
-					nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+
+			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
+					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
 				return true;
-			} else if(nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME) &&
-					prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
+			} else if (nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
+					&& prevAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {
 				return true;
 			} else {
 				return false;
 			}
-				
-//			String prevId = prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-//			String nextId = nextAct.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-//			
-//			String prevId2 = prevAct2.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-//			String nextId2 = nextAct2.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-//			
-//			if(prevId.equalsIgnoreCase(nextId2) && nextId.equalsIgnoreCase(prevId2)) {
-//				return true;
-//			}
+
+			// String prevId =
+			// prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+			// String nextId =
+			// nextAct.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+			//
+			// String prevId2 =
+			// prevAct2.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+			// String nextId2 =
+			// nextAct2.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+			//
+			// if(prevId.equalsIgnoreCase(nextId2) &&
+			// nextId.equalsIgnoreCase(prevId2)) {
+			// return true;
+			// }
 		}
-		
+
 		return false;
 	}
-	
+
 	public static void main(String args[]) {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.car.wkday.200K.xml");
-		
-		DeleteShortTrips task = new DeleteShortTrips(3000);
-		for(ProxyPerson person : parser.getPersons()) {
+
+		parser.parse("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
+
+		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
+		for (ProxyPerson person : parser.getPersons()) {
 			task.apply(person.getPlans().get(0));
 		}
-		
+
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.car.wkday.wo3k.200K.xml", parser.getPersons());
-		
+		writer.write("/home/johannes/gsv/mid2008/pop/hesen.car.3-300km.xml", parser.getPersons());
+
 	}
 }

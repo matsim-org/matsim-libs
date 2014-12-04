@@ -17,34 +17,71 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import java.util.Set;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class ZoneMatrix {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
+	private KeyMatrix delegate;
+	
+	private final String primaryKey;
+	
+	private Map<Zone, String> index;
+	
+	public ZoneMatrix() {
+		this(null);
+	}
+	
+	public ZoneMatrix(String primaryKey) {
+		index = new HashMap<Zone, String>();
+		delegate = new KeyMatrix();
+		this.primaryKey = primaryKey;
+	}
+	
+	public void set(Zone origin, Zone destination, Double value) {
+		String key1 = index.get(origin);
+		String key2 = index.get(destination);
 		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
+		if(key1 == null) {
+			key1 = createKey(origin);
+			index.put(origin, key1);
+		}
+		
+		if(key2 == null) {
+			key2 = createKey(destination);
+			index.put(destination, key2);
+		}
+		
+		delegate.set(key1, key2, value);
+	}
+	
+	public Double get(Zone origin, Zone destination) {
+		String key1 = index.get(origin);
+		String key2 = index.get(destination);
+		
+		return delegate.get(key1, key2);
+	}
+	
+	private String createKey(Zone zone) {
+		if(primaryKey != null) {
+			return zone.getAttribute(primaryKey);
+		} else {
+			return String.valueOf(zone.hashCode());
 		}
 	}
-
+	
+	public Set<Zone> zones() {
+		return index.keySet();
+	}
+	
+	public String getPrimaryKey() {
+		return primaryKey;
+	}
 }

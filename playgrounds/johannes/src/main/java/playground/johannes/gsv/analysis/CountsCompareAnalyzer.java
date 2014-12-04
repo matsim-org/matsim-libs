@@ -35,7 +35,11 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import playground.johannes.gsv.gis.CountsCompare2GeoJSON;
 import playground.johannes.gsv.gis.NetworkLoad2GeoJSON;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.BufferedWriter;
@@ -68,8 +72,11 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
         Network network = event.getControler().getScenario().getNetwork();
-		DescriptiveStatistics stats = new DescriptiveStatistics();
-		TDoubleArrayList vals = new TDoubleArrayList();
+		DescriptiveStatistics error = new DescriptiveStatistics();
+		DescriptiveStatistics errorAbs = new DescriptiveStatistics();
+		DescriptivePiStatistics errorWeighted = new WSMStatsFactory().newInstance();
+		
+		TDoubleArrayList errorVals = new TDoubleArrayList();
 		TDoubleArrayList caps = new TDoubleArrayList();
 
 		for (Count count : counts.getCounts().values()) {
@@ -83,24 +90,35 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 				simVal *= factor;
 
 				double err = (simVal - obsVal) / obsVal;
-
-				stats.addValue(err);
+				
+				error.addValue(err);
+				errorAbs.addValue(Math.abs(err));
+				errorWeighted.addValue(Math.abs(err), 1/obsVal);
 
 				Link link = network.getLinks().get(count.getLocId());
-				vals.add(Math.abs(err));
+				errorVals.add(Math.abs(err));
 				caps.add(link.getCapacity());
 			}
 		}
 
-		TDoubleDoubleHashMap map = Correlations.mean(caps.toNativeArray(), vals.toNativeArray());
-
-		logger.info(String.format("mean = %s, var = %s, stderr = %s, min = %s, max = %s", stats.getMean(), stats.getVariance(), stats.getStandardDeviation(), stats.getMin(),
-				stats.getMax()));
+		logger.info(String.format("Relative counts error: mean = %s, var = %s, stderr = %s, min = %s, max = %s", error.getMean(), error.getVariance(), error.getStandardDeviation(), error.getMin(),
+				error.getMax()));
+		logger.info(String.format("Absolute relative counts error: mean = %s, var = %s, stderr = %s, min = %s, max = %s", errorAbs.getMean(), errorAbs.getVariance(), errorAbs.getStandardDeviation(), errorAbs.getMin(),
+				errorAbs.getMax()));
+		logger.info(String.format("Absolute weigthed relative counts error: mean = %s, var = %s, stderr = %s, min = %s, max = %s", errorWeighted.getMean(), errorWeighted.getVariance(), errorWeighted.getStandardDeviation(), errorWeighted.getMin(),
+				errorWeighted.getMax()));
 
 		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
 
 		try {
-			TXTWriter.writeMap(map, "capacity", "counts", outdir + "/counterr-cap.txt");
+			TDoubleDoubleHashMap map = Correlations.mean(caps.toNativeArray(), errorVals.toNativeArray());
+			TXTWriter.writeMap(map, "capacity", "counts", String.format("%s/countsError.capacity.txt", outdir));
+			TXTWriter.writeMap(Histogram.createHistogram(error, new LinearDiscretizer(0.1), false), "Error", "Frequency", String.format("%s/countsError.hist.txt", outdir));
+			TXTWriter.writeMap(Histogram.createHistogram(errorAbs, new LinearDiscretizer(0.1), false), "Error (absolute)", "Frequency", String.format("%s/countsErrorAbs.hist.txt", outdir));
+			TXTWriter.writeMap(Histogram.createHistogram(errorWeighted, new LinearDiscretizer(0.1), true), "Error (weighted)", "Frequency", String.format("%s/countsErrorWeighted.hist.txt", outdir));
+			
+			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);
+			NetworkLoad2GeoJSON.write(event.getControler().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -112,30 +130,26 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 		}
 		
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/counts-err.stats.txt", rootOutDir), append));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/countsError.txt", rootOutDir), append));
 			if(!append) {
 				// write header
 				writer.write("mean\tvar\tstderr\tmin\tmax");
 				writer.newLine();
 			}
 			
-			writer.write(String.valueOf(stats.getMean()));
+			writer.write(String.valueOf(error.getMean()));
 			writer.write("\t");
-			writer.write(String.valueOf(stats.getVariance()));
+			writer.write(String.valueOf(error.getVariance()));
 			writer.write("\t");
-			writer.write(String.valueOf(stats.getStandardDeviation()));
+			writer.write(String.valueOf(error.getStandardDeviation()));
 			writer.write("\t");
-			writer.write(String.valueOf(stats.getMin()));
+			writer.write(String.valueOf(error.getMin()));
 			writer.write("\t");
-			writer.write(String.valueOf(stats.getMax()));
+			writer.write(String.valueOf(error.getMax()));
 			writer.newLine();
 			
 			writer.close();
-			
-			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);
-			NetworkLoad2GeoJSON.write(event.getControler().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

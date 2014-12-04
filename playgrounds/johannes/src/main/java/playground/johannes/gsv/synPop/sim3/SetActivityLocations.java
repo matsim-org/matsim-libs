@@ -111,37 +111,41 @@ public class SetActivityLocations {
 		/*
 		 * Build the listener
 		 */
-		SamplerListenerComposite lComposite = new SamplerListenerComposite();
+		SamplerListenerComposite listener = new SamplerListenerComposite();
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 
 		long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
 		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		
+		if(dumpInterval % logInterval != 0) {
+			throw new RuntimeException("The dump intervall needs to be a multiple of the log intervall.");
+		}
 		/*
 		 * add loggers
 		 */
-		lComposite.addComponent(new BlockingSamplerListener(new HamiltonianLogger(distance, logInterval, outputDir), logInterval, numThreads));
-		lComposite.addComponent(new BlockingSamplerListener(new HamiltonianLogger(new TargetDistanceAbsolute(), logInterval, outputDir), logInterval,
-				numThreads));
+		listener.addComponent(new HamiltonianLogger(distance, logInterval, outputDir));
+		listener.addComponent(new HamiltonianLogger(new TargetDistanceAbsolute(), logInterval, outputDir));
 		/*
 		 * put the population writer and analyzer into a separate composite to
 		 * ensure the CopyFacilityUserData is always called before dumping and
 		 * analysis.
 		 */
-		SamplerListenerComposite dumpListener = new SamplerListenerComposite();
-		dumpListener.addComponent(new CopyFacilityUserData(dumpInterval));
-		dumpListener.addComponent(new PopulationWriter(outputDir, dumpInterval));
-		dumpListener.addComponent(new AnalyzerListener(dataPool, outputDir, dumpInterval));
+//		SamplerListenerComposite dumpListener = new SamplerListenerComposite();
+		listener.addComponent(new CopyFacilityUserData(dumpInterval));
+		listener.addComponent(new PopulationWriter(outputDir, dumpInterval));
+		listener.addComponent(new AnalyzerListener(dataPool, outputDir, dumpInterval));
+		listener.addComponent(new ErrorTargetDistanceLogger(logInterval, outputDir));
 		/*
 		 * need to copy activity location user key to activity attributes
 		 */
-		lComposite.addComponent(new BlockingSamplerListener(dumpListener, dumpInterval, numThreads));
+//		lComposite.addComponent(new BlockingSamplerListener(dumpListener, dumpInterval, numThreads));
 		// lComposite.addComponent(new BlockingSamplerListener(new
 		// AnalyzerListener(dataPool, outputDir), dumpInterval, numThreads));
 
 		SamplerLogger slogger = new SamplerLogger();
-		lComposite.addComponent(slogger);
+		listener.addComponent(slogger);
 
-		sampler.setSamplerListener(lComposite);
+		sampler.setSamplerListener(new BlockingSamplerListener(listener, logInterval, numThreads));
 
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));

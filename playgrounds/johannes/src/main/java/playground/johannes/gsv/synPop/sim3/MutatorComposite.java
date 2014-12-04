@@ -17,34 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Random;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
  * 
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class MutatorComposite implements Mutator {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
+	private final ChoiceSet<Mutator> mutators;
+
+	private Mutator active;
+
+	public MutatorComposite(Random random) {
+		mutators = new ChoiceSet<>(random);
+	}
+
+	public void addMutator(Mutator mutator) {
+		mutators.addChoice(mutator);
+	}
+	
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
-		}
+	public List<ProxyPerson> select(List<ProxyPerson> persons) {
+		active = mutators.randomChoice();
+		return active.select(persons);
+	}
+
+	@Override
+	public boolean modify(List<ProxyPerson> persons) {
+		return active.modify(persons);
+	}
+
+	@Override
+	public void revert(List<ProxyPerson> persons) {
+		active.revert(persons);
+
 	}
 
 }

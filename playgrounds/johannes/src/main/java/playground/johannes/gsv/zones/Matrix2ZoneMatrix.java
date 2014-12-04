@@ -17,34 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
 
 /**
  * @author johannes
  * 
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class Matrix2ZoneMatrix {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
+	public static KeyMatrix convert(Matrix mIn) {
+		KeyMatrix mOut = new KeyMatrix();
+
+		Set<String> keys = new HashSet<>(mIn.getFromLocations().keySet());
+		keys.addAll(mIn.getToLocations().keySet());
+
+		for (String from : keys) {
+			for (String to : keys) {
+				if (from.equals(to)) {
+					if (mOut.get(from, to) == null) {
+						Entry e = mIn.getEntry(from, to);
+						if (e != null) {
+							mOut.set(from, to, e.getValue());
+						}
+					}
+				} else {
+					Entry e = mIn.getEntry(from, to);
+					if (e != null) {
+						mOut.set(from, to, e.getValue());
+					}
+				}
+			}
 		}
-	}
 
+		return mOut;
+	}
 }

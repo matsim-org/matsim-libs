@@ -47,41 +47,41 @@ public class AddDummyActOptions {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities.all.xml");
+		facReader.readFile(args[0]);
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
 		logger.info("Adding dummy activity options...");
 		ProgressLogger.init(facilities.getFacilities().size(), 1, 10);
 		
 		for(ActivityFacility facility : facilities.getFacilities().values()) {
-			ActivityOption newOpt = facilities.getFactory().createActivityOption("private");
-			facility.addActivityOption(newOpt);
+			ActivityOption newOpt = null;//facilities.getFactory().createActivityOption("private");
+//			facility.addActivityOption(newOpt);
 			
-			newOpt = facilities.getFactory().createActivityOption("pickdrop");
-			newOpt.setCapacity(1);
-			facility.addActivityOption(newOpt);
+//			newOpt = facilities.getFactory().createActivityOption("pickdrop");
+//			newOpt.setCapacity(1);
+//			facility.addActivityOption(newOpt);
 	
 			newOpt = facilities.getFactory().createActivityOption("misc");
 			newOpt.setCapacity(1);
 			facility.addActivityOption(newOpt);
 			
-			newOpt = facilities.getFactory().createActivityOption("outoftown");
-			newOpt.setCapacity(1);
-			facility.addActivityOption(newOpt);
-			
-			newOpt = facilities.getFactory().createActivityOption("unknown");
-			newOpt.setCapacity(1);
-			facility.addActivityOption(newOpt);
-			
-			newOpt = facilities.getFactory().createActivityOption("intown");
-			newOpt.setCapacity(1);
-			facility.addActivityOption(newOpt);
+//			newOpt = facilities.getFactory().createActivityOption("outoftown");
+//			newOpt.setCapacity(1);
+//			facility.addActivityOption(newOpt);
+//			
+//			newOpt = facilities.getFactory().createActivityOption("unknown");
+//			newOpt.setCapacity(1);
+//			facility.addActivityOption(newOpt);
+//			
+//			newOpt = facilities.getFactory().createActivityOption("intown");
+//			newOpt.setCapacity(1);
+//			facility.addActivityOption(newOpt);
 			
 			ProgressLogger.step();
 		}
 		
 		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write("/home/johannes/gsv/osm/facilities.all2.xml");
+		writer.write(args[1]);
 
 	}
 

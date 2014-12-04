@@ -17,34 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
-		}
+public class NUTSZone extends Zone {
+	
+	public static final String NUTS_CODE_KEY = "nutsCode";
+	
+	public static final String NAME_KEY = "name";
+	
+	public NUTSZone(Geometry geometry) {
+		super(geometry);
 	}
 
+	public String getCode() {
+		return getAttribute(NUTS_CODE_KEY);
+	}
+	
+	public String getName() {
+		return getAttribute(NAME_KEY);
+	}
 }

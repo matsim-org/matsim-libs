@@ -79,6 +79,7 @@ public class InitHomeBasedActLocations implements ProxyPlanTask {
 					String targetDist = leg.getAttribute(CommonKeys.LEG_DISTANCE);
 					if (prevFac != null && targetDist != null) {
 						double d = Double.parseDouble(targetDist);
+						d = d/TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR;
 						f = getFacility(prevFac.getCoord(), d, type);
 						act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
 					} else {

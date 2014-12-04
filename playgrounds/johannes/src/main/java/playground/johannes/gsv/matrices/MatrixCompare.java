@@ -40,6 +40,9 @@ import org.matsim.visum.VisumMatrixReader;
 
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
@@ -230,6 +233,9 @@ public class MatrixCompare {
 		TDoubleArrayList errs = new TDoubleArrayList();
 		TDoubleArrayList dists = new TDoubleArrayList();
 		
+		DescriptivePiStatistics stats1 = new DescriptivePiStatistics();
+		DescriptivePiStatistics stats2 = new DescriptivePiStatistics();
+		
 		for (String id1 : zoneIds) {
 			for (String id2 : zoneIds) {
 				if (!id1.equals(id2)) {
@@ -257,12 +263,18 @@ public class MatrixCompare {
 									double d = OrthodromicDistanceCalculator.getInstance().distance(p1, p2);
 									
 									distEntry = distMatrix.createEntry(id1, id2, d);
+									
+//									stats1.addValue(d, val1);
+//									stats2.addValue(d, val2);
 								}
 								
 								double dist = distEntry.getValue();
 		
 								dists.add(dist);
 								errs.add(err);
+								
+								stats1.addValue(dist, 1/val1);
+								stats2.addValue(dist, 1/val2);
 							}
 						}
 					} else
@@ -275,7 +287,14 @@ public class MatrixCompare {
 			System.out.println(String.format("%s zero reference values.", zeros));
 		}
 
-		return Correlations.mean(dists.toNativeArray(), errs.toNativeArray(), 1000);
+		try {
+			TXTWriter.writeMap(Histogram.createHistogram(stats1, FixedSampleSizeDiscretizer.create(stats1.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist1.txt");
+			TXTWriter.writeMap(Histogram.createHistogram(stats2, FixedSampleSizeDiscretizer.create(stats2.getValues(), 1, 50), true), "Disctance", "p", "/home/johannes/gsv/matrices/dist2.txt");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return Correlations.mean(dists.toNativeArray(), errs.toNativeArray(), 10000);
 	}
 	/**
 	 * @param args
@@ -289,12 +308,12 @@ public class MatrixCompare {
 		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-//		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
-		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.418.fma");
+//		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
 
-//		MatrixOperations.applyFactor(m1, 1 / 365.0);
-//		MatrixOperations.applyFactor(m2, 12);
-//		MatrixOperations.applyIntracellFactor(m2, 1.3);
+		MatrixOperations.applyFactor(m1, 1 / 365.0);
+		MatrixOperations.applyFactor(m2, 11);
+		MatrixOperations.applyIntracellFactor(m2, 1.3);
 		
 		System.out.println(String.format("PSMobility - matrix sum: %s", MatrixOperations.sum(m1, false)));
 		System.out.println(String.format("Matsim - matrix sum: %s", MatrixOperations.sum(m2, false)));
@@ -338,8 +357,8 @@ public class MatrixCompare {
 		ids.put("8111", "STG");
 
 		zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
-		distErrCorrelation = distErrCorrelation(m1, m2, zones, ids.keySet(), false, ignoreZeros);
-		TXTWriter.writeMap(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.sel.txt");
+//		distErrCorrelation = distErrCorrelation(m1, m2, zones, ids.keySet(), false, ignoreZeros);
+//		TXTWriter.writeMap(distErrCorrelation, "distance", "rel. error", "/home/johannes/gsv/matrices/distErr.sel.txt");
 		
 		Map<String, double[]> relErrs = relError(m1, m2, ids, false);
 		for(java.util.Map.Entry<String, double[]> entry : relErrs.entrySet()) {

@@ -96,20 +96,20 @@ public class MatrixDiffPlot {
 	public static void main(String args[]) throws IOException {
 		Matrix m1 = new Matrix("2", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m1);
-		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
+		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
 
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.365.fma");
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
-		MatrixOperations.applyFactor(m2, 11);
+		MatrixOperations.applyFactor(m2, 12);
 		MatrixOperations.applyIntracellFactor(m2, 1.3);
 
 		ZoneLayer<Map<String, Object>> zonelayer = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
 
 		ZoneLayer<Map<String, Object>> newLayer = diffLayer(m1, m2, zonelayer);
 
-		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/diff.psm.shp");
+		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/diff.itp.365.shp");
 	}
 }

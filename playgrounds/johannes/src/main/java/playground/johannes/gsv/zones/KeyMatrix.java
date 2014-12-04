@@ -17,34 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author johannes
  * 
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class KeyMatrix {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
+	private Map<String, Map<String, Double>> matrix;
+	
+	public KeyMatrix() {
+		matrix = new HashMap<>();
+	}
+	
+	public Double set(String key1, String key2, Double value) {
+		Map<String, Double> col = matrix.get(key1);
+		if(col == null) {
+			col = new HashMap<String, Double>();
+			matrix.put(key1, col);
 		}
+		
+		return col.put(key2, value);
 	}
 
+	public Double get(String key1, String key2) {
+		Map<String, Double> col = matrix.get(key1);
+		if(col == null) {
+			return null;
+		} else {
+			return col.get(key2);
+		}
+	}
+	
+	public Set<String> keys() {
+		Set<String> keys = new HashSet<>(matrix.keySet());
+		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
+			keys.addAll(entry.getValue().keySet());
+		}
+		
+		return keys;
+	}
 }

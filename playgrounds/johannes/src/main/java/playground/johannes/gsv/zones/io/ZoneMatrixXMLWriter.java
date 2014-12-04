@@ -17,34 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones.io;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.ZoneMatrix;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class ZoneMatrixXMLWriter extends MatsimXmlWriter {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
-		}
+	public void write(KeyMatrix m, String file) {
+		openFile(file);
+		writeXmlHead();
+		writeStartTag("matrix", null);
+//		writeEntries(m);
+		writeEndTag("matrix");
+		close();
 	}
-
+	
+	
+	
+	protected void writeEntries(ZoneMatrix m) {
+//		for(String i : m.keys()) {
+//			for(String j : m.keys()) {
+//				Double val = m.get(i, j);
+//				if(val != null) {
+//					List<Tuple<String, String>> atts = new ArrayList<>(3);
+//					atts.add(createTuple("row", i));
+//					atts.add(createTuple("col", j));
+//					atts.add(createTuple("value", val));
+//					writeStartTag("cell", atts, true);
+//				}
+//			}
+//		}
+	}
 }

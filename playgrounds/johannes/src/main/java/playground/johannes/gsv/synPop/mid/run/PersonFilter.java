@@ -28,7 +28,7 @@ import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.analysis.DeleteShortTrips;
+import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
@@ -49,14 +49,14 @@ public class PersonFilter {
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/hessen.xml");
+		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
-		logger.info("Cloning persons...");
-		persons = PersonCloner.weightedClones(persons, 100000, new XORShiftRandom());
-		new ApplySampleProbas(82000000).apply(persons);
-		logger.info("Population size = " + persons.size());
+//		logger.info("Cloning persons...");
+//		persons = PersonCloner.weightedClones(persons, 100000, new XORShiftRandom());
+//		new ApplySampleProbas(82000000).apply(persons);
+//		logger.info("Population size = " + persons.size());
 		
 		logger.info("Converting ride legs to car legs...");
 		ProxyTaskRunner.run(new ConvertRide2Car(), persons);
@@ -66,19 +66,27 @@ public class PersonFilter {
 		
 		logger.info("Removing non mobile persons...");
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
-		logger.info(String.format("Persons after filte: %s", persons.size()));
-//		writer.write(outDir + "pop.mob.xml", persons);
+		logger.info(String.format("Persons after filter: %s", persons.size()));
+		writer.write(outDir + "pop.mob.xml", persons);
 		
 		logger.info("Removing non car persons...");
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteModes("car"), persons);
-		logger.info(String.format("Persons after filte: %s", persons.size()));
-//		writer.write(outDir + "pop.car.xml", persons);
+		logger.info(String.format("Persons after filter: %s", persons.size()));
+		writer.write(outDir + "pop.car.xml", persons);
 		
 		logger.info("Removing legs with less than 3 KM...");
-		ProxyTaskRunner.run(new DeleteShortTrips(3000), persons);
+		ProxyTaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
-		logger.info(String.format("Persons after filte: %s", persons.size()));
-		writer.write(outDir + "hesen.car.wo3km.midjourneys.xml", persons);
+		logger.info(String.format("Persons after filter: %s", persons.size()));
+		
+		writer.write(outDir + "pop.car.wo3km.xml", persons);
+//		writer.write(outDir + "hesen.car.wo3km.midjourneys.xml", persons);
+		
+		logger.info("Removing legs with more than 1000 KM...");
+		ProxyTaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
+		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
+		logger.info(String.format("Persons after filter: %s", persons.size()));
+		writer.write(outDir + "pop.car.3-1000km.xml", persons);
 		
 		logger.info("Done.");
 	}

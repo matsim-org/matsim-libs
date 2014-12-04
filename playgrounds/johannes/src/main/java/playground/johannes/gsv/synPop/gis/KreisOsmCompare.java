@@ -77,13 +77,13 @@ public class KreisOsmCompare {
 		ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read("/home/johannes/gsv/osm/kreisCompare/zones_zone.SHP");
 		
 //		String[] types = new String[]{"W","A","S","B","H","F","E","D","U","R","T","V","P"};
-		String[] types = new String[]{"W"};
+		String[] types = new String[]{"F", "U", "R", "T", "V"};
 		TObjectIntHashMap<String> attractivness = readAttractivness("/home/johannes/gsv/osm/kreisCompare/StrukturAttraktivitaet.csv", types);
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.home.20.xml");
+		facReader.readFile("/home/johannes/gsv/osm/facilities/netz2030/leisure.netz2030.xml");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
 		
@@ -138,13 +138,13 @@ public class KreisOsmCompare {
 
 		ZoneLayer<Map<String, Object>> newZoneLayer = new ZoneLayer<>(zones);
 		newZoneLayer.overwriteCRS(CRSUtils.getCRS(4326));
-		ZoneLayerSHP.writeWithAttributes(newZoneLayer, "/home/johannes/gsv/osm/kreisCompare/diff.work.shp");
+		ZoneLayerSHP.writeWithAttributes(newZoneLayer, "/home/johannes/gsv/osm/kreisCompare/diff.leisure.shp");
 		
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
 		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
-		TXTWriter.writeMap(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/shop.mean.txt");
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/shop.txt"));
+		TXTWriter.writeMap(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/leisure.mean.txt");
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/leisure.txt"));
 		writer.write("attractivity\tfacilities");
 		writer.newLine();
 		for(int i = 0; i < values1.size(); i++) {
@@ -183,7 +183,7 @@ public class KreisOsmCompare {
 		return CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(coord), transform);
 	}
 	
-	private static TObjectIntHashMap<String> readAttractivness(String filename, String[] types) throws IOException {
+	public static TObjectIntHashMap<String> readAttractivness(String filename, String[] types) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		String line = reader.readLine();
 

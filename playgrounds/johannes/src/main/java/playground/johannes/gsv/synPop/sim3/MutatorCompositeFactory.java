@@ -17,34 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class MutatorCompositeFactory implements MutatorFactory {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
+	private final List<MutatorFactory> factories;
+	
+	private final Random random;
+	
+	public MutatorCompositeFactory(Random random) {
+		this.random = random;
+		this.factories = new ArrayList<>();
+	}
+	
+	public void addFactory(MutatorFactory factory) {
+		factories.add(factory);
+	}
+	
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
+	public Mutator newInstance() {
+		MutatorComposite composite = new MutatorComposite(new XORShiftRandom(random.nextLong()));
+		for(MutatorFactory factory : factories) {
+			composite.addMutator(factory.newInstance());
 		}
+		
+		return composite;
 	}
 
 }

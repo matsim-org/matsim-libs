@@ -128,6 +128,7 @@ public class HamiltonianLogger implements SamplerListener {
 			}
 			
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 100), true);
+			Histogram.normalize(hist);
 //			String file = String.format("%s/%s.%s.txt", outdir, h.getClass().getSimpleName(), iterNow);
 			String file = String.format("%s/%s", outdir, h.getClass().getSimpleName());
 			File afile = new File(file);

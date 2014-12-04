@@ -17,48 +17,63 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.osm;
+package playground.johannes.gsv.zones;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygonal;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class AddActivityOption {
+public class Zone {
 
-	private final static Logger logger = Logger.getLogger(AddActivityOption.class);
+	private static final Logger logger = Logger.getLogger(Zone.class);
 	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		String type = args[2];
-		
-		logger.info("Loading facilities...");
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile(args[0]);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		
-		for(ActivityFacility fac : facilities.getFacilities().values()) {
-			fac.addActivityOption(new ActivityOptionImpl(type));
-		}
+	private final Geometry geometry;
 
-		logger.info(String.format("Writing %s facilities...", facilities.getFacilities().size()));
-		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write(args[1]);
-		logger.info("Done.");
+	private Map<String, String> attributes;
+
+	public Zone(Geometry geometry) {
+		if(!(geometry instanceof Polygonal))
+			logger.warn("Geometry is not instance of Polygonal. This is ok but may have effects on geometric operations.");
+		
+		this.geometry = geometry;
 	}
 
+	public Geometry getGeometry() {
+		return geometry;
+	}
+	
+	private void initAttributes() {
+		if (attributes == null)
+			attributes = new HashMap<String, String>();
+	}
+
+	public String getAttribute(String key) {
+		if (attributes == null)
+			return null;
+		else
+			return attributes.get(key);
+	}
+
+	public Map<String, String> attributes() {
+		return Collections.unmodifiableMap(attributes);
+	}
+	
+	public String setAttribute(String key, String value) {
+		initAttributes();
+		return attributes.put(key, value);
+	}
+
+	public String removeAttribute(String key) {
+		if(attributes == null) return null;
+		else return attributes.remove(key);
+	}
 }

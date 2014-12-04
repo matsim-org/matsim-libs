@@ -115,30 +115,30 @@ public class SetHomeLocations {
 		/*
 		 * Build the listener
 		 */
-		SamplerListenerComposite lComposite = new SamplerListenerComposite();
 		/*
 		 * need to copy home location user key to activity attributes
 		 */
 		long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		if(dumpInterval % logInterval != 0) {
+			throw new RuntimeException("Dump interval needs to be a multiple of log interval");
+		}
 		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 		
 		SamplerListenerComposite dumpListener = new SamplerListenerComposite();
 		dumpListener.addComponent(new CopyHomeLocations(dumpInterval));
 		dumpListener.addComponent(new PopulationWriter(outputDir, dumpInterval));
+		dumpListener.addComponent(new HamiltonianLogger(personLau2, logInterval, outputDir));
+		dumpListener.addComponent(new HamiltonianLogger(personNuts1, logInterval, outputDir));
 		
-		lComposite.addComponent(new BlockingSamplerListener(dumpListener, dumpInterval, numThreads));
 		/*
 		 * add loggers
 		 */
-		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
-		lComposite.addComponent(new BlockingSamplerListener(new HamiltonianLogger(personLau2, logInterval, outputDir), logInterval, numThreads));
-		lComposite.addComponent(new BlockingSamplerListener(new HamiltonianLogger(personNuts1, logInterval, outputDir), logInterval, numThreads));
-		
 		SamplerLogger slogger = new SamplerLogger();
-		lComposite.addComponent(slogger);
+		dumpListener.addComponent(slogger);
 		
-		sampler.setSamplerListener(lComposite);
+		sampler.setSamplerListener(new BlockingSamplerListener(dumpListener, logInterval, numThreads));
 
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));

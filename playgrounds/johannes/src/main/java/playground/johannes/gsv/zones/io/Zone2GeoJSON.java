@@ -17,34 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.zones.io;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import org.wololo.geojson.Feature;
+import org.wololo.geojson.GeoJSON;
+import org.wololo.geojson.GeoJSONFactory;
+import org.wololo.geojson.Geometry;
+import org.wololo.jts2geojson.GeoJSONWriter;
+
+import playground.johannes.gsv.zones.Zone;
 
 /**
  * @author johannes
  * 
  */
-public class JourneyDistanceHandler implements LegAttributeHandler {
+public class Zone2GeoJSON {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
-	 */
-	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
-		int dist = Integer.parseInt(attributes.get("p1016"));
-		
-		if (dist <= 20000) { //range according to mid documentation
-			dist *= 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist));
-		}
+	public static String toJson(Zone zone) {
+		GeoJSONWriter writer = new GeoJSONWriter();
+		GeoJSON json = writer.write(zone.getGeometry());
+
+		Geometry geometry = (Geometry) GeoJSONFactory.create(json.toString());
+		Feature feature = new Feature(geometry, new HashMap<String, Object>(zone.attributes()));
+
+		List<Feature> features = new ArrayList<>(1);
+		features.add(feature);
+		return writer.write(features).toString();
 	}
 
+	public static String toJson(Collection<Zone> zones) {
+		GeoJSONWriter writer = new GeoJSONWriter();
+		List<Feature> features = new ArrayList<>(1);
+
+		for (Zone zone : zones) {
+			GeoJSON json = writer.write(zone.getGeometry());
+			Geometry geometry = (Geometry) GeoJSONFactory.create(json.toString());
+			Feature feature = new Feature(geometry, new HashMap<String, Object>(zone.attributes()));
+			features.add(feature);
+		}
+
+		return writer.write(features).toString();
+	}
 }

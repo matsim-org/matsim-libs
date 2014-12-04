@@ -84,16 +84,15 @@ public class OSMObjectBuilder {
 		try {
 			ring = factory.createLinearRing(coords);
 		} catch (IllegalArgumentException e) {
-//			coords[coords.length - 1] = coords[0];
-//			ring = factory.createLinearRing(coords);
-//			
-//			logger.warn("Unclosed polygon. Closing it manually.");
-			logger.warn("Failed to create polygon. Coords = " + coords.length);
+			logger.trace("Failed to create polygon. Coords = " + coords.length);
 			return null;
 		}
 
 		Polygon poly = factory.createPolygon(ring, null);
-
+		
+		if(poly.isEmpty()) {
+			return null;
+		}
 		return poly;
 	}
 }

@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
+
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -31,11 +33,13 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class BlockingSamplerListener implements SamplerListener {
 
+	private static final Logger logger = Logger.getLogger(BlockingSamplerListener.class);
+	
 	private final AtomicLong iters = new AtomicLong();
 	
 	private final long interval;
 	
-	private long next;
+	private volatile long next; // not sure if this needs to be volatile
 	
 	private final SamplerListener delegate;
 	
@@ -54,7 +58,9 @@ public class BlockingSamplerListener implements SamplerListener {
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accept) {
 		if(iters.get() >= next) {
 			phaser.setState(population, mutations, accept);
+			logger.debug(String.format("Thread %s: Arrived at barrier.", Thread.currentThread().getName()));
 			phaser.arriveAndAwaitAdvance();
+			logger.debug(String.format("Thread %s: Advanced.", Thread.currentThread().getName()));
 		} else {
 			delegate.afterStep(population, mutations, accept);
 		}
@@ -77,6 +83,7 @@ public class BlockingSamplerListener implements SamplerListener {
 		
 		@Override
 		protected boolean onAdvance(int phase, int registeredParties) {
+			logger.debug(String.format("Thread %s: on advance.", Thread.currentThread().getName()));
 			for(int i = 0; i < registeredParties; i++)
 				delegate.afterStep(tmpPopulation, tmpMutations, tmpAccept);
 			

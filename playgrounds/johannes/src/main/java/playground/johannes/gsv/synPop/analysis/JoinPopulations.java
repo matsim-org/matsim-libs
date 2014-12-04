@@ -17,47 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.osm;
+package playground.johannes.gsv.synPop.analysis;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class AddActivityOption {
+public class JoinPopulations {
 
-	private final static Logger logger = Logger.getLogger(AddActivityOption.class);
+	private static final Logger logger = Logger.getLogger(JoinPopulations.class);
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		String type = args[2];
+		XMLParser parser = new XMLParser();
+		parser.setValidating(false);
+	
+		logger.info("Loading persons 1...");
+		parser.parse(args[0]);
+		Set<ProxyPerson> persons = new HashSet<>(parser.getPersons());
 		
-		logger.info("Loading facilities...");
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile(args[0]);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
+		logger.info("Loading persons 2...");
+		parser = new XMLParser();
+		parser.setValidating(false);
+		parser.parse(args[1]);
+		persons.addAll(parser.getPersons());
 		
-		for(ActivityFacility fac : facilities.getFacilities().values()) {
-			fac.addActivityOption(new ActivityOptionImpl(type));
-		}
-
-		logger.info(String.format("Writing %s facilities...", facilities.getFacilities().size()));
-		FacilitiesWriter writer = new FacilitiesWriter(facilities);
-		writer.write(args[1]);
+		logger.info("Writing persons...");
+		XMLWriter writer = new XMLWriter();
+		writer.write(args[2], persons);
 		logger.info("Done.");
 	}
 
