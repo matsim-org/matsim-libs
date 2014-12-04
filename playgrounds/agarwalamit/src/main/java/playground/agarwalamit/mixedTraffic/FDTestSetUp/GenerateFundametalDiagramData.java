@@ -111,7 +111,7 @@ public class GenerateFundametalDiagramData {
 
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
 		String OUTPUT_FOLDER ="/run306/";
-		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
+//		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
 
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
