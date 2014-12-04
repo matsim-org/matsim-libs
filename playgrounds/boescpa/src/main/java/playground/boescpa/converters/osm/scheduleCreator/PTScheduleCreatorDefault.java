@@ -33,10 +33,7 @@ import org.matsim.vehicles.Vehicle;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The default implementation of PTStationCreator (using the Swiss-HAFAS-Schedule).
@@ -136,6 +133,8 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		this.schedule.addStopFacility(stopFacility);
 	}
 
+	private final Map<Id<TransitLine>,PtLineFPLAN> linesFPLAN = new HashMap<>();
+
 	protected void readLines(String FPLAN) {
 		try {
 			FileReader reader = new FileReader(FPLAN);
@@ -155,6 +154,15 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 							an.
 							27−29 INT16 Taktzeit in Minuten (Abstand zwischen zwei Fahrten).*/
 
+							// Get the appropriate transit line...
+							PtLineFPLAN lineFPLAN = getPtLineFPLAN(Id.create(newLine.substring(9,15), TransitLine.class));
+
+							// Create the new route in this line...
+							String routeId = newLine.substring(3, 8);
+							int numberOfDepartures = Integer.parseInt(newLine.substring(22, 25));
+							int cycleTime = Integer.parseInt(newLine.substring(26, 29));
+							lineFPLAN.addPtRouteFPLAN(new PtRouteFPLAN(routeId,PtRouteFPLAN.TYPE_Z, numberOfDepartures, cycleTime));
+
 							break;
 						case 'T': // Initialzeile neue Fahrt (Unterschied zu Z-Zeile: Flexible Abfahrtszeiten <-> AwaitDeparture = False)
 							/*Spalte Typ Bedeutung
@@ -164,6 +172,15 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 							keine Leerzeichen enthalten.
 							17−20 INT16 Fahrtzeitraum in Minuten
 							22−25 INT16 Taktdichte in Sekunden (Abstand zweier Fahrten).*/
+
+							// Get the appropriate transit line...
+							lineFPLAN = getPtLineFPLAN(Id.create(newLine.substring(9,15), TransitLine.class));
+
+							// Create the new route in this line...
+							routeId = newLine.substring(3, 8);
+							int timeOfService = Integer.parseInt(newLine.substring(16, 20));
+							cycleTime = Integer.parseInt(newLine.substring(21, 25));
+							lineFPLAN.addPtRouteFPLAN(new PtRouteFPLAN(routeId,PtRouteFPLAN.TYPE_T, timeOfService, cycleTime));
 
 							break;
 						case 'G': // Verkehrsmittelzeile
@@ -214,6 +231,17 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private PtLineFPLAN getPtLineFPLAN(Id<TransitLine> lineId) {
+		PtLineFPLAN lineFPLAN;
+		if (linesFPLAN.containsKey(lineId)) {
+			lineFPLAN = linesFPLAN.get(lineId);
+		} else {
+			lineFPLAN = new PtLineFPLAN(lineId.toString());
+			linesFPLAN.put(lineId, lineFPLAN);
+		}
+		return lineFPLAN;
 	}
 
 	private class PtLineFPLAN {
