@@ -172,7 +172,10 @@ public class SpatialInterpolation {
 		return this.cellWeights;
 	}
 
-	public void writeSurfacePlotRData(){
+	/**
+	 * Same data sheet can be used for plotting surface polygon and filled contour plot data
+	 */
+	public void writeRData(){
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = SpatialDataInputs.gridType;
@@ -204,49 +207,6 @@ public class SpatialInterpolation {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to file. Reason "+e);
 		}
-	}
-
-	public void writeRContourPlotData(){
-		SpatialDataInputs.LOG.info("====Writing data to plot filled contour in R.====");
-
-		GridType type = SpatialDataInputs.gridType;
-		String fileName = SpatialDataInputs.outputDir+"rContour_plot"+"_"+type+"_"+SpatialDataInputs.linkWeigthMethod+".txt";
-		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
-			List<Double> xCoords = new ArrayList<Double>();
-			List<Double> yCoords = new ArrayList<Double>();
-
-			for(Point p : this.cellWeights.keySet()){
-				if(this.cellWeights.get(p)>0.){
-					xCoords.add(p.getX());
-					yCoords.add(p.getY());
-				}
-			}
-			Collections.sort(xCoords);
-			Collections.sort(yCoords);
-
-			writer.write("\t");
-			//x-coordinates as first row
-			for(int xIndex = 0; xIndex < xCoords.size(); xIndex++){
-				writer.write(xCoords.get(xIndex).toString() + "\t");
-			}
-			writer.newLine();
-			for(int yIndex = 0; yIndex < yCoords.size(); yIndex++){
-				//y-coordinates as first column
-				writer.write(yCoords.get(yIndex) + "\t");
-				for(int xIndex =0; xIndex < xCoords.size(); xIndex++){
-					Point p = gf.createPoint(new Coordinate(xCoords.get(xIndex), yCoords.get(yIndex)));
-					double emissionWeight = this.cellWeights.get(p);
-					writer.write(Double.toString(emissionWeight)+"\t");
-				}
-				writer.newLine();
-				SpatialDataInputs.LOG.info("Writing line "+yIndex);
-			}
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written to file. Reason "+e);
-		}
-		SpatialDataInputs.LOG.info("Data is written to file "+fileName);
 	}
 
 	public boolean isInResearchArea(Link link) {
