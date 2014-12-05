@@ -66,7 +66,7 @@ public class MunichSpatialPlots {
 			//write here for different time intervals
 		}
 
-		plot.writeSurfacePlotRData();
+		plot.writeRData();
 		SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
 
 		double cellWeights =0;
