@@ -43,6 +43,7 @@ import java.util.*;
 public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
+	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
 	private static final Set<Id<Vehicle>> vehicles = new HashSet<>();
 	// TODO-boescpa Create a vehicles-file...
 
@@ -220,8 +221,8 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						}
 						double departureTime = 0;
 						try {
-							departureTime = Double.parseDouble(newLine.substring(31, 33)) * 60 * 60 +
-									Double.parseDouble(newLine.substring(33, 35)) * 60;
+							departureTime = Double.parseDouble(newLine.substring(38, 40)) * 60 * 60 +
+									Double.parseDouble(newLine.substring(40, 42)) * 60;
 						} catch (Exception e) {
 
 						}
@@ -282,10 +283,11 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		private Id<Vehicle> usedVehicle = null;
 
 		public void setUsedVehicle(String usedVehicle) {
+			String vehicle = usedVehicle.trim();
 			if (this.usedVehicle == null) {
-				this.usedVehicle = Id.create(usedVehicle, Vehicle.class);
+				this.usedVehicle = Id.create(vehicle, Vehicle.class);
 			}
-			vehicles.add(Id.create(usedVehicle, Vehicle.class));
+			vehicles.add(Id.create(vehicle, Vehicle.class));
 		}
 
 		public PtRouteFPLAN(Id<TransitLine> idOwnerLine, String lineId, int numberOfDepartures, int cycleTime) {
@@ -312,13 +314,13 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			TransitStopFacility stopFacility = schedule.getFacilities().get(Id.create(stopId, TransitStopFacility.class));
 			double arrivalDelay = 0.0;
 			if (arrivalTime > 0 && firstDepartureTime > 0) {
-				arrivalDelay = arrivalTime - firstDepartureTime;
+				arrivalDelay = arrivalTime + initialDelay - firstDepartureTime;
 			}
 			double departureDelay = 0.0;
 			if (departureTime > 0 && firstDepartureTime > 0) {
-				departureDelay = departureTime - firstDepartureTime;
+				departureDelay = departureTime + initialDelay - firstDepartureTime;
 			} else if (arrivalDelay > 0) {
-				departureDelay = arrivalDelay + 1;
+				departureDelay = arrivalDelay + initialDelay;
 			}
 			stops.add(createRouteStop(stopFacility, arrivalDelay, departureDelay));
 		}
@@ -333,8 +335,8 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			}
 			List<Departure> departures = new ArrayList<>();
 			for (int i = 0; i < numberOfDepartures; i++) {
-				Id<Departure> departureId = Id.create(routeId.toString() + "_" + (i + 1), Departure.class);
-				double departureTime = firstDepartureTime + (i * cycleTime);
+				Id<Departure> departureId = Id.create(idOwnerLine.toString() + "_" + routeId.toString() + "_" + (i + 1), Departure.class);
+				double departureTime = firstDepartureTime + (i * cycleTime) - initialDelay;
 				departures.add(createDeparture(departureId, departureTime, usedVehicle));
 			}
 			return departures;

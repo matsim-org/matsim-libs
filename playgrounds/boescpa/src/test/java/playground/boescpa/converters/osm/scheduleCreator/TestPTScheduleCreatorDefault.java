@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -71,6 +72,7 @@ public class TestPTScheduleCreatorDefault {
     public void testReadLines() {
         scheduleCreator.readStops(utils.getClassInputDirectory()+"BFKOORD_GEO");
         scheduleCreator.readLines(utils.getClassInputDirectory()+"FPLAN");
-        // TODO-boescpa Finish tests...
+        TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
+        writer.writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");
     }
 }
