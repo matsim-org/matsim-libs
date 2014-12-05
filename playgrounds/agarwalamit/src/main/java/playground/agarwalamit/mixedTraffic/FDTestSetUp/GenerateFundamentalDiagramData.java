@@ -64,10 +64,10 @@ import java.util.*;
  * @author amit after ssix
  */
 
-public class GenerateFundametalDiagramData {
+public class GenerateFundamentalDiagramData {
 
 	//	private static Integer[] TEST_DISTRIBUTION = {0,0,140};
-	static final Logger log = Logger.getLogger(GenerateFundametalDiagramData.class);
+	static final Logger log = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
 	//CONFIGURATION: static variables used for aggregating configuration options
 
@@ -111,12 +111,12 @@ public class GenerateFundametalDiagramData {
 
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
 		String OUTPUT_FOLDER ="/run306/";
-//		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
+		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
 
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
 
-		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
+		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
@@ -126,7 +126,7 @@ public class GenerateFundametalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(args[1]);
 		generateFDData.setUseHoles(Boolean.valueOf(args[2]));
-		generateFDData.setReduceDataPointsByFactor(10);
+		generateFDData.setReduceDataPointsByFactor(30);
 		generateFDData.setUsingSeepNetworkFactory(Boolean.valueOf(args[3]));
 		HOLE_SPEED = args[4];
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
@@ -187,7 +187,7 @@ public class GenerateFundametalDiagramData {
 	}
 
 	public void setWriteInputFiles(boolean writeInputFiles) {
-		GenerateFundametalDiagramData.writeInputFiles = writeInputFiles;
+		GenerateFundamentalDiagramData.writeInputFiles = writeInputFiles;
 	}
 
 	public void setTravelModes(String[] travelModes) {
@@ -279,7 +279,7 @@ public class GenerateFundametalDiagramData {
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
 		for (int m=1; m<numberOfPoints; m++){
 			List<Integer> pointToRun = new ArrayList<Integer>();
-			for (int i=0; i<GenerateFundametalDiagramData.TRAVELMODES.length; i++){
+			for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 				pointToRun.add(minSteps.get(i)*m);
 			}
 			log.info("Number of Agents - \t"+pointToRun);
@@ -395,7 +395,7 @@ public class GenerateFundametalDiagramData {
 		}
 
 		if(WRITE_FD_DATA) {
-			writer.format("%d\t\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
+			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
 			}
@@ -641,7 +641,7 @@ public class GenerateFundametalDiagramData {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			if (GenerateFundametalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
+			if (GenerateFundamentalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
 				goHome = true; 
 			}
 

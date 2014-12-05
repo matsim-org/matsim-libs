@@ -148,10 +148,10 @@ import org.matsim.vehicles.VehicleType;
 		for (int i=0; i<this.speedTableSize; i++){
 			relativeDeviances += Math.pow( ((this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed) , 2);
 		}
-		relativeDeviances /= GenerateFundametalDiagramData.TRAVELMODES.length;//taking dependence on number of modes away
+		relativeDeviances /= GenerateFundamentalDiagramData.TRAVELMODES.length;//taking dependence on number of modes away
 		if (relativeDeviances < 0.0005){
 			this.speedStability = true;
-			GenerateFundametalDiagramData.log.info("========== Reaching a certain speed stability in mode: "+modeId);
+			GenerateFundamentalDiagramData.log.info("========== Reaching a certain speed stability in mode: "+modeId);
 		} else {
 			this.speedStability = false;
 		}
@@ -161,8 +161,8 @@ import org.matsim.vehicles.VehicleType;
 		double absoluteDeviances = this.lastXFlows900.get(this.lastXFlows900.size()-1) - this.lastXFlows900.get(0);
 		if (Math.abs(absoluteDeviances) < 1){
 			this.flowStability = true;
-			if(modeId==null) GenerateFundametalDiagramData.log.info("========== Reaching a certain flow stability for global flow.");
-			else GenerateFundametalDiagramData.log.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
+			if(modeId==null) GenerateFundamentalDiagramData.log.info("========== Reaching a certain flow stability for global flow.");
+			else GenerateFundamentalDiagramData.log.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
 		} else {
 			this.flowStability = false;
 		}
@@ -232,11 +232,11 @@ import org.matsim.vehicles.VehicleType;
 		//NB: Should not be called upon a modeData without a vehicleType, as this.vehicleType will be null and will throw an exception.
 		this.permanentDensity = this.numberOfAgents / (InputsForFDTestSetUp.LINK_LENGTH*3) *1000 * this.vehicleType.getPcuEquivalents();
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
-		GenerateFundametalDiagramData.log.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
+		GenerateFundamentalDiagramData.log.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 		//this.permanentFlow = this.getActualFlow();
 		this.permanentFlow = /*this.getActualFlow900();*///Done: Sliding average instead of taking just the last value (seen to be sometimes farther from the average than expected)
 							   this.getSlidingAverageLastXFlows900();
-		GenerateFundametalDiagramData.log.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
+		GenerateFundamentalDiagramData.log.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
 	}
 	
 	//Getters/Setters

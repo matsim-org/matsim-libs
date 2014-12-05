@@ -74,7 +74,7 @@ public class InputsForFDTestSetUp {
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 	
 	void run(){
-		this.outputFolder= GenerateFundametalDiagramData.RUN_DIR;
+		this.outputFolder= GenerateFundamentalDiagramData.RUN_DIR;
 		setUpConfig();
 		createTriangularNetwork();
 		//Initializing modeData objects//TODO [AA]: should be initialized when instancing FundamentalDiagrams, no workaround still found
@@ -83,36 +83,36 @@ public class InputsForFDTestSetUp {
 	}
 
 	private void setUpConfig(){
-		GenerateFundametalDiagramData.log.info("==========Creating config ============");
+		GenerateFundamentalDiagramData.log.info("==========Creating config ============");
 		Config config = ConfigUtils.createConfig();
 
-		config.qsim().setMainModes(Arrays.asList(GenerateFundametalDiagramData.TRAVELMODES));
+		config.qsim().setMainModes(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
 		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);//allows to set agents to abort after getting the wanted data.
-		if(GenerateFundametalDiagramData.PASSING_ALLOWED){
+		if(GenerateFundamentalDiagramData.PASSING_ALLOWED){
 			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		}
-		if(GenerateFundametalDiagramData.WITH_HOLES){
+		if(GenerateFundamentalDiagramData.WITH_HOLES){
 			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_WITH_HOLES);
-			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundametalDiagramData.HOLE_SPEED);
+			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
 		}
 		
-		if(GenerateFundametalDiagramData.SEEPAGE_ALLOWED){
+		if(GenerateFundamentalDiagramData.SEEPAGE_ALLOWED){
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 		}
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		scenario = ScenarioUtils.createScenario(config);
-		if(GenerateFundametalDiagramData.writeInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
+		if(GenerateFundamentalDiagramData.writeInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
 	/**
 	 * It will generate a triangular network. 
 	 * Each link is subdivided in number of sub division factor.
 	 */
 	private void createTriangularNetwork(){
-		GenerateFundametalDiagramData.log.info("==========Creating network=========");
+		GenerateFundamentalDiagramData.log.info("==========Creating network=========");
 		Network network = scenario.getNetwork();
 		int capMax = 100*LINK_CAPACITY;
 
@@ -172,7 +172,7 @@ public class InputsForFDTestSetUp {
 			link.setLength(calculateLength(from,to));
 			link.setNumberOfLanes(NO_OF_LANES);
 			Set<String> allowedModes = new HashSet<>();
-			for(String mode : GenerateFundametalDiagramData.TRAVELMODES){
+			for(String mode : GenerateFundamentalDiagramData.TRAVELMODES){
 				allowedModes.add(mode);
 			}
 
@@ -195,16 +195,16 @@ public class InputsForFDTestSetUp {
 		endLink.setNumberOfLanes(1.);
 		network.addLink(endLink);
 
-		if(GenerateFundametalDiagramData.writeInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
+		if(GenerateFundamentalDiagramData.writeInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
 	}
 
 	private void fillTravelModeData(){
 		vehicle2TravelModesData = new HashMap<>();
-		for (int i=0; i < GenerateFundametalDiagramData.TRAVELMODES.length; i++){
-			Id<VehicleType> modeId = Id.create(GenerateFundametalDiagramData.TRAVELMODES[i],VehicleType.class);
+		for (int i=0; i < GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
+			Id<VehicleType> modeId = Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
-			vehicleType.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(GenerateFundametalDiagramData.TRAVELMODES[i]));
-			vehicleType.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(GenerateFundametalDiagramData.TRAVELMODES[i]));
+			vehicleType.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(GenerateFundamentalDiagramData.TRAVELMODES[i]));
+			vehicleType.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(GenerateFundamentalDiagramData.TRAVELMODES[i]));
 			VehicleCapacity cap = new VehicleCapacityImpl();
 			cap.setSeats(3);//this is default for now, could be improved with mode-dependent vehicle capacity
 			vehicleType.setCapacity(cap);
@@ -219,15 +219,15 @@ public class InputsForFDTestSetUp {
 	 * @param gapInSecond
 	 */
 	void createWantedPopulation(List<Integer> agentDistribution, int gapInSecond){
-		GenerateFundametalDiagramData.log.info("==========Creating population=========");
+		GenerateFundamentalDiagramData.log.info("==========Creating population=========");
 		Population population = scenario.getPopulation();
 
 		population.getPersons().clear();
 
 		for (int i=0; i<agentDistribution.size(); i++){
-			createAndAddPersonToPopulation(agentDistribution.get(i), GenerateFundametalDiagramData.TRAVELMODES[i]);
+			createAndAddPersonToPopulation(agentDistribution.get(i), GenerateFundamentalDiagramData.TRAVELMODES[i]);
 		}
-		if(GenerateFundametalDiagramData.writeInputFiles) new PopulationWriter(population,scenario.getNetwork()).write(outputFolder+"/plans.xml.gz");
+		if(GenerateFundamentalDiagramData.writeInputFiles) new PopulationWriter(population,scenario.getNetwork()).write(outputFolder+"/plans.xml.gz");
 	}
 
 	/**

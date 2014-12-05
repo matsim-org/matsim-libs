@@ -63,8 +63,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 	public GlobalFlowDynamicsUpdator(Scenario sc, Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
 		this.scenario =  sc;
 		this.travelModesFlowData = travelModeFlowDataContainer;
-		for (int i=0; i<GenerateFundametalDiagramData.TRAVELMODES.length; i++){
-			this.travelModesFlowData.get(Id.create(GenerateFundametalDiagramData.TRAVELMODES[i],VehicleType.class)).initDynamicVariables();
+		for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
+			this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).initDynamicVariables();
 		}
 		this.globalFlowData = new TravelModesFlowDynamicsUpdator();
 		this.globalFlowData.setnumberOfAgents(sc.getPopulation().getPersons().size());
@@ -74,8 +74,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
 	@Override
 	public void reset(int iteration) {	
-		for (int i=0; i<GenerateFundametalDiagramData.TRAVELMODES.length; i++){
-			this.travelModesFlowData.get(Id.create(GenerateFundametalDiagramData.TRAVELMODES[i],VehicleType.class)).reset();
+		for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
+			this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).reset();
 		}
 		this.globalFlowData.reset();
 		this.permanentRegime = false;
@@ -120,8 +120,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
 					//Checking modes stability
 					boolean modesStable = true;
-					for (int i=0; i<GenerateFundametalDiagramData.TRAVELMODES.length; i++){
-						Id<VehicleType> localVehicleType = Id.create(GenerateFundametalDiagramData.TRAVELMODES[i],VehicleType.class);
+					for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
+						Id<VehicleType> localVehicleType = Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class);
 						if (this.travelModesFlowData.get(localVehicleType).numberOfAgents != 0){
 							if (! this.travelModesFlowData.get(localVehicleType).isSpeedStable() || !(this.travelModesFlowData.get(localVehicleType).isFlowStable())) {
 								modesStable = false;
@@ -133,9 +133,9 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 						//Checking global stability
 						if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
 							//log.info("Global permanent regime attained");
-							GenerateFundametalDiagramData.log.info("========== Global permanent regime is attained");
-							for (int i=0; i<GenerateFundametalDiagramData.TRAVELMODES.length; i++){
-								this.travelModesFlowData.get(Id.create(GenerateFundametalDiagramData.TRAVELMODES[i],VehicleType.class)).saveDynamicVariables();
+							GenerateFundamentalDiagramData.log.info("========== Global permanent regime is attained");
+							for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
+								this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).saveDynamicVariables();
 							}
 							this.globalFlowData.setPermanentAverageVelocity(this.globalFlowData.getActualAverageVelocity());
 							//this.permanentFlow = this.getActualFlow();
