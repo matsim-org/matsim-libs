@@ -59,7 +59,7 @@ public class AvignonControler extends Controler {
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
 		 
 		 
-		if (!super.getConfig().locationchoice().getPrefsFile().equals("null") &&
+		if (!super.getConfig().findParam("locationchoice", "prefsFile").equals("null") &&
 				!super.getConfig().facilities().getInputFile().equals("null")) {
 			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
 		} else {

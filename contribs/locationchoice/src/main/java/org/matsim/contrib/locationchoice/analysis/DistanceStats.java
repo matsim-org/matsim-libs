@@ -41,13 +41,13 @@ public class DistanceStats implements IterationEndsListener {
 	private String mode;
 	
 	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {	
-		this.analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary()); 
+		this.analysisBoundary = Double.parseDouble(config.findParam("locationchoice", "analysisBoundary")); 
 		this.config = config;
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
 		this.actTypeConverter = actTypeConverter;
 		this.mode = mode;
-		this.bins = new Bins(Double.parseDouble(config.locationchoice().getAnalysisBinSize()),
+		this.bins = new Bins(Double.parseDouble(config.findParam("locationchoice", "analysisBinSize")),
 				analysisBoundary, type + "_" + mode + "_distance");
 	}
 
@@ -57,8 +57,8 @@ public class DistanceStats implements IterationEndsListener {
         for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
-			if (this.config.locationchoice().getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
-					Long.parseLong(p.getId().toString()) > Long.parseLong(this.config.locationchoice().getIdExclusion())) continue;
+			if (this.config.findParam("locationchoice", "idExclusion") == null || !this.isLong(p.getId().toString()) ||
+					Long.parseLong(p.getId().toString()) > Long.parseLong(this.config.findParam("locationchoice", "idExclusion"))) continue;
 					
 			PlanImpl plan = (PlanImpl) p.getSelectedPlan();
 			

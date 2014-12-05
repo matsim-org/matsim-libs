@@ -88,7 +88,7 @@ public class ChoiceSet {
 //					"The way this is done looks like a hack to me.  kai, jan'13" ) ;
 //			}
 //		}
-		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
+		this.numberOfAlternatives = Integer.parseInt(config.findParam("locationchoice", "probChoiceSetSize") );
 	}
 	
 	public void addDestination(Id<ActivityFacility> facilityId) {

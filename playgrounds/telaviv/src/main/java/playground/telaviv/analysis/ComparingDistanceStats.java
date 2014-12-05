@@ -50,8 +50,8 @@ public class ComparingDistanceStats implements IterationEndsListener {
 	private String idExclusion;
 	
 	public ComparingDistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode, double[] referenceShares) {
-		this(Double.parseDouble(config.locationchoice().getAnalysisBinSize()), Double.parseDouble(config.locationchoice().getAnalysisBoundary()), 
-				config.locationchoice().getIdExclusion(), bestOrSelected, type, actTypeConverter, mode, referenceShares);
+		this(Double.parseDouble(config.findParam("locationchoice", "analysisBinSize")), Double.parseDouble(config.findParam("locationchoice", "analysisBoundary")), 
+				config.findParam("locationchoice", "idExclusion"), bestOrSelected, type, actTypeConverter, mode, referenceShares);
 	}
 
 	public ComparingDistanceStats(double analysisBinSize, double analysisBoundary, String idExclusion, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode, double[] referenceShares) {

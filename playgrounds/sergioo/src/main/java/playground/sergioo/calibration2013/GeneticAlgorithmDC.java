@@ -89,12 +89,12 @@ public class GeneticAlgorithmDC {
 		
 		public ParametersArray(Scenario scenario) {
 			int k=0;
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getAnalysisBinSize());
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getAnalysisBoundary());
-			String[] parts = scenario.getConfig().locationchoice().getEpsilonScaleFactors().split(",");
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "analysisBinSize"));
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "analysisBoundary"));
+			String[] parts = scenario.getConfig().findParam("locationchoice", "epsilonScaleFactors").split(",");
 			for(String part:parts)
 				this.parameters[k++] = Double.parseDouble(part.trim());
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getProbChoiceSetSize());
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "probChoiceSetSize") );
 			String radius = scenario.getConfig().findParam("locationchoice", "radius");
 			this.parameters[k++] = radius.equals("null")?0.0:Double.parseDouble(radius);
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnExp"));

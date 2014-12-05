@@ -110,7 +110,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		this.actTypeConverter = defineFlexibleActivities.getConverter();
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
 		
-		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
+		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().findParam("locationchoice", "randomSeed")));
 		this.readFacilitesAttributesAndBetas();
 		this.readPrefs();
 		
@@ -165,7 +165,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	private void readPrefs() {
-		String prefsFileName = this.scenario.getConfig().locationchoice().getPrefsFile();
+		String prefsFileName = this.scenario.getConfig().findParam("locationchoice", "prefsFile");
 		if (!prefsFileName.equals("null")) {			
 			ObjectAttributesXmlReader prefsReader = new ObjectAttributesXmlReader(this.prefsAttributes);
 			try {

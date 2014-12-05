@@ -106,7 +106,7 @@ public class DestinationScoring {
 		/*
 		 * generate the epsilons according to standard Gumbel or standard Gaussian distribution
 		 */
-		if (config.locationchoice().getEpsilonDistribution().equals("gumbel")) {
+		if (config.findParam("locationchoice", "epsilonDistribution").equals("gumbel")) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextDouble();

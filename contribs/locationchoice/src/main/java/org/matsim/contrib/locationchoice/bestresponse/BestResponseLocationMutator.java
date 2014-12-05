@@ -102,7 +102,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// TODO: replace this now by subpopulation!
 		final Person person = plan.getPerson();
 		
-		String idExclusion = super.scenario.getConfig().locationchoice().getIdExclusion();
+		String idExclusion = super.scenario.getConfig().findParam("locationchoice", "idExclusion");
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > Long.parseLong(idExclusion)) return;
 
 		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13

@@ -177,7 +177,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		
 		if ( usingLocationChoice ) {
-			if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
+			if ( !config.findParam("locationchoice", "destinationSamplePercent").equals("100.") ) {
 				problem = true ;
 				System.out.flush() ;
 				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +

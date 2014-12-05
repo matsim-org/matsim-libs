@@ -320,9 +320,9 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		/*
 		 * further analysis stuff for location choice
 		 */
-		double analysisBinSize = Double.parseDouble(config.locationchoice().getAnalysisBinSize());
-		double analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary());
-		String idExclusion = config.locationchoice().getIdExclusion();
+		double analysisBinSize = Double.parseDouble(config.findParam("locationchoice", "analysisBinSize"));
+		double analysisBoundary = Double.parseDouble(config.findParam("locationchoice", "analysisBoundary"));
+		String idExclusion = config.findParam("locationchoice", "idExclusion");
 		ActTypeConverter converter = new ActTypeConverter(false);
 		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.findParam("locationchoice", "flexible_types"));
   		for (String actType : flexibleTypes) {

@@ -59,7 +59,7 @@ public class CreateScenario {
 		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 		
-		this.seed = Long.parseLong(config.locationchoice().getRandomSeed());
+		this.seed = Long.parseLong(config.findParam("locationchoice", "randomSeed"));
 		rnd.setSeed(this.seed);
 		
 		CreateNetwork networkCreator = new CreateNetwork();

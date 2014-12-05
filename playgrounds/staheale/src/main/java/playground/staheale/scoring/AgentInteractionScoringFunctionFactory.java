@@ -82,14 +82,14 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 		this.actTypeConverter = actTypeConverter;		
 		this.flexibleTypes = flexibleTypes;	
 		this.config2 = config2;
-		this.createObjectAttributes(Long.parseLong(config2.locationchoice().getRandomSeed()));
+		this.createObjectAttributes(Long.parseLong(config2.findParam("locationchoice", "randomSeed")));
 	}
 
 	private void createObjectAttributes(long seed) {
 		this.facilitiesKValues = new ObjectAttributes();
 		this.personsKValues = new ObjectAttributes();
 
-		String pkValues = this.config2.locationchoice().getpkValuesFile();
+		String pkValues = this.config2.findParam("locationchoice", "pkValuesFile");
 		if (!pkValues.equals("null")) {
 			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			try {
@@ -102,7 +102,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 		else {
 			this.computeAttributes(seed);
 		}
-		String fkValues = this.config2.locationchoice().getfkValuesFile();
+		String fkValues = this.config2.findParam("locationchoice", "fkValuesFile");
 		if (!fkValues.equals("null")) {
 			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
 			try {

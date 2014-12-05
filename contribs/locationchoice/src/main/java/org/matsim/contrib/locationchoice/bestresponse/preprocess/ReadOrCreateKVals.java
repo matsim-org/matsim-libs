@@ -52,9 +52,9 @@ public class ReadOrCreateKVals {
 	 * This is important to know for reading (case 0) or computation of maxDCScore (case 1)
 	 */
 	public int run() {
-		String pkValuesFileName = this.scenario.getConfig().locationchoice().getpkValuesFile();
-		String fkValuesFileName = this.scenario.getConfig().locationchoice().getfkValuesFile();
-		String maxEpsValuesFileName = this.scenario.getConfig().locationchoice().getMaxEpsFile();
+		String pkValuesFileName = this.scenario.getConfig().findParam("locationchoice", "pkValuesFile");
+		String fkValuesFileName = this.scenario.getConfig().findParam("locationchoice", "fkValuesFile");
+		String maxEpsValuesFileName = this.scenario.getConfig().findParam("locationchoice", "maxDCScoreFile");
 		if (!pkValuesFileName.equals("null") && !fkValuesFileName.equals("null") && !maxEpsValuesFileName.equals("null")) {			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
