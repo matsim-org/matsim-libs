@@ -89,7 +89,7 @@ public class CAAgentMover extends AgentMover {
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		CAQLink lowResLink = engineCA.getCAQLink(nextLinkId);
 		if (lowResLink == null)
-			System.out.println("ERROR IN MOVING TO Q!!!");
+			Log.error("ERROR IN MOVING TO Q!!!");
 		lowResLink.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
 		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
 		lowResLink.addFromUpstream(pedestrian.getVehicle());

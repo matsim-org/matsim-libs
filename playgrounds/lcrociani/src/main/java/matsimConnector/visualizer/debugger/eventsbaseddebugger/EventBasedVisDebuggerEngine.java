@@ -28,6 +28,7 @@ import java.util.Map;
 
 import matsimConnector.agents.Pedestrian;
 import matsimConnector.environment.TransitionArea;
+import matsimConnector.events.CAAgentChangeLinkEvent;
 import matsimConnector.events.CAAgentConstructEvent;
 import matsimConnector.events.CAAgentEnterEnvironmentEvent;
 import matsimConnector.events.CAAgentExitEvent;
@@ -96,12 +97,11 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		this.vis.addKeyControl(this.keyControl);
 	}
 	
-	@SuppressWarnings("unused")
+	
 	public void startIteration(int iteration){
-		if ((iteration!=0 && iteration != 9) || !Constants.SAVE_FRAMES)
-			fs = null;
-		else
-			fs = new FrameSaver(Constants.PATH+"/videos/frames/it"+iteration, "png", 3);
+		fs = null;
+		if((iteration==0 || iteration ==9) && Constants.SAVE_FRAMES)
+			fs = new FrameSaver(Constants.PATH+"/videos/frames/it"+iteration, "png", 1);
 		this.vis.fs = fs;
 		this.keyControl.fs = fs;
 	}
@@ -181,8 +181,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	@Override
 	public void reset(int iteration) {
 		this.time = -1;
-		this.vis.reset(iteration);
-
+		//this.vis.reset(iteration);
 	}
 
 	public void handleEvent(CAAgentMoveEvent event) {
@@ -279,17 +278,16 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			drawCAEnvironments();
 			environmentInit = true;
 		}
+		
 		Pedestrian pedestrian = event.getPedestrian();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) (0.4/5.091);
-		//int nr = pedestrian.getId().toString().hashCode()%100;
+		this.circleProperties.put(pedestrian.getId(), cp);
+		updateColor(pedestrian);
+		/*
 		int nr = pedestrian.getDestination().getLevel();
 		int color = nr;//(nr/10)%3;
-//		if (Integer.parseInt(a.getId().toString()) < 0) {
-//			color = 1;
-//		} else {
-//			color = 2;
-//		}
+
 		if (color == 1){
 			cp.r = 255;
 			cp.g = 255-nr;
@@ -306,22 +304,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			cp.b = 255-nr;
 			cp.a = 255;
 		}
-		
-		if (pedestrian.getId().toString().startsWith("g")) {
-			cp.r=0;
-			cp.g=255-nr;
-			cp.b=0;
-		} else if (pedestrian.getId().toString().startsWith("b")) {
-			cp.r=0;
-			cp.g=0;
-			cp.b=255-nr;			
-		}else if (pedestrian.getId().toString().startsWith("r")) {
-			cp.r=255-nr;
-			cp.g=0;
-			cp.b=0;			
-		}
-		
-		this.circleProperties.put(pedestrian.getId(), cp);
+		*/		
 	}
 		
 	@Override
@@ -379,5 +362,22 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	public void handleEvent(CAAgentEnterEnvironmentEvent event) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void handleEvent(CAAgentChangeLinkEvent event) {
+		Pedestrian pedestrian = event.getPedestrian();
+		updateColor(pedestrian);
+	}
+
+	private void updateColor(Pedestrian pedestrian) {
+		CircleProperty cp = this.circleProperties.get(pedestrian.getId());
+		int destLevel = pedestrian.getDestination().getLevel();
+		int origLevel = pedestrian.getOriginMarker().getLevel();
+		int color = (((destLevel+1)*origLevel)*40)%256;
+		cp.r = color;
+		cp.g = 255-color;
+		cp.b = color;
+		cp.a = 255;
 	}
 }

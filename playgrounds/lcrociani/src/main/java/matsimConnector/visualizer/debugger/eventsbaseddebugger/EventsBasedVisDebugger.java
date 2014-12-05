@@ -36,7 +36,6 @@ import matsimConnector.utility.Constants;
 import org.gicentre.utils.move.ZoomPan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.misc.Time;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -72,7 +71,7 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	FrameSaver fs;
 	//	private final FrameSaver fs = null;
-	private String it;
+	//private String it;
 	
 	public EventsBasedVisDebugger(FrameSaver fs) {
 		this.fs = fs;
@@ -305,7 +304,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 
 		if (this.fs != null) {
-			this.fs.saveFrame(this, this.it+Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSSDOTSS));
+			this.fs.saveFrame(this);//+Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSSDOTSS));
 		}
 
 	}
@@ -733,7 +732,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		this.keyControl = keyControl;
 		this.keyControl.addTileMap(this.tileMap);
 	}
-
+	/*
 	public void reset(int it) {
 		if (it < 10) {
 			this.it = "it.00"+it+"_";
@@ -743,12 +742,5 @@ public class EventsBasedVisDebugger extends PApplet {
 			this.it = "it."+it+"_";
 		}
 
-	}
-
-
-
-
-
-
-
+	}*/
 }

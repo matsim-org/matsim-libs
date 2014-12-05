@@ -33,6 +33,7 @@ public class Pedestrian extends Agent {
 		this.vehicle = vehicle;
 		finalDestinationReached = false;
 		this.transitionArea = transitionArea;
+		this.originMarker = transitionArea.getReferenceDestination();
 		enterTransitionArea(getPosition());
 	}
 	
@@ -151,7 +152,6 @@ public class Pedestrian extends Agent {
 	
 	public void moveToEnvironment(){
 		GridPoint nextPosition = transitionArea.convertTAPosToEnvPos(getPosition());
-		this.originMarker = transitionArea.getReferenceDestination();
 		leaveTransitionArea();
 		enterPedestrianGrid(nextPosition);
 	}

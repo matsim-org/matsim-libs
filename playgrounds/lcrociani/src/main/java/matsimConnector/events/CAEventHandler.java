@@ -15,4 +15,6 @@ public interface CAEventHandler extends EventHandler {
 	public void handleEvent(CAAgentLeaveEnvironmentEvent event);
 	
 	public void handleEvent(CAAgentEnterEnvironmentEvent event);
+	
+	public void handleEvent(CAAgentChangeLinkEvent event);
 }

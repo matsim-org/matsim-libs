@@ -32,12 +32,16 @@ public class FrameSaver {
 	private final String extension;
 	private int frameSkip;
 	private int skiped;
+	private int frameNumber;
+	private int nZeros;
 
 	public FrameSaver(String path, String extension, int frameSkip) {
 		this.path = path;
 		this.extension = extension;
 		this.frameSkip = frameSkip;
 		this.skiped = frameSkip;
+		frameNumber=0;
+		nZeros = 5;
 	}
 	
 //	public boolean wouldskipNext() {
@@ -47,7 +51,14 @@ public class FrameSaver {
 //		this.skiped++;
 //		return false;
 //	}
-	
+	public void saveFrame(PApplet p) {
+		String identifier = "img";
+		for(int i=nZeros-1; i>0 && Math.pow(10, i) > frameNumber; i--)
+			identifier += 0;
+		identifier += frameNumber;
+		saveFrame(p,identifier);
+		frameNumber++;
+	}
 	
 	
 	public void saveFrame(PApplet p, String identifier) {
