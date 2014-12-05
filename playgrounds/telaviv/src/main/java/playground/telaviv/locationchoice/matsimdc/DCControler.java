@@ -56,8 +56,8 @@ public class DCControler extends Controler {
 
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 		
-		if (Double.parseDouble(super.getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
-				Double.parseDouble(super.getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {		
+		if (Double.parseDouble(super.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+				Double.parseDouble(super.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {		
 					this.addControlerListener(new FacilitiesLoadCalculator(this.dcContext.getFacilityPenalties()));
 				}
 		

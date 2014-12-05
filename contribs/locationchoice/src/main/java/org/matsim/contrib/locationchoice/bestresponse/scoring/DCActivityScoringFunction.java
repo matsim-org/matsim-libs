@@ -208,8 +208,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
 				
 				if (this.dcContext.getScaleEpsilon().isFlexibleType(this.converter.convertType(act.getType())) &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
-						Double.parseDouble(this.dcContext.getScenario().getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {
+						Double.parseDouble(this.dcContext.getScenario().getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+						Double.parseDouble(this.dcContext.getScenario().getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
 					
 						/* Penalty due to facility load: --------------------------------------------
 						 * Store the temporary score to reduce it in finish() proportionally

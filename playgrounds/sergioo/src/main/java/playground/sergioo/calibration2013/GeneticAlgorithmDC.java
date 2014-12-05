@@ -97,9 +97,9 @@ public class GeneticAlgorithmDC {
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getProbChoiceSetSize());
 			String radius = scenario.getConfig().locationchoice().getRadius();
 			this.parameters[k++] = radius.equals("null")?0.0:Double.parseDouble(radius);
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getRestraintFcnExp());
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getRestraintFcnFactor());
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getScaleFactor());
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnExp"));
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnFactor"));
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "scaleFactor"));
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_car());
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_pt());
 			calculateScore(scenario);

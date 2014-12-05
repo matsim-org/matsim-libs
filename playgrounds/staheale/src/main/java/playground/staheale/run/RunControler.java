@@ -61,7 +61,7 @@ public class RunControler extends Controler {
 
 		// create the AgentInteractionScoringFunctionFactory
 		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(this, this.config, planCalcScoreConfigGroup,
-				facilities, network, Double.parseDouble(this.getConfig().locationchoice().getScaleFactor()),
+				facilities, network, Double.parseDouble(this.getConfig().findParam("locationchoice", "scaleFactor")),
 				facilityOccupancies, attributes, scaleEpsilon, actTypeConverter,
 				defineFlexibleActivities.getFlexibleTypes());
 

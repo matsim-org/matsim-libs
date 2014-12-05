@@ -66,8 +66,8 @@ public class ControlerSingapore {
 		/*dcContext = new DestinationChoiceBestResponseContext(controler.getScenario());	
 		dcContext.init();
 		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
-		if (Double.parseDouble(controler.getConfig().locationchoice().getRestraintFcnExp()) > 0.0 &&
-				Double.parseDouble(controler.getConfig().locationchoice().getRestraintFcnFactor()) > 0.0) {		
+		if (Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+				Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {		
 					controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
 		}*/
 		controler.run();
