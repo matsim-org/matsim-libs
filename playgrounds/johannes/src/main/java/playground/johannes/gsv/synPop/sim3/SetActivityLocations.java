@@ -78,7 +78,7 @@ public class SetActivityLocations {
 
 		logger.info("Replacing activity types...");
 		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
-		
+
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
@@ -116,8 +116,8 @@ public class SetActivityLocations {
 
 		long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
 		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
-		
-		if(dumpInterval % logInterval != 0) {
+
+		if (dumpInterval % logInterval != 0) {
 			throw new RuntimeException("The dump intervall needs to be a multiple of the log intervall.");
 		}
 		/*
@@ -130,7 +130,8 @@ public class SetActivityLocations {
 		 * ensure the CopyFacilityUserData is always called before dumping and
 		 * analysis.
 		 */
-//		SamplerListenerComposite dumpListener = new SamplerListenerComposite();
+		// SamplerListenerComposite dumpListener = new
+		// SamplerListenerComposite();
 		listener.addComponent(new CopyFacilityUserData(dumpInterval));
 		listener.addComponent(new PopulationWriter(outputDir, dumpInterval));
 		listener.addComponent(new AnalyzerListener(dataPool, outputDir, dumpInterval));
@@ -138,7 +139,8 @@ public class SetActivityLocations {
 		/*
 		 * need to copy activity location user key to activity attributes
 		 */
-//		lComposite.addComponent(new BlockingSamplerListener(dumpListener, dumpInterval, numThreads));
+		// lComposite.addComponent(new BlockingSamplerListener(dumpListener,
+		// dumpInterval, numThreads));
 		// lComposite.addComponent(new BlockingSamplerListener(new
 		// AnalyzerListener(dataPool, outputDir), dumpInterval, numThreads));
 
@@ -146,6 +148,15 @@ public class SetActivityLocations {
 		listener.addComponent(slogger);
 
 		sampler.setSamplerListener(new BlockingSamplerListener(listener, logInterval, numThreads));
+
+		String val = config.findParam(MODULE_NAME, "distanceStratification");
+		boolean dStrat = false;
+		if (val != null) {
+			dStrat = Boolean.parseBoolean(val);
+		}
+		if (dStrat) {
+			sampler.setSegmenter(new DistancePopSegmenter());
+		}
 
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));

@@ -308,7 +308,7 @@ public class MatrixCompare {
 		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.418.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.438.fma");
 //		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);

@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
@@ -34,7 +36,8 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
  */
 public class Sampler {
 	
-	private final static Object H_KEY = new Object();
+//	private final static Object H_KEY = new Object();
+	private static final Logger logger = Logger.getLogger(Sampler.class);
 	
 	private final Collection<ProxyPerson> population;
 	
@@ -45,6 +48,8 @@ public class Sampler {
 	private final Random random;
 	
 	private SamplerListener listener;
+	
+	private PopulationSegmenter segmenter = new DefaultSegmenter();
 	
 	public Sampler(Collection<ProxyPerson> population, Hamiltonian hamiltonian, MutatorFactory factory, Random random) {
 		this.population = population;
@@ -60,20 +65,25 @@ public class Sampler {
 		this.listener = listener;
 	}
 	
+	public void setSegmenter(PopulationSegmenter segmenter) {
+		this.segmenter = segmenter;
+	}
+	
 	public void run(long iters, int numThreads) {
 		/*
 		 * split collection in approx even segments
 		 */
-		int n = Math.min(population.size(), numThreads);
-		List<ProxyPerson>[] segments = CollectionUtils.split(population, n);
+		List<ProxyPerson>[] segments = segmenter.split(population, numThreads);
 		/*
 		 * create threads
 		 */
 		Thread[] threads = new Thread[numThreads];
 		for(int i = 0; i < numThreads; i++) {
+			
 			Mutator thisMutator = mutatorFactory.newInstance();
 			Random thisRandom = new XORShiftRandom(random.nextLong());
 			threads[i] = new Thread(new SampleThread(segments[i], thisMutator, iters, thisRandom));
+			logger.info(String.format("%s: %s persons.", threads[i].getName(), segments[i].size()));
 			threads[i].start();
 		}
 		/*
@@ -156,6 +166,16 @@ public class Sampler {
 				@Override
 		public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
 			
+		}
+		
+	}
+	
+	private static class DefaultSegmenter implements PopulationSegmenter {
+
+		@Override
+		public List<ProxyPerson>[] split(Collection<ProxyPerson> persons, int segments) {
+			int n = Math.min(persons.size(), segments);
+			return CollectionUtils.split(persons, n);
 		}
 		
 	}
