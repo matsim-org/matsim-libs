@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -250,7 +249,7 @@ public class SpatialInterpolation {
 		SpatialDataInputs.LOG.info("Data is written to file "+fileName);
 	}
 
-	boolean isInResearchArea(Link link) {
+	public boolean isInResearchArea(Link link) {
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 		Point linkcentroidPoint = gf.createPoint(linkCentroid);
 

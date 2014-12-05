@@ -19,7 +19,6 @@
 package playground.agarwalamit.spatial;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -32,7 +31,7 @@ import playground.agarwalamit.spatial.GeneralGrid.GridType;
  * @author amit
  */
 
- class SpatialDataInputs {
+public class SpatialDataInputs {
 
 	public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
 	
