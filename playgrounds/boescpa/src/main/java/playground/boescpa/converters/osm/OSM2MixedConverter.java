@@ -55,9 +55,9 @@ public class OSM2MixedConverter {
 		this.osmFile = osmFile;
 		this.scheduleFile = scheduleFile;
 
-		this.multimodalNetworkCreator = new MultimodalNetworkCreatorDefault(network);
-		this.ptScheduleCreator = new PTScheduleCreatorDefault(schedule);
-		this.ptLineRouter = new PTLineRouterDefault(schedule);
+		this.multimodalNetworkCreator = new MultimodalNetworkCreatorDefault(this.network);
+		this.ptScheduleCreator = new PTScheduleCreatorDefault(this.schedule);
+		this.ptLineRouter = new PTLineRouterDefault(this.schedule);
 	}
 
 	/**
