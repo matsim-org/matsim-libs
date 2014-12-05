@@ -324,7 +324,7 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		double analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary());
 		String idExclusion = config.locationchoice().getIdExclusion();
 		ActTypeConverter converter = new ActTypeConverter(false);
-		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.locationchoice().getFlexibleTypes());
+		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.findParam("locationchoice", "flexible_types"));
   		for (String actType : flexibleTypes) {
   			String filename = TelAvivConfig.basePath + "/locationchoice/" + actType + "ReferenceShares.txt";
   			if (!new File(filename).exists()) {

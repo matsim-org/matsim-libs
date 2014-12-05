@@ -63,7 +63,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}		
 		Config config = lcContext.getScenario().getConfig() ;
-		String planSelector = config.locationchoice().getPlanSelector();
+		String planSelector = config.findParam("locationchoice", "planSelector");
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan, Person>());
 		} else if (planSelector.equals("ChangeExpBeta")) {

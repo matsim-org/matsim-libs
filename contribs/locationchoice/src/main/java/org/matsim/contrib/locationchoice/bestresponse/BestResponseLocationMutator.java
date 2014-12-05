@@ -126,7 +126,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 
 	private void handleActivities(Plan plan, final Plan bestPlan, int personIndex) {
-		int tmp = Integer.parseInt(scenario.getConfig().locationchoice().getTravelTimeApproximationLevel());
+		int tmp = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "tt_approximationLevel"));
 		ApproximationLevel travelTimeApproximationLevel ;
 		if ( tmp==0 ) {
 			travelTimeApproximationLevel = ApproximationLevel.COMPLETE_ROUTING ;
@@ -291,7 +291,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
 		 */
-		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().locationchoice().getTravelSpeed_car());
+		double travelSpeedCrowFly = Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
 		double betaTime = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr();
 //		if ( Boolean.getBoolean(this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice)) ) {
 		if ( this.scenario.getConfig().vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
@@ -311,8 +311,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 
 		// define a maximum distance choice set manually
-		if (Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore()) > 0.0) {
-			maxDistance = Double.parseDouble(this.scenario.getConfig().locationchoice().getMaxDistanceDCScore());
+		if (Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "maxDistanceDCScore")) > 0.0) {
+			maxDistance = Double.parseDouble(this.scenario.getConfig().findParam("locationchoice", "maxDistanceDCScore"));
 		}
 		return maxDistance;
 	}

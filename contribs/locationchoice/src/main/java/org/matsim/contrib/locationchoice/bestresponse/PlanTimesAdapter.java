@@ -243,10 +243,10 @@ public class PlanTimesAdapter {
 		
 		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
 		// I do not want users having to set dc parameters in other config modules!
-		double speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car());	// seems to be overwritten in any case? cdobler, oct'14
+		double speed = Double.parseDouble(this.config.findParam("locationchoice", "travelSpeed_car"));	// seems to be overwritten in any case? cdobler, oct'14
 		
 		if (mode.equals(TransportMode.pt)) {
-			speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_pt());	
+			speed = Double.parseDouble(this.config.findParam("locationchoice", "travelSpeed_pt"));	
 		} else if (mode.equals(TransportMode.bike)) {
 			speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {

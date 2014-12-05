@@ -148,8 +148,8 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	}
 	
 	private void readFacilitesAttributesAndBetas() {
-		String pBetasFileName = this.scenario.getConfig().locationchoice().getpBetasFile();
-		String fAttributesFileName = this.scenario.getConfig().locationchoice().getfAttributesFile();
+		String pBetasFileName = this.scenario.getConfig().findParam("locationchoice", "pBetasFileName");
+		String fAttributesFileName = this.scenario.getConfig().findParam("locationchoice", "fAttributesFileName");
 		if (!pBetasFileName.equals("null") && !fAttributesFileName.equals("null")) {			
 			ObjectAttributesXmlReader personsBetasReader = new ObjectAttributesXmlReader(this.personsBetas);
 			ObjectAttributesXmlReader facilitiesAttributesReader = new ObjectAttributesXmlReader(this.facilitiesAttributes);

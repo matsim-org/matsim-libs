@@ -47,7 +47,7 @@ public class WeeklyPlans {
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
 		facilitiesWithType = new HashMap<String, Set<ActivityFacility>>();
-		for(String type:config.locationchoice().getFlexibleTypes().split(","))
+		for(String type:config.findParam("locationchoice", "flexible_types").split(","))
 			facilitiesWithType.put(type.trim(), new HashSet<ActivityFacility>());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
 			for(String typeOption:facility.getActivityOptions().keySet())
@@ -130,7 +130,7 @@ public class WeeklyPlans {
 			String prevActivityType = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType();
 			Coord prevActivityCoord = ((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getCoord();
 			plan.addLeg(new LegImpl(carAvailable?TransportMode.car:TransportMode.pt));
-			String type = !prevActivityType.equals("home") && Math.random()<PROB_HOME?"home":getRandomActivityType(config.locationchoice().getFlexibleTypes().split(","));
+			String type = !prevActivityType.equals("home") && Math.random()<PROB_HOME?"home":getRandomActivityType(config.findParam("locationchoice", "flexible_types").split(","));
 			double duration;
 			try {
 				duration = new NormalDistributionImpl(config.planCalcScore().getActivityParams(type).getTypicalDuration(), config.planCalcScore().getActivityParams(type).getMinimalDuration()/2).inverseCumulativeProbability(Math.random());

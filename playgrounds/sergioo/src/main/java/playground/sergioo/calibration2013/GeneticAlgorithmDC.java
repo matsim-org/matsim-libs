@@ -95,13 +95,13 @@ public class GeneticAlgorithmDC {
 			for(String part:parts)
 				this.parameters[k++] = Double.parseDouble(part.trim());
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getProbChoiceSetSize());
-			String radius = scenario.getConfig().locationchoice().getRadius();
+			String radius = scenario.getConfig().findParam("locationchoice", "radius");
 			this.parameters[k++] = radius.equals("null")?0.0:Double.parseDouble(radius);
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnExp"));
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnFactor"));
 			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "scaleFactor"));
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_car());
-			this.parameters[k++] = Double.parseDouble(scenario.getConfig().locationchoice().getTravelSpeed_pt());
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
+			this.parameters[k++] = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_pt"));
 			calculateScore(scenario);
 		}
 		public ParametersArray(double[] parameters, Scenario scenario) {
@@ -114,7 +114,7 @@ public class GeneticAlgorithmDC {
 			scenario.getConfig().locationchoice().setAnalysisBinSize(Double.toString(this.parameters[k++]));
 			scenario.getConfig().locationchoice().setAnalysisBoundary(Double.toString(this.parameters[k++]));
 			String factors = "";
-			for(int j=0; j<scenario.getConfig().locationchoice().getFlexibleTypes().split(",").length; j++)
+			for(int j=0; j<scenario.getConfig().findParam("locationchoice", "flexible_types").split(",").length; j++)
 				factors += this.parameters[k++]+",";
 			scenario.getConfig().locationchoice().setEpsilonScaleFactors(factors.substring(0, factors.length()-1));
 			scenario.getConfig().locationchoice().setProbChoiceSetSize(Integer.toString((int)this.parameters[k++]));
@@ -148,7 +148,7 @@ public class GeneticAlgorithmDC {
 				for(PlanElement planElement:copyPlan.getPlanElements())
 					if(planElement instanceof Activity) {
 						String type = ((Activity)planElement).getType();
-						if(scenario.getConfig().locationchoice().getFlexibleTypes().contains(type)) {
+						if(scenario.getConfig().findParam("locationchoice", "flexible_types").contains(type)) {
 							Map<String, List<Double>> map = distances.get(type);
 							if(map==null) {
 								map = new HashMap<String, List<Double>>();

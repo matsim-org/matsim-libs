@@ -46,7 +46,7 @@ public class WeeklyOpeningTimes {
 	}
 
 	private static boolean isSecondary(String key, Config config) {
-		String[] fActs = config.locationchoice().getFlexibleTypes().split(",");
+		String[] fActs = config.findParam("locationchoice", "flexible_types").split(",");
 		for(String fAct:fActs)
 			if(fAct.trim().equals(key))
 				return true;

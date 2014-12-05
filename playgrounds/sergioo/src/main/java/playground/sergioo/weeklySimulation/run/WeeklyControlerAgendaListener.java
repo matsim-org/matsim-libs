@@ -103,8 +103,8 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		if(controler.getConfig().scenario().isUseTransit())
 			modes.add("pt");
         if(createPersons) {
-			boolean fixedTypes = controler.getConfig().locationchoice().getFlexibleTypes()==null ||controler.getConfig().locationchoice().getFlexibleTypes().equals("");
-			String[] types = fixedTypes?new String[]{"home", "work"}:controler.getConfig().locationchoice().getFlexibleTypes().split(", ");
+			boolean fixedTypes = controler.getConfig().findParam("locationchoice", "flexible_types")==null ||controler.getConfig().findParam("locationchoice", "flexible_types").equals("");
+			String[] types = fixedTypes?new String[]{"home", "work"}:controler.getConfig().findParam("locationchoice", "flexible_types").split(", ");
 			TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilderWithDefaults = new TripRouterFactoryBuilderWithDefaults();
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = tripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
 			TripRouterFactory tripRouterFactory = new DefaultTripRouterFactoryImpl(controler.getScenario(), leastCostPathCalculatorFactory, transitRouterFactory);

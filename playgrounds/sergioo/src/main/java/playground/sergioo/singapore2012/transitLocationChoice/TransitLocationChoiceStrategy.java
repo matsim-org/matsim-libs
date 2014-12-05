@@ -27,7 +27,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	private PlanStrategyImpl delegate;
 	
 	public TransitLocationChoiceStrategy(final Scenario scenario) {
-		String planSelector = scenario.getConfig().locationchoice().getPlanSelector();
+		String planSelector = scenario.getConfig().findParam("locationchoice", "planSelector");
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (planSelector.equals("ChangeExpBeta")) {

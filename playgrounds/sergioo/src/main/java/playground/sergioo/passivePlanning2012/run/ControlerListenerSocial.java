@@ -74,8 +74,8 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
         Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
-		/*boolean fixedTypes = event.getControler().getConfig().locationchoice().getFlexibleTypes()==null ||event.getControler().getConfig().locationchoice().getFlexibleTypes().equals("");
-		String[] types = fixedTypes?new String[]{"home", "work"}:event.getControler().getConfig().locationchoice().getFlexibleTypes().split(", ");
+		/*boolean fixedTypes = event.getControler().getConfig().findParam("locationchoice", "flexible_types")==null ||event.getControler().getConfig().findParam("locationchoice", "flexible_types").equals("");
+		String[] types = fixedTypes?new String[]{"home", "work"}:event.getControler().getConfig().findParam("locationchoice", "flexible_types").split(", ");
 		TransitRouterFactory transitRouterFactory = new TransitRouterImplFactory(
 				event.getControler().getScenario().getTransitSchedule(),
 				new TransitRouterConfig(
