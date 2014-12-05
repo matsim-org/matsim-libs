@@ -18,15 +18,24 @@
  * *********************************************************************** */
 package playground.agarwalamit.spatial;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.agarwalamit.spatial.GeneralGrid.GridType;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -41,32 +50,27 @@ public class SpatialInterpolation {
 	public SpatialInterpolation() {
 		new File(SpatialDataInputs.outputDir).mkdirs();
 
-		this.grid = createGridFromBoundingBox();
+		SpatialDataInputs.LOG.info("Creating grids inside polygon of bounding box.");
+		createGridFromBoundingBox();
 		this.grid.writeGrid(SpatialDataInputs.outputDir, SpatialDataInputs.targetCRS.toString());
 
 		// initialize map
-		this.cellWeights = new HashMap<Point, Double>(this.grid.getGrid().size());
+		this.cellWeights = new HashMap<Point, Double>();
 		for(Point p :this.grid.getGrid().values()){
 			this.cellWeights.put(p, 0.);
 		}
 	}
 
-	public static void main(String[] args) {
-
-	}
-
 	private GeometryFactory gf;
 	private GeneralGrid grid ;
+	public Polygon boundingBoxPolygon;
 
-	/**
-	 * Point (key of map) could be centroid of hexagonal grid or square grid
-	 */
-	public Map<Point, Double> cellWeights;
+	private Map<Point, Double> cellWeights;
 
 	/**
 	 * @return general grid of cells from pre defined bounding box
 	 */
-	private GeneralGrid createGridFromBoundingBox (){
+	private void createGridFromBoundingBox (){
 		gf = new GeometryFactory();
 		// create polygon from bounding box and then get polygon from that
 		Coordinate c1 = new Coordinate(SpatialDataInputs.xMin,SpatialDataInputs.yMin);
@@ -74,39 +78,45 @@ public class SpatialInterpolation {
 		Coordinate c3 = new Coordinate(SpatialDataInputs.xMin,SpatialDataInputs.yMax);
 		Coordinate c4 = new Coordinate(SpatialDataInputs.xMax,SpatialDataInputs.yMax);
 
-		Polygon polygon = gf.createPolygon(new Coordinate []{c1,c2,c3,c4});
+		boundingBoxPolygon = gf.createPolygon(new Coordinate []{c1,c2,c4,c3,c1}); // sequence to create polygon is equally important
 
-		GeneralGrid generalGrid = new GeneralGrid(SpatialDataInputs.cellWidth, SpatialDataInputs.gridType);
-		generalGrid.generateGrid(polygon);
+		this.grid = new GeneralGrid(SpatialDataInputs.cellWidth, SpatialDataInputs.gridType);
+		this.grid.generateGrid(boundingBoxPolygon);
 
-		return generalGrid;
+		SpatialDataInputs.LOG.info("Total number of cells in the grid are "+this.grid.getGrid().size());
 	}
 
 	/**
 	 * @param link
-	 * @param intensityOnLink (emissions, ...) intensity for 100% sample.
+	 * @param intensityOnLink (emissions etc) intensity for 100% sample.
 	 */
 	public void processLink(Link link, double intensityOnLink){
+
+		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+		Coordinate fromNodeCoord = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY());
+		Coordinate toNodeCoord = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
+		Point linkcentroidPoint = gf.createPoint(linkCentroid);
+
+		if(!boundingBoxPolygon.covers(linkcentroidPoint)) return;
+
 		for(Point p: this.cellWeights.keySet()){
 
 			Coordinate pointCoord = p.getCoordinate();
-			Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-			Coordinate fromNodeCoord = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY());
-			Coordinate toNodeCoord = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
 
 			double cellArea = this.grid.getCellGeometry(p).getArea();
-			double normalizationFactor = cellArea/SpatialDataInputs.boundingBoxArea;
+			double area_smoothingCircle = Math.PI * SpatialDataInputs.smoothingRadius *SpatialDataInputs.smoothingRadius;
+			double normalizationFactor = cellArea/area_smoothingCircle;
 			double weightSoFar = this.cellWeights.get(p);
 			double weightNow;
 
 
 			if(SpatialDataInputs.linkWeigthMethod.equals("line")){
 
-				weightNow = calculateWeightFromLine(fromNodeCoord,toNodeCoord,pointCoord) * normalizationFactor;
+				weightNow = intensityOnLink * calculateWeightFromLine(fromNodeCoord,toNodeCoord,pointCoord) * normalizationFactor;
 
 			} else if(SpatialDataInputs.linkWeigthMethod.equals("point")) {
 
-				weightNow = calculateWeightFromPoint(linkCentroid, pointCoord) * normalizationFactor;
+				weightNow = intensityOnLink * calculateWeightFromPoint(linkCentroid, pointCoord) * normalizationFactor;
 
 			} else throw new RuntimeException("Averaging method for weight is not recongnized. Use 'line' or 'point'.");
 
@@ -128,7 +138,7 @@ public class SpatialInterpolation {
 		double linkLengthFromCoord = fromNodeCoord.distance(toNodeCoord);
 		double constantR = SpatialDataInputs.smoothingRadius;
 
-		constantC= (constantR*(Math.sqrt(Math.PI))/(linkLengthFromCoord*2))*Math.exp(-(constantA-(constantB*constantB/(linkLengthFromCoord*linkLengthFromCoord)))/constantR*constantR);
+		constantC= (constantR*(Math.sqrt(Math.PI))/(linkLengthFromCoord*2))*Math.exp(-(constantA-(constantB*constantB/(linkLengthFromCoord*linkLengthFromCoord)))/(constantR*constantR));
 
 		double upperLimit = (linkLengthFromCoord+(constantB/linkLengthFromCoord));
 		double lowerLimit = constantB/(linkLengthFromCoord);
@@ -154,6 +164,97 @@ public class SpatialInterpolation {
 		double smoothingRadius_square = SpatialDataInputs.smoothingRadius * SpatialDataInputs.smoothingRadius;
 		double weight = Math.exp((- dist * dist) / (smoothingRadius_square));
 		return weight;
+	}
+
+	/**
+	 * Point (key of map) could be centroid of hexagonal grid or square grid
+	 */
+	public Map<Point, Double> getCellWeights(){
+		return this.cellWeights;
+	}
+
+	public void writeSurfacePlotRData(){
+		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
+
+		GridType type = SpatialDataInputs.gridType;
+		String fileName = SpatialDataInputs.outputDir+"rSurfacePlot"+"_"+type+"_"+SpatialDataInputs.linkWeigthMethod+".txt";
+		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
+
+		int noOfSidesOfPolygon = 0;
+		if(type.equals(GridType.SQUARE)) noOfSidesOfPolygon = 4;
+		else if(type.equals(GridType.HEX)) noOfSidesOfPolygon = 6;
+		else throw new RuntimeException(type +" is not a valid grid type.");
+
+		try {
+			for(int i=0;i<noOfSidesOfPolygon;i++){
+				writer.write("polyX"+i+"\t"+"polyY"+i+"\t");
+			}
+			writer.write("centroidX \t centroidY \t weight \n ");
+
+			for(Point p : this.cellWeights.keySet()){
+				Geometry g = this.grid.getCellGeometry(p);
+				Coordinate[] ca = g.getCoordinates();
+				for(int i = 0; i < ca.length-1; i++){ // a square polygon have 5 coordinate, first and last is same. 
+					writer.write(ca[i].x+"\t"+ca[i].y+"\t");
+				}
+				double thisWeight = this.cellWeights.get(p);
+				writer.write(p.getX()+"\t"+p.getY()+"\t"+thisWeight+"\n");
+			}
+			writer.close();
+			SpatialDataInputs.LOG.info("Data is written to file "+fileName);
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written to file. Reason "+e);
+		}
+	}
+
+	public void writeRContourPlotData(){
+		SpatialDataInputs.LOG.info("====Writing data to plot filled contour in R.====");
+
+		GridType type = SpatialDataInputs.gridType;
+		String fileName = SpatialDataInputs.outputDir+"rContour_plot"+"_"+type+"_"+SpatialDataInputs.linkWeigthMethod+".txt";
+		try {
+			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
+			List<Double> xCoords = new ArrayList<Double>();
+			List<Double> yCoords = new ArrayList<Double>();
+
+			for(Point p : this.cellWeights.keySet()){
+				if(this.cellWeights.get(p)>0.){
+					xCoords.add(p.getX());
+					yCoords.add(p.getY());
+				}
+			}
+			Collections.sort(xCoords);
+			Collections.sort(yCoords);
+
+			writer.write("\t");
+			//x-coordinates as first row
+			for(int xIndex = 0; xIndex < xCoords.size(); xIndex++){
+				writer.write(xCoords.get(xIndex).toString() + "\t");
+			}
+			writer.newLine();
+			for(int yIndex = 0; yIndex < yCoords.size(); yIndex++){
+				//y-coordinates as first column
+				writer.write(yCoords.get(yIndex) + "\t");
+				for(int xIndex =0; xIndex < xCoords.size(); xIndex++){
+					Point p = gf.createPoint(new Coordinate(xCoords.get(xIndex), yCoords.get(yIndex)));
+					double emissionWeight = this.cellWeights.get(p);
+					writer.write(Double.toString(emissionWeight)+"\t");
+				}
+				writer.newLine();
+				SpatialDataInputs.LOG.info("Writing line "+yIndex);
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written to file. Reason "+e);
+		}
+		SpatialDataInputs.LOG.info("Data is written to file "+fileName);
+	}
+
+	boolean isInResearchArea(Link link) {
+		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+		Point linkcentroidPoint = gf.createPoint(linkCentroid);
+
+		return boundingBoxPolygon.covers(linkcentroidPoint);
 	}
 
 }

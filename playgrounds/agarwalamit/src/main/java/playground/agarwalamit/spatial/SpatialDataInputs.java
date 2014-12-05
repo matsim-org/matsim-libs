@@ -19,6 +19,7 @@
 package playground.agarwalamit.spatial;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -43,11 +44,16 @@ import playground.agarwalamit.spatial.GeneralGrid.GridType;
 	public final static GridType gridType = GridType.SQUARE;
 	
 	/**
+	 * Hexagonal or square grids will depend on this
+	 */
+	public final static double cellWidth = 170.;
+	
+	/**
 	 * same as count scale factor
 	 */
 	public final static double scalingFactor = 100.; 
 	
-	public final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run6/";
+	public final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	
 	
 	/**
@@ -59,6 +65,7 @@ import playground.agarwalamit.spatial.GeneralGrid.GridType;
 	public final static int BAULastIteration = LoadMyScenarios.getLastIteration(BAUConfig); 
 	public final static String BAUEmissionEventsFile = BAU+"/ITERS/it."+BAULastIteration+"/"+BAULastIteration+".emission.events.xml.gz";
 	public final static String BAUEventsFile = BAU+"/ITERS/it."+BAULastIteration+"/"+BAULastIteration+".events.xml.gz";
+	public final static String BAUPlans = BAU+"/output_plans.xml.gz";
 	
 	/**
 	 * policy case location folder
@@ -69,20 +76,16 @@ import playground.agarwalamit.spatial.GeneralGrid.GridType;
 	public final static int compareToCaseLastIteration = LoadMyScenarios.getLastIteration(compareToCaseConfig); 
 	public final static String compareToCaseEmissionEventsFile = compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".emission.events.xml.gz";
 	public final static String compareToCaseEventsFile = compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".events.xml.gz";
+	public final static String compareToCasePlans = compareToCase+"/output_plans.xml.gz";
 	
 	public final static String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	public final static CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	public final static double xMin =4452550.25;
-	public final static double yMin =4479483.33;
-	public final static double xMax =5324955.00;
+	public final static double xMax =4479483.33;
+	public final static double yMin =5324955.00;
 	public final static double yMax =5345696.81;
 	public final static double boundingBoxArea = (yMax-yMin)*(xMax-xMin);
 	public final static double smoothingRadius = 500.;
-	
-	/**
-	 * Hexagonal or square grids will depend on this
-	 */
-	public final static double cellWidth = 160.;
 	
 	public final static int noOfTimeBin = 1;
 	
