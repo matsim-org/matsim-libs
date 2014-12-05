@@ -112,6 +112,6 @@ public class CAAgentMover extends AgentMover {
 		//eventManager.processEvent(new CAAgentLeaveEnvironmentEvent(time, pedestrian));
 		
 		//TODO CHANGE THE DESTINATION OF THE AGENT
-		//pedestrian.refreshDestination();
+		pedestrian.refreshDestination();
 	}	
 }

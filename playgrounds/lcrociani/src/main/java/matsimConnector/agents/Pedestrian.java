@@ -5,6 +5,7 @@ import matsimConnector.utility.Constants;
 import matsimConnector.utility.IdUtility;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 import pedCA.agents.Agent;
@@ -140,6 +141,13 @@ public class Pedestrian extends Agent {
 		if (nextStepNeighbourhood.size() == 0)
 			nextStepNeighbourhood.add(getPosition());
 	}	
+	
+	public void refreshDestination() {
+		Id<Link> linkId = vehicle.getDriver().getCurrentLinkId();
+		int destinationId = IdUtility.linkIdToDestinationId(linkId);
+		this.destination = context.getMarkerConfiguration().getDestination(destinationId);
+		this.finalDestinationReached = false;
+	}
 	
 	public void moveToEnvironment(){
 		GridPoint nextPosition = transitionArea.convertTAPosToEnvPos(getPosition());

@@ -18,10 +18,10 @@ import pedCA.utility.Lottery;
 public class Agent extends PhysicalObject{
 	
 	private final int Id;
-	private final Context context;
+	protected final Context context;
 	private GridPoint nextpos; 
 	private Heading heading;
-	private Destination destination;
+	protected Destination destination;
 	private boolean arrived;
 	
 	private boolean wantToSwap;
