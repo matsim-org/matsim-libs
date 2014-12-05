@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.spatial;
+package playground.agarwalamit.analysis.spatial;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,7 +31,7 @@ import org.apache.commons.math.special.Erf;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.spatial.GeneralGrid.GridType;
+import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.spatial;
+package playground.agarwalamit.analysis.spatial;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

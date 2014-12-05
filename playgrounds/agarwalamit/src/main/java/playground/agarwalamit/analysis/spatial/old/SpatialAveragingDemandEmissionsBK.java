@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.spatial.old;
+package playground.agarwalamit.analysis.spatial.old;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.agarwalamit.spatial.SpatialDataInputs;
+import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
