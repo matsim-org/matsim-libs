@@ -14,7 +14,7 @@ import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.grid.neighbourhood.Neighbourhood;
 import pedCA.environment.markers.Destination;
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 import pedCA.utility.NeighbourhoodUtility;
 
 public class Pedestrian extends Agent {
@@ -23,7 +23,7 @@ public class Pedestrian extends Agent {
 	private QVehicle vehicle; 
 	private TransitionArea transitionArea;
 	private boolean finalDestinationReached;
-	private TacticalDestination originMarker;
+	private FinalDestination originMarker;
 	private Neighbourhood nextStepNeighbourhood;
 	
 	public Double lastTimeCheckAtExit = null;		
@@ -214,18 +214,18 @@ public class Pedestrian extends Agent {
 			if (transitionArea != null)
 				return checkOccupancy(neighbour,transitionArea) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));						//transitionArea.isOccupied(neighbour) || getPedestrianGrid().isOccupied(transitionArea.convertTAPosToEnvPos(neighbour));//checkOccupancy(neighbour,transitionArea) || checkOccupancy(transitionArea.convertTAPosToEnvPos(neighbour),getPedestrianGrid());
 			else{
-				TransitionArea neighbourTA = getDestination(neighbour).getTransitionArea();
+				TransitionArea neighbourTA = getFinalDestination(neighbour).getTransitionArea();
 				return neighbourTA.isOccupied(neighbourTA.convertEnvPosToTAPos(neighbour)) || checkOccupancy(neighbour,getPedestrianGrid());//checkOccupancy(neighbourTA.convertEnvPosToTAPos(neighbour),neighbourTA) || checkOccupancy(neighbour,getPedestrianGrid());
 			}
 		}		
 		return checkOccupancy(neighbour, getUsedPedestrianGrid());
 	}
 	
-	private TacticalDestination getDestination(GridPoint neighbour) {
-		TacticalDestination result = null;
+	private FinalDestination getFinalDestination(GridPoint neighbour) {
+		FinalDestination result = null;
 		for (Destination dest : getContext().getMarkerConfiguration().getDestinations())
-			if (dest instanceof TacticalDestination && dest.getCells().contains(neighbour)){
-				result = (TacticalDestination)dest;
+			if (dest instanceof FinalDestination && dest.getCells().contains(neighbour)){
+				result = (FinalDestination)dest;
 				break;
 			}
 		return result;
@@ -236,7 +236,7 @@ public class Pedestrian extends Agent {
 		if (transitionArea != null){
 			return transitionArea.isAtBorder(position);
 		} else
-			return getDestination(position)!=null;
+			return getFinalDestination(position)!=null;
 	}
 
 	/**
@@ -259,7 +259,7 @@ public class Pedestrian extends Agent {
 		return getNewPosition();
 	}
 	
-	public TacticalDestination getOriginMarker(){
+	public FinalDestination getOriginMarker(){
 		return originMarker;
 	}
 }

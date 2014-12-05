@@ -19,7 +19,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import pedCA.context.Context;
 import pedCA.environment.markers.Destination;
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 import pedCA.environment.network.Coordinates;
 
 public class NetworkGenerator {
@@ -138,27 +138,28 @@ public class NetworkGenerator {
 		int nodeCount = 0;
 		int linkCount = 0;
 		for (Destination dest : contextCA.getMarkerConfiguration().getDestinations()){
-			TacticalDestination destinationCA = (TacticalDestination) dest;
-			ArrayList<Node> nodes = new ArrayList<Node>();
-			for (int i=0; i<nLinks;i++){
-				double x = destinationCA.getCoordinates().getX();
-				double y = destinationCA.getCoordinates().getY();
-				Coordinates coord = new Coordinates(x-(LINK_LENGTH*i)-0.2,y);
-				MathUtility.rotate(coord, destinationCA.getRotation(), destinationCA.getCoordinates());
-				nodes.add(fac.createNode(Id.create("n"+nodeCount,Node.class), new CoordImpl(coord.getX(),coord.getY())));
-				net.addNode(nodes.get(nodes.size()-1));
-				nodeCount++;
-			}			
-			for (int i=1; i<nLinks;i++){
-				Link linkOut = fac.createLink(Id.create("l"+linkCount,Link.class), nodes.get(i-1), nodes.get(i));
-				Link linkIn = fac.createLink(Id.create("l"+(linkCount+1),Link.class), nodes.get(i), nodes.get(i-1));
-				initLink(linkOut);
-				initLink(linkIn);
-				net.addLink(linkOut);
-				net.addLink(linkIn);
-				linkCount+=2;
+			if (dest instanceof FinalDestination){
+				FinalDestination destinationCA = (FinalDestination) dest;
+				ArrayList<Node> nodes = new ArrayList<Node>();
+				for (int i=0; i<nLinks;i++){
+					double x = destinationCA.getCoordinates().getX();
+					double y = destinationCA.getCoordinates().getY();
+					Coordinates coord = new Coordinates(x-(LINK_LENGTH*i)-0.2,y);
+					MathUtility.rotate(coord, destinationCA.getRotation(), destinationCA.getCoordinates());
+					nodes.add(fac.createNode(Id.create("n"+nodeCount,Node.class), new CoordImpl(coord.getX(),coord.getY())));
+					net.addNode(nodes.get(nodes.size()-1));
+					nodeCount++;
+				}			
+				for (int i=1; i<nLinks;i++){
+					Link linkOut = fac.createLink(Id.create("l"+linkCount,Link.class), nodes.get(i-1), nodes.get(i));
+					Link linkIn = fac.createLink(Id.create("l"+(linkCount+1),Link.class), nodes.get(i), nodes.get(i-1));
+					initLink(linkOut);
+					initLink(linkIn);
+					net.addLink(linkOut);
+					net.addLink(linkIn);
+					linkCount+=2;
+				}
 			}
-			
 		}
 		
 		Double x_min=null;

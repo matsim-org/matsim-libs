@@ -18,6 +18,7 @@ public class ContextGenerator {
 			e.printStackTrace();
 		}
 		markerConfiguration = EnvironmentGenerator.generateBorderDestinations(environmentGrid);
+		EnvironmentGenerator.addTacticalDestinations(markerConfiguration, environmentGrid);
 		Context context = new Context(environmentGrid, markerConfiguration);
 		try {
 			context.saveConfiguration(path);

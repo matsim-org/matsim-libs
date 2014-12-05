@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QCALink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 
 public class LinkUtility {
 	public static void initLink(Link link, double length, Set<String> modes){
@@ -31,13 +31,13 @@ public class LinkUtility {
 	
 	public static int getTransitionAreaWidth(Node borderNode, CAEnvironment environmentCA){
 		int destinationId = IdUtility.nodeIdToDestinationId(borderNode.getId());
-		TacticalDestination tacticalDestination = (TacticalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId);
+		FinalDestination tacticalDestination = (FinalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId);
 		return (int)(tacticalDestination.getWidth()/Constants.CA_CELL_SIDE);
 	}
 	
 	public static double getTransitionLinkWidth(Link link, CAEnvironment environmentCA){
 		int destinationId = IdUtility.linkIdToDestinationId(link.getId());
-		return ((TacticalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId)).getWidth();
+		return ((FinalDestination)environmentCA.getContext().getMarkerConfiguration().getDestination(destinationId)).getWidth();
 	}
 	
 	public static int getTransitionAreaWidth(Link link, CAEnvironment env) {

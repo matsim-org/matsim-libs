@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import pedCA.context.Context;
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 import pedCA.environment.network.CANetwork;
 
 public class CAEnvironment {
@@ -58,8 +58,8 @@ public class CAEnvironment {
 		return transitionAreas;
 	}
 	
-	public TacticalDestination getDestination(int destinationId){
-		return (TacticalDestination) getContext().getMarkerConfiguration().getDestination(destinationId);
+	public FinalDestination getDestination(int destinationId){
+		return (FinalDestination) getContext().getMarkerConfiguration().getDestination(destinationId);
 	}
 
 }

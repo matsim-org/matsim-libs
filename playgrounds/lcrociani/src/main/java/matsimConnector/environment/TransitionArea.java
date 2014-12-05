@@ -7,7 +7,7 @@ import matsimConnector.utility.Constants;
 import matsimConnector.utility.MathUtility;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.PedestrianGrid;
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 import pedCA.environment.network.Coordinates;
 import pedCA.utility.Lottery;
 
@@ -16,10 +16,10 @@ public class TransitionArea extends PedestrianGrid {
 	private int rotation;
 	private GridPoint environmentRef;	//coordinates of the top cell of the transition Area in the real grid
 	private GridPoint transAreaRef;
-	private TacticalDestination destinationRef;
+	private FinalDestination destinationRef;
 	private ArrayList<GridPoint> positionsForGeneration;
 	
-	public TransitionArea(int rows, int cols, TacticalDestination destination){
+	public TransitionArea(int rows, int cols, FinalDestination destination){
 		this(rows, cols, destination.getRotation(),destination.getEnvironmentRef());
 		this.destinationRef = destination;
 	}
@@ -95,7 +95,7 @@ public class TransitionArea extends PedestrianGrid {
 			return getColumns()-1-position.getX();
 	}
 	
-	public TacticalDestination getReferenceDestination(){
+	public FinalDestination getReferenceDestination(){
 		return destinationRef;
 	}
 	

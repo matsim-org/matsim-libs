@@ -116,6 +116,8 @@ public class CAScenario {
 				break;
 			}
 		}
+		if (pivot == null)
+			return;
 				
 		Id<Node> fromId = pivot.getId();
 		Id<Node> toId = n.getId();

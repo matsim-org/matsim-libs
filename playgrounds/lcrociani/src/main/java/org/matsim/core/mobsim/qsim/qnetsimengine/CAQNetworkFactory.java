@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import pedCA.environment.markers.TacticalDestination;
+import pedCA.environment.markers.FinalDestination;
 
 public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 	
@@ -97,7 +97,7 @@ public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 		int rows = LinkUtility.getTransitionAreaWidth(borderNode, environmentCA);
 		int columns = Constants.TRANSITION_AREA_COLUMNS;
 		int destinationId = IdUtility.nodeIdToDestinationId(borderNode.getId());
-		TacticalDestination destination = environmentCA.getDestination(destinationId);
+		FinalDestination destination = environmentCA.getDestination(destinationId);
 		TransitionArea transitionArea = new TransitionArea(rows,columns,destination);
 		destination.setTransitionArea(transitionArea);
 		registerTransitionArea(borderNode, transitionArea, environmentCA);

@@ -123,20 +123,28 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	}
 
 	public void drawCAEnvironment(CAEnvironment environmentCA) {
-		drawObstacles(environmentCA.getContext().getEnvironmentGrid());
+		drawObjects(environmentCA.getContext().getEnvironmentGrid());
 		for (PedestrianGrid pedestrianGrid : environmentCA.getContext().getPedestrianGrids())
 			drawPedestrianGridBorders(pedestrianGrid);
 	}
 
-	private void drawObstacles(EnvironmentGrid environmentGrid) {
+	private void drawObjects(EnvironmentGrid environmentGrid) {
 		for (int y=0; y<environmentGrid.getRows(); y++)
 			for(int x=0; x<environmentGrid.getColumns();x++)
 				if (environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_OBSTACLE)
 					drawObstacle(new GridPoint(x,y));		
+				else if(environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_TACTICAL_DESTINATION)
+					drawTacticalDestinationCell(new GridPoint(x,y));
+	}
+
+	private void drawTacticalDestinationCell(GridPoint gridPoint) {
+		Coordinates bottomLeft = new Coordinates(gridPoint);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 0, 0, 255, 192, 0, false);
+		
 	}
 
 	private void drawObstacle(GridPoint gridPoint) {
-		Coordinates bottomLeft = new Coordinates(new GridPoint(gridPoint.getX(),gridPoint.getY()));
+		Coordinates bottomLeft = new Coordinates(gridPoint);
 		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 255, 0, 0, 192, 0, true);
 	}
 

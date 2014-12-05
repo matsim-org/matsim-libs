@@ -76,7 +76,7 @@ public class MarkerConfiguration {
         }
 		
 		for (int i = 0; i < destinations.size(); i++) {
-			if (destinations.get(i) instanceof TacticalDestination){
+			if (destinations.get(i) instanceof FinalDestination){
 				File file = new File(path+"/destinations/tacticalDestination_"+i+".ser");
 				file.createNewFile();
 	            fout = new FileOutputStream(path+"/destinations/tacticalDestination_"+i+".ser", false);
@@ -114,7 +114,7 @@ public class MarkerConfiguration {
 			}catch(IOException e){
 				streamIn = new FileInputStream(path+"/destinations/tacticalDestination_"+i+".ser");
 				ois = new ObjectInputStream(streamIn);
-				addDestination((TacticalDestination) ois.readObject());
+				addDestination((FinalDestination) ois.readObject());
 			}
 			ois.close();
         }

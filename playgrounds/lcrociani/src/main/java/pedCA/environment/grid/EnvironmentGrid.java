@@ -88,6 +88,9 @@ public class EnvironmentGrid extends Grid<Integer>{
 	public boolean belongsToExit(GridPoint cell){
 		return (cell.getY()==0 || cell.getX()==0 || cell.getY() == getRows()-1 || cell.getX() == getColumns()-1) && isWalkable(cell);
 	}
-
+	
+	public boolean belongsToTacticalDestination(GridPoint cell){
+		return getCellValue(cell) == Constants.ENV_TACTICAL_DESTINATION;
+	}
 
 }
