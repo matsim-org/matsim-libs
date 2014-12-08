@@ -82,7 +82,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		//	CONFIG:
 		final Config config = localCreateConfig();
 
-		config.setAlgorithm(Algotype.bestResponse) ;
+		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
 		config.locationchoice().setEpsilonScaleFactors("100.0") ;
 		config.locationchoice().setRandomSeed("4711") ;
 
