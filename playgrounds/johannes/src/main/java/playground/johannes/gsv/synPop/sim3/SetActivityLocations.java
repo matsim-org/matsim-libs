@@ -79,6 +79,9 @@ public class SetActivityLocations {
 		logger.info("Replacing activity types...");
 		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
 
+		logger.info("Truncating distances...");
+		ProxyTaskRunner.run(new TruncateDistances(1000000), persons);
+		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
