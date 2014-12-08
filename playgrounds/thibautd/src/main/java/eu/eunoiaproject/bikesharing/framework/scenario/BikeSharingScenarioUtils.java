@@ -139,6 +139,8 @@ public class BikeSharingScenarioUtils {
 		for (String mode : org.matsim.core.utils.collections.CollectionUtils.stringToArray(multimodalConfigGroup.getSimulatedModes())) {
 			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}
+
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory( BikeSharingConstants.MODE , new BikeSharingRouteFactory() );
 	}
 
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(

@@ -41,6 +41,16 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 	private Id<ActivityFacility> destinationStation;
 
 	public BikeSharingRoute(
+			final Id<Link> oLink,
+			final Id<Link> dLink) {
+		this( new LinkNetworkRouteImpl(
+					oLink,
+					dLink ) ,
+				null,
+				null );
+	}
+
+	public BikeSharingRoute(
 			final Facility originStation,
 			final Facility destinationStation) {
 		this( new LinkNetworkRouteImpl(
