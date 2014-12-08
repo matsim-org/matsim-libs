@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 
-public class LocationChoiceConfigGroup extends ConfigGroup {
+public class DestinationChoiceConfigGroup extends ConfigGroup {
 
 	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct }
 	public static final String GROUP_NAME = "locationchoice";
