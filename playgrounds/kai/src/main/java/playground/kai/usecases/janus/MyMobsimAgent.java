@@ -77,13 +77,11 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public void endActivityAndComputeNextState(double now) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented"); // should never be called since agent never arrives
 	}
 
 	@Override
 	public void endLegAndComputeNextState(double now) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented"); // should never be called since agent never arrives
 	}
 
@@ -98,7 +96,6 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public Double getExpectedTravelTime() {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented"); // should not be needed since agent does not teleport
 	}
 
@@ -150,13 +147,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
-		// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
-		// kai, nov'14
-		if ( this.chooseNextLinkId()==null ) {
-			return true ;
-		} else {
-			return false ;
-		}
+		return false ; // this agent never wants to arrive
 	}
 
 

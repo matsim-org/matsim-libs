@@ -62,9 +62,6 @@ public class Main {
 			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 				
-				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
-				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
-				// sure that this is appropriately delayed.
 				qsim.addAgentSource(new AgentSource(){
 					@Override
 					public void insertAgentsIntoMobsim() {
@@ -80,6 +77,7 @@ public class Main {
 						qsim.insertAgentIntoMobsim(ag) ;
 					}
 				}) ;
+
 				return qsim ;
 			}
 		}) ;
