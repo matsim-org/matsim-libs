@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import playground.benjamin.internalization.EmissionCostModule;
-import playground.juliakern.distribution.Cell;
+import playground.benjamin.scenarios.munich.exposure.Cell;
 import playground.juliakern.distribution.EmActivity;
 
 public class ResDisCalculator implements TravelDisutility{

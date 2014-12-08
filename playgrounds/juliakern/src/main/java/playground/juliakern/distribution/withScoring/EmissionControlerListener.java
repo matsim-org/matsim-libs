@@ -29,7 +29,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import playground.juliakern.distribution.GridTools;
+
+import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.juliakern.distribution.ResponsibilityEvent;
 import playground.juliakern.distribution.withScoringFast.GeneratedEmissionsHandler;
 

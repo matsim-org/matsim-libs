@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.juliakern.internalizationExposure;
+package playground.benjamin.scenarios.munich;
 
 import java.util.Map;
 
@@ -32,7 +32,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.juliakern.distribution.GridTools;
+import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
+import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.benjamin.scenarios.munich.exposure.GridTools;
+import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 
 /**
  * @author benjamin

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.internalizationExposure;
+package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.Map;
 

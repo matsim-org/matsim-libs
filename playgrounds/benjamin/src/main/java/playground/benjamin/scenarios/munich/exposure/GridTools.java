@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.distribution;
+package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.HashMap;
 import java.util.Map;

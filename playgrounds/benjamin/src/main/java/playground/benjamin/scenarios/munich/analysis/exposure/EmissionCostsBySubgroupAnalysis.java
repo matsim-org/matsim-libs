@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.exposureAnalysis;
+package playground.benjamin.scenarios.munich.analysis.exposure;
 
 import java.util.HashMap;
 import java.util.Map;

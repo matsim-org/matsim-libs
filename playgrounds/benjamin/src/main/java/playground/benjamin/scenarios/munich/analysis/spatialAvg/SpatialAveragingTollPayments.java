@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.juliakern.exposureAnalysis;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.io.IOException;
 import java.util.Map;
@@ -37,12 +37,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkPointWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkWeightUtil;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingInputData;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
-import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 
 /**

@@ -47,9 +47,9 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.CarDistanceEventHandler;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.MultiAnalyzerWriter;
 import playground.benjamin.scenarios.munich.analysis.kuhmo.TravelTimePerModeEventHandler;
+import playground.benjamin.scenarios.munich.exposure.GridTools;
+import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
-import playground.juliakern.distribution.GridTools;
-import playground.juliakern.internalizationExposure.IntervalHandler;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**

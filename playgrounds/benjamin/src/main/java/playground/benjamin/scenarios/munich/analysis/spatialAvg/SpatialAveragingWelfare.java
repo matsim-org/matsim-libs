@@ -20,6 +20,7 @@
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveraging
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingParameters;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialGrid;
+import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
@@ -99,6 +101,17 @@ public class SpatialAveragingWelfare {
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		ubc.calculateUtility_money(pop);
 		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
+//		// calculate personal / average refund
+//		MoneyEventHandler moneyEventHandler = new MoneyEventHandler();
+//		eventsManager.addHandler(moneyEventHandler);
+//		eventsReader.parse(eventsFile);
+//		// sign correct?
+//		Map<Id, Double> personId2PersonalRefund = moneyEventHandler.getPersonId2TollMap();
+//		double sumOfTollPayments = moneyEventHandler.getSumOfTollPayments();
+//		Map<Id, Double> personId2AverageRefund = calculateAvgRefund(sumOfTollPayments, pop);
+//		Map<Id, Double> personId2UtilityPersonalRefund = sumUpUtilities(personId2Utility, personId2PersonalRefund);
+//		Map<Id, Double> personId2UtilityAverageRefund = sumUpUtilities(personId2Utility, personId2AverageRefund);
+		
 		LocationFilter lf = new LocationFilter();
 		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 		logger.info("Starting to distribute welfare. This may take a while.");
@@ -114,6 +127,29 @@ public class SpatialAveragingWelfare {
 		// normalize 
 		spatialGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
 		return spatialGrid;
+	}
+
+	private Map<Id, Double> calculateAvgRefund(double sumOfTollPayments, Population pop) {
+		Map<Id, Double> personId2AvgRefund = new HashMap<Id, Double>();
+		double avgRefund = sumOfTollPayments / pop.getPersons().size();
+		for(Id personId : pop.getPersons().keySet()){
+			personId2AvgRefund.put(personId, avgRefund);
+		}
+		return personId2AvgRefund;
+	}
+
+	private Map<Id, Double> sumUpUtilities(Map<Id, Double> personId2Utility, Map<Id, Double> personId2Refund) {
+		Map<Id, Double> sumOfUtilities = new HashMap<Id, Double>();
+		for(Id personId : personId2Utility.keySet()){
+			double sumOfUtility;
+			if(personId2Refund.get(personId) != null){
+				sumOfUtility = personId2Utility.get(personId) + personId2Refund.get(personId);
+			} else {
+				sumOfUtility = personId2Utility.get(personId);
+			}
+			sumOfUtilities.put(personId, sumOfUtility);
+		}
+		return sumOfUtilities;
 	}
 
 	public static void main(String[] args) throws IOException{

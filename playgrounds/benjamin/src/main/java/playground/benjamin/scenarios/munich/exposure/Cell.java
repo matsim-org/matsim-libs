@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.juliakern.distribution;
+package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -35,7 +35,7 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
  * @author benjamin
  *
  */
-public class RunInternalizationMunich {
+public class RunEmissionInternalizationMunich {
 
 	static String configFile;
 	static String emissionCostFactor;

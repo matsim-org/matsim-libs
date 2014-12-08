@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.juliakern.distribution.Cell;
+import playground.benjamin.scenarios.munich.exposure.Cell;
 import playground.juliakern.distribution.EmActivity;
 import playground.juliakern.distribution.EmPerCell;
 import playground.juliakern.distribution.ResponsibilityEvent;

@@ -1,4 +1,4 @@
-package playground.juliakern.internalizationExposure;
+package playground.benjamin.scenarios.munich.exposure;
 
 import java.util.HashMap;
 import java.util.HashSet;

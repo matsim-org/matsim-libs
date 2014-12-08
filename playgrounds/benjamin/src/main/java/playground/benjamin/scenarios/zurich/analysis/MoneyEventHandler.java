@@ -52,6 +52,14 @@ public class MoneyEventHandler implements PersonMoneyEventHandler{
 		}	
 	}
 
+	public Double getSumOfTollPayments(){
+		double sumOfTollPayments = 0.0;
+		for(Id personId : id2Toll.keySet()){
+			sumOfTollPayments += id2Toll.get(personId);
+		}
+		return sumOfTollPayments;
+	}
+	
 	public Map<Id, Double> getPersonId2TollMap() {
 		return Collections.unmodifiableMap(id2Toll);
 	}
