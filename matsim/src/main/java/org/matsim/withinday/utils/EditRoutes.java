@@ -22,10 +22,8 @@ package org.matsim.withinday.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,6 +36,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -274,42 +273,5 @@ public class EditRoutes {
 		}
 
 		return linkIds;
-	}
-	
-	/*
-	 * Wraps a Link into a Facility.
-	 */
-	private static class LinkWrapperFacility implements Facility<ActivityFacility> {
-		
-		private final Link wrapped;
-
-		public LinkWrapperFacility(final Link toWrap) {
-			wrapped = toWrap;
-		}
-
-		@Override
-		public Coord getCoord() {
-			return wrapped.getCoord();
-		}
-
-		@Override
-		public Id<ActivityFacility> getId() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<String, Object> getCustomAttributes() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Id<Link> getLinkId() {
-			return wrapped.getId();
-		}
-
-		@Override
-		public String toString() {
-			return "[LinkWrapperFacility: wrapped="+wrapped+"]";
-		}
 	}
 }
