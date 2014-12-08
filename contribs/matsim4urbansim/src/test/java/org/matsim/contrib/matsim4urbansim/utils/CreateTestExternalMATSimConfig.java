@@ -32,7 +32,7 @@ import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModul
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -148,10 +148,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		// !! note that the modules are deliberately anonymous (i.e. not typed) since we test the effect of incomplete entries !!
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		ConfigGroup matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
 
-		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
+		ConfigGroup ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS, this.usePtStops);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES, this.ptTravelTimes);
@@ -178,32 +178,32 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST_POWER2, this.betaPtTravelCostPower2+ "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_MONETARY_COST, this.betaPtLnTravelCost + "");
 		
-		Module acm = config.createModule( AccessibilityConfigGroup.GROUP_NAME ) ;
+		ConfigGroup acm = config.createModule( AccessibilityConfigGroup.GROUP_NAME ) ;
 		acm.addParam(AccessibilityConfigGroup.TIME_OF_DAY, this.timeOfDay + "");
 		
 		
 		// changeLegMode module
-		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
+		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
 		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
 		
 		// strategy module
-		Module strategyModule = config.createModule(strategyModuleName);
+		ConfigGroup strategyModule = config.createModule(strategyModuleName);
 		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
 		strategyModule.addParam(startegyModule4ParamName, PlanStrategyRegistrar.Names.ChangeLegMode.toString() );
 		
 		// generating already existing MATSim4UrbanSim entries in external MATsim config
 		
 		// network module
-		Module networkModule = config.createModule(NetworkConfigGroup.GROUP_NAME);
+		ConfigGroup networkModule = config.createModule(NetworkConfigGroup.GROUP_NAME);
 		networkModule.addParam(networkParamName, networkInputFileName);
 		
 		// controler module 
-		Module contolerModule = config.createModule(ControlerConfigGroup.GROUP_NAME);
+		ConfigGroup contolerModule = config.createModule(ControlerConfigGroup.GROUP_NAME);
 		contolerModule.addParam(controlerFirstIterationPramName, firstIteration.toString());
 		contolerModule.addParam(controlerLastIterationPramName, lastIteration.toString());
 		
 		// plan calc score module 
-		Module planCalcScoreModule = config.createModule(PlanCalcScoreConfigGroup.GROUP_NAME);
+		ConfigGroup planCalcScoreModule = config.createModule(PlanCalcScoreConfigGroup.GROUP_NAME);
 		planCalcScoreModule.addParam(activityType0ParamName, activityType_0);
 		planCalcScoreModule.addParam(activityTypicalDuration0ParamName, activityTypicalDuration0Value);
 		planCalcScoreModule.addParam(activityType1ParamName, activityType_1);
@@ -212,11 +212,11 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		planCalcScoreModule.addParam(activityLatestStartTime1ParamName, activityLatestStartTime1Value);
 		
 		// plans module
-		Module plansModule = config.createModule(PlansConfigGroup.GROUP_NAME);
+		ConfigGroup plansModule = config.createModule(PlansConfigGroup.GROUP_NAME);
 		plansModule.addParam(plansPramName, inputPlansFileName);
 		
 		// qsim module
-		Module qsimModule = config.createModule(QSimConfigGroup.GROUP_NAME);
+		ConfigGroup qsimModule = config.createModule(QSimConfigGroup.GROUP_NAME);
 		qsimModule.addParam(qsimNumberOfThreadsPramName, qsimNumberOfThreadsValue + "");
 		qsimModule.addParam(flowCapacityFactorParamName, flowCapacityFactorValue + "");
 		qsimModule.addParam(storageCapacityFactorParamName, storageCapacityFactorValue + "");
@@ -224,7 +224,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		qsimModule.addParam(endTimeParamName, endTimeValue);
 		
 		// plan calc route module
-		Module planCalcRouteModule = config.createModule(PlansCalcRouteConfigGroup.GROUP_NAME);
+		ConfigGroup planCalcRouteModule = config.createModule(PlansCalcRouteConfigGroup.GROUP_NAME);
 		planCalcRouteModule.addParam(beelineDistanceFactorParamName, beelineDistanceFactorValue + "");
 		planCalcRouteModule.addParam(teleportedModeSpeedWalkParamName, teleportedModeSpeedWalkValue + "");
 		planCalcRouteModule.addParam(teleportedModeSpeedBikeParamName, teleportedModeSpeedBikeValue + "");
@@ -244,13 +244,13 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		
 
 		// improved pseudo pt:
-		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
+		ConfigGroup ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.USING_PT_STOPS, "tRue" );
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
 		// changeLegMode module
-		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
+		ConfigGroup changeLegModeModule = config.createModule(changeLegModeModuleName);
 		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);
 		
 //		// strategy module
@@ -284,7 +284,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	
 	
 	public AccessibilityConfigGroup getAccessibilityParameterConfig(Config config) {
-		Module m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);
+		ConfigGroup m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);
 		if (m instanceof AccessibilityConfigGroup) {
 			return (AccessibilityConfigGroup) m;
 		}
@@ -294,7 +294,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	}
 	
 	public M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
-		Module m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
@@ -304,7 +304,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 	}
 	
 	public UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig(Config config) {
-		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}

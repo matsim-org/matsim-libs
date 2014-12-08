@@ -92,17 +92,17 @@ public class MyBasicConfig {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		//---------------------------------------------------------------------
 		StrategySettings s1 = new StrategySettings(Id.create("1", StrategySettings.class));
-		s1.setModuleName("SelectExpBeta");
+		s1.setStrategyName("SelectExpBeta");
 		s1.setProbability(0.80);
 		config.strategy().addStrategySettings(s1);
 		//---------------------------------------------------------------------
 		StrategySettings s2 = new StrategySettings(Id.create("2", StrategySettings.class));
-		s2.setModuleName("ReRoute");
+		s2.setStrategyName("ReRoute");
 		s2.setProbability(0.10);
 		config.strategy().addStrategySettings(s2);
 		//---------------------------------------------------------------------
 		StrategySettings s3 = new StrategySettings(Id.create("3", StrategySettings.class));
-		s3.setModuleName("TimeAllocationMutator");
+		s3.setStrategyName("TimeAllocationMutator");
 		s3.setProbability(0.10);
 		config.strategy().addStrategySettings(s3);
 		//---------------------------------------------------------------------

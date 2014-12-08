@@ -22,9 +22,9 @@
 
 package playground.mzilske.clones;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class ClonesConfigGroup extends ReflectiveModule {
+public class ClonesConfigGroup extends ReflectiveConfigGroup {
 
     public static final String NAME = "clones";
 

@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule.InconsistentModuleException;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.InconsistentModuleException;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -65,7 +65,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingOrphanSetter() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "setterWithoutGetter" )
 				public void setStuff(String s) {}
 			};
@@ -80,7 +80,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingOrphanGetter() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringGetter( "getterWithoutSetter" )
 				public Coord getStuff() { return null;}
 			};
@@ -95,7 +95,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingInvalidSetter() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				// no arg: no good
 				@StringSetter( "field" )
 				public Object setStuff() { return null;}
@@ -111,7 +111,7 @@ public class ReflectiveModuleTest {
 		}
 
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				// bad arg type: no good
 				@StringSetter( "field" )
 				public Object setStuff(Coord stuff) { return null;}
@@ -130,7 +130,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingInvalidGetter() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "field" )
 				public Object setStuff(String s) { return null;}
 
@@ -146,7 +146,7 @@ public class ReflectiveModuleTest {
 		}
 
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "field" )
 				public Object setStuff(String stuff) { return null;}
 
@@ -165,7 +165,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingSeveralGetters() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "field" )
 				public void setStuff(String s) {}
 
@@ -186,7 +186,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testFailOnConstructingSeveralSetters() {
 		try {
-			new ReflectiveModule( "name" ) {
+			new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "field" )
 				public void setStuff(String s) {}
 
@@ -206,8 +206,8 @@ public class ReflectiveModuleTest {
 
 	@Test
 	public void testBehaviorWhenAcceptingUnknownParameters() {
-		final Module testee =
-			new ReflectiveModule( "name" , true ) {
+		final ConfigGroup testee =
+			new ReflectiveConfigGroup( "name" , true ) {
 				@StringSetter( "field" )
 				public void setStuff(String s) {}
 
@@ -226,8 +226,8 @@ public class ReflectiveModuleTest {
 
 	@Test
 	public void testBehaviorWhenRejectingUnknownParameters() {
-		final Module testee =
-			new ReflectiveModule( "name" , false ) {
+		final ConfigGroup testee =
+			new ReflectiveConfigGroup( "name" , false ) {
 				@StringSetter( "field" )
 				public void setStuff(String s) {}
 
@@ -264,7 +264,7 @@ public class ReflectiveModuleTest {
 	@Test
 	public void testExceptionRedirection() {
 		final RuntimeException thrown = new RuntimeException();
-		final Module m = new ReflectiveModule( "name" ) {
+		final ConfigGroup m = new ReflectiveConfigGroup( "name" ) {
 				@StringSetter( "field" )
 				public void setStuff(String s) {
 					throw thrown;

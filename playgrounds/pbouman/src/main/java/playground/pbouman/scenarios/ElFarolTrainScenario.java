@@ -306,11 +306,11 @@ public class ElFarolTrainScenario
 		
 		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class));
 		//stratSets.setModuleName("BestScore");
-		stratSets.setModuleName("SelectExpBeta");
+		stratSets.setStrategyName("SelectExpBeta");
 		stratSets.setProbability(0.8);
 		config.strategy().addStrategySettings(stratSets);
 		stratSets = new StrategySettings(Id.create("2", StrategySettings.class));
-		stratSets.setModuleName("TransitTimeAllocationMutator");
+		stratSets.setStrategyName("TransitTimeAllocationMutator");
 		stratSets.setProbability(0.2);
 		config.strategy().addStrategySettings(stratSets);
 		//stratSets = new StrategySettings(Id.create("3"));

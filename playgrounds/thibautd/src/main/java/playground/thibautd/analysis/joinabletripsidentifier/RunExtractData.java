@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,7 +52,7 @@ public class RunExtractData {
 		ScenarioUtils.loadScenario(scenario);
 		Network network = scenario.getNetwork();
 
-		Module module = config.getModule(MODULE);
+		ConfigGroup module = config.getModule(MODULE);
 		String eventFile = module.getValue(EVENTS);
 		String outputDir = module.getValue(DIR);
 

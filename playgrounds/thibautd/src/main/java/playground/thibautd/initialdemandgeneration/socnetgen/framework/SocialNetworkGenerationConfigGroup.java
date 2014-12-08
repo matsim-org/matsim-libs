@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * Allows to specify parameters useful for any use case
  * @author thibautd
  */
-public class SocialNetworkGenerationConfigGroup extends ReflectiveModule {
+public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "socialNetworkGeneration";
 
 	private String inputPopulationFile = null;

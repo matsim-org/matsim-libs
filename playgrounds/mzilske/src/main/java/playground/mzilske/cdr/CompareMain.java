@@ -207,7 +207,7 @@ public class CompareMain {
 		tmp.setRemoveStuckVehicles(false);
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 

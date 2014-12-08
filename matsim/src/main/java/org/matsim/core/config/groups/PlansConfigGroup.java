@@ -23,12 +23,12 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveModule;
-import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 
-public class PlansConfigGroup extends ReflectiveModule {
+public class PlansConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "plans";
 

@@ -80,7 +80,7 @@ public class CadytsIntegration_launcher {
 		//strategies settings
 		{ //cadyts
 		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
-		stratSets.setModuleName("myCadyts");
+		stratSets.setStrategyName("myCadyts");
 		stratSets.setProbability(1.0);
 		config.strategy().addStrategySettings(stratSets);
 		}

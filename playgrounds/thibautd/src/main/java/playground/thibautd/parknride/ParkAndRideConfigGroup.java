@@ -20,13 +20,13 @@
 package playground.thibautd.parknride;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
 /**
  * @author thibautd
  */
-public class ParkAndRideConfigGroup extends ReflectiveModule {
+public class ParkAndRideConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "parkAndRide";
 
 	private String facilities = null;

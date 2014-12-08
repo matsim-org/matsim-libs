@@ -20,12 +20,12 @@
 
 package org.matsim.contrib.multimodal.config;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MultiModalConfigGroup extends Module {
+public class MultiModalConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "multimodal";
 	

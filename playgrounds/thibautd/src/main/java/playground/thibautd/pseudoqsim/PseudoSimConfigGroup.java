@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.pseudoqsim;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class PseudoSimConfigGroup extends ReflectiveModule {
+public class PseudoSimConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "pseudoSim";
 
 	public static enum PSimType { detailled , teleported; }

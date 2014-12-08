@@ -134,7 +134,7 @@ public class PtRate2 implements IterationEndsListener, ShutdownListener {
 				}
 				StringBuffer sb = new StringBuffer();
 				for (StrategySettings ss : cf.strategy().getStrategySettings()) {
-					sb.append(ss.getModuleName());
+					sb.append(ss.getStrategyName());
 					sb.append('-');
 					sb.append(ss.getProbability());
 					sb.append(',');

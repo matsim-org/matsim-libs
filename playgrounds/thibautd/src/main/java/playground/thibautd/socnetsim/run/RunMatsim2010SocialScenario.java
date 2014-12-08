@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
@@ -163,7 +163,7 @@ public class RunMatsim2010SocialScenario {
 		return config;
 	}
 
-	private static class SocialDilutionConfigGroup extends ReflectiveModule {
+	private static class SocialDilutionConfigGroup extends ReflectiveConfigGroup {
 		public static final String GROUP_NAME = "socialDilution";
 
 		// this is the most efficient (it removes the most agents)

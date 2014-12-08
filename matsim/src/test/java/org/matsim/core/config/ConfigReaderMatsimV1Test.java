@@ -61,7 +61,7 @@ public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	/*default*/ static class TestModule extends Module {
+	/*default*/ static class TestModule extends ConfigGroup {
 
 		/*default*/ boolean param1set = false;
 		/*default*/ boolean param2set = false;

@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * Demonstate how to easily create a config group for a specific purpose.
- * Look at the documentation of {@link ReflectiveModule} for details.
+ * Look at the documentation of {@link ReflectiveConfigGroup} for details.
  * Implementing specific config groups allow to vary the parameters of a simulation easily,
  * but just changing parameters in the xml file, rather than in a script.
  * <br>
@@ -31,7 +31,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * in the output directory (in the ouput config file), which may come in handy for analysis.
  * @author thibautd
  */
-public class RandomRelocatorConfigGroup extends ReflectiveModule {
+public class RandomRelocatorConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "randomBikeRelocator";
 
 	// if nothing specified in the config, this will be the default

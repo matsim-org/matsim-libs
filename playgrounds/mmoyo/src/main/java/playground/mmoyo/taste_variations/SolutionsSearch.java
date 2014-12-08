@@ -93,7 +93,7 @@ public class SolutionsSearch {
 		////////  Randomized router ///
 		{//////  set randomized router strategy/////////// 
 		StrategySettings stratSets = new StrategySettings(Id.create(++lastStrategyIdx, StrategySettings.class));
-		stratSets.setModuleName("ReRoute");
+		stratSets.setStrategyName("ReRoute");
 		stratSets.setProbability(1.0);
 		stratSets.setDisableAfter(20);
 		config.strategy().addStrategySettings(stratSets);
@@ -109,7 +109,7 @@ public class SolutionsSearch {
 		
 		{//////  Cadyts as plan selector//////////////// 
 		StrategySettings stratSets2 = new StrategySettings(Id.create(++lastStrategyIdx, StrategySettings.class));
-		stratSets2.setModuleName("myCadyts");
+		stratSets2.setStrategyName("myCadyts");
 		stratSets2.setProbability(1.0);
 		config.strategy().addStrategySettings(stratSets2);
 		}

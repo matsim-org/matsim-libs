@@ -38,7 +38,7 @@ import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -79,7 +79,7 @@ public class CadytsIntegrationTest {
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
@@ -127,7 +127,7 @@ public class CadytsIntegrationTest {
 
 		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class)) ;
 		//		stratSets.setModuleName("ChangeExpBeta") ;
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
@@ -290,7 +290,7 @@ public class CadytsIntegrationTest {
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
@@ -437,7 +437,7 @@ public class CadytsIntegrationTest {
 		config.ptCounts().setPtCountsInterval(1) ;
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
@@ -625,7 +625,7 @@ public class CadytsIntegrationTest {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---
-		Module cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
 
 		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;

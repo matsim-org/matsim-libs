@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
 import playground.singapore.typesPopulation.population.PersonImplPops;
@@ -38,7 +38,7 @@ import playground.singapore.typesPopulation.population.PersonImplPops;
  *
  * @author mrieser
  */
-public class StrategyPopsConfigGroup extends Module {
+public class StrategyPopsConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "strategy";
 	private static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";

@@ -19,13 +19,13 @@
 
 package playground.andreas.aas.modules.cellBasedAccessibility.config;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
 public class ConfigurationModule {
 	
 	public static AccessibilityParameterConfigModule getAccessibilityParameterConfigModule(ScenarioImpl scenario){
-		Module m = scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
 		if (m instanceof AccessibilityParameterConfigModule) {
 			return (AccessibilityParameterConfigModule) m;
 		}
@@ -33,7 +33,7 @@ public class ConfigurationModule {
 	}
 
 	public static MATSim4UrbanSimControlerConfigModule getMATSim4UrbaSimControlerConfigModule(ScenarioImpl scenario){
-		Module m = scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModule.GROUP_NAME);
 		if (m instanceof MATSim4UrbanSimControlerConfigModule) {
 			return (MATSim4UrbanSimControlerConfigModule) m;
 		}
@@ -41,7 +41,7 @@ public class ConfigurationModule {
 	}
 	
 	public static UrbanSimParameterConfigModule getUrbanSimParameterConfigModule(ScenarioImpl scenario){
-		Module m = scenario.getConfig().getModule(UrbanSimParameterConfigModule.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(UrbanSimParameterConfigModule.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModule) {
 			return (UrbanSimParameterConfigModule) m;
 		}

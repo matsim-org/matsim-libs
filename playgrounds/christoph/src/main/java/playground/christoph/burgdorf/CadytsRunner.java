@@ -41,7 +41,7 @@ public class CadytsRunner {
 		controler.addControlerListener(cContext);
 		
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-		stratSets.setModuleName("ccc") ;
+		stratSets.setStrategyName("ccc") ;
 		stratSets.setProbability(1.0) ;
 		controler.getConfig().strategy().addStrategySettings(stratSets);
 		

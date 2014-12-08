@@ -24,14 +24,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 
 /**
  * @author dgrether
  *
  */
-public class TravelTimeCalculatorConfigGroup extends Module {
+public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 	

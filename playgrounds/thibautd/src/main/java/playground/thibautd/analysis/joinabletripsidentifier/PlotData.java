@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.collections.Tuple;
@@ -77,7 +77,7 @@ public class PlotData {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
-		Module module = config.getModule(MODULE);
+		ConfigGroup module = config.getModule(MODULE);
 		String outputDir = module.getValue(DIR);
 		String xmlFile = module.getValue(XML_FILE);
 

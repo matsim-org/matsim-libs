@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Provides access to planomat config parameters.
@@ -32,7 +32,7 @@ import org.matsim.core.config.Module;
  * @author meisterk
  *
  */
-public class PlanomatConfigGroup extends Module {
+public class PlanomatConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "planomat";
 

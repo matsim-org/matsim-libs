@@ -22,13 +22,13 @@ package playground.thibautd.socnetsim.cliques.config;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * A config group for the joint trips mutator.
  * @author thibautd
  */
-public class JointTripsMutatorConfigGroup extends Module {
+public class JointTripsMutatorConfigGroup extends ConfigGroup {
 	private static final Logger log =
 		Logger.getLogger(JointTripsMutatorConfigGroup.class);
 

@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -191,7 +191,7 @@ public class BenchmarkV2 {
 		c.global().setNumberOfThreads(nOfTheadsReplanning);
 
 		if (nOfThreadsEvents > 0) {
-			Module m = new Module("parallelEventHandling");
+			ConfigGroup m = new ConfigGroup("parallelEventHandling");
 			m.addParam("numberOfThreads", Integer.toString(nOfThreadsEvents));
 			c.addModule(m);
 		}

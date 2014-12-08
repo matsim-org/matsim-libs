@@ -109,14 +109,14 @@ public class CadytsRandomTrips {
 
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-            stratSets.setModuleName("SelectExpBeta");
+            stratSets.setStrategyName("SelectExpBeta");
 
             stratSets.setProbability(1.0);
             config.strategy().addStrategySettings(stratSets);
         }
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-            stratSets.setModuleName("NewRandomTrip");
+            stratSets.setStrategyName("NewRandomTrip");
             stratSets.setProbability(0.1);
 //            stratSets.setDisableAfter(25);
             config.strategy().addStrategySettings(stratSets);

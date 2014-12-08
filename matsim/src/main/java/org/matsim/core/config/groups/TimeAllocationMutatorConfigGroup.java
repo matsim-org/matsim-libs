@@ -22,9 +22,9 @@ package org.matsim.core.config.groups;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class TimeAllocationMutatorConfigGroup extends ReflectiveModule {
+public class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "TimeAllocationMutator";
 	

@@ -22,7 +22,7 @@
  *     &lt;param name="my-value3" value="foo-bar" />
  *   &lt;/module>
  * </pre>
- * These settings are then stored in an instance of {@link org.matsim.core.config.Module}, which just stores
+ * These settings are then stored in an instance of {@link org.matsim.core.config.ConfigGroup}, which just stores
  * all the parameters in a map. You could access such parameters with:
  * <pre>
  * Config config;
@@ -34,27 +34,27 @@
  * can be very inefficient. In such cases, it may be of advantage to offer a custom config-group to store
  * the parameters with their native types.<br>
  * 
- * To write a custom config-group, extend {@link org.matsim.core.config.Module}. This allows you to convert
+ * To write a custom config-group, extend {@link org.matsim.core.config.ConfigGroup}. This allows you to convert
  * the parsed values from the configuration file only once and then store the parameters in their native
  * type. Just provide the corresponding getters and setters for your parameters, and overwrite the following
  * methods:
  * <ul>
- * <li>{@link org.matsim.core.config.Module#addParam(String, String)} to store the values read from a 
+ * <li>{@link org.matsim.core.config.ConfigGroup#addParam(String, String)} to store the values read from a 
  * 		configuration file.</li>
- * <li>{@link org.matsim.core.config.Module#getParams()} to return a map containing all the parameter names and 
+ * <li>{@link org.matsim.core.config.ConfigGroup#getParams()} to return a map containing all the parameter names and 
  * 		their values to be stored in a configuration file.</li>
- * <li>{@link org.matsim.core.config.Module#getValue(String)} should be implemented as well for compatibility
+ * <li>{@link org.matsim.core.config.ConfigGroup#getValue(String)} should be implemented as well for compatibility
  * 		reasons. You can implement it with an <code>UnsupportedOperationException</code> if you are sure that
  *    you will never call this method.</li>
- * <li>{@link org.matsim.core.config.Module#getName()} should return the name of your config-group, as it
+ * <li>{@link org.matsim.core.config.ConfigGroup#getName()} should return the name of your config-group, as it
  *    appears in the configuration file.</li>
- * <li>Optionally: {@link org.matsim.core.config.Module#checkConsistency()} to check that all the settings make
+ * <li>Optionally: {@link org.matsim.core.config.ConfigGroup#checkConsistency()} to check that all the settings make
  *    some sense together after being read from a file.</li> 
  * </ul> 
  * The custom config-group must be 
- * {@linkplain org.matsim.core.config.Config#addModule(Module) added} to the 
+ * {@linkplain org.matsim.core.config.Config#addModule(ConfigGroup) added} to the 
  * {@link org.matsim.core.config.Config}-object before the configuration is read from file, because
- * otherwise a generic {@link org.matsim.core.config.Module} will be created for these settings. The 
+ * otherwise a generic {@link org.matsim.core.config.ConfigGroup} will be created for these settings. The 
  * {@linkplain org.matsim.core.controler controler-documenation} has an example of how to use custom
  * config-groups with additional functionality provided by 
  * {@link org.matsim.core.controler.listener.ControlerListener}s in the "Best Practices" section.

@@ -45,7 +45,7 @@ public class Config {
 	// ////////////////////////////////////////////////////////////////////
 
 	/** Map of all config-groups known to this instance. */
-	private final TreeMap<String, Module> modules = new TreeMap<String, Module>();
+	private final TreeMap<String, ConfigGroup> modules = new TreeMap<String, ConfigGroup>();
 
 	/*
 	 * the following members are for the direct access to the core config
@@ -177,7 +177,7 @@ public class Config {
 	 * currently set make sense in their combination.
 	 */
 	public void checkConsistency() {
-		for (Module m : this.modules.values()) {
+		for (ConfigGroup m : this.modules.values()) {
 			m.checkConsistency();
 		}
 		for (ConfigConsistencyChecker c : this.consistencyCheckers) {
@@ -206,11 +206,11 @@ public class Config {
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final Module createModule(final String name) {
+	public final ConfigGroup createModule(final String name) {
 		if (this.modules.containsKey(name)) {
 			throw new IllegalArgumentException("Module " + name + " exists already.");
 		}
-		Module m = new Module(name);
+		ConfigGroup m = new ConfigGroup(name);
 		this.modules.put(name, m);
 		return m;
 	}
@@ -225,7 +225,7 @@ public class Config {
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final void addModule(final Module specializedConfigModule) {
+	public final void addModule(final ConfigGroup specializedConfigModule) {
 		String name = specializedConfigModule.getName();
 		if (name == null || name.isEmpty()) {
 			throw new RuntimeException("cannot insert module with empty name") ;
@@ -234,11 +234,11 @@ public class Config {
 		// (1) assume that module is some SpecializedConfigModule that extends Module
 
 		// (2) it is presumably found here from parsing, but as a general Module:
-		Module m = this.modules.get(name);
+		ConfigGroup m = this.modules.get(name);
 
 		if (m != null) {
 			// (3) this is the corresponding test: m is general, module is specialized:
-			if (m.getClass() == Module.class && specializedConfigModule.getClass() != Module.class) {
+			if (m.getClass() == ConfigGroup.class && specializedConfigModule.getClass() != ConfigGroup.class) {
 
 				// (4) go through everything in m (from parsing) and add it to module:
 				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
@@ -274,7 +274,7 @@ public class Config {
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 
-	public final TreeMap<String, Module> getModules() {
+	public final TreeMap<String, ConfigGroup> getModules() {
 		return this.modules;
 	}
 
@@ -286,7 +286,7 @@ public class Config {
 	 *            name of the requested module
 	 * @return requested module
 	 */
-	public final Module getModule(final String moduleName) {
+	public final ConfigGroup getModule(final String moduleName) {
 		return this.modules.get(moduleName);
 	}
 
@@ -303,7 +303,7 @@ public class Config {
 	 * @see #findParam(String, String)
 	 */
 	public final String getParam(final String moduleName, final String paramName) {
-		Module m = this.modules.get(moduleName);
+		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
 			log.error("Module \"" + moduleName + "\" is not known.");
 			throw new IllegalArgumentException("Module \"" + moduleName + "\" is not known.");
@@ -330,7 +330,7 @@ public class Config {
 	 * @see #getParam(String, String)
 	 */
 	public final String findParam(final String moduleName, final String paramName) {
-		Module m = this.modules.get(moduleName);
+		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
 			return null;
 		}
@@ -368,7 +368,7 @@ public class Config {
 	 */
 	public final void setParam(final String moduleName, final String paramName, final String value) {
 		checkIfLocked();
-		Module m = this.modules.get(moduleName);
+		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
 			m = createModule(moduleName);
 			log.info("module \"" + moduleName + "\" added.");

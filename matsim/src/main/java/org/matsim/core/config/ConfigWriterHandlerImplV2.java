@@ -48,7 +48,7 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			final String moduleTag,
 			final String moduleNameAtt,
 			final String moduleName,
-			final Module module) {
+			final ConfigGroup module) {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
 
@@ -79,8 +79,8 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 				writer.write( this.newline );
 			}
 
-			for ( Entry<String, ? extends Collection<? extends Module>> entry : module.getParameterSets().entrySet() ) {
-				for ( Module pSet : entry.getValue() ) {
+			for ( Entry<String, ? extends Collection<? extends ConfigGroup>> entry : module.getParameterSets().entrySet() ) {
+				for ( ConfigGroup pSet : entry.getValue() ) {
 					// TODO: write comments only for the first parameter set of a given type?
 					writeModule(
 							writer,
@@ -128,7 +128,7 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 	@Override
 	public void writeModule(
-			final Module module,
+			final ConfigGroup module,
 			final BufferedWriter out) {
 		writeModule(
 				out,

@@ -22,7 +22,7 @@ package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-public class QSimConfigGroup extends ReflectiveModule implements MobsimConfigGroupI {
+public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
 
     public static enum LinkDynamics { FIFO, PassingQ }
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;

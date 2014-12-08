@@ -29,7 +29,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * Demonstrate how to use ReflectiveModule to easily create typed config groups.
  * Please do not modify this class: it is used from unit tests!
  */
-public class MyModule extends ReflectiveModule {
+public class MyModule extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "testModule";
 
 	// TODO: test for ALL primitive types

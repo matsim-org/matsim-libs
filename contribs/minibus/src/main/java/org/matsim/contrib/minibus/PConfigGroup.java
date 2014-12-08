@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
@@ -36,7 +36,7 @@ import org.matsim.vehicles.VehicleType.DoorOperationMode;
  * @author aneumann
  *
  */
-public final class PConfigGroup extends Module{
+public final class PConfigGroup extends ConfigGroup{
 	
 	/**
 	 * TODO [AN] This one has to be checked

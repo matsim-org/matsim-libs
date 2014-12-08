@@ -20,14 +20,14 @@
 
 package playground.ivt.kticompatibility;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * information necesary to a Kti scenario, which cannot be added
  * to the standard config
  * @author thibautd
  */
-public class KtiPtConfigGroup extends ReflectiveModule {
+public class KtiPtConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ktiPtConfigGroup";
 
 	private String worldFile = null;

@@ -24,9 +24,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class MeisterkConfigGroup extends Module {
+public class MeisterkConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "meisterk";
 

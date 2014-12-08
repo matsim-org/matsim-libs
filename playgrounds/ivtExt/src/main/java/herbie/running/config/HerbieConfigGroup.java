@@ -21,9 +21,9 @@
 package herbie.running.config;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class HerbieConfigGroup extends Module {
+public class HerbieConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "herbie";
 

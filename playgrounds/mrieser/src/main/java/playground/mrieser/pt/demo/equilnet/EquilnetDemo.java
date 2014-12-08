@@ -23,7 +23,7 @@ package playground.mrieser.pt.demo.equilnet;
 import java.util.EnumSet;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -72,10 +72,10 @@ public class EquilnetDemo {
 		config.strategy().addParam("ModuleProbability_4", "0.1");
 		config.strategy().addParam("Module_4", "SelectExpBeta");
 
-		Module changeLegModeModule = config.createModule("changeLegMode");
+		ConfigGroup changeLegModeModule = config.createModule("changeLegMode");
 		changeLegModeModule.addParam("modes", "car,pt");
 
-		Module transitModule = config.createModule("transit");
+		ConfigGroup transitModule = config.createModule("transit");
 		transitModule.addParam("transitScheduleFile", "src/playground/marcel/pt/demo/equilnet/transitSchedule.xml");
 		transitModule.addParam("vehiclesFile", "src/playground/marcel/pt/demo/equilnet/vehicles.xml");
 		transitModule.addParam("transitModes", "pt");

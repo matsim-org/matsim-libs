@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,7 +66,7 @@ public class TXTInputCreator {
 		scenario.getConfig().getModule("controler").addParam("lastIteration", "1");
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true) ;
-		TreeMap<String, Module> a = controler.getConfig().getModules();
+		TreeMap<String, ConfigGroup> a = controler.getConfig().getModules();
 		PlansCalcRouteConfigGroup pcrcg = (PlansCalcRouteConfigGroup) controler.getConfig().getModules().get("planscalcroute");
 		//pcrcg.getTeleportedModeSpeeds().put(MZConstants.MOFA, 1.0);
 		//pcrcg.getTeleportedModeSpeeds().put(MZConstants.TRAIN, 1.0);

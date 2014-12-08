@@ -2,7 +2,7 @@ package playground.acmarmol.Avignon.controler;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.run.Controler;
 
@@ -20,7 +20,7 @@ public class AvignonControler {
 		
 		Scenario sc = controler.getScenario() ;
 		Config cf = sc.getConfig() ;
-		Module aa = cf.getModule("planscalcroute");
+		ConfigGroup aa = cf.getModule("planscalcroute");
 		System.out.println(aa.getParams().toString());
 		
 		controler.setOverwriteFiles(true) ;

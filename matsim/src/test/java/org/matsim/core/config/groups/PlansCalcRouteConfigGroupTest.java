@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -149,8 +149,8 @@ public class PlansCalcRouteConfigGroupTest {
 				inputConfigGroup.getTeleportedModeSpeeds() );
 	}
 
-	private Module toUnderscoredModule(final PlansCalcRouteConfigGroup initialGroup) {
-		final Module module = new Module( initialGroup.getName() );
+	private ConfigGroup toUnderscoredModule(final PlansCalcRouteConfigGroup initialGroup) {
+		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
 			log.info( "add param "+e.getKey() );

@@ -21,7 +21,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
 interface ConfigKey {}
@@ -31,7 +31,7 @@ interface ConfigKey {}
  * @author dgrether
  * @author nagel
  */
-public class VspExperimentalConfigGroup extends ReflectiveModule {
+public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);

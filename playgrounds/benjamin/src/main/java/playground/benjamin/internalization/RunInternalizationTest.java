@@ -163,11 +163,11 @@ public class RunInternalizationTest {
 		
 		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
 //		changePlan.setModuleName("BestScore");
-		changePlan.setModuleName("ChangeExpBeta");
+		changePlan.setStrategyName("ChangeExpBeta");
 		changePlan.setProbability(0.7);
 		
 		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.3);
 		
 		scg.addStrategySettings(changePlan);

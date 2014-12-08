@@ -26,8 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import java.util.*;
@@ -41,7 +41,7 @@ import java.util.Map.Entry;
  * @author dgrether
  * @author mrieser
  */
-public class PlansCalcRouteConfigGroup extends Module {
+public class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 
 	public static final String GROUP_NAME = "planscalcroute";
@@ -66,7 +66,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	private boolean acceptModeParamsWithoutClearing = false;
 
-	public static class ModeRoutingParams extends ReflectiveModule implements MatsimParameters {
+	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 
 		private String mode = null;
@@ -188,7 +188,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	@Override
-	public Module createParameterSet( final String type ) {
+	public ConfigGroup createParameterSet( final String type ) {
 		switch ( type ) {
 			case ModeRoutingParams.SET_TYPE:
 				return new ModeRoutingParams();
@@ -198,7 +198,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	@Override
-	protected void checkParameterSet( final Module module ) {
+	protected void checkParameterSet( final ConfigGroup module ) {
 		switch ( module.getName() ) {
 			case ModeRoutingParams.SET_TYPE:
 				if ( !(module instanceof ModeRoutingParams) ) {
@@ -211,7 +211,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	@Override
-	public void addParameterSet(final Module set) {
+	public void addParameterSet(final ConfigGroup set) {
 		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
@@ -226,7 +226,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 	public Map<String, ModeRoutingParams> getModeRoutingParams() {
 		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
 
-		for ( Module pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
 			final String mode = ((ModeRoutingParams) pars).getMode();
 			final ModeRoutingParams old =
 				map.put( mode ,

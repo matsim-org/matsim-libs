@@ -19,9 +19,9 @@
 
 package playground.andreas.aas.modules.cellBasedAccessibility.config;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class AccessibilityParameterConfigModule extends Module{
+public class AccessibilityParameterConfigModule extends ConfigGroup{
 
 	public static final String GROUP_NAME = "accessibilityParameter";
 	

@@ -21,9 +21,9 @@ package org.matsim.pt.config;
 
 import java.util.Map;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class TransitRouterConfigGroup extends Module {
+public class TransitRouterConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "transitRouter";
 

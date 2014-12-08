@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
@@ -179,9 +179,9 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			dummyGroup.addParam( e.getKey() , e.getValue() );
 		}
 
-		for ( Collection<? extends Module> sets : config.getParameterSets().values() ) {
-			for ( Module set : sets ) {
-				final Module dummySet = dummyGroup.createParameterSet( set.getName() );
+		for ( Collection<? extends ConfigGroup> sets : config.getParameterSets().values() ) {
+			for ( ConfigGroup set : sets ) {
+				final ConfigGroup dummySet = dummyGroup.createParameterSet( set.getName() );
 
 				for ( Map.Entry<String, String> e : set.getParams().entrySet() ) {
 					dummySet.addParam( e.getKey() , e.getValue() );

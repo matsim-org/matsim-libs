@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.ivt.kticompatibility;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class KtiLikeScoringConfigGroup extends ReflectiveModule {
+public class KtiLikeScoringConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ktiLikeScoring";
 
 	private double travelCardRatio = 1;

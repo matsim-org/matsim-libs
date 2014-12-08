@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class HitchHikingConfigGroup extends ReflectiveModule {
+public class HitchHikingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "hitchHiking";
 

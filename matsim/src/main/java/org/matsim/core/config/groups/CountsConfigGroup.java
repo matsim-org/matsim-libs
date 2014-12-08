@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author dgrether
  * @author mrieser
  */
-public class CountsConfigGroup extends Module {
+public class CountsConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "counts";
 

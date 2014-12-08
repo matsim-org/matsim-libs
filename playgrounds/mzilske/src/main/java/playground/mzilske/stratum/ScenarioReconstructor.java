@@ -89,13 +89,13 @@ class ScenarioReconstructor implements Provider<Scenario> {
             config.qsim().setRemoveStuckVehicles(false);
             {
                 StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-                stratSets.setModuleName("SelectExpBeta");
+                stratSets.setStrategyName("SelectExpBeta");
                 stratSets.setProbability(0.9);
                 config.strategy().addStrategySettings(stratSets);
             }
             {
                 StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-                stratSets.setModuleName("SelectRandom");
+                stratSets.setStrategyName("SelectRandom");
                 stratSets.setProbability(0.1);
                 stratSets.setDisableAfter(10);
                 config.strategy().addStrategySettings(stratSets);

@@ -124,11 +124,11 @@ public class RunEmissionPricing {
 	// strategy
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setModuleName("ChangeExpBeta");
+		strategySettings.setStrategyName("ChangeExpBeta");
 		strategySettings.setProbability(1.0);
 		scg.addStrategySettings(strategySettings);
 		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
-		strategySettingsR.setModuleName("ReRoute");
+		strategySettingsR.setStrategyName("ReRoute");
 		strategySettingsR.setProbability(1.0);
 		strategySettingsR.setDisableAfter(5);
 		scg.addStrategySettings(strategySettingsR);

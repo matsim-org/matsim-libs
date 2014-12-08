@@ -21,13 +21,13 @@ package playground.thibautd.utils;
 
 import java.util.Map;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author thibautd
  */
 public class MyConfigUtils {
-	public static <T extends Module> void transmitParams(
+	public static <T extends ConfigGroup> void transmitParams(
 			final T source,
 			final T target) {
 		for ( Map.Entry<String, String> e : source.getParams().entrySet() ) {

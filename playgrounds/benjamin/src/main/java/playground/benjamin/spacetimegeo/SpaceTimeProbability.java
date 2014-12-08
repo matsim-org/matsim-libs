@@ -208,7 +208,7 @@ public class SpaceTimeProbability {
 		StrategyConfigGroup scg = config.strategy();
 
 		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
-		changePlan.setModuleName(entry.getValue().getChoiceModule());
+		changePlan.setStrategyName(entry.getValue().getChoiceModule());
 		changePlan.setProbability(1.0);
 
 //		StrategySettings reRoute = new StrategySettings(Id.create("2"));

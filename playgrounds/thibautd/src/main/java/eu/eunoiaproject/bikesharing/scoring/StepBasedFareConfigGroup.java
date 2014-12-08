@@ -21,12 +21,12 @@ package eu.eunoiaproject.bikesharing.scoring;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class StepBasedFareConfigGroup extends ReflectiveModule {
+public class StepBasedFareConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "bikeSharingFare";
 

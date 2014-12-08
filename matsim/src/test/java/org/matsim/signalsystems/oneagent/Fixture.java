@@ -67,7 +67,7 @@ public class Fixture {
 		conf.planCalcScore().addActivityParams(params);
 
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
-		settings.setModuleName("ChangeExpBeta");
+		settings.setStrategyName("ChangeExpBeta");
 		settings.setProbability(1.0);
 		conf.strategy().addStrategySettings(settings);
 		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");

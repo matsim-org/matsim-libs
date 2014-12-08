@@ -1,8 +1,8 @@
 package playground.balac.taxiservice.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class TaxiserviceConfigGroup extends ReflectiveModule {
+public class TaxiserviceConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "Taxiservice";
 	

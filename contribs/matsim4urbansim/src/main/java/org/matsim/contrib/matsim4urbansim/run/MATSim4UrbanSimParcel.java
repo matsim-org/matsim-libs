@@ -52,7 +52,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -512,7 +512,7 @@ public class MATSim4UrbanSimParcel{
 	 * @return AccessibilityParameterConfigModule
 	 */
 	AccessibilityConfigGroup getAccessibilityParameterConfig() {
-		Module m = this.scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
+		ConfigGroup m = this.scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
 		if (m instanceof AccessibilityConfigGroup) {
 			return (AccessibilityConfigGroup) m;
 		}
@@ -526,7 +526,7 @@ public class MATSim4UrbanSimParcel{
 	 * @return MATSim4UrbanSimControlerConfigModuleV3
 	 */
 	M4UControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
-		Module m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
@@ -540,7 +540,7 @@ public class MATSim4UrbanSimParcel{
 	 * @return UrbanSimParameterConfigModuleV3
 	 */
 	UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfig() {
-		Module m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = this.scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}

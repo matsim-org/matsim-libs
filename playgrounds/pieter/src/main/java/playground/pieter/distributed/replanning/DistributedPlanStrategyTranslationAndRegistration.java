@@ -112,19 +112,19 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     public static void substituteSelectorStrategies(Config config) {
         for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
-            String classname = settings.getModuleName();
+            String classname = settings.getStrategyName();
 
             if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
                 classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
-                settings.setModuleName(classname);
+                settings.setStrategyName(classname);
             }
             if (!DistributedPlanStrategyTranslationAndRegistration.isStrategySupported(classname)) {
                 throw new RuntimeException("Strategy " + classname + " not known to be compatible with (Distributed) PSim. Exiting.");
             } else {
                 if (SupportedMutators.containsKey(classname))
-                    settings.setModuleName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
+                    settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
                 if (SupportedSelectors.containsKey(classname))
-                    settings.setModuleName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
+                    settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
             }
 
 

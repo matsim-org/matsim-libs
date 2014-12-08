@@ -22,12 +22,12 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author mrieser / Senozon AG
  */
-public class FacilitiesConfigGroup extends Module {
+public class FacilitiesConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "facilities";
 

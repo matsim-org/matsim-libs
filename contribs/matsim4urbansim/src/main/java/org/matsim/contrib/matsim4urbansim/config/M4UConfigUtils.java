@@ -40,7 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -216,13 +216,13 @@ public class M4UConfigUtils {
 	 * @param matsim4urbansimConfigPart1
 	 * @throws UncheckedIOException
 	 */
-	 static Module getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
+	 static ConfigGroup getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
 
 		if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
 			Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
 
 			// loading additional matsim4urbansim parameter settings from external config file
-			Module module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+			ConfigGroup module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 			if(module == null)
 				log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
 			else
@@ -358,19 +358,19 @@ public class M4UConfigUtils {
 		config.strategy().setMaxAgentPlanMemorySize( 5 );
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-		changeExpBeta.setModuleName(Selector.ChangeExpBeta.toString());
+		changeExpBeta.setStrategyName(Selector.ChangeExpBeta.toString());
 		changeExpBeta.setProbability( 0.8 ) ;
 		config.strategy().addStrategySettings(changeExpBeta);
 
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-		timeAlocationMutator.setModuleName(Names.TimeAllocationMutator.toString()); 
+		timeAlocationMutator.setStrategyName(Names.TimeAllocationMutator.toString()); 
 		timeAlocationMutator.setProbability( 0.1 ); 
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		config.timeAllocationMutator().setMutationRange(7200.) ;
 
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(Id.create(3, StrategySettings.class));
-		reroute.setModuleName(Names.ReRoute.toString());  
+		reroute.setStrategyName(Names.ReRoute.toString());  
 		reroute.setProbability( 0.1 );
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);
@@ -448,7 +448,7 @@ public class M4UConfigUtils {
 	}
 
 	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
-		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
@@ -458,7 +458,7 @@ public class M4UConfigUtils {
 	}
 
 	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
-		Module m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}

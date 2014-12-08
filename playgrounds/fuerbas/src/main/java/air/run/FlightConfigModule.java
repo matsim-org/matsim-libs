@@ -20,7 +20,7 @@
 package air.run;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 
 
@@ -33,7 +33,7 @@ public class FlightConfigModule {
 	public static final String MODULE_NAME = "flight";
 	public static final String DO_REROUTE_STUCKED = "rerouteStuckedPersons";
 	public static final String DO_RANDOMIZED_ROUTING = "randomizedTransitTTAndDisutilityRouting";
-	private Module flightModule;
+	private ConfigGroup flightModule;
 	
 	public FlightConfigModule(Config config) {
 		this.flightModule = config.getModule(MODULE_NAME);

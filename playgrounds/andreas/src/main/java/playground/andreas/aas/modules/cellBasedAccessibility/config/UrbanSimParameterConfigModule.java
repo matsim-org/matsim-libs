@@ -19,9 +19,9 @@
 
 package playground.andreas.aas.modules.cellBasedAccessibility.config;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class UrbanSimParameterConfigModule extends Module{
+public class UrbanSimParameterConfigModule extends ConfigGroup{
 	
 	public static final String GROUP_NAME = "urbansimParameter";
 	

@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Config group to configure p
@@ -33,7 +33,7 @@ import org.matsim.core.config.Module;
  *
  */
 @Deprecated
-public class PConfigGroup extends Module{
+public class PConfigGroup extends ConfigGroup{
 	
 	/**
 	 * TODO [AN] This one has to be checked

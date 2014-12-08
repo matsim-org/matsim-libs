@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -20,7 +20,7 @@ public class LinksFreeSpeedModifier {
 		config.setParam("network", "inputNetworkFile", inputBase + "network.xml");
 		ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.loadScenario(config);
 		
-		Module a = config.getModule("planCalcScore");
+		ConfigGroup a = config.getModule("planCalcScore");
 		System.out.println(a.getParams().toString());
 	
 		Network network = scenario.getNetwork();

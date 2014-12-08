@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -56,7 +56,7 @@ public class AssociateFacilitiesToCarLinks {
 		removeNonCarLinks( network );
 		removeIsolatedNodes( network );
 
-		final Module f2l = new Module( WorldConnectLocations.CONFIG_F2L );
+		final ConfigGroup f2l = new ConfigGroup( WorldConnectLocations.CONFIG_F2L );
 		f2l.addParam( WorldConnectLocations.CONFIG_F2L_OUTPUTF2LFile , outputf2l );
 
 		final Config conf = new Config();

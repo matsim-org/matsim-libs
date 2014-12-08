@@ -39,7 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -376,7 +376,7 @@ public class ScenarioGenerator {
 	}
 
 	public GripsConfigModule getGripsConfig() {
-		Module m = this.matsimConfig.getModule("grips");
+		ConfigGroup m = this.matsimConfig.getModule("grips");
 		if (m instanceof GripsConfigModule) {
 			return (GripsConfigModule) m;
 		}
@@ -389,7 +389,7 @@ public class ScenarioGenerator {
 	// call this w/origin parameter
 	public GripsConfigModule getGripsConfig(Config c) {
 
-		Module m = c.getModule("grips");
+		ConfigGroup m = c.getModule("grips");
 		if (m instanceof GripsConfigModule) {
 			return (GripsConfigModule) m;
 		}

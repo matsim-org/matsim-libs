@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
  public class ConfigReaderMatsimV2 extends MatsimXmlParser {
 	private final Config config;
 
-	private final Deque<Module> moduleStack = new ArrayDeque<Module>();
+	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<ConfigGroup>();
 
 	public ConfigReaderMatsimV2(
 			final Config config) {
@@ -79,12 +79,12 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startParameterSet(final Attributes atts) {
-		final Module m = moduleStack.getFirst().createParameterSet( atts.getValue( TYPE ) );
+		final ConfigGroup m = moduleStack.getFirst().createParameterSet( atts.getValue( TYPE ) );
 		moduleStack.addFirst( m );
 	}
 
 	private void startModule(final Attributes atts) {
-		final Module m = config.getModule( atts.getValue( NAME ) );
+		final ConfigGroup m = config.getModule( atts.getValue( NAME ) );
 		moduleStack.addFirst(
 				m == null ?
 				config.createModule( atts.getValue( NAME ) ) :
@@ -97,7 +97,7 @@ import org.xml.sax.Attributes;
 			final String content,
 			final Stack<String> context) {
 		if ( name.equals( MODULE ) || name.equals( PARAMETER_SET ) ) {
-			final Module head = moduleStack.removeFirst();
+			final ConfigGroup head = moduleStack.removeFirst();
 			
 			if ( !moduleStack.isEmpty() ) moduleStack.getFirst().addParameterSet( head );
 		}

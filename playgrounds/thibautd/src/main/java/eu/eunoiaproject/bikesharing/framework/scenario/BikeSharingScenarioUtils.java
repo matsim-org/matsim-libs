@@ -32,7 +32,7 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -62,8 +62,8 @@ public class BikeSharingScenarioUtils {
 
 	private  BikeSharingScenarioUtils() {}
 
-	public static Config loadConfig( final String fileName , final Module... additionalModules ) {
-		final Module[] modules = Arrays.copyOf( additionalModules , additionalModules.length + 1 );
+	public static Config loadConfig( final String fileName , final ConfigGroup... additionalModules ) {
+		final ConfigGroup[] modules = Arrays.copyOf( additionalModules , additionalModules.length + 1 );
 		modules[ modules.length - 1 ] = new BikeSharingConfigGroup();
 		final Config config = ConfigUtils.loadConfig(
 				fileName,
@@ -126,7 +126,7 @@ public class BikeSharingScenarioUtils {
 
 	}
 
-	public static Scenario loadScenario( final String configFile , final Module... modules ) {
+	public static Scenario loadScenario( final String configFile , final ConfigGroup... modules ) {
 		return loadScenario( loadConfig( configFile , modules) );
 	}
 

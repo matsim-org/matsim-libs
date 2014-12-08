@@ -106,13 +106,13 @@ public class CemdapMatsimCadytsController {
 //		config.strategy().addStrategySettings(strategySettings1);
 		
 		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
-		strategySettings2.setModuleName("ReRoute");
+		strategySettings2.setStrategyName("ReRoute");
 		strategySettings2.setProbability(0.5);
 		strategySettings2.setDisableAfter(90);
 		config.strategy().addStrategySettings(strategySettings2);
 		
 		StrategySettings strategySetinngs3 = new StrategySettings(Id.create(1, StrategySettings.class));
-		strategySetinngs3.setModuleName("cadytsCar");
+		strategySetinngs3.setStrategyName("cadytsCar");
 		strategySetinngs3.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySetinngs3);
 		

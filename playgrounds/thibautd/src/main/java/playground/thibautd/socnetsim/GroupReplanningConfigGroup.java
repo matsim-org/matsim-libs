@@ -21,16 +21,16 @@ package playground.thibautd.socnetsim;
 
 import java.util.Collection;
 
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class GroupReplanningConfigGroup extends ReflectiveModule {
+public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "groupStrategy";
 
-	public static class StrategyParameterSet extends ReflectiveModule {
+	public static class StrategyParameterSet extends ReflectiveConfigGroup {
 		public static final String SET_NAME = "strategy";
 
 		private String strategyName = null;
@@ -103,7 +103,7 @@ public class GroupReplanningConfigGroup extends ReflectiveModule {
 	}
 
 	@Override
-	public Module createParameterSet(final String type) {
+	public ConfigGroup createParameterSet(final String type) {
 		if ( type.equals( StrategyParameterSet.SET_NAME ) ) {
 			return new StrategyParameterSet();
 		}
@@ -117,7 +117,7 @@ public class GroupReplanningConfigGroup extends ReflectiveModule {
 	// XXX not soooo safe, but should be OK (normally, no other type  can be added for the type)
 	@SuppressWarnings("unchecked")
 	public Collection<StrategyParameterSet> getStrategyParameterSets() {
-		final Collection<? extends Module> sets = getParameterSets( StrategyParameterSet.SET_NAME );
+		final Collection<? extends ConfigGroup> sets = getParameterSets( StrategyParameterSet.SET_NAME );
 		return (Collection<StrategyParameterSet>) sets;
 	}
 

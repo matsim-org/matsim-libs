@@ -67,7 +67,7 @@ public class AutosensingTest {
 		config.planCalcScore().setMarginalUtilityOfMoney(marginalUtilityOfMoneyCONFIG);
 		
 		StrategySettings stratSets = new StrategySettings( Id.create(1, StrategySettings.class) ) ;
-		stratSets.setModuleName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
+		stratSets.setStrategyName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
 		stratSets.setProbability(1.);
 		config.strategy().addStrategySettings(stratSets);
 		

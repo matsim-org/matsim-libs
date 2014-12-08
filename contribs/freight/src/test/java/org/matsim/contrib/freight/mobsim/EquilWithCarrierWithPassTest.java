@@ -57,10 +57,10 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
 		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
-		bestScore.setModuleName("BestScore");
+		bestScore.setStrategyName("BestScore");
 		bestScore.setProbability(1.0);
 		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.0);
 		reRoute.setDisableAfter(300);
 		config.strategy().setMaxAgentPlanMemorySize(5);

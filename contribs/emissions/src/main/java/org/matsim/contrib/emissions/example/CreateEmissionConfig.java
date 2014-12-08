@@ -85,7 +85,7 @@ public class CreateEmissionConfig {
 		// strategy
 			StrategyConfigGroup scg = controler.getConfig().strategy();
 			StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-			strategySettings.setModuleName("ChangeExpBeta");
+			strategySettings.setStrategyName("ChangeExpBeta");
 			strategySettings.setProbability(1.0);
 			scg.addStrategySettings(strategySettings);
 			

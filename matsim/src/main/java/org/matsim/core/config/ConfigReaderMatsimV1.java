@@ -46,7 +46,7 @@ import org.xml.sax.InputSource;
 	private final static String PARAM = "param";
 
 	private final Config config;
-	private Module currmodule = null;
+	private ConfigGroup currmodule = null;
 
 	private String localDtd;
 

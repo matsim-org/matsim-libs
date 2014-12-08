@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class GlobalConfigGroup extends Module {
+public class GlobalConfigGroup extends ConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";

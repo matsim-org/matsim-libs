@@ -21,7 +21,7 @@ package org.matsim.core.config.groups;
 
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * This config Module can be used to specify the paths to the
@@ -30,7 +30,7 @@ import org.matsim.core.config.Module;
  * @author dgrether
  *
  */
-public class SignalSystemsConfigGroup extends Module {
+public class SignalSystemsConfigGroup extends ConfigGroup {
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";

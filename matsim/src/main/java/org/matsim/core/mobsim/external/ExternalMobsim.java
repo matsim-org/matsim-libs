@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
@@ -105,7 +105,7 @@ public class ExternalMobsim implements Mobsim {
 		Config simConfig = this.scenario.getConfig();
 		Config extConfig = new Config();
 		// network
-		Module module = extConfig.createModule("network");
+		ConfigGroup module = extConfig.createModule("network");
 		module.addParam("inputNetworkFile", simConfig.network().getInputFile());
 		module.addParam("localInputDTD", "dtd/matsim_v1.dtd");
 		// plans

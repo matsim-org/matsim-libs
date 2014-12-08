@@ -92,13 +92,13 @@ public class Simulator {
 		Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
 		
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
-		settings.setModuleName("activityLocations");
+		settings.setStrategyName("activityLocations");
 //		settings.setProbability(0.1);
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
 		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home", controler));
 		
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
-		settings.setModuleName("doNothing");
+		settings.setStrategyName("doNothing");
 //		settings.setProbability(0.9);
 		
 		controler.addPlanStrategyFactory("doNothing", new PlanStrategyFactory() {

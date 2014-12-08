@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Cnofig group to configure missing scoring parameters of {@link BvgLegScoringFunction}
@@ -32,7 +32,7 @@ import org.matsim.core.config.Module;
  * @author aneumann
  *
  */
-public class BvgScoringFunctionConfigGroup extends Module {
+public class BvgScoringFunctionConfigGroup extends ConfigGroup {
 	
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionConfigGroup.class);
 	

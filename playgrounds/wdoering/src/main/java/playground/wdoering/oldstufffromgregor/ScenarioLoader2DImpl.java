@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -59,7 +59,7 @@ public class ScenarioLoader2DImpl  {
 	}
 
 	private void initSim2DConfigGroup() {
-		Module module = this.config.getModule("sim2d");
+		ConfigGroup module = this.config.getModule("sim2d");
 		Sim2DConfigGroup s = null;
 		if (module == null) {
 			s = new Sim2DConfigGroup();

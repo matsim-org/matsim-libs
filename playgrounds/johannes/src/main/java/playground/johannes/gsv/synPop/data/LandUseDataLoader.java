@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -40,9 +40,9 @@ public class LandUseDataLoader implements DataLoader {
 	
 	public static final String KEY = "landuse";
 
-	private final Module module;
+	private final ConfigGroup module;
 
-	public LandUseDataLoader(Module module) {
+	public LandUseDataLoader(ConfigGroup module) {
 		this.module = module;
 	}
 
@@ -58,9 +58,9 @@ public class LandUseDataLoader implements DataLoader {
 	}
 
 	private ZoneLayer<Map<String, Object>> loadLayer(String type) {
-		Collection<? extends Module> modules = module.getParameterSets(type);
+		Collection<? extends ConfigGroup> modules = module.getParameterSets(type);
 		if (!modules.isEmpty()) {
-			Module m = modules.iterator().next();
+			ConfigGroup m = modules.iterator().next();
 			String file = m.getValue("file");
 			String nameKey = m.getValue("namekey");
 			String popKey = m.getValue("popkey");

@@ -25,7 +25,7 @@ package playground.vsp.parkAndRide;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Additional parameters which are required by the park-and-ride module.
@@ -33,7 +33,7 @@ import org.matsim.core.config.Module;
  * @author ikaddoura
  *
  */
-public class PRConfigGroup extends Module{
+public class PRConfigGroup extends ConfigGroup{
 
 	public static final String GROUP_NAME = "parkAndRide";
 	private static final String INPUT_FILE= "inputFile";

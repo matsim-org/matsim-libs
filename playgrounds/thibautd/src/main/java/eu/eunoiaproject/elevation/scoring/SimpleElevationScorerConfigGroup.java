@@ -22,7 +22,7 @@ package eu.eunoiaproject.elevation.scoring;
 import java.util.Collections;
 import java.util.Set;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * so that several of those groups can be created for different modes.
  * @author thibautd
  */
-public class SimpleElevationScorerConfigGroup extends ReflectiveModule {
+public class SimpleElevationScorerConfigGroup extends ReflectiveConfigGroup {
 	private Set<String> modes = Collections.emptySet();
 	private double marginalUtilityOfDenivelation_m = 0;
 

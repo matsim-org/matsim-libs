@@ -80,27 +80,27 @@ public class FirstSimulation {
 		
 		// find a shortest route
 		StrategySettings reRoute = new StrategySettings(Id.create(1, StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.2);
 		reRoute.setDisableAfter(50);
 		config.strategy().addStrategySettings(reRoute);
 		
 		// choose one of existing plans
 		StrategySettings change = new StrategySettings(Id.create(2, StrategySettings.class));
-		change.setModuleName("ChangeExpBeta");
+		change.setStrategyName("ChangeExpBeta");
 		change.setProbability(0.3); //TODO decrease later
 		config.strategy().addStrategySettings(change);
 		
 		// change leg mode of a plan
 		StrategySettings modechoice = new StrategySettings(Id.create(3, StrategySettings.class));
-		modechoice.setModuleName("ChangeLegMode");
+		modechoice.setStrategyName("ChangeLegMode");
 		modechoice.setProbability(0.05);
 		modechoice.setDisableAfter(50);
 		config.strategy().addStrategySettings(modechoice);
 		
 		// shift start times 
 		StrategySettings timeAll = new StrategySettings(Id.create(4, StrategySettings.class));
-		timeAll.setModuleName("TimeAllocationMutator");
+		timeAll.setStrategyName("TimeAllocationMutator");
 		timeAll.setProbability(0.1);
 		timeAll.setDisableAfter(50);
 		String mutationRange = Double.toString(60.*15);		
@@ -109,7 +109,7 @@ public class FirstSimulation {
 		
 		// keep last plan = do nothing
 		StrategySettings keep = new StrategySettings(Id.create(5, StrategySettings.class));
-		keep.setModuleName("KeepLastSelected");
+		keep.setStrategyName("KeepLastSelected");
 		keep.setProbability(0.3);
 		config.strategy().addStrategySettings(keep);
 		

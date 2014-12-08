@@ -1,8 +1,8 @@
 package playground.toronto.sotr.config;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
-public class SOTRConfig extends Module {
+public class SOTRConfig extends ConfigGroup {
 	
 	public static final String GROUP_NAME = "secondOrderTransitRouter";
 

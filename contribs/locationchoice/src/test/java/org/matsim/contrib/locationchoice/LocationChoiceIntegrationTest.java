@@ -379,7 +379,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.planCalcScore().addActivityParams(work);
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setModuleName("MyLocationChoice");
+		strategySettings.setStrategyName("MyLocationChoice");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 

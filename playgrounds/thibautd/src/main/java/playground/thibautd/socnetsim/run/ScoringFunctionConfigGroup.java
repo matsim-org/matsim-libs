@@ -24,12 +24,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring;
 
-public class ScoringFunctionConfigGroup extends ReflectiveModule {
+public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;

@@ -47,7 +47,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+			.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("car");
 			changeExpBetaStrategySettings.setProbability(0.7);
@@ -57,14 +57,14 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+			.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("car");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 	
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRouteWithId.setModuleName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setStrategyName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.15);
 			reRouteWithId.setSubpopulation("car");
 			config.strategy().addStrategySettings(reRouteWithId);
@@ -76,7 +76,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+			.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("commercial");
 			changeExpBetaStrategySettings.setProbability(0.80);
@@ -84,7 +84,7 @@ final class GautengUtils {
 			.addStrategySettings(changeExpBetaStrategySettings);
 	
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRouteWithId.setModuleName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setStrategyName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.20);
 			reRouteWithId.setSubpopulation("commercial");
 			config.strategy().addStrategySettings(reRouteWithId);
@@ -96,7 +96,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+			.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("bus");
 			changeExpBetaStrategySettings.setProbability(0.7);
@@ -106,14 +106,14 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+			.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("bus");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 	
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRouteWithId.setModuleName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setStrategyName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.15);
 			reRouteWithId.setSubpopulation("bus");
 			config.strategy().addStrategySettings(reRouteWithId);
@@ -124,7 +124,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+			.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("taxi");
 			changeExpBetaStrategySettings.setProbability(0.7);
@@ -134,14 +134,14 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+			.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("taxi");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 	
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRouteWithId.setModuleName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setStrategyName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.15);
 			reRouteWithId.setSubpopulation("taxi");
 			config.strategy().addStrategySettings(reRouteWithId);
@@ -152,7 +152,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Selector.ChangeExpBeta
+			.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("ext");
 			changeExpBetaStrategySettings.setProbability(0.7);
@@ -162,14 +162,14 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setModuleName(PlanStrategyRegistrar.Names.TimeAllocationMutator
+			.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("ext");
 			timeStrategySettings.setProbability(0.15);
 			config.strategy().addStrategySettings(timeStrategySettings);
 	
 			StrategySettings reRouteWithId = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRouteWithId.setModuleName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
+			reRouteWithId.setStrategyName(GautengControler_subpopulations.RE_ROUTE_AND_SET_VEHICLE);
 			reRouteWithId.setProbability(0.15);
 			reRouteWithId.setSubpopulation("ext");
 			config.strategy().addStrategySettings(reRouteWithId);

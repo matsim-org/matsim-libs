@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -407,7 +407,7 @@ public class DaganzoScenarioGenerator {
 
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
 				Id.create(1, StrategySettings.class));
-		selectExp.setModuleName("ChangeExpBeta");
+		selectExp.setStrategyName("ChangeExpBeta");
 //		selectExp.setModuleName("BestScore");
 		config.strategy().addStrategySettings(selectExp);
 		if (isUsePlansOnly) {
@@ -418,12 +418,12 @@ public class DaganzoScenarioGenerator {
 		  StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
 		      Id.create(2, StrategySettings.class));
 		  reRoute.setProbability(0.1);
-		  reRoute.setModuleName("ReRoute");
+		  reRoute.setStrategyName("ReRoute");
 		  reRoute.setDisableAfter(iterations);
 		  config.strategy().addStrategySettings(reRoute);
 		}
 
-		Module module = new Module(CONFIG_MODULE);
+		ConfigGroup module = new ConfigGroup(CONFIG_MODULE);
 		if (pSignal != null){
 			module.addParam(PSIGNAL_CONFIG_PARAMETER, Double.toString(pSignal));
 		}

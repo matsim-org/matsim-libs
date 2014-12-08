@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
-public class SimulationConfigGroup extends Module implements MobsimConfigGroupI {
+public class SimulationConfigGroup extends ConfigGroup implements MobsimConfigGroupI {
 
 	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
 

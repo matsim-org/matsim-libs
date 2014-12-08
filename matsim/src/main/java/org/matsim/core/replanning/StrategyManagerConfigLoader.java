@@ -76,7 +76,7 @@ public final class StrategyManagerConfigLoader {
 				// from zero at a later iteration.  (Not possible from config, but possible in code.)  kai, nov'13
 				// yy It is neither a rate nor a probability, since either would need to be normalized. kai, nov'13
 			}
-			String moduleName = settings.getModuleName();
+			String moduleName = settings.getStrategyName();
 
 			if (moduleName.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
 				moduleName = moduleName.replace("org.matsim.demandmodeling.plans.strategies.", "");

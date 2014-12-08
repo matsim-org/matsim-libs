@@ -274,11 +274,11 @@ public class Utils {
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		// I think we should use SelectRandom here, as I'm not really sure what will
 		// happen when we use ChangeExpBeta (own scoring). //dr, oct'13
-		settings.setModuleName(PlanStrategyRegistrar.Selector.SelectRandom.toString());
+		settings.setStrategyName(PlanStrategyRegistrar.Selector.SelectRandom.toString());
 		settings.setProbability(0.8);
 		config.strategy().addStrategySettings(settings);
 		settings = new StrategySettings(Id.create("2", StrategySettings.class));
-		settings.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
+		settings.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.toString());
 		settings.setProbability(0.2);
 		config.strategy().addStrategySettings(settings);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);

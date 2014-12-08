@@ -24,13 +24,13 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author thibautd
  */
-public class PlanLinkConfigGroup extends ReflectiveModule {
+public class PlanLinkConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "planLinkIdentifier";
 
 	public static enum LinkStrength {

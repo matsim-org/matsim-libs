@@ -27,11 +27,11 @@ public class RunPassengerPlansFromScratch {
 		config.plans().setInputFile(PLANS_FILENAME);
 		
 		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
-		bestScore.setModuleName("BestScore");
+		bestScore.setStrategyName("BestScore");
 		bestScore.setProbability(0.5);
 		
 		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.5);
 //		reRoute.setDisableAfter(300);
 		

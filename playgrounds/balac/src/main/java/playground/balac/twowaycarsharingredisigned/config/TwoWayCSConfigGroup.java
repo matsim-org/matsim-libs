@@ -1,9 +1,9 @@
 package playground.balac.twowaycarsharingredisigned.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
-public class TwoWayCSConfigGroup extends ReflectiveModule {
+public class TwoWayCSConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "TwoWayCarsharing";
 	
 	private String travelingTwoWayCarsharing = null;

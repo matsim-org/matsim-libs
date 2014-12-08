@@ -23,7 +23,7 @@ package playground.andreas.bln.net.simplex;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
@@ -85,7 +85,7 @@ public final class TransitControler extends Controler {
 			this.config.addModule(this.transitConfig);
 		} else {
 			// this would not be necessary if TransitConfigGroup is part of core config
-			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
+			ConfigGroup oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
 			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));

@@ -81,12 +81,12 @@ public class CadytsEquilController {
 		
 		// strategy
 		StrategySettings strategySettings1 = new StrategySettings(Id.create(1, StrategySettings.class));
-		strategySettings1.setModuleName("ChangeExpBeta");
+		strategySettings1.setStrategyName("ChangeExpBeta");
 		strategySettings1.setProbability(1.);
 		config.strategy().addStrategySettings(strategySettings1);
 		
 		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
-		strategySettings2.setModuleName("ReRoute");
+		strategySettings2.setStrategyName("ReRoute");
 		strategySettings2.setProbability(1.);
 		//strategySettings2.setProbability(.5);
 		//strategySettings2.setDisableAfter(60);

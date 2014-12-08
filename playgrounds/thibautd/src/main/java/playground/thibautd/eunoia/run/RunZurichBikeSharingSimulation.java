@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -143,7 +143,7 @@ public class RunZurichBikeSharingSimulation {
 		}
 	}
 
-	private static class RelocationConfigGroup extends ReflectiveModule {
+	private static class RelocationConfigGroup extends ReflectiveConfigGroup {
 		public static final String GROUP_NAME = "bikeSharingRedistribution";
 
 		public static enum Strategy {
@@ -166,7 +166,7 @@ public class RunZurichBikeSharingSimulation {
 		}
 	}
 
-	private static class DenivelationConfigGroup extends ReflectiveModule {
+	private static class DenivelationConfigGroup extends ReflectiveConfigGroup {
 		public static final String GROUP_NAME = "denivelationScoring";
 
 		// from Gregory Erhardt: biking up 1 distance unit is equivalent to

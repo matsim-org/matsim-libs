@@ -3,7 +3,7 @@ package playground.pbouman.transitfares;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
 public class FarePolicies
@@ -32,7 +32,7 @@ public class FarePolicies
 		discountIntervals = new LinkedList<DiscountInterval>();
 		pricingPolicies = new LinkedList<PricingPolicy>();
 		
-		Module mod = scenario.getConfig().getModule("transitPricing");
+		ConfigGroup mod = scenario.getConfig().getModule("transitPricing");
 		if (mod != null)
 		{
 			Map<String, String> map = mod.getParams();

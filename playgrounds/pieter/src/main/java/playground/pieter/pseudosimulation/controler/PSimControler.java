@@ -96,18 +96,18 @@ public class PSimControler {
 	private void substituteStrategies() {
 		for (StrategyConfigGroup.StrategySettings settings : matsimControler.getConfig().strategy().getStrategySettings()) {
 
-			String classname = settings.getModuleName();
+			String classname = settings.getStrategyName();
 			
 			if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
-				settings.setModuleName(classname);
+				settings.setStrategyName(classname);
 			}
 //			if(nonMutatingStrategies.contains(classname))
 //				continue;
 			if(!psimStrategies.getCompatibleStrategies().contains(classname)){
 				throw new RuntimeException("Strategy "+classname+"not known to be compatible with PseudoSim. Exiting.");
 			}else{
-				settings.setModuleName(classname+"PSim");
+				settings.setStrategyName(classname+"PSim");
 			}
 			Logger.getLogger(this.getClass()).info("Mutating plan strategies prepared for PSim");
 		}

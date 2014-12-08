@@ -85,14 +85,14 @@ public class RndPtRouterLauncher {
 		//strategies settings
 		{ 
 		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
-		stratSets.setModuleName("myCadyts");
+		stratSets.setStrategyName("myCadyts");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
 		}
 		
 		{    //////!!!!!!!!!!!!!!!!!!!!!///////
 		StrategySettings stratSets2 = new StrategySettings(Id.create(lastStrategyIdx+2, StrategySettings.class));
-		stratSets2.setModuleName("ReRoute"); // test that this does work.  Otherwise define this strategy in config file
+		stratSets2.setStrategyName("ReRoute"); // test that this does work.  Otherwise define this strategy in config file
 		stratSets2.setProbability(0.1);
 		stratSets2.setDisableAfter(400) ;
 		config.strategy().addStrategySettings(stratSets2);

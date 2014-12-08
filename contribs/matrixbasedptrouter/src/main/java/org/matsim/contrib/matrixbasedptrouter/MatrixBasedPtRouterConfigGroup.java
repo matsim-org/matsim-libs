@@ -25,13 +25,13 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author nagel
  *
  */
-public final class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
+public final class MatrixBasedPtRouterConfigGroup extends ReflectiveConfigGroup {
 	static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
 
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;

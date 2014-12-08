@@ -113,13 +113,13 @@ class MultiRateRunResource {
         tmp.setStuckTime(10.0);
         {
             StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-            stratSets.setModuleName("ChangeExpBeta");
+            stratSets.setStrategyName("ChangeExpBeta");
             stratSets.setProbability(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
             StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
-            stratSets.setModuleName("ReRoute");
+            stratSets.setStrategyName("ReRoute");
             stratSets.setProbability(0.3);
             config.strategy().addStrategySettings(stratSets);
         }
@@ -147,13 +147,13 @@ class MultiRateRunResource {
         tmp.setStuckTime(10.0);
         {
             StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-            stratSets.setModuleName("ChangeExpBeta");
+            stratSets.setStrategyName("ChangeExpBeta");
             stratSets.setProbability(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
             StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
-            stratSets.setModuleName("ReRoute");
+            stratSets.setStrategyName("ReRoute");
             stratSets.setProbability(0.3);
             config.strategy().addStrategySettings(stratSets);
         }

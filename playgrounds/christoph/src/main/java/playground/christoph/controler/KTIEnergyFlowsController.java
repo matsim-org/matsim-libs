@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -77,7 +77,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			 * The KTIConfigGroup is loaded as generic Module. We replace this
 			 * generic object with a KtiConfigGroup object and copy all its parameter.
 			 */
-			Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
+			ConfigGroup module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
 			this.config.removeModule(KtiConfigGroup.GROUP_NAME);
 			this.config.addModule(this.ktiConfigGroup);
 			

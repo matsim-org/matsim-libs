@@ -69,8 +69,8 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 			// checks that the replanning strategies don't specify a certain router, as we need a special router ourselves.
 			final StrategyConfigGroup config = controler.getConfig().strategy();
 			for (StrategySettings settings : config.getStrategySettings()) {
-				if (settings.getModuleName().startsWith("ReRoute_")) {
-					throw new RuntimeException("The replanning module " + settings.getModuleName() + " is not supported together with an area toll. Please use the normal \"ReRoute\" instead.");
+				if (settings.getStrategyName().startsWith("ReRoute_")) {
+					throw new RuntimeException("The replanning module " + settings.getStrategyName() + " is not supported together with an area toll. Please use the normal \"ReRoute\" instead.");
 				}
 			}
 		}

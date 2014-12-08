@@ -82,7 +82,7 @@ public class ConfigTest {
 		Assert.assertEquals("bbb", group.getB());
 	}
 
-	private static class ConfigTestGroup extends Module {
+	private static class ConfigTestGroup extends ConfigGroup {
 
 		public static final String GROUP_NAME = "ctg";
 

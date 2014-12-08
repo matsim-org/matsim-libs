@@ -103,9 +103,9 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 			this.handler.startConfig(this.config, this.writer);
 			this.handler.writeSeparator(this.writer);
-			Iterator<Module> m_it = this.config.getModules().values().iterator();
+			Iterator<ConfigGroup> m_it = this.config.getModules().values().iterator();
 			while (m_it.hasNext()) {
-				Module m = m_it.next();
+				ConfigGroup m = m_it.next();
 				this.handler.writeModule(m, this.writer);
 				this.handler.writeSeparator(this.writer);
 			}

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
 public class AgentSensitivities
@@ -29,7 +29,7 @@ public class AgentSensitivities
 	private void compilePatterns()
 	{
 		patterns = new LinkedList<SensitivityPattern>();
-		Module mod = scenario.getConfig().getModule("transitPricing");
+		ConfigGroup mod = scenario.getConfig().getModule("transitPricing");
 		if (mod != null)
 		{
 			Map<String, String> map = mod.getParams();

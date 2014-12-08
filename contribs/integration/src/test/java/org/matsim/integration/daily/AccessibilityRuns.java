@@ -98,7 +98,7 @@ public class AccessibilityRuns {
 		
 		{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) );
-			stratSets.setModuleName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
+			stratSets.setStrategyName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
 			stratSets.setProbability(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}

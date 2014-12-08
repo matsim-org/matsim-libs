@@ -20,13 +20,13 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
 import java.util.*;
 
-public class ControlerConfigGroup extends Module {
+public class ControlerConfigGroup extends ConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 

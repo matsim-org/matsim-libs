@@ -31,14 +31,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * A module using reflection for easy implementation of config groups.
  * <br>
  * <br>
  * This class takes care of all the housekeeping tasks that you normally have
- * to manually implement when extending {@link Module} (usually forgetting half of it).
+ * to manually implement when extending {@link ConfigGroup} (usually forgetting half of it).
  * <br>
  * <br>
  * For each field in the xml file, just implement a setter taking one of the following types as parameter:
@@ -77,9 +77,9 @@ import org.matsim.core.config.Module;
  *
  * @author thibautd
  */
-public abstract class ReflectiveModule extends Module {
+public abstract class ReflectiveConfigGroup extends ConfigGroup {
 	private static final Logger log =
-		Logger.getLogger(ReflectiveModule.class);
+		Logger.getLogger(ReflectiveConfigGroup.class);
 
 	private final boolean storeUnknownParameters;
 
@@ -95,7 +95,7 @@ public abstract class ReflectiveModule extends Module {
 	 *
 	 * @param name the name of the module in the config file.
 	 */
-	public ReflectiveModule(final String name) {
+	public ReflectiveConfigGroup(final String name) {
 		this( name , false );
 	}
 
@@ -106,9 +106,9 @@ public abstract class ReflectiveModule extends Module {
 	 * @param name the name of the module in the config file.
 	 * @param storeUnknownParametersAsStrings if true, when no annotated getter
 	 * or setter is found for a parameter name, the parameters are stored using
-	 * the default {@link Module} behavior. This is not that safe, so be careful.
+	 * the default {@link ConfigGroup} behavior. This is not that safe, so be careful.
 	 */
-	public ReflectiveModule(
+	public ReflectiveConfigGroup(
 			final String name,
 			final boolean storeUnknownParametersAsStrings) {
 		super(name);
@@ -123,7 +123,7 @@ public abstract class ReflectiveModule extends Module {
 
 	private Map<String, Method> getStringGetters() {
 		final Map<String, Method> gs = new HashMap<String, Method>();
-		final Class<? extends ReflectiveModule> c = getClass();
+		final Class<? extends ReflectiveConfigGroup> c = getClass();
 
 		final Method[] allMethods = c.getDeclaredMethods();
 
@@ -153,7 +153,7 @@ public abstract class ReflectiveModule extends Module {
 
 	private Map<String, Method> getSetters() {
 		final Map<String, Method> ss = new HashMap<String, Method>();
-		final Class<? extends ReflectiveModule> c = getClass();
+		final Class<? extends ReflectiveConfigGroup> c = getClass();
 
 		final Method[] allMethods = c.getDeclaredMethods();
 

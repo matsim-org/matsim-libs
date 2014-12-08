@@ -25,12 +25,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class RandomJointLocationChoiceConfigGroup extends ReflectiveModule {
+public class RandomJointLocationChoiceConfigGroup extends ReflectiveConfigGroup {
 	public final static String GROUP_NAME = "randomGroupLocationChoice";
 
 	private Collection<String> types = Collections.singleton( "leisure" );

@@ -221,7 +221,7 @@ ControlerListener {
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
-			String moduleName = settings.getModuleName();
+			String moduleName = settings.getStrategyName();
 
 			// now check if this modules should be disabled after some iterations
 			int maxIter = settings.getDisableAfter();

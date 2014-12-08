@@ -19,9 +19,9 @@
 
 package playground.thibautd.socnetsim.run;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-class KtiInputFilesConfigGroup extends ReflectiveModule {
+class KtiInputFilesConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ktiInputFiles";
 
 	private String worldFile = null;

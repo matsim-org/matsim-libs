@@ -22,9 +22,9 @@ package org.matsim.roadpricing;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class RoadPricingConfigGroup extends ReflectiveModule {
+public class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	// has to be public
 
 	/* Reason for removing "usingRoadPricing" switch: We found it hard to interpret.  

@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -213,8 +213,8 @@ public class StrategyConfigGroupTest {
 				inputConfigGroup.getStrategySettings().size() );
 	}
 
-	private Module toUnderscoredModule(final StrategyConfigGroup initialGroup) {
-		final Module module = new Module( initialGroup.getName() );
+	private ConfigGroup toUnderscoredModule(final StrategyConfigGroup initialGroup) {
+		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
 			log.info( "add param "+e.getKey() );
@@ -223,7 +223,7 @@ public class StrategyConfigGroupTest {
 
 		for ( StrategySettings settings : initialGroup.getStrategySettings() ) {
 			final Id<StrategySettings> id = settings.getId();
-			module.addParam( "Module_"+id , settings.getModuleName() );
+			module.addParam( "Module_"+id , settings.getStrategyName() );
 			module.addParam( "ModuleProbability_"+id , ""+settings.getProbability() );
 			module.addParam( "ModuleDisableAfterIteration_"+id , ""+settings.getDisableAfter() );
 			module.addParam( "ModuleExePath_"+id , settings.getExePath() );
@@ -244,14 +244,14 @@ public class StrategyConfigGroupTest {
 
 		/* scope of settings: minimal */ {
 			final StrategySettings settings = new StrategySettings();
-			settings.setModuleName( "MyModule" );
+			settings.setStrategyName( "MyModule" );
 			settings.setProbability( 10. );
 			group.addStrategySettings( settings );
 		}
 
 		/* scope of settings: all options */ {
 			final StrategySettings settings = new StrategySettings();
-			settings.setModuleName( "YourModule" );
+			settings.setStrategyName( "YourModule" );
 			settings.setProbability( 0 );
 			settings.setDisableAfter( 10 );
 			settings.setExePath( "path/to/nowhere/" );

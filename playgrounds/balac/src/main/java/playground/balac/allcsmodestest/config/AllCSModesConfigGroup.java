@@ -1,9 +1,9 @@
 package playground.balac.allcsmodestest.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
-public class AllCSModesConfigGroup extends ReflectiveModule {
+public class AllCSModesConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "AllCSModes";
 	
 	private String statsWriterFrequency = null;

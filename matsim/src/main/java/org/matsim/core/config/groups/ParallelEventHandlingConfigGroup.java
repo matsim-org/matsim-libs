@@ -20,7 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -29,7 +29,7 @@ import java.util.TreeMap;
  * @author nagel
  *
  */
-public class ParallelEventHandlingConfigGroup extends Module {
+public class ParallelEventHandlingConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "parallelEventHandling";
 

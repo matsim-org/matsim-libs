@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class StrategyAnalysisConfigGroup extends ReflectiveModule {
+public class StrategyAnalysisConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "strategyanalysis";
 

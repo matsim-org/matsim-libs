@@ -96,15 +96,15 @@ public class UlmResource {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		
 		StrategySettings change = new StrategySettings(Id.create(1, StrategySettings.class));
-		change.setModuleName("ChangeExpBeta");
+		change.setStrategyName("ChangeExpBeta");
 		change.setProbability(0.8);
 	
 		StrategySettings reRoute = new StrategySettings(Id.create(2, StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.1);
 		
 		StrategySettings time = new StrategySettings(Id.create(3, StrategySettings.class));
-		time.setModuleName("TimeAllocationMutator");
+		time.setStrategyName("TimeAllocationMutator");
 		time.setProbability(0.1);
 	
 		config.strategy().addStrategySettings(change);

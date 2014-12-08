@@ -37,11 +37,11 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
-	public static Config loadConfig(final String filename, Module... customModules) throws UncheckedIOException {
+	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();
 
-        for (Module customModule : customModules) {
+        for (ConfigGroup customModule : customModules) {
             config.addModule(customModule);
         }
 
@@ -133,9 +133,9 @@ public abstract class ConfigUtils {
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)
 	 * and then hit Refactor/Inline.
 	 */
-	public static <T extends Module> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
-		Module module = config.getModule(groupName);
-		if (module == null || module.getClass() == Module.class) {
+	public static <T extends ConfigGroup> T addOrGetModule(Config config, String groupName, Class<T> moduleClass) {
+		ConfigGroup module = config.getModule(groupName);
+		if (module == null || module.getClass() == ConfigGroup.class) {
 			try {
 				module = moduleClass.newInstance();
 				config.addModule(module);

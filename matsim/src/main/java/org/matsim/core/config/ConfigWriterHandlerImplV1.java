@@ -67,7 +67,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 //////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void writeModule(final Module module, final BufferedWriter out) throws UncheckedIOException {
+	public void writeModule(final ConfigGroup module, final BufferedWriter out) throws UncheckedIOException {
 		Map<String, String> params = module.getParams();
 		Map<String, String> comments = module.getComments();
 

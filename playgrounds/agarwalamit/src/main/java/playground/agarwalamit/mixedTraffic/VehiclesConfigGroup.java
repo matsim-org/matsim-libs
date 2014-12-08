@@ -28,7 +28,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicles;
 /**
  * @author amit
  */
-public class VehiclesConfigGroup extends Module {
+public class VehiclesConfigGroup extends ConfigGroup {
 
 	public VehiclesConfigGroup() {
 		super(GROUP_NAME);

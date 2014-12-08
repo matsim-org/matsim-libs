@@ -23,12 +23,12 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author nagel
  */
-public class PtCountsConfigGroup extends Module {
+public class PtCountsConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "ptCounts";
 

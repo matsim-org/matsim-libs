@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -160,7 +160,7 @@ public class ControlerTest {
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);
-		Module strategyParams = config.getModule("strategy");
+		ConfigGroup strategyParams = config.getModule("strategy");
 		strategyParams.addParam("maxAgentPlanMemorySize", "4");
 		strategyParams.addParam("ModuleProbability_1", "1.0");
 		strategyParams.addParam("Module_1", "ReRoute");

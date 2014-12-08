@@ -94,7 +94,7 @@ public class CadytsFreightChainTest {
 		config.planCalcScore().setBrainExpBeta(beta);
 
 		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setModuleName("ccc");
+		strategySettings.setStrategyName("ccc");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 

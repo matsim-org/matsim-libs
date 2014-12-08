@@ -22,8 +22,8 @@ package org.matsim.core.config.groups;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.Collection;
@@ -37,9 +37,13 @@ import java.util.Map;
  *
  * @author mrieser
  */
-public class StrategyConfigGroup extends Module {
+public class StrategyConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "strategy";
+	
+	// in the following, it is still named "module", for the following reason:
+	// the "right" side is the outside interface, used in the config files, which is left with the old keys for backwards compatibility.
+	// kai/mz, dec'14
 	private static final String MODULE = "Module_";
 	private static final String MODULE_PROBABILITY = "ModuleProbability_";
 	private static final String MODULE_DISABLE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
@@ -50,11 +54,11 @@ public class StrategyConfigGroup extends Module {
 	// yy could you please describe why this indirect design was done?  Was ist just because it made refactoring easier, or does it provide
 	// an advantage or is even necessary?  Thanks ...  kai, oct'14
 
-	public static class StrategySettings extends ReflectiveModule implements MatsimParameters {
+	public static class StrategySettings extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";
 		private Id<StrategySettings> id;
 		private double probability = -1.0;
-		private String moduleName = null;
+		private String name = null;
 		private int disableAfter = -1;
 		private String exePath = null;
 		private String subpopulation = null;
@@ -73,16 +77,16 @@ public class StrategyConfigGroup extends Module {
 			Map<String,String> map = super.getComments();
 
 			// put comments only for the first strategy to improve readability
-			map.put( "moduleName",
+			map.put( "strategyName",
 					"name of strategy (if not full class name, resolved in StrategyManagerConfigLoader)");
 			map.put( "probability",
 					"probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
 			map.put( "disableAfterIteration",
-					"iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
+					"iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
 			map.put( "executionPath",
 					"path to external executable (if applicable)" ) ;
 			map.put( "subpopulation",
-					"subpopulation to which the module applies. \"null\" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute)" ) ;
+					"subpopulation to which the strategy applies. \"null\" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute)" ) ;
 
 			return map ;
 		}
@@ -91,11 +95,11 @@ public class StrategyConfigGroup extends Module {
 		protected void checkConsistency() {
 			super.checkConsistency();
 
-			if ( getModuleName() == null || getModuleName().length() == 0 ) {
-				throw new RuntimeException("Strategy has no module set");
+			if ( getStrategyName() == null || getStrategyName().length() == 0 ) {
+				throw new RuntimeException("Strategy name is not set");
 			}
 			if ( getProbability() < 0.0 ) {
-				throw new RuntimeException("Probability for strategy " + getModuleName() + " must be >= 0.0" ); 
+				throw new RuntimeException("Probability for strategy " + getStrategyName() + " must be >= 0.0" ); 
 			}
 		}
 
@@ -109,14 +113,14 @@ public class StrategyConfigGroup extends Module {
 			return this.probability;
 		}
 
-		@StringSetter( "moduleName" )
-		public void setModuleName(final String moduleName) {
-			this.moduleName = moduleName;
+		@StringSetter( "strategyName" )
+		public void setStrategyName(final String name) {
+			this.name = name;
 		}
 
-		@StringGetter( "moduleName" )
-		public String getModuleName() {
-			return this.moduleName;
+		@StringGetter( "strategyName" )
+		public String getStrategyName() {
+			return this.name;
 		}
 
 		@StringSetter( "disableAfterIteration" )
@@ -177,7 +181,7 @@ public class StrategyConfigGroup extends Module {
 		// adding underscore parameters is still supported for backward compatibility.
 		if (key != null && key.startsWith(MODULE)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE.length()), StrategySettings.class), true);
-			settings.setModuleName(value);
+			settings.setStrategyName(value);
 		}
 		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_PROBABILITY.length()), StrategySettings.class), true);
@@ -233,12 +237,12 @@ public class StrategyConfigGroup extends Module {
 				+ "skeleton config, to which additional information will be added.  Can be null.");
 		map.put(ReflectiveDelegate.EXTERNAL_EXE_TMP_FILE_ROOT_DIR, "root directory for temporary files generated by the external executable. Provided as a service; "
 				+ "I don't think this is used by MATSim.") ;
-		map.put(ReflectiveDelegate.EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external module as failed") ;
+		map.put(ReflectiveDelegate.EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external strategy as failed") ;
 		return map ;
 	}
 
 	@Override
-	protected void checkParameterSet(final Module set) {
+	protected void checkParameterSet(final ConfigGroup set) {
 		switch ( set.getName() ) {
 			case StrategySettings.SET_NAME:
 				if ( !(set instanceof StrategySettings) ) {
@@ -251,7 +255,7 @@ public class StrategyConfigGroup extends Module {
 	}
 
 	@Override
-	public Module createParameterSet(final String type) {
+	public ConfigGroup createParameterSet(final String type) {
 		switch ( type ) {
 			case StrategySettings.SET_NAME:
 				return new StrategySettings( );
@@ -338,7 +342,7 @@ public class StrategyConfigGroup extends Module {
 		return delegate.getParams();
 	}
 
-	private static class ReflectiveDelegate extends ReflectiveModule {
+	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
 		 static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
 		 static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
 		 static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";

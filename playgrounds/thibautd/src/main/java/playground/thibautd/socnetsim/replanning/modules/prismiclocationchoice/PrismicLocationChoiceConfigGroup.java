@@ -24,12 +24,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class PrismicLocationChoiceConfigGroup extends ReflectiveModule {
+public class PrismicLocationChoiceConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "prismicLocationChoice";
 
 	private double tieActivationProb = 0.5;

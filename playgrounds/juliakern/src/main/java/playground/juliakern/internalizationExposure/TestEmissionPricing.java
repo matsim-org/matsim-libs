@@ -17,7 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.juliakern.distribution.withScoring;
+package playground.juliakern.internalizationExposure;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -26,21 +30,30 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.*;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import playground.juliakern.distribution.GridTools;
 
 
 /**
@@ -66,23 +79,41 @@ public class TestEmissionPricing {
 	static String outputPath = "output/testEmissionPricing/";
 
 	private static Logger logger;
+
+	private static Double xMin = 0.0;
+
+	private static Double xMax = 20000.;
+
+	private static Double yMin = 0.0;
+
+	private static Double yMax = 12500.;
+
+	private static Map<Id<Link>, Integer> links2xCells;
+
+	private static Integer noOfXCells = 32;
+
+	private static Map<Id<Link>, Integer> links2yCells;
+
+	private static Integer noOfYCells = 20;
+
+	private static ResponsibilityGridTools rgt;
+
+	private static Double timeBinSize = 3600.;
+
+	private static int noOfTimeBins = 24;
 	
-	static String configFile = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/output_config_for_test.xml";
-	
+	private static int numberOfIterations = 21;
 	
 	public static void main(String[] args) {
-		Config config = new Config();
-//		ConfigReaderMatsimV1 crm = new ConfigReaderMatsimV1(config);
-//		crm.readFile(configFile);
-//		MatsimConfigReader mcr = new MatsimConfigReader(config);
-//		mcr.readFile(configFile);
+		
 		logger = Logger.getLogger(TestEmissionPricing.class);
 		
-		//Config config = new Config();
+		Config config = new Config();
 		config.addCoreModules();
-		config.setParam("strategy", "maxAgentPlanMemorySize", "11");
+		config.setParam("strategy", "maxAgentPlanMemorySize", "2");
 		Controler controler = new Controler(config);
 		config.setParam("controler", "writeEventsInterval", "1");
+		
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
@@ -92,8 +123,7 @@ public class TestEmissionPricing {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(21);
-//		ccg.setLastIteration(1);
+		ccg.setLastIteration(numberOfIterations);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -103,7 +133,7 @@ public class TestEmissionPricing {
 	// qsimConfigGroup
 		QSimConfigGroup qcg = controler.getConfig().qsim();
 		qcg.setStartTime(0 * 3600.);
-		qcg.setEndTime(30 * 3600.);
+		qcg.setEndTime(24 * 3600.);
 		qcg.setFlowCapFactor(0.1);
 		qcg.setStorageCapFactor(0.3);
 //		qcg.setFlowCapFactor(0.01);
@@ -155,17 +185,32 @@ public class TestEmissionPricing {
 		
 		logger.info("mrg util of money " + pcs.getMarginalUtilityOfMoney() + " = 0.0789942?");
 
+		
+
 	// strategy
+//		StrategyConfigGroup scg = controler.getConfig().strategy();
+//		StrategySettings strategySettings = new StrategySettings(Id.create("1"));
+//		strategySettings.setModuleName("BestScore");
+//		strategySettings.setProbability(0.01);
+//		scg.addStrategySettings(strategySettings);
+//		StrategySettings strategySettingsR = new StrategySettings(Id.create("2"));
+//		strategySettingsR.setModuleName("ReRoute");
+//		strategySettingsR.setProbability(1.0);
+//		strategySettingsR.setDisableAfter(10);
+//		scg.addStrategySettings(strategySettingsR);
+		
 		StrategyConfigGroup scg = controler.getConfig().strategy();
-		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setProbability(0.01);
-		scg.addStrategySettings(strategySettings);
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
+
+		StrategySettings strategySettingsR = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setProbability(1.0);
+		strategySettingsR.setProbability(0.999);
 		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
+		
+		StrategySettings strategySettings = new StrategySettings(Id.create("2", StrategySettings.class));
+		strategySettings.setStrategyName("ChangeExpBeta");
+		strategySettings.setProbability(0.001);
+		scg.addStrategySettings(strategySettings);
 		
 	// network
 		Scenario scenario = controler.getScenario();
@@ -176,29 +221,43 @@ public class TestEmissionPricing {
 		createPassiveAgents(scenario);
 		
 	// define emission tool input files	
-	       EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-	        controler.getConfig().addModule(ecg);
-	        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-	        ecg.setEmissionVehicleFile(emissionVehicleFile);
-	        
-	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
-	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-	        
-	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
-	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
-	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
+        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+        controler.getConfig().addModule(ecg);
+        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+        ecg.setEmissionVehicleFile(emissionVehicleFile);
+        
+        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+        
+        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
-		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		vcg.setWritingOutputEvents(false) ;
-		
-		EmissionControlerListener ecl = new EmissionControlerListener(controler);
-		controler.addControlerListener(ecl);
-        controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getScenario().getNetwork(), ecl));
+//		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
+//		vcg.setWritingOutputEvents(false) ;
+//		
+//		EmissionControlerListener ecl = new EmissionControlerListener(controler);
+//		controler.addControlerListener(ecl);
+//		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
-		config.checkConsistency();
-		logger.info("checked consitency");
+		EmissionModule emissionModule = new EmissionModule(scenario);
+		emissionModule.setEmissionEfficiencyFactor(1.0);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		links2xCells = gt.mapLinks2Xcells(noOfXCells);
+		links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		
+		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt, links2xCells, links2yCells);
+		EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.setTravelDisutilityFactory(emfac);
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis",new OTFFileWriterFactory());
 		
 		controler.run();
 		
@@ -224,32 +283,29 @@ public class TestEmissionPricing {
 		}
 		
 		// check not selected plans - score should be worse if link 39 is used
-		boolean plan9ex=false;
+		
 		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
-				logger.info("This plan is not selected. It's score is " + p.getScore());
 				for(PlanElement pe: p.getPlanElements()){
 					if(pe instanceof Leg){
 						Leg leg = (Leg)pe;
 						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
 						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							plan9ex = true;
-							if(scoreOfSelectedPlan<p.getScore()){
-								logger.info("A plan with a route via node 9 should have a worse score.");
-							}
+							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
+						}
+						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
+							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
 						}
 					}
 				}
-			}
+			
 		}
-		if(!plan9ex)logger.info("Something with rerouting went wrong. There is no alternative route via node 9.");
 		
-//		
-//		for(Id linkId: ecl.links2xcells.keySet()){
-//			logger.info("link" + linkId.toString() + " is in cell " + ecl.links2xcells.get(linkId).toString() + " " + ecl.links2ycells.get(linkId));
+		
+		// check links
+//		for(Id linkId: scenario.getNetwork().getLinks().keySet()){
+//			logger.info("link id " + linkId.toString() + " cell " + links2xCells.get(linkId) + " , " + links2yCells.get(linkId));
 //		}
-		
-		
+//		logger.info("epsilon"+epsilon);
 	}
 	
 	private static void createNetwork(Scenario scenario) {
@@ -289,7 +345,7 @@ public class TestEmissionPricing {
 				
 				// add a link for each person
 				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), scenario.createCoord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), scenario.createCoord(xCoord, yCoord+10.));
+				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), scenario.createCoord(xCoord, yCoord+1.));
 				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
 
 			}
@@ -314,7 +370,7 @@ public class TestEmissionPricing {
 				Activity home = pFactory.createActivityFromCoord("home", coord );
 				home.setEndTime(1.0);
 				Leg leg = pFactory.createLeg(TransportMode.walk);
-				Coord coord2 = new CoordImpl(xCoord, yCoord+10.);
+				Coord coord2 = new CoordImpl(xCoord, yCoord+1.);
 				Activity home2 = pFactory.createActivityFromCoord("home", coord2);
 
 				plan.addActivity(home);
@@ -331,21 +387,26 @@ public class TestEmissionPricing {
 		Person person = pFactory.createPerson(Id.create("567417.1#12424", Person.class));
 		Plan plan = pFactory.createPlan();
 
-		Activity home = pFactory.createActivityFromLinkId("home", Id.create("12", Link.class));
+		Coord homeCoords = new CoordImpl(1.0, 10000.0);
+		Activity home = pFactory.createActivityFromCoord("home", homeCoords);
+		//Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
 		home.setEndTime(6 * 3600);
 		plan.addActivity(home);
 
 		Leg leg1 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg1);
 
-		Activity work = pFactory.createActivityFromLinkId("work", Id.create("45", Link.class));
+		Coord workCoords = new CoordImpl(19999.0, 10000.0);
+		Activity work = pFactory.createActivityFromCoord("work" , workCoords);
+//		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
 		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
 		plan.addActivity(work);
 
 		Leg leg2 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg2);
 
-		home = pFactory.createActivityFromLinkId("home", Id.create("12", Link.class));
+		home = pFactory.createActivityFromCoord("home", homeCoords);
+//		home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
 		plan.addActivity(home);
 
 		person.addPlan(plan);

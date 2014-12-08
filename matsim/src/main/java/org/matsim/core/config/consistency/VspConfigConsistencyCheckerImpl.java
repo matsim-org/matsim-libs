@@ -85,7 +85,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		boolean found = false ;
 		Collection<StrategySettings> settingsColl = config.strategy().getStrategySettings();
 		for ( StrategySettings settings : settingsColl ) {
-			if ( settings.getModuleName().equalsIgnoreCase("ChangeExpBeta") ) {
+			if ( settings.getStrategyName().equalsIgnoreCase("ChangeExpBeta") ) {
 				found = true ;
 			}
 		}
@@ -171,7 +171,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		boolean usingLocationChoice = false ;
 		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
-			if ( StrategyManagerConfigLoader.LOCATION_CHOICE.equals(settings.getModuleName())) {
+			if ( StrategyManagerConfigLoader.LOCATION_CHOICE.equals(settings.getStrategyName())) {
 				usingLocationChoice = true ;
 			}
 		}

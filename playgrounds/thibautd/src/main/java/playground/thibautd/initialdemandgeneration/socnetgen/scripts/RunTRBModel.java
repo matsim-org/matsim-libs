@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -121,9 +121,9 @@ public class RunTRBModel {
 		MoreIOUtils.closeOutputDirLogging();
 	}
 
-	private static void loadAndLogGroups( final String file , final Module... groups ) {
+	private static void loadAndLogGroups( final String file , final ConfigGroup... groups ) {
 		final Config config = new Config();
-		for ( Module group : groups ) config.addModule( group );
+		for ( ConfigGroup group : groups ) config.addModule( group );
 
 		new MatsimConfigReader( config ).readFile( file );
 
@@ -240,7 +240,7 @@ public class RunTRBModel {
 		}
 	}
 
-	private static class TRBModelConfigGroup extends ReflectiveModule {
+	private static class TRBModelConfigGroup extends ReflectiveConfigGroup {
 		private static final String GROUP_NAME = "utility";
 
 		private double b_logDist = -1.222;

@@ -18,13 +18,13 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author nagel
  *
  */
-public class IVVReaderConfigGroup extends ReflectiveModule {
+public class IVVReaderConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "IVVReaderConfigGroup" ;
 	
 	// ---

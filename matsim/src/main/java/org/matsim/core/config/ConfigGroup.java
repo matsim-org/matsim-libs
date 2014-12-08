@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * @author mrieser
  * @author balmermi
  */
-public class Module {
+public class ConfigGroup {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -43,11 +43,11 @@ public class Module {
 
 	private final String name;
 	private final TreeMap<String,String> params;
-	private final Map<String, Collection<Module>> parameterSetsPerType = new HashMap<String, Collection<Module>>();
+	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<String, Collection<ConfigGroup>>();
 
-	private final static Logger log = Logger.getLogger(Module.class);
+	private final static Logger log = Logger.getLogger(ConfigGroup.class);
 
-	public Module(final String name) {
+	public ConfigGroup(final String name) {
 		this.name = name;
 		this.params = new TreeMap<String,String>();
 	}
@@ -83,8 +83,8 @@ public class Module {
 	 */
 	protected void checkConsistency() {
 		// default: just call this method on parameter sets
-		for ( Collection<? extends Module> sets : getParameterSets().values() ) {
-			for ( Module set : sets ) set.checkConsistency();
+		for ( Collection<? extends ConfigGroup> sets : getParameterSets().values() ) {
+			for ( ConfigGroup set : sets ) set.checkConsistency();
 		}
 	}
 
@@ -123,8 +123,8 @@ public class Module {
 	/**
 	 * Override if parameter sets of a certain type need a special implementation
 	 */
-	public Module createParameterSet(final String type) {
-		return new Module( type );
+	public ConfigGroup createParameterSet(final String type) {
+		return new ConfigGroup( type );
 	}
 
 	//public final Module createAndAddParameterSet(final String type) {
@@ -139,20 +139,20 @@ public class Module {
 	//	return m;
 	//}
 
-	public void addParameterSet(final Module set) {
+	public void addParameterSet(final ConfigGroup set) {
 		checkParameterSet( set );
-		Collection<Module> parameterSets = parameterSetsPerType.get( set.getName() );
+		Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
 
 		if ( parameterSets == null ) {
-			parameterSets = new ArrayList<Module>();
+			parameterSets = new ArrayList<ConfigGroup>();
 			parameterSetsPerType.put( set.getName() ,  parameterSets );
 		}
 
 		parameterSets.add( set );
 	}
 
-	public boolean removeParameterSet( final Module set ) {
-		final Collection<Module> parameterSets = parameterSetsPerType.get( set.getName() );
+	public boolean removeParameterSet( final ConfigGroup set ) {
+		final Collection<ConfigGroup> parameterSets = parameterSetsPerType.get( set.getName() );
 		return parameterSets != null ?
 			parameterSets.remove( set ) :
 			false;
@@ -164,7 +164,7 @@ public class Module {
 	 * for instance if parameter sets of a given type should be
 	 * instances of a particular class.
 	 */
-	protected void checkParameterSet(final Module set) {
+	protected void checkParameterSet(final ConfigGroup set) {
 		// empty for inheritance
 	}
 	
@@ -172,18 +172,18 @@ public class Module {
 	 * Useful for instance if default values are provided but should be cleared if
 	 * user provides values.
 	 */
-	protected final Collection<? extends Module> clearParameterSetsForType( final String type ) {
+	protected final Collection<? extends ConfigGroup> clearParameterSetsForType( final String type ) {
 		return parameterSetsPerType.remove( type );
 	}
 
-	public final Collection<? extends Module> getParameterSets(final String type) {
-		final Collection<Module> sets = parameterSetsPerType.get( type );
+	public final Collection<? extends ConfigGroup> getParameterSets(final String type) {
+		final Collection<ConfigGroup> sets = parameterSetsPerType.get( type );
 		return sets == null ?
-			Collections.<Module>emptySet() :
+			Collections.<ConfigGroup>emptySet() :
 			Collections.unmodifiableCollection( sets );
 	}
 
-	public final Map<String, ? extends Collection<? extends Module>> getParameterSets() {
+	public final Map<String, ? extends Collection<? extends ConfigGroup>> getParameterSets() {
 		// TODO: immutabilize (including lists)
 		return parameterSetsPerType;
 	}

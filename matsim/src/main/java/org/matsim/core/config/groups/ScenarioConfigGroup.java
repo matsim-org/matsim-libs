@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,7 +28,7 @@ import java.util.TreeMap;
  * @author dgrether
  *
  */
-public class ScenarioConfigGroup extends Module {
+public class ScenarioConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "scenario";
 

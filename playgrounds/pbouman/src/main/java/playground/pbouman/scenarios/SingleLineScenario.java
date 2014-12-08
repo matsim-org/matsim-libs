@@ -227,11 +227,11 @@ public class SingleLineScenario
 		
 		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class));
 		//stratSets.setModuleName("BestScore");
-		stratSets.setModuleName("SelectExpBeta");
+		stratSets.setStrategyName("SelectExpBeta");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
 		stratSets = new StrategySettings(Id.create("2", StrategySettings.class));
-		stratSets.setModuleName("TransitTimeAllocationMutator");
+		stratSets.setStrategyName("TransitTimeAllocationMutator");
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		

@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class SocialNetworkConfigGroup extends ReflectiveModule {
+public class SocialNetworkConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "socialNetwork";
 
 	private String inputFile = null;

@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.contrib.grips.io.DepartureTimeDistribution;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Config module for grips project
@@ -32,7 +32,7 @@ import org.matsim.core.config.Module;
  * @author laemmel
  * 
  */
-public class GripsConfigModule extends Module {
+public class GripsConfigModule extends ConfigGroup {
 
 	public static final String GROUP_NAME = "grips";
 	public static final String NETWORK_FILE_NAME = "networkFile";
@@ -56,7 +56,7 @@ public class GripsConfigModule extends Module {
 		super(name);
 	}	
 
-	public GripsConfigModule(Module grips) {
+	public GripsConfigModule(ConfigGroup grips) {
 		super(GROUP_NAME);
 		for (Entry<String, String> e : grips.getParams().entrySet()) {
 			addParam(e.getKey(), e.getValue());

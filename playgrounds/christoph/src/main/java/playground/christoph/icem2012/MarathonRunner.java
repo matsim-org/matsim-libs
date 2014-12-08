@@ -46,7 +46,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -287,7 +287,7 @@ public final class MarathonRunner implements StartupListener,
 		 * The KTIConfigGroup is loaded as generic Module. We replace this
 		 * generic object with a KtiConfigGroup object and copy all its parameter.
 		 */
-		Module module = this.scenario.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
+		ConfigGroup module = this.scenario.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
 		this.scenario.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
 		this.scenario.getConfig().addModule(this.ktiConfigGroup);
 		

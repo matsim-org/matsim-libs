@@ -22,12 +22,12 @@ package playground.thibautd.socnetsim.scoring;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class GroupSizePreferencesConfigGroup extends ReflectiveModule {
+public class GroupSizePreferencesConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "groupSizePreferences";
 
 	private String activityType = "leisure";

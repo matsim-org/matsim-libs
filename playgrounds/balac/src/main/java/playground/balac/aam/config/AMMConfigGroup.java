@@ -1,9 +1,9 @@
 package playground.balac.aam.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
-public class AMMConfigGroup extends ReflectiveModule {
+public class AMMConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "MovingPathways";
 	
 	private String travelingMovingPathways = null;

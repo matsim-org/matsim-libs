@@ -22,13 +22,13 @@ package playground.wdoering.oldstufffromgregor;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author laemmel
  * 
  */
-public class Sim2DConfigGroup extends Module {
+public class Sim2DConfigGroup extends ConfigGroup {
 
 	/**
 	 * 
@@ -101,7 +101,7 @@ public class Sim2DConfigGroup extends Module {
 
 	private final double tau = 0.5;
 
-	public Sim2DConfigGroup(Module sim2d) {
+	public Sim2DConfigGroup(ConfigGroup sim2d) {
 		super(GROUP_NAME);
 		for (Entry<String, String> e : sim2d.getParams().entrySet()) {
 			addParam(e.getKey(), e.getValue());

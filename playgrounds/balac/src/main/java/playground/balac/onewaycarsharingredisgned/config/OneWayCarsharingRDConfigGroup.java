@@ -1,9 +1,9 @@
 package playground.balac.onewaycarsharingredisgned.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
-public class OneWayCarsharingRDConfigGroup extends ReflectiveModule {
+public class OneWayCarsharingRDConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "OneWayCarsharing";
 	
 	private String travelingOneWayCarsharing = null;

@@ -22,13 +22,13 @@ package playground.thibautd.socnetsim.cliques.config;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * Defines the file used to import clique information.
  * @author thibautd
  */
-public class CliquesConfigGroup extends Module {
+public class CliquesConfigGroup extends ConfigGroup {
 
 	private static final Logger log = Logger.getLogger(CliquesConfigGroup.class);
 

@@ -28,7 +28,7 @@ import java.io.BufferedWriter;
 	
 	public void endConfig(final BufferedWriter out);
 
-	public void writeModule(final Module module, final BufferedWriter out);
+	public void writeModule(final ConfigGroup module, final BufferedWriter out);
 	
 	public void writeSeparator(final BufferedWriter out);
 	

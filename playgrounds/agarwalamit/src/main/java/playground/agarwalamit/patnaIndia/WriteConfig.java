@@ -73,11 +73,11 @@ public class WriteConfig {
 		config.qsim().setTrafficDynamics("queue");
 
 		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
-		expChangeBeta.setModuleName("ChangeExpBeta");
+		expChangeBeta.setStrategyName("ChangeExpBeta");
 		expChangeBeta.setProbability(0.9);
 
 		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
-		reRoute.setModuleName("ReRoute");
+		reRoute.setStrategyName("ReRoute");
 		reRoute.setProbability(0.1);
 
 //		StrategySettings modeChoice = new StrategySettings(Id.create("4",StrategySettings.class));
@@ -85,7 +85,7 @@ public class WriteConfig {
 //		modeChoice.setProbability(0.05);
 
 		StrategySettings timeAllocationMutator	= new StrategySettings(Id.create("3",StrategySettings.class));
-		timeAllocationMutator.setModuleName("TimeAllocationMutator");
+		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
 		timeAllocationMutator.setProbability(0.05);
 
 //		config.setParam("changeLegMode", "modes", "car,bike,motorbike,pt,walk");

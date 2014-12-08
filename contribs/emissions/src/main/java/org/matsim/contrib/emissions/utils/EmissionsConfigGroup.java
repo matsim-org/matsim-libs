@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 import java.util.Map;
 
 public class EmissionsConfigGroup
-    extends ReflectiveModule
+    extends ReflectiveConfigGroup
 {
     private static final String GROUP_NAME = "emissions";
 

@@ -61,7 +61,7 @@ import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -195,7 +195,7 @@ public class MultiModalDemo {
 		home.setTypicalDuration(24*3600);
 		config.planCalcScore().addActivityParams(home);
 		
-		Module module = config.createModule("changeLegMode");
+		ConfigGroup module = config.createModule("changeLegMode");
 		module.addParam("modes", legModes);	
 			
 		Scenario scenario = ScenarioUtils.createScenario(config);

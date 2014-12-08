@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ZoomEntry;
 
 
@@ -37,7 +37,7 @@ import org.matsim.core.config.groups.ZoomEntry;
  * @author dstrippgen
  *
  */
-public class OTFVisConfigGroup extends Module {
+public class OTFVisConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "otfvis";
 

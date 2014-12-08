@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 public class ConfigurationUtils {
 	
 	public static AccessibilityConfigGroup getAccessibilityParameterConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
 		if (m instanceof AccessibilityConfigGroup) {
 			return (AccessibilityConfigGroup) m;
 		}
@@ -36,7 +36,7 @@ public class ConfigurationUtils {
 	}
 
 	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
@@ -44,7 +44,7 @@ public class ConfigurationUtils {
 	}
 	
 	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		ConfigGroup m = scenario.getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}

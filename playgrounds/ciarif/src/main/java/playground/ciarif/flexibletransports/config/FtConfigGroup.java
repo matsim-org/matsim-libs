@@ -20,11 +20,11 @@
 package playground.ciarif.flexibletransports.config;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.ConfigGroup;
 
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
-public class FtConfigGroup extends Module {
+public class FtConfigGroup extends ConfigGroup {
 	
 	public static final String GROUP_NAME = "ft";
 

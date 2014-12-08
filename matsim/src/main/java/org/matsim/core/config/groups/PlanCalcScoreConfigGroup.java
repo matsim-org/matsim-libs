@@ -28,8 +28,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -44,7 +44,7 @@ import org.matsim.pt.PtConstants;
  * @author nagel
  *
  */
-public class PlanCalcScoreConfigGroup extends Module {
+public class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
 
@@ -472,7 +472,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	@Override
-	public void addParameterSet( final Module set ) {
+	public void addParameterSet( final ConfigGroup set ) {
 		switch ( set.getName() ) {
 			case ActivityParams.SET_TYPE:
 				addActivityParams( (ActivityParams) set );
@@ -521,7 +521,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	/* complex classes */
 
-	public static class ActivityParams extends ReflectiveModule implements MatsimParameters {
+	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
 		final static String SET_TYPE = "activityParams";
 		private String type;
 		private double priority = 1.0;
@@ -683,7 +683,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		}
 	}
 
-	public static class ModeParams extends ReflectiveModule implements MatsimParameters {
+	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 		final static String SET_TYPE = "modeParams";
 
 		private String mode = null;
@@ -768,7 +768,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	/* parameter set handling */
 	@Override
-	public Module createParameterSet(final String type) {
+	public ConfigGroup createParameterSet(final String type) {
 		switch ( type ) {
 			case ActivityParams.SET_TYPE:
 				return new ActivityParams();
@@ -780,7 +780,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	@Override
-	protected void checkParameterSet( final Module module ) {
+	protected void checkParameterSet( final ConfigGroup module ) {
 		switch ( module.getName() ) {
 			case ActivityParams.SET_TYPE:
 				if ( !(module instanceof ActivityParams) ) {
@@ -885,7 +885,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
 	}
 
-	private static class ReflectiveDelegate extends ReflectiveModule {
+	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
 		private ReflectiveDelegate() {
 			super( PlanCalcScoreConfigGroup.GROUP_NAME );
 		}

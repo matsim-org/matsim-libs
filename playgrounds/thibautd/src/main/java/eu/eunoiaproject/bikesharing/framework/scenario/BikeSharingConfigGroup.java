@@ -21,13 +21,13 @@ package eu.eunoiaproject.bikesharing.framework.scenario;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * Stores the parameters from the config file for a bike sharing simulation.
  * @author thibautd
  */
-public class BikeSharingConfigGroup extends ReflectiveModule {
+public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "bikeSharing";
 
 	private String facilitiesAttributesFile = null;

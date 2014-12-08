@@ -19,10 +19,10 @@
 
 package playground.balac.freefloating.config;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
-public class FreeFloatingConfigGroup extends ReflectiveModule {
+public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "FreeFloating";
 		

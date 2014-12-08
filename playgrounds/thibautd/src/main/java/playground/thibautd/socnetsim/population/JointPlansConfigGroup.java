@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class JointPlansConfigGroup extends ReflectiveModule {
+public class JointPlansConfigGroup extends ReflectiveConfigGroup {
 	public final static String GROUP_NAME = "jointPlans";
 
 	public JointPlansConfigGroup() {

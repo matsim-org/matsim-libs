@@ -19,13 +19,13 @@
 package org.matsim.contrib.matsim4urbansim.config;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author nagel
  *
  */
-public class Matsim4UrbansimConfigGroup extends ReflectiveModule {
+public class Matsim4UrbansimConfigGroup extends ReflectiveConfigGroup {
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(Matsim4UrbansimConfigGroup.class);
 
