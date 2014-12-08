@@ -181,9 +181,7 @@ public class NoiseTest {
 		
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
-		
-		final Scenario sc = scenario;
-		
+				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
 		events.addHandler(new ActivityStartEventHandler() {
@@ -424,7 +422,7 @@ public class NoiseTest {
 			
 			for(Id<ReceiverPoint> receiverPointId : affectedPersonsPerReceiverPointTest.keySet()){
 				
-				Assert.assertEquals("Wrong number of affected persons", consideredAgentsPerReceiverPoint.get(receiverPointId).get(index), affectedPersonsPerReceiverPointTest.get(receiverPointId), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Wrong number of affected persons", affectedPersonsPerReceiverPointTest.get(receiverPointId), consideredAgentsPerReceiverPoint.get(receiverPointId).get(index), MatsimTestUtils.EPSILON);
 				
 			}
 			
@@ -507,7 +505,7 @@ public class NoiseTest {
 			double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 			double noiseEmission = mittelungspegel + Dv;
 			
-			Assert.assertEquals("Wrong amount of emission!", emissionsPerLink.get(linkId), noiseEmission, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of emission!", noiseEmission, emissionsPerLink.get(linkId), MatsimTestUtils.EPSILON);
 			noiseEmissionsPerLink.put(linkId, noiseEmission);
 			
 		}
@@ -573,7 +571,7 @@ public class NoiseTest {
 				
 			}
 			
-			Assert.assertEquals("Wrong amount of immission!", immissionPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateResultingNoiseImmission(linkId2IsolatedImmission.values()), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of immission!", NoiseEquations.calculateResultingNoiseImmission(linkId2IsolatedImmission.values()), immissionPerReceiverPointId.get(rp.getId()), MatsimTestUtils.EPSILON);
 				
 		}
 		
@@ -619,7 +617,7 @@ public class NoiseTest {
 			double noiseImmission = immissionPerReceiverPointId.get(rp.getId());
 			double affectedAgentUnits = consideredAgentsPerReceiverPoint.get(rp.getId()).get(1);
 			
-			Assert.assertEquals("Wrong damage!", damagesPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong damage!", NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), damagesPerReceiverPointId.get(rp.getId()),  MatsimTestUtils.EPSILON);
 			
 		}
 		
