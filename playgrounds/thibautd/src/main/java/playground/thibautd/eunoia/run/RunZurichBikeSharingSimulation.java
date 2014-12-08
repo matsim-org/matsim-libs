@@ -170,8 +170,8 @@ public class RunZurichBikeSharingSimulation {
 		public static final String GROUP_NAME = "denivelationScoring";
 
 		// from Gregory Erhardt: biking up 1 distance unit is equivalent to
-		// biking additional 316 units
-		private double equivalentDistanceForAltitudeGain = 316;
+		// biking additional 31.68 units
+		private double equivalentDistanceForAltitudeGain = 31.68;
 
 		public DenivelationConfigGroup( ) {
 			super( GROUP_NAME );
