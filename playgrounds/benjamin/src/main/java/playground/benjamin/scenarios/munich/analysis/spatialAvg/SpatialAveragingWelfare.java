@@ -175,15 +175,6 @@ public class SpatialAveragingWelfare {
 		return spatialGrid;
 	}
 
-	private Map<Id, Double> calculateAvgRefund(double sumOfTollPayments, Population pop) {
-		Map<Id, Double> personId2AvgRefund = new HashMap<Id, Double>();
-		double avgRefund = sumOfTollPayments / pop.getPersons().size();
-		for(Id personId : pop.getPersons().keySet()){
-			personId2AvgRefund.put(personId, avgRefund);
-		}
-		return personId2AvgRefund;
-	}
-
 	private Map<Id, Double> sumUpUtilities(Map<Id, Double> personId2Utility, Map<Id, Double> personId2Refund) {
 		Map<Id, Double> sumOfUtilities = new HashMap<Id, Double>();
 		for(Id personId : personId2Utility.keySet()){
