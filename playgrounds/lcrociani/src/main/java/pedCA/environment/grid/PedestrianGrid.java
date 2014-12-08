@@ -12,10 +12,10 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	private ArrayList<Shadow> shadows;
 	private final DensityGrid densityGrid;
 	
-	public PedestrianGrid(int rows, int cols){
+	public PedestrianGrid(int rows, int cols, EnvironmentGrid environmentGrid){
 		super(rows, cols);		
 		this.shadows = new ArrayList<Shadow>();
-		this.densityGrid = new DensityGrid(rows, cols);
+		this.densityGrid = new DensityGrid(rows, cols, environmentGrid);
 	}
 		
 	public void moveTo(Agent pedestrian, GridPoint newPos) {

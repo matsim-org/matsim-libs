@@ -29,7 +29,7 @@ public class TransitionArea extends PedestrianGrid {
 	}
 	
 	public TransitionArea(int rows, int cols, int rotation, GridPoint environmentRef) {
-		super(rows,cols);
+		super(rows,cols, null);
 		this.rotation = rotation;
 		this.environmentRef = environmentRef;
 		this.transAreaRef = new GridPoint(cols-1,0);

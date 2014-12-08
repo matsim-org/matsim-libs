@@ -10,10 +10,12 @@ import pedCA.utility.Distances;
 public class DensityGrid extends Grid<Double> {
 
 	private final PedestrianFootprint pedestrianFootprint;
+	private final EnvironmentGrid environmentGrid;
 	
-	public DensityGrid(int rows, int cols) {
+	public DensityGrid(int rows, int cols, EnvironmentGrid environmentGrid) {
 		super(rows, cols);
 		this.pedestrianFootprint = new PedestrianFootprint(Constants.DENSITY_GRID_RADIUS);
+		this.environmentGrid = environmentGrid;
 	}
 
 	protected void diffuse(GridPoint position){
@@ -46,12 +48,20 @@ public class DensityGrid extends Grid<Double> {
 			GridPoint positionToWrite = Distances.gridPointDifference(position, shift);
 			if (!neighbourCondition(positionToWrite.getY(), positionToWrite.getX())){
 				deltaArea+=cellArea;
-			}
+			} 
 		}
 		double densityValue = get(position).get(0);
 		double footprintArea = pedestrianFootprint.getArea();
 		densityValue = densityValue*footprintArea/(footprintArea-deltaArea);
 		return densityValue;
+	}
+	
+	@Override
+	public boolean neighbourCondition(int row, int col){
+		if (environmentGrid != null)
+			return super.neighbourCondition(row, col) && environmentGrid.isWalkable(row, col);
+		else
+			return super.neighbourCondition(row, col);
 	}
 	
 	@Override

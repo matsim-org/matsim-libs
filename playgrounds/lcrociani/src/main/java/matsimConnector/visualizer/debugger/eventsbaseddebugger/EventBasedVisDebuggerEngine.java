@@ -239,7 +239,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		}
 
 		this.vis.addCircle(to_x,to_y,cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
-		this.vis.addText(to_x,to_y, ""+event.getPedestrian().getID(), 200);
+		this.vis.addText(to_x,to_y, ""+event.getDensity(), 200);
 	}
 
 	private void update(double time2) {

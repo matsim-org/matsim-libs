@@ -34,7 +34,7 @@ public class Context {
 		this.markerConfiguration = markerConfiguration;
 		floorFieldsGrid = new FloorFieldsGrid(environmentGrid, markerConfiguration);
 		pedestrianGrids = new ArrayList<PedestrianGrid>();
-		pedestrianGrids.add(new PedestrianGrid(environmentGrid.getRows(), environmentGrid.getColumns()));
+		pedestrianGrids.add(new PedestrianGrid(environmentGrid.getRows(), environmentGrid.getColumns(), environmentGrid));
 	}
 	
 	public void saveConfiguration(String path) throws IOException{

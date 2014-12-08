@@ -35,17 +35,18 @@ public class EnvironmentTests extends MatsimTestCase {
 	
 	@Test
 	public void testPedestrianGrid(){
-		PedestrianGrid grid = new PedestrianGrid(4,5);
-		PedestrianGrid result = new PedestrianGrid(4,5);
+		PedestrianGrid grid = new PedestrianGrid(4,5, null);
+		PedestrianGrid result = new PedestrianGrid(4,5, null);
 
 		Agent ped1 = new Agent(0, new GridPoint(1,0), null, null);
 		Agent ped2 = new Agent(0, new GridPoint(1,2), null, null);
 			
-		result.add(0, 2, ped1);
-		result.add(2, 1, ped2);
+		result.addPedestrian(new GridPoint(1, 0), ped1);
+		result.addPedestrian(new GridPoint(1, 2), ped2);
+		result.moveTo(ped1, new GridPoint(2,0));
 		
-		grid.add(0, 1, ped1);
-		grid.add(2, 1, ped2);
+		grid.addPedestrian(new GridPoint(1, 0), ped1);
+		grid.addPedestrian(new GridPoint(1, 2), ped2);
 		
 		grid.moveTo(ped1, new GridPoint(2,0));
 		//grid.moveTo(ped2, new GridPoint(2,0));

@@ -56,6 +56,8 @@ public class EnvironmentGrid extends Grid<Integer>{
 			StringTokenizer st = new StringTokenizer(line,",");
 			if (st.countTokens()==1)
 				st = new StringTokenizer(line, ";");
+			if (st.countTokens()==1)
+				st = new StringTokenizer(line, "\t");
 			String value_s;
 			do{
 				value_s = st.nextToken();

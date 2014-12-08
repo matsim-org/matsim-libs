@@ -30,4 +30,9 @@ public class Shadow extends PhysicalObject{
 	public int getPedestrianId() {
 		return pedestrianId;
 	}
+	
+	@Override
+	public String toString(){
+		return "shadow";
+	}
 }
