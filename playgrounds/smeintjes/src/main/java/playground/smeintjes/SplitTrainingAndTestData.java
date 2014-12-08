@@ -17,8 +17,8 @@ import playground.southafrica.utilities.Header;
 	 * @author sumarie
 	 *
 	 */
-public class DigicoreVehicleIdsToFiles {
-	private final static Logger LOG = Logger.getLogger(DigicoreVehicleIdsToFiles.class);
+public class SplitTrainingAndTestData {
+	private final static Logger LOG = Logger.getLogger(SplitTrainingAndTestData.class.toString());
 	
 	/**
 	 * @param the path to the .txt file containing the list of vehicle ids
@@ -27,7 +27,7 @@ public class DigicoreVehicleIdsToFiles {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Header.printHeader(DigicoreVehicleIdsToFiles.class.toString(), args);
+		Header.printHeader(SplitTrainingAndTestData.class.toString(), args);
 		String inputFile = args[0];
 		String xmlFolder = args[1];
 		String outputFolder = args[2]; //Note: output folder must already exist!
