@@ -133,52 +133,54 @@ public class Matsim2030Utils {
 		final ScenarioMergingConfigGroup mergingGroup = (ScenarioMergingConfigGroup)
 			config.getModule( ScenarioMergingConfigGroup.GROUP_NAME );
 
-		if ( !mergingGroup.isPerformMerging() ) {
-			log.warn( "skipping scenario merging!" );
-			return;
+		if ( mergingGroup.isPerformMerging() ) {
+
+			final Random random = MatsimRandom.getLocalInstance();
+
+			if ( mergingGroup.getCrossBorderPlansFile() != null ) {
+				log.info( "reading cross border plans from "+mergingGroup.getCrossBorderPlansFile() );
+				addSubpopulation(
+						random,
+						mergingGroup.getSamplingRate(),
+						mergingGroup.getCrossBorderPopulationId(),
+						mergingGroup.getCrossBorderPlansFile(),
+						scenario );
+			}
+
+			if ( mergingGroup.getCrossBorderFacilitiesFile() != null ) {
+				log.info( "reading facilities for cross-border population from "+mergingGroup.getCrossBorderFacilitiesFile() );
+				new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getCrossBorderFacilitiesFile() );
+			}
+
+			if ( mergingGroup.getFreightPlansFile() != null ) {
+				log.info( "reading freight plans from "+mergingGroup.getFreightPlansFile() );
+				addSubpopulation(
+						random,
+						mergingGroup.getSamplingRate(),
+						mergingGroup.getFreightPopulationId(),
+						mergingGroup.getFreightPlansFile(),
+						scenario );
+			}
+
+			if ( mergingGroup.getFreightFacilitiesFile() != null ) {
+				log.info( "reading facilities for freight population from "+mergingGroup.getFreightFacilitiesFile() );
+				new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getFreightFacilitiesFile() );
+			}
+
+			logPopulationStats( scenario );
+
+			// do it BEFORE importing the PT part of the network.
+			log.info( "connecting activities, links and facilities" );
+			connectFacilitiesWithLinks( mergingGroup , scenario );
+
+			if ( mergingGroup.getPtSubnetworkFile() != null ) {
+				log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
+				new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
+			}
 		}
-
-		final Random random = MatsimRandom.getLocalInstance();
-
-		if ( mergingGroup.getCrossBorderPlansFile() != null ) {
-			log.info( "reading cross border plans from "+mergingGroup.getCrossBorderPlansFile() );
-			addSubpopulation(
-					random,
-					mergingGroup.getSamplingRate(),
-					mergingGroup.getCrossBorderPopulationId(),
-					mergingGroup.getCrossBorderPlansFile(),
-					scenario );
-		}
-
-		if ( mergingGroup.getCrossBorderFacilitiesFile() != null ) {
-			log.info( "reading facilities for cross-border population from "+mergingGroup.getCrossBorderFacilitiesFile() );
-			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getCrossBorderFacilitiesFile() );
-		}
-
-		if ( mergingGroup.getFreightPlansFile() != null ) {
-			log.info( "reading freight plans from "+mergingGroup.getFreightPlansFile() );
-			addSubpopulation(
-					random,
-					mergingGroup.getSamplingRate(),
-					mergingGroup.getFreightPopulationId(),
-					mergingGroup.getFreightPlansFile(),
-					scenario );
-		}
-
-		if ( mergingGroup.getFreightFacilitiesFile() != null ) {
-			log.info( "reading facilities for freight population from "+mergingGroup.getFreightFacilitiesFile() );
-			new MatsimFacilitiesReader( scenario ).readFile( mergingGroup.getFreightFacilitiesFile() );
-		}
-
-		logPopulationStats( scenario );
-
-		// do it BEFORE importing the PT part of the network.
-		log.info( "connecting activities, links and facilities" );
-		connectFacilitiesWithLinks( mergingGroup , scenario );
-
-		if ( mergingGroup.getPtSubnetworkFile() != null ) {
-			log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
-			new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
+		else {
+			log.warn( "skipping merging, just connecting facilities to links." );
+			connectFacilitiesWithLinks( mergingGroup , scenario );
 		}
 
 	}
@@ -321,6 +323,7 @@ public class Matsim2030Utils {
 				final Id<ActivityFacility> facilityId = act.getFacilityId();
 
 				final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
+				if ( fac == null ) continue; // might be a bike sharing facility when re-reading
 				if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
 				else if ( !fac.getLinkId().equals( linkId ) ) throw new RuntimeException( "inconsistent links for facility "+facilityId );
 			}
