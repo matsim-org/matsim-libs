@@ -24,7 +24,8 @@ public class GridCell <T> {
 			set(level, object);
 		}catch(IndexOutOfBoundsException e){
 			if (force==true){
-				for(int i=0;i<level-objects.size();i++)
+				int oldSize = objects.size();
+				for(int i=0;i<level-oldSize;i++)
 					objects.add(null);
 				objects.add(object);
 			}else throw e;

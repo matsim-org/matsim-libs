@@ -53,7 +53,9 @@ public class EnvironmentGrid extends Grid<Integer>{
 		String line = br.readLine();
 		for (int row = 0;line!=null;row++){
 			addRow();
-			StringTokenizer st = new StringTokenizer(line,",");	
+			StringTokenizer st = new StringTokenizer(line,",");
+			if (st.countTokens()==1)
+				st = new StringTokenizer(line, ";");
 			String value_s;
 			do{
 				value_s = st.nextToken();

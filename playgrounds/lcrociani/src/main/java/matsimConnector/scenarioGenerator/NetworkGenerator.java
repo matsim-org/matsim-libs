@@ -175,14 +175,16 @@ public class NetworkGenerator {
 				y_max = node.getCoord().getY();
 				firstIt = false;
 			}
-			else if(node.getCoord().getY() < y_min)
-				y_min = node.getCoord().getY();
-			else if(node.getCoord().getY() > y_max)
-				y_max = node.getCoord().getY();
-			else if(node.getCoord().getX() < x_min)
-				x_min = node.getCoord().getX();
-			else if(node.getCoord().getX() > x_max)
-				x_max = node.getCoord().getX();
+			else{
+				if(node.getCoord().getY() < y_min)
+					y_min = node.getCoord().getY();
+				if(node.getCoord().getY() > y_max)
+					y_max = node.getCoord().getY();
+				if(node.getCoord().getX() < x_min)
+					x_min = node.getCoord().getX();
+				if(node.getCoord().getX() > x_max)
+					x_max = node.getCoord().getX();
+			}
 		}
 		ArrayList<Node> south = new ArrayList<Node>();
 		ArrayList<Node> north = new ArrayList<Node>();
@@ -191,11 +193,11 @@ public class NetworkGenerator {
 		for (Node node : net.getNodes().values()){
 			if (node.getCoord().getY() == y_min && y_min < 0)
 				south.add(node);
-			if (node.getCoord().getY() == y_max && y_max > contextCA.getRows()*Constants.CA_CELL_SIDE)
+			if (node.getCoord().getY() == y_max && y_max > (double)contextCA.getRows()*Constants.CA_CELL_SIDE)
 				north.add(node);
 			if (node.getCoord().getX() == x_min && x_min < 0)
 				west.add(node);
-			if (node.getCoord().getX() == x_max && x_max > contextCA.getColumns()*Constants.CA_CELL_SIDE)
+			if (node.getCoord().getX() == x_max && x_max > (double)contextCA.getColumns()*Constants.CA_CELL_SIDE)
 				east.add(node);
 		}
 		if (south.size()>0){

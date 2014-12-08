@@ -88,8 +88,6 @@ public class CAAgentMover extends AgentMover {
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		CAQLink lowResLink = engineCA.getCAQLink(nextLinkId);
-		if (lowResLink == null)
-			Log.error("ERROR IN MOVING TO Q!!!");
 		lowResLink.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
 		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
 		lowResLink.addFromUpstream(pedestrian.getVehicle());
@@ -104,8 +102,8 @@ public class CAAgentMover extends AgentMover {
 		Log.log(pedestrian.toString()+" changing CALink.");
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
-		CALink linkCA = engineCA.getCALink(nextLinkId);
-		linkCA.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
+		CALink nextLinkCA = engineCA.getCALink(nextLinkId);
+		nextLinkCA.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
 		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
 			
 		//TODO CHANGE THE COLOR OF THE AGENT

@@ -139,7 +139,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 	private void drawTacticalDestinationCell(GridPoint gridPoint) {
 		Coordinates bottomLeft = new Coordinates(gridPoint);
-		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 0, 0, 255, 192, 0, false);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 0, 0, 255, 150, 0, true);
 		
 	}
 
