@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 
 /**
@@ -108,7 +109,7 @@ public class CAMultiLaneNode implements CANode {
 		this.threadNR = thread;
 	}
 
-	/* package */double getWidth() {
+	public double getWidth() {
 		return width;
 	}
 
@@ -281,7 +282,7 @@ public class CAMultiLaneNode implements CANode {
 
 		// check post-condition and generate events
 		// first for persons behind
-		triggerPrevAgent(time, a);
+		triggerPrevAgent(time);
 
 		// second for oneself
 		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time,
@@ -370,7 +371,7 @@ public class CAMultiLaneNode implements CANode {
 
 		// check post-condition and generate events
 		// first for persons behind
-		triggerPrevAgent(time, a);
+		triggerPrevAgent(time);
 
 		// second for oneself
 		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a,
@@ -421,7 +422,7 @@ public class CAMultiLaneNode implements CANode {
 
 	// ======================================================
 
-	private void triggerPrevAgent(double time, CAMoveableEntity a) {
+	private void triggerPrevAgent(double time) {
 
 		double cap = 0;
 		List<Tuple<CAMultiLaneLink, CAMoveableEntity>> cands = new ArrayList<Tuple<CAMultiLaneLink, CAMoveableEntity>>();
@@ -499,8 +500,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			// log.info("situation at link's upstream end for agent: " + a
-			// + " has changed, dropping event.");
+			log.info("situation at link's upstream end for agent: " + a
+					+ " has changed, dropping event.");
 			return;
 		}
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
@@ -523,7 +524,11 @@ public class CAMultiLaneNode implements CANode {
 
 		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time,
 				lane);
-		checkPostConditionForAgentSwapedToNode(swapA, time);
+		if (swapA.getNextLinkId() == null) {
+			letAgentArrive(swapA, time);
+		} else {
+			checkPostConditionForAgentSwapedToNode(swapA, time);
+		}
 
 	}
 
@@ -635,8 +640,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			// log.info("situation at link's downstream end for agent: " + a
-			// + " has changed, dropping event.");
+			log.info("situation at link's downstream end for agent: " + a
+					+ " has changed, dropping event.");
 			return;
 		}
 
@@ -661,7 +666,11 @@ public class CAMultiLaneNode implements CANode {
 		// check post-conditions & new events
 		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a,
 				time, lane);
-		checkPostConditionForAgentSwapedToNode(swapA, time);
+		if (swapA.getNextLinkId() == null) {
+			letAgentArrive(swapA, time);
+		} else {
+			checkPostConditionForAgentSwapedToNode(swapA, time);
+		}
 	}
 
 	@Override
@@ -756,6 +765,16 @@ public class CAMultiLaneNode implements CANode {
 	@Override
 	public double getY() {
 		return y;
+	}
+
+	public void letAgentArrive(CAMoveableEntity a, double time) {
+		CANetsimEngine engine = this.net.getEngine();
+		if (engine != null) {
+			engine.letVehicleArrive((CAVehicle) a);
+		}
+		this.slots[a.getLane()] = null;
+		this.net.unregisterAgent(a);
+		triggerPrevAgent(time);
 	}
 
 }

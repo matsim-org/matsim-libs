@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.gregor.casim.simulation.CANetsimEngine;
+import playground.gregor.vis.CASimVisRequestHandler;
 
 public class CAMultiLaneNetwork extends AbstractCANetwork {
 
@@ -36,6 +37,9 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 			CANetsimEngine engine) {
 		super(net, em, engine);
 		init();
+		if (STATIC_VIS_HANDLER != null) {
+			((CASimVisRequestHandler) STATIC_VIS_HANDLER).intitialize(this);
+		}
 	}
 
 	private void init() {
@@ -68,8 +72,7 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 					continue;
 				}
 			}
-			CAMultiLaneLink caL = new CAMultiLaneLink(l, rev, ds, us,
-					this);
+			CAMultiLaneLink caL = new CAMultiLaneLink(l, rev, ds, us, this);
 
 			if (caL.getTFree() < tFreeMin) {
 				tFreeMin = caL.getTFree();

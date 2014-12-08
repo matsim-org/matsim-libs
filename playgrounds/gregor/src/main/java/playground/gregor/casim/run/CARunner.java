@@ -37,14 +37,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
+import playground.gregor.vis.CASimVisRequestHandler;
+import playground.gregor.vis.VisRequestHandler;
+import playground.gregor.vis.VisServer;
 
 public class CARunner implements IterationStartsListener {
 
@@ -84,20 +80,27 @@ public class CARunner implements IterationStartsListener {
 
 		if (args[2].equals("true")) {
 			AbstractCANetwork.EMIT_VIS_EVENTS = true;
-			// VIS only
-			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
 
-			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(
-					sc);
-			InfoBox iBox = new InfoBox(dbg, sc);
-			dbg.addAdditionalDrawer(iBox);
-			dbg.addAdditionalDrawer(new Branding());
-			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-			dbg.addAdditionalDrawer(qDbg);
-			controller.getEvents().addHandler(dbg);
-			controller.getEvents().addHandler(qDbg);
+			VisRequestHandler rHandle = new CASimVisRequestHandler();
+			VisServer s = new VisServer(sc, rHandle);
+			// AbstractCANetwork.STATIC_VIS_SERVER = s;
+			AbstractCANetwork.STATIC_VIS_HANDLER = rHandle;
+			// // VIS only
+			// Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+			// Sim2DScenario sc2d =
+			// Sim2DScenarioUtils.createSim2dScenario(conf2d);
+			// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+			//
+			// EventBasedVisDebuggerEngine dbg = new
+			// EventBasedVisDebuggerEngine(
+			// sc);
+			// InfoBox iBox = new InfoBox(dbg, sc);
+			// dbg.addAdditionalDrawer(iBox);
+			// dbg.addAdditionalDrawer(new Branding());
+			// QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			// dbg.addAdditionalDrawer(qDbg);
+			// controller.getEvents().addHandler(dbg);
+			// controller.getEvents().addHandler(qDbg);
 		}
 
 		// DefaultTripRouterFactoryImpl fac = builder.build(sc);

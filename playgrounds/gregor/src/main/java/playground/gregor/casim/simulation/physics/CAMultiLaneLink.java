@@ -20,10 +20,9 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -92,8 +91,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private static int EXP_WARN_CNT = 0;
 
-	private final Queue<CAMoveableEntity> dsWaitQ = new ArrayDeque<>();
-	private final Queue<CAMoveableEntity> usWaitQ = new ArrayDeque<>();
+	private final LinkedHashSet<CAMoveableEntity> dsWaitQ = new LinkedHashSet<>();
+	private final LinkedHashSet<CAMoveableEntity> usWaitQ = new LinkedHashSet<>();
 
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
 			CAMultiLaneNode us, AbstractCANetwork net) {
@@ -171,6 +170,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTE(CAMoveableEntity a, double time) {
+		// if (a.getId().toString().equals("3096")) {
+		// log.error("Gotcha!");
+		// }
 		int dir = a.getDir();
 		int desiredPos = -1;
 		if (dir == 1) {
@@ -200,7 +202,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			int desiredPos) {
 
 		this.net.registerAgent(a);
-		this.usWaitQ.poll();
+		if (!this.usWaitQ.remove(a)) {
+			throw new RuntimeException("Agent:" + a
+					+ " is not in the upstream waiting queue!");
+		}
+		;
 		this.particles[lane][desiredPos] = a;
 		a.materialize(desiredPos, -1, lane);
 		if (a instanceof CAVehicle) {
@@ -217,7 +223,10 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void handleTTEDownStream(CAMoveableEntity a, double time, int lane,
 			int desiredPos) {
 		this.net.registerAgent(a);
-		this.dsWaitQ.poll();
+		if (!this.dsWaitQ.remove(a)) {
+			throw new RuntimeException("Agent:" + a
+					+ " is not in the downstream waiting queue!");
+		}
 		this.particles[lane][desiredPos] = a;
 		a.materialize(desiredPos, 1, lane);
 		if (a instanceof CAVehicle) {
@@ -292,8 +301,10 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnDownStreamAdvance(int idx,
 			double time, int lane) {
 		if (idx - 1 < 0) {
-			if (this.usWaitQ.peek() != null) {
-				triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+
+			if (!this.usWaitQ.isEmpty()) {
+				CAMoveableEntity el = this.usWaitQ.iterator().next();
+				triggerTTE(el, this, time);// move wait first
 			}
 			this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(),
 					time);
@@ -428,11 +439,14 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForPersonBehindOnUpStreamAdvance(int idx,
 			double time, int lane) {
 		if (idx + 1 >= this.size) {
-			if (this.dsWaitQ.peek() != null) {
-				triggerTTE(this.dsWaitQ.peek(), this, time);// move wait first
+			if (!this.dsWaitQ.isEmpty()) {
+				CAMoveableEntity el = this.dsWaitQ.iterator().next();
+				triggerTTE(el, this, time);// move wait first
 			}
-			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
-					time);
+			if (this.usl != null) {
+				this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(
+						this.usl.getId(), time);
+			}
 		} else {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx + 1];
 			if (toBeTriggered != null) {
@@ -536,6 +550,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
 			double time) {
+		// if (toBeTriggered.getId().toString().equals("3096")) {
+		// log.error("Gotcha!");
+		// }
 		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
 		this.net.pushEvent(e);
 
@@ -594,8 +611,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		// check post-condition and generate events
 		// first for persons behind or on node
 
-		if (dsWaitQ.peek() != null) {
-			triggerTTE(dsWaitQ.peek(), this, time);// move wait first
+		if (!dsWaitQ.isEmpty()) {
+			CAMoveableEntity el = dsWaitQ.iterator().next();
+			triggerTTE(el, this, time);// move wait first
 		}
 
 		if (this.usl != null) {
@@ -649,8 +667,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
 		if (a.getNextLinkId() == null) {
 			int lane = a.getLane();
-			this.lastLeftTimes[lane][0] = time;
-			this.particles[lane][0] = null;
+
 			letAgentArrive(a, time, 0, lane);
 			// check post-condition and generate events
 			// first for persons behind
@@ -704,8 +721,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		// check post-condition and generate events
 		// first for persons behind or on node
 
-		if (this.usWaitQ.peek() != null) {
-			triggerTTE(this.usWaitQ.peek(), this, time);// move wait first
+		if (!this.usWaitQ.isEmpty()) {
+			CAMoveableEntity el = this.usWaitQ.iterator().next();
+			triggerTTE(el, this, time);// move wait first
 		}
 
 		this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(), time);
@@ -770,7 +788,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 				lane);
 
 		// second for oneself
-		checkPostConditionForOneSelfOnNodeAdvance(this.ds, a, time);
+		if (a.getNextLinkId() == null) {
+			this.ds.letAgentArrive(a, time);
+		} else {
+			checkPostConditionForOneSelfOnNodeAdvance(this.ds, a, time);
+		}
 	}
 
 	private void swapWithUpStreamNode(CAMoveableEntity a, double time) {
@@ -805,7 +827,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		checkPostConditionForAgentOnDownStreamAdvance(-1, swapA, time, lane);
 
 		// second for oneself
-		checkPostConditionForOneSelfOnNodeAdvance(this.us, a, time);
+		if (a.getNextLinkId() == null) {
+			this.us.letAgentArrive(a, time);
+		} else {
+			checkPostConditionForOneSelfOnNodeAdvance(this.us, a, time);
+		}
 	}
 
 	// TODO us generic ids for event firing
@@ -993,6 +1019,12 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			engine.letVehicleArrive((CAVehicle) a);
 		}
 		this.net.unregisterAgent(a);
+
+		checkPostConditionForPersonBehindOnDownStreamAdvance(idx, time, lane);
+		checkPostConditionForPersonBehindOnUpStreamAdvance(idx, time, lane);
+
+		// this.net.registerAgent(a);
+		// this.net.unregisterAgent(a);
 	}
 
 	@Override

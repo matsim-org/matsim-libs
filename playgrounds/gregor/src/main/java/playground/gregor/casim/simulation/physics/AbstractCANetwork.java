@@ -45,7 +45,10 @@ import org.matsim.core.gbl.Gbl;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+import playground.gregor.proto.ProtoFrame.Frame.Event;
+import playground.gregor.proto.ProtoFrame.Frame.Event.Type;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.vis.VisRequestHandler;
 
 /**
  * Centerpiece of the bidirectional 1d ca simulation. Basic idea is based on
@@ -92,6 +95,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 	private static int EXP_WARN_CNT;
 
 	public static int NR_THREADS = 4;
+
+	public static VisRequestHandler STATIC_VIS_HANDLER = null;
 	private final CyclicBarrier barrier1 = new CyclicBarrier(NR_THREADS + 1);
 	private final CyclicBarrier barrier2 = new CyclicBarrier(NR_THREADS + 1);
 	private final Worker[] workers = new Worker[NR_THREADS];
@@ -113,6 +118,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 		this.engine = engine;
 		init();
 		this.dens = new CASimDensityEstimator(this);
+
 	}
 
 	private void init() {
@@ -170,7 +176,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 					&& this.events.peek().getEventExcexutionTime() <= timeFrameEnd) {
 				CAEvent e = this.events.poll();
 				cnt++;
-				// log.info("==> " + e);
 				int thread = e.getCANetworkEntity().threadNR();
 				// log.info("added to thread: " + thread);
 				this.workers[thread].add(e);
@@ -223,8 +228,9 @@ abstract public class AbstractCANetwork implements CANetwork {
 				throw new RuntimeException(e);
 			}
 		}
-		if (EMIT_VIS_EVENTS) {
-			draw2(time);
+		if (STATIC_VIS_HANDLER != null) {
+			// draw2(time);
+			STATIC_VIS_HANDLER.update(time);
 		}
 	}
 
@@ -265,9 +271,80 @@ abstract public class AbstractCANetwork implements CANetwork {
 		if (EMIT_VIS_EVENTS) {
 			// updateDensity();
 			draw2(time);
+			// draw3(time);
 		}
 
 		afterSim();
+	}
+
+	private void drawCAMultiLaneNode(CAMultiLaneNode n, double time,
+			List<Event> e,
+			playground.gregor.proto.ProtoFrame.Frame.Event.Builder eb) {
+		int lanes = n.getNRLanes();
+		double laneWidth = n.getWidth() / lanes;
+
+		double x = n.getNode().getCoord().getX();
+		double y0 = n.getNode().getCoord().getY() - laneWidth * lanes / 2
+				+ laneWidth / 2;
+
+		for (int slot = 0; slot < lanes; slot++) {
+			CAMoveableEntity agent = n.peekForAgentInSlot(slot);
+			if (agent != null) {
+				Event ev = eb.setX(x).setY(y0).setVx(0).setVy(0)
+						.setEvntType(Type.POS).setId(agent.getId().toString())
+						.build();
+				e.add(ev);
+			}
+			y0 += laneWidth;
+		}
+
+	}
+
+	private void drawCAMultiLaneLink(CAMultiLaneLink l, double time,
+			List<Event> e,
+			playground.gregor.proto.ProtoFrame.Frame.Event.Builder eb) {
+		double dx = l.getLink().getToNode().getCoord().getX()
+				- l.getLink().getFromNode().getCoord().getX();
+		double dy = l.getLink().getToNode().getCoord().getY()
+				- l.getLink().getFromNode().getCoord().getY();
+		double length = Math.sqrt(dx * dx + dy * dy);
+		dx /= length;
+		dy /= length;
+		double ldx = dx;
+		double ldy = dy;
+		double incr = l.getLink().getLength() / l.getNumOfCells();
+		dx *= incr;
+		dy *= incr;
+		double laneWidth = l.getLaneWidth();
+		double hx = -ldy;
+		double hy = ldx;
+		hx *= laneWidth;
+		hy *= laneWidth;
+		int lanes = l.getNrLanes();
+		double x0 = l.getLink().getFromNode().getCoord().getX() - hx * lanes
+				/ 2 + hx / 2 + dx / 2;
+		double y0 = l.getLink().getFromNode().getCoord().getY() - hy * lanes
+				/ 2 + hy / 2 + dy / 2;
+		for (int lane = 0; lane < l.getNrLanes(); lane++) {
+			double x = x0 + lane * hx;
+			double y = y0 + lane * hy;
+			for (int i = 0; i < l.getNumOfCells(); i++) {
+				if (l.getParticles(lane)[i] != null) {
+					double ddx = 1;
+					if (l.getParticles(lane)[i].getDir() == -1) {
+						ddx = -1;
+					}
+					Event ev = eb.setEvntType(Type.POS).setX(x).setY(y)
+							.setVx(ldx * ddx).setVy(ldy * ddx)
+							.setId(l.getParticles(lane)[i].getId().toString())
+							.build();
+					e.add(ev);
+				}
+				x += dx;
+				y += dy;
+			}
+		}
+
 	}
 
 	private void draw2(double time) {
@@ -428,7 +505,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 		// log.warn("current event: " + event.getCAAgent().getCurrentEvent()
 		// + "\n new event: " + event);
 		// }
-		// log.info("<== " + event);
+
 		event.getCAAgent().setCurrentEvent(event);
 		// this.events.add(event);
 		Worker w = this.workerMap.get(Thread.currentThread().getName());

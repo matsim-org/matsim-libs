@@ -54,36 +54,37 @@ public class Control implements KeyListener, MouseWheelListener {
 	private final CyclicBarrier screenshotBarrier = new CyclicBarrier(2);
 	private final ZoomPan zoomer;
 
-	private Map<Integer,Zoom> zooms = new HashMap<Integer,Zoom>();
+	private Map<Integer, Zoom> zooms = new HashMap<Integer, Zoom>();
 	private boolean makeScreenshot = false;
 
 	private boolean recordCameraMovement = false;
 	private CameraMovement current = new CameraMovement();
 	private final int currentIdx = 0;
-//	private final List<Zoom> currentRecordedCameraMovement = new ArrayList<Zoom>();
+	// private final List<Zoom> currentRecordedCameraMovement = new
+	// ArrayList<Zoom>();
 	private boolean replayCameraMovement;
-//	private Iterator<Zoom> replayCameraMovementIT;
-//	private final int cameraTrackFrameSkip;
-//	private int skip = 0;
-//	private double cameraTrackFrameSkipDbl;
-//	private double stepSize;
-	
-	private Map<Integer,CameraMovement> movements = new HashMap<Integer,CameraMovement>();
-	
+	// private Iterator<Zoom> replayCameraMovementIT;
+	// private final int cameraTrackFrameSkip;
+	// private int skip = 0;
+	// private double cameraTrackFrameSkipDbl;
+	// private double stepSize;
+
+	private Map<Integer, CameraMovement> movements = new HashMap<Integer, CameraMovement>();
+
 	private final FrameSaver fs;
 	private final int cameraTrackFrameSkip;
 	private TileMap tileMap;
 
-	//static zoom
-	//13189.192:7476.9673x20.593802448270605
+	// static zoom
+	// 13189.192:7476.9673x20.593802448270605
 	// zoom:96268.414:56770.85x152.2291436143277 at key 0
 
-	//zoom:1389.2476:778.86145x2.0789281794113688 at key 0
-	//2683.7285:1353.723x3.7334563223415764
+	// zoom:1389.2476:778.86145x2.0789281794113688 at key 0
+	// 2683.7285:1353.723x3.7334563223415764
 	private static final Zoom z = new Zoom();
 	static {
-		z.z =3.7334563223415764;
-		z.o = new PVector(2683.7285f,1353.723f);
+		z.z = 3.7334563223415764;
+		z.o = new PVector(2683.7285f, 1353.723f);
 	}
 
 	public Control(ZoomPan zoomer, int cameraTrackFrameSkip, FrameSaver fs) {
@@ -105,14 +106,14 @@ public class Control implements KeyListener, MouseWheelListener {
 				return;
 			}
 			this.speedup *= 2;
-			//			System.out.println("speedup:" + this.speedup);
+			// System.out.println("speedup:" + this.speedup);
 			log.info("setting accelaration to:" + this.speedup);
 		} else if (e.getKeyChar() == '-') {
 			if (this.speedup <= 0.125) {
 				log.info("acceleration already at minimum (0.125).");
 				return;
 			}
-			this.speedup  /= 2;
+			this.speedup /= 2;
 			log.info("setting accelaration to:" + this.speedup);
 		} else if (e.getKeyChar() == 'p') {
 			log.info("toggle pause");
@@ -120,9 +121,9 @@ public class Control implements KeyListener, MouseWheelListener {
 				awaitPause();
 			}
 			this.pause = !this.pause;
-		} else if (e.getKeyChar() == 's'){
+		} else if (e.getKeyChar() == 's') {
 			log.info("screenshot requested");
-			this.makeScreenshot  = true;
+			this.makeScreenshot = true;
 		} else if (e.getKeyChar() == 'i') {
 			Zoom z = new Zoom();
 			z.o = this.zoomer.getPanOffset();
@@ -130,9 +131,10 @@ public class Control implements KeyListener, MouseWheelListener {
 			log.info(z);
 		} else if (e.getKeyChar() == 'r') {
 			log.info("toggle recording camera movement");
-			if (this.recordCameraMovement){
-				this.current.stepSize = (double)this.current.cameraTrackFrameSkip/this.current.movement.size();
-				
+			if (this.recordCameraMovement) {
+				this.current.stepSize = (double) this.current.cameraTrackFrameSkip
+						/ this.current.movement.size();
+
 			}
 			this.recordCameraMovement = !this.recordCameraMovement;
 		} else if (e.getKeyChar() == 'e') {
@@ -140,7 +142,8 @@ public class Control implements KeyListener, MouseWheelListener {
 				throw new RuntimeException("stop recording first!");
 			}
 			this.replayCameraMovement = true;
-			this.current.replayCameraMovementIT = this.current.movement.iterator();
+			this.current.replayCameraMovementIT = this.current.movement
+					.iterator();
 		} else if (e.getKeyChar() == 'w') {
 			if (this.recordCameraMovement) {
 				throw new RuntimeException("stop recording first!");
@@ -148,12 +151,14 @@ public class Control implements KeyListener, MouseWheelListener {
 			this.current.stepSize *= -1;
 			this.replayCameraMovement = true;
 			Collections.reverse(this.current.movement);
-			this.current.replayCameraMovementIT = this.current.movement.iterator();
+			this.current.replayCameraMovementIT = this.current.movement
+					.iterator();
 		} else if (e.getKeyChar() == 'o') {
 			log.info("serializing zooms and camera movements");
 			try {
-				FileOutputStream out = new FileOutputStream("/Users/laemmel/devel/hhw_hybrid/zooms.data");
-				ObjectOutputStream oOut = new ObjectOutputStream (out);
+				FileOutputStream out = new FileOutputStream(
+						"/Users/laemmel/devel/hhw_hybrid/zooms.data");
+				ObjectOutputStream oOut = new ObjectOutputStream(out);
 				oOut.writeObject(this.zooms);
 				oOut.writeObject(this.movements);
 				oOut.close();
@@ -167,9 +172,10 @@ public class Control implements KeyListener, MouseWheelListener {
 		} else if (e.getKeyChar() == 'l') {
 			log.info("restoring zooms and camera movements");
 			try {
-				FileInputStream out = new FileInputStream("/Users/laemmel/devel/hhw_hybrid/zooms.data");
-				ObjectInputStream oOut = new ObjectInputStream (out);
-//				oOut.writeObject(this.zooms);
+				FileInputStream out = new FileInputStream(
+						"/Users/laemmel/devel/hhw_hybrid/zooms.data");
+				ObjectInputStream oOut = new ObjectInputStream(out);
+				// oOut.writeObject(this.zooms);
 				Object o1 = oOut.readObject();
 				this.zooms = (Map<Integer, Zoom>) o1;
 				Object o2 = oOut.readObject();
@@ -177,14 +183,15 @@ public class Control implements KeyListener, MouseWheelListener {
 				for (CameraMovement m : this.movements.values()) {
 					m.cameraTrackFrameSkip = this.cameraTrackFrameSkip;
 					m.cameraTrackFrameSkipDbl = this.cameraTrackFrameSkip;
-					m.stepSize = (double)m.cameraTrackFrameSkip/(m.movement.size()-1);
+					m.stepSize = (double) m.cameraTrackFrameSkip
+							/ (m.movement.size() - 1);
 				}
 				Zoom z = this.zooms.get(0);
 				if (z != null) {
 					log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z);
 					this.zoomer.setZoomScale(z.z);
 					this.zoomer.setPanOffset(z.o.x, z.o.y);
-					//				this.zoomer.transform();
+					// this.zoomer.transform();
 				}
 				this.current = this.movements.get(0);
 				oOut.close();
@@ -200,31 +207,34 @@ public class Control implements KeyListener, MouseWheelListener {
 
 		}
 
-		//this works with Mac
-		if (e.getModifiers() == 4 &&  e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
+		// this works with Mac
+		if (e.getModifiers() == 4 && e.getKeyCode() >= 48
+				&& e.getKeyCode() <= 57) {
 			Zoom z = new Zoom();
 			z.z = this.zoomer.getZoomScale();
 			z.o = this.zoomer.getPanOffset();
 			this.zooms.put(e.getKeyCode(), z);
-			log.info("storing zoom:" + z.o.x + ":" + z.o.y + "x" + z.z + " at key "  + e.getKeyChar());
-		}  else if (e.getModifiers() == 2 && e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
-			log.info("selecting record: " + (e.getKeyCode()-48));
-			this.current = this.movements.get(e.getKeyCode()-48);
+			log.info("storing zoom:" + z.o.x + ":" + z.o.y + "x" + z.z
+					+ " at key " + e.getKeyChar());
+		} else if (e.getModifiers() == 2 && e.getKeyCode() >= 48
+				&& e.getKeyCode() <= 57) {
+			log.info("selecting record: " + (e.getKeyCode() - 48));
+			this.current = this.movements.get(e.getKeyCode() - 48);
 			if (this.current == null) {
 				log.info("record does not exist, creating new one!");
 				this.current = new CameraMovement();
 				this.current.cameraTrackFrameSkip = this.cameraTrackFrameSkip;
 				this.current.cameraTrackFrameSkipDbl = this.cameraTrackFrameSkip;
-				this.movements.put(e.getKeyCode()-48, this.current);
+				this.movements.put(e.getKeyCode() - 48, this.current);
 			}
 
-		}else if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57){
+		} else if (e.getKeyCode() >= 48 && e.getKeyCode() <= 57) {
 			Zoom z = this.zooms.get(e.getKeyCode());
 			if (z != null) {
 				log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z);
 				this.zoomer.setZoomScale(z.z);
 				this.zoomer.setPanOffset(z.o.x, z.o.y);
-				//				this.zoomer.transform();
+				// this.zoomer.transform();
 				this.tileMap.panEnded();
 			}
 		}
@@ -233,7 +243,7 @@ public class Control implements KeyListener, MouseWheelListener {
 	}
 
 	public void awaitPause() {
-		if(!this.pause) {
+		if (!this.pause) {
 			return;
 		}
 		try {
@@ -245,7 +255,6 @@ public class Control implements KeyListener, MouseWheelListener {
 		}
 
 	}
-
 
 	public void awaitScreenshot() {
 		if (!this.makeScreenshot) {
@@ -263,6 +272,7 @@ public class Control implements KeyListener, MouseWheelListener {
 	public boolean isScreenshotRequested() {
 		return this.makeScreenshot;
 	}
+
 	public void informScreenshotPerformed() {
 		this.makeScreenshot = false;
 	}
@@ -279,11 +289,11 @@ public class Control implements KeyListener, MouseWheelListener {
 
 	}
 
-	/*package*/ double getSpeedup() {
+	public double getSpeedup() {
 		return this.speedup;
 	}
 
-	private static final class Zoom implements Serializable{
+	private static final class Zoom implements Serializable {
 
 		/**
 		 * 
@@ -293,7 +303,7 @@ public class Control implements KeyListener, MouseWheelListener {
 		public double z;
 
 		@Override
-		public String toString(){
+		public String toString() {
 			return "zoom: " + this.z + " at: " + this.o.x + "," + this.o.y;
 		}
 
@@ -320,48 +330,52 @@ public class Control implements KeyListener, MouseWheelListener {
 	}
 
 	public void update(double time2) {
-		if (this.replayCameraMovement && (this.current.skip++) >= this.current.cameraTrackFrameSkipDbl) {
-			if (this.current.replayCameraMovementIT.hasNext()){
+		if (this.replayCameraMovement
+				&& (this.current.skip++) >= this.current.cameraTrackFrameSkipDbl) {
+			if (this.current.replayCameraMovementIT.hasNext()) {
 				Zoom z = this.current.replayCameraMovementIT.next();
-				log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z + " skips =" + this.current.cameraTrackFrameSkipDbl);
+				log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z
+						+ " skips =" + this.current.cameraTrackFrameSkipDbl);
 				this.zoomer.setZoomScale(z.z);
 				this.zoomer.setPanOffset(z.o.x, z.o.y);
 				this.current.cameraTrackFrameSkipDbl -= this.current.stepSize;
 			} else {
-				
+
 				this.replayCameraMovement = false;
 				double d1 = Math.abs(this.current.cameraTrackFrameSkipDbl);
-				double d2 = Math.abs(this.current.cameraTrackFrameSkipDbl-this.current.cameraTrackFrameSkip);
+				double d2 = Math.abs(this.current.cameraTrackFrameSkipDbl
+						- this.current.cameraTrackFrameSkip);
 				if (d1 < d2) {
 					this.current.cameraTrackFrameSkipDbl = 0;
 				} else {
 					this.current.cameraTrackFrameSkipDbl = this.current.cameraTrackFrameSkip;
 				}
-				if (this.current.movement.get(0).z > this.current.movement.get(this.current.movement.size()-1).z) {
+				if (this.current.movement.get(0).z > this.current.movement
+						.get(this.current.movement.size() - 1).z) {
 					Zoom z = this.zooms.get(48);
-					log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z + " skips =" + this.current.cameraTrackFrameSkipDbl);
+					log.info("loading zoom:" + z.o.x + ":" + z.o.y + "x" + z.z
+							+ " skips =" + this.current.cameraTrackFrameSkipDbl);
 					this.zoomer.setZoomScale(z.z);
 					this.zoomer.setPanOffset(z.o.x, z.o.y);
 				}
 			}
 			this.tileMap.panEnded();
-//			this.zoomer.
+			// this.zoomer.
 			this.current.skip = 0;
 			if (this.fs != null) {
-				int round = (int)(this.current.cameraTrackFrameSkipDbl+.5);
+				int round = (int) (this.current.cameraTrackFrameSkipDbl + .5);
 				this.fs.setSkip(round);
 			}
 		}
 
 	}
-	
-	private static final class CameraMovement implements Serializable{
+
+	private static final class CameraMovement implements Serializable {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 4206049019877073858L;
-		
-		
+
 		double stepSize;
 		List<Zoom> movement = new ArrayList<Zoom>();
 		Iterator<Zoom> replayCameraMovementIT;

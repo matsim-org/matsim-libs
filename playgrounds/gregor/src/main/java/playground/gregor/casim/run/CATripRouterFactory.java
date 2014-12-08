@@ -18,17 +18,24 @@
  * *********************************************************************** */
 package playground.gregor.casim.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 public class CATripRouterFactory implements TripRouterFactory {
+
+	private static final Logger log = Logger
+			.getLogger(CATripRouterFactory.class);
 
 	private final String mainMode = "walkca";
 
@@ -59,6 +66,29 @@ public class CATripRouterFactory implements TripRouterFactory {
 						.getNetwork(), routeAlgo,
 						((PopulationFactoryImpl) scenario.getPopulation()
 								.getFactory()).getModeRouteFactory())));
+		PlansCalcRouteConfigGroup routeConfigGroup = this.scenario.getConfig()
+				.plansCalcRoute();
+
+		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds()
+				.keySet()) {
+			final RoutingModule old = tr.setRoutingModule(
+					mainMode,
+					new LegRouterWrapper(mainMode, scenario.getPopulation()
+							.getFactory(), new TeleportationLegRouter(
+							((PopulationFactoryImpl) scenario.getPopulation()
+									.getFactory()).getModeRouteFactory(),
+							routeConfigGroup.getTeleportedModeSpeeds().get(
+									mainMode), routeConfigGroup
+									.getBeelineDistanceFactor())));
+			if (old != null) {
+				log.error("inconsistent router configuration for mode "
+						+ mainMode);
+				log.error("One situation which triggers this warning: setting both speed and speedFactor for a mode (this used to be possible).");
+				throw new RuntimeException(
+						"there was already a module set when trying to set teleporting module for mode "
+								+ mainMode + ": " + old);
+			}
+		}
 		return tr;
 	}
 
