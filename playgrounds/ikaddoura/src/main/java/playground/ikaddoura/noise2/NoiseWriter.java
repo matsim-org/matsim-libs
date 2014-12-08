@@ -34,7 +34,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -78,26 +77,26 @@ public class NoiseWriter {
 		
 		// shape file	
 				
-		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
-		.setName("receiver point")
-		.addAttribute("Id", String.class)
-		.create();
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
-					
-			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
-			features.add(feature);
-		}
-		
-		String filePath = outputPath;
-		File file = new File(filePath);
-		file.mkdirs();
-		
-		log.info("Writing receiver points to shapefile... ");
-		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
-		log.info("Writing receiver points to shapefile... Done. ");
+//		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+//		.setCrs(MGC.getCRS(noiseContext.getNoiseParams().getTransformationFactory()))
+//		.setName("receiver point")
+//		.addAttribute("Id", String.class)
+//		.create();
+//		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+//		
+//		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+//					
+//			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(rp.getCoord()), new Object[] {rp.getId().toString()}, null);
+//			features.add(feature);
+//		}
+//		
+//		String filePath = outputPath;
+//		File file = new File(filePath);
+//		file.mkdirs();
+//		
+//		log.info("Writing receiver points to shapefile... ");
+//		ShapeFileWriter.writeGeometries(features, filePath + "receiverPoints.shp");
+//		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
 	private static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
