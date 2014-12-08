@@ -56,12 +56,11 @@ public class MultiplerunsControler {
     	
     	this.init();
  	    	
-    	String config[] = {""};
 		SingleRunControler controler;
 					    	   	
     	for (int runIndex = 0; runIndex < numberOfRandomRuns; runIndex++) {   		
     		for (int i = 0; i < 5; i++) {
-    			config[0] = "src/main/java/playground/anhorni/input/PLOC/3towns/runs/run"+ runIndex + "/day" + i + "/config.xml";
+    			String config = "src/main/java/playground/anhorni/input/PLOC/3towns/runs/run"+ runIndex + "/day" + i + "/config.xml";
 	    		controler = new SingleRunControler(config);	 
 	    		controler.setPersonAttributes(this.personAttributes);
 	    		controler.setTempVar(configReader.isTemporalVar());

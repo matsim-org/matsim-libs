@@ -107,7 +107,7 @@ public class MultipleRunsControler {
 	public void run() {
 		for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
 			String configFile = inPathStub + "/runs/run" + runIndex + "/config.xml";
-			String config[] = {configFile};
+			String config = configFile;
 			SingleRunControler controler;
     		controler = new SingleRunControler(config);	 
         	controler.run();

@@ -20,10 +20,11 @@
 package playground.anhorni.PLOC;
 
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -34,9 +35,13 @@ public class SingleRunControler extends Controler {
 	private ObjectAttributes personAttributes;
 	private int day = -1;
 	private boolean tempVar;
+	
+	public SingleRunControler(String config) {
+		super(config);	
+	}
 		
-	public SingleRunControler(final String[] args) {
-		super(args);	
+	public SingleRunControler(final Config config) {
+		super(config);	
 	}
 	
 	public void setDay(int day) {
@@ -52,10 +57,14 @@ public class SingleRunControler extends Controler {
 	}
 		
     public static void main (final String[] args) { 
-    	SingleRunControler controler = new SingleRunControler(args);
+    	// load the config, telling it to "materialize" the location choice section:
+    	Config config = ConfigUtils.loadConfig( args[0], new LocationChoiceConfigGroup() ) ;
+    	
+    	SingleRunControler controler = new SingleRunControler(config);
     	controler.run();
     }
-        
+    
+         
     @Override
     protected void setUp() {
       super.setUp();
@@ -63,14 +72,10 @@ public class SingleRunControler extends Controler {
       
       if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
       
-      ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
-	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+      ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(
+    		  (LocationChoiceConfigGroup) this.config.getModule("locationchoice"));
 	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
             
- //     MixedScoringFunctionFactory mixedScoringFunctionFactory =
-//			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter, defineFlexibleActivities.getFlexibleTypes());
-  	
-//		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));
 		
 		throw new RuntimeException("integrate LC with listener!");
