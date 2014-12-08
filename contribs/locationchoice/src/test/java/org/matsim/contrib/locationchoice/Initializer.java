@@ -39,6 +39,7 @@ public class Initializer {
 		this.controler = new Controler(config);
 		this.controler.setCreateGraphs(false);
 		this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
+		this.controler.setOverwriteFiles(true);
 		this.controler.run();
 	}
 
