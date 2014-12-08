@@ -175,11 +175,9 @@ public class SpatialAveragingWelfare {
 	private Map<Id, Double> sumUpUtilities(Map<Id, Double> personId2Utility, Map<Id, Double> personId2Refund) {
 		Map<Id, Double> sumOfUtilities = new HashMap<Id, Double>();
 		for(Id personId : personId2Utility.keySet()){
-			double sumOfUtility;
+			double sumOfUtility = personId2Utility.get(personId);;
 			if(personId2Refund.get(personId) != null){
-				sumOfUtility = personId2Utility.get(personId) + personId2Refund.get(personId);
-			} else {
-				sumOfUtility = personId2Utility.get(personId);
+				sumOfUtility += personId2Refund.get(personId);
 			}
 			sumOfUtilities.put(personId, sumOfUtility);
 		}
