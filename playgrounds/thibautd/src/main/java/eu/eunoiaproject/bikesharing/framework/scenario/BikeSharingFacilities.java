@@ -24,9 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -42,22 +42,22 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 		Logger.getLogger(BikeSharingFacilities.class);
 
 	public static final String ELEMENT_NAME = "bikeSharingFacilities";
-	private final Map<Id, BikeSharingFacility> facilities =
-		new LinkedHashMap<Id, BikeSharingFacility>();
-	private final Map<Id, BikeSharingFacility> unmodifiableFacilities =
+	private final Map<Id<BikeSharingFacility>, BikeSharingFacility> facilities =
+		new LinkedHashMap< >();
+	private final Map<Id<BikeSharingFacility>, BikeSharingFacility> unmodifiableFacilities =
 		Collections.unmodifiableMap( facilities );
 	private final ObjectAttributes facilitiesAttributes = new ObjectAttributes();
 
-	private final QuadTreeRebuilder<BikeSharingFacility> quadTreeBuilder = new QuadTreeRebuilder<BikeSharingFacility>();
+	private final QuadTreeRebuilder<BikeSharingFacility> quadTreeBuilder = new QuadTreeRebuilder< >();
 
-	private final Map<String, String> metadata = new LinkedHashMap<String, String>();
+	private final Map<String, String> metadata = new LinkedHashMap< >();
 
 	public void addFacility( final BikeSharingFacility facility ) {
 		facilities.put( facility.getId() , facility );
 		quadTreeBuilder.put( facility.getCoord() , facility );
 	}
 
-	public Map<Id, BikeSharingFacility> getFacilities() {
+	public Map<Id<BikeSharingFacility>, BikeSharingFacility> getFacilities() {
 		return unmodifiableFacilities;
 	}
 
@@ -73,9 +73,9 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 		return new BikeSharingFacilitiesFactory() {
 			@Override
 			public BikeSharingFacility createBikeSharingFacility(
-					final Id id,
+					final Id<BikeSharingFacility> id,
 					final Coord coord,
-					final Id linkId,
+					final Id<Link> linkId,
 					final int capacity,
 					final int initialNumberOfBikes) {
 				return new BikeSharingFacilityImpl(

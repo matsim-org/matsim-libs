@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -68,7 +67,7 @@ public class BikeSharingSimulationEventsTest {
 		scenario.getConfig().addModule( new BikeSharingConfigGroup() );
 
 		final Id<Link> linkId = Id.create( "link" , Link.class);
-		final Id<ActivityFacility> stationId = Id.create( "station" , ActivityFacility.class);
+		final Id<BikeSharingFacility> stationId = Id.create( "station" , BikeSharingFacility.class);
 
 		final BikeSharingFacilities stations = new BikeSharingFacilities();
 		scenario.addScenarioElement( BikeSharingFacilities.ELEMENT_NAME , stations );

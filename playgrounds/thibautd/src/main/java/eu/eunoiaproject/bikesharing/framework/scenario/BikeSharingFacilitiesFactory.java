@@ -22,7 +22,6 @@ package eu.eunoiaproject.bikesharing.framework.scenario;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -32,7 +31,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface BikeSharingFacilitiesFactory extends MatsimFactory {
 	public BikeSharingFacility createBikeSharingFacility(
-			Id<ActivityFacility> id,
+			Id<BikeSharingFacility> id,
 			Coord coord,
 			Id<Link> linkId,
 			int capacity,

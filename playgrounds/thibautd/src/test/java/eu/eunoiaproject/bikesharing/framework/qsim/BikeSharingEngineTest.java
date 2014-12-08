@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -81,7 +80,7 @@ public class BikeSharingEngineTest {
 
 		final BikeSharingFacility departureFacility =
 			facilities.getFactory().createBikeSharingFacility(
-					Id.create( "departure" , ActivityFacility.class),
+					Id.create( "departure" , BikeSharingFacility.class),
 					new CoordImpl( 0 , 0 ),
 					Id.create( "departure_link" , Link.class),
 					capacity,
@@ -90,7 +89,7 @@ public class BikeSharingEngineTest {
 
 		final BikeSharingFacility arrivalFacility =
 			facilities.getFactory().createBikeSharingFacility(
-					Id.create( "arrival" , ActivityFacility.class),
+					Id.create( "arrival" , BikeSharingFacility.class),
 					new CoordImpl( 10 , 10 ),
 					Id.create( "arrival_link" , Link.class),
 					capacity,

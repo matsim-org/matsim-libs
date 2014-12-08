@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
 /**
  * @author thibautd
@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 public class NewBikeSharingFacilityStateEvent extends Event {
 	public static final String EVENT_TYPE = "newBikeSharingFacilityState";
 
-	private final Id<ActivityFacility> facilityId;
+	private final Id<BikeSharingFacility> facilityId;
 	private final int newAmountOfBikes;
 
 	public NewBikeSharingFacilityStateEvent(
@@ -40,20 +40,20 @@ public class NewBikeSharingFacilityStateEvent extends Event {
 		if ( !event.getEventType().equals( EVENT_TYPE ) ) {
 			throw new IllegalArgumentException( ""+event );
 		}
-		this.facilityId = Id.create( event.getAttributes().get( "facilityId" ) , ActivityFacility.class);
+		this.facilityId = Id.create( event.getAttributes().get( "facilityId" ) , BikeSharingFacility.class );
 		this.newAmountOfBikes = Integer.parseInt( event.getAttributes().get( "newAmountOfBikes" ) ); 
 	}
 
 	public NewBikeSharingFacilityStateEvent(
 			final double time,
-			final Id<ActivityFacility> facilityId,
+			final Id<BikeSharingFacility> facilityId,
 			final int newAmountOfBikes) {
 		super( time );
 		this.facilityId = facilityId;
 		this.newAmountOfBikes = newAmountOfBikes;
 	}
 
-	public Id<ActivityFacility> getFacilityId() {
+	public Id<BikeSharingFacility> getFacilityId() {
 		return facilityId;
 	}
 

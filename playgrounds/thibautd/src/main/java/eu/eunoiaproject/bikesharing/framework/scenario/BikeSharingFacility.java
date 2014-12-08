@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.facilities.Facility;
  * number of bikes.
  * @author thibautd
  */
-public interface BikeSharingFacility extends Facility {
+public interface BikeSharingFacility extends Facility<BikeSharingFacility> {
 	public int getCapacity();
 	public int getInitialNumberOfBikes();
 }

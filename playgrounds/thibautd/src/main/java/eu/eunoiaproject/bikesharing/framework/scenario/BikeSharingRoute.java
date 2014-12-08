@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -37,8 +36,8 @@ import org.matsim.vehicles.Vehicle;
  */
 public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 	private final NetworkRoute routeDelegate;
-	private Id<ActivityFacility> originStation;
-	private Id<ActivityFacility> destinationStation;
+	private Id<BikeSharingFacility> originStation;
+	private Id<BikeSharingFacility> destinationStation;
 
 	public BikeSharingRoute(
 			final Id<Link> oLink,
@@ -62,8 +61,8 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 
 	public BikeSharingRoute(
 			final NetworkRoute routeDelegate,
-			final Id<ActivityFacility> originStation,
-			final Id<ActivityFacility> destinationStation) {
+			final Id<BikeSharingFacility> originStation,
+			final Id<BikeSharingFacility> destinationStation) {
 		this.routeDelegate = routeDelegate;
 		this.originStation = originStation;
 		this.destinationStation = destinationStation;
@@ -118,12 +117,20 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 		routeDelegate.setEndLinkId(linkId);
 	}
 
-	public Id<ActivityFacility> getOriginStation() {
+	public Id<BikeSharingFacility> getOriginStation() {
 		return originStation;
 	}
 
-	public Id<ActivityFacility> getDestinationStation() {
+	public Id<BikeSharingFacility> getDestinationStation() {
 		return destinationStation;
+	}
+
+	public void setOriginStation( final Id<BikeSharingFacility> originStation ) {
+		this.originStation = originStation;
+	}
+
+	public void setDestinationStation( final Id<BikeSharingFacility> destinationStation ) {
+		this.destinationStation = destinationStation;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -137,8 +144,8 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 		this.routeDelegate.setEndLinkId( endLinkId );
 		final String[] stations = routeDescription.trim().split( " " );
 		if ( stations.length < 2 ) throw new IllegalArgumentException( routeDescription );
-		this.originStation = Id.create( stations[ 0 ], ActivityFacility.class );
-		this.destinationStation = Id.create( stations[ 1 ], ActivityFacility.class );
+		this.originStation = Id.create( stations[ 0 ], BikeSharingFacility.class );
+		this.destinationStation = Id.create( stations[ 1 ], BikeSharingFacility.class );
 
 		final List<Id<Link>> links = new ArrayList<Id<Link>>( stations.length - 2 );
 		for ( int i=3; i < stations.length; i++ ) {

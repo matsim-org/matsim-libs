@@ -19,13 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.generation;
 
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -35,13 +41,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 
 /**
  * @author thibautd
@@ -108,7 +113,7 @@ public class ConvertXYToBikeSharingStations {
 				final Id<Link> link =
 					NetworkUtils.getNearestLink(network, coord).getId();
 
-				final Id<ActivityFacility> id = Id.create( prefix+filecount+"-"+(linecount++) , ActivityFacility.class );
+				final Id<BikeSharingFacility> id = Id.create( prefix+filecount+"-"+(linecount++) , BikeSharingFacility.class );
 
 				facilities.addFacility(
 						facilities.getFactory().createBikeSharingFacility(

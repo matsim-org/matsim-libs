@@ -24,7 +24,6 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -69,7 +68,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 
 			facilities.addFacility(
 					facilities.getFactory().createBikeSharingFacility(
-						Id.create( idString, ActivityFacility.class ),
+						Id.create( idString, BikeSharingFacility.class ),
 						new CoordImpl(
 							Double.parseDouble( x ),
 							Double.parseDouble( y ) ),

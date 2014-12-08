@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
@@ -28,11 +29,15 @@ import org.matsim.core.population.routes.RouteFactory;
  * @author thibautd
  */
 public class BikeSharingRouteFactory implements RouteFactory {
+	private static final Logger log =
+		Logger.getLogger(BikeSharingRouteFactory.class);
+
 
 	@Override
 	public Route createRoute(
 			final Id<Link> startLinkId,
 			final Id<Link> endLinkId ) {
+		if ( log.isTraceEnabled() ) log.trace( "creating bike sharing route between links "+startLinkId+" and "+endLinkId );
 		return new BikeSharingRoute( startLinkId , endLinkId );
 	}
 }
