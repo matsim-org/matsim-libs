@@ -1606,7 +1606,7 @@ MAKEINDEX_CMD_NAME     = makeindex
 # The default value is: NO.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-COMPACT_LATEX          = NO
+COMPACT_LATEX          = YES
 
 # The PAPER_TYPE tag can be used to set the paper type that is used by the
 # printer.
@@ -1666,7 +1666,7 @@ LATEX_EXTRA_FILES      =
 # The default value is: YES.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-PDF_HYPERLINKS         = NO
+PDF_HYPERLINKS         = YES
 
 # If the LATEX_PDFLATEX tag is set to YES, doxygen will use pdflatex to generate
 # the PDF file directly from the LaTeX files. Set this option to YES to get a
@@ -1674,7 +1674,7 @@ PDF_HYPERLINKS         = NO
 # The default value is: YES.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-USE_PDFLATEX           = NO
+USE_PDFLATEX           = YES
 
 # If the LATEX_BATCHMODE tag is set to YES, doxygen will add the \batchmode
 # command to the generated LaTeX files. This will instruct LaTeX to keep running
@@ -1683,14 +1683,14 @@ USE_PDFLATEX           = NO
 # The default value is: NO.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_BATCHMODE        = NO
+LATEX_BATCHMODE        = YES
 
 # If the LATEX_HIDE_INDICES tag is set to YES then doxygen will not include the
 # index chapters (such as File Index, Compound Index, etc.) in the output.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_HIDE_INDICES     = NO
+LATEX_HIDE_INDICES     = YES
 
 # If the LATEX_SOURCE_CODE tag is set to YES then doxygen will include source
 # code with syntax highlighting in the LaTeX output.
@@ -1700,7 +1700,7 @@ LATEX_HIDE_INDICES     = NO
 # The default value is: NO.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-LATEX_SOURCE_CODE      = NO
+LATEX_SOURCE_CODE      = YES
 
 # The LATEX_BIB_STYLE tag can be used to specify the style to use for the
 # bibliography, e.g. plainnat, or ieeetr. See
