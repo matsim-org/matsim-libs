@@ -25,7 +25,9 @@ package playground.ikaddoura.noise2;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,13 +39,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,7 +52,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -182,14 +182,9 @@ public class NoiseTest {
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
 		
-		final double endTime = 39600;
 		final Scenario sc = scenario;
-		final Map<Id<Person>,Double> homeActivityStartEvents = new HashMap<Id<Person>,Double>();
-		final Map<Id<Person>,Double> workActivityStartEvents = new HashMap<Id<Person>,Double>();
-		final Map<Id<Person>,Double> homeActivityEndEvents = new HashMap<Id<Person>,Double>();
-		final Map<Id<Person>,Double> workActivityEndEvents = new HashMap<Id<Person>,Double>();
-		final Map<Id<Person>,Coord> coordsHome = new HashMap<Id<Person>, Coord>();
-		final Map<Id<Person>,Coord> coordsWork = new HashMap<Id<Person>, Coord>();
+		
+		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
 		events.addHandler(new ActivityStartEventHandler() {
 			
@@ -200,14 +195,12 @@ public class NoiseTest {
 			
 			@Override
 			public void handleEvent(ActivityStartEvent event) {
-					if(event.getActType().equals("home")){
-						homeActivityStartEvents.put(event.getPersonId(), 0.);
-						coordsHome.put(event.getPersonId(), sc.getNetwork().getLinks().get(event.getLinkId()).getCoord());
-					}
-					if(event.getActType().equals("work")){
-						workActivityStartEvents.put(event.getPersonId(), event.getTime());
-						coordsWork.put(event.getPersonId(), sc.getNetwork().getLinks().get(event.getLinkId()).getCoord());
-					}
+				
+				if(!eventsPerPersonId.containsKey(event.getPersonId())){
+					eventsPerPersonId.put(event.getPersonId(), new ArrayList<Event>());
+				}
+				eventsPerPersonId.get(event.getPersonId()).add(event);
+				
 			}
 		});
 		
@@ -220,13 +213,12 @@ public class NoiseTest {
 			
 			@Override
 			public void handleEvent(ActivityEndEvent event) {
-				if(event.getTime() <= endTime && event.getTime() >= endTime - 3600){
-					if(event.getActType().equals("home")){
-						homeActivityEndEvents.put(event.getPersonId(), event.getTime());
-					} else if(event.getActType().equals("work")){
-						workActivityEndEvents.put(event.getPersonId(), event.getTime());
-					}
+				
+				if(!eventsPerPersonId.containsKey(event.getPersonId())){
+					eventsPerPersonId.put(event.getPersonId(), new ArrayList<Event>());
 				}
+				eventsPerPersonId.get(event.getPersonId()).add(event);
+				
 			}
 		});
 		
@@ -241,96 +233,202 @@ public class NoiseTest {
 		
 		// test considered agent units
 		
+		double sevenOclock = 25200;
+		double endTime = 39600;
+		double ttOclock = 79200;
+		
 		String separator = ";";
 		String line = null;
 		
-		String pathToConsideredAgentUnitsFile = runDirectory + "analysis_it.0/consideredAgentUnits/0.consideredAgentUnits_" + Double.toString(endTime) + ".csv";
-		
-		Map<Id<ReceiverPoint>, Double> consideredAgentsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, Double>();
+		double[] timeSlots = {sevenOclock, endTime, ttOclock};
+		String pathToConsideredAgentUnitsFile;
+		Map<Id<ReceiverPoint>, List<Double>> consideredAgentsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, List<Double>>();
 		Map<String, Integer> idxFromKey = new ConcurrentHashMap<String, Integer>();
+		BufferedReader br;
 		
-		BufferedReader br = IOUtils.getBufferedReader(pathToConsideredAgentUnitsFile);
-		
-		try {
+		for(double currentTimeSlot : timeSlots){
 			
-			line = br.readLine();
+			pathToConsideredAgentUnitsFile = runDirectory + "analysis_it.0/consideredAgentUnits/0.consideredAgentUnits_" + Double.toString(currentTimeSlot) + ".csv";
 			
-			String[] keys = line.split(separator);
-			for(int i = 0; i < keys.length; i++){
-				idxFromKey.put(keys[i], i);
+			br = IOUtils.getBufferedReader(pathToConsideredAgentUnitsFile);
+			
+			try {
+				
+				line = br.readLine();
+				
+				String[] keys = line.split(separator);
+				for(int i = 0; i < keys.length; i++){
+					idxFromKey.put(keys[i], i);
+				}
+				
+				int idxReceiverPointId = idxFromKey.get("Receiver Point Id");
+				int idxConsideredAgentUnits = idxFromKey.get("Considered Agent Units " + Time.writeTime(currentTimeSlot, Time.TIMEFORMAT_HHMMSS));
+				
+				while((line = br.readLine()) != null){
+					
+					keys = line.split(separator);
+					if(!consideredAgentsPerReceiverPoint.containsKey(Id.create(keys[idxReceiverPointId], ReceiverPoint.class))){
+						consideredAgentsPerReceiverPoint.put(Id.create(keys[idxReceiverPointId], ReceiverPoint.class), new ArrayList<Double>());
+					}
+					
+					consideredAgentsPerReceiverPoint.get(Id.create(keys[idxReceiverPointId], ReceiverPoint.class)).add(Double.parseDouble(keys[idxConsideredAgentUnits]));
+					
+				}
+				
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			
-			int idxReceiverPointId = idxFromKey.get("Receiver Point Id");
-			int idxConsideredAgentUnits = idxFromKey.get("Considered Agent Units " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS));
-			
-			while((line = br.readLine()) != null){
-				
-				keys = line.split(separator);
-				consideredAgentsPerReceiverPoint.put(Id.create(keys[idxReceiverPointId], ReceiverPoint.class), Double.parseDouble(keys[idxConsideredAgentUnits]));
-				
-			}
-			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		
 		Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, Double>();
-
-		for(Id<Person> personId : noiseContext.getScenario().getPopulation().getPersons().keySet()){
+		
+		int index = 0;
+		
+		for(double currentTimeSlot : timeSlots){
+			
+			Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPointTest = new HashMap<Id<ReceiverPoint>, Double>();
 			
 			double affectedPersons = 0.;
 			
-			double startHome = 0.;
-			double endHome = homeActivityEndEvents.containsKey(personId) ? homeActivityEndEvents.get(personId) : 30.*3600;
-			double startWork = workActivityStartEvents.containsKey(personId) ? workActivityStartEvents.get(personId) : 0.;
-			double endWork = workActivityEndEvents.containsKey(personId) ? workActivityEndEvents.get(personId) : 30.*3600;
-			
-			PersonActivityInfo actInfo = new PersonActivityInfo();
-			actInfo.setActivityType("home");
-			actInfo.setStartTime(startHome);
-			actInfo.setEndTime(endHome);
-			
-			double unitsThisPersonActivityInfo = actInfo.getDurationWithinInterval(endTime, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-			affectedPersons = ( unitsThisPersonActivityInfo * noiseContext.getNoiseParams().getScaleFactor() );
-			
-			Coord home = ((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord();
-			
-			Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(home);
-			
-			if(!affectedPersonsPerReceiverPoint.containsKey(rpId)){
-				affectedPersonsPerReceiverPoint.put(rpId, affectedPersons);
-			} else{
-				double n = affectedPersonsPerReceiverPoint.get(rpId);
-				affectedPersonsPerReceiverPoint.put(rpId, n + affectedPersons);
+			for(Id<Person> personId : noiseContext.getScenario().getPopulation().getPersons().keySet()){
+				
+				double start = 0.;
+				
+				for(Event e : eventsPerPersonId.get(personId)){
+					
+					boolean activityEnded = false;
+					
+					PersonActivityInfo actInfo = null;
+					
+					if(e.getEventType().equals("actend")){
+						
+						ActivityEndEvent event = (ActivityEndEvent)e;
+						
+						if(event.getActType().equals("home")){
+							
+							actInfo = new PersonActivityInfo();
+							actInfo.setActivityType("home");
+							actInfo.setStartTime(start);
+							double end= index == 2 ? 30*3600 : event.getTime();
+							actInfo.setEndTime(end);
+							
+							activityEnded = true;
+							
+						}
+						
+						else if(event.getActType().equals("work")){
+							
+							actInfo = new PersonActivityInfo();
+							actInfo.setActivityType("work");
+							actInfo.setStartTime(start);
+							actInfo.setEndTime(event.getTime());
+							
+							activityEnded = true;
+							
+						}
+						
+					} else if(e.getEventType().equals("actstart")){
+						
+						ActivityStartEvent event = (ActivityStartEvent)e;
+						
+						if(event.getActType().equals("home")){
+							
+							if(index == 0){
+								
+								continue;
+								
+							}
+							
+							start = event.getTime();
+							
+						} else if(event.getActType().equals("work")){
+							
+							start = event.getTime();
+							
+						}
+						
+					}
+					
+					if(activityEnded){
+						
+						//test code of getDurationInWithinInterval from actInfo
+						
+						double durationInThisInterval = 0.;
+						double timeIntervalStart = currentTimeSlot - noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+						
+						if (( actInfo.getStartTime() < currentTimeSlot) && ( actInfo.getEndTime() >=  timeIntervalStart )) {
+							
+							if ((actInfo.getStartTime() <= timeIntervalStart) && actInfo.getEndTime() >= currentTimeSlot) {
+								
+								durationInThisInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+							
+							} else if (actInfo.getStartTime() <= timeIntervalStart && actInfo.getEndTime() <= currentTimeSlot) {
+								
+								durationInThisInterval = actInfo.getEndTime() - timeIntervalStart;
+							
+							} else if (actInfo.getStartTime() >= timeIntervalStart && actInfo.getEndTime() >= currentTimeSlot) {
+								
+								durationInThisInterval = currentTimeSlot - actInfo.getStartTime();
+							
+							} else if (actInfo.getStartTime() >= timeIntervalStart && actInfo.getEndTime() <= currentTimeSlot) {
+								
+								durationInThisInterval = actInfo.getEndTime() - actInfo.getStartTime();
+								
+						
+							} else {
+								
+								throw new RuntimeException("Unknown case. Aborting...");
+							}
+								
+						}
+						
+						double durationInThisIntervalMethod = actInfo.getDurationWithinInterval(currentTimeSlot, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()); 
+							
+						Assert.assertEquals("Durations of activities do not match!", durationInThisIntervalMethod, durationInThisInterval, MatsimTestUtils.EPSILON);
+							
+						double unitsThisPersonActivityInfo = durationInThisInterval / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation(); 
+						affectedPersons = ( unitsThisPersonActivityInfo * noiseContext.getNoiseParams().getScaleFactor() );
+						
+						Coord coord = actInfo.getActivityType().equals("home") ?
+								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord() :
+								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2)).getCoord();
+							
+						Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
+						
+						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){
+							
+							affectedPersonsPerReceiverPointTest.put(rpId, affectedPersons);
+							
+						} else{
+							
+							double n = affectedPersonsPerReceiverPointTest.get(rpId);
+							affectedPersonsPerReceiverPointTest.put(rpId, n + affectedPersons);
+							
+						}
+						
+					}
+					
+				}
+				
 			}
 			
-			if(startWork > 0){
-			
-			actInfo = new PersonActivityInfo();
-			actInfo.setActivityType("work");
-			actInfo.setStartTime(startWork);
-			actInfo.setEndTime(endWork);
-			
-			unitsThisPersonActivityInfo = actInfo.getDurationWithinInterval(endTime, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
-			affectedPersons = ( unitsThisPersonActivityInfo * noiseContext.getNoiseParams().getScaleFactor() );
-			
-			Coord work = ((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2)).getCoord();
-			
-			rpId = noiseContext.getActivityCoord2receiverPointId().get(work);
-			
-			if(!affectedPersonsPerReceiverPoint.containsKey(rpId)){
-				affectedPersonsPerReceiverPoint.put(rpId, affectedPersons);
-			} else{
-				double n = affectedPersonsPerReceiverPoint.get(rpId);
-				affectedPersonsPerReceiverPoint.put(rpId, n + affectedPersons);
-			}
+			if(currentTimeSlot == endTime){
+				
+				affectedPersonsPerReceiverPoint = affectedPersonsPerReceiverPointTest;
+				
+				Assert.assertEquals("Wrong number of affected persons at receiver point 16", 2.35305555555555, affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Wrong number of affected persons at receiver point 0", 0.479722222222222, affectedPersonsPerReceiverPointTest.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+				
 			}
 			
-		}
-		
-		for(Id<ReceiverPoint> receiverPointId : affectedPersonsPerReceiverPoint.keySet()){
+			for(Id<ReceiverPoint> receiverPointId : affectedPersonsPerReceiverPointTest.keySet()){
+				
+				Assert.assertEquals("Wrong number of affected persons", consideredAgentsPerReceiverPoint.get(receiverPointId).get(index), affectedPersonsPerReceiverPointTest.get(receiverPointId), MatsimTestUtils.EPSILON);
+				
+			}
 			
-			Assert.assertEquals(consideredAgentsPerReceiverPoint.get(receiverPointId), affectedPersonsPerReceiverPoint.get(receiverPointId), MatsimTestUtils.EPSILON);
+			index++;
 			
 		}
 		
@@ -392,6 +490,12 @@ public class NoiseTest {
 			
 		}
 		
+		Map<Id<Link>,Double> noiseEmissionsPerLink = new HashMap<Id<Link>,Double>();
+		
+		for(Id<Link> linkId : noiseContext.getScenario().getNetwork().getLinks().keySet()){
+			noiseEmissionsPerLink.put(linkId, 0.);
+		}
+		
 		for(Id<Link> linkId : amountOfVehiclesPerLink.keySet()){
 
 			double vCar = (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -403,9 +507,15 @@ public class NoiseTest {
 			double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 			double noiseEmission = mittelungspegel + Dv;
 			
-			Assert.assertEquals(emissionsPerLink.get(linkId), noiseEmission, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of emission!", emissionsPerLink.get(linkId), noiseEmission, MatsimTestUtils.EPSILON);
+			noiseEmissionsPerLink.put(linkId, noiseEmission);
 			
 		}
+		
+		Assert.assertEquals("Wrong amount of emission!", 56.4418948379387, noiseEmissionsPerLink.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong amount of emission!", 86.4302864851097, noiseEmissionsPerLink.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong amount of emission!", 0., noiseEmissionsPerLink.get(Id.create("link4", Link.class)), MatsimTestUtils.EPSILON);
+		
 		
 		// +++++++++++++++++++++++++++++++++++++++++++++++++++
 		// test immissions and damages per receiver point and time
@@ -463,9 +573,13 @@ public class NoiseTest {
 				
 			}
 			
-			Assert.assertEquals(immissionPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateResultingNoiseImmission(linkId2IsolatedImmission.values()), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of immission!", immissionPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateResultingNoiseImmission(linkId2IsolatedImmission.values()), MatsimTestUtils.EPSILON);
 				
 		}
+		
+		Assert.assertEquals("Wrong amount of immission!", 77.2591534246579, immissionPerReceiverPointId.get(Id.create("15", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong amount of immission!", 67.9561670074151, immissionPerReceiverPointId.get(Id.create("31", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong amount of immission!", 0., immissionPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
 		line = null;
 		
@@ -503,11 +617,14 @@ public class NoiseTest {
 		for(ReceiverPoint rp : noiseContext.getReceiverPoints().values()){
 			
 			double noiseImmission = immissionPerReceiverPointId.get(rp.getId());
-			double affectedAgentUnits = consideredAgentsPerReceiverPoint.get(rp.getId());
+			double affectedAgentUnits = consideredAgentsPerReceiverPoint.get(rp.getId()).get(1);
 			
-			Assert.assertEquals(damagesPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong damage!", damagesPerReceiverPointId.get(rp.getId()), NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), MatsimTestUtils.EPSILON);
 			
 		}
+		
+		Assert.assertEquals("Wrong damage!", 0.0664164095284536, damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
 		// +++++++++++++++++++++++++++++++++++++++++++++++++++
 
