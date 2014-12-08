@@ -20,6 +20,7 @@
 package org.matsim.contrib.locationchoice;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -30,7 +31,11 @@ public class Initializer {
 	public void init(MatsimTestCase testCase) {
 		// lnk does not work. get path to locationchcoice
 		String	path = testCase.getPackageInputDirectory() + "config.xml";
-		Config config = testCase.loadConfig(path);
+		
+		Config config = ConfigUtils.loadConfig(path, new DestinationChoiceConfigGroup() ) ;
+		
+		//Config config = testCase.loadConfig(path);
+				
 		this.controler = new Controler(config);
 		this.controler.setCreateGraphs(false);
 		this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
