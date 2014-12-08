@@ -72,7 +72,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	public BestReplyDestinationChoice(DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());
-		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
+		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)lcContext.getScenario().getConfig().getModule("locationchoice")).getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext;
@@ -94,17 +94,17 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private void initLocal() {
 		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
 		((NetworkImpl) this.scenario.getNetwork()).connect();
-		this.initTrees(this.scenario.getActivityFacilities(), this.scenario.getConfig().locationchoice());
+		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		this.sampler = new DestinationSampler(
 				this.lcContext.getPersonsKValuesArray(), 
 				this.lcContext.getFacilitiesKValuesArray(), 
-				this.scenario.getConfig().locationchoice());
+				(DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 	}
 
 	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
+	private void initTrees(ActivityFacilities facilities, DestinationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
 		
 		for (String flexibleType : this.flexibleTypes) {

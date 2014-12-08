@@ -2,12 +2,12 @@ package playground.staheale.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -48,7 +48,7 @@ public class RunControler extends Controler {
 
 		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
 
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) this.config.getModule("locationchoice"));
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
 		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 
 		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();

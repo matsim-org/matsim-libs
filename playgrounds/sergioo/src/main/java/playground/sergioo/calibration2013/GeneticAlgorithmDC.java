@@ -26,12 +26,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -59,6 +60,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 
 //import com.imsl.stat.KolmogorovTwoSample;
+
 
 
 
@@ -111,19 +113,19 @@ public class GeneticAlgorithmDC {
 		}
 		private void modifyConfig(Scenario scenario) {
 			int k=0;
-			scenario.getConfig().locationchoice().setAnalysisBinSize(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setAnalysisBoundary(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAnalysisBinSize(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAnalysisBoundary(Double.toString(this.parameters[k++]));
 			String factors = "";
 			for(int j=0; j<scenario.getConfig().findParam("locationchoice", "flexible_types").split(",").length; j++)
 				factors += this.parameters[k++]+",";
-			scenario.getConfig().locationchoice().setEpsilonScaleFactors(factors.substring(0, factors.length()-1));
-			scenario.getConfig().locationchoice().setProbChoiceSetSize(Integer.toString((int)this.parameters[k++]));
-			scenario.getConfig().locationchoice().setRadius(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setRestraintFcnExp(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setRestraintFcnFactor(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setScaleFactor(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setTravelSpeed_car(Double.toString(this.parameters[k++]));
-			scenario.getConfig().locationchoice().setTravelSpeed_pt(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonScaleFactors(factors.substring(0, factors.length()-1));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setProbChoiceSetSize(Integer.toString((int)this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setRadius(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setRestraintFcnExp(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setRestraintFcnFactor(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setScaleFactor(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_car(Double.toString(this.parameters[k++]));
+			((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_pt(Double.toString(this.parameters[k++]));
 		}
 		private void calculateScore(final Scenario scenario) {
 			module.prepareReplanning(context);
@@ -300,13 +302,13 @@ public class GeneticAlgorithmDC {
 					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
 		for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
-		scenario.getConfig().locationchoice().setAlgorithm(Algotype.valueOf("bestResponse"));
-		scenario.getConfig().locationchoice().setEpsilonDistribution("gumbel");
-		scenario.getConfig().locationchoice().setFlexibleTypes(actTypes);
-		scenario.getConfig().locationchoice().setEpsilonScaleFactors("1, 1, 1, 1, 1, 1, 1, 1, 1");
-		scenario.getConfig().locationchoice().setDestinationSamplePercent(args[9]);
-		scenario.getConfig().locationchoice().setRestraintFcnExp("1");
-		scenario.getConfig().locationchoice().setRestraintFcnFactor("1");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(Algotype.valueOf("bestResponse"));
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonDistribution("gumbel");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setFlexibleTypes(actTypes);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonScaleFactors("1, 1, 1, 1, 1, 1, 1, 1, 1");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setDestinationSamplePercent(args[9]);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setRestraintFcnExp("1");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setRestraintFcnFactor("1");
 		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		events.addHandler(travelTimeCalculator);

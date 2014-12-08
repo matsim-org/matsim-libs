@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrCreateKVals;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
@@ -105,7 +106,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	
 	public void init() {
 		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()) ;		
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.scenario.getConfig().locationchoice());
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 		this.actTypeConverter = defineFlexibleActivities.getConverter();
 		this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
@@ -224,7 +225,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	
 	private Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
-		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), this.scenario.getConfig().locationchoice());
+		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		treesBuilder.setActTypeConverter(this.getConverter());
 		treesBuilder.createTrees(scenario.getActivityFacilities());
 		

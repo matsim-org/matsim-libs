@@ -20,12 +20,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -54,6 +55,7 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 //import com.imsl.stat.KolmogorovTwoSample;
+
 
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
@@ -160,15 +162,15 @@ public class IterativeAlgorithmDC {
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[4]);
-		scenario.getConfig().locationchoice().setAlgorithm(Algotype.valueOf("bestResponse"));
-		scenario.getConfig().locationchoice().setEpsilonDistribution("gumbel");
-		scenario.getConfig().locationchoice().setFlexibleTypes(actTypes);
-		scenario.getConfig().locationchoice().setEpsilonScaleFactors("1, 1, 1, 1, 1, 1, 1, 1, 1");
-		scenario.getConfig().locationchoice().setDestinationSamplePercent(args[9]);
-		scenario.getConfig().locationchoice().setAnalysisBoundary("0.25");
-		scenario.getConfig().locationchoice().setScaleFactor("0.25");
-		scenario.getConfig().locationchoice().setTravelSpeed_car("9");
-		scenario.getConfig().locationchoice().setTravelSpeed_pt("5");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(Algotype.valueOf("bestResponse"));
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonDistribution("gumbel");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setFlexibleTypes(actTypes);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonScaleFactors("1, 1, 1, 1, 1, 1, 1, 1, 1");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setDestinationSamplePercent(args[9]);
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAnalysisBoundary("0.25");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setScaleFactor("0.25");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_car("9");
+		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setTravelSpeed_pt("5");
 		EventsManager events = new EventsManagerImpl();
 		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		events.addHandler(travelTimeCalculator);
@@ -213,7 +215,7 @@ public class IterativeAlgorithmDC {
 				int best = 0, v=0;
 				double bestScore = Double.POSITIVE_INFINITY;
 				for(double value = minValueI+jump/2; value<maxValueI; value+=jump) {
-					scenario.getConfig().locationchoice().setEpsilonScaleFactors(getEpsilonFactors(a, value, actTypes.split(",").length));
+					((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setEpsilonScaleFactors(getEpsilonFactors(a, value, actTypes.split(",").length));
 					DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
 					dcContext.init();
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);

@@ -23,6 +23,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -77,7 +78,8 @@ public class ReadOrComputeMaxDCScore {
 	
 	private void computeMaxDCScore() {			
 		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValuesArray(), 
-				this.lcContext.getFacilitiesKValuesArray(), this.config.locationchoice());
+				this.lcContext.getFacilitiesKValuesArray(), 
+				(DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {

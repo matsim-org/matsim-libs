@@ -59,7 +59,7 @@ public class Config {
 	private FacilitiesConfigGroup facilities = null;
 	private GlobalConfigGroup global = null;
 	private HouseholdsConfigGroup households;
-	private LocationChoiceConfigGroup locationchoice = null;
+//	private LocationChoiceConfigGroup locationchoice = null;
 	private NetworkConfigGroup network = null;
 	private ParallelEventHandlingConfigGroup parallelEventHandling = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
@@ -133,8 +133,8 @@ public class Config {
 		this.strategy = new StrategyConfigGroup();
 		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
 
-		this.locationchoice = new LocationChoiceConfigGroup();
-		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
+//		this.locationchoice = new LocationChoiceConfigGroup();
+//		this.modules.put(LocationChoiceConfigGroup.GROUP_NAME, this.locationchoice);
 
 		this.signalSystemConfigGroup = new SignalSystemsConfigGroup();
 		this.modules.put(SignalSystemsConfigGroup.GROUPNAME, this.signalSystemConfigGroup);
@@ -418,9 +418,9 @@ public class Config {
 		return this.strategy;
 	}
 
-	public final LocationChoiceConfigGroup locationchoice() {
-		return this.locationchoice;
-	}
+//	public final LocationChoiceConfigGroup locationchoice() {
+//		return this.locationchoice;
+//	}
 
 	public SignalSystemsConfigGroup signalSystems() {
 		return this.signalSystemConfigGroup;

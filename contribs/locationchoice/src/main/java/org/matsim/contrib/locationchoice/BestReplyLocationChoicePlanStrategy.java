@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -59,7 +58,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 */
 		DestinationChoiceBestResponseContext lcContext = (DestinationChoiceBestResponseContext) scenario.getScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME);
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
-		if ( !LocationChoiceConfigGroup.Algotype.bestResponse.equals(lcContext.getScenario().getConfig().locationchoice().getAlgorithm())) {
+		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)lcContext.getScenario().getConfig().getModule("locationchoice")).getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}		
 		Config config = lcContext.getScenario().getConfig() ;

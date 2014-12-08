@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 
 /**
  * Chooses a stable sample of facilities for every person 
@@ -42,10 +42,10 @@ public class DestinationSampler {
 	double samplePercent = 100.0;
 	
 	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues,  
-			LocationChoiceConfigGroup config) {
+			DestinationChoiceConfigGroup module) {
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
-		this.samplePercent = Double.parseDouble(config.getDestinationSamplePercent());
+		this.samplePercent = Double.parseDouble(module.getDestinationSamplePercent());
 	}
 	
 	public boolean sample(int facilityIndex, int personIndex) { 

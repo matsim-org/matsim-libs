@@ -21,6 +21,7 @@ package org.matsim.contrib.locationchoice;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
@@ -30,8 +31,6 @@ import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -58,7 +57,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	public DestinationChoice(Scenario scenario) {
 		super(scenario.getConfig().global());
-		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(scenario.getConfig().locationchoice().getAlgorithm()) ) {
+		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getAlgorithm()) ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
 					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13");
 		}
@@ -67,17 +66,17 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		this.defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
-		this.initTrees(this.scenario.getActivityFacilities(), (LocationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 	}
 
 	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
+	private void initTrees(ActivityFacilities facilities, DestinationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.scenario.getNetwork(), config);
 		treesBuilder.setActTypeConverter(actTypeConverter);
@@ -93,10 +92,10 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	protected final void afterFinishReplanningHook() {
-		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 
-		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
-				|| LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
+		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
+				|| DestinationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
             for (PlanAlgorithm plan_algo : this.planAlgoInstances) {
                 if (Algotype.localSearchSingleAct.equals(algorithm)) {
@@ -114,7 +113,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
-		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 		switch ( algorithm ) {
 		case random:
 			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  

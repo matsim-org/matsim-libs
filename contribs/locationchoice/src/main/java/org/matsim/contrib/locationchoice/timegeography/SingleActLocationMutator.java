@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -52,7 +52,7 @@ public class SingleActLocationMutator extends LocationMutator {
 			Random random) {
 
 		super(scenario, quad_trees, facilities_of_type, random);
-		this.defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
 	}
 
 	@Override

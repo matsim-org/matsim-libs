@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
@@ -43,7 +44,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -82,9 +82,9 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		//	CONFIG:
 		final Config config = localCreateConfig();
 
-		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
-		config.locationchoice().setEpsilonScaleFactors("100.0") ;
-		config.locationchoice().setRandomSeed("4711") ;
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.bestResponse);
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("100.0");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed("4711");
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -158,9 +158,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	public void testLocationChoiceFeb2013NegativeScores() {
 		// config:
 		final Config config = localCreateConfig();
+		
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.bestResponse);
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("100.0");
 
-		config.locationchoice().setAlgorithm(Algotype.bestResponse) ;
-		config.locationchoice().setEpsilonScaleFactors("100.0") ;
 
 		// scenario:
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -302,6 +303,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
 		// should pull the best response test away from the other (old) test.  kai, feb'13
 
+		controler.setOverwriteFiles(true) ;
 		controler.run();
 
 		// test that everything worked as expected
@@ -357,7 +359,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 	private Config localCreateConfig() {
 		// setup config
-		final Config config = loadConfig(null);
+		String args [] = {this.getPackageInputDirectory() + "config.xml"};
+		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup() ) ;
 
 		config.global().setNumberOfThreads(0);
 		config.controler().setFirstIteration(0);
@@ -365,8 +368,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 
-		config.locationchoice().setAlgorithm(Algotype.random);
-		config.locationchoice().setFlexibleTypes("work");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.random);
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setFlexibleTypes("work");
 
 		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(12*60*60);

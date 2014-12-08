@@ -23,6 +23,8 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 @Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
@@ -37,8 +39,16 @@ public class DCControler extends Controler {
 	}
 	
 	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
+	public DCControler(final Config config) {
+		super(config);	
+	}
+	
+	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 	public static void main (final String[] args) { 
-		DCControler controler = new DCControler(args);
+		
+		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup() ) ;
+		
+		DCControler controler = new DCControler(config);
 		controler.setOverwriteFiles(true);
 		controler.init();
     	controler.run();
@@ -58,8 +68,8 @@ public class DCControler extends Controler {
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.dcContext); 	
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
 		
-		if (!super.getConfig().findParam("locationchoice", "prefsFile").equals("null") &&
-				!super.getConfig().facilities().getInputFile().equals("null")) {
+		if (!this.getConfig().findParam("locationchoice", "prefsFile").equals("null") &&
+				!this.getConfig().facilities().getInputFile().equals("null")) {
 			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
 		} else {
 			dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
@@ -73,8 +83,8 @@ public class DCControler extends Controler {
 
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 		
-		if (Double.parseDouble(super.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
-				Double.parseDouble(super.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {		
+		if (Double.parseDouble(this.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+				Double.parseDouble(this.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {		
 					this.addControlerListener(new FacilitiesLoadCalculator(this.dcContext.getFacilityPenalties()));
 				}
 		

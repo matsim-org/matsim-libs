@@ -19,12 +19,12 @@
 
 package playground.anhorni.PLOC;
 
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -58,7 +58,7 @@ public class SingleRunControler extends Controler {
 		
     public static void main (final String[] args) { 
     	// load the config, telling it to "materialize" the location choice section:
-    	Config config = ConfigUtils.loadConfig( args[0], new LocationChoiceConfigGroup() ) ;
+    	Config config = ConfigUtils.loadConfig( args[0], new DestinationChoiceConfigGroup() ) ;
     	
     	SingleRunControler controler = new SingleRunControler(config);
     	controler.run();
@@ -73,7 +73,7 @@ public class SingleRunControler extends Controler {
       if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
       
       ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(
-    		  (LocationChoiceConfigGroup) this.config.getModule("locationchoice"));
+    		  (DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
 	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
             
 		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));

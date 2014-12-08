@@ -29,10 +29,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -58,7 +59,8 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	public DestinationChoice(Scenario scenario) {
 		super(scenario.getConfig().global());
-		if ( LocationChoiceConfigGroup.Algotype.bestResponse.equals(scenario.getConfig().locationchoice().getAlgorithm()) ) {
+		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(
+				((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getAlgorithm())) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
 					"Use BestReplyLocationChoice instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
 			// yyyyyy the best reply code pieces can be removed from this here.  kai, feb'13
@@ -95,7 +97,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	protected final void afterFinishReplanningHook() {
-		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 
 		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
 				|| LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
@@ -120,7 +122,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {		
-		Algotype algorithm = this.scenario.getConfig().locationchoice().getAlgorithm();
+		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 		switch ( algorithm ) {
 		case random:
 			this.planAlgoInstances.add(new RandomLocationMutator(this.scenario,  

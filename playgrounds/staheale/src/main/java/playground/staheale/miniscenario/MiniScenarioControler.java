@@ -22,6 +22,7 @@ package playground.staheale.miniscenario;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
@@ -67,7 +68,7 @@ public class MiniScenarioControler extends Controler {
 
 		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
 
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) this.config.getModule("locationchoice"));
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
 		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 
 		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
