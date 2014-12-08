@@ -26,15 +26,16 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+
 
 public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
-	private LocationChoiceConfigGroup dcconfig;
+	private DestinationChoiceConfigGroup dcconfig;
 	private ActTypeConverter converter = null;
 
-	public ActivitiesHandler(final LocationChoiceConfigGroup dcconfig) {
+	public ActivitiesHandler(final DestinationChoiceConfigGroup dcconfig) {
 		this.dcconfig = dcconfig;
 		this.createActivityTypeConverter();
 		this.initFlexibleTypes(dcconfig);
@@ -105,7 +106,7 @@ public class ActivitiesHandler {
 		}
 	}
 
-	private void initFlexibleTypes(LocationChoiceConfigGroup config) {
+	private void initFlexibleTypes(DestinationChoiceConfigGroup config) {
 		String types = config.getFlexibleTypes();
 		if (!types.equals("null")) {
 			String[] entries = types.split(",", -1);

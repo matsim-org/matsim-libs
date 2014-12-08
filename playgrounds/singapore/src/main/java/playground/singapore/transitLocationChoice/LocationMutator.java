@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -52,7 +52,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	// ----------------------------------------------------------
 
 	public LocationMutator(final Scenario scenario, Random random) {
-		this.defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.scenario = scenario;
@@ -64,7 +64,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			Random random) {
 
-		this.defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
@@ -87,7 +87,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	 * Initialize the quadtrees of all available activity types
 	 */
 	private void initTrees(ActivityFacilities facilities) {
-		TreesBuilder treesBuilder = new TreesBuilder(this.scenario.getNetwork(), (LocationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		TreesBuilder treesBuilder = new TreesBuilder(this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();

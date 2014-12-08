@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.locationchoice.facilityload;
 
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 
 /*
  * TODO: (discussion)
@@ -48,7 +48,7 @@ public class FacilityPenalty {
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
 
-	FacilityPenalty(double minCapacity, double scaleNumberOfPersons, LocationChoiceConfigGroup config) {
+	FacilityPenalty(double minCapacity, double scaleNumberOfPersons, DestinationChoiceConfigGroup config) {
 		this.capacity = minCapacity;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
 		this.scaleNumberOfPersons = scaleNumberOfPersons;

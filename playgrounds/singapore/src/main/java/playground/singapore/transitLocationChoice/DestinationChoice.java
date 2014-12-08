@@ -33,7 +33,6 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -71,17 +70,17 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		this.defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
-		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), (LocationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 	}
 
 	/**
 	 * Initialize the quadtrees of all available activity types
 	 */
-	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
+	private void initTrees(ActivityFacilities facilities, DestinationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.scenario.getNetwork(), config);
 		treesBuilder.setActTypeConverter(actTypeConverter);
@@ -99,18 +98,18 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	protected final void afterFinishReplanningHook() {
 		Algotype algorithm = ((DestinationChoiceConfigGroup)this.scenario.getConfig().getModule("locationchoice")).getAlgorithm();
 
-		if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
-				|| LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
+		if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) 
+				|| DestinationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 			int unsuccessfull = 0;
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
 
-				if ( LocationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
+				if ( DestinationChoiceConfigGroup.Algotype.localSearchSingleAct.equals(algorithm) ) {
 					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
-				else if ( LocationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) ) {
+				else if ( DestinationChoiceConfigGroup.Algotype.localSearchRecursive.equals(algorithm) ) {
 					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
 					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
 				}

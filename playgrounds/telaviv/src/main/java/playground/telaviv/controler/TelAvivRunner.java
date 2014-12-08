@@ -21,11 +21,11 @@
 package playground.telaviv.controler;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.roadpricing.RoadPricing;
 
@@ -85,7 +85,7 @@ public class TelAvivRunner {
 
 		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
 		
-		LocationChoiceConfigGroup lcConfigGroup = (LocationChoiceConfigGroup) config.getModule("locationchoice");
+		DestinationChoiceConfigGroup lcConfigGroup = (DestinationChoiceConfigGroup) config.getModule("locationchoice");
 		double restraintFcnExp = Double.parseDouble(lcConfigGroup.getRestraintFcnExp());
 		double restraintFcnFactor = Double.parseDouble(lcConfigGroup.getRestraintFcnFactor());
 		if (restraintFcnExp > 0.0 && restraintFcnFactor > 0.0) {		

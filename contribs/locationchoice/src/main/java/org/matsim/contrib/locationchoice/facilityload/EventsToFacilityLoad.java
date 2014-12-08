@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityOption;
 
 /**
@@ -44,7 +44,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
 	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityPenalty> facilityPenalties, LocationChoiceConfigGroup config) {
+			TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceConfigGroup config) {
 		super();
 
 		this.facilityPenalties = facilityPenalties;

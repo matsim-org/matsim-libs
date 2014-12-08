@@ -21,9 +21,9 @@
 package org.matsim.contrib.locationchoice.facilityload;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -64,8 +64,12 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 		 */
 		double scaleNumberOfPersons = Double.parseDouble(controler.getConfig().findParam("locationchoice", "scaleFactor"));
-        this.eventsToFacilityLoad = new EventsToFacilityLoad(controler.getScenario().getActivityFacilities(), scaleNumberOfPersons,
-				this.facilityPenalties, (LocationChoiceConfigGroup) controler.getConfig().getModule("locationchoice"));
+        this.eventsToFacilityLoad = new EventsToFacilityLoad(
+        		controler.getScenario().getActivityFacilities(), 
+        		scaleNumberOfPersons,
+				this.facilityPenalties, 
+				((DestinationChoiceConfigGroup)controler.getConfig().getModule("locationchoice"))
+				);
 		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
 

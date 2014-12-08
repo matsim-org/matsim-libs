@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
@@ -42,7 +42,7 @@ public class TreesBuilder {
 	private Network network = null;
 	private static final Logger log = Logger.getLogger(TreesBuilder.class);
 	private HashSet<String> flexibleTypes = new HashSet<String>();
-	private final LocationChoiceConfigGroup config;
+	private final DestinationChoiceConfigGroup config;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
@@ -50,13 +50,13 @@ public class TreesBuilder {
 	private ActTypeConverter converter = new ActTypeConverter(true);
 
 
-	public TreesBuilder(HashSet<String> flexibleTypes, Network network, LocationChoiceConfigGroup config) {
+	public TreesBuilder(HashSet<String> flexibleTypes, Network network, DestinationChoiceConfigGroup config) {
 		this.flexibleTypes = flexibleTypes;
 		this.network = network;
 		this.config = config;
 	}
 
-	public TreesBuilder(Network network, LocationChoiceConfigGroup config) {
+	public TreesBuilder(Network network, DestinationChoiceConfigGroup config) {
 		this.network = network;
 		this.config = config;
 		this.initFlexibleTypes();

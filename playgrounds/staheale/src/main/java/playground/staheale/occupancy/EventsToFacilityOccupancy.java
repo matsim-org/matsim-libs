@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 
 
 public class EventsToFacilityOccupancy implements ActivityStartEventHandler, ActivityEndEventHandler {
@@ -40,8 +40,10 @@ public class EventsToFacilityOccupancy implements ActivityStartEventHandler, Act
 	private final static Logger log = Logger.getLogger(EventsToFacilityOccupancy.class);
 
 
-	public EventsToFacilityOccupancy(final ActivityFacilities facilities, int numberOfTimeBins, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityOccupancy> facilityOccupancies, LocationChoiceConfigGroup config) {
+	public EventsToFacilityOccupancy(final ActivityFacilities facilities, 
+			int numberOfTimeBins, double scaleNumberOfPersons,
+			TreeMap<Id, FacilityOccupancy> facilityOccupancies, 
+			DestinationChoiceConfigGroup config) {
 		super();
 
 		this.facilityOccupancies = facilityOccupancies;
