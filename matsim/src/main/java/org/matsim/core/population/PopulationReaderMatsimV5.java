@@ -291,7 +291,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
     }
 
     private void startLeg(final Attributes atts) {
-		String mode = atts.getValue(ATTR_LEG_MODE).toLowerCase(Locale.ROOT);
+		String mode = atts.getValue(ATTR_LEG_MODE);
 		if (VALUE_UNDEF.equals(mode)) {
 			mode = "undefined";
 		}
