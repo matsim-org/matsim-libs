@@ -139,8 +139,8 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			
 				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
 				
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * params.marginalUtilityOfPerforming_s;
-				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * params.marginalUtilityOfPerforming_s;
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
 				
 				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
 					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
@@ -154,8 +154,8 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			
 				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
 				
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * performingConst;
-				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfEarlyDeparture_s * performingConst;
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s;
+				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s;
 				
 				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst;
 				
@@ -169,11 +169,10 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 				
 				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s;
 				
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
-				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfEarlyDeparture_s * params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (incomeFactors.get(person.getId())/factorMean);
+				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfEarlyDeparture_s * (incomeFactors.get(person.getId())/factorMean);
 		
-				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
-
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
 			}
 			
 

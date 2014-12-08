@@ -98,8 +98,8 @@ ControlerListener {
 		Double mean = 0.0;
 		for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
 			sum = sum + (int) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), "income");
-			mean = (double) sum / (double) this.scenario.getPopulation().getPersons().size();
 		}
+		mean = (double) sum / (double) this.scenario.getPopulation().getPersons().size();
 
 		/*Create map of personal income factors*/
 		Double factorSum=0.0;
