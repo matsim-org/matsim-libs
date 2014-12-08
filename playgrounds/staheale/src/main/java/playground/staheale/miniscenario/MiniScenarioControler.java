@@ -27,10 +27,12 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
 import playground.staheale.occupancy.FacilitiesOccupancyCalculator;
 import playground.staheale.occupancy.FacilityOccupancy;
 import playground.staheale.scoring.AgentInteractionScoringFunctionFactory;
@@ -65,7 +67,7 @@ public class MiniScenarioControler extends Controler {
 
 		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
 
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((LocationChoiceConfigGroup) this.config.getModule("locationchoice"));
 		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 
 		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();

@@ -23,6 +23,7 @@ package playground.staheale.occupancy;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -90,7 +91,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 	@Override
 	public void notifyStartup(final StartupEvent event) {
         this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy(event.getControler().getScenario().getActivityFacilities(), this.numberOfTimeBins, this.scaleNumberOfPersons,
-				facilityOccupancies, event.getControler().getConfig().locationchoice());
+				facilityOccupancies, (LocationChoiceConfigGroup) event.getControler().getConfig().getModule("locationchoice"));
 		event.getControler().getEvents().addHandler(this.eventsToFacilityOccupancy);
 	}
 

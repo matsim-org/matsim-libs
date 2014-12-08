@@ -20,7 +20,6 @@
 
 package playground.telaviv.controler;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
@@ -86,7 +85,7 @@ public class TelAvivRunner {
 
 		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
 		
-		LocationChoiceConfigGroup lcConfigGroup = config.locationchoice();
+		LocationChoiceConfigGroup lcConfigGroup = (LocationChoiceConfigGroup) config.getModule("locationchoice");
 		double restraintFcnExp = Double.parseDouble(lcConfigGroup.getRestraintFcnExp());
 		double restraintFcnFactor = Double.parseDouble(lcConfigGroup.getRestraintFcnFactor());
 		if (restraintFcnExp > 0.0 && restraintFcnFactor > 0.0) {		
