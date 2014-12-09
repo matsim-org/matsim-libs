@@ -16,7 +16,7 @@ public class SlaveScoreStats implements ScoreStats {
 
     public SlaveScoreStats(Config config) {
         firstIter = config.controler().getFirstIteration();
-        int size = config.controler().getLastIteration() - firstIter;
+        int size = config.controler().getLastIteration() - firstIter+1;
         this.history = new double[4][size];
     }
 

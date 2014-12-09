@@ -31,10 +31,10 @@ public class PSimFactory implements MobsimFactory {
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		if (iteration > 0)
-			eventsManager.resetHandlers(iteration++);
-		else
-			iteration++;
+//		if (iteration > 0)
+//			eventsManager.resetHandlers(iteration++);
+//		else
+//			iteration++;
 		if (waitTime != null) {
 			return new PSim(sc, eventsManager, plans, travelTime, waitTime, stopStopTime);
 

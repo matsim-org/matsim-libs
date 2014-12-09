@@ -6,6 +6,7 @@ package playground.pieter.distributed;
 public enum CommunicationsMode {
     TRANSMIT_SCENARIO,
     TRANSMIT_TRAVEL_TIMES,
+    TRANSMIT_SCORES,
     POOL_PERSONS,
     DISTRIBUTE_PERSONS,
     DUMP_PLANS,

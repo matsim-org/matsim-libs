@@ -34,7 +34,6 @@ class PlansSubsampler {
 
 		}
 		pw.closeStreaming();
-		// okay, now remove in a 2nd step all persons we do no longer need
 		System.out.println("Wrote " + countPlans + " plans.");
 		System.out.println("    done.");
 

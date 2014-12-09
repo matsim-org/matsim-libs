@@ -66,6 +66,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean travelTimesUpdated = true;
     private Collection<Plan> plansForPSim;
     private int executedPlanCount;
+    private int currentIteration=0;
+    private int masterCurrentIteration=-1;
 
     public Config getConfig() {
         return config;
@@ -182,8 +184,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
         config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(0);
-        config.controler().setWritePlansInterval(0);
+//        config.controler().setWriteEventsInterval(0);
+//        config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
         scenario = ScenarioUtils.createScenario(config);
         //assume basic scenario for now, can create a loadScenario later
@@ -242,10 +244,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         ((ActivityImpl) planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl) planElement).getCoord()).getId());
             for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
                 ((ActivityFacilityImpl) facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
-            //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
-            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
             //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
+            //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
+            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
         }
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
@@ -321,6 +323,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             if (somethingWentWrong) Runtime.getRuntime().halt(0);
             initialRouting = false;
         }
+        this.currentIteration = event.getIteration();
         lastIterationStartTime = System.currentTimeMillis();
         travelTime.setTravelTime(linkTravelTimes);
         pSimFactory.setTravelTime(linkTravelTimes);
@@ -376,6 +379,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
         plansCopyForSending = tempPlansCopyForSending;
         slaveLogger.warn("Sending " + plansCopyForSending.size()+" plans...");
+        writer.writeInt(currentIteration);
+        writer.writeInt(masterCurrentIteration);
         writer.writeObject(plansCopyForSending);
         slaveLogger.warn("Sending completed.");
 
@@ -383,12 +388,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     public void transmitTravelTimes() throws IOException, ClassNotFoundException {
         slaveLogger.warn("RECEIVING travel times...");
+        masterCurrentIteration  =reader.readInt();
         linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
         if (config.scenario().isUseTransit()) {
             stopStopTimes = (StopStopTime) reader.readObject();
             waitTimes = (WaitTime) reader.readObject();
         }
-        slaveLogger.warn("RECEIVING travel times completed.");
+        slaveLogger.warn("RECEIVING travel times completed. Master at iteration number "+masterCurrentIteration);
     }
 
     public void transmitPerformance() throws IOException {
@@ -433,10 +439,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void distributePersons() throws IOException, ClassNotFoundException {
-        addPersons((List<PersonSerializable>) reader.readObject());
+        int masterCurrentIteration  =reader.readInt();
+        List<PersonSerializable> personSerializables = (List<PersonSerializable>) reader.readObject();
+        addPersons(personSerializables);
         iterationTimes = new ArrayList<>();
         executedPlanCount = 0;
-        slaveLogger.warn("Load balancing done. waiting for others to finish...");
+        slaveLogger.warn("Received " + personSerializables.size()+" persons. Master.currentIteration = "+ masterCurrentIteration);
     }
 
     public void poolPersons() throws IOException {
@@ -474,8 +482,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         break;
                     case TRANSMIT_PLANS_TO_MASTER:
                         transmitPlans();
-                        transmitScores();
                         slaveIsOKForNextIter();
+                        break;
+                    case TRANSMIT_SCORES:
+                        transmitScores();
                         break;
                     case TRANSMIT_PERFORMANCE:
                         transmitPerformance();
@@ -536,12 +546,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-//        if (travelTimesUpdated) {
-//            plansForPSim.clear();
-//            for (Person person : scenario.getPopulation().getPersons().values())
-//                plansForPSim.add(person.getSelectedPlan());
-//            travelTimesUpdated = false;
-//        }
+        if (travelTimesUpdated) {
+            plansForPSim.clear();
+            for (Person person : scenario.getPopulation().getPersons().values())
+                plansForPSim.add(person.getSelectedPlan());
+            travelTimesUpdated = false;
+        }
         selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
         if (event.getIteration()==0) {
             for (Person person : scenario.getPopulation().getPersons().values()) {

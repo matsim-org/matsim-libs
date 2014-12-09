@@ -29,6 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import others.sergioo.util.dataBase.NoConnectionException;
 
 import java.io.IOException;
@@ -50,14 +51,13 @@ public class MyPlansToPlans {
 	void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
 		Scenario scenario;
 		MatsimRandom.reset(123);
-		scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 //		new MatsimNetworkReader(scenario).readFile(args[0]);
-		new MatsimPopulationReader(scenario)
-		.readFile(scenario.getConfig().plans().getInputFile());
+		new MatsimPopulationReader(scenario).readFile(args[0]);
 		System.out.println(scenario.getPopulation().getPersons().size());
-        new PlanResetter(scenario).run();
-        new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
+//        new PlanResetter(scenario);
+//        new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
 
 
 //		new MatsimFacilitiesReader((ScenarioImpl) scenario).readFile(args[1]);
@@ -81,7 +81,7 @@ public class MyPlansToPlans {
 //				scenario.getNetwork());
 //		popwriter.write(args[1]);
 		
-//		new PlansSubsampler().run(scenario, args[1], 0.04);
+		new PlansSubsampler().run(scenario, args[1], 0.01);
 //		System.out.println("done.");
 		
 //		new PlanFindLegDistances(scenario, dba).run();
@@ -94,39 +94,37 @@ public class MyPlansToPlans {
 
 }
 
-class PlanResetter{
+class PlanResetter implements PlanAlgorithm{
     Config config;
     Population population;
     Scenario scenario;
 
 
     PlanResetter(Scenario scenario) {
-        this.scenario=scenario;
         this.config=scenario.getConfig();
-        this.population=scenario.getPopulation();
     }
-    public void run(){
-        for(Person person:population.getPersons().values()){
-            for(Plan plan:person.getPlans()){
-                double lastDepartureTime = 0;
-                for(PlanElement planElement:plan.getPlanElements()){
-                    if(planElement instanceof Activity){
-                        Activity act = (Activity) planElement;
-                        String type = act.getType();
-                        PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
-                        if(lastDepartureTime>0) {
-                            act.setStartTime(lastDepartureTime + random() * 3600);
-                        }
-                            act.setEndTime(Math.max(0,act.getStartTime()) + Math.max(random() * 3600, random()*params.getTypicalDuration()));
-                        lastDepartureTime = act.getEndTime();
-                    }
-                    if(planElement instanceof Leg){
-                        Leg leg = (Leg) planElement;
-                        leg.setRoute(null);
-                        leg.setDepartureTime(lastDepartureTime);
-                        leg.setMode(TransportMode.car);
-                    }
+
+
+
+    @Override
+    public void run(Plan plan) {
+        double lastDepartureTime = 0;
+        for(PlanElement planElement:plan.getPlanElements()){
+            if(planElement instanceof Activity){
+                Activity act = (Activity) planElement;
+                String type = act.getType();
+                PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
+                if(lastDepartureTime>0) {
+                    act.setStartTime(lastDepartureTime + random() * 3600);
                 }
+                act.setEndTime(Math.max(0,act.getStartTime()) + Math.max(random() * 3600, random()*params.getTypicalDuration()));
+                lastDepartureTime = act.getEndTime();
+            }
+            if(planElement instanceof Leg){
+                Leg leg = (Leg) planElement;
+                leg.setRoute(null);
+                leg.setDepartureTime(lastDepartureTime);
+                leg.setMode(TransportMode.car);
             }
         }
     }

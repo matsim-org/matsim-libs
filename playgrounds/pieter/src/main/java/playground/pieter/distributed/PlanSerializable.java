@@ -194,6 +194,7 @@ class PlanSerializable implements Serializable {
                 planElements.add(new LegSerializable((Leg) planElement));
         personId = plan.getPerson().getId().toString();
         score = plan.getScore();
+//        score = 0.0;
         type = plan.getType();
     }
 
