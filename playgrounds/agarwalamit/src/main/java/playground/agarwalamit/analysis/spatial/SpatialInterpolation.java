@@ -179,7 +179,7 @@ public class SpatialInterpolation {
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = SpatialDataInputs.gridType;
-		String fileName = SpatialDataInputs.outputDir+"rSurfacePlot"+"_"+type+"_"+SpatialDataInputs.linkWeigthMethod+".txt";
+		String fileName = SpatialDataInputs.outputDir+"rSurfacePlot"+"_"+type+"_"+SpatialDataInputs.cellWidth+"_"+SpatialDataInputs.linkWeigthMethod+".txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 
 		int noOfSidesOfPolygon = 0;
