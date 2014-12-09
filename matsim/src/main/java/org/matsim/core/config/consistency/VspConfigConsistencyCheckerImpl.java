@@ -170,10 +170,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		
 		boolean usingLocationChoice = false ;
-		for ( StrategySettings settings : config.strategy().getStrategySettings() ) {
-			if ( StrategyManagerConfigLoader.LOCATION_CHOICE.equals(settings.getStrategyName())) {
-				usingLocationChoice = true ;
-			}
+		if ( config.getModule("locationchoice")!=null ) {
+			usingLocationChoice = true ;
 		}
 		
 		if ( usingLocationChoice ) {
