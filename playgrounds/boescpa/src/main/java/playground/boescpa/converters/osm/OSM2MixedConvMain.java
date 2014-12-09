@@ -44,12 +44,12 @@ public class OSM2MixedConvMain {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		// Get resources:
 		String osmFile = args[0];
-		String hafasFile = args[1];
+		String hafasFolder = args[1];
 		String outputMultimodalNetwork = args[2];
 		String outputSchedule = args[3];
 
 		// **************** Convert ****************
-		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, osmFile, hafasFile);
+		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, osmFile, hafasFolder);
 		converter.convertOSM2MultimodalNetwork();
 		converter.writeOutput(outputMultimodalNetwork, outputSchedule);
 	}
