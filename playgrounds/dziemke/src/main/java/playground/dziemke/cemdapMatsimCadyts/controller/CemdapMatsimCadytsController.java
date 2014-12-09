@@ -107,13 +107,13 @@ public class CemdapMatsimCadytsController {
 		
 		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
 		strategySettings2.setStrategyName("ReRoute");
-		strategySettings2.setProbability(0.5);
+		strategySettings2.setWeight(0.5);
 		strategySettings2.setDisableAfter(90);
 		config.strategy().addStrategySettings(strategySettings2);
 		
 		StrategySettings strategySetinngs3 = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySetinngs3.setStrategyName("cadytsCar");
-		strategySetinngs3.setProbability(1.0);
+		strategySetinngs3.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySetinngs3);
 		
 		config.strategy().setMaxAgentPlanMemorySize(10);

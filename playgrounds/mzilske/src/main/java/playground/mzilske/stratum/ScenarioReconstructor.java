@@ -90,13 +90,13 @@ class ScenarioReconstructor implements Provider<Scenario> {
             {
                 StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
                 stratSets.setStrategyName("SelectExpBeta");
-                stratSets.setProbability(0.9);
+                stratSets.setWeight(0.9);
                 config.strategy().addStrategySettings(stratSets);
             }
             {
                 StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
                 stratSets.setStrategyName("SelectRandom");
-                stratSets.setProbability(0.1);
+                stratSets.setWeight(0.1);
                 stratSets.setDisableAfter(10);
                 config.strategy().addStrategySettings(stratSets);
             }

@@ -359,19 +359,19 @@ public class M4UConfigUtils {
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
 		changeExpBeta.setStrategyName(Selector.ChangeExpBeta.toString());
-		changeExpBeta.setProbability( 0.8 ) ;
+		changeExpBeta.setWeight( 0.8 ) ;
 		config.strategy().addStrategySettings(changeExpBeta);
 
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
 		timeAlocationMutator.setStrategyName(Names.TimeAllocationMutator.toString()); 
-		timeAlocationMutator.setProbability( 0.1 ); 
+		timeAlocationMutator.setWeight( 0.1 ); 
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		config.timeAllocationMutator().setMutationRange(7200.) ;
 
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(Id.create(3, StrategySettings.class));
 		reroute.setStrategyName(Names.ReRoute.toString());  
-		reroute.setProbability( 0.1 );
+		reroute.setWeight( 0.1 );
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);
 

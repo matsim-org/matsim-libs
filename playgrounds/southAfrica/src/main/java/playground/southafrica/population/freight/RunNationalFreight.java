@@ -122,12 +122,12 @@ public class RunNationalFreight {
 			/* Generic strategy */
 		StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		changeExpBetaStrategySettings.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-		changeExpBetaStrategySettings.setProbability(0.8);
+		changeExpBetaStrategySettings.setWeight(0.8);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 			/* Subpopulation strategy */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		commercialStrategy.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-		commercialStrategy.setProbability(0.7);
+		commercialStrategy.setWeight(0.7);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
 		//TODO Add the custom strategy module.

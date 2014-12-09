@@ -208,7 +208,7 @@ public class CompareMain {
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.) ;
+		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 

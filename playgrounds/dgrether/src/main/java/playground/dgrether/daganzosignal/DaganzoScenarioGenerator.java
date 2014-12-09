@@ -411,13 +411,13 @@ public class DaganzoScenarioGenerator {
 //		selectExp.setModuleName("BestScore");
 		config.strategy().addStrategySettings(selectExp);
 		if (isUsePlansOnly) {
-		  selectExp.setProbability(1.0);
+		  selectExp.setWeight(1.0);
 		}
 		else {
-		  selectExp.setProbability(0.9);
+		  selectExp.setWeight(0.9);
 		  StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
 		      Id.create(2, StrategySettings.class));
-		  reRoute.setProbability(0.1);
+		  reRoute.setWeight(0.1);
 		  reRoute.setStrategyName("ReRoute");
 		  reRoute.setDisableAfter(iterations);
 		  config.strategy().addStrategySettings(reRoute);

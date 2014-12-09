@@ -68,7 +68,7 @@ public class AutosensingTest {
 		
 		StrategySettings stratSets = new StrategySettings( Id.create(1, StrategySettings.class) ) ;
 		stratSets.setStrategyName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
-		stratSets.setProbability(1.);
+		stratSets.setWeight(1.);
 		config.strategy().addStrategySettings(stratSets);
 		
 		config.timeAllocationMutator().setMutationRange(7200.);

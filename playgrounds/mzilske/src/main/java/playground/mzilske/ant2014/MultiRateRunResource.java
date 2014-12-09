@@ -114,13 +114,13 @@ class MultiRateRunResource {
         {
             StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setStrategyName("ChangeExpBeta");
-            stratSets.setProbability(0.7);
+            stratSets.setWeight(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
             StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setStrategyName("ReRoute");
-            stratSets.setProbability(0.3);
+            stratSets.setWeight(0.3);
             config.strategy().addStrategySettings(stratSets);
         }
         config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
@@ -148,13 +148,13 @@ class MultiRateRunResource {
         {
             StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setStrategyName("ChangeExpBeta");
-            stratSets.setProbability(0.7);
+            stratSets.setWeight(0.7);
             config.strategy().addStrategySettings(stratSets);
         }
         {
             StrategySettings stratSets = new StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setStrategyName("ReRoute");
-            stratSets.setProbability(0.3);
+            stratSets.setWeight(0.3);
             config.strategy().addStrategySettings(stratSets);
         }
         config.strategy().setFractionOfIterationsToDisableInnovation(0.8);

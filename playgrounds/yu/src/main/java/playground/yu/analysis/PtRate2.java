@@ -136,7 +136,7 @@ public class PtRate2 implements IterationEndsListener, ShutdownListener {
 				for (StrategySettings ss : cf.strategy().getStrategySettings()) {
 					sb.append(ss.getStrategyName());
 					sb.append('-');
-					sb.append(ss.getProbability());
+					sb.append(ss.getWeight());
 					sb.append(',');
 					sb.append(' ');
 				}

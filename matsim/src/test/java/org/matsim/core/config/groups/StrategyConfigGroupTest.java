@@ -224,7 +224,7 @@ public class StrategyConfigGroupTest {
 		for ( StrategySettings settings : initialGroup.getStrategySettings() ) {
 			final Id<StrategySettings> id = settings.getId();
 			module.addParam( "Module_"+id , settings.getStrategyName() );
-			module.addParam( "ModuleProbability_"+id , ""+settings.getProbability() );
+			module.addParam( "ModuleProbability_"+id , ""+settings.getWeight() );
 			module.addParam( "ModuleDisableAfterIteration_"+id , ""+settings.getDisableAfter() );
 			module.addParam( "ModuleExePath_"+id , settings.getExePath() );
 			module.addParam( "ModuleSubpopulation_"+id , settings.getSubpopulation() );
@@ -245,14 +245,14 @@ public class StrategyConfigGroupTest {
 		/* scope of settings: minimal */ {
 			final StrategySettings settings = new StrategySettings();
 			settings.setStrategyName( "MyModule" );
-			settings.setProbability( 10. );
+			settings.setWeight( 10. );
 			group.addStrategySettings( settings );
 		}
 
 		/* scope of settings: all options */ {
 			final StrategySettings settings = new StrategySettings();
 			settings.setStrategyName( "YourModule" );
-			settings.setProbability( 0 );
+			settings.setWeight( 0 );
 			settings.setDisableAfter( 10 );
 			settings.setExePath( "path/to/nowhere/" );
 			settings.setSubpopulation( "sushi_eaters" );

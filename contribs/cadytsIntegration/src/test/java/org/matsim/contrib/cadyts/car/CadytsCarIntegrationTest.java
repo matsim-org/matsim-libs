@@ -85,7 +85,7 @@ public class CadytsCarIntegrationTest {
 		
 		StrategySettings strategySettingss = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySettingss.setStrategyName("ccc") ;
-		strategySettingss.setProbability(1.0) ;
+		strategySettingss.setWeight(1.0) ;
 		config.strategy().addStrategySettings(strategySettingss);
 		
 		final Controler controler = new Controler(config);
@@ -143,7 +143,7 @@ public class CadytsCarIntegrationTest {
 		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		// strategySettings.setModuleName("ChangeExpBeta");
 		strategySettings.setStrategyName("ccc");
-		strategySettings.setProbability(1.0);
+		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
 		// ===

@@ -74,11 +74,11 @@ public class WriteConfig {
 
 		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
 		expChangeBeta.setStrategyName("ChangeExpBeta");
-		expChangeBeta.setProbability(0.9);
+		expChangeBeta.setWeight(0.9);
 
 		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
 		reRoute.setStrategyName("ReRoute");
-		reRoute.setProbability(0.1);
+		reRoute.setWeight(0.1);
 
 //		StrategySettings modeChoice = new StrategySettings(Id.create("4",StrategySettings.class));
 //		modeChoice.setModuleName("ChangeLegMode");
@@ -86,7 +86,7 @@ public class WriteConfig {
 
 		StrategySettings timeAllocationMutator	= new StrategySettings(Id.create("3",StrategySettings.class));
 		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
-		timeAllocationMutator.setProbability(0.05);
+		timeAllocationMutator.setWeight(0.05);
 
 //		config.setParam("changeLegMode", "modes", "car,bike,motorbike,pt,walk");
 

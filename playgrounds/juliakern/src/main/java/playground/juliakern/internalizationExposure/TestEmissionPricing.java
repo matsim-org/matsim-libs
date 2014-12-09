@@ -203,13 +203,13 @@ public class TestEmissionPricing {
 
 		StrategySettings strategySettingsR = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setProbability(0.999);
+		strategySettingsR.setWeight(0.999);
 		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
 		
 		StrategySettings strategySettings = new StrategySettings(Id.create("2", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setProbability(0.001);
+		strategySettings.setWeight(0.001);
 		scg.addStrategySettings(strategySettings);
 		
 	// network

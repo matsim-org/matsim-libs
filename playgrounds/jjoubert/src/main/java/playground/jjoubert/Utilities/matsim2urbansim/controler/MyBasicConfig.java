@@ -93,17 +93,17 @@ public class MyBasicConfig {
 		//---------------------------------------------------------------------
 		StrategySettings s1 = new StrategySettings(Id.create("1", StrategySettings.class));
 		s1.setStrategyName("SelectExpBeta");
-		s1.setProbability(0.80);
+		s1.setWeight(0.80);
 		config.strategy().addStrategySettings(s1);
 		//---------------------------------------------------------------------
 		StrategySettings s2 = new StrategySettings(Id.create("2", StrategySettings.class));
 		s2.setStrategyName("ReRoute");
-		s2.setProbability(0.10);
+		s2.setWeight(0.10);
 		config.strategy().addStrategySettings(s2);
 		//---------------------------------------------------------------------
 		StrategySettings s3 = new StrategySettings(Id.create("3", StrategySettings.class));
 		s3.setStrategyName("TimeAllocationMutator");
-		s3.setProbability(0.10);
+		s3.setWeight(0.10);
 		config.strategy().addStrategySettings(s3);
 		//---------------------------------------------------------------------
 

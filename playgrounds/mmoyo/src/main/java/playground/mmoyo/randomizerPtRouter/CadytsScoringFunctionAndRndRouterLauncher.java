@@ -96,14 +96,14 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		{ //cadyts
 		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
 		stratSets.setStrategyName("myCadyts");
-		stratSets.setProbability(0.9);
+		stratSets.setWeight(0.9);
 		config.strategy().addStrategySettings(stratSets);
 		}
 		
 		{ //rnd router
 		StrategySettings stratSets2 = new StrategySettings(Id.create(lastStrategyIdx+2, StrategySettings.class));
 		stratSets2.setStrategyName("ReRoute"); // 
-		stratSets2.setProbability(0.1);
+		stratSets2.setWeight(0.1);
 		stratSets2.setDisableAfter(400) ;
 		config.strategy().addStrategySettings(stratSets2);
 		}		

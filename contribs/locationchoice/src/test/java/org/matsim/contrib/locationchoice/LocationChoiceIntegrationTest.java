@@ -380,7 +380,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("MyLocationChoice");
-		strategySettings.setProbability(1.0);
+		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.) ;

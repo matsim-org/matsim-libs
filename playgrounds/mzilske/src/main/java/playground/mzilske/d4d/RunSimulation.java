@@ -194,16 +194,16 @@ public class RunSimulation {
 		
 		StrategySettings changeExp = new StrategySettings(Id.create(1, StrategySettings.class));
 		changeExp.setStrategyName("ChangeExpBeta");
-		changeExp.setProbability(0.8);
+		changeExp.setWeight(0.8);
 		StrategySettings reRoute = new StrategySettings(Id.create(2, StrategySettings.class));
 		reRoute.setStrategyName("ReRoute");
 		// reRoute.setModuleName("Duplicate");
-		reRoute.setProbability(0.1);
+		reRoute.setWeight(0.1);
 		reRoute.setDisableAfter(150);
 		StrategySettings changeMode = new StrategySettings(Id.create(3, StrategySettings.class));
 		changeMode.setStrategyName("ChangeLegMode");
 		// changeMode.setModuleName("Duplicate");
-		changeMode.setProbability(0.1);
+		changeMode.setWeight(0.1);
 		changeMode.setDisableAfter(150);
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		config.strategy().addStrategySettings(changeExp);

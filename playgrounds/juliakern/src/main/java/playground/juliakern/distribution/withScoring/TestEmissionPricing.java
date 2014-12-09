@@ -159,11 +159,11 @@ public class TestEmissionPricing {
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setProbability(0.01);
+		strategySettings.setWeight(0.01);
 		scg.addStrategySettings(strategySettings);
 		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
 		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setProbability(1.0);
+		strategySettingsR.setWeight(1.0);
 		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
 		

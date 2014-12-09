@@ -39,7 +39,7 @@ class Main {
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
 		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
 		stratSets.setStrategyName("doSomethingSpecial");
-		stratSets.setProbability(0.1);
+		stratSets.setWeight(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		
 		final Controler controler = new Controler(config);

@@ -80,7 +80,7 @@ public class CadytsIntegrationTest {
 		config.controler().setLastIteration(0);
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.) ;
+		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -128,7 +128,7 @@ public class CadytsIntegrationTest {
 		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class)) ;
 		//		stratSets.setModuleName("ChangeExpBeta") ;
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.0) ;
+		stratSets.setWeight(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 		// ===
@@ -291,7 +291,7 @@ public class CadytsIntegrationTest {
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.) ;
+		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -438,7 +438,7 @@ public class CadytsIntegrationTest {
 
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.) ;
+		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
 		CadytsConfigGroup cConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME) ;

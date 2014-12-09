@@ -245,7 +245,7 @@ public class InvertedNetworkRoutingTest {
 			config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 			StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 			stratSets.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.toString());
-			stratSets.setProbability(1.0);
+			stratSets.setWeight(1.0);
 			config.strategy().addStrategySettings(stratSets);
 			config.planCalcScore().setTraveling_utils_hr(-1200.0);
 			ActivityParams params = new ActivityParams("home");

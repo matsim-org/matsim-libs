@@ -209,7 +209,7 @@ public class SpaceTimeProbability {
 
 		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
 		changePlan.setStrategyName(entry.getValue().getChoiceModule());
-		changePlan.setProbability(1.0);
+		changePlan.setWeight(1.0);
 
 //		StrategySettings reRoute = new StrategySettings(Id.create("2"));
 //		reRoute.setModuleName("ReRoute");

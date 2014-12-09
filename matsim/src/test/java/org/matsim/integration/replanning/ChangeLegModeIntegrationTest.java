@@ -62,7 +62,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeLegMode");
-		strategySettings.setProbability(1.0);
+		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 		config.setParam("changeLegMode", "modes", "car,walk");
 

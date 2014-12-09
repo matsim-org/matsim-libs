@@ -42,7 +42,7 @@ public class CadytsRunner {
 		
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName("ccc") ;
-		stratSets.setProbability(1.0) ;
+		stratSets.setWeight(1.0) ;
 		controler.getConfig().strategy().addStrategySettings(stratSets);
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {

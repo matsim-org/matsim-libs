@@ -68,7 +68,7 @@ public class Fixture {
 
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		settings.setStrategyName("ChangeExpBeta");
-		settings.setProbability(1.0);
+		settings.setWeight(1.0);
 		conf.strategy().addStrategySettings(settings);
 		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";

@@ -39,11 +39,11 @@ public class PotsdamRun implements Runnable {
 		config.controler().setLastIteration(0);
 		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class));
 		stratSets.setStrategyName("ReRoute");
-		stratSets.setProbability(0.2);
+		stratSets.setWeight(0.2);
 		stratSets.setDisableAfter(8);
 		StrategySettings expBeta = new StrategySettings(Id.create("2", StrategySettings.class));
 		expBeta.setStrategyName("ChangeExpBeta");
-		expBeta.setProbability(0.6);
+		expBeta.setWeight(0.6);
 
 		
 		config.strategy().addStrategySettings(expBeta);

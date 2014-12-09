@@ -130,12 +130,12 @@ public class CMCFScenarioGenerator {
 		//configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-		selectExp.setProbability(0.9);
+		selectExp.setWeight(0.9);
 		selectExp.setStrategyName("SelectExpBeta");
 		this.config.strategy().addStrategySettings(selectExp);
 
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-		reRoute.setProbability(0.1);
+		reRoute.setWeight(0.1);
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setDisableAfter(iterations);
 		this.config.strategy().addStrategySettings(reRoute);

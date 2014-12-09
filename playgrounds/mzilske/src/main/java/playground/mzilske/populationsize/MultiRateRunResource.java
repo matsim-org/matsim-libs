@@ -227,7 +227,7 @@ class MultiRateRunResource {
         {
             StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
             stratSets.setStrategyName("SelectExpBeta");
-            stratSets.setProbability(1.0);
+            stratSets.setWeight(1.0);
             config.strategy().addStrategySettings(stratSets);
         }
 //        {
@@ -240,7 +240,7 @@ class MultiRateRunResource {
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
             stratSets.setStrategyName("ReRealize");
-            stratSets.setProbability(0.3 / cloneFactor);
+            stratSets.setWeight(0.3 / cloneFactor);
             stratSets.setDisableAfter((int) (LAST_ITERATION * 0.8));
             config.strategy().addStrategySettings(stratSets);
         }

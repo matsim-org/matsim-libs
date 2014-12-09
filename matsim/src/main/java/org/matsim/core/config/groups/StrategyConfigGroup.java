@@ -79,8 +79,8 @@ public class StrategyConfigGroup extends ConfigGroup {
 			// put comments only for the first strategy to improve readability
 			map.put( "strategyName",
 					"name of strategy (if not full class name, resolved in StrategyManagerConfigLoader)");
-			map.put( "probability",
-					"probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight''");
+			map.put( "weight",
+					"weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight");
 			map.put( "disableAfterIteration",
 					"iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
 			map.put( "executionPath",
@@ -98,18 +98,18 @@ public class StrategyConfigGroup extends ConfigGroup {
 			if ( getStrategyName() == null || getStrategyName().length() == 0 ) {
 				throw new RuntimeException("Strategy name is not set");
 			}
-			if ( getProbability() < 0.0 ) {
-				throw new RuntimeException("Probability for strategy " + getStrategyName() + " must be >= 0.0" ); 
+			if ( getWeight() < 0.0 ) {
+				throw new RuntimeException("Weight for strategy " + getStrategyName() + " must be >= 0.0" ); 
 			}
 		}
 
-		@StringSetter( "probability" )
-		public void setProbability(final double probability) {
+		@StringSetter( "weight" )
+		public void setWeight(final double probability) {
 			this.probability = probability;
 		}
 
-		@StringGetter( "probability" )
-		public double getProbability() {
+		@StringGetter( "weight" )
+		public double getWeight() {
 			return this.probability;
 		}
 
@@ -185,7 +185,7 @@ public class StrategyConfigGroup extends ConfigGroup {
 		}
 		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_PROBABILITY.length()), StrategySettings.class), true);
-			settings.setProbability(Double.parseDouble(value));
+			settings.setWeight(Double.parseDouble(value));
 		}
 		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_DISABLE_AFTER_ITERATION.length()), StrategySettings.class), true);

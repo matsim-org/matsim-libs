@@ -140,7 +140,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));
 		tam.setStrategyName("TimeAllocationMutator");
-		tam.setProbability(1.0);
+		tam.setWeight(1.0);
 		config.strategy().addStrategySettings(tam);
 
 		// run

@@ -50,9 +50,9 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		Collection<StrategySettings> settings = config.strategy().getStrategySettings();
 		for (StrategySettings setting: settings) {
 			if ("ReRoute".equals(setting.getStrategyName())) {
-				setting.setProbability(1.0);
+				setting.setWeight(1.0);
 			} else {
-				setting.setProbability(0.0);
+				setting.setWeight(0.0);
 			}
 		}
 		config.controler().setLastIteration(1);

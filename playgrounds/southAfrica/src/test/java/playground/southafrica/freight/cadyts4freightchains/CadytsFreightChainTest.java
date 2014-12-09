@@ -95,7 +95,7 @@ public class CadytsFreightChainTest {
 
 		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ccc");
-		strategySettings.setProbability(1.0);
+		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
 		// ===

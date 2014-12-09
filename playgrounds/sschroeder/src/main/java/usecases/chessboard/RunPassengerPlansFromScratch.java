@@ -28,11 +28,11 @@ public class RunPassengerPlansFromScratch {
 		
 		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
 		bestScore.setStrategyName("BestScore");
-		bestScore.setProbability(0.5);
+		bestScore.setWeight(0.5);
 		
 		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
 		reRoute.setStrategyName("ReRoute");
-		reRoute.setProbability(0.5);
+		reRoute.setWeight(0.5);
 //		reRoute.setDisableAfter(300);
 		
 		config.strategy().setMaxAgentPlanMemorySize(5);

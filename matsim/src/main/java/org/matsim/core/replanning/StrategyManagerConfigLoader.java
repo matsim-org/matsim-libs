@@ -69,7 +69,7 @@ public final class StrategyManagerConfigLoader {
 		manager.setSubpopulationAttributeName(
 				config.plans().getSubpopulationAttributeName() );
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
-			double rate = settings.getProbability();
+			double rate = settings.getWeight();
 			if (rate == 0.0) {
 				continue;
 				// yyyy is this so practical?  Some people might want to instantiate it, and set the rate/probability/weight to something different
