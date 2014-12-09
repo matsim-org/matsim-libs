@@ -22,6 +22,7 @@ package playground.wrashid.ABMT.vehicleShare;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
@@ -35,6 +36,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
+
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
 import java.io.File;
@@ -60,7 +62,8 @@ public class RunZurichScenario {
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup() );
+				new KtiLikeScoringConfigGroup(),
+				new DestinationChoiceConfigGroup());
 
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
