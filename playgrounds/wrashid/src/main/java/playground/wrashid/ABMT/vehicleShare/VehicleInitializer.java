@@ -8,13 +8,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
 import org.matsim.api.core.v01.Id;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Random;
 
 
 
@@ -43,8 +43,9 @@ public class VehicleInitializer implements IterationStartsListener {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
 				LegImpl leg = (LegImpl) pe;
-				leg.getMode().equalsIgnoreCase(TransportMode.car);
-				return true;
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					return true;
+				}
 			}
 		}
 		return false;
@@ -53,8 +54,7 @@ public class VehicleInitializer implements IterationStartsListener {
 	public static void initialize(Plan plan) {
 		if (hasCarLeg(plan)) {
 			if (!hasElectricVehicle.containsKey(plan)) {
-				Random rand = new Random();
-				hasElectricVehicle.put(plan, rand.nextBoolean());
+				hasElectricVehicle.put(plan, MatsimRandom.getRandom().nextBoolean());
 			}
 		}
 	}
@@ -76,9 +76,8 @@ public class VehicleInitializer implements IterationStartsListener {
 			
 			if (hasCarLeg(person.getSelectedPlan())) {
 				if (!hasElectricVehicle.containsKey(person.getSelectedPlan())) {
-					Random rand = new Random();
 					hasElectricVehicle.put(person.getSelectedPlan(),
-							rand.nextBoolean());
+							MatsimRandom.getRandom().nextBoolean());
 					newKeysAdded++;
 				} else {
 					existingKeyUsed++;
