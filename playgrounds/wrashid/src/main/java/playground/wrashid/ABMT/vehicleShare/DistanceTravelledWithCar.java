@@ -41,16 +41,14 @@ public class DistanceTravelledWithCar implements LinkEnterEventHandler, PersonAr
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)) {
 			double linkLength = network.getLinks().get(event.getLinkId()).getLength();
 			distanceTravelled.incrementBy(event.getPersonId(), linkLength / 2);
-		}
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		double linkLength = network.getLinks().get(event.getLinkId()).getLength();
-		distanceTravelled.decrementBy(event.getPersonId(), linkLength / 2);
+		distanceTravelled.incrementBy(event.getPersonId(), linkLength / 2);
 	}
 
 }

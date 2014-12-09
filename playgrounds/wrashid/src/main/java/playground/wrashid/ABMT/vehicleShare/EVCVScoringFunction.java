@@ -1,5 +1,8 @@
 package playground.wrashid.ABMT.vehicleShare;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
@@ -30,6 +33,7 @@ public class EVCVScoringFunction implements BasicScoring {
 			if (VehicleInitializer.hasElectricVehicle.get(selectedPlan)) {
 				this.score += evCosts.getInitialInvestmentCost();
 				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * evCosts.getPerMeterTravelCost();
+		
 			} else {
 				this.score += cvCosts.getInitialInvestmentCost();
 				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * cvCosts.getPerMeterTravelCost();
@@ -48,3 +52,5 @@ public class EVCVScoringFunction implements BasicScoring {
 	}
 
 }
+
+

@@ -67,7 +67,11 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 			Link currentLink = network.getLinks().get(event.getLinkId());
 			double radiusInMeters = GlobalTESFParameters.tollAreaRadius;
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters
-					&& GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters) {
+					&& GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters
+					&& ((GlobalTESFParameters.morningTollStart < event.getTime() && GlobalTESFParameters.morningTollEnd > event.getTime()) 
+							|| (GlobalTESFParameters.eveningTollStart < event.getTime() && GlobalTESFParameters.eveningTollEnd > event.getTime())
+						)
+				) {
 				tollDisutilities.put(event.getPersonId(), tollDisutility);
 			}
 			previousLinks.put(event.getPersonId(), event.getLinkId());

@@ -4,22 +4,22 @@ public class CVCosts implements VehicleCosts {
 
 	@Override
 	public double getInitialInvestmentCost() {
-		return 0;
+		// import zölle
+		
+		// singapore - dänemark, norwegen (future work: priority lanes for evs, e.g. bus lanes).
+		// future work: close certain, areas/roads for cv driving
+		
+		return 	GlobalTESFParameters.cvPurchaseCostPerDay + GlobalTESFParameters.cvInsuranceCostPerDay + GlobalTESFParameters.cvTariffCostPerDay;
 	}
 
 	@Override
 	public double getPerMeterTravelCost() {
-		double maintainanceCostPerMeter;
-		double drivingCostPerMeter;
-		double taxationPerMeter;
-		double subsidyPerMeter;
-		
-		return 0;
+		return GlobalTESFParameters.cvMaintainanceCostPerMeter + GlobalTESFParameters.cvDrivingCostPerMeter + GlobalTESFParameters.cvTaxationPerMeter + GlobalTESFParameters.cvSubsidyPerMeter;
 	}
 
 	@Override
 	public double getPaidTollCost() {
-		return 0;
+		return GlobalTESFParameters.tollPriceCV;
 	}
 
 }

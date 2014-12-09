@@ -1,17 +1,22 @@
 package playground.wrashid.ABMT.vehicleShare;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.Id;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
+
+
 
 /**
  * 
@@ -20,8 +25,20 @@ import java.util.Random;
  */
 public class VehicleInitializer implements IterationStartsListener {
 
+	protected static final Logger log = Logger.getLogger(VehicleInitializer.class);
+	
 	public static HashMap<Plan, Boolean> hasElectricVehicle = new HashMap<Plan, Boolean>();
-
+	
+	public static HashMap<Id, Boolean> personHasElectricVehicle;
+	
+	public VehicleInitializer(){
+		prepareForNewIteration();
+	}
+	
+	public static void prepareForNewIteration(){
+		personHasElectricVehicle = new HashMap<Id, Boolean>();
+	}
+	
 	public static boolean hasCarLeg(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof LegImpl) {
@@ -69,8 +86,10 @@ public class VehicleInitializer implements IterationStartsListener {
 
 				if (hasElectricVehicle.get(person.getSelectedPlan())) {
 					evCount++;
+					personHasElectricVehicle.put(person.getId(), true);
 				} else {
 					cvCount++;
+					personHasElectricVehicle.put(person.getId(), false);
 				}
 
 				for (Plan plan : person.getPlans()) {
@@ -86,22 +105,22 @@ public class VehicleInitializer implements IterationStartsListener {
 			}
 		}
 
-		for (Plan plan : removePlans) {
-			hasElectricVehicle.remove(plan);
+		for (Plan plan1 : removePlans) {
+			hasElectricVehicle.remove(plan1);
 			numberOfPlansRemovedFromHM++;
 		}
 
-		System.out.println("iteration: " + event.getIteration());
+	
+		log.info("iteration: " + event.getIteration());
 
-		System.out.println("numberOfPlansRemovedFromHM: "
+		log.info("numberOfPlansRemovedFromHM: "
 				+ numberOfPlansRemovedFromHM);
-		System.out.println("evCount: " + evCount);
-		System.out.println("cvCount: " + cvCount);
-		System.out.println("hasElectricVehicle.size(): "
+		log.info("evCount: " + evCount);
+		log.info("cvCount: " + cvCount);
+		log.info("hasElectricVehicle.size(): "
 				+ hasElectricVehicle.size());
-		System.out.println("newKeysAdded: " + newKeysAdded);
-		System.out.println("existingKeyUsed: " + existingKeyUsed);
-		System.out.println();
-	}
-
+		log.info("newKeysAdded: " + newKeysAdded);
+		log.info("existingKeyUsed: " + existingKeyUsed);
+		log.info("");
+}
 }

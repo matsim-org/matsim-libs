@@ -93,6 +93,7 @@ public class RunZurichScenario {
 						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
 
 		controler.addControlerListener(new VehicleInitializer());
+		controler.addControlerListener(new WriteStatistics());
 		controler.addControlerListener(new EventHandlerAtStartupAdder(new TollsManager(controler)));
         controler.addControlerListener(new EventHandlerAtStartupAdder(new DistanceTravelledWithCar(controler.getScenario().getNetwork())));
 		//================ end custom code for EV scenario
