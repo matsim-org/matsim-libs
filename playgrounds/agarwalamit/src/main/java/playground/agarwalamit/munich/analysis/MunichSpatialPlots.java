@@ -41,13 +41,13 @@ import com.vividsolutions.jts.geom.Point;
 public class MunichSpatialPlots {
 
 	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau;
-	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsEi;
+	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy;
 
 	public static void main(String[] args) {
 
 		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String bau = runDir+"/baseCaseCtd";
-		String ei = runDir+"/ei";
+		String ei = runDir+"/eci";
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
@@ -67,12 +67,13 @@ public class MunichSpatialPlots {
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
-		emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, 1);
-		emsLnkAna.init();
-		emsLnkAna.preProcessData();
-		emsLnkAna.postProcessData();
-		linkEmissionsEi = emsLnkAna.getLink2TotalEmissions();
-
+		if(inputs.isComparing){
+			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, 1);
+			emsLnkAna.init();
+			emsLnkAna.preProcessData();
+			emsLnkAna.postProcessData();
+			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();
+		}
 
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
@@ -85,28 +86,28 @@ public class MunichSpatialPlots {
 				if(plot.isInResearchArea(l)){
 
 					double emiss = 0;
-							
+
 					if(inputs.isComparing){
-						
+
 						double linkEmissionBau =0;
-						double linkEmissionEi =0;
-						
-						if(linkEmissionsBau.get(time).containsKey(id) && linkEmissionsEi.get(time).containsKey(id)) {
+						double linkEmissionPolicy =0;
+
+						if(linkEmissionsBau.get(time).containsKey(id) && linkEmissionsPolicy.get(time).containsKey(id)) {
 							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
-							linkEmissionEi = 100 * linkEmissionsEi.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionPolicy = 100 * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
 						} else if(linkEmissionsBau.get(time).containsKey(id)){
 							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
-						} else if(linkEmissionsEi.get(time).containsKey(id)){
-							linkEmissionEi = 100 * linkEmissionsEi.get(time).get(id).get(WarmPollutant.NO2.toString());
+						} else if(linkEmissionsPolicy.get(time).containsKey(id)){
+							linkEmissionPolicy = 100 * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
 						}
-						emiss = linkEmissionEi - linkEmissionBau;
-					
+						emiss = linkEmissionPolicy - linkEmissionBau;
+
 					} else {
-					
+
 						if(linkEmissionsBau.get(time).containsKey(id)) emiss = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
 						else emiss =0;
 					}
-						
+
 					plot.processLink(l,  emiss);
 					sumEmission += (emiss);
 				}
