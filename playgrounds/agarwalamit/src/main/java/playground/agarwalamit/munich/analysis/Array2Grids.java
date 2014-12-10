@@ -35,6 +35,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 
 /**
+ * <p> 1) Read the pre-existing parameter (emission, delays, toll etc.) and weights (population density, toll payers etc) file in matrix format.
+ * <p> 2) Get the centroid from matrix and create polygons depending on bounding box and number of x and y bins.
+ * <p> 3) Store polygon coordinates, centroid coordinates, parameter and weight in a file to plot it.
  * @author amit
  */
 
@@ -44,23 +47,22 @@ public class Array2Grids {
 	private int yBins = 120;
 	private double xWidth = (SpatialDataInputs.xMax - SpatialDataInputs.xMin)/xBins;
 	private double yWidth = (SpatialDataInputs.yMax - SpatialDataInputs.yMin)/yBins;
+	
 	private String outFile =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
+	private String inputFile_toll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
+	private String inputFile_weight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
 
 	public static void main(String[] args) {
-		new Array2Grids().getTolls();
+		new Array2Grids().writeRData();
 	}
 	
-	
-	private void getTolls(){
+	private void writeRData(){
 		
 		GeometryFactory gf = new GeometryFactory();
 		
 		Map<Polygon, Double> poly2toll = new HashMap<>();
 		Map<Polygon, Double> poly2weight = new HashMap<>();
 		Map<Polygon, Coordinate> poly2Centroid = new HashMap<>();
-		
-		String inputFile_toll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
-		String inputFile_weight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
 		
 		String [] [] array_toll = readInputFile(inputFile_toll);
 		String [] [] array_weight = readInputFile(inputFile_weight);
@@ -114,8 +116,6 @@ public class Array2Grids {
  		}catch (Exception e) {
 			throw new RuntimeException("Data is not written to file. Reason "+e);
 		}
- 		
-		
 	}
 
 	private String [] [] readInputFile(String inputFile){
