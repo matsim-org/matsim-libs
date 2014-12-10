@@ -39,7 +39,8 @@ class MyMobsimAgent implements MobsimDriverAgent {
 		this.mobsimTimer = mobsimTimer ;
 		this.scenario = scenario ;
 		
-		this.destinationLinkId = getRandomDestinationLink() ;
+		this.linkId = getRandomLink() ;
+		this.destinationLinkId = getRandomLink() ;
 	}
 
 	@Override
@@ -116,12 +117,12 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
 		if ( this.linkId.equals( this.destinationLinkId ) ) {
-			getRandomDestinationLink();
+			getRandomLink();
 		}
 		return false ;
 	}
 
-	private Id<Link> getRandomDestinationLink() {
+	private Id<Link> getRandomLink() {
 		// if we are at the final destination, select a random new destination:
 		Map<Id<Link>, ? extends Link> links = this.scenario.getNetwork().getLinks() ;
 		int idx = rnd.nextInt(links.size()) ;

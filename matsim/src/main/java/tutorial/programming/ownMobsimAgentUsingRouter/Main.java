@@ -51,7 +51,7 @@ class Main {
 		TripRouter router = ctrl.getTripRouterFactory().instantiateAndConfigureTripRouter() ;
 		
 		// guidance.  Will need one instance per agent in order to be thread safe
-		final MyGuidance guidance = new MyGuidance( router ) ;
+		final MyGuidance guidance = new MyGuidance( router, ctrl.getScenario() ) ;
 		
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
@@ -62,9 +62,6 @@ class Main {
 
 				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
 				
-				// Why AgentSource instead of inserting agents directly?  Inserting agents into activities is, in fact possible just
-				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
-				// sure that this is appropriately delayed.
 				qsim.addAgentSource(new AgentSource(){
 					@Override
 					public void insertAgentsIntoMobsim() {
@@ -74,7 +71,7 @@ class Main {
 						
 						// insert vehicle:
 						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType() );
-						Id<Link> linkId4VehicleInsertion = null ;
+						Id<Link> linkId4VehicleInsertion = ag.getCurrentLinkId() ;
 						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 					}
 				}) ;
