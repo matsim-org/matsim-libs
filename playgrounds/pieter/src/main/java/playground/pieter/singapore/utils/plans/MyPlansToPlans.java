@@ -26,10 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import others.sergioo.util.dataBase.NoConnectionException;
 
 import java.io.IOException;
@@ -43,21 +40,22 @@ import static java.lang.Math.random;
  * <li>It is our (kn+mz) intuition that this part of the tutorial is rather
  * out-dated and should either be modernized or deleted.
  * </ul>
- * 
+ *
  * @author kn after mrieser
  */
 public class MyPlansToPlans {
 
-	void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
-		Scenario scenario;
-		MatsimRandom.reset(123);
-		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+    void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
+        Scenario scenario;
+        MatsimRandom.reset(123);
+//		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 //		new MatsimNetworkReader(scenario).readFile(args[0]);
-		new MatsimPopulationReader(scenario).readFile(args[0]);
-		System.out.println(scenario.getPopulation().getPersons().size());
-//        new PlanResetter(scenario);
-//        new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
+//		new MatsimPopulationReader(scenario).readFile(args[0]);
+        System.out.println(scenario.getPopulation().getPersons().size());
+        new PlanResetter(scenario).run();
+//        new PlansSubsampler().run(scenario, args[1], 0.01);
+        new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()).write(args[1]);
 
 
 //		new MatsimFacilitiesReader((ScenarioImpl) scenario).readFile(args[1]);
@@ -75,56 +73,58 @@ public class MyPlansToPlans {
 //		PopulationWriter popwriter = new PopulationWriter(pop,
 //				scenario.getNetwork());
 //		popwriter.write(args[1]);
-		
+
 //		new PlanRouteStripper().run(pop);
 //		PopulationWriter popwriter = new PopulationWriter(pop,
 //				scenario.getNetwork());
 //		popwriter.write(args[1]);
-		
-		new PlansSubsampler().run(scenario, args[1], 0.01);
-//		System.out.println("done.");
-		
-//		new PlanFindLegDistances(scenario, dba).run();
-	}
 
-	public static void main(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
-		MyPlansToPlans app = new MyPlansToPlans();
-		app.run(args);
-	}
+//		new PlansSubsampler().run(scenario, args[1], 0.01);
+//		System.out.println("done.");
+
+//		new PlanFindLegDistances(scenario, dba).run();
+    }
+
+    public static void main(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
+        MyPlansToPlans app = new MyPlansToPlans();
+        app.run(args);
+    }
 
 }
 
-class PlanResetter implements PlanAlgorithm{
+class PlanResetter {
     Config config;
     Population population;
-    Scenario scenario;
 
 
     PlanResetter(Scenario scenario) {
-        this.config=scenario.getConfig();
+        this.config = scenario.getConfig();
+        this.population = scenario.getPopulation();
     }
 
-
-
-    @Override
-    public void run(Plan plan) {
-        double lastDepartureTime = 0;
-        for(PlanElement planElement:plan.getPlanElements()){
-            if(planElement instanceof Activity){
-                Activity act = (Activity) planElement;
-                String type = act.getType();
-                PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
-                if(lastDepartureTime>0) {
-                    act.setStartTime(lastDepartureTime + random() * 3600);
+    public void run() {
+        for (Person person : population.getPersons().values()) {
+            for (Plan plan : person.getPlans()) {
+                String mode  = Math.random()>0.5?TransportMode.car:TransportMode.pt;
+                double lastDepartureTime = 0;
+                for (PlanElement planElement : plan.getPlanElements()) {
+                    if (planElement instanceof Activity) {
+                        Activity act = (Activity) planElement;
+                        String type = act.getType();
+                        PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
+                        if (lastDepartureTime > 0) {
+                            act.setStartTime(lastDepartureTime + random() * 3600);
+                        }
+                        act.setEndTime(Math.max(0, act.getStartTime()) + Math.max(random() * 3600, random() * params.getTypicalDuration()));
+                        lastDepartureTime = act.getEndTime();
+                    }
+                    if (planElement instanceof Leg) {
+                        Leg leg = (Leg) planElement;
+                        leg.setRoute(null);
+                        leg.setDepartureTime(lastDepartureTime);
+                        leg.setMode(mode);
+                    }
                 }
-                act.setEndTime(Math.max(0,act.getStartTime()) + Math.max(random() * 3600, random()*params.getTypicalDuration()));
-                lastDepartureTime = act.getEndTime();
-            }
-            if(planElement instanceof Leg){
-                Leg leg = (Leg) planElement;
-                leg.setRoute(null);
-                leg.setDepartureTime(lastDepartureTime);
-                leg.setMode(TransportMode.car);
             }
         }
     }

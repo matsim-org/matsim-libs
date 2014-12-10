@@ -2,10 +2,10 @@ package playground.pieter.distributed.replanning;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.*;
-import playground.pieter.distributed.SlaveControler;
 import playground.pieter.distributed.replanning.factories.DistributedPlanMutatorStrategyFactory;
 import playground.pieter.distributed.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import playground.pieter.distributed.replanning.factories.TransitLocationChoiceFactory;
@@ -69,13 +69,13 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     public static final String SUFFIX = "PSIM";
 
-    public DistributedPlanStrategyTranslationAndRegistration(Controler controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
+    public DistributedPlanStrategyTranslationAndRegistration(Controler  controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
 
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
             try {
                 controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
-                        new DistributedPlanSelectorStrategyFactory<>(controler,slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(),  quickReplanning,  selectionInflationFactor));
+                        new DistributedPlanSelectorStrategyFactory<>( slave,
+                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }

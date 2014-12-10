@@ -24,7 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import playground.pieter.distributed.SlaveControler;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPSim;
 

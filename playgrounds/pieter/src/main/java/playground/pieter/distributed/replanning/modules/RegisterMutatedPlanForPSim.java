@@ -2,11 +2,7 @@ package playground.pieter.distributed.replanning.modules;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import playground.pieter.distributed.SlaveControler;
 import playground.pieter.distributed.replanning.PlanCatcher;
 
 /**

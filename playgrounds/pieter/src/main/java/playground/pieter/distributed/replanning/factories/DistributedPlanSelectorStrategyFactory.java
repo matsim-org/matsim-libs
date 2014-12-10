@@ -25,8 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import playground.pieter.distributed.SlaveControler;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.selectors.DistributedPlanSelector;
 /**
@@ -37,23 +35,21 @@ import playground.pieter.distributed.replanning.selectors.DistributedPlanSelecto
  */
 public class DistributedPlanSelectorStrategyFactory<T extends PlanStrategyFactory> implements
 		PlanStrategyFactory {
-    private final Controler controler;
 
     T delegate;
     PlanCatcher slave;
     boolean quickReplanning; int selectionInflationFactor;
 
-    public DistributedPlanSelectorStrategyFactory(Controler controler,PlanCatcher slave,T  planStrategyFactory, boolean quickReplanning, int selectionInflationFactor) {
+    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave,T  planStrategyFactory, boolean quickReplanning, int selectionInflationFactor) {
         this.delegate = planStrategyFactory;
         this.slave = slave;
         this.quickReplanning = quickReplanning;
         this.selectionInflationFactor = selectionInflationFactor;
-        this.controler = controler;
     }
 
     @Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		return new PlanStrategyImpl(new DistributedPlanSelector(controler,delegate ,slave, quickReplanning, selectionInflationFactor));
+		return new PlanStrategyImpl(new DistributedPlanSelector(scenario, eventsManager,delegate ,slave, quickReplanning, selectionInflationFactor));
 	}
 
 }
