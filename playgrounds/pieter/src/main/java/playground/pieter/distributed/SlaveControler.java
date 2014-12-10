@@ -63,7 +63,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final int myNumber;
     public static int numberOfPSimIterationsPerCycle;
     private int numberOfIterations = -1;
-    private boolean travelTimesUpdated = true;
     private Collection<Plan> plansForPSim;
     private int executedPlanCount;
     private int currentIteration=0;
@@ -471,8 +470,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                         break;
                     case TRANSMIT_TRAVEL_TIMES:
                         transmitTravelTimes();
-                        //all plans in agent memory should be executed against updated traveltimes
-                        travelTimesUpdated = true;
                         break;
                     case POOL_PERSONS:
                         poolPersons();
@@ -546,14 +543,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        if (travelTimesUpdated) {
-            plansForPSim.clear();
-            for (Person person : scenario.getPopulation().getPersons().values())
-                plansForPSim.add(person.getSelectedPlan());
-            travelTimesUpdated = false;
-        }
+
         selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
         if (event.getIteration()==0) {
+            plansForPSim = new ArrayList<>();
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 plansForPSim.add(person.getSelectedPlan());
             }
