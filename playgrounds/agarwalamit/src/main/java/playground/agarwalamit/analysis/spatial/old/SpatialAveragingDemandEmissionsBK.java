@@ -59,18 +59,18 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAvera
 public class SpatialAveragingDemandEmissionsBK {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissionsBK.class);
 
-	final double scalingFactor = SpatialDataInputs.scalingFactor;
-	private final static String runDir = SpatialDataInputs.runDir;
-	private final static String runBAU = SpatialDataInputs.BAU;
+	final double scalingFactor = 100.;
+	private final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+	private final static String runBAU = runDir+"/baseCaseCtd";
 	//	private final static String outDir = runDir+runBAU+"NoCheck4VisBoundary";
-	private final static String runNumber = SpatialDataInputs.compareToCase;
-	private final String netFile1 = SpatialDataInputs.BAUNetwork;//"../../siouxFallsJava/output/run4/output_network.xml.gz" ;//runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	private final static String runNumber = runDir+"/ei";
+	private final String netFile1 = runBAU+"/output_network.xml.gz";//"../../siouxFallsJava/output/run4/output_network.xml.gz" ;//runDirectory1 + runNumber1 + ".output_network.xml.gz";
 
 	private final String munichShapeFile = SpatialDataInputs.shapeFile;
 
-	private static String configFile1 =SpatialDataInputs.BAUConfig; //"../../siouxFallsJava/output/run4/output_config.xml";//runDirectory1 + runNumber1 + ".output_config.xml.gz";
-	private final String emissionFileBAU = SpatialDataInputs.BAUEmissionEventsFile;//"../../siouxFallsJava/output/run4/ITERS/it.100/100.emission.events.xml.gz";//runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = SpatialDataInputs.compareToCaseEmissionEventsFile;
+	private static String configFile1 =runBAU+"/output_config.xml.gz";; //"../../siouxFallsJava/output/run4/output_config.xml";//runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final String emissionFileBAU = runBAU+"/ITERS/it.1500/1500.emission.events.xml.gz";
+	private final String emissionFile2 = runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");//EPSG:3459 for siouxFalls
 	final double xMin = 4452550.25;

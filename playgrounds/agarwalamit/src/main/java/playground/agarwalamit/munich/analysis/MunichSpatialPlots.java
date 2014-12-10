@@ -28,6 +28,7 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
+import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 
@@ -42,25 +43,36 @@ public class MunichSpatialPlots {
 	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissions;
 
 	public static void main(String[] args) {
+		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+		String bau = runDir+"/baseCaseCtd";
 
-		SpatialInterpolation plot = new SpatialInterpolation();
+		// setting of input data
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
+		inputs.setGridInfo(GridType.SQUARE, 150);
+		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
+		// set bounding box, smoothing radius and targetCRS if different.
+		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
+		//		inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
+		//		inputs.setSmoothingRadius(500.);
 
-		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(SpatialDataInputs.BAUConfig), SpatialDataInputs.BAUEmissionEventsFile, 1);
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+
+		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, 1);
 		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissions = emsLnkAna.getLink2TotalEmissions();
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(SpatialDataInputs.BAUNetwork);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 		double sumEmission =0;
 
 		for(double time :linkEmissions.keySet()){
 			for(Id<Link> id : linkEmissions.get(time).keySet()){
 				Link l =sc.getNetwork().getLinks().get(id);
 				if(plot.isInResearchArea(l)){
-					plot.processLink(l,  SpatialDataInputs.scalingFactor * linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()));
-					sumEmission += (linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()) * SpatialDataInputs.scalingFactor );
+					plot.processLink(l,  100 * linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()));
+					sumEmission += (linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()) * 100. );
 				}
 			}
 			//write here for different time intervals
