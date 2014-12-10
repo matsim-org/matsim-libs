@@ -10,14 +10,19 @@ import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
+
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 
@@ -32,6 +37,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	private QuadTree<Id> vehicleLocations;
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
 	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
+	private EventsManager eventsManager;
+	private EventWriterXML eventsWriter;
 	
 	public ParkingModuleWithFFCarSharingZH(Controler controler,Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates) {
 		super(controler);
@@ -136,6 +143,15 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		super.notifyIterationStarts(event);
 		//resetForNewIterationStart();
 		// already called by free floating code
+		
+		eventsManager = EventsUtils.createEventsManager();
+		eventsWriter = new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		eventsManager.addHandler(eventsWriter);
+		
+		eventsManager.resetHandlers(0);
+		eventsWriter.init(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		
+		getParkingInfrastructure().setEventsManager(eventsManager);
 	}
 	
 	@Override
@@ -160,6 +176,10 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		parkingGroupOccupanciesZH.savePlot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();
 		
+		eventsManager.finishProcessing();
+		eventsWriter.reset(0);
+		
+		System.out.println();
 	}
 	
 }

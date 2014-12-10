@@ -28,13 +28,17 @@ import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.PC2.scoring.*;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
@@ -45,6 +49,9 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class SetupParkingForZHScenario {
+	
+	
+	
 
 	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Controler controler){
 		Config config = controler.getConfig();
@@ -54,7 +61,15 @@ public class SetupParkingForZHScenario {
 		LinkedList<Parking> parkings = getParking(config, baseDir);
 	
 		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings);
-		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager,  controler.getEvents());
+		
+//		EventsManager events = EventsUtils.createEventsManager();
+//		EventWriterXML eventsWriter = new EventWriterXML("c:\\tmp\\events.xml.gz");
+//		events.addHandler(eventsWriter);
+//		
+//		events.resetHandlers(0);
+//		eventsWriter.init("c:\\tmp\\events.xml.gz");
+		
+		ParkingInfrastructureManager pim=new ParkingInfrastructureManager(parkingScoreManager,null);
 		
 		ParkingCostModel pcm=new ParkingCostModelZH(config,parkings);
 		LinkedList<PublicParking> publicParkings=new LinkedList<PublicParking>();
