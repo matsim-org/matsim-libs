@@ -23,13 +23,14 @@
 	</module>
 
 	<module name="controler">
-		<param name= "routingAlgorithmType" value="FastAStarLandmarks" />
+		<!-- <param name= "routingAlgorithmType" value="FastAStarLandmarks" /> -->
 	</module>
 
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
+		<!-- <param name="endTime" value="00:00:00" /> -->
+		<param name="endTime" value="24:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		
@@ -72,11 +73,11 @@
 		<param name="ModuleProbability_1" value="0.8" />
 		<param name="Module_1" value="BestScore" />
 
-		<param name="ModuleProbability_2" value="0.1" />
+		<!-- <param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
 	
 		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="Module_3" value="TimeAllocationMutator" /> -->
 	</module>
 
 </config>
