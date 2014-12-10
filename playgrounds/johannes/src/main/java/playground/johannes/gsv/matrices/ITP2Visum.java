@@ -87,7 +87,7 @@ public class ITP2Visum {
 		 * read file
 		 */
 		Matrix m = new Matrix("1", null);
-
+		int notfound = 0;
 		reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrices/Lieferung_Intraplan/2007_12_04/Europamatrix_071204.csv"));
 		double totaltrips = 0;
 		while ((line = reader.readLine()) != null) {
@@ -153,12 +153,14 @@ public class ITP2Visum {
 								e.setValue(e.getValue() + trips);
 							}
 						} else {
-							System.out.println(String.format("Cell not found: %s -> %s", nutsFrom, nutsTo));
+							notfound++;
+//							System.out.println(String.format("Cell not found: %s -> %s", nutsFrom, nutsTo));
 						}
 					}
 				}
 			}
 		}
+		System.out.println("Cells not foun: "+notfound);
 		System.out.println("Total trips = " + totaltrips);
 		
 		reader.close();

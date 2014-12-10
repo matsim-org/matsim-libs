@@ -19,45 +19,10 @@
 
 package playground.johannes.gsv.zones.io;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ZoneMatrix;
-
 /**
  * @author johannes
  *
  */
-public class ZoneMatrixXMLWriter extends MatsimXmlWriter {
+public class ZoneCollection2GeoJSON {
 
-	public void write(KeyMatrix m, String file) {
-		openFile(file);
-		writeXmlHead();
-		writeStartTag("matrix", null);
-//		writeEntries(m);
-		writeEndTag("matrix");
-		close();
-	}
-	
-	
-	
-	protected void writeEntries(ZoneMatrix m) {
-//		for(String i : m.keys()) {
-//			for(String j : m.keys()) {
-//				Double val = m.get(i, j);
-//				if(val != null) {
-//					List<Tuple<String, String>> atts = new ArrayList<>(3);
-//					atts.add(createTuple("row", i));
-//					atts.add(createTuple("col", j));
-//					atts.add(createTuple("value", val));
-//					writeStartTag("cell", atts, true);
-//				}
-//			}
-//		}
-	}
 }

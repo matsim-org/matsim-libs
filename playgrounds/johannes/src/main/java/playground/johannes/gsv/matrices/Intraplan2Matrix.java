@@ -22,18 +22,18 @@ package playground.johannes.gsv.matrices;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixWriter;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.ODMatrix;
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.gsv.zones.io.ODMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
@@ -49,10 +49,15 @@ public class Intraplan2Matrix {
 		/*
 		 * read nuts to gsv mappings
 		 */
-		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+//		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+		ZoneCollection zones = new ZoneCollection();
+		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
+		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		
 		Map<String, String> nuts2gsv = new HashMap<String, String>();
-		for (Zone<Map<String, Object>> zone : zones.getZones()) {
-			nuts2gsv.put((String) zone.getAttribute().get("CODE"), zone.getAttribute().get("NO").toString());
+		for (Zone zone : zones.zoneSet()) {
+//			nuts2gsv.put((String) zone.getAttribute().get("CODE"), zone.getAttribute().get("NO").toString());
+			nuts2gsv.put(zone.getAttribute("nuts3_code"), zone.getAttribute("gsvId"));
 		}
 		/*
 		 * read itp to nuts mappings
@@ -88,8 +93,9 @@ public class Intraplan2Matrix {
 		/*
 		 * read file
 		 */
-		KeyMatrix m = new KeyMatrix();
-
+		ODMatrix m = new ODMatrix();
+		zones.setPrimaryKey("gsvId");
+		int notfound = 0;
 		reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrices/Lieferung_Intraplan/2007_12_04/Europamatrix_071204.csv"));
 		double totaltrips = 0;
 		while ((line = reader.readLine()) != null) {
@@ -101,13 +107,13 @@ public class Intraplan2Matrix {
 				if(itpFrom.startsWith("0")) itpFrom = itpFrom.substring(1);
 				if(itpTo.startsWith("0")) itpTo = itpTo.substring(1);
 				
-				if(itpFrom.equalsIgnoreCase("5425")) {
-					int trips = 0;
-					for (int i = 8; i < 14; i++) {
-						trips += Integer.parseInt(tokens[i]);
-					}
-					totaltrips += trips;
-				}
+//				if(itpFrom.equalsIgnoreCase("5425")) {
+//					int trips = 0;
+//					for (int i = 8; i < 14; i++) {
+//						trips += Integer.parseInt(tokens[i]);
+//					}
+//					totaltrips += trips;
+//				}
 				
 				String nutsFrom = itp2nuts.get(itpFrom);
 				String nutsTo = itp2nuts.get(itpTo);
@@ -123,14 +129,17 @@ public class Intraplan2Matrix {
 					if (nutsFrom.startsWith("DE") && nutsTo.startsWith("DE")) {
 //					if(isDE.get(itpTo) && isDE.get(itpFrom)) {
 
-						String gsvFrom = nuts2gsv.get(nutsFrom);
-						String gsvTo = nuts2gsv.get(nutsTo);
+						String gsvIdFrom = nuts2gsv.get(nutsFrom);
+						Zone gsvFrom = zones.get(gsvIdFrom);
+						
+						String gsvIdTo = nuts2gsv.get(nutsTo);
+						Zone gsvTo = zones.get(gsvIdTo);
 
 						int trips = 0;
 						for (int i = 8; i < 14; i++) {
 							trips += Integer.parseInt(tokens[i]);
 						}
-//						totaltrips += trips;
+						totaltrips += trips;
 						
 						if (gsvFrom != null && gsvTo != null) {
 							/*
@@ -145,7 +154,11 @@ public class Intraplan2Matrix {
 //							} else {
 //								e.setValue(e.getValue() + trips);
 //							}
-							m.set(gsvFrom, gsvTo, (double) trips);
+							Double val = m.get(gsvFrom, gsvTo);
+							if(val == null) {
+								val = new Double(0);
+							}
+							m.set(gsvFrom, gsvTo, (double) val + trips);
 							/*
 							 * return trip
 							 */
@@ -155,21 +168,40 @@ public class Intraplan2Matrix {
 //							} else {
 //								e.setValue(e.getValue() + trips);
 //							}
-							m.set(gsvTo, gsvFrom, (double) trips);
+							val = m.get(gsvTo, gsvFrom);
+							if(val == null) {
+								val = new Double(0);
+							}
+							m.set(gsvTo, gsvFrom, (double) val + trips);
 						} else {
-							System.out.println(String.format("Cell not found: %s -> %s", nutsFrom, nutsTo));
+							notfound++;
+//							System.out.println(String.format("Cell not found: %s -> %s", nutsFrom, nutsTo));
 						}
 					}
 				}
 			}
 		}
+		System.out.println("Cells not found: " + notfound);
 		System.out.println("Total trips = " + totaltrips);
 		
 		reader.close();
 
+		double sum = 0;
+		Set<Zone> keys = m.zones();
+		for(Zone i : keys) {
+			for(Zone j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					sum += val;
+				}
+			}
+		}
+		System.out.println("ODMatrix sum: " + sum/2.0);
 //		VisumMatrixWriter writer = new VisumMatrixWriter(m);
 //		writer.writeFile("/home/johannes/gsv/matrices/itp.fma");
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+//		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		ODMatrixXMLWriter writer = new ODMatrixXMLWriter();
+		System.out.println("Sum = " + MatrixOpertaions.sum(m.toKeyMatrix("gsvId")));
 		writer.write(m, "/home/johannes/gsv/matrices/itp.xml");
 	}
 

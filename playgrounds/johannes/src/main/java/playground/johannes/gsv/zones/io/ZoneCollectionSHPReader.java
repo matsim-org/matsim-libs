@@ -17,71 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.zones.io;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
+
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
  *
  */
-public class ZoneMatrix {
+public class ZoneCollectionSHPReader {
 
-	private KeyMatrix delegate;
-	
-	private final String primaryKey;
-	
-	private Map<Zone, String> index;
-	
-	public ZoneMatrix() {
-		this(null);
-	}
-	
-	public ZoneMatrix(String primaryKey) {
-		index = new HashMap<Zone, String>();
-		delegate = new KeyMatrix();
-		this.primaryKey = primaryKey;
-	}
-	
-	public void set(Zone origin, Zone destination, Double value) {
-		String key1 = index.get(origin);
-		String key2 = index.get(destination);
+	public static ZoneCollection read(String filename) {
+		ZoneCollection zones = new ZoneCollection();
+		Set<Zone> zoneSet = new HashSet<>();
 		
-		if(key1 == null) {
-			key1 = createKey(origin);
-			index.put(origin, key1);
+		try {
+			for(SimpleFeature feature : FeatureSHP.readFeatures(filename)) {
+				Zone zone = new Zone((Geometry) feature.getDefaultGeometry());
+		
+				for(Property prop : feature.getProperties()) {
+					zone.setAttribute(prop.getName().getLocalPart(), prop.getValue().toString());
+					
+				}
+				
+				zoneSet.add(zone);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
-		if(key2 == null) {
-			key2 = createKey(destination);
-			index.put(destination, key2);
-		}
+		zones.addAll(zoneSet);
 		
-		delegate.set(key1, key2, value);
-	}
-	
-	public Double get(Zone origin, Zone destination) {
-		String key1 = index.get(origin);
-		String key2 = index.get(destination);
-		
-		return delegate.get(key1, key2);
-	}
-	
-	private String createKey(Zone zone) {
-		if(primaryKey != null) {
-			return zone.getAttribute(primaryKey);
-		} else {
-			return String.valueOf(zone.hashCode());
-		}
-	}
-	
-	public Set<Zone> zones() {
-		return index.keySet();
-	}
-	
-	public String getPrimaryKey() {
-		return primaryKey;
+		return zones;
 	}
 }

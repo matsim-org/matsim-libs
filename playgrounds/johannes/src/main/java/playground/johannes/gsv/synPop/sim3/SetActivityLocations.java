@@ -158,7 +158,9 @@ public class SetActivityLocations {
 			dStrat = Boolean.parseBoolean(val);
 		}
 		if (dStrat) {
-			sampler.setSegmenter(new DistancePopSegmenter());
+			double threshold = Double.parseDouble(config.getParam(MODULE_NAME, "threshold"));
+			sampler.setSegmenter(new DistancePopSegmenter(threshold));
+//			sampler.setSegmenter(new LongDistSegmenter(threshold));
 		}
 
 		logger.info("Running sampler...");

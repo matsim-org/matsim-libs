@@ -20,6 +20,7 @@
 package playground.johannes.gsv.zones;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -56,6 +57,11 @@ public class ZoneCollection {
 		buildKeyIndex();
 	}
 
+	public void add(Zone zone) {
+		this.zones.add(zone);
+		buildIndex();
+	}
+	
 	public void addAll(Collection<Zone> zones) {
 		this.zones.addAll(zones);
 		buildIndex();
@@ -70,7 +76,12 @@ public class ZoneCollection {
 		keyIndex = new HashMap<>();
 		if (primaryKey != null) {
 			for (Zone zone : zones) {
-				keyIndex.put(zone.getAttribute(primaryKey), zone);
+				String key = zone.getAttribute(primaryKey);
+				if(key == null)
+					throw new NullPointerException();
+				if(null != keyIndex.put(key, zone)) {
+					throw new RuntimeException("Overwriting key " + zone.getAttribute(primaryKey));
+				}
 			}
 		}
 	}
@@ -90,6 +101,10 @@ public class ZoneCollection {
 
 	}
 
+	public Set<Zone> zoneSet() {
+		return Collections.unmodifiableSet(zones);
+	}
+	
 	public Zone get(String key) {
 		return keyIndex.get(key);
 	}

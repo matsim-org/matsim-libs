@@ -19,9 +19,10 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
@@ -33,20 +34,20 @@ import playground.johannes.socialnetworks.utils.CollectionUtils;
  * @author johannes
  *
  */
-public class DistancePopSegmenter implements PopulationSegmenter {
+public class LongDistSegmenter implements PopulationSegmenter {
 
-//	private static final Logger logger = Logger.getLogger(DistancePopSegmenter.class);
-	
 	private final double threshold;
 	
-	public DistancePopSegmenter(double threshold) {
+	public LongDistSegmenter(double threshold) {
 		this.threshold = threshold;
 	}
 	
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim3.PopulationSegmenter#split(java.util.Collection, int)
+	 */
 	@Override
 	public List<ProxyPerson>[] split(Collection<ProxyPerson> persons, int segments) {
-		List<ProxyPerson> shortDist = new ArrayList<>(persons.size());
-		List<ProxyPerson> longDist = new ArrayList<>(persons.size());
+		Set<ProxyPerson> longDist = new HashSet<>(persons.size());
 		
 		for(ProxyPerson person : persons) {
 			double max = 0;
@@ -61,25 +62,10 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 			
 			if(max > threshold) {
 				longDist.add(person);
-			} else {
-				shortDist.add(person);
 			}
 		}
 		
-		int n = (int) Math.ceil(segments/2.0);
-		List<ProxyPerson>[] shortSegements = CollectionUtils.split(shortDist, n);
-		List<ProxyPerson>[] longSegments = CollectionUtils.split(longDist, segments - n);
-		
-		List<ProxyPerson>[] list = new List[segments];
-		for(int i = 0; i < shortSegements.length; i++) {
-			list[i] = shortSegements[i];
-		}
-		
-		for(int i = shortSegements.length; i < segments; i++) {
-			list[i] = longSegments[i - shortSegements.length];
-		}
-		
-		return list;
+		return CollectionUtils.split(longDist, segments);
 	}
 
 }

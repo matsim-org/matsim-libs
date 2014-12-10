@@ -34,6 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
@@ -50,7 +51,7 @@ public class Matsim2Proxy {
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
-		parser.parse(args[0]);
+		parser.parse(args[1]);
 		
 		Map<Id<Person>, ? extends Person> matsimPersons = scenario.getPopulation().getPersons();
 		Map<String, ProxyPerson> proxyPresons = new HashMap<>(matsimPersons.size());
@@ -80,5 +81,8 @@ public class Matsim2Proxy {
 			}
 			
 		}
+		
+		XMLWriter writer = new XMLWriter();
+		writer.write(args[2], proxyPresons.values());
 	}
 }

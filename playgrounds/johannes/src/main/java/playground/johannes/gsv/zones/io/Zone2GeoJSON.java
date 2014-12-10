@@ -22,12 +22,17 @@ package playground.johannes.gsv.zones.io;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.wololo.geojson.Feature;
+import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.GeoJSON;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
+import org.wololo.jts2geojson.GeoJSONReader;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import playground.johannes.gsv.zones.Zone;
@@ -62,5 +67,30 @@ public class Zone2GeoJSON {
 		}
 
 		return writer.write(features).toString();
+	}
+
+	public static Set<Zone> parseFeatureCollection(String data) {
+
+		GeoJSON json = GeoJSONFactory.create(data);
+
+		if (json instanceof FeatureCollection) {
+			GeoJSONReader reader = new GeoJSONReader();
+			Set<Zone> zones = new HashSet<>();
+			FeatureCollection features = (FeatureCollection) json;
+			for (Feature feature : features.getFeatures()) {
+				Zone zone = new Zone(reader.read(feature.getGeometry()));
+//				System.out.println(zone.getGeometry().toString());
+				for (Entry<String, Object> prop : feature.getProperties().entrySet()) {
+					zone.setAttribute(prop.getKey(), prop.getValue().toString());
+				}
+//				System.out.println(zone.attributes().toString());
+//				System.exit(0);
+				zones.add(zone);
+			}
+			return zones;
+		} else {
+			return null;
+		}
+
 	}
 }

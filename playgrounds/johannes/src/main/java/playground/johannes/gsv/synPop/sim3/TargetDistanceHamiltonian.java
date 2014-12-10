@@ -32,7 +32,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class TargetDistanceHamiltonian implements Hamiltonian {
 	
-	public static final double DEFAULT_DETOUR_FACTOR = 2.0;
+	public static final double DEFAULT_DETOUR_FACTOR = 1.3;
 	
 	private double detourFactor = DEFAULT_DETOUR_FACTOR;
 
