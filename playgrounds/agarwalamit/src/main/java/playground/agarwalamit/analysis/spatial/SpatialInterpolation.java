@@ -185,11 +185,11 @@ public class SpatialInterpolation {
 		
 		String fileName;
 		if(inputs.isComparing){
-			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
-			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
-		} else {
 			String scenarioCase = inputs.compareToCase.split("/") [inputs.compareToCase.split("/").length-1];
 			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+"_"+"diff"+".txt";
+		} else {
+			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
+			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
 		}
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
