@@ -21,11 +21,13 @@ package playground.pieter.distributed.replanning.factories;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import playground.pieter.distributed.SlaveControler;
+import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.selectors.DistributedPlanSelector;
 /**
  * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
@@ -35,16 +37,23 @@ import playground.pieter.distributed.replanning.selectors.DistributedPlanSelecto
  */
 public class DistributedPlanSelectorStrategyFactory<T extends PlanStrategyFactory> implements
 		PlanStrategyFactory {
-    public DistributedPlanSelectorStrategyFactory(SlaveControler slave, T delegate) {
-        this.delegate = delegate;
-        this.slave = slave;
-    }
+    private final Controler controler;
 
     T delegate;
-    SlaveControler slave;
-	@Override
+    PlanCatcher slave;
+    boolean quickReplanning; int selectionInflationFactor;
+
+    public DistributedPlanSelectorStrategyFactory(Controler controler,PlanCatcher slave,T  planStrategyFactory, boolean quickReplanning, int selectionInflationFactor) {
+        this.delegate = planStrategyFactory;
+        this.slave = slave;
+        this.quickReplanning = quickReplanning;
+        this.selectionInflationFactor = selectionInflationFactor;
+        this.controler = controler;
+    }
+
+    @Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		return new PlanStrategyImpl(new DistributedPlanSelector(delegate ,slave));
+		return new PlanStrategyImpl(new DistributedPlanSelector(controler,delegate ,slave, quickReplanning, selectionInflationFactor));
 	}
 
 }

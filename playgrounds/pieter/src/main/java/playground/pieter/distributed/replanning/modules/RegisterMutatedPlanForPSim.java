@@ -7,16 +7,17 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.pieter.distributed.SlaveControler;
+import playground.pieter.distributed.replanning.PlanCatcher;
 
 /**
  * Created by fouriep on 11/26/14.
  */
 public class RegisterMutatedPlanForPSim implements PlanStrategyModule {
-    public RegisterMutatedPlanForPSim(SlaveControler slave) {
+    public RegisterMutatedPlanForPSim(PlanCatcher slave) {
         this.slave = slave;
     }
 
-    private SlaveControler slave;
+    private PlanCatcher slave;
 
     @Override
     public void prepareReplanning(ReplanningContext replanningContext) {

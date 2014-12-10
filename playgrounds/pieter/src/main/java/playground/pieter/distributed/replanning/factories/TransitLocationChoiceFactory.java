@@ -5,6 +5,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import playground.pieter.distributed.SlaveControler;
+import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPSim;
 import playground.singapore.transitLocationChoice.TransitLocationChoiceStrategy;
 
@@ -12,9 +13,9 @@ import playground.singapore.transitLocationChoice.TransitLocationChoiceStrategy;
  * Created by fouriep on 11/25/14.
  */
 public class TransitLocationChoiceFactory implements PlanStrategyFactory {
-    SlaveControler slave;
+    PlanCatcher slave;
 
-    public TransitLocationChoiceFactory(SlaveControler slave) {
+    public TransitLocationChoiceFactory(PlanCatcher slave) {
         this.slave = slave;
     }
 

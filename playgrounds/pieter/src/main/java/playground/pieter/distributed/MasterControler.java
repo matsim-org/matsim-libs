@@ -78,6 +78,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     public enum SimulationMode {SERIAL, PARALLEL}
     public static SimulationMode SelectedSimulationMode = SimulationMode.PARALLEL;
 
+    public static boolean QuickReplanning = false;
 
     /**
      * value between 0 and 1; increasing it increases the dampening effect of preventing
@@ -99,6 +100,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("r", false, "Perform initial routing of plans on slaves.");
         options.addOption("l", true, "Number of iterations between load balancing. Default = 5");
         options.addOption("w", true, "Number of iterations between dumping plans from all slaves. Defaults to the value in the config (so disabled if set to zero).");
+        options.addOption("q", false, "Quick replanning: each replanning strategy operates at 1/(number of PSim iters), \n " +
+                "effectively producing the same number of new plans per QSim iteration as a normal MATSim run, but having a multinomial distribution");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         int numSlaves = 1;
@@ -114,6 +117,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         } else {
             masterLogger.warn("Running in PARALLEL mode (PSim execution during QSim execution).");
         }
+
         if (commandLine.hasOption("i")) {
             numberOfPSimIterations = Integer.parseInt(commandLine.getOptionValue("i"));
             masterLogger.warn("Running  " + numberOfPSimIterations + " PSim iterations for every QSim iteration run on the master");
@@ -121,6 +125,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterLogger.warn("Unspecified number of PSim iterations for every QSim iteration run on the master.");
             masterLogger.warn("Using default value of " + numberOfPSimIterations);
         }
+
+        if (commandLine.hasOption("q")){
+            QuickReplanning = true;
+            masterLogger.warn("QUICK replanning: each replanning strategy operates at 1/"+numberOfPSimIterations+" (numberOfPSimIterations), \n " +
+            "effectively producing the same number of new plans per QSim iteration as a normal MATSim run, but having a multinomial distribution");
+        } else {
+            masterLogger.warn("NORMAL Replanning: each replanning strategy operates at the rate specified in the config for each PSim iteration");
+        }
+
         slaves = new TreeMap<>();
         if (commandLine.hasOption("p"))
             try {
@@ -169,6 +182,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             slave.sendNumber(slaveUniqueNumber++);
             slave.sendNumber(numberOfPSimIterations);
             slave.sendBoolean(initialRoutingOnSlaves);
+            slave.sendBoolean(QuickReplanning);
             slave.readMemoryStats();
             slave.readNumberOfThreadsOnSlave();
             Thread.sleep(1000);
@@ -388,6 +402,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         if(SelectedSimulationMode.equals(SimulationMode.PARALLEL)) {
             waitForSlaveThreads();
             mergePlansFromSlaves();
+            waitForSlaveThreads();
+            startSlavesInMode(CommunicationsMode.TRANSMIT_SCORES);
+            waitForSlaveThreads();
         }
         isLoadBalanceIteration = event.getIteration()>config.controler().getFirstIteration() &&
                 (event.getIteration() % loadBalanceInterval == 0 ||
@@ -408,10 +425,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
             waitForSlaveThreads();
             mergePlansFromSlaves();
+            waitForSlaveThreads();
+            startSlavesInMode(CommunicationsMode.TRANSMIT_SCORES);
+            waitForSlaveThreads();
         }
-        waitForSlaveThreads();
-        startSlavesInMode(CommunicationsMode.TRANSMIT_SCORES);
-        waitForSlaveThreads();
     }
 
     private boolean slavesHaveRequestedShutdown() {

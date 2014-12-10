@@ -69,13 +69,13 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     public static final String SUFFIX = "PSIM";
 
-    public DistributedPlanStrategyTranslationAndRegistration(SlaveControler slave) {
+    public DistributedPlanStrategyTranslationAndRegistration(Controler controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
 
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
             try {
-                slave.getMATSimControler().addPlanStrategyFactory(e.getKey() + SUFFIX,
-                        new DistributedPlanSelectorStrategyFactory<>(slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance()));
+                controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
+                        new DistributedPlanSelectorStrategyFactory<>(controler,slave,
+                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(),  quickReplanning,  selectionInflationFactor));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }
@@ -84,11 +84,11 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
             if(e.getKey().equals( "TransitLocationChoice")){
                 TransitLocationChoiceFactory factory = new TransitLocationChoiceFactory(slave);
-                slave.getMATSimControler().addPlanStrategyFactory("TransitLocationChoicePSIM", factory);
+                controler.addPlanStrategyFactory("TransitLocationChoicePSIM", factory);
                 continue;
             }
             try {
-                slave.getMATSimControler().addPlanStrategyFactory(e.getKey() + SUFFIX,
+                controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanMutatorStrategyFactory<>(slave,
                                 (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance()));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
@@ -109,7 +109,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         else return false;
     }
 
-    public static void substituteSelectorStrategies(Config config) {
+    public static void substituteSelectorStrategies(Config config, boolean quickReplanning, int selectionInflationFactor) {
         for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
             String classname = settings.getStrategyName();
@@ -123,8 +123,13 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             } else {
                 if (SupportedMutators.containsKey(classname))
                     settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
-                if (SupportedSelectors.containsKey(classname))
+                if (SupportedSelectors.containsKey(classname)){
                     settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
+                    //implement quick replanning by simply multiplying the selector weights by the number of PSim Iterations
+                    if(quickReplanning){
+                        settings.setWeight(settings.getWeight() * (double) selectionInflationFactor);
+                    }
+                }
             }
 
 

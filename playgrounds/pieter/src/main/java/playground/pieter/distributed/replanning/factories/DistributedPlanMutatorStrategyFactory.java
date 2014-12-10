@@ -25,6 +25,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.distributed.SlaveControler;
+import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPSim;
 
 /**
@@ -35,9 +36,9 @@ import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPS
  */
 public class DistributedPlanMutatorStrategyFactory<T extends PlanStrategyFactory> implements
 		PlanStrategyFactory {
-    private final SlaveControler slave;
+    private final PlanCatcher slave;
     T delegate;
-    public DistributedPlanMutatorStrategyFactory(SlaveControler slave, T delegate) {
+    public DistributedPlanMutatorStrategyFactory(PlanCatcher slave, T delegate) {
         this.delegate = delegate;
         this.slave = slave;
     }

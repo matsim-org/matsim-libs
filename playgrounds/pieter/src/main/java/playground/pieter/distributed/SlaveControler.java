@@ -38,6 +38,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
@@ -58,12 +59,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
+    private final boolean quickReplannning;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
     public static int numberOfPSimIterationsPerCycle;
     private int numberOfIterations = -1;
-    private Collection<Plan> plansForPSim;
+
     private int executedPlanCount;
     private int currentIteration=0;
     private int masterCurrentIteration=-1;
@@ -88,6 +90,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private long fSLEEP_INTERVAL = 100;
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
+    private final PlanCatcher plancatcher;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -171,6 +174,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
 
         initialRouting = reader.readBoolean();
+        quickReplannning = reader.readBoolean();
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
         memoryUsageCalculator = new MemoryUsageCalculator();
@@ -191,9 +195,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         loadScenario();
 
 
-        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config);
+        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config,quickReplannning,numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
-        new DistributedPlanStrategyTranslationAndRegistration(this);
+        plancatcher = new PlanCatcher();
+        new DistributedPlanStrategyTranslationAndRegistration(this.matsimControler,plancatcher,quickReplannning,numberOfPSimIterationsPerCycle);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
         linkTravelTimes = new FreeSpeedTravelTime();
@@ -334,7 +339,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
             }
         }
-        plansForPSim = new ArrayList<>();
+        plancatcher.init();
         numberOfIterations++;
     }
 
@@ -539,28 +544,28 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void addPlansForPsim(Plan plan){
-        plansForPSim.add(plan);
+        plancatcher.addPlansForPsim(plan);
     }
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
         selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
         if (event.getIteration()==0) {
-            plansForPSim = new ArrayList<>();
+            plancatcher.init();
             for (Person person : scenario.getPopulation().getPersons().values()) {
-                plansForPSim.add(person.getSelectedPlan());
+                plancatcher.addPlansForPsim(person.getSelectedPlan());
             }
         }else{
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 selectedPlanScoreMemory.put(person.getId(),person.getSelectedPlan().getScore());
             }
-            for(Plan plan:plansForPSim){
+            for(Plan plan:plancatcher.getPlansForPSim()){
                 selectedPlanScoreMemory.remove(plan.getPerson().getId());
             }
         }
 
-        executedPlanCount += plansForPSim.size();
-        pSimFactory.setPlans(plansForPSim);
+        executedPlanCount += plancatcher.getPlansForPSim().size();
+        pSimFactory.setPlans(plancatcher.getPlansForPSim());
     }
 
     @Override

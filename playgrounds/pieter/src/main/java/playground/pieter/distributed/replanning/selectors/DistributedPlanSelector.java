@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -35,6 +36,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import playground.pieter.distributed.SlaveControler;
+import playground.pieter.distributed.replanning.PlanCatcher;
 
 
 public class DistributedPlanSelector<T extends PlanStrategyFactory>implements PlanSelector {
@@ -42,12 +44,13 @@ public class DistributedPlanSelector<T extends PlanStrategyFactory>implements Pl
     private double selectionFrequency;
     T delegateFactory;
     GenericPlanSelector delegate;
-    SlaveControler slave;
+    PlanCatcher slave;
 
-    public DistributedPlanSelector(T delegateFactory, SlaveControler slave) {
+    public DistributedPlanSelector(Controler controler,T delegateFactory, PlanCatcher slave,boolean quickReplanning, int selectionInflationFactor) {
         this.slave = slave;
-        this.delegate = ((PlanStrategyImpl) delegateFactory.createPlanStrategy(slave.getMATSimControler().getScenario(),slave.getMATSimControler().getEvents())).getPlanSelector();
-        this.selectionFrequency=1/slave.numberOfPSimIterationsPerCycle;
+        this.delegate = ((PlanStrategyImpl) delegateFactory.createPlanStrategy(controler.getScenario(),controler.getEvents())).getPlanSelector();
+//        when doing quicckReplanning, the weight of the selection strategy is inflated by selectionInflationFactor, so it needs to be deflated by that much to prevent repeated execution
+        this.selectionFrequency=1/(selectionInflationFactor * (quickReplanning?selectionInflationFactor:1));
     }
 
     @Override
