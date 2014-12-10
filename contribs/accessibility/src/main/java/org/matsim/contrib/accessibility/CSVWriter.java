@@ -11,7 +11,8 @@ public final class CSVWriter {
 
 	public static final String FILE_NAME= "accessibilities.csv";
 	
-	private static final String SEPARATOR = "\t"; // comma is the correct choice for excel.  But gnuplot cannot deal with comma!
+	private static final String SEPARATOR = ",";
+	// comma is the correct choice for excel.  But gnuplot cannot deal with comma, needs "\t"!
 
 	private BufferedWriter writer ;
 
@@ -66,4 +67,5 @@ public final class CSVWriter {
 			e.printStackTrace();
 		}	
 	}
+	
 }

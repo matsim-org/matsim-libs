@@ -3,6 +3,7 @@ package org.matsim.contrib.accessibility;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,8 +35,14 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.utils.LeastCostPathTree;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -136,7 +143,7 @@ implements ShutdownListener, StartupListener {
 	private Config config;
 	
 	//new ... testing
-	private String subdirectory;
+	private String outputSubdirectory;
 	// end new
 	
 	
@@ -193,16 +200,16 @@ implements ShutdownListener, StartupListener {
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		
 		// new ... testing
-		if (subdirectory == null) {
+		if (outputSubdirectory == null) {
 			// end new
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
 		// new ... testing
 		} else {
-			File file = new File(config.controler().getOutputDirectory() + "/" + subdirectory);
+			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 //			file.mkdir();
 			file.mkdirs();
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
-					config.controler().getOutputDirectory() + "/" + subdirectory);
+					config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 		}
 		// end new
 
@@ -306,12 +313,12 @@ implements ShutdownListener, StartupListener {
 
 		urbansimAccessibilityWriter.close();
 		// new ... testing
-		if (subdirectory == null) {
+		if (outputSubdirectory == null) {
 			// end new
 			writePlottingData(matsimOutputDirectory);
 			// new testing....
 		} else {
-			writePlottingData(matsimOutputDirectory + "/" + subdirectory);
+			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
 		}
 		// end new
 
@@ -346,27 +353,29 @@ implements ShutdownListener, StartupListener {
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 * 
-	 * @param matsimOutputDirectory
+	 * @param adaptedOutputDirectory
 	 * @throws IOException
 	 */
-	private final void writePlottingData(String matsimOutputDirectory) {
+	private final void writePlottingData(String adaptedOutputDirectory) {
 
-		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
+		log.info("Writing plotting data for R analyis into " + adaptedOutputDirectory + " ...");
 		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 			if ( this.isComputingMode.get(mode) ) {
 				final SpatialGrid spatialGrid = this.accessibilityGrids.get(mode);
 
 				// output for R:
-				GridUtils.writeSpatialGridTable( spatialGrid, matsimOutputDirectory
+				GridUtils.writeSpatialGridTable( spatialGrid, adaptedOutputDirectory
 						+ "/" + mode.toString() + Labels.ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
 
 			}
 		}
 		log.info("Writing plotting data for R done!");
 
-		log.info("Writing plotting data for other analyis into " + matsimOutputDirectory + " ...");
+		
+		//
+		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
 
-		final CSVWriter writer = new CSVWriter(matsimOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
+		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
 		final SpatialGrid spatialGrid = this.accessibilityGrids.get( Modes4Accessibility.freeSpeed ) ;
 		// yy for time being, have to assume that this is always there
@@ -398,8 +407,34 @@ implements ShutdownListener, StartupListener {
 		writer.close() ;
 
 		log.info("Writing plotting data for other analysis done!");
+		
+		
+		// Write accessibility (so far only for mode freeSpeed) to a shapefile
+//		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+//		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
+//		.setName("accessibility")
+//		.addAttribute("access", Double.class)
+//		.create();
+//		
+//		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+//		
+//		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+//			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+//				// so far only for mode freeSpeed
+//				final SpatialGrid theSpatialGrid = this.accessibilityGrids.get(Modes4Accessibility.freeSpeed);
+//				final double value = theSpatialGrid.getValue(x, y);
+//				
+//				CoordImpl coord = new CoordImpl(x, y);
+//				factory.createPoint(MGC.coord2Coordinate(coord), new Object[] {value}, null);
+//				SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(coord), new Object[] {value}, null);
+//				features.add(feature);
+//			}
+//		}
+//				
+//		log.info("Writing accessibilities and densities to shapefile... ");
+//		ShapeFileWriter.writeGeometries(features, adaptedOutputDirectory + "/accessibilities.shp");
+//		log.info("Writing accessibilities and densities to shapefile... Done. ");
 	}
-
 	
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -515,7 +550,7 @@ implements ShutdownListener, StartupListener {
 
 	// new .... testing
 	public void writeToSubdirectoryWithName(String subdirectory) {
-		this.subdirectory = subdirectory;
+		this.outputSubdirectory = subdirectory;
 	}
 	// end new
 }
