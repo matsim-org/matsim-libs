@@ -42,24 +42,24 @@
 		</resources>
 		<plugins>
 			<plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>create</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <doCheck>false</doCheck>
-          <doUpdate>false</doUpdate>
-          <revisionOnScmFailure>unknown</revisionOnScmFailure>
-          <timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
-        </configuration>
-      </plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -93,7 +93,8 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx700m -Djava.awt.headless=true
+						-Dmatsim.preferLocalDtds=true</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -109,6 +110,53 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.1</version>
+					<configuration>
+						<quiet>true</quiet>
+						<header>MATSim API</header>
+						<groups>
+							<group>
+								<title>api</title>
+								<packages>org.matsim.api*</packages>
+							</group>
+							<group>
+								<title>run</title>
+								<packages>org.matsim.run*</packages>
+							</group>
+							<group>
+								<title>core</title>
+								<packages>org.matsim.core*</packages>
+							</group>
+							<group>
+								<title>pt</title>
+								<packages>org.matsim.pt*</packages>
+							</group>
+							<group>
+								<title>utils</title>
+								<packages>org.matsim.utils*</packages>
+							</group>
+							<group>
+								<title>withinday</title>
+								<packages>org.matsim.withinday*</packages>
+							</group>
+							<group>
+								<title>vis</title>
+								<packages>org.matsim.vis*</packages>
+							</group>
+							<group>
+								<title>tutorial</title>
+								<packages>tutorial*</packages>
+							</group>
+						</groups>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<reporting>
@@ -119,45 +167,6 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.8</version>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8.1</version>
-				<configuration>
-					<quiet>true</quiet>
-					<header>MATSim API</header>
-					<groups>
-						<group>
-							<title>api</title>
-							<packages>org.matsim.api*</packages>
-						</group>
-						<group>
-							<title>run</title>
-							<packages>org.matsim.run*</packages>
-						</group>
-						<group>
-							<title>core</title>
-							<packages>org.matsim.core*</packages>
-						</group>
-						<group>
-							<title>utils</title>
-							<packages>org.matsim.utils*</packages>
-						</group>
-						<group>
-							<title>vis</title>
-							<packages>org.matsim.vis*</packages>
-						</group>
-						<group>
-							<title>tutorial</title>
-							<packages>org.matsim.tutorial*</packages>
-						</group>
-
-					</groups>
-					<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
-				</configuration>
-			</plugin>
-
 		</plugins>
 	</reporting>
 
@@ -176,7 +185,8 @@
 	<profiles>
 		<profile>
 			<!-- special settings for some plugins only used on the hudson build server -->
-			<!-- must be manually activated with "mvn -Phudson ..." and the corresponding goals -->
+			<!-- must be manually activated with "mvn -Phudson ..." and the corresponding 
+				goals -->
 			<id>hudson</id>
 			<build>
 				<pluginManagement>
@@ -198,6 +208,14 @@
 							<configuration>
 								<effort>Max</effort>
 								<threshold>Low</threshold>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-javadoc-plugin</artifactId>
+							<version>2.10.1</version>
+							<configuration>
+								<linksource>true</linksource>
 							</configuration>
 						</plugin>
 					</plugins>
@@ -227,6 +245,7 @@
 							<threshold>Low</threshold>
 						</configuration>
 					</plugin>
+
 				</plugins>
 			</reporting>
 		</profile>
@@ -414,16 +433,16 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.7.1</version>
 		</dependency>
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-multibindings</artifactId>
-            <version>3.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-multibindings</artifactId>
+			<version>3.0</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
