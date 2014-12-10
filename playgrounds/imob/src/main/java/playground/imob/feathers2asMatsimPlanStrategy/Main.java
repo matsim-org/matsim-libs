@@ -60,7 +60,7 @@ class Main {
 		// request FEATHERS2 as a PlanStrategy (it is added to the controler further below):
 		StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 		stratSets.setStrategyName( FEATHERS2 );
-		stratSets.setProbability(0.1);
+		stratSets.setWeight(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		
 		// loading the scenario:
