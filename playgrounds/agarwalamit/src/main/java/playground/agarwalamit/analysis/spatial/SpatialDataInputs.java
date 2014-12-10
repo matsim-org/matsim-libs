@@ -85,12 +85,12 @@ public class SpatialDataInputs {
 	/**
 	 * policy case location folder
 	 */
-	private String compareToCase;
+	public String compareToCase;
 	
-	String compareToCaseConfig;
-	String compareToCaseNetwork;
+	public String compareToCaseConfig;
+	public String compareToCaseNetwork;
 	int compareToCaseLastIteration ; 
-	String compareToCaseEmissionEventsFile;
+	public String compareToCaseEmissionEventsFile;
 	String compareToCaseEventsFile;
 	String compareToCasePlans; 
 	

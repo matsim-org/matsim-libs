@@ -40,14 +40,17 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MunichSpatialPlots {
 
-	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissions;
+	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau;
+	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsEi;
 
 	public static void main(String[] args) {
+
 		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String bau = runDir+"/baseCaseCtd";
+		String ei = runDir+"/ei";
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
 		inputs.setGridInfo(GridType.SQUARE, 150);
 		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -62,20 +65,52 @@ public class MunichSpatialPlots {
 		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
-		linkEmissions = emsLnkAna.getLink2TotalEmissions();
+		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
+
+		emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, 1);
+		emsLnkAna.init();
+		emsLnkAna.preProcessData();
+		emsLnkAna.postProcessData();
+		linkEmissionsEi = emsLnkAna.getLink2TotalEmissions();
+
+
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 		double sumEmission =0;
 
-		for(double time :linkEmissions.keySet()){
-			for(Id<Link> id : linkEmissions.get(time).keySet()){
-				Link l =sc.getNetwork().getLinks().get(id);
+		for(double time :linkEmissionsBau.keySet()){
+			for(Link l : sc.getNetwork().getLinks().values()){
+				Id<Link> id = l.getId();
+
 				if(plot.isInResearchArea(l)){
-					plot.processLink(l,  100 * linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()));
-					sumEmission += (linkEmissions.get(time).get(id).get(WarmPollutant.NO2.toString()) * 100. );
+
+					double emiss = 0;
+							
+					if(inputs.isComparing){
+						
+						double linkEmissionBau =0;
+						double linkEmissionEi =0;
+						
+						if(linkEmissionsBau.get(time).containsKey(id) && linkEmissionsEi.get(time).containsKey(id)) {
+							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionEi = 100 * linkEmissionsEi.get(time).get(id).get(WarmPollutant.NO2.toString());
+						} else if(linkEmissionsBau.get(time).containsKey(id)){
+							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+						} else if(linkEmissionsEi.get(time).containsKey(id)){
+							linkEmissionEi = 100 * linkEmissionsEi.get(time).get(id).get(WarmPollutant.NO2.toString());
+						}
+						emiss = linkEmissionEi - linkEmissionBau;
+					
+					} else {
+					
+						if(linkEmissionsBau.get(time).containsKey(id)) emiss = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+						else emiss =0;
+					}
+						
+					plot.processLink(l,  emiss);
+					sumEmission += (emiss);
 				}
 			}
-			//write here for different time intervals
 		}
 
 		plot.writeRData();

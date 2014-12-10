@@ -47,6 +47,7 @@ public class SpatialInterpolation {
 		SpatialDataInputs.LOG.info("Creating grids inside polygon of bounding box.");
 		createGridFromBoundingBox();
 		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
+		this.outputFolder = outputFolder;
 
 		// initialize map
 		this.cellWeights = new HashMap<Point, Double>();
@@ -181,8 +182,16 @@ public class SpatialInterpolation {
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = inputs.gridType;
-		String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
-		String fileName = outputFolder+"rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";
+		
+		String fileName;
+		if(inputs.isComparing){
+			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
+			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
+		} else {
+			String scenarioCase = inputs.compareToCase.split("/") [inputs.compareToCase.split("/").length-1];
+			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+"_"+"diff"+".txt";
+		}
+		
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 
 		int noOfSidesOfPolygon = 0;
