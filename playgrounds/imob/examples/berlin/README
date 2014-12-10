@@ -6,13 +6,15 @@ and adapted.
 
 ---
 
-plans_hwh_3agents.xml
+plans_3agents.xml
 
 is a copy of
 
 plans_hwh_1pct.xml
 
-where all agents except for the frist three agents have been removed.
+where all agents except for the first three agents have been removed.
+Then, for two agents, all plan elements except the first acitivity and the subsequent leg, have been removed.
+These two agents are considered for within-day replanning while the other one is just a normal agent.
 
 ===
 

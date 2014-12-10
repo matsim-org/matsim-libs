@@ -22,6 +22,7 @@ package playground.imob.feathers2forWithinDayReplanning;
 
 
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -46,6 +47,8 @@ import org.matsim.withinday.utils.EditRoutes;
  * In fact this should be renamed to NextTripReplanner. cdobler, apr'14
  */
 public class NextActivityAppendingReplanner extends WithinDayDuringActivityReplanner {
+	
+	private static Logger logger = Logger.getLogger(NextActivityAppendingReplanner.class);
 
 	private final TripRouter tripRouter;
 	
@@ -56,9 +59,13 @@ public class NextActivityAppendingReplanner extends WithinDayDuringActivityRepla
 
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
+		if (withinDayAgent.getId().equals(Id.createPersonId("66128"))) {
+			return true;
+		}
 		
+		logger.info("Replanning agent " + withinDayAgent.getId() + " at " + getTime());
 		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
-
+		
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 
@@ -68,19 +75,23 @@ public class NextActivityAppendingReplanner extends WithinDayDuringActivityRepla
 		Id<Link> linkId = links[random].getId() ;
 		
 		Activity nextActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("dummy", linkId) ;
-		nextActivity.setMaximumDuration(10.);
+		nextActivity.setMaximumDuration(666.0);
 		
 		executedPlan.addActivity(nextActivity);
 		
 		Trip trip = EditRoutes.getTrip(executedPlan, currentActivity, this.tripRouter);
 
 		// If there is no trip after the activity.
-		if (trip == null) return false;
+		if (trip == null) {
+			return false;
+		}
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
 		double departureTime = EditRoutes.getDepatureTime(trip);
 
 		EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
+		
+		executedPlan.addLeg(scenario.getPopulation().getFactory().createLeg(mainMode));
 		
 		return true;
 	}
