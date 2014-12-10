@@ -20,6 +20,7 @@
 
 package matsimConnector.visualizer.debugger.eventsbaseddebugger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,8 +55,7 @@ import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.grid.GridPoint;
 import pedCA.environment.grid.PedestrianGrid;
 import pedCA.environment.network.Coordinates;
-
-
+import pedCA.utility.FileUtility;
 
 public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler{
 
@@ -100,8 +100,11 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	
 	public void startIteration(int iteration){
 		fs = null;
-		if((iteration==0 || iteration ==9) && Constants.SAVE_FRAMES)
-			fs = new FrameSaver(Constants.PATH+"/videos/frames/it"+iteration, "png", 1);
+		if((iteration==0 || iteration ==9) && Constants.SAVE_FRAMES){
+			String pathName = Constants.PATH+"/videos/frames/it"+iteration;
+			FileUtility.deleteDirectory(new File(pathName));
+			fs = new FrameSaver(pathName, "png", 1);
+		}
 		this.vis.fs = fs;
 		this.keyControl.fs = fs;
 	}

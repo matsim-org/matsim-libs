@@ -39,7 +39,7 @@ public class TransitionArea extends PedestrianGrid {
 	
 	//TODO OPTIMIZE THIS
 	public boolean acceptPedestrians(){
-		return getFreePositions(positionsForGeneration).size()>2;
+		return getFreePositions(positionsForGeneration).size()>0;
 	}
 	
 	public boolean isAtBorder(Pedestrian pedestrian){

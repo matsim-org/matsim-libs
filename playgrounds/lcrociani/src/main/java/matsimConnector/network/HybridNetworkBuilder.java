@@ -34,8 +34,8 @@ public class HybridNetworkBuilder {
 		net.setEffectiveLaneWidth(.71);
 		
 		Set<String> modes = new HashSet<String>();
-		modes.add("car");
-		modes.add("walk");
+		modes.add(Constants.CAR_LINK_MODE);
+		modes.add(Constants.WALK_LINK_MODE);
 		modes.add(Constants.CA_LINK_MODE);
 		
 		for (CANode nodeCA : environmentCA.getCANetwork().getNodes()) {

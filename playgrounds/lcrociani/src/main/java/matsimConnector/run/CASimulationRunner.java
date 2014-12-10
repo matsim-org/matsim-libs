@@ -1,6 +1,7 @@
 package matsimConnector.run;
 
 import matsimConnector.engine.CAMobsimFactory;
+import matsimConnector.engine.CATripRouterFactory;
 import matsimConnector.network.HybridNetworkBuilder;
 import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
@@ -46,6 +47,9 @@ public class CASimulationRunner implements IterationStartsListener{
 		Controler controller = new Controler(scenario);
 		
 		controller.setOverwriteFiles(true);
+		
+		CATripRouterFactory tripRouterFactoryCA = new CATripRouterFactory(scenario);
+		controller.setTripRouterFactory(tripRouterFactoryCA);
 		
 		CAMobsimFactory factoryCA = new CAMobsimFactory();
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);

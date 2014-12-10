@@ -4,6 +4,8 @@ public class Constants {
 
 	public static final String CA_MOBSIM_MODE = "MobsimCA";
 	public static final String CA_LINK_MODE = "walkCA";
+	public static final String WALK_LINK_MODE = "walk";
+	public static final String CAR_LINK_MODE = "car";
 	public static final String TO_Q_LINK_MODE = "CA->Q";
 	public static final String TO_CA_LINK_MODE = "Q->CA";
 	

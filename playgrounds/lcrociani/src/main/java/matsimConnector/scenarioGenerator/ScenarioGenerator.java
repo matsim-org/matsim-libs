@@ -8,6 +8,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -25,7 +26,7 @@ public class ScenarioGenerator {
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
 	private static Double TOTAL_DENSITY = 4.;
-	private static int POPULATION_SIZE = 300;//(int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+	private static int POPULATION_SIZE = 600;//(int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
 	
 	public static void main(String [] args) {
 		if (args.length>0){
@@ -52,6 +53,7 @@ public class ScenarioGenerator {
 
 		c.controler().setOutputDirectory(outputDir);
 		c.controler().setLastIteration(200);
+		c.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
 
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
 
@@ -80,6 +82,7 @@ public class ScenarioGenerator {
 
 		QSimConfigGroup qsim = scenario.getConfig().qsim();
 		qsim.setEndTime(20*60);
+		qsim.setStuckTime(100000);
 		c.controler().setMobsim(Constants.CA_MOBSIM_MODE);
 		c.global().setCoordinateSystem(Constants.COORDINATE_SYSTEM);
 		c.qsim().setEndTime(60*10);
