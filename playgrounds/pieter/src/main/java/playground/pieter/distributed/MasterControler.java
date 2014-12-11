@@ -190,7 +190,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         writeServer.close();
         masterLogger.warn("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.");
         hydra = new Hydra();
-        new Thread(hydra).start();
+        Thread hydraThread = new Thread(hydra);
+        hydraThread.setName("HYDRA");
+        hydraThread.start();
 
         scenario = ScenarioUtils.createScenario(config);
         loadScenario();
@@ -330,7 +332,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         numThreads = new AtomicInteger(slaves.size());
         for (Slave slave : slaves.values()) {
             slave.communicationsMode = mode;
-            new Thread(slave).start();
+            Thread slaveThread = new Thread(slave);
+            slaveThread.setName("slave_"+slave.myNumber+":"+mode.toString());
+            slaveThread.start();
 
         }
     }
@@ -941,6 +945,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     slave.sendNumber(i);
                     slave.sendNumber(numberOfPSimIterations);
                     slave.sendBoolean(false);
+                    slave.sendBoolean(QuickReplanning);
                     slave.readMemoryStats();
                     slave.readNumberOfThreadsOnSlave();
                     slave.slavePersonPool = new ArrayList<>();
