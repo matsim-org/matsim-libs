@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.contrib.locationchoice.*;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
@@ -92,7 +93,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private final PlanCatcher plancatcher;
 
-    private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
@@ -137,6 +138,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         config.global().setNumberOfThreads(numThreads);
         config.parallelEventHandling().setNumberOfThreads(1);
+        String planSelector = ((DestinationChoiceConfigGroup)config.getModule("locationchoice")).getPlanSelector();
 
         String hostname = "localhost";
         if (commandLine.hasOption("h")) {
