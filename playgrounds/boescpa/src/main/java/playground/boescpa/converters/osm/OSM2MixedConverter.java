@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 import playground.boescpa.converters.osm.networkCreator.*;
 import playground.boescpa.converters.osm.scheduleCreator.*;
 import playground.boescpa.converters.osm.ptRouter.*;
@@ -41,6 +43,7 @@ public class OSM2MixedConverter {
 
 	private final Network network;
 	private final TransitSchedule schedule;
+	private final Vehicles vehicles;
 	private final String osmFile;
 	private final String scheduleFile;
 	// TODO-boescpa implement observer for osmFile and scheduleFile so that it hasn't to be read x-times...
@@ -49,14 +52,15 @@ public class OSM2MixedConverter {
 	private final PTScheduleCreator ptScheduleCreator;
 	private final PTLineRouter ptLineRouter;
 
-	public OSM2MixedConverter(Network network, TransitSchedule schedule, String osmFile, String scheduleFile) {
+	public OSM2MixedConverter(Network network, TransitSchedule schedule, Vehicles vehicles, String osmFile, String scheduleFile) {
 		this.network = network;
 		this.schedule = schedule;
+		this.vehicles = vehicles;
 		this.osmFile = osmFile;
 		this.scheduleFile = scheduleFile;
 
 		this.multimodalNetworkCreator = new MultimodalNetworkCreatorDefault(this.network);
-		this.ptScheduleCreator = new PTScheduleCreatorDefault(this.schedule);
+		this.ptScheduleCreator = new PTScheduleCreatorDefault(this.schedule, this.vehicles);
 		this.ptLineRouter = new PTLineRouterDefault(this.schedule);
 	}
 
@@ -77,11 +81,13 @@ public class OSM2MixedConverter {
 	 * @param outputMultimodalNetwork	A string specifying the target network file.
 	 * @param outputSchedule			A string specifying the target schedule file.
 	 */
-	public void writeOutput(String outputMultimodalNetwork, String outputSchedule) {
+	public void writeOutput(String outputMultimodalNetwork, String outputSchedule, String outputVehicles) {
 		log.info("Writing multimodal Network to " + outputMultimodalNetwork + "...");
 		new NetworkWriter(network).write(outputMultimodalNetwork);
 		log.info("Writing multimodal Schedule to " + outputSchedule + "...");
 		new TransitScheduleWriter(schedule).writeFile(outputSchedule);
+		log.info("Writing vehicles to " + outputVehicles + "...");
+		new VehicleWriterV1(vehicles).writeFile(outputVehicles);
 		log.info("Writing of Network and Schedule done.");
 	}
 }

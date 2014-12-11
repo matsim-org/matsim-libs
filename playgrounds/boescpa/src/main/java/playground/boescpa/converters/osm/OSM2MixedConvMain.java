@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Creates a mixed network with public and private transport based on OSM and HAFAS data.
@@ -40,18 +41,21 @@ public class OSM2MixedConvMain {
 		// Get an empty network and an empty schedule:
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().scenario().setUseVehicles(true);
 		Network network = scenario.getNetwork();
 		TransitSchedule schedule = scenario.getTransitSchedule();
+		Vehicles vehicles = scenario.getVehicles();
 		// Get resources:
 		String osmFile = args[0];
 		String hafasFolder = args[1];
 		String outputMultimodalNetwork = args[2];
 		String outputSchedule = args[3];
+		String outputVehicles = args[4];
 
 		// **************** Convert ****************
-		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, osmFile, hafasFolder);
+		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, vehicles, osmFile, hafasFolder);
 		converter.convertOSM2MultimodalNetwork();
-		converter.writeOutput(outputMultimodalNetwork, outputSchedule);
+		converter.writeOutput(outputMultimodalNetwork, outputSchedule, outputVehicles);
 	}
 
 }

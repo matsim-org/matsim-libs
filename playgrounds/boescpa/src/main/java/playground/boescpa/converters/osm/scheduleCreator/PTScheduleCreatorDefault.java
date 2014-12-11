@@ -30,6 +30,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -45,11 +46,9 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
-	private static final Map<Id<Vehicle>, Id<VehicleType>> vehicles = new HashMap<>();
-	// TODO-boescpa Create a vehicles-file...
 
-	public PTScheduleCreatorDefault(TransitSchedule schedule) {
-		super(schedule);
+	public PTScheduleCreatorDefault(TransitSchedule schedule, Vehicles vehicles) {
+		super(schedule, vehicles);
 	}
 
 	@Override
@@ -288,12 +287,17 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			}
 		}
 
-		private String usedVehicleType = null;
 		private String usedVehicleID = null;
+		private VehicleType usedVehicleType = null;
 
 		public void setUsedVehicle(String usedVehicle) {
-			usedVehicleType = usedVehicle.trim();
-			usedVehicleID = usedVehicleType + "_" + idOwnerLine.toString() + "_" + routeId.toString();
+			Id<VehicleType> typeId = Id.create(usedVehicle.trim(), VehicleType.class);
+			usedVehicleType = vehicles.getVehicleTypes().get(typeId);
+			if (usedVehicleType == null) {
+				usedVehicleType = vehicleBuilder.createVehicleType(typeId);
+				vehicles.addVehicleType(usedVehicleType);
+			}
+			usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
 		}
 
 		public PtRouteFPLAN(Id<TransitLine> idOwnerLine, Id<TransitRoute> routeId, int numberOfDepartures, int cycleTime) {
@@ -352,7 +356,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 				double departureTime = firstDepartureTime + (i * cycleTime) - initialDelay;
 				// Departure vehicle
 				Id<Vehicle> vehicleId = Id.create(usedVehicleID + "_" + String.format("%04d", i + 1), Vehicle.class);
-				vehicles.put(vehicleId, Id.create(usedVehicleType, VehicleType.class));
+				vehicles.addVehicle(vehicleBuilder.createVehicle(vehicleId, usedVehicleType));
 				// Departure
 				departures.add(createDeparture(departureId, departureTime, vehicleId));
 			}

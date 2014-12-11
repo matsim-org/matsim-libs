@@ -25,6 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
@@ -39,14 +41,18 @@ public abstract class PTScheduleCreator {
 
 	protected final TransitSchedule schedule;
 	protected final TransitScheduleFactory scheduleBuilder;
+	protected final Vehicles vehicles;
+	protected final VehiclesFactory vehicleBuilder;
 
-	protected PTScheduleCreator(TransitSchedule schedule) {
+	protected PTScheduleCreator(TransitSchedule schedule, Vehicles vehicles) {
 		this.schedule = schedule;
 		this.scheduleBuilder = this.schedule.getFactory();
+		this.vehicles = vehicles;
+		this.vehicleBuilder = this.vehicles.getFactory();
 	}
 
 	/**
-	 * This method creates pt lines (stops and scheduled times, no routes) from the OSM network,
+	 * This method creates pt lines (stops and scheduled times, no routes) and vehicles from the OSM network,
 	 * which are corrected by the given schedule-file.
 	 * The stops are linked to the given network.
 	 *

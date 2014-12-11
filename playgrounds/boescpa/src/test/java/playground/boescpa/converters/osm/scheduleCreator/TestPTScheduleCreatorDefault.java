@@ -32,6 +32,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,6 +46,7 @@ public class TestPTScheduleCreatorDefault {
 
     PTScheduleCreatorDefault scheduleCreator = null;
     TransitSchedule schedule = null;
+    Vehicles vehicles = null;
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
@@ -52,8 +55,10 @@ public class TestPTScheduleCreatorDefault {
     public void prepareTests() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().scenario().setUseVehicles(true);
         schedule = scenario.getTransitSchedule();
-        scheduleCreator = new PTScheduleCreatorDefault(schedule);
+        vehicles = scenario.getVehicles();
+        scheduleCreator = new PTScheduleCreatorDefault(schedule, vehicles);
     }
 
     @Test
@@ -70,9 +75,9 @@ public class TestPTScheduleCreatorDefault {
 
     @Test
     public void testReadLines() {
-        scheduleCreator.readStops(utils.getClassInputDirectory()+"BFKOORD_GEO");
-        scheduleCreator.readLines(utils.getClassInputDirectory()+"FPLAN");
-        TransitScheduleWriter writer = new TransitScheduleWriter(schedule);
-        writer.writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");
+        scheduleCreator.readStops(utils.getClassInputDirectory() + "BFKOORD_GEO");
+        scheduleCreator.readLines(utils.getClassInputDirectory() + "FPLAN");
+        new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");
+        new VehicleWriterV1(vehicles).writeFile(utils.getOutputDirectory() + "VehicleTest.xml");
     }
 }
