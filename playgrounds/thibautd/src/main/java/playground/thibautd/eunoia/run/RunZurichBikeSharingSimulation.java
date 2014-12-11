@@ -104,8 +104,11 @@ public class RunZurichBikeSharingSimulation {
 		// Matsim2030Utils.initializeLocationChoice( controler );
 
 		final double refBikeSpeed = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
+		final double utilTravelBike_s =
+			( sc.getConfig().planCalcScore().getModes().get( TransportMode.bike ).getMarginalUtilityOfTraveling() / 3600. ) +
+			( sc.getConfig().planCalcScore().getPerforming_utils_hr() / 3600. );
 		final double utilGain_m =
-					sc.getConfig().planCalcScore().getModes().get( TransportMode.bike ).getMarginalUtilityOfTraveling() * 
+					 utilTravelBike_s * 
 						(denivelationConfig.getEquivalentDistanceForAltitudeGain() /
 						refBikeSpeed);
 
