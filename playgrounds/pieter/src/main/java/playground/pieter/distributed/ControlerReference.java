@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -33,7 +34,7 @@ public class ControlerReference {
 	private final Controler delegate;
 
 	private ControlerReference(String configString) {
-        Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configString));
+        Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configString,new DestinationChoiceConfigGroup() ));
         Config config = scenario.getConfig();
         this.delegate = new Controler(scenario);
 		delegate.setOverwriteFiles(true);

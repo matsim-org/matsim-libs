@@ -108,7 +108,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         if (commandLine.hasOption("c")) {
             try {
-                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"),new DestinationChoiceConfigGroup() ) ;;
 
             } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
@@ -138,7 +138,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         config.global().setNumberOfThreads(numThreads);
         config.parallelEventHandling().setNumberOfThreads(1);
-        String planSelector = ((DestinationChoiceConfigGroup)config.getModule("locationchoice")).getPlanSelector();
 
         String hostname = "localhost";
         if (commandLine.hasOption("h")) {
