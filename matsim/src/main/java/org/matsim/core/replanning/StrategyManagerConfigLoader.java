@@ -44,8 +44,6 @@ import java.lang.reflect.InvocationTargetException;
  */
 public final class StrategyManagerConfigLoader {
 
-	public static final String LOCATION_CHOICE = "LocationChoice";
-
 	private static final Logger log = Logger.getLogger(StrategyManagerConfigLoader.class);
 
 	private static int externalCounter = 0;
@@ -118,9 +116,10 @@ public final class StrategyManagerConfigLoader {
 
 	private static PlanStrategy loadStrategy(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		// Special cases, scheduled to go away.
-		if (name.equals(LOCATION_CHOICE)) {
-            return tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
-		} else if (name.equals("ExternalModule")) {
+//		if (name.equals(LOCATION_CHOICE)) {
+//            return tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
+//		} else 
+		if (name.equals("ExternalModule")) {
 			externalCounter++;
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 			String exePath = settings.getExePath();
