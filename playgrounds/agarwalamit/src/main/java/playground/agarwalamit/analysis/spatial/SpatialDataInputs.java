@@ -77,7 +77,7 @@ public class SpatialDataInputs {
 	public String initialCaseNetworkFile;
 	int initialCaseLastIteration; 
 	public String initialCaseEmissionEventsFile;
-	String initialCaseEventsFile;
+	public String initialCaseEventsFile;
 	String initialCasePlansFile;
 	
 	public boolean isComparing = false;
@@ -91,7 +91,7 @@ public class SpatialDataInputs {
 	public String compareToCaseNetwork;
 	int compareToCaseLastIteration ; 
 	public String compareToCaseEmissionEventsFile;
-	String compareToCaseEventsFile;
+	public String compareToCaseEventsFile;
 	String compareToCasePlans; 
 	
 	public static String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";

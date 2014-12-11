@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.analysis;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -27,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
@@ -39,19 +41,99 @@ import com.vividsolutions.jts.geom.Point;
  */
 
 public class MunichSpatialPlots {
-
-	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau;
-	private static Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy;
+	
+	String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+	String bau = runDir+"/baseCaseCtd";
+	String ei = runDir+"/ci";
 
 	public static void main(String[] args) {
+		MunichSpatialPlots plots = new MunichSpatialPlots();
+		plots.writeCongestionCells();
+		plots.writeEmissionCells();
+	}
 
-		String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String bau = runDir+"/baseCaseCtd";
-		String ei = runDir+"/eci";
+	private void writeCongestionCells(){
+		Map<Double, Map<Id, Double>> linkDelaysBau = new HashMap<>();
+		Map<Double, Map<Id, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
-		inputs.setGridInfo(GridType.SQUARE, 150);
+		inputs.setGridInfo(GridType.HEX, 500);
+		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+		
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
+
+		CongestionLinkAnalyzer emsLnkAna = new CongestionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEventsFile, 1); 
+		emsLnkAna.init(sc);
+		emsLnkAna.preProcessData();
+		emsLnkAna.postProcessData();
+		linkDelaysBau = emsLnkAna.getCongestionPerLinkTimeInterval();
+
+		if(inputs.isComparing){
+			emsLnkAna = new CongestionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEventsFile, 1);
+			emsLnkAna.init(LoadMyScenarios.loadScenarioFromNetwork(inputs.compareToCaseNetwork));
+			emsLnkAna.preProcessData();
+			emsLnkAna.postProcessData();
+			linkDelaysPolicy = emsLnkAna.getCongestionPerLinkTimeInterval();
+		}
+		double sumDelays =0;
+
+		for(double time :linkDelaysBau.keySet()){
+			for(Link l : sc.getNetwork().getLinks().values()){
+				Id<Link> id = l.getId();
+
+				if(plot.isInResearchArea(l)){
+
+					double delays = 0;
+
+					if(inputs.isComparing){
+
+						double linkDelayBau =0;
+						double linkDelayPolicy =0;
+
+						if(linkDelaysBau.get(time).containsKey(id) && linkDelaysPolicy.get(time).containsKey(id)) {
+							linkDelayBau = 100 * linkDelaysBau.get(time).get(id);
+							linkDelayPolicy = 100 * linkDelaysPolicy.get(time).get(id);
+						} else if(linkDelaysBau.get(time).containsKey(id)){
+							linkDelayBau = 100 * linkDelaysBau.get(time).get(id);
+						} else if(linkDelaysPolicy.get(time).containsKey(id)){
+							linkDelayPolicy = 100 * linkDelaysPolicy.get(time).get(id);
+						}
+						delays = linkDelayPolicy - linkDelayBau;
+
+					} else {
+
+						if(linkDelaysBau.get(time).containsKey(id)) delays = 100 * linkDelaysBau.get(time).get(id);
+						else delays =0;
+					}
+
+					plot.processLink(l,  delays);
+					sumDelays += (delays);
+				}
+			}
+		}
+
+		plot.writeRData("delays");
+		SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
+
+		double cellWeights =0;
+		for(Point p: plot.getCellWeights().keySet()){
+			cellWeights += plot.getCellWeights().get(p);
+		}
+		SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
+
+	}
+
+	
+	private void writeEmissionCells(){
+		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau = new HashMap<>();
+		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
+		
+		// setting of input data
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
+		inputs.setGridInfo(GridType.HEX, 500);
 		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		// set bounding box, smoothing radius and targetCRS if different.
@@ -114,7 +196,7 @@ public class MunichSpatialPlots {
 			}
 		}
 
-		plot.writeRData();
+		plot.writeRData("NO2");
 		SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
 
 		double cellWeights =0;
@@ -122,6 +204,7 @@ public class MunichSpatialPlots {
 			cellWeights += plot.getCellWeights().get(p);
 		}
 		SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
+
 	}
 
 }

@@ -178,7 +178,7 @@ public class SpatialInterpolation {
 	 * Same data sheet can be used for plotting surface polygon and filled contour plot data. 
 	 * <p> The file name will composed of grid type, cell width, link weight method and scenario seperated by "_".
 	 */
-	public void writeRData(){
+	public void writeRData(String fileNamePrefix){
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = inputs.gridType;
@@ -186,10 +186,10 @@ public class SpatialInterpolation {
 		String fileName;
 		if(inputs.isComparing){
 			String scenarioCase = inputs.compareToCase.split("/") [inputs.compareToCase.split("/").length-1];
-			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+"_"+"diff"+".txt";
+			fileName = outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+"_"+"diff"+".txt";
 		} else {
 			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
-			fileName= outputFolder+"/rData"+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
+			fileName= outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
 		}
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
