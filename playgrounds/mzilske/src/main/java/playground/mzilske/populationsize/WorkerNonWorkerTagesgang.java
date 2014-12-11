@@ -34,14 +34,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 import playground.mzilske.ant2014.IterationResource;
-import playground.mzilske.cdr.Sighting;
-import playground.mzilske.cdr.Sightings;
 
-import java.util.List;
+import java.util.Arrays;
 
 public class WorkerNonWorkerTagesgang {
-
-    public static final String RATE = "5";
 
     interface Predicate {
         boolean test(Id<Person> personId);
@@ -49,44 +45,34 @@ public class WorkerNonWorkerTagesgang {
 
     public static void main(String[] args) {
         final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
-        final RegimeResource uncongested = experiment.getRegime("uncongested");
+        final RegimeResource uncongested = experiment.getRegime("uncongested2");
         final Scenario baseRun = uncongested.getBaseRun().getOutputScenario();
 
-        final MultiRateRunResource multiRateRun = uncongested.getMultiRateRun("random");
-        final RunResource run = multiRateRun.getRateRun(RATE, "3");
 
-        Config outputConfig = run.getOutputConfig();
 
-        IterationResource iteration = run.getLastIteration();
 
         Predicate predicate;
-//        predicate = new Predicate() {
-//            @Override
-//            public boolean test(Id<Person> personId) {
-//                return isWorker(personId, baseRun);
-//            }
-//        };
-
         predicate = new Predicate() {
-            Sightings sightings = multiRateRun.getSightings(RATE);
             @Override
             public boolean test(Id<Person> personId) {
-                List<Sighting> sightings1 = sightings.getSightingsPerPerson().get(resolvePerson(personId));
-                return sightings1 != null && sightings1.size() > 8;
+                return isWorker(personId, baseRun);
             }
         };
 
-        doIt(predicate, outputConfig, iteration);
-        doIt(predicate, outputConfig, run.getIteration(0));
-        doIt(predicate, uncongested.getBaseRun().getOutputConfig(), uncongested.getBaseRun().getIteration(0));
 
+        doIt(predicate, baseRun.getConfig(), uncongested.getBaseRun().getIteration(0));
+        for (String rate : Arrays.asList("5", "0")) {
+            final MultiRateRunResource multiRateRun = uncongested.getMultiRateRun("realcountlocations");
+            final RunResource run = multiRateRun.getRateRun(rate, "3");
+            IterationResource iteration = run.getLastIteration();
+            doIt(predicate, baseRun.getConfig(), iteration);
+            doIt(predicate, baseRun.getConfig(), run.getIteration(0));
+        }
     }
 
     private static void doIt(final Predicate isHeavyPhoner, Config outputConfig, IterationResource iteration) {
         final EventsManager workersEventsManager = EventsUtils.createEventsManager(outputConfig);
         final EventsManager nonWorkersEventsManager = EventsUtils.createEventsManager(outputConfig);
-
-
         EventsManager eventsManager = EventsUtils.createEventsManager(outputConfig);
         eventsManager.addHandler(new BasicEventHandler() {
             @Override

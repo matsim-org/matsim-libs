@@ -4,8 +4,8 @@
    <!ENTITY NETWORK        "../input/VSP/svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz">
    <!ENTITY PLANS          "../input/VSP/svn/studies/countries/de/berlin/plans/baseplan_900s.xml.gz">
    <!ENTITY COUNTS         "../input/VSP/svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml">
-   <!ENTITY WRITEINTERVAL  "200">
-   <!ENTITY LASTITER  "1000">
+   <!ENTITY WRITEINTERVAL  "20">
+   <!ENTITY LASTITER  "100">
 
    <!ENTITY OUTBASE "../output/2kW/">
    <!ENTITY NAME "2kW.15">

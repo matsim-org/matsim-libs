@@ -77,7 +77,7 @@ class MultiRateRunResource {
         this.alternative = alternative;
     }
 
-    private final static int TIME_BIN_SIZE = 60*60;
+    private final static int TIME_BIN_SIZE = 60 * 60;
     private final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
 
     Collection<String> getRates() {
@@ -105,10 +105,10 @@ class MultiRateRunResource {
 
     public void twoRates(String string) {
         final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
-        final int rate = Integer.parseInt(string);
+        final double rate = Integer.parseInt(string);
         for (Person person : baseScenario.getPopulation().getPersons().values()) {
             if (CountWorkers.isWorker(person)) {
-                person.getCustomAttributes().put("phonerate", 50);
+                person.getCustomAttributes().put("phonerate", 50.0);
             } else {
                 person.getCustomAttributes().put("phonerate", rate);
             }
@@ -126,11 +126,11 @@ class MultiRateRunResource {
         final Sightings sightings = results.get(Sightings.class);
         final VolumesAnalyzer groundTruthVolumes = results.get(VolumesAnalyzer.class);
 
-        String rateDir = WD + "/rates/" + rate;
+        String rateDir = WD + "/rates/" + string;
         new File(rateDir).mkdirs();
 
         new SightingsWriter(sightings).write(rateDir + "/sightings.txt");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes, 1.0);
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
         final Counts someCounts = filterCounts(allCounts);
@@ -189,12 +189,24 @@ class MultiRateRunResource {
         return allSightings;
     }
 
-    static Counts filterCounts(Counts allCounts) {
+    Counts filterCounts(Counts allCounts) {
         Counts someCounts = new Counts();
-        for (Map.Entry<Id<Link>, Count> entry: allCounts.getCounts().entrySet()) {
-            if (Math.random() < 0.05) {
-                someCounts.getCounts().put(entry.getKey(), entry.getValue());
+        if (alternative.startsWith("randomcountlocations")) {
+            for (Map.Entry<Id<Link>, Count> entry : allCounts.getCounts().entrySet()) {
+                if (Math.random() < 0.05) {
+                    someCounts.getCounts().put(entry.getKey(), entry.getValue());
+                }
             }
+        } else if (alternative.startsWith("realcountlocations")) {
+            final Counts originalCounts = new Counts();
+            new CountsReaderMatsimV1(originalCounts).parse(getBaseRun().getWd() + "/counts4bb_5_v_notscaled_simple.xml");
+            for (Map.Entry<Id<Link>, Count> entry : allCounts.getCounts().entrySet()) {
+                if (originalCounts.getCounts().keySet().contains(entry.getKey())) {
+                    someCounts.getCounts().put(entry.getKey(), entry.getValue());
+                }
+            }
+        } else {
+            throw new RuntimeException();
         }
         return someCounts;
     }
@@ -338,7 +350,7 @@ class MultiRateRunResource {
                 nPeople++;
             }
         }
-        pw.printf("%s\t%d\t%d\n",rate, (int) (kmSum / 1000.0), nPeople);
+        pw.printf("%s\t%d\t%d\n", rate, (int) (kmSum / 1000.0), nPeople);
     }
 
     public void persodisthisto() {
@@ -381,7 +393,7 @@ class MultiRateRunResource {
                 String id = entry.getKey().toString();
                 String originalId;
                 if (id.startsWith("I"))
-                    originalId = id.substring(id.indexOf("_")+1);
+                    originalId = id.substring(id.indexOf("_") + 1);
                 else
                     originalId = id;
                 pw.printf("%s\t%s\t%s\t%s\t%f\n", entry.getKey().toString(), rate, ccase, CountWorkers.isWorker(baseScenario.getPopulation().getPersons().get(Id.create(originalId, Person.class))) ? "workers" : "non-workers", km);
@@ -398,7 +410,7 @@ class MultiRateRunResource {
     private static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id linkId) {
         int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
         int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(linkId);
-        if(maybeVolumes == null) {
+        if (maybeVolumes == null) {
             return new int[maxSlotIndex + 1];
         }
         return maybeVolumes;
@@ -423,11 +435,11 @@ class MultiRateRunResource {
         final Sightings sightings = results.get(Sightings.class);
         final VolumesAnalyzer groundTruthVolumes = results.get(VolumesAnalyzer.class);
 
-        String rateDir = WD + "/rates/" + (int) (worker*100) + "-" + (int) (nonworker*100);
+        String rateDir = WD + "/rates/" + (int) (worker * 100) + "-" + (int) (nonworker * 100);
         new File(rateDir).mkdirs();
 
         new SightingsWriter(sightings).write(rateDir + "/sightings.txt");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes, 1.0);
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
         final Counts someCounts = filterCounts(allCounts);
@@ -474,11 +486,11 @@ class MultiRateRunResource {
         final Sightings sightings = results.get(Sightings.class);
         final VolumesAnalyzer groundTruthVolumes = results.get(VolumesAnalyzer.class);
 
-        String rateDir = WD + "/rates/" + (int) (worker*100) + "-" + (int) (nonworker*100);
+        String rateDir = WD + "/rates/" + (int) (worker * 100) + "-" + (int) (nonworker * 100);
         new File(rateDir).mkdirs();
 
         new SightingsWriter(sightings).write(rateDir + "/sightings.txt");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes, 1.0);
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
         final Counts someCounts = filterCounts(allCounts);
@@ -517,7 +529,7 @@ class MultiRateRunResource {
         new File(rateDir).mkdirs();
 
         new SightingsWriter(sightings).write(rateDir + "/sightings.txt");
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes, 1.0);
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
         final Counts someCounts = filterCounts(allCounts);

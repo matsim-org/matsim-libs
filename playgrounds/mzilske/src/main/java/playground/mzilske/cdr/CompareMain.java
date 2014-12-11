@@ -131,14 +131,14 @@ public class CompareMain {
 		return sum / lengthsum;
 	}
 
-	public static Counts volumesToCounts(Network network, VolumesAnalyzer volumesAnalyzer) {
+	public static Counts volumesToCounts(Network network, VolumesAnalyzer volumesAnalyzer, double weight) {
 		Counts counts = new Counts();
 		for (Link link : network.getLinks().values()) {
 			Count count = counts.createAndAddCount(link.getId(), link.getId().toString());
 			int[] volumesForLink = getVolumesForLink(volumesAnalyzer, link);
 			int h = 1;
 			for (int v : volumesForLink) {
-				count.createVolume(h, v);
+				count.createVolume(h, v * weight);
 				++h;
 			}
 		}

@@ -86,7 +86,7 @@ public class CDREquilTest {
     }
 
     private VolumesAnalyzer runWithCadyts(Scenario scenario, ZoneTracker.LinkToZoneResolver linkToZoneResolver, Sightings sightings, VolumesAnalyzer groundTruthVolumes) {
-        Counts counts = CompareMain.volumesToCounts(scenario.getNetwork(), groundTruthVolumes);
+        Counts counts = CompareMain.volumesToCounts(scenario.getNetwork(), groundTruthVolumes, 1.0);
         VolumesAnalyzer cdrVolumes = CompareMain.runWithTwoPlansAndCadyts(utils.getOutputDirectory() + "/output2", scenario.getNetwork(), linkToZoneResolver, sightings, counts);
         System.out.printf("%f\t%f\t%f\n", CompareMain.compareAllDay(scenario, cdrVolumes, groundTruthVolumes), CompareMain.compareTimebins(scenario, cdrVolumes, groundTruthVolumes), CompareMain.compareEMDMassPerLink(scenario, cdrVolumes, groundTruthVolumes));
         return cdrVolumes;

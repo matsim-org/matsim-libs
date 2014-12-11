@@ -7,12 +7,12 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class BerlinRun implements Runnable {
+public class BerlinRunUncongested implements Runnable {
 	
 	final static String BERLIN_PATH = "/Users/michaelzilske/shared-svn/studies/countries/de/berlin/";
 	
 	public static void main(String[] args) {
-		BerlinRun berlinRun = new BerlinRun();
+		BerlinRunUncongested berlinRun = new BerlinRunUncongested();
 		berlinRun.run();
 	}
 	
@@ -24,8 +24,9 @@ public class BerlinRun implements Runnable {
 		config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");  // 18377 persons
 		config.network().setInputFile(BERLIN_PATH + "network/bb_4.xml.gz"); // only till secondary roads (4), dumped from OSM 20090603, contains 35336 nodes and 61920 links
 		config.counts().setCountsFileName(BERLIN_PATH + "counts/iv_counts/vmz_di-do.xml");
-		config.controler().setOutputDirectory("car/output-berlin");
+        config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested/output-berlin");
 		config.controler().setMobsim(MobsimType.qsim.toString());
+        config.controler().setLastIteration(0);
 		config.qsim().setFlowCapFactor(100);
 		config.qsim().setStorageCapFactor(100);
 		config.qsim().setRemoveStuckVehicles(false);

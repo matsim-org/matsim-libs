@@ -240,10 +240,10 @@ public class CadytsRandomTrips {
         events.addHandler(groundTruthVolumes);
         new MatsimEventsReader(events).readFile(uncongested.getLastIteration().getEventsFileName());
 
-        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), groundTruthVolumes, 1.0);
         allCounts.setYear(2012);
         new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
-        final Counts someCounts = MultiRateRunResource.filterCounts(allCounts);
+        final Counts someCounts = allCounts;
         someCounts.setYear(2012);
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
     }

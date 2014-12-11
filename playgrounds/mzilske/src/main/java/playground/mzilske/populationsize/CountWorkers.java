@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
-class CountWorkers {
+public class CountWorkers {
 
     public static void main(String[] args) {
         final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
@@ -41,7 +41,7 @@ class CountWorkers {
         System.out.printf("Workers: %d, non-workers: %d", nWorkers, population.getPersons().size() - nWorkers);
     }
 
-    static boolean isWorker(Person person) {
+    public static boolean isWorker(Person person) {
         for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
             if (pe instanceof Activity) {
                 if (((Activity) pe).getType().equals("work")) {

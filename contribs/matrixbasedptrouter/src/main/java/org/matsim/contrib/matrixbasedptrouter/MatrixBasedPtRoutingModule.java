@@ -22,12 +22,10 @@
  */
 package org.matsim.contrib.matrixbasedptrouter;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -37,6 +35,9 @@ import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Design thoughts:<ul>
@@ -70,8 +71,8 @@ public final class MatrixBasedPtRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
 		Leg newLeg = scenario.getPopulation().getFactory().createLeg( TransportMode.pt );
-		Id startLinkId = fromFacility.getLinkId();
-		Id endLinkId = toFacility.getLinkId();
+		Id<Link> startLinkId = fromFacility.getLinkId();
+		Id<Link> endLinkId = toFacility.getLinkId();
 		newLeg.setDepartureTime( departureTime );
 		double travelTime = this.ptMatrix.getTotalTravelTime_seconds(fromFacility.getCoord(), toFacility.getCoord());
 		newLeg.setTravelTime( travelTime );

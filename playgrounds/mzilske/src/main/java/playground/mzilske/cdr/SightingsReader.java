@@ -22,15 +22,15 @@
 
 package playground.mzilske.cdr;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 public class SightingsReader {
 
@@ -41,28 +41,21 @@ public class SightingsReader {
     }
 
     public void read(InputStream in) {
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            try {
-                String line = reader.readLine();
-                while (line != null) {
-                    String tokens[] = line.split("\\s+");
-                    Id<Person> personId = Id.create(tokens[0], Person.class);
-                    List<Sighting> perPerson = sightings.getSightingsPerPerson().get(personId);
-                    if (perPerson == null) {
-                        perPerson = new ArrayList<Sighting>();
-                        sightings.getSightingsPerPerson().put(personId, perPerson);
-                    }
-                    long timeInSeconds = Long.parseLong(tokens[1]);
-                    String cellTowerId = tokens[2];
-                    Sighting sighting = new Sighting(personId, timeInSeconds, cellTowerId);
-                    perPerson.add(sighting);
-                    line = reader.readLine();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            String line = reader.readLine();
+            while (line != null) {
+                String tokens[] = line.split("\\s+");
+                Id<Person> personId = Id.create(tokens[0], Person.class);
+                List<Sighting> perPerson = sightings.getSightingsPerPerson().get(personId);
+                if (perPerson == null) {
+                    perPerson = new ArrayList<>();
+                    sightings.getSightingsPerPerson().put(personId, perPerson);
                 }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                reader.close();
+                long timeInSeconds = Long.parseLong(tokens[1]);
+                String cellTowerId = tokens[2];
+                Sighting sighting = new Sighting(personId, timeInSeconds, cellTowerId);
+                perPerson.add(sighting);
+                line = reader.readLine();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

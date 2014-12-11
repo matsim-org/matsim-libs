@@ -71,7 +71,7 @@ public class Main {
 
         final VolumesAnalyzer groundTruthVolumes = controler.getVolumes();
 
-        final Counts allCounts = CompareMain.volumesToCounts(groundTruth.getNetwork(), groundTruthVolumes);
+        final Counts allCounts = CompareMain.volumesToCounts(groundTruth.getNetwork(), groundTruthVolumes, 1.0);
         final Counts calibrationCounts = filterCounts(allCounts, countHours);
 
         Scenario cdrScenario = new ScenarioReconstructor(groundTruth.getNetwork(), (Sightings) groundTruth.getScenarioElement("sightings"), new MyLinkToZoneResolver()).get();
