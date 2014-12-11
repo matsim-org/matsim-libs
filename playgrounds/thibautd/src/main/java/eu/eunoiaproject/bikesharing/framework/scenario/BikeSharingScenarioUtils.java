@@ -31,14 +31,19 @@ import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -179,22 +184,43 @@ public class BikeSharingScenarioUtils {
 				new BikeSharingTripRouterFactory( scenario ) );
 
 		if ( utilityGain_m != 0 ) {
-			final SlopeAwareTravelDisutilityFactory slopeDisutil =
-					new SlopeAwareTravelDisutilityFactory(
-						utilityGain_m,
-						linkSlopes,
-						disutilityFactory );
-
 			fact.setDisutilityFactoryForMode(
 					TransportMode.bike,
-					slopeDisutil );
+					createSlopeAwareDisutilityFactory(
+						utilityGain_m,
+						linkSlopes,
+						TransportMode.bike ) );
 
 			fact.setDisutilityFactoryForMode(
 					BikeSharingConstants.MODE,
-					slopeDisutil );
+					createSlopeAwareDisutilityFactory(
+						utilityGain_m,
+						linkSlopes,
+						BikeSharingConstants.MODE ) );
 		}
 
 		return fact;
+	}
+
+	private static TravelDisutilityFactory createSlopeAwareDisutilityFactory(
+			final double utilityGain_m,
+			final Map<Id<Link>, Double> linkSlopes,
+			final String mode ) {
+		return new SlopeAwareTravelDisutilityFactory(
+				utilityGain_m,
+				linkSlopes,
+				new TravelDisutilityFactory() {
+					@Override
+					public TravelDisutility createTravelDisutility(
+							final TravelTime timeCalculator,
+							final PlanCalcScoreConfigGroup cnScoringGroup ) {
+						final ModeParams pars = cnScoringGroup.getModes().get( mode );
+						return new TravelTimeAndDistanceBasedTravelDisutility(
+									timeCalculator,
+									(-pars.getMarginalUtilityOfTraveling() / 3600.) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0),
+									-pars.getMarginalUtilityOfDistance()  );
+					}
+				} );
 	}
 }
 
