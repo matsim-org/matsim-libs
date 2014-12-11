@@ -39,6 +39,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.agarwalamit.analysis.congestion.CongestionPerLinkHandler;
+import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAveragingUtilsExtended;
@@ -50,34 +51,34 @@ public class SpatialAveragingCongestion {
 	private final Logger logger = Logger.getLogger(SpatialAveragingCongestion.class);
 	private CongestionPerLinkHandler congestionPerLinkHandler;
 	final double scalingFactor = 1.;
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
-	private final static String runBAU = "run202/";
-	private final static String runNumber = "run202/";
-	private final String netFile1 = runDir+runBAU+"/output_network.xml.gz";
+	private final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+	private final static String runBAU = runDir+"/baseCaseCtd";
+	private final static String runNumber = runDir+"/ei";
+	private final String netFile1 = runBAU+"/output_network.xml.gz";
 
-	private final String siouxFallsShapeFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/shape/siouxFallsAreaPolygon.shp";
+	private final String munichShapeFile = SpatialDataInputs.shapeFile;
 
-	private static String configFileBAU =runDir+runBAU+"/output_config.xml"; 
-	private final String eventsFileBAU = runDir+runBAU+"/ITERS/it.500/500.events.xml.gz";
-	private final String eventsFile2 = runDir+runNumber+"/ITERS/it.500/500.events.xml.gz";
-	private final String emissionFileBAU = runDir+runBAU+"/ITERS/it.500/500.emission.events.xml.gz";
-	private final String emissionFile2 = runDir+runNumber+"/ITERS/it.500/500.emission.events.xml.gz";
+	private static String configFileBAU =runBAU+"/output_config.xml"; 
+	private final String eventsFileBAU = runBAU+"/ITERS/it.1500/1500.events.xml.gz";
+	private final String eventsFile2 = runNumber+"/ITERS/it.1500/1500.events.xml.gz";
+	private final String emissionFileBAU = runBAU+"/ITERS/it.1500/1500.emission.events.xml.gz";
+	private final String emissionFile2 = runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
-	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:3459");
-	final double xMin =	673506.73;
-	final double xMax = 689857.13;
-	final double yMin = 4814378.34;
-	final double yMax = 4857392.75;
+	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
+	final double xMin = 4452550.25;
+	final double xMax = 4479483.33;
+	final double yMin = 5324955.00;
+	final double yMax = 5345696.81;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 
 	final int noOfTimeBins = 1;
 
 	//========
-	final double smoothingRadius_m = 200.;
+	final double smoothingRadius_m = 500.;
 	final boolean line = true;
 	//========
-	final boolean compareToBAU = false;
+	final boolean compareToBAU = true;
 
 	SpatialAveragingUtils sau;
 	LocationFilter lf;
@@ -90,7 +91,7 @@ public class SpatialAveragingCongestion {
 	EmissionsPerLinkWarmEventHandler warmHandler;
 
 	public  void run(){
-		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, siouxFallsShapeFile, targetCRS);
+		this.sau = new SpatialAveragingUtils(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
 		this.lf = new LocationFilter();
 		extended = new SpatialAveragingUtilsExtended(smoothingRadius_m);
 		this.simulationEndTime = getEndTime(configFileBAU);
@@ -118,9 +119,9 @@ public class SpatialAveragingCongestion {
 		Map<Double, double[][]> time2SpecificDelays = calculateSpecificDelaysPerBin(time2WeightedCongestion, time2WeightedDemand);
 
 		if(line){
-			outPathStub = runDir+runBAU+"/analysis/r/rCongestionLine"+smoothingRadius_m;
+			outPathStub = runDir+"/analysis/spatialPlots/rCongestionLine"+smoothingRadius_m;
 		} else {
-			outPathStub = runDir+runBAU+"/analysis/r/rCongestionPoint"+smoothingRadius_m;
+			outPathStub = runDir+"/analysis/spatialPlots/rCongestionPoint"+smoothingRadius_m;
 		}
 
 		for(double endOfTimeInterval: time2WeightedCongestion.keySet()){
@@ -155,9 +156,9 @@ public class SpatialAveragingCongestion {
 			Map<Double, double[][]> time2SpecificCongestionDifferences = calculateAbsoluteDifferencesPerBin(time2SpecificDelays, time2SpecificDelays2);
 
 			if(line){
-				outPathStub = runDir+runNumber+"/analysis/r/rCongestionWRTBAULine"+smoothingRadius_m;//runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
+				outPathStub = runDir+"/analysis/spatialPlots/rCongestionWRTBAULine"+smoothingRadius_m;//runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 			} else {
-				outPathStub = runDir+runNumber+"/analysis/r/rCongestionWRTBAUPoint"+smoothingRadius_m;//runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
+				outPathStub = runDir+"/analysis/spatialPlots/rCongestionWRTBAUPoint"+smoothingRadius_m;//runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 			}
 
 			for(double endOfTimeInterval : time2AbsoluteDemandDifferences.keySet()){

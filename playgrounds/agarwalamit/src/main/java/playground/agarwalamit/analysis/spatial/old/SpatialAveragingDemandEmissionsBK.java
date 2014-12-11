@@ -63,7 +63,7 @@ public class SpatialAveragingDemandEmissionsBK {
 	private final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private final static String runBAU = runDir+"/baseCaseCtd";
 	//	private final static String outDir = runDir+runBAU+"NoCheck4VisBoundary";
-	private final static String runNumber = runDir+"/eci";
+	private final static String runNumber = runDir+"/ci";
 	private final String netFile1 = runBAU+"/output_network.xml.gz";//"../../siouxFallsJava/output/run4/output_network.xml.gz" ;//runDirectory1 + runNumber1 + ".output_network.xml.gz";
 
 	private final String munichShapeFile = SpatialDataInputs.shapeFile;
