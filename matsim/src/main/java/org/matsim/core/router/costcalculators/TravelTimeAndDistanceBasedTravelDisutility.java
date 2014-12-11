@@ -60,6 +60,16 @@ public class TravelTimeAndDistanceBasedTravelDisutility implements TravelDisutil
 		
 	}
 
+
+	public TravelTimeAndDistanceBasedTravelDisutility(
+			final TravelTime timeCalculator,
+			final double marginalCostOfTime_s,
+			final double marginalCostOfDistance_m ) {
+		this.timeCalculator = timeCalculator;
+		this.marginalCostOfTime = marginalCostOfTime_s;
+		this.marginalCostOfDistance = marginalCostOfDistance_m;
+	}
+
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
