@@ -52,7 +52,7 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		final Scenario sc = BikeSharingScenarioUtils.loadScenario( configFile , configGroup );
 		final Controler controler = new Controler( sc );
 
-		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc ) );
+		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc , null ) );
 		controler.setMobsimFactory(
 				new BikeSharingWithSimplisticRelocationQSimFactory(
 					configGroup.getNVehicles() ) );

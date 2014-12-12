@@ -160,7 +160,7 @@ public class BikeSharingScenarioUtils {
 					MultiModalConfigGroup.GROUP_NAME );
 
 		if ( !multimodalConfigGroup.isMultiModalSimulationEnabled() ) {
-			return new BikeSharingTripRouterFactory( scenario );
+			return new BikeSharingTripRouterFactory( scenario , scorer );
 		}
 
 		// PrepareMultiModalScenario.run( scenario );
@@ -182,7 +182,7 @@ public class BikeSharingScenarioUtils {
 				scenario,
 				multiModalTravelTimeFactory.createTravelTimes(),
 				disutilityFactory,
-				new BikeSharingTripRouterFactory( scenario ) );
+				new BikeSharingTripRouterFactory( scenario , scorer ) );
 
 		if ( scorer != null ) {
 			fact.setDisutilityFactoryForMode(

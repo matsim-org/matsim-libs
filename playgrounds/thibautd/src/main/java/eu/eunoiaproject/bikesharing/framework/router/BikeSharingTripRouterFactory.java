@@ -21,15 +21,21 @@ package eu.eunoiaproject.bikesharing.framework.router;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.InitialNodeRouter;
@@ -44,23 +50,28 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 
 	private final TripRouterFactory delegate;
 	private final Scenario scenario;
+	private final LinkSlopeScorer slopeScorer;
 
 	private final TransitMultiModalAccessRoutingModule.RoutingData data;
 
 	public BikeSharingTripRouterFactory(
 			final TripRouterFactory delegate,
-			final Scenario scenario ) {
+			final Scenario scenario,
+			final LinkSlopeScorer slopeScorer) {
 		this.delegate = delegate;
 		this.scenario = scenario;
 		this.data = scenario.getConfig().scenario().isUseTransit() ?
 					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
 					null;
+		this.slopeScorer = slopeScorer;
 	}
 
 	public BikeSharingTripRouterFactory(
-			final Scenario scenario ) {
+			final Scenario scenario,
+			final LinkSlopeScorer slopeScorer) {
 		this( DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,
-				scenario );
+				scenario,
+				slopeScorer );
 	}
 
 	@Override
@@ -95,7 +106,21 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 								router.getRoutingModule( BikeSharingConstants.MODE ),
 								configGroup.getPtSearchRadius(),
 								3, // there is randomness: keep the "best" of a few draws
-								scoringParams ) );
+								scoringParams ) {
+							@Override
+							protected double calcCost( final List<? extends PlanElement> trip ) {
+								double baseScore = super.calcCost( trip );
+								if ( slopeScorer == null ) return baseScore;
+
+								for ( PlanElement pe : trip ) {
+									if ( pe instanceof Leg && ((Leg) pe).getMode().equals( BikeSharingConstants.MODE ) ) {
+										baseScore += slopeScorer.calcGainUtil( (NetworkRoute) ((Leg) pe).getRoute() );
+									}
+								}
+
+								return baseScore;
+							}
+						});
 			}
 			router.setRoutingModule(
 					TransportMode.pt,
