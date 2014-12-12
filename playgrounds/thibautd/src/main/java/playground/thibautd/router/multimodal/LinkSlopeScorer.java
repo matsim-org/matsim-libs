@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * @author thibautd
@@ -50,6 +51,19 @@ public class LinkSlopeScorer {
 	public double calcGainUtil( final Link link ) {
 		final double gain = link.getLength() * linkSlopes.get( link.getId() );
 		return betaGain * Math.max( 0 , gain );
+	}
+
+	public double calcGainUtil( final NetworkRoute route ) {
+		double score = 0;
+
+		for ( Id<Link> linkId : route.getLinkIds() ) {
+			score += calcGainUtil( linkId );
+		}
+
+		score += calcGainUtil( route.getEndLinkId() );
+
+		return score;
+
 	}
 }
 

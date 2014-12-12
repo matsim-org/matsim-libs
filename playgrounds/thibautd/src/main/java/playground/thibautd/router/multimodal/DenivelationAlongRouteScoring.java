@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,11 +56,7 @@ public class DenivelationAlongRouteScoring implements BasicScoring {
 			if ( !l.getMode().equals( mode ) ) continue;
 			final NetworkRoute route = (NetworkRoute) l.getRoute();
 
-			for ( Id<Link> linkId : route.getLinkIds() ) {
-				score += scorer.calcGainUtil(linkId );
-			}
-
-			score += scorer.calcGainUtil( route.getEndLinkId() );
+			score += scorer.calcGainUtil( route );
 		}
 
 		return score;
