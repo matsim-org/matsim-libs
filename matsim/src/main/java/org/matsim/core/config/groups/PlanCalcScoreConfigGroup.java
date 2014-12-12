@@ -75,10 +75,8 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String WRITE_EXPERIENCED_PLANS = "writeExperiencedPlans";
 
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_CAR = "marginalUtlOfDistanceCar";
 
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private static final String MARGINAL_UTL_OF_DISTANCE_PT = "marginalUtlOfDistancePt";
 	private static final String MARGINAL_UTL_OF_DISTANCE = "marginalUtlOfDistance_";
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
@@ -400,7 +398,6 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 		   this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() :
 		   this.waitingPt ;
 	}
-
 
 	public double getTraveling_utils_hr() {
 		return this.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
