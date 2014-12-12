@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -35,19 +32,10 @@ import org.matsim.vehicles.Vehicle;
  */
 public class SlopeAwareTravelDisutilityFactory implements TravelDisutilityFactory {
 	final TravelDisutilityFactory delegateFactory;
-	final DenivelationAlongRouteScoring slopeScoring;
+	final LinkSlopeScorer slopeScoring;
 
 	public SlopeAwareTravelDisutilityFactory(
-			final double betaGain,
-			final Map<Id<Link>, Double> slopes,
-			final TravelDisutilityFactory delegate) {
-		this(
-			new DenivelationAlongRouteScoring( null , slopes , null , null , betaGain ),
-			delegate );
-	}
-
-	public SlopeAwareTravelDisutilityFactory(
-			final DenivelationAlongRouteScoring slopeScoring,
+			final LinkSlopeScorer slopeScoring,
 			final TravelDisutilityFactory delegate) {
 		this.delegateFactory = delegate;
 		this.slopeScoring = slopeScoring;

@@ -87,7 +87,7 @@ public class RunConfigurableBikeSharingSimulation {
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
-					0 ) );
+					null ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:

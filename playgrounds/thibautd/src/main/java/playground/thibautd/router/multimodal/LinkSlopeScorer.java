@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DenivelationAlongRouteScoring.java
+ * LinkSlopeScorer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,53 +19,37 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * @author thibautd
  */
-public class DenivelationAlongRouteScoring implements BasicScoring {
-	private final LinkSlopeScorer scorer;
+public class LinkSlopeScorer {
+	final Network network;
+	final Map<Id<Link>, Double> linkSlopes;
+	final double betaGain;
 
-	private final Plan plan;
-	private final String mode;
-	private double score = Double.NaN;
-
-	public DenivelationAlongRouteScoring(
-			final LinkSlopeScorer scorer,
-			final Plan plan,
-			final String mode) {
-		this.scorer = scorer;
-		this.plan = plan;
-		this.mode = mode;
+	public LinkSlopeScorer(
+			final Network network,
+			final Map<Id<Link>, Double> linkSlopes,
+			final double betaGain ) {
+		if ( betaGain > 0 ) throw new IllegalArgumentException( "elevation gain is assumed to have negative utility. Got "+betaGain );
+		this.betaGain = betaGain;
+		this.network = network;
+		this.linkSlopes = linkSlopes;
 	}
 
-	@Override
-	public void finish() {}
+	public double calcGainUtil( final Id<Link> link ) {
+		return calcGainUtil( network.getLinks().get( link ) );
+	}
 
-	@Override
-	public double getScore() {
-		if ( !Double.isNaN( score ) ) return score;
-
-		score = 0;
-		for ( Leg l : TripStructureUtils.getLegs( plan ) ) {
-			if ( !l.getMode().equals( mode ) ) continue;
-			final NetworkRoute route = (NetworkRoute) l.getRoute();
-
-			for ( Id<Link> linkId : route.getLinkIds() ) {
-				score += scorer.calcGainUtil(linkId );
-			}
-
-			score += scorer.calcGainUtil( route.getEndLinkId() );
-		}
-
-		return score;
+	public double calcGainUtil( final Link link ) {
+		final double gain = link.getLength() * linkSlopes.get( link.getId() );
+		return betaGain * Math.max( 0 , gain );
 	}
 }
 

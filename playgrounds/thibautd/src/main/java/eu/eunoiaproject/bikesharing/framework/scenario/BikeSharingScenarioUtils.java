@@ -49,6 +49,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFactory;
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
 import playground.thibautd.utils.CollectionUtils;
 
@@ -153,7 +154,7 @@ public class BikeSharingScenarioUtils {
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
 			final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
-			final double utilityGain_m ) {
+			final LinkSlopeScorer scorer ) {
 		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
@@ -183,19 +184,17 @@ public class BikeSharingScenarioUtils {
 				disutilityFactory,
 				new BikeSharingTripRouterFactory( scenario ) );
 
-		if ( utilityGain_m != 0 ) {
+		if ( scorer != null ) {
 			fact.setDisutilityFactoryForMode(
 					TransportMode.bike,
 					createSlopeAwareDisutilityFactory(
-						utilityGain_m,
-						linkSlopes,
+						scorer,
 						TransportMode.bike ) );
 
 			fact.setDisutilityFactoryForMode(
 					BikeSharingConstants.MODE,
 					createSlopeAwareDisutilityFactory(
-						utilityGain_m,
-						linkSlopes,
+						scorer,
 						BikeSharingConstants.MODE ) );
 		}
 
@@ -203,12 +202,10 @@ public class BikeSharingScenarioUtils {
 	}
 
 	private static TravelDisutilityFactory createSlopeAwareDisutilityFactory(
-			final double utilityGain_m,
-			final Map<Id<Link>, Double> linkSlopes,
+			final LinkSlopeScorer scorer,
 			final String mode ) {
 		return new SlopeAwareTravelDisutilityFactory(
-				utilityGain_m,
-				linkSlopes,
+				scorer,
 				new TravelDisutilityFactory() {
 					@Override
 					public TravelDisutility createTravelDisutility(

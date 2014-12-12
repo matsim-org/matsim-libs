@@ -20,11 +20,14 @@
 package playground.thibautd.eunoia.run;
 
 import java.io.File;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
@@ -40,6 +43,7 @@ import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import playground.thibautd.utils.SoftCache;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
@@ -111,12 +115,17 @@ public class RunZurichBikeSharingSimulation {
 					 utilTravelBike_s * 
 						(denivelationConfig.getEquivalentDistanceForAltitudeGain() /
 						refBikeSpeed);
+		final LinkSlopeScorer slopeScorer = 
+			new LinkSlopeScorer(
+					sc.getNetwork(),
+					(Map<Id<Link>, Double>) sc.getScenarioElement( BikeSharingScenarioUtils.LINK_SLOPES_ELEMENT_NAME ),
+					utilGain_m );
 
 		controler.setTripRouterFactory(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
-					utilGain_m ) );
+					slopeScorer ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
@@ -132,7 +141,7 @@ public class RunZurichBikeSharingSimulation {
 		controler.setScoringFunctionFactory(
 				new Matsim2010BikeSharingScoringFunctionFactory(
 					sc,
-					utilGain_m ) );
+					slopeScorer ) );
 						
 		Matsim2030Utils.loadControlerListeners( controler );
 

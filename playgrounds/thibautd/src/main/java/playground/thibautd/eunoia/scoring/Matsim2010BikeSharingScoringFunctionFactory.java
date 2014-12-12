@@ -19,12 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.scoring;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -35,10 +31,10 @@ import org.matsim.pt.PtConstants;
 
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.router.multimodal.DenivelationAlongRouteScoring;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 
@@ -48,11 +44,11 @@ import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunctionFactory {
 	private final MATSim2010ScoringFunctionFactory delegate;
 	private final Scenario scenario;
-	private double betaGain_m;
+	private final LinkSlopeScorer scorer;
 
 	public Matsim2010BikeSharingScoringFunctionFactory(
 			final Scenario scenario,
-			final double betaGain_m ) {
+			final LinkSlopeScorer scorer ) {
 		this.delegate =
 			new MATSim2010ScoringFunctionFactory(
 					scenario,
@@ -61,7 +57,7 @@ public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunct
 						PtConstants.TRANSIT_ACTIVITY_TYPE,
 						BikeSharingConstants.INTERACTION_TYPE ) ); 	
 		this.scenario = scenario;
-		this.betaGain_m = betaGain_m;
+		this.scorer = scorer;
 	}
 
 	@Override
@@ -88,11 +84,9 @@ public class Matsim2010BikeSharingScoringFunctionFactory implements ScoringFunct
 			final Plan plan,
 			final String mode) {
 		return new DenivelationAlongRouteScoring(
-			scenario.getNetwork(),
-			(Map<Id<Link>, Double>) scenario.getScenarioElement( BikeSharingScenarioUtils.LINK_SLOPES_ELEMENT_NAME ),
-			plan,
-			mode,
-			betaGain_m );
+				scorer,
+				plan,
+				mode);
 	}
 }
 
