@@ -110,8 +110,8 @@ public class GenerateFundamentalDiagramData {
 	public static void main(String[] args) {
 
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
-		String OUTPUT_FOLDER ="/run306/";
-		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "false", "false","15.","true"};
+		String OUTPUT_FOLDER ="/run304_2/";
+		args = new String [] {"true", RUN_DIR+OUTPUT_FOLDER, "true", "true","15.","false"};
 
 		String [] travelModes= {"car","bike"};
 		Double [] modalSplit = {0.5,0.5};
@@ -126,7 +126,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(args[1]);
 		generateFDData.setUseHoles(Boolean.valueOf(args[2]));
-		generateFDData.setReduceDataPointsByFactor(30);
+		generateFDData.setReduceDataPointsByFactor(10);
 		generateFDData.setUsingSeepNetworkFactory(Boolean.valueOf(args[3]));
 		HOLE_SPEED = args[4];
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
@@ -303,6 +303,7 @@ public class GenerateFundamentalDiagramData {
 			this.STARTING_POINT [ii] =0;
 			this.Step_Size [ii] = this.reduceDataPointsByFactor*1;
 		}
+		this.STARTING_POINT = new Integer[] {370,1100};
 		
 		MAX_AGENT_DISTRIBUTION = new Integer [TRAVELMODES.length];
 		for(int ii=0;ii<MAX_AGENT_DISTRIBUTION.length;ii++){
@@ -330,7 +331,8 @@ public class GenerateFundamentalDiagramData {
 			numberOfPoints *= (int) Math.floor((MAX_AGENT_DISTRIBUTION[jj]-STARTING_POINT[jj])/Step_Size[jj])+1;
 		}
 		
-		if(numberOfPoints > 1000) log.warn("Total number of points to run is "+numberOfPoints+". This may take long time. For lesser time to get the data reduce data points by some factor.");
+		if(numberOfPoints > 1000) log.warn("Total number of points to run is "+numberOfPoints+". This may take long time. "
+				+ "For lesser time to get the data reduce data points by some factor.");
 
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(Arrays.asList(MAX_AGENT_DISTRIBUTION), Arrays.asList(Step_Size), STARTING_POINT);
@@ -361,8 +363,7 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(this.scenario, this.mode2FlowData);
-		//		this.modesData = fundiN.getModesData();
-		//		funfunfun = fundiN;
+
 		events.addHandler(globalFlowDynamicsUpdator);
 
 		if(writeInputFiles){

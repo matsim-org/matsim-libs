@@ -68,7 +68,7 @@ public class InputsForFDTestSetUp {
 	private  final int LINK_CAPACITY = 2700;//in PCU/h
 	private  final double END_TIME = 24*3600;
 	private final  double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	private final  double STUCK_TIME = 60;
+	private final  double STUCK_TIME = 10;
 	
 	private Scenario scenario;
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;

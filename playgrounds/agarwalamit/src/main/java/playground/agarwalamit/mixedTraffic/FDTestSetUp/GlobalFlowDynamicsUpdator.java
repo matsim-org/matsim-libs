@@ -45,7 +45,6 @@ import org.matsim.vehicles.VehicleType;
 
 class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
-
 	private Scenario scenario;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private TravelModesFlowDynamicsUpdator globalFlowData;
@@ -81,7 +80,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 		this.permanentRegime = false;
 	}
 
-
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (!(permanentRegime)){
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());

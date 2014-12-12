@@ -310,12 +310,4 @@ import org.matsim.vehicles.VehicleType;
 	public int getNumberOfDrivingAgents() {
 		return this.lastSeenOnStudiedLinkEnter.size();
 	}
-	
-	public Map<Id<Person>, Double> getLastSeenOnStudiedLinkEnter() {
-		return lastSeenOnStudiedLinkEnter;
-	}
-
-	public List<Double> getSpeedTable() {
-		return this.speedTable;
-	}
 }
