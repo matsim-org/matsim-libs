@@ -320,7 +320,8 @@ public class TXTReader {
 		logger.info("Population size = " + persons.size());
 		
 		logger.info("Initializing target distances...");
-		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+//		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
 		
 		logger.info("Deleting persons with legs more than 1000 KM...");
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);

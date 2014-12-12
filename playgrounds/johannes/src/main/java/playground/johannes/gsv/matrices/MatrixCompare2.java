@@ -44,6 +44,7 @@ import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -58,19 +59,20 @@ public class MatrixCompare2 {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "456";
+		String runId = "494";
 		
 		ODMatrixXMLReader reader = new ODMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse("/home/johannes/gsv/matrices/itp.xml");
 		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
-//		MatrixOpertaions.applyFactor(m1, 1/365.0);
+		MatrixOpertaions.applyFactor(m1, 1/365.0);
 		
 		reader = new ODMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/"+runId+".miv.xml");
+		reader.parse("/home/johannes/gsv/matrices/miv."+runId+".xml");
 		KeyMatrix m2 = reader.getMatrix().toKeyMatrix("gsvId");
 		MatrixOpertaions.applyFactor(m2, 11.0);
+		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
 		
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
@@ -190,7 +192,8 @@ public class MatrixCompare2 {
 				Point pi = zones.get(i).getGeometry().getCentroid();
 				Point pj = zones.get(j).getGeometry().getCentroid();
 				
-				double d = CartesianDistanceCalculator.getInstance().distance(pi, pj);
+//				double d = CartesianDistanceCalculator.getInstance().distance(pi, pj);
+				double d = WGS84DistanceCalculator.getInstance().distance(pi, pj);
 				m_d.set(i, j, d);
 			}
 		}

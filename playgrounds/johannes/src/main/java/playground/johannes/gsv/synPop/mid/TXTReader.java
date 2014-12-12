@@ -149,7 +149,7 @@ public class TXTReader {
 			ProxyPerson person = persons.get(id);
 			
 			ProxyPlan plan = new ProxyPlan();
-			plan.setAttribute("datasource", "midjourneys");
+			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_JOUNREYS);
 			for(PlanAttributeHandler handler : planAttHandlers) {
 				handler.hanle(plan, attributes);
 			}

@@ -32,9 +32,9 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class TargetDistanceHamiltonian implements Hamiltonian {
 	
-	public static final double DEFAULT_DETOUR_FACTOR = 1.3;
+//	public static final double DEFAULT_DETOUR_FACTOR = 1.3;
 	
-	private double detourFactor = DEFAULT_DETOUR_FACTOR;
+//	private double detourFactor = DEFAULT_DETOUR_FACTOR;
 
 	private static final Object TARGET_DISTANCE_KEY = new Object();
 
@@ -62,7 +62,8 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 //				detourFactor = - 1/600.0 * targetDistance/1000.0 + 2;
 //				detourFactor = Math.max(detourFactor, 1);
 				
-				dist = dist * detourFactor;
+//				dist = dist * detourFactor;
+				dist = dist * calcDetourFactor(dist);
 				double delta = Math.abs(dist - targetDistance)/targetDistance;
 				errSum += delta;
 			}
@@ -85,4 +86,13 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		return d;
 	}
 
+	public static double calcDetourFactor(double beeline) {
+		if(beeline < 100000) {
+			return 2.5;
+		} else if(beeline < 300000) {
+			return 1.3;
+		} else {
+			return 1.0;
+		}
+	}
 }

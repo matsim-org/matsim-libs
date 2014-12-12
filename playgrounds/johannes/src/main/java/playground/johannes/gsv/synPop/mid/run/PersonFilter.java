@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ApplySampleProbas;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
@@ -31,8 +30,6 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes

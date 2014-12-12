@@ -82,4 +82,6 @@ public interface CommonKeys {
 	public static final String SATURDAY = "sat";
 	
 	public static final String SUNDAY = "sun";
+	
+	public static final String DATA_SOURCE = "datasource";
 }

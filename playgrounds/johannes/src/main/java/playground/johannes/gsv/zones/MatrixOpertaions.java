@@ -75,6 +75,16 @@ public class MatrixOpertaions {
 		}
 	}
 
+	public static void applyDiagonalFactor(KeyMatrix m, double factor) {
+		Set<String> keys = m.keys();
+		for (String i : keys) {
+			Double val = m.get(i, i);
+			if (val != null) {
+				m.set(i, i, val * factor);
+			}
+		}
+	}
+
 	public static double sum(KeyMatrix m) {
 		double sum = 0;
 		Set<String> keys = m.keys();
@@ -82,7 +92,7 @@ public class MatrixOpertaions {
 			for (String j : keys) {
 				Double val = m.get(i, j);
 				if (val != null) {
-//					if(i == j) val = val/2.0;
+					// if(i == j) val = val/2.0;
 					sum += val;
 				}
 			}
@@ -106,7 +116,7 @@ public class MatrixOpertaions {
 		}
 		return marginals;
 	}
-	
+
 	public static TObjectDoubleHashMap<String> marginalsCol(KeyMatrix m) {
 		TObjectDoubleHashMap<String> marginals = new TObjectDoubleHashMap<>();
 		Set<String> keys = m.keys();

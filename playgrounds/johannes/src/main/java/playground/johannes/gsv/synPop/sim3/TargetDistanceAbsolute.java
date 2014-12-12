@@ -32,7 +32,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public class TargetDistanceAbsolute implements Hamiltonian {
 	
-	private final double detourFactor = TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR;
+//	private final double detourFactor = TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR;
 
 	private static final Object TARGET_DISTANCE_KEY = new Object();
 
@@ -55,7 +55,8 @@ public class TargetDistanceAbsolute implements Hamiltonian {
 				ProxyObject next = person.getPlan().getActivities().get(i);
 				
 				double dist = distance(prev, next);
-				dist = dist * detourFactor;
+//				dist = dist * detourFactor;
+				dist = dist * TargetDistanceHamiltonian.calcDetourFactor(dist);
 				double delta = Math.abs(dist - targetDistance);
 //				if(targetDistance > 1000000)
 //					System.err.println();

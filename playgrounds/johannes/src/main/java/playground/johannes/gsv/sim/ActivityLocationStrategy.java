@@ -65,7 +65,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	private String blacklist;
 
-	private double mutationError = 0.2;
+	private double mutationError = 0.1;
 
 	private ActivityFacilities facilities;
 
@@ -301,17 +301,19 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 				Plan plan = person.getSelectedPlan();
 				distances = new double[(plan.getPlanElements().size() - 1) / 2];
 				for (int i = 1; i < plan.getPlanElements().size(); i+=2) {
-					Activity prev = (Activity) plan.getPlanElements().get(i - 1);
-					Activity next = (Activity) plan.getPlanElements().get(i + 1);
+//					Activity prev = (Activity) plan.getPlanElements().get(i - 1);
+//					Activity next = (Activity) plan.getPlanElements().get(i + 1);
+//
+//					ActivityFacility origin = facilities.getFacilities().get(prev.getFacilityId());
+//					ActivityFacility target = facilities.getFacilities().get(next.getFacilityId());
+//
+//					double dx = origin.getCoord().getX() - target.getCoord().getX();
+//					double dy = origin.getCoord().getY() - target.getCoord().getY();
+//
+//					double d = Math.sqrt(dx * dx + dy * dy);
 
-					ActivityFacility origin = facilities.getFacilities().get(prev.getFacilityId());
-					ActivityFacility target = facilities.getFacilities().get(next.getFacilityId());
-
-					double dx = origin.getCoord().getX() - target.getCoord().getX();
-					double dy = origin.getCoord().getY() - target.getCoord().getY();
-
-					double d = Math.sqrt(dx * dx + dy * dy);
-
+					Leg leg = (Leg) plan.getPlanElements().get(i);
+					double d = leg.getTravelTime();
 					distances[(i - 1)/2] = d;
 				}
 

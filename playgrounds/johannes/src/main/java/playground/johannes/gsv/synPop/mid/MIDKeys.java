@@ -90,4 +90,7 @@ public interface MIDKeys {
 	public static final String NOVEMBER = "nov";
 	
 	public static final String DECEMBER = "dec";
+	
+	public static final String MID_JOUNREYS = "midjourneys";
+	
 }

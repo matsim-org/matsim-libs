@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Id;
@@ -60,6 +61,8 @@ import com.vividsolutions.jts.geom.Point;
  * 
  */
 public class Plans2Matrix {
+	
+	private static final Logger logger = Logger.getLogger(Plans2Matrix.class);
 
 	public Matrix run(Collection<Plan> plans, ZoneLayer<?> zones, ActivityFacilities facilities) {
 		Matrix m = new Matrix("1", null);
@@ -86,11 +89,16 @@ public class Plans2Matrix {
 			e1.printStackTrace();
 		}
 		int noZones = 0;
+		int legs = 0;
+		int trips = 0;
+		
 		ProgressLogger.init(plans.size(), 2, 10);
 		for (Plan plan : plans) {
 			for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
 				Leg leg = (Leg) plan.getPlanElements().get(i);
+				legs++;
 				if (leg.getMode().equalsIgnoreCase("car")) {
+					trips++;
 					Activity orig = (Activity) plan.getPlanElements().get(i - 1);
 					Activity dest = (Activity) plan.getPlanElements().get(i + 1);
 
@@ -121,7 +129,11 @@ public class Plans2Matrix {
 			ProgressLogger.step();
 		}
 
-		System.err.println(noZones + " zones not found.");
+		if(noZones > 0)
+			logger.info(String.format("%s activities could not be located in a zone.", noZones));
+		
+		logger.info(String.format("Processed %s legs.", legs));
+		logger.info(String.format("Processed %s car trips.", trips));
 
 		return m;
 	}

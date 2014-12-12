@@ -26,6 +26,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -34,6 +37,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
@@ -45,6 +50,7 @@ import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.ODMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -55,45 +61,63 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class ProxyPlans2Matrix {
 
-	private final Predicate modePredicate = new ModePredicate("car");
+	private static final Logger logger = Logger.getLogger(ProxyPlans2Matrix.class);
+	
+	private Predicate predicate;
+	
+	private MathTransform transform;
+	
+	public ProxyPlans2Matrix(Predicate predicate) {
+		setPredicate(predicate);
+		
+		
+		try {
+			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
+		} catch (FactoryException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+	
+	public void setPredicate(Predicate predicate) {
+		this.predicate = predicate;
+	}
 	
 	public ODMatrix run(Collection<ProxyPlan> plans, ZoneCollection zones, ActivityFacilities facilities) {
-		ODMatrix m = new ODMatrix();
 		
-//		MathTransform transform = null;
-//		try {
-//			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
-//		} catch (FactoryException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		
+		ODMatrix m = new ODMatrix();
 		
 		int noZones = 0;
 		
 		ProgressLogger.init(plans.size(), 2, 10);
 		
+		int legs = 0;
+		int trips = 0;
+		
 		for (ProxyPlan plan : plans) {
-			for (int i = 1; i < plan.getLegs().size(); i ++) {
+			for (int i = 1; i < plan.getLegs().size(); i++) {
 				ProxyObject leg = plan.getLegs().get(i);
 				ProxyObject prev = plan.getActivities().get(i);
 				ProxyObject next = plan.getActivities().get(i+1);
-				
-				if (modePredicate.test(leg, prev, next)) {
-					
+		
+				legs++;
+				if (predicate.test(leg, prev, next)) {
+					trips++;
 					Id<ActivityFacility> origId = Id.create(prev.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility origFac = facilities.getFacilities().get(origId);
 
 					Id<ActivityFacility> destId = Id.create(next.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility destFac = facilities.getFacilities().get(destId);
 
-//					Point origPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(origFac.getCoord()), transform);
-//					Point destPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(destFac.getCoord()), transform);
+					Coordinate c1 = new Coordinate(origFac.getCoord().getX(), origFac.getCoord().getY());
+					Coordinate c2 = new Coordinate(destFac.getCoord().getX(), destFac.getCoord().getY());
 					
-//					Zone origZone = zones.get(origPoint.getCoordinate());
-//					Zone destZone = zones.get(destPoint.getCoordinate());
-
-					Zone origZone = zones.get(new Coordinate(origFac.getCoord().getX(), origFac.getCoord().getY()));
-					Zone destZone = zones.get(new Coordinate(destFac.getCoord().getX(), destFac.getCoord().getY()));
+					CRSUtils.transformCoordinate(c1, transform);
+					CRSUtils.transformCoordinate(c2, transform);
+					
+					Zone origZone = zones.get(c1);
+					Zone destZone = zones.get(c2);
 
 					if (origZone != null && destZone != null) {
 						Double val = m.get(origZone, destZone);
@@ -110,8 +134,13 @@ public class ProxyPlans2Matrix {
 			ProgressLogger.step();
 		}
 
-		System.err.println(noZones + " zones not found.");
-
+		if(noZones > 0) {
+			logger.warn(String.format("%s activity locations could not be located in a zone.", noZones));
+		}
+	
+		logger.info(String.format("Processed %s legs.", legs));
+		logger.info(String.format("Processed %s car trips.", trips));
+		
 		return m;
 	}
 
@@ -119,15 +148,16 @@ public class ProxyPlans2Matrix {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
+		logger.info("Loading facilities...");
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(args[1]);
 
-//		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read(args[2]);
-//		ZoneCollection zones = ZoneCollectionSHPReader.read(args[2]);
+		logger.info("Loading zones...");
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get(args[2])));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 
+		logger.info("Loading persons...");
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		parser.parse(args[0]);
@@ -136,10 +166,51 @@ public class ProxyPlans2Matrix {
 		for(ProxyPerson person : parser.getPersons()) {
 			plans.add(person.getPlans().get(0));
 		}
-		
-		ODMatrix m = new ProxyPlans2Matrix().run(plans, zones, scenario.getActivityFacilities());
 
+		String outdir = args[3];
+		
+		ModePredicate modePred = new ModePredicate("car");
+		ProxyPlans2Matrix p2m = new ProxyPlans2Matrix(modePred);
+		/*
+		 * all car
+		 */
+		logger.info("Extraction total matrix...");
+		ODMatrix m = p2m.run(plans, zones, scenario.getActivityFacilities());
 		ODMatrixXMLWriter writer = new ODMatrixXMLWriter();
-		writer.write(m, args[3]);
+		writer.write(m, String.format("%s/miv.xml", outdir));
+		/*
+		 * types
+		 */
+		String[] types = new String[]{"work", "buisiness", "shop", "edu", "vacations_short", "vacations_long"};
+		for(String type : types) {
+			logger.info(String.format("Extracting matrix %s...", type));
+			PredicateANDComposite pred = new PredicateANDComposite();
+			pred.addComponent(modePred);
+			pred.addComponent(new ActivityTypePredicate(type));
+			
+			p2m.setPredicate(pred);
+			m = p2m.run(plans, zones, scenario.getActivityFacilities());
+			
+			writer.write(m, String.format("%s/miv.%s.xml", outdir, type));
+		}
+		/*
+		 * one-day leisure
+		 */
+		logger.info("Extracting matrix private...");
+		types = new String[]{"leisure", "visit", "gastro", "culture", "private", "pickdrop", "sport"};
+		PredicateORComposite predOR = new PredicateORComposite();
+		for(String type : types) {
+			predOR.addComponent(new ActivityTypePredicate(type));
+		}
+		
+		PredicateANDComposite pred = new PredicateANDComposite();
+		pred.addComponent(predOR);
+		pred.addComponent(modePred);
+		
+		p2m.setPredicate(pred);
+		m = p2m.run(plans, zones, scenario.getActivityFacilities());
+		
+		writer.write(m, String.format("%s/miv.leisure.xml", outdir));
+		
 	}
 }

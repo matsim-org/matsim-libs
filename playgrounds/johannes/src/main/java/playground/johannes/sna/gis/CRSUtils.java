@@ -147,4 +147,15 @@ public class CRSUtils {
 		Point p = geoFactory.createPoint(new Coordinate(points[0], points[1]));
 		return p;
 	}
+
+	public static void transformCoordinate(Coordinate coord, MathTransform transform) {
+		double[] points = new double[] { coord.x, coord.y };
+		try {
+			transform.transform(points, 0, points, 0, 1);
+		} catch (TransformException e) {
+			e.printStackTrace();
+		}
+		coord.x = points[0];
+		coord.y = points[1];
+	}
 }

@@ -308,12 +308,12 @@ public class MatrixCompare {
 		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
-		reader.readFile("/home/johannes/gsv/matrices/miv.435.fma");
+		reader.readFile("/home/johannes/gsv/matrices/miv.489.fma");
 //		reader.readFile("/home/johannes/gsv/matrices/netz2030.fma");
 
 		MatrixOperations.applyFactor(m1, 1 / 365.0);
-		MatrixOperations.applyFactor(m2, 11);
-		MatrixOperations.applyIntracellFactor(m2, 1.3);
+//		MatrixOperations.applyFactor(m2, 11);
+//		MatrixOperations.applyIntracellFactor(m2, 1.3);
 		
 		System.out.println(String.format("PSMobility - matrix sum: %s", MatrixOperations.sum(m1, false)));
 		System.out.println(String.format("Matsim - matrix sum: %s", MatrixOperations.sum(m2, false)));

@@ -51,10 +51,10 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	
 	private final DistanceCalculator dCalc = OrthodromicDistanceCalculator.getInstance();
 	
-	private final double detourFactor;
+//	private final double detourFactor;
 	
-	public InitializeTargetDistance(double detourFactor) {
-		this.detourFactor = detourFactor;
+	public InitializeTargetDistance() {
+//		this.detourFactor = detourFactor;
 	}
 	
 	@Override
@@ -72,7 +72,8 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 				Point dest = string2Coord(destStr);
 				
 				double d = dCalc.distance(source, dest);
-				d = d * detourFactor;
+//				d = d * detourFactor;
+				d = d * TargetDistanceHamiltonian.calcDetourFactor(d);
 				
 				leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
 			}
@@ -114,7 +115,8 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
-		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+//		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
 		
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/5.pop.dist.xml", persons);

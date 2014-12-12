@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -102,6 +103,7 @@ public class Proxy2Matsim {
 						mode = "undefined";
 					}
 					Leg leg = factory.createLeg(mode);
+					leg.setTravelTime(Double.parseDouble(proxyLeg.getAttribute(CommonKeys.LEG_DISTANCE))); //FIME: temporary hack!
 					plan.addLeg(leg);
 				}
 			}
