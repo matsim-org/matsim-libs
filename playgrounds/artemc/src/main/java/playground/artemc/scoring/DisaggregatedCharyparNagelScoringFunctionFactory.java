@@ -174,6 +174,15 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		
 				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
 			}
+		else if(simulationType.equals("heteroGammaProp") ){
+			
+			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s;
+			
+			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+			params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+	
+			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
+		}
 			
 
 		}

@@ -333,7 +333,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 			//Write Time Cost Summary File for the Last Iteration		
 			if(event.getIteration()==event.getControler().getScenario().getConfig().controler().getLastIteration()){
-				String timeCostSummaryFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostSumamry.it"+event.getIteration()+".csv";
+				String timeCostSummaryFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostSummary.it"+event.getIteration()+".csv";
 				File timeCostSummaryFile = new File( timeCostSummaryFilePath);
 
 				BufferedWriter timeCostSummaryWriter = new BufferedWriter(new FileWriter(timeCostSummaryFile));
