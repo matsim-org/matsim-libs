@@ -148,7 +148,7 @@
  *   &lt;param name="tollLinksFile" value="path/to/your/roadpricing-file.xml" /&gt;
  * &lt;/module&gt; </pre>
  * 
- *Start MATSim using the following lines of code (check {@link org.matsim.roadpricing.run.Main} in the roadpricing contrib for an up-to-date example):
+ *Start MATSim using the following lines of code (check {@link org.matsim.roadpricing.run.RoadPricingExample} in the roadpricing contrib for an up-to-date example):
  * <code>
  * <pre>
  * 	public static void main(String[] args) {
