@@ -23,6 +23,7 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -77,16 +79,18 @@ public class CadytsCarIntegrationTest {
 
 	@Test
 	public final void testInitialization() {
+		final String CADYTS_STRATEGY_NAME = "ccc";
+
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 		
 		Config config = createTestConfig(inputDir, outputDir);
 		config.controler().setLastIteration(0);
 		
-		StrategySettings strategySettingss = new StrategySettings(Id.create(1, StrategySettings.class));
-		strategySettingss.setStrategyName("ccc") ;
-		strategySettingss.setWeight(1.0) ;
-		config.strategy().addStrategySettings(strategySettingss);
+		StrategySettings strategySettings = new StrategySettings(Id.create(1, StrategySettings.class));
+		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME) ;
+		strategySettings.setWeight(1.0) ;
+		config.strategy().addStrategySettings(strategySettings);
 		
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
@@ -101,7 +105,7 @@ public class CadytsCarIntegrationTest {
 		config.getModule("cadytsCar").addParam("timeBinSize", "3600");
 		controler.addControlerListener(context) ;
 				
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
@@ -128,6 +132,8 @@ public class CadytsCarIntegrationTest {
 	//--------------------------------------------------------------
 	@Test
 	public final void testCalibrationAsScoring() throws IOException {
+		final String CADYTS_STRATEGY_NAME = "ccc";
+
 		final double beta=30. ;
 		final int lastIteration = 20 ;
 		
@@ -140,9 +146,8 @@ public class CadytsCarIntegrationTest {
 		
 		config.planCalcScore().setBrainExpBeta(beta);
 		
-		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		// strategySettings.setModuleName("ChangeExpBeta");
-		strategySettings.setStrategyName("ccc");
+		StrategySettings strategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
@@ -157,10 +162,10 @@ public class CadytsCarIntegrationTest {
 		controler.addControlerListener(cContext);
 		
 		// new PlanStrategy which does the same as above, but cleaner (getting rid of the weight which needs to be set to "0")
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration(
+				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
 						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
 		} ) ;
@@ -177,7 +182,7 @@ public class CadytsCarIntegrationTest {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(), config, cContext);
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
 				final double cadytsScoringWeight = beta*30.;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
