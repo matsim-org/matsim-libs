@@ -674,4 +674,186 @@ public class NoiseTest {
 		
 	 }
 	
+	//tests the static methods within class "noiseEquations"
+	@Test
+	public final void Test3(){
+		
+		double p = 0;
+		double pInPercent = 0;
+		double vCar = 100;
+		double vHgv = vCar;
+		
+		//test speed correction term
+		double eCar = 27.7 + 10 * Math.log10( 1 + Math.pow((0.02 * vCar), 3) );
+		double eHgv = 23.1 + 12.5 * Math.log10( vHgv );
+				
+		double expectedEcar = 37.2424250943932;
+		double expectedEhgv = 48.1;
+				
+		Assert.assertEquals("Error in deviation term for speed correction (car)", expectedEcar, eCar, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in deviation term for speed correction (car)", expectedEcar, NoiseEquations.calculateLCar(vCar), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in deviation term for speed correction (hgv)", expectedEhgv, eHgv, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in deviation term for speed correction (hgv)", expectedEhgv, NoiseEquations.calculateLHdv(vHgv), MatsimTestUtils.EPSILON);
+				
+		Assert.assertTrue("Error in deviation term for speed correction (eCar > eHgv)", eCar < eHgv);
+		
+		//test mittelungspegel and speed correction
+		
+		for(double nHgvs = 0; nHgvs < 3; nHgvs++){
+			
+			for(double nCars = 0; nCars < 3; nCars++){
+				
+				int n = (int) (nCars + nHgvs);
+				
+				if(n > 0){
+					p = nHgvs / n;
+					pInPercent = 100 * p;
+				}
+				
+				//test computation of mittelungspegel
+				double mittelungspegel = 37.3 + 10 * Math.log10( n * ( 1 + 0.082 * pInPercent ) );
+				
+				double expectedMittelungspegel = Double.NEGATIVE_INFINITY;
+				
+				if(nHgvs == 0){
+					if(nCars == 1) expectedMittelungspegel = 37.3;
+					else if(nCars == 2) expectedMittelungspegel = 40.3102999566398;
+				} else{
+					if( nHgvs == 1){
+						if( nCars == 0) expectedMittelungspegel = 46.9378782734556;
+						else if( nCars == 1) expectedMittelungspegel = 47.3860017176192;
+						else if(nCars == 2) expectedMittelungspegel = 47.7921802267018;
+					}
+					else if( nHgvs == 2){
+						if( nCars == 0) expectedMittelungspegel = 49.9481782300954;
+						else if( nCars == 1) expectedMittelungspegel = 50.1780172993023;
+						else if( nCars == 2) expectedMittelungspegel = 50.396301674259;
+					}
+				}
+				
+				Assert.assertEquals("Error while calculating Mittelungspegel for " + nCars + " car(s) and " + nHgvs + " hgv(s)!", expectedMittelungspegel, mittelungspegel, MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Error while calculating Mittelungspegel for " + nCars + " car(s) and " + nHgvs + " hgv(s)!", expectedMittelungspegel, NoiseEquations.calculateMittelungspegelLm(n, p), MatsimTestUtils.EPSILON);
+				
+				//test speed correction
+				double speedCorrection = expectedEcar - 37.3 + 10 * Math.log10( (100 + ( Math.pow(10, 0.1*(expectedEhgv - expectedEcar)) - 1 ) * pInPercent ) / (100 + 8.23*pInPercent) );
+				
+				double expectedSpeedCorrection = -0.0575749056067494;
+				
+				if(p == 1./3.) expectedSpeedCorrection = 0.956336446449128;
+				else if(p == 0.5) expectedSpeedCorrection = 1.04384127904235;
+				else if(p == 2./3.) expectedSpeedCorrection = 1.09354779994927;
+				else if( p == 1) expectedSpeedCorrection = 1.14798298974089;
+				
+				Assert.assertEquals("Error while calculating speed correction term for p = " + p + "!", expectedSpeedCorrection, speedCorrection, MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Error while calculating speed correction term for p = " + p + "!", expectedSpeedCorrection, NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHgv, p), MatsimTestUtils.EPSILON);
+
+			}
+			
+		}
+		
+		//test distance correction term
+		for(double distance = 5.; distance <= 140; distance += 45.){
+			
+			double distanceCorrection = 15.8 - 10 * Math.log10( distance ) - 0.0142 * Math.pow(distance, 0.9);
+			
+			double expectedDistanceCorrection = 0.;
+			
+			if(distance == 5) expectedDistanceCorrection = 8.74985482214084;
+			else if(distance == 50) expectedDistanceCorrection = -1.66983281320262;
+			else if(distance == 95) expectedDistanceCorrection = -4.8327746143211;
+			else if(distance == 140) expectedDistanceCorrection = -6.87412053759382;
+			
+			Assert.assertEquals("Error while calculating distance correction term!", expectedDistanceCorrection, distanceCorrection, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Error while calculating distance correction term!", expectedDistanceCorrection, NoiseEquations.calculateDistanceCorrection(distance), MatsimTestUtils.EPSILON);
+			
+		}
+		
+		//test angle correction term
+		for(double angle = 45; angle <= 360; angle += 45){
+			
+			double angleCorrection = 10 * Math.log10( angle / 180 );
+			
+			double expectedAngleCorrection = 0.;
+			
+			if(angle == 45) expectedAngleCorrection = -6.02059991327962;
+			else if(angle == 90) expectedAngleCorrection = -3.01029995663981;
+			else if(angle == 135) expectedAngleCorrection = -1.249387366083;
+			else if(angle == 180) expectedAngleCorrection = 0.;
+			else if(angle == 225) expectedAngleCorrection = 0.969100130080564;
+			else if(angle == 270) expectedAngleCorrection = 1.76091259055681;
+			else if(angle == 315) expectedAngleCorrection = 2.43038048686294;
+			else if(angle == 360) expectedAngleCorrection = 3.01029995663981;
+			
+			Assert.assertEquals("Error while calculating angle correction term!", expectedAngleCorrection, angleCorrection, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Error while calculating angle correction term!", expectedAngleCorrection, NoiseEquations.calculateAngleCorrection(angle), MatsimTestUtils.EPSILON);
+			
+		}
+		
+		//test resulting noise immission
+		double distance1 = 120;
+		double angle1 = 120;
+		double emission1 = 49;
+		double distance2 = 5;
+		double angle2 = 234;
+		double emission2 = 0.;
+		double distance3 = 399;
+		double angle3 = 10;
+		double emission3 = 50;
+		
+		double distanceCorrection1 = 15.8 - 10 * Math.log10( distance1 ) - 0.0142 * Math.pow(distance1, 0.9);
+		double angleCorrection1 = 10 * Math.log10( angle1 / 180 );
+		double distanceCorrection2 = 15.8 - 10 * Math.log10( distance2 ) - 0.0142 * Math.pow(distance2, 0.9);
+		double angleCorrection2 = 10 * Math.log10( angle2 / 180 );
+		double distanceCorrection3 = 15.8 - 10 * Math.log10( distance3 ) - 0.0142 * Math.pow(distance3, 0.9);
+		double angleCorrection3 = 10 * Math.log10( angle3 / 180 );
+		
+		double i1 = emission1 + distanceCorrection1 + angleCorrection1;
+		double i2 = emission2 + distanceCorrection2 + angleCorrection2;
+		double i3 = emission3 + distanceCorrection3 + angleCorrection3;
+		
+		double[] immissionsArray = {i1,i2,i3};
+		
+		List<Double> immissions = new ArrayList<Double>();
+		immissions.add(i1);
+		immissions.add(i2);
+		immissions.add(i3);
+		
+		double tmp = 0.;
+		
+		for(double d : immissionsArray){
+			tmp += Math.pow(10, 0.1*d);
+		}
+		
+		double resultingNoiseImmission = 10*Math.log10(tmp);
+		double expectedResultingNoiseImmission = 41.279204220881;
+		
+		Assert.assertEquals("Error in noise immission calculation!", expectedResultingNoiseImmission, resultingNoiseImmission, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in noise immission calculation!", expectedResultingNoiseImmission, NoiseEquations.calculateResultingNoiseImmission(immissions), MatsimTestUtils.EPSILON);
+		
+		//test noise damage
+		double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+		
+		double thresholdDay = 50;
+		double thresholdEvening = 45;
+		double thresholdNight = 40;
+		
+		int nPersons = 4;
+		
+		double costsDay = resultingNoiseImmission > thresholdDay ? annualCostRate * 3600/(365*24) * nPersons/3600 * Math.pow(2, 0.1 * (resultingNoiseImmission - thresholdDay)) : 0.;
+		double costsEvening = resultingNoiseImmission > thresholdEvening ? annualCostRate * 3600/(365*24) * nPersons/3600 * Math.pow(2, 0.1 * (resultingNoiseImmission - thresholdEvening)) : 0.;
+		double costsNight = resultingNoiseImmission > thresholdNight ? annualCostRate * 3600/(365*24) * nPersons/3600 * Math.pow(2, 0.1 * (resultingNoiseImmission - thresholdNight)) : 0.;
+		
+		double expectedCostsDay = 0.;
+		double expectedCostsEvening = 0.;
+		double expectedCostsNight = 0.031590380365211;
+		
+		Assert.assertEquals("Error in damage calculation!", expectedCostsDay, costsDay , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsDay, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 7.*3600, annualCostRate, 3600.) , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, costsEvening, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 19.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, costsNight, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
+		
+	}
+	
 }
