@@ -657,6 +657,15 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			this.config = new TransitRouterConfig( scenario.getConfig() );
 			this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
 		}
+
+		public RoutingData(
+				final Scenario scenario,
+				final TransitRouterNetwork routingNetwork) {
+			this.scenario = scenario;
+			this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
+			this.config = new TransitRouterConfig( scenario.getConfig() );
+			this.transitNetwork = routingNetwork;
+		}
 	}
 }
 

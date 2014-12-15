@@ -55,15 +55,26 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	private final TransitMultiModalAccessRoutingModule.RoutingData data;
 
 	public BikeSharingTripRouterFactory(
+			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
 			final TripRouterFactory delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this.delegate = delegate;
 		this.scenario = scenario;
-		this.data = scenario.getConfig().scenario().isUseTransit() ?
-					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
-					null;
+		this.data = routingData;
 		this.slopeScorer = slopeScorer;
+	}
+
+	public BikeSharingTripRouterFactory(
+			final TripRouterFactory delegate,
+			final Scenario scenario,
+			final LinkSlopeScorer slopeScorer) {
+		this( scenario.getConfig().scenario().isUseTransit() ?
+					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
+					null,
+			delegate,
+			scenario,
+			slopeScorer );
 	}
 
 	public BikeSharingTripRouterFactory(
