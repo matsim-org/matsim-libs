@@ -20,7 +20,6 @@
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -35,16 +34,11 @@ class MyPlanSelector implements PlanSelector,
 ActivityEndEventHandler // as an example
 {
 	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
-	private Scenario sc;
-
-	MyPlanSelector( Scenario scenario ) {
-		this.sc = scenario ;
-	}
 
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
-		log.error("calling selectPlan") ;
-		return null ;
+		log.error("calling selectPlan. Just selecting the first plan as an example.") ;
+		return person.getPlans().get(0);
 	}
 
 	@Override

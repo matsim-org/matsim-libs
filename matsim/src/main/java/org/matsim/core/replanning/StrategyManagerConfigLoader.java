@@ -32,9 +32,6 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Loads the strategy modules specified in the config-file. This class offers
  * backwards-compatibility to the old StrategyManager where the complete class-
@@ -53,89 +50,72 @@ public final class StrategyManagerConfigLoader {
 		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
         PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
         PlanSelectorFactoryRegister planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
-		load(controler.getScenario(), controler.getControlerIO(), controler.getEvents(), manager, planStrategyFactoryRegister, planSelectorFactoryRegister);
+		load(controler.getInjector(), planStrategyFactoryRegister, planSelectorFactoryRegister, manager);
 	}
 
-	public static void load(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister, PlanSelectorFactoryRegister planSelectorFactoryRegister) {
-		Config config = scenario.getConfig();
-		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
-		
-		int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration()) 
-				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
-		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
+    public static void load(Injector injector, PlanStrategyFactoryRegister planStrategyFactoryRegister, PlanSelectorFactoryRegister planSelectorFactoryRegister, StrategyManager manager) {
+        Config config = injector.getInstance(Config.class);
+        manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
-		manager.setSubpopulationAttributeName(
-				config.plans().getSubpopulationAttributeName() );
-		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
-			double rate = settings.getWeight();
-			if (rate == 0.0) {
-				continue;
-				// yyyy is this so practical?  Some people might want to instantiate it, and set the rate/probability/weight to something different
-				// from zero at a later iteration.  (Not possible from config, but possible in code.)  kai, nov'13
-				// yy It is neither a rate nor a probability, since either would need to be normalized. kai, nov'13
-			}
-			String moduleName = settings.getStrategyName();
+        int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration())
+                * config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
+        log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-			if (moduleName.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
-				moduleName = moduleName.replace("org.matsim.demandmodeling.plans.strategies.", "");
-			}
+        manager.setSubpopulationAttributeName(
+                config.plans().getSubpopulationAttributeName());
+        for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
+            String moduleName = settings.getStrategyName();
 
-			PlanStrategy strategy = loadStrategy(scenario, controlerIO, events, moduleName, settings, planStrategyFactoryRegister);
+            PlanStrategy strategy = loadStrategy(moduleName, settings, planStrategyFactoryRegister, injector);
 
-			if (strategy == null) {
-				throw new RuntimeException("Could not initialize strategy named " + moduleName);
-			}
+            if (strategy == null) {
+                throw new RuntimeException("Could not initialize strategy named " + moduleName);
+            }
 
-			manager.addStrategy(strategy, settings.getSubpopulation() , rate);
+            manager.addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
 
-			// now check if this modules should be disabled after some iterations
-			int maxIter = settings.getDisableAfter();
-			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
-				if (!PlanStrategies.isOnlySelector(strategy)) {
-					maxIter = globalInnovationDisableAfter ;
-				}
-			}
+            // now check if this modules should be disabled after some iterations
+            int maxIter = settings.getDisableAfter();
+            if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
+                if (!PlanStrategies.isOnlySelector(strategy)) {
+                    maxIter = globalInnovationDisableAfter ;
+                }
+            }
 
-			if (maxIter >= 0) {
-				if (maxIter >= config.controler().getFirstIteration()) {
-					manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation() , 0.0);
-				} else {
-					/* The controler starts at a later iteration than this change request is scheduled for.
-					 * make the change right now.					 */
-					manager.changeWeightOfStrategy(strategy, settings.getSubpopulation() , 0.0);
-				}
-			}
-		}
-		String name = config.strategy().getPlanSelectorForRemoval();
-		if ( name != null ) {
-			// ``manager'' has a default setting.
-			GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.getInstance(name).createPlanSelector(scenario);
-			manager.setPlanSelectorForRemoval(planSelector) ;
-		}
-	}
+            if (maxIter >= 0) {
+                if (maxIter >= config.controler().getFirstIteration()) {
+                    manager.addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation(), 0.0);
+                } else {
+                    /* The controler starts at a later iteration than this change request is scheduled for.
+                     * make the change right now.					 */
+                    manager.changeWeightOfStrategy(strategy, settings.getSubpopulation(), 0.0);
+                }
+            }
+        }
+        String name = config.strategy().getPlanSelectorForRemoval();
+        if ( name != null ) {
+            // ``manager'' has a default setting.
+            GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.getInstance(name).createPlanSelector(injector.getInstance(Scenario.class));
+            manager.setPlanSelectorForRemoval(planSelector) ;
+        }
+    }
 
-	private static PlanStrategy loadStrategy(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
-		// Special cases, scheduled to go away.
-//		if (name.equals(LOCATION_CHOICE)) {
-//            return tryToLoadPlanStrategyByName(scenario, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
-//		} else 
+    private static PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister, Injector injector) {
 		if (name.equals("ExternalModule")) {
 			externalCounter++;
-			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-			String exePath = settings.getExePath();
-			ExternalModule em = new ExternalModule(exePath, "ext" + externalCounter, controlerIO, scenario);
-			strategy.addStrategyModule(em);
-			return strategy;
+            String exePath = settings.getExePath();
+            PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+            builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, injector.getInstance(OutputDirectoryHierarchy.class), injector.getInstance(Scenario.class)));
+			return builder.build();
 		} else if (name.contains(".")) {
-            return tryToLoadPlanStrategyByName(scenario, name);
+            return tryToLoadPlanStrategyByName(name, injector);
 		} else {
 			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-            return planStrategyFactory.createPlanStrategy(scenario, events);
+            return planStrategyFactory.createPlanStrategy(injector.getInstance(Scenario.class), injector.getInstance(EventsManager.class));
 		} 
 	} 
 
-
-	private static PlanStrategy tryToLoadPlanStrategyByName(final Scenario scenario, final String name) {
+	private static PlanStrategy tryToLoadPlanStrategyByName(final String name, Injector injector) {
 		PlanStrategy strategy;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
@@ -143,12 +123,9 @@ public final class StrategyManagerConfigLoader {
 		} else {
 			try {
 				Class<?> klas = Class.forName(name);
-				Constructor<?> c = klas.getConstructor(Scenario.class);
-				strategy = (PlanStrategy) c.newInstance(scenario);
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				throw new RuntimeException(e);
-			} catch (NoSuchMethodException e) {
-				log.info("Cannot find Constructor in PlanStrategy " + name + " with single argument of type Scenario. ");
+                // Instantiates the class and injects it.
+                strategy = (PlanStrategy) injector.getJITInstance(klas);
+			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
         }

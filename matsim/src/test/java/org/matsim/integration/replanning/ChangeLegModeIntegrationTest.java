@@ -21,15 +21,21 @@
 package org.matsim.integration.replanning;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PlanSelectorRegistrar;
+import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -84,11 +90,15 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		act = plan.createAndAddActivity("work", new CoordImpl(0, 500));
 		act.setLinkId(link.getId());
 
-		// setup strategy manager and load from config
-		final Controler controler = new Controler(scenario);
-		controler.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+        Injector injector = Injector.createInjector(config, new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(Scenario.class, scenario);
+                bindToInstance(EventsManager.class, EventsUtils.createEventsManager());
+            }
+        });
 		final StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(controler, manager);
+		StrategyManagerConfigLoader.load(injector, new PlanStrategyRegistrar().getFactoryRegister(), new PlanSelectorRegistrar().getFactoryRegister(), manager);
 		manager.run(population, new ReplanningContext() {
 
 			@Override

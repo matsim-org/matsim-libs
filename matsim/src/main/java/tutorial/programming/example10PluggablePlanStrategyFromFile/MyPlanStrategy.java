@@ -19,42 +19,44 @@
 
 package tutorial.programming.example10PluggablePlanStrategyFromFile;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 
+import javax.inject.Inject;
+
 
 public class MyPlanStrategy implements PlanStrategy {
-	// the reason why this class needs to be here is that this is defined in the config file
 	
-	PlanStrategyImpl planStrategyDelegate = null ;
+	private final PlanStrategy planStrategyDelegate;
 
-	public MyPlanStrategy(Controler controler) {
-		// also possible: MyStrategy( Scenario scenario ).  But then I do not have events.  kai, aug'10
-		
-		// A PlanStrategy is something that can be applied to a person(!).  
-		
-		// It first selects one of the plans:
-		MyPlanSelector planSelector = new MyPlanSelector( controler.getScenario() );
-		planStrategyDelegate = new PlanStrategyImpl( planSelector );
-		
-		// the plan selector may, at the same time, collect events:
-		controler.getEvents().addHandler( planSelector ) ;
-		
-		// if you just want to select plans, you can stop here.  
-		
-		// Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least 
-		// one module added here, then the plan is copied and then modified.
-		MyPlanStrategyModule mod = new MyPlanStrategyModule( controler ) ;
-		planStrategyDelegate.addStrategyModule(mod) ;
+	@Inject
+    MyPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+		// A PlanStrategy is something that can be applied to a Person (not a Plan).
+        // It first selects one of the plans:
+        MyPlanSelector planSelector = new MyPlanSelector();
+        PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(planSelector);
 
-		// these modules may, at the same time, be events listeners (so that they can collect information):
-		controler.getEvents().addHandler( mod ) ;
-		
+        // the plan selector may, at the same time, collect events:
+        eventsManager.addHandler(planSelector);
+
+        // if you just want to select plans, you can stop here.
+
+
+        // Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least
+        // one module added here, then the plan is copied and then modified.
+        MyPlanStrategyModule mod = new MyPlanStrategyModule(scenario);
+        builder.addStrategyModule(mod);
+
+        // these modules may, at the same time, be events listeners (so that they can collect information):
+        eventsManager.addHandler(mod);
+
+        planStrategyDelegate = builder.build();
 	}
 
 	@Override

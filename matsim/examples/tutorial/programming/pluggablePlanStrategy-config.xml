@@ -18,9 +18,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="./output/pluggable-plan-strategy" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
-		<param name="mobsim" value="queueSimulation" />
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
+		<param name="lastIteration" value="1" />
 	</module>
 
 	<module name="simulation">

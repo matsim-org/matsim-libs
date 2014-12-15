@@ -8,22 +8,19 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.ReplanningContext;
 
-public class MyPlanStrategyModule implements PlanStrategyModule,
-ActivityEndEventHandler // this is just there as an example
-{
-	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
+public class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandler {
+  	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
-	Scenario sc;
-	Network net;
-	Population pop;
+	Scenario scenario;
+	Network network;
+	Population population;
 
-	public MyPlanStrategyModule(Controler controler) {
-		this.sc = controler.getScenario();
-		this.net = this.sc.getNetwork();
-		this.pop = this.sc.getPopulation();
+	public MyPlanStrategyModule(Scenario scenario) {
+		this.scenario = scenario;
+		this.network = this.scenario.getNetwork();
+		this.population = this.scenario.getPopulation();
 	}
 
 	@Override

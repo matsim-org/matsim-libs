@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
-class Main {
+public class Main {
 
 	public static void main(final String[] args) {
 
@@ -35,6 +35,7 @@ class Main {
 		}
 
 		final Controler controler = new Controler(config);
+        controler.setOverwriteFiles(true);
 		controler.run();
 
 	}

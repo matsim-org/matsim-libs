@@ -320,6 +320,7 @@ public class Controler extends AbstractController {
                         bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
                         bindToInstance(IterationStopWatch.class, stopwatch);
                         bindToInstance(Scenario.class, scenarioData);
+                        bindToInstance(EventsManager.class, events);
                     }
                 });
         this.injector.retrofitScoringFunctionFactory(this.getScoringFunctionFactory());
@@ -445,7 +446,7 @@ public class Controler extends AbstractController {
             });
         }
 		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister);
+        StrategyManagerConfigLoader.load(injector, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister, manager);
 		return manager;
 	}
 
@@ -576,13 +577,16 @@ public class Controler extends AbstractController {
 	}
 
 	public final Scenario getScenario() {
-		return this.scenarioData ;
+		return this.scenarioData;
 	}
+
+    public final Injector getInjector() {
+        return this.injector;
+    }
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every
 	 *             iteration
-	 * @return
 	 */
 	@Deprecated
 	public final CalcLinkStats getLinkStats() {
@@ -756,8 +760,6 @@ public class Controler extends AbstractController {
 	/**
 	 * Register a {@link MobsimFactory} with a given name.
 	 *
-	 * @param mobsimName
-	 * @param mobsimFactory
 	 *
 	 * @see ControlerConfigGroup#getMobsim()
 	 */

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class Injector {
+public class Injector {
 
     private com.google.inject.Injector injector;
 
@@ -42,7 +42,7 @@ class Injector {
         this.injector = injector;
     }
 
-    static Injector createInjector(final Config config, AbstractModule... modules) {
+    public static Injector createInjector(final Config config, AbstractModule... modules) {
         com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
             @Override
             public void configure(Binder binder) {
@@ -62,8 +62,33 @@ class Injector {
         return new Injector(bootstrapInjector.createChildInjector(guiceModules));
     }
 
-    <T> T getInstance(Class<T> type) {
+    /**
+     *
+     * Returns an instance of a specified infrastructure class or interface.
+     * This so-called binding needs to have been explicitly declared in a Module at startup time.
+     * If the binding is unknown, an exception will be thrown.
+     *
+     */
+    public <T> T getInstance(Class<T> type) {
         return injector.getInstance(type);
+    }
+
+    /**
+     *
+     * Returns an instance of the specified class and injects it with infrastructure.
+     * The class needs to have either a constructor without arguments, or exactly one constructor
+     * annotated with @Inject whose parameter types are all known to this injector, i.e. it would
+     * return an instance if getInstance was called with this type.
+     * Member variables annotated with @Inject are also injected.
+     *
+     */
+    public <T> T getJITInstance(final Class<T> type) {
+        return injector.createChildInjector(new com.google.inject.AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(type);
+            }
+        }).getInstance(type);
     }
 
     Set<EventHandler> getEventHandlersDeclaredByModules() {
@@ -87,7 +112,7 @@ class Injector {
         ));
     }
 
-    public void retrofitScoringFunctionFactory(ScoringFunctionFactory scoringFunctionFactory) {
+    void retrofitScoringFunctionFactory(ScoringFunctionFactory scoringFunctionFactory) {
         injector.injectMembers(scoringFunctionFactory);
     }
 
