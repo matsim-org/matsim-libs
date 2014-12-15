@@ -36,6 +36,7 @@ public class HeteroLoop {
 	private static String output;
 	private static boolean heteroSwitch = false;
 	private static String  simulationType = "homo";
+	private static Double heterogeneityFactor = 1.0;
 
 
 	public static void main(String[] args){
@@ -45,9 +46,14 @@ public class HeteroLoop {
 		simulationTypes.add("hetero");
 		simulationTypes.add("heteroAlpha");
 		simulationTypes.add("heteroGamma");
+		simulationTypes.add("heteroAlphaProp");
 		
 		input = args[0];
 		heteroSwitch=true;
+		
+		if(args.length>2){
+			heterogeneityFactor = Double.valueOf(args[2]);			
+		}
 		
 		for(String type:simulationTypes){
 			simulationType = type;	
@@ -77,7 +83,7 @@ public class HeteroLoop {
 
 		
 		log.info("Simulation type: "+simulationType);
-		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType);
+		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType, heterogeneityFactor);
 		if(heteroSwitch)
 		{
 			log.info("Adding Heterogeneity Config...");

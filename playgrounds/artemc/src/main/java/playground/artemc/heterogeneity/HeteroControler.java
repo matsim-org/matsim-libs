@@ -34,7 +34,8 @@ public class HeteroControler {
 	private static String input;
 	private static String output;
 	private static boolean heteroSwitch = false;
-	private static String  simulationType = "homo";
+	private static String simulationType = "homo";
+	private static Double heterogeneityFactor = 1.0;
 
 
 	public static void main(String[] args){
@@ -52,6 +53,10 @@ public class HeteroControler {
 				heteroSwitch=true;
 		}
 
+		if(args.length>3){
+			heterogeneityFactor = Double.valueOf(args[3]);			
+		}
+		
 		HeteroControler  runner = new HeteroControler();
 		runner.run();
 	}
@@ -73,12 +78,13 @@ public class HeteroControler {
 
 		
 		log.info("Simulation type: "+simulationType);
-		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType);
+		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType, heterogeneityFactor);
 		if(heteroSwitch)
 		{
 			log.info("Adding Heterogeneity Config...");
 			controler.addControlerListener(heterogeneityConfig);
 			
+			log.info("Heterogeneityfactor: "+heterogeneityFactor);
 			
 			log.info("Setting TravelDisutilityFactory for heterogeneous population...");
 			//Routing Car

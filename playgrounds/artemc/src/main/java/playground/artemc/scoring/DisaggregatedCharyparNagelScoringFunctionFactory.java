@@ -192,8 +192,8 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 				
 			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
 			
-			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s;
-			params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s;
+			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * betaFactors.get(person.getId());
+			params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s * betaFactors.get(person.getId());
 			
 			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - betaFactors.get(person.getId()) * performingConst;
 			

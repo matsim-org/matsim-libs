@@ -35,6 +35,9 @@ ControlerListener {
 	static double lambda_dist = 1.0;
 	static boolean heterogeneitySwitch = false;
 	static boolean homogeneousIncomeFactorSwitch = false;
+	static double heterogeneityFactor = 1.0;
+	
+	
 
 
 	private Controler controler;
@@ -49,10 +52,11 @@ ControlerListener {
 	private HashMap<Id<Person>, Double> incomeFactors;
 	private HashMap<Id<Person>, Double> betaFactors;
 
-	public HeterogeneityConfig(String inputPath, Scenario scenario, String simulationType){
+	public HeterogeneityConfig(String inputPath, Scenario scenario, String simulationType, Double heterogeneityFactor){
 		this.inputPath = inputPath;
 		this.scenario = scenario;
 		this.simulationType = simulationType;
+		this.heterogeneityFactor = heterogeneityFactor;
 
 		//Initialize all maps
 		this.incomeFactors = new HashMap<Id<Person>, Double>();
@@ -126,7 +130,7 @@ ControlerListener {
 		Double factoreMean = 0.0;
 		for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
 			Integer personIncome = (int) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), "income");
-			double incomeFactor = Math.pow((double) personIncome/mean,this.getLambda_income());
+			double incomeFactor = Math.pow((double) personIncome/mean,(this.getLambda_income()*this.heterogeneityFactor));
 			incomeFactors.put(personId, incomeFactor);
 			factorSum = factorSum + incomeFactor;
 		}
