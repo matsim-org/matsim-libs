@@ -57,6 +57,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	private final PlanCalcScoreConfigGroup config;
 	private HashMap<Id, ScoringFunction> personScoringFunctions;
 	private HashMap<Id<Person>, Double> incomeFactors = null;
+	private HashMap<Id<Person>, Double> betaFactors = null;
 	private String simulationType;
 
 
@@ -71,6 +72,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
 		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
+		this.betaFactors = heterogeneityConfig.getBetaFactors();
 		this.simulationType = heterogeneityConfig.getSimulationType();
 	}
 
@@ -182,6 +184,22 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
 	
 			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
+		}
+		
+		else if(simulationType.equals("heteroAlphaProp") ){
+			
+			double performingConst = 	params.marginalUtilityOfPerforming_s;
+				
+			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+			
+			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s;
+			params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s;
+			
+			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - betaFactors.get(person.getId()) * performingConst;
+			
+			for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
+				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
+			}
 		}
 			
 
