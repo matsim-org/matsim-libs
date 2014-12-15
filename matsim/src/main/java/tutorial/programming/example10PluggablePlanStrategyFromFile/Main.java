@@ -35,7 +35,6 @@ public class Main {
 		}
 
 		final Controler controler = new Controler(config);
-        controler.setOverwriteFiles(true);
 		controler.run();
 
 	}

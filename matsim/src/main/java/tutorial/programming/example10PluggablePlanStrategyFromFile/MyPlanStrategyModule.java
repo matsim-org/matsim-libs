@@ -10,14 +10,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 
-public class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandler {
+class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandler {
   	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
 	Scenario scenario;
 	Network network;
 	Population population;
 
-	public MyPlanStrategyModule(Scenario scenario) {
+	MyPlanStrategyModule(Scenario scenario) {
 		this.scenario = scenario;
 		this.network = this.scenario.getNetwork();
 		this.population = this.scenario.getPopulation();

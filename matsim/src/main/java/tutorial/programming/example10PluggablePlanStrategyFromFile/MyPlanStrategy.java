@@ -31,11 +31,11 @@ import org.matsim.core.replanning.ReplanningContext;
 import javax.inject.Inject;
 
 
-public class MyPlanStrategy implements PlanStrategy {
+class MyPlanStrategy implements PlanStrategy {
 	
 	private final PlanStrategy planStrategyDelegate;
 
-	@Inject
+	@Inject // The constructor must be annotated so that the framework knows which one to use.
     MyPlanStrategy(Scenario scenario, EventsManager eventsManager) {
 		// A PlanStrategy is something that can be applied to a Person (not a Plan).
         // It first selects one of the plans:
