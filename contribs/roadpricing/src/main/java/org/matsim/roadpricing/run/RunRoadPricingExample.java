@@ -32,7 +32,8 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
  * @author nagel
  *
  */
-public class RoadPricingExample {
+final class RunRoadPricingExample {
+	// to not change class name: referenced from book.  kai, dec'14
 
 	public static void main(String[] args) {
 		// load the config, telling it to "materialize" the road pricing section:
