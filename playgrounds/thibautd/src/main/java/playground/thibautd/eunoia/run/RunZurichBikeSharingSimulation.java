@@ -126,7 +126,8 @@ public class RunZurichBikeSharingSimulation {
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					slopeScorer,
-					null ) );
+					null,
+					false ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:

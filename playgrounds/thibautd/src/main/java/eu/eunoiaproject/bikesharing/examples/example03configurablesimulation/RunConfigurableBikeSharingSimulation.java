@@ -33,11 +33,14 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.thibautd.utils.SoftCache;
@@ -85,6 +88,7 @@ public class RunConfigurableBikeSharingSimulation {
 		config.addModule( relocationGroup );
 
 		final Scenario sc = BikeSharingScenarioUtils.loadScenario( config );
+		loadTransitInScenario( sc );
 
 		final Controler controler = new Controler( sc );
 
@@ -94,7 +98,8 @@ public class RunConfigurableBikeSharingSimulation {
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					null,
-					ptRouting ) );
+					ptRouting,
+					thinnedNetworkGroup.isTeleportRatherThanSimulate() ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
@@ -132,6 +137,37 @@ public class RunConfigurableBikeSharingSimulation {
 		final File file = new File( outdir +"/" );
 		if ( file.exists() && file.list().length > 0 ) {
 			throw new UncheckedIOException( "Directory "+outdir+" exists and is not empty!" );
+		}
+	}
+
+	private static final void loadTransitInScenario( final Scenario scenario ) {
+		final Config config = scenario.getConfig();
+		// if actual simulation of transit is disabled, the transit schedule
+		// is not loaded automatically: we need to do it by hand
+		if ( !config.scenario().isUseTransit() ) {
+			if ( config.transit().getTransitScheduleFile() == null ) {
+				log.info( "no schedule file defined in config: not loading any schedule information" );
+				return;
+			}
+
+			((ScenarioImpl) scenario).createTransitSchedule();
+			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
+			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
+
+			// this is not necessary in the vast majority of applications.
+			if ( config.transit().getTransitLinesAttributesFile() != null ) {
+				log.info("loading transit lines attributes from " + config.transit().getTransitLinesAttributesFile());
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitLinesAttributes() ).parse(
+						config.transit().getTransitLinesAttributesFile() );
+			}
+			if ( config.transit().getTransitStopsAttributesFile() != null ) {
+				log.info("loading transit stop facilities attributes from " + config.transit().getTransitStopsAttributesFile() );
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitStopsAttributes() ).parse(
+						config.transit().getTransitStopsAttributesFile() );
+			}
+		}
+		else {
+			log.info( "Transit will be simulated." );
 		}
 	}
 

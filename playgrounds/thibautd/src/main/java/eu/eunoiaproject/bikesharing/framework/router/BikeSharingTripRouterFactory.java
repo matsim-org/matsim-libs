@@ -47,6 +47,8 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
  * @author thibautd
  */
 public class BikeSharingTripRouterFactory implements TripRouterFactory {
+	
+	private boolean routePtUsingSchedule = false;
 
 	private final TripRouterFactory delegate;
 	private final Scenario scenario;
@@ -109,7 +111,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 					configGroup.getSearchRadius(),
 					router) );
 
-		if ( scenario.getConfig().scenario().isUseTransit() ) {
+		if ( routePtUsingSchedule || scenario.getConfig().scenario().isUseTransit() ) {
 			// XXX should be person-dependent
 			final CharyparNagelScoringParameters scoringParams =
 					new CharyparNagelScoringParameters(
@@ -164,5 +166,9 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 			final String mode) {
 		for ( String m : modes ) if ( mode.equals( m ) ) return true;
 		return false;
+	}
+
+	public void setRoutePtUsingSchedule( boolean routePtUsingSchedule ) {
+		this.routePtUsingSchedule = routePtUsingSchedule;
 	}
 }

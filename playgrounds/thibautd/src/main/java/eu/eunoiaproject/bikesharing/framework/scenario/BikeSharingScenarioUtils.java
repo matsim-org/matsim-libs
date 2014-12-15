@@ -156,7 +156,8 @@ public class BikeSharingScenarioUtils {
 			final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
 			final LinkSlopeScorer scorer,
-			final RoutingData routingData ) {
+			final RoutingData routingData,
+			final boolean forceScheduleRouting ) {
 		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
@@ -178,12 +179,8 @@ public class BikeSharingScenarioUtils {
 			new MultiModalTravelTimeFactory(
 					scenario.getConfig(),
 					linkSlopes );
-	
-		final AccessEgressMultimodalTripRouterFactory fact =
-			new AccessEgressMultimodalTripRouterFactory(
-				scenario,
-				multiModalTravelTimeFactory.createTravelTimes(),
-				disutilityFactory,
+
+		final BikeSharingTripRouterFactory bsFact =
 				routingData == null ?
 					new BikeSharingTripRouterFactory(
 						scenario,
@@ -191,7 +188,15 @@ public class BikeSharingScenarioUtils {
 					new BikeSharingTripRouterFactory(
 						routingData,
 						scenario,
-						scorer ) );
+						scorer );
+		bsFact.setRoutePtUsingSchedule( forceScheduleRouting );
+	
+		final AccessEgressMultimodalTripRouterFactory fact =
+			new AccessEgressMultimodalTripRouterFactory(
+				scenario,
+				multiModalTravelTimeFactory.createTravelTimes(),
+				disutilityFactory,
+				bsFact );
 
 		if ( scorer != null ) {
 			fact.setDisutilityFactoryForMode(
