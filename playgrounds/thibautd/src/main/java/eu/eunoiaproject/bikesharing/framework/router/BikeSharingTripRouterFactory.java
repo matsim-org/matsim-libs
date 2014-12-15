@@ -132,16 +132,16 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 								scoringParams ) {
 							@Override
 							protected double calcCost( final List<? extends PlanElement> trip ) {
-								double baseScore = super.calcCost( trip );
-								if ( slopeScorer == null ) return baseScore;
+								double baseCost = super.calcCost( trip );
+								if ( slopeScorer == null ) return baseCost;
 
 								for ( PlanElement pe : trip ) {
 									if ( pe instanceof Leg && ((Leg) pe).getMode().equals( BikeSharingConstants.MODE ) ) {
-										baseScore += slopeScorer.calcGainUtil( (NetworkRoute) ((Leg) pe).getRoute() );
+										baseCost -= slopeScorer.calcGainUtil( (NetworkRoute) ((Leg) pe).getRoute() );
 									}
 								}
 
-								return baseScore;
+								return baseCost;
 							}
 						});
 			}
