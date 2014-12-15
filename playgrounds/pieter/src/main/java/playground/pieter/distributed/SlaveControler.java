@@ -572,6 +572,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
+        StopStopTimeCalculatorSerializable.printCallStatisticsAndReset();
+        WaitTimeCalculatorSerializable.printCallStatisticsAndReset();
         while(iterator.hasNext()){
             Map.Entry<Id<Person>, Double> entry = iterator.next();
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());

@@ -25,6 +25,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -879,14 +880,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         private void dumpPlans(int iteration) throws IOException, ClassNotFoundException {
-            Population temp = PopulationUtils.createPopulation(config);
+            PopulationImpl temp = (PopulationImpl) PopulationUtils.createPopulation(config);
+            temp.setIsStreaming(true);
             OutputDirectoryHierarchy controlerIO = matsimControler.getControlerIO();
+            org.matsim.core.population.PopulationWriter pw = new org.matsim.core.population.PopulationWriter(
+                    temp, scenario.getNetwork());
+            pw.startStreaming(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
             slaveLogger.warn("Dumping population of " + currentPopulationSize + " agents on slave number " + myNumber);
             List<PersonSerializable> tempPax = (List<PersonSerializable>) reader.readObject();
             for (PersonSerializable p : tempPax) {
-                temp.addPerson(p.getPerson());
+                pw.writePerson(p.getPerson());
             }
-            new PopulationWriter(temp, scenario.getNetwork()).write(controlerIO.getIterationFilename(iteration, "FULLplans_slave_" + myNumber + ".xml.gz"));
+            pw.closeStreaming();
             slaveLogger.warn("Done writing on slave number " + myNumber);
         }
 

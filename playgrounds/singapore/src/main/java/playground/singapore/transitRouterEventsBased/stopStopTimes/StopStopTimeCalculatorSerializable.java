@@ -20,17 +20,28 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable {
-	
+
 	private final Map<String, Map<String, StopStopTimeData>> stopStopTimes = new HashMap<String, Map<String, StopStopTimeData>>(5000);
 	private final Map<String, Map<String, Double>> scheduledStopStopTimes = new HashMap<String, Map<String, Double>>(5000);
 	private final Map<String, Tuple<String, Double>> inTransitVehicles = new HashMap<String, Tuple<String,Double>>(1000);
 	private final Set<String> vehicleIds = new HashSet<String>();
 	private double timeSlot;
 	private boolean useVehicleIds = true;
-	
+	private static int scheduleCalls = 0;
+	private static int totalCalls = 0;
+	private static double stopTimesInflation = 0;
+
 	//Constructors
 	public StopStopTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+	}
+	public static void printCallStatisticsAndReset(){
+		org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StopStopTimeCalculatorSerializable.class);
+		logger.warn("stop times read from schedule vs total (S:T) = " + scheduleCalls + " : " + totalCalls);
+		logger.warn("inflation of recorded times called vs their scheduled time:" +stopTimesInflation/(double)(totalCalls -scheduleCalls));
+		scheduleCalls = 0;
+		totalCalls = 0;
+		stopTimesInflation=0;
 	}
 	public StopStopTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
@@ -74,7 +85,7 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 			for(Entry<String, Double> entry2:entry.getValue().entrySet())
 				entry.getValue().put(entry2.getKey(), entry2.getValue()/numObservations.get(entry.getKey()).get(entry2.getKey()));
 	}
-		
+
 	//Methods
 	public StopStopTime getStopStopTimes() {
 		return new StopStopTime() {
@@ -90,10 +101,15 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 	}
 	private double getStopStopTime(Id stopOId, Id stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
-		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
+		totalCalls++;
+		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0) {
+			scheduleCalls++;
 			return scheduledStopStopTimes.get(stopOId.toString()).get(stopDId.toString());
-		else
-			return stopStopTimeData.getStopStopTime((int) (time/timeSlot));
+		}
+		else {
+			stopTimesInflation += stopStopTimeData.getStopStopTime((int) (time / timeSlot))/scheduledStopStopTimes.get(stopOId.toString()).get(stopDId.toString());
+			return stopStopTimeData.getStopStopTime((int) (time / timeSlot));
+		}
 	}
 	private double getStopStopTimeVariance(Id stopOId, Id stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
@@ -111,11 +127,11 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(!useVehicleIds || vehicleIds.contains(event.getVehicleId())) {
-			Tuple<String, Double> route = inTransitVehicles.remove(event.getVehicleId());
+		if(!useVehicleIds || vehicleIds.contains(event.getVehicleId().toString())) {
+			Tuple<String, Double> route = inTransitVehicles.remove(event.getVehicleId().toString());
 			if(route!=null)
 				try {
-					stopStopTimes.get(route.getFirst()).get(event.getFacilityId()).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
+					stopStopTimes.get(route.getFirst()).get(event.getFacilityId().toString()).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
 				} catch(Exception e) {
 					//System.out.println("No: "+route.getFirst()+"-->"+event.getFacilityId());
 				}
@@ -124,8 +140,8 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 	}
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if((!useVehicleIds || vehicleIds.contains(event.getVehicleId())) && event.getPersonId().toString().startsWith("pt_") && event.getPersonId().toString().contains(event.getVehicleId().toString()))
-			inTransitVehicles.remove(event.getVehicleId());
+		if((!useVehicleIds || vehicleIds.contains(event.getVehicleId().toString())) && event.getPersonId().toString().startsWith("pt_") && event.getPersonId().toString().contains(event.getVehicleId().toString()))
+			inTransitVehicles.remove(event.getVehicleId().toString());
 	}
 	public void setUseVehicleIds(boolean useVehicleIds) {
 		this.useVehicleIds = useVehicleIds;

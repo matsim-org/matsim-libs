@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -51,6 +52,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Serializable {
 
+	private static int scheduleCalls;
+	private static int waitTimeCalls;
 	//Attributes
 	private final double timeSlot;
 	private final Map<Tuple<String, String>, Map<String, WaitTimeData>> waitTimes = new HashMap<Tuple<String, String>, Map<String, WaitTimeData>>(1000);
@@ -58,7 +61,12 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	private final Map<String, Double> agentsWaitingData = new HashMap<String, Double>();
 	private Map<String, Tuple<String, String>> linesRoutesOfVehicle = new HashMap<String, Tuple<String, String>>();
 	private Map<String, String> stopOfVehicle = new HashMap<String, String>();
-	
+	public static void printCallStatisticsAndReset(){
+		Logger logger = Logger.getLogger(WaitTimeCalculatorSerializable.class);
+		logger.warn("scheduled wait time calls vs unscheduled: " + scheduleCalls + " : " + waitTimeCalls);
+		scheduleCalls=0;
+		waitTimeCalls=0;
+	}
 	//Constructors
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
@@ -110,15 +118,19 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 			}
 		};
 	}
+
 	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
+		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
+			scheduleCalls++;
 			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId.toString());
 			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
-		else
+		else{
 			return waitTimeData.getWaitTime((int) (time/timeSlot));
+		}
 	}
 	@Override
 	public void reset(int iteration) {
@@ -131,25 +143,25 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	}
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(event.getLegMode().equals("pt") && agentsWaitingData.get(event.getPersonId())==null)
+		if(event.getLegMode().equals("pt") && agentsWaitingData.get(event.getPersonId().toString())==null)
 			agentsWaitingData.put(event.getPersonId().toString(), event.getTime());
-		else if(agentsWaitingData.get(event.getPersonId())!=null)
+		else if(agentsWaitingData.get(event.getPersonId().toString())!=null)
 			new RuntimeException("Departing with old data");
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
+		Double startWaitingTime = agentsWaitingData.get(event.getPersonId().toString());
 		if(startWaitingTime!=null) {
-			Tuple<String, String> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId());
-			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId()));
+			Tuple<String, String> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId().toString());
+			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId().toString()));
 			data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
-			agentsWaitingData.remove(event.getPersonId());
+			agentsWaitingData.remove(event.getPersonId().toString());
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(linesRoutesOfVehicle.get(event.getVehicleId())!=null)
+		if(linesRoutesOfVehicle.get(event.getVehicleId().toString())!=null)
 			stopOfVehicle.put(event.getVehicleId().toString(), event.getFacilityId().toString());
 	}
 
