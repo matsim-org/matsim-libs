@@ -91,6 +91,7 @@ public class Plans2Matrix {
 		int noZones = 0;
 		int legs = 0;
 		int trips = 0;
+		int nullEntries = 0;
 		
 		ProgressLogger.init(plans.size(), 2, 10);
 		for (Plan plan : plans) {
@@ -118,7 +119,8 @@ public class Plans2Matrix {
 						String destZoneId = ((Map<String, Object>) destZone.getAttribute()).get("NO").toString();
 						Entry e = m.getEntry(origZoneId, destZoneId);
 						if (e == null) {
-							e = m.createEntry(origZoneId, destZoneId, 0);
+//							e = m.createEntry(origZoneId, destZoneId, 0);
+							nullEntries++;
 						}
 						e.setValue(e.getValue() + 1);
 					} else {
@@ -131,7 +133,7 @@ public class Plans2Matrix {
 
 		if(noZones > 0)
 			logger.info(String.format("%s activities could not be located in a zone.", noZones));
-		
+		logger.info(String.format("%s null entries (non DE?)", nullEntries));
 		logger.info(String.format("Processed %s legs.", legs));
 		logger.info(String.format("Processed %s car trips.", trips));
 

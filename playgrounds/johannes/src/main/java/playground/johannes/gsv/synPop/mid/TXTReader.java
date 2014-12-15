@@ -86,7 +86,7 @@ public class TXTReader {
 		 */
 		for(ProxyPerson person : persons.values()) {
 			ProxyPlan plan = new ProxyPlan();
-			plan.setAttribute("datasource", "midtrips");
+			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_TRIPS);
 			person.setPlan(plan);
 		}
 		/*

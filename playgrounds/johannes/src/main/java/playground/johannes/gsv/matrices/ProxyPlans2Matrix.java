@@ -96,7 +96,7 @@ public class ProxyPlans2Matrix {
 		int trips = 0;
 		
 		for (ProxyPlan plan : plans) {
-			for (int i = 1; i < plan.getLegs().size(); i++) {
+			for (int i = 0; i < plan.getLegs().size(); i++) {
 				ProxyObject leg = plan.getLegs().get(i);
 				ProxyObject prev = plan.getActivities().get(i);
 				ProxyObject next = plan.getActivities().get(i+1);

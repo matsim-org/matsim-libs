@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,7 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -45,6 +45,8 @@ import playground.johannes.sna.util.ProgressLogger;
  *
  */
 public class Proxy2Matsim {
+	
+	private static final Logger logger = Logger.getLogger(Proxy2Matsim.class);
 
 	/**
 	 * @param args
@@ -68,6 +70,11 @@ public class Proxy2Matsim {
 		
 		ProgressLogger.init(parser.getPersons().size(), 1, 10);
 		
+		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
+		
+		int legs = 0;
+		int plans = 0;
+		
 		for(ProxyPerson proxyPerson : parser.getPersons()) {
 			Person person = factory.createPerson(Id.create(proxyPerson.getId(), Person.class));
 			pop.addPerson(person);
@@ -75,6 +82,7 @@ public class Proxy2Matsim {
 			ProxyPlan proxyPlan = proxyPerson.getPlan();
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
+			plans++;
 			
 			for(int i = 0; i < proxyPlan.getActivities().size(); i++) {
 				ProxyObject proxyAct = proxyPlan.getActivities().get(i);
@@ -103,14 +111,19 @@ public class Proxy2Matsim {
 						mode = "undefined";
 					}
 					Leg leg = factory.createLeg(mode);
-					leg.setTravelTime(Double.parseDouble(proxyLeg.getAttribute(CommonKeys.LEG_DISTANCE))); //FIME: temporary hack!
+					String val = proxyLeg.getAttribute(CommonKeys.LEG_DISTANCE);
+					if(val != null) {
+						leg.setTravelTime(Double.parseDouble(val)); //FIME: temporary hack!
+					}
 					plan.addLeg(leg);
+					legs++;
 				}
 			}
 			
 			ProgressLogger.step();
 		}
 		
+		logger.info(String.format("Created %s plans and %s legs.", plans, legs));
 		PopulationWriter writer = new PopulationWriter(pop);
 		writer.write(args[2]);
 	}

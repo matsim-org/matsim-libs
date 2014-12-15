@@ -59,7 +59,7 @@ public class MatrixCompare2 {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "494";
+		String runId = "513";
 		
 		ODMatrixXMLReader reader = new ODMatrixXMLReader();
 		reader.setValidating(false);

@@ -109,7 +109,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 			
 			if(outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 100, 100);
+					writeHistograms(stats, key, 1000, 100);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

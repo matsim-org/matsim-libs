@@ -93,4 +93,6 @@ public interface MIDKeys {
 	
 	public static final String MID_JOUNREYS = "midjourneys";
 	
+	public static final String MID_TRIPS = "midtrips";
+	
 }
