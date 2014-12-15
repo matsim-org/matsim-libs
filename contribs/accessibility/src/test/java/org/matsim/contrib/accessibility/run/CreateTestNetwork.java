@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.usecases;
+package org.matsim.contrib.accessibility.run;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;

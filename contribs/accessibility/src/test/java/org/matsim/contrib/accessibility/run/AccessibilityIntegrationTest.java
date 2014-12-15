@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.usecases;
+package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
 import java.util.HashMap;
@@ -99,7 +99,7 @@ public class AccessibilityIntegrationTest {
 			opportunities.addActivityFacility(facility);
 		}
 
-		org.matsim.contrib.accessibility.run.Main.run(sc);
+		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
 	}
 
 	@Test

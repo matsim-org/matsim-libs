@@ -40,10 +40,11 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  *
  */
-public final class Main {
+final class RunAccessibilityExample {
+	// do not change name of class; matsim book refers to it.  kai, dec'14
 
 
-	private static final Logger log = Logger.getLogger(Main.class);
+	private static final Logger log = Logger.getLogger(RunAccessibilityExample.class);
 
 	public static void main(String[] args) {
 
