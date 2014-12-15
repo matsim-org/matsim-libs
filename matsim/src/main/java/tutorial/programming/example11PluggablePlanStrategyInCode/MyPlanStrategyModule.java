@@ -29,9 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 
-public class MyPlanStrategyModule implements PlanStrategyModule, 
-		ActivityEndEventHandler // this is just there as an example
-{
+class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandler {
 	private static final Logger log = Logger.getLogger(MyPlanStrategyModule.class);
 
 	Scenario sc;

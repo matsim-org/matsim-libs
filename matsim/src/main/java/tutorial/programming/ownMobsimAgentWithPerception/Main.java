@@ -24,9 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MobsimRegistrar;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -43,7 +41,7 @@ import org.matsim.vehicles.VehiclesFactory;
  * 
  * @author nagel
  */
-class Main {
+public class Main {
 
 	public static void main(String[] args) {
 		
