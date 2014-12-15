@@ -125,7 +125,8 @@ public class RunZurichBikeSharingSimulation {
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
-					slopeScorer ) );
+					slopeScorer,
+					null ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:

@@ -55,6 +55,7 @@ import playground.thibautd.utils.CollectionUtils;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -154,7 +155,8 @@ public class BikeSharingScenarioUtils {
 	public static TripRouterFactory createTripRouterFactoryAndConfigureRouteFactories(
 			final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
-			final LinkSlopeScorer scorer ) {
+			final LinkSlopeScorer scorer,
+			final RoutingData routingData ) {
 		final MultiModalConfigGroup multimodalConfigGroup = (MultiModalConfigGroup)
 			scenario.getConfig().getModule(
 					MultiModalConfigGroup.GROUP_NAME );
@@ -182,7 +184,14 @@ public class BikeSharingScenarioUtils {
 				scenario,
 				multiModalTravelTimeFactory.createTravelTimes(),
 				disutilityFactory,
-				new BikeSharingTripRouterFactory( scenario , scorer ) );
+				routingData == null ?
+					new BikeSharingTripRouterFactory(
+						scenario,
+						scorer ) :
+					new BikeSharingTripRouterFactory(
+						routingData,
+						scenario,
+						scorer ) );
 
 		if ( scorer != null ) {
 			fact.setDisutilityFactoryForMode(

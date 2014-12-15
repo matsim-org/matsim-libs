@@ -78,6 +78,16 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	}
 
 	public BikeSharingTripRouterFactory(
+			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
+			final Scenario scenario,
+			final LinkSlopeScorer slopeScorer) {
+		this( routingData,
+				DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,
+				scenario,
+				slopeScorer );
+	}
+
+	public BikeSharingTripRouterFactory(
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this( DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario) ,

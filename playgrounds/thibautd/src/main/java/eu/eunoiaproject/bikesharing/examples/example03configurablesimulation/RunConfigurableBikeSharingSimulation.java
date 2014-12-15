@@ -37,11 +37,14 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.router.TransitRouterNetwork;
 
+import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.thibautd.utils.SoftCache;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
@@ -60,6 +63,8 @@ public class RunConfigurableBikeSharingSimulation {
 		Logger.getLogger( SoftCache.class ).setLevel( Level.TRACE );
 
 		final Config config = BikeSharingScenarioUtils.loadConfig( configFile );
+		final ThinnedNetworkConfigGroup thinnedNetworkGroup = new ThinnedNetworkConfigGroup();
+		config.addModule( thinnedNetworkGroup );
 		config.addModule( new StepBasedFareConfigGroup() );
 		config.addModule( new MultiModalConfigGroup() );
 
@@ -83,11 +88,13 @@ public class RunConfigurableBikeSharingSimulation {
 
 		final Controler controler = new Controler( sc );
 
+		final RoutingData ptRouting = createRoutingData( sc, thinnedNetworkGroup );
 		controler.setTripRouterFactory(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
-					null ) );
+					null,
+					ptRouting ) );
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
@@ -105,6 +112,20 @@ public class RunConfigurableBikeSharingSimulation {
 					sc ) );
 
 		controler.run();
+	}
+
+	private static RoutingData createRoutingData(
+			final Scenario sc,
+			final ThinnedNetworkConfigGroup conf ) {
+		if ( conf.getThinnedNetworkFile() == null ) return new RoutingData( sc );
+
+		final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
+		new TransitRouterNetworkReader(
+				sc.getTransitSchedule(),
+				transitRouterNetwork ).parse(
+					conf.getThinnedNetworkFile() );
+
+		return new RoutingData( sc ,  transitRouterNetwork );
 	}
 
 	private static void failIfExists(final String outdir) {
@@ -161,5 +182,35 @@ public class RunConfigurableBikeSharingSimulation {
 
 	}
 
+	private static class ThinnedNetworkConfigGroup extends ReflectiveConfigGroup {
+		private static final String GROUP_NAME = "customPtRouting";
+
+		private boolean teleportRatherThanSimulate = false;
+		private String thinnedNetworkFile = null;
+
+		public ThinnedNetworkConfigGroup( ) {
+			super( GROUP_NAME );
+		}
+
+		@StringGetter( "teleportRatherThanSimulate" )
+		public boolean isTeleportRatherThanSimulate() {
+			return teleportRatherThanSimulate;
+		}
+
+		@StringSetter( "teleportRatherThanSimulate" )
+		public void setTeleportRatherThanSimulate( boolean teleportRatherThanSimulate ) {
+			this.teleportRatherThanSimulate = teleportRatherThanSimulate;
+		}
+
+		@StringGetter( "thinnedNetworkFile" )
+		public String getThinnedNetworkFile() {
+			return thinnedNetworkFile;
+		}
+
+		@StringSetter( "thinnedNetworkFile" )
+		public void setThinnedNetworkFile( String thinnedNetworkFile ) {
+			this.thinnedNetworkFile = thinnedNetworkFile;
+		}
+	}
 }
 
