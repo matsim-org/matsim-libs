@@ -87,6 +87,6 @@ public class CreateVehiclesForPatna {
 //				}
 //			}
 //		}
-		new VehicleWriterV1(vehicles).writeFile(MyFirstControler.outputDir+"/vehiclesPatna.xml");
+		new VehicleWriterV1(vehicles).writeFile("./output/vehiclesPatna.xml");
 	}
 }
