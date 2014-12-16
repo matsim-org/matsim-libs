@@ -109,12 +109,12 @@ public class GenerateFundamentalDiagramData {
 
 	public static void main(String[] args) {
 
-		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/withHoles/";
-		String OUTPUT_FOLDER ="/run5/motorbike/";
-		args = new String [] {"false", RUN_DIR+OUTPUT_FOLDER, "true", "true","15.","false"};
+		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
+		String OUTPUT_FOLDER ="/run305/";
+		args = new String [] {"true", RUN_DIR+OUTPUT_FOLDER, "true", "true","27.","false"};
 
-		String [] travelModes= {"motorbike"};
-		Double [] modalSplit = {1.};
+		String [] travelModes= {"car","bike"};
+		Double [] modalSplit = {0.5,0.5};
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -397,6 +397,7 @@ public class GenerateFundamentalDiagramData {
 						+ "This is " + speedUnstableWarnCount[index]+ "th warning.");
 			}
 		}
+		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
 		if(WRITE_FD_DATA && stableState) {
 			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
