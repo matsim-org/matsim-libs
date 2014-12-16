@@ -1,4 +1,4 @@
-package playground.agarwalamit.patnaIndia;
+package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

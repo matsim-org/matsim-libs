@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.patnaIndia;
+package playground.agarwalamit.mixedTraffic.patnaIndia;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +26,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+
+import playground.agarwalamit.mixedTraffic.patnaIndia.old.MyFirstControler;
 
 /**
  * @author amit
