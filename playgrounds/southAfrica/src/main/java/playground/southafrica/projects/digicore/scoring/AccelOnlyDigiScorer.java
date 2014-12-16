@@ -64,19 +64,22 @@ public class AccelOnlyDigiScorer implements DigiScorer{
 				String line = null;
 				while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
 					String[] sa = line.split(",");
+					String id = sa[1];
 					double x = Double.parseDouble(sa[5]);
 					double y = Double.parseDouble(sa[6]);
 					double z = Double.parseDouble(sa[7]);
-					int road = Integer.parseInt(sa[9]);
+
+					Double speed = Double.parseDouble(sa[8]);
+					Integer road = Integer.parseInt(sa[9]);
 					
 					/* Put data conditions here. */
 					if(
-	//						id.equalsIgnoreCase("37ff9d8e04c164ee793e172a561c7b1e") &	/* Specific individual, A. */
-	//						id.equalsIgnoreCase("9a01080c086096aaaaff7504a01ea9e3") &	/* Specific individual, B. */
-	//						id.equalsIgnoreCase("0ae0c60759b410c2c38fa0ba135a8e16") &	/* Specific individual, C. */
-							road <= 2 & 												/* Road is a highway */
-	//						speed <= 60.0 &												/* Low speed */
-	//						speed > 60.0 &												/* High speed */
+//							id.equalsIgnoreCase("16d38cf2304c6ee23c702f4a65e5f5e0") &	/* Specific individual, A: Good */
+//							id.equalsIgnoreCase("5b71b050d8e03e618728cce5ca6a3471") &	/* Specific individual, B: Average */
+//							id.equalsIgnoreCase("d655fcbb9910c5580e030a591d6ac66d") &	/* Specific individual, C: Bad */
+//							road <= 2 & 												/* Road is a highway */
+//							speed <= 60.0 &												/* Low speed */
+//							speed > 90.0 &												/* High speed */
 							true){
 						
 						/* In this implementation, ONLY look at acceleration, so add
@@ -109,7 +112,6 @@ public class AccelOnlyDigiScorer implements DigiScorer{
 	 */
 	@Override
 	public RISK_GROUP getRiskGroup(String record) {
-		/* Check that the 'blob'  has already been created and populated. */
 		/* Check that the 'blob'  has already been created and populated. */
 		if(!this.grid.isRanked()){
 			LOG.error("You cannot get a risk group unless the risk evaluation has been done.");

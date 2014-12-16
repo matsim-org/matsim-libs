@@ -40,7 +40,7 @@ import playground.southafrica.utilities.Header;
 public class SpeedAndAccelDigiScorer implements DigiScorer{
 	private final static Logger LOG = Logger.getLogger(SpeedAndAccelDigiScorer.class);
 	private final SpeedDigiScorer delegate;
-
+	
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
 	private int noSpeedLimitWarningCount = 0;
@@ -49,6 +49,8 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 	private final double SPEED_ZERO = 1.0;
 	private final double SPEED_ONE = 1.1;
 	private final double SPEED_TWO = 1.2;
+	private double weight_speed = 0.5;
+	private double weight_accel = 0.5;
 
 
 	public SpeedAndAccelDigiScorer(final double scale, String filename, final List<Double> riskThresholds, Visual visual) {
@@ -89,6 +91,10 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 				 * NOT only non-speeding records are added to the blob. The 
 				 * weights are equally shared between the speed risk and the
 				 * accelerometer risk. 
+				 * 
+				 * (5 Nov 2014) It turns out to be that whatever the weight, it
+				 * does not influence the weighting, because the overall weighting
+				 * just goes down. Changed it back to 1.  
 				 */
 				/* Put data conditions here. */
 				if(
@@ -118,10 +124,10 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 						speedIndex = 3;
 					}
 					double oldCount = speedObservations[speedIndex];
-					speedObservations[speedIndex] = oldCount + 0.5;
+					speedObservations[speedIndex] = oldCount + 1.0;
 
 					Coord3d c = delegate.getGrid().getClosest(x, y, z);
-					delegate.getGrid().incrementCount(c, 0.5);
+					delegate.getGrid().incrementCount(c, 1.0);
 				}
 				counter.incCounter();
 			}
@@ -142,19 +148,9 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 		delegate.getGrid().rankGridCells();
 	}
 
-	/**
-	 * An accelerometer record is given two risk groups: one based on speed and
-	 * another based on the accelerometer data. The overall risk group is the
-	 * lower (more risky) of the two components. 
-	 */
-	@Override
-	public RISK_GROUP getRiskGroup(String record) {
-		/* Check that the 'blob'  has already been created and populated. */
-		if(!delegate.getGrid().isRanked()){
-			LOG.error("You cannot get a risk group unless the risk evaluation has been done.");
-			LOG.error("First call the method 'buildScoringModel(...)");
-			throw new RuntimeException();
-		}
+	
+	public double getRiskGroupValue(String record){
+		double result = 0.0;
 		
 		String[] sa = record.split(",");
 		
@@ -170,17 +166,23 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 		 * When building the risk model, zero speed limits is associated with no 
 		 * risk speed. */
 		RISK_GROUP speedRisk = null;
+		double speedRiskValue = 0.0;
 		if(speeding <= SPEED_ZERO || speedLimit == 0.0){
 			speedRisk = RISK_GROUP.NONE;
+			speedRiskValue = 0.0;
 		} else if(speeding < SPEED_ONE){
 			speedRisk = RISK_GROUP.LOW;	
+			speedRiskValue = 1.0;
 		} else if(speeding < SPEED_TWO){
 			speedRisk = RISK_GROUP.MEDIUM;
+			speedRiskValue = 2.0;
 		} else{
 			speedRisk = RISK_GROUP.HIGH;
+			speedRiskValue = 3.0;
 		}
 
 		RISK_GROUP accelRisk = null;
+		double accelRiskValue = 0.0;
 		/* Return accelerometer risk class. */
 		double x = Double.parseDouble(sa[5]);
 		double y = Double.parseDouble(sa[6]);
@@ -192,64 +194,98 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 		switch (risk) {
 		case 0:
 			accelRisk = RISK_GROUP.NONE;
+			accelRiskValue = 0.0;
 			break;
 		case 1:
 			accelRisk = RISK_GROUP.LOW;
+			accelRiskValue = 1.0;
 			break;
 		case 2:
 			accelRisk = RISK_GROUP.MEDIUM;
+			accelRiskValue = 2.0;
 			break;
 		case 3:
 			accelRisk = RISK_GROUP.HIGH;
+			accelRiskValue = 3.0;
 			break;
 		default:
 			throw new RuntimeException("Don't know what risk class " + risk + " is!");
 		}
 
-		/* Now return the lower (riskier) of the two components. */ 
-		RISK_GROUP result = null;
-		switch (speedRisk) {
-		case NONE:
-			result = accelRisk;
-			break;
-		case LOW:
-			switch (accelRisk) {
-			case NONE:
-			case LOW:
-				result = speedRisk;
-				break;
-			case MEDIUM:			
-			case HIGH:			
-			default:
-				result = accelRisk;
-			}
-			break;
-		case MEDIUM:			
-			switch (accelRisk) {
-			case NONE:
-			case LOW:
-			case MEDIUM:			
-				result = speedRisk;
-				break;
-			case HIGH:			
-			default:
-				result = accelRisk;
-			}
-			break;
-		case HIGH:			
-			switch (accelRisk) {
-			case NONE:
-			case LOW:
-			case MEDIUM:			
-			case HIGH:			
-				result = speedRisk;
-				break;
-			default:
-				result = accelRisk;
-			}
+//		/* Now return the lower (riskier) of the two components. */ 
+//		RISK_GROUP result = null;
+//		switch (speedRisk) {
+//		case NONE:
+//			result = accelRisk;
+//			break;
+//		case LOW:
+//			switch (accelRisk) {
+//			case NONE:
+//			case LOW:
+//				result = speedRisk;
+//				break;
+//			case MEDIUM:			
+//			case HIGH:			
+//			default:
+//				result = accelRisk;
+//			}
+//			break;
+//		case MEDIUM:			
+//			switch (accelRisk) {
+//			case NONE:
+//			case LOW:
+//			case MEDIUM:			
+//				result = speedRisk;
+//				break;
+//			case HIGH:			
+//			default:
+//				result = accelRisk;
+//			}
+//			break;
+//		case HIGH:			
+//			switch (accelRisk) {
+//			case NONE:
+//			case LOW:
+//			case MEDIUM:			
+//			case HIGH:			
+//				result = speedRisk;
+//				break;
+//			default:
+//				result = accelRisk;
+//			}
+//		}
+//		
+		result = weight_speed*speedRiskValue + weight_accel*accelRiskValue;
+		return result;
+	}
+	
+	
+	/**
+	 * An accelerometer record is given two risk groups: one based on speed and
+	 * another based on the accelerometer data. The overall risk group is the
+	 * lower (more risky) of the two components. 
+	 */
+	@Override
+	public RISK_GROUP getRiskGroup(String record) {
+		/* Check that the 'blob'  has already been created and populated. */
+		if(!delegate.getGrid().isRanked()){
+			LOG.error("You cannot get a risk group unless the risk evaluation has been done.");
+			LOG.error("First call the method 'buildScoringModel(...)");
+			throw new RuntimeException();
 		}
 		
-		return result;
+		/* Quantify the risk. */ 
+		double riskValue = getRiskGroupValue(record);
+		
+		if(riskValue <= 0.75){
+			return RISK_GROUP.NONE;
+		} else if(riskValue <= 1.5){
+			return RISK_GROUP.LOW;
+		} else if (riskValue <= 2.25){
+			return RISK_GROUP.MEDIUM;
+		} else{
+			return RISK_GROUP.HIGH;
+		}
 	}
 
 	/**
@@ -371,7 +407,23 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 	public void setMaximumLines(int maxLines){
 		this.maxLines = maxLines;
 	}
-
+	
+	public double getSpeedWeight(){
+		return this.weight_speed;
+	}
+	
+	public void setSpeedWeight(double weight){
+		this.weight_speed = weight;
+	}
+	
+	public double getAccelWeight(){
+		return this.weight_accel;
+	}
+	
+	public void setAccelWeight(double weight){
+		this.weight_accel = weight;
+	}
+	
 	/**
 	 * Writes the speed observation results: the number of records in each risk
 	 * class. The output file with name <code>speedClassCounts.csv</code> will
@@ -435,6 +487,8 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 
 		SpeedAndAccelDigiScorer sds = new SpeedAndAccelDigiScorer(scale, filename, riskThresholds, visual);
 		sds.setMaximumLines(maxLines);
+		sds.setAccelWeight(0.40);
+		sds.setSpeedWeight(0.60);
 		sds.buildScoringModel(filename);
 		sds.getGrid().writeCellCountsAndRiskClasses(outputFolder);
 		sds.writeSpeedCounts(outputFolder);

@@ -57,11 +57,13 @@ public class GeographicClassifier {
 	 * 
 	 * @param args
 	 * <ul>
-	 * <li> args[0] : the absolute path to the folder containing XML vehicle files
-	 * <li> args[1] : the absolute path to the shapefile for the specific area
-	 * <li> args[2] : the percentage threshold to distinguish between intra- and inter-provincial vehicles (currently 0.6)
-	 * <li> args[3] : number of threads to use
-	 * <li> args[4] : the absolute path to the output folder - it must exist!
+	 * <li> args[0] : the absolute path to the folder containing XML vehicle files;
+	 * <li> args[1] : the absolute path to the shapefile for the specific area;
+	 * <li> args[2] : the field in the shapefile containing the id;
+	 * <li> args[3] : the percentage threshold to distinguish between intra- and inter-provincial vehicles (currently 0.6)
+	 * <li> args[4] : number of threads to use
+	 * <li> args[5] : the absolute path to the output folder - it must exist!
+	 * <li> args[6] : a descriptor... forwhat?!
 	 * </ul>
 	 * 
 	 * @throws IOException

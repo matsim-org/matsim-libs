@@ -19,6 +19,7 @@
 
 package playground.southafrica.projects.digicore.grid;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
@@ -70,7 +73,7 @@ public class DigiGrid  extends AbstractAnalysis {
 	private String snapshotfolder = "./snapshots/";
 	
 	private final double scale;
-	private double pointsConsidered;
+	private double pointsConsidered = 0.0;
 	private Visual visual = Visual.NONE;
 	private boolean isPopulated = false;
 	private boolean isRanked = false;
@@ -148,16 +151,20 @@ public class DigiGrid  extends AbstractAnalysis {
 			maxY = Math.max(maxY, gp.getY());
 			maxZ = Math.max(maxZ, gp.getZ());
 		}
+		LOG.info("Done calculating data extent.");
 
 		/* Establish and populate the OcTree given the centroid extent. */
+		LOG.info("Building OcTree with dodecahedron centroids... (" + ga.length + " centroids)");
+		Counter centroidCounter = new Counter("   centroid # "); 
 		map = new HashMap<Coord3d, Double>(ga.length);
-		LOG.info("Building OcTree with dodecahedron centroids...");
 		ot = new OcTree<Coord3d>(minX, minY, minZ, maxX, maxY, maxZ);
 		for(GridPoint gp : ga){
 			Coord3d c = new Coord3d(gp.getX(), gp.getY(), gp.getZ());
 			ot.put(gp.getX(), gp.getY(), gp.getZ(), c);
 			map.put(c, new Double(0.0));
+			centroidCounter.incCounter();
 		}
+		centroidCounter.printCounter();
 		LOG.info("Done populating centroid grid: " + ga.length + " points.");
 	}
 	
@@ -178,7 +185,7 @@ public class DigiGrid  extends AbstractAnalysis {
 	
 	public void incrementCount(Coord3d c, double weight){
 		this.map.put(c, this.map.get(c)+weight);
-		this.pointsConsidered++;
+		this.pointsConsidered += weight;
 		this.isPopulated = true;
 	}
 	

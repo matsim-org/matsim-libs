@@ -72,11 +72,11 @@ public class GtiActivityRelocator {
 		/* Write population and household attributes to file. These are the
 		 * only two elements that have been edited. */
 		PopulationWriter pw = new PopulationWriter(gar.cpr.getScenario().getPopulation());
-		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "Population_Gti.xml.gz");
+		pw.write(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "population_Gti.xml.gz");
 		
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(gar.cpr.getScenario().getHouseholds().getHouseholdAttributes());
 		oaw.putAttributeConverter(CoordImpl.class, new CoordConverter());
-		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "HouseholdAttributes_Gti.xml.gz");
+		oaw.writeFile(populationFolder + (populationFolder.endsWith("/") ? "" : "/") + "householdAttributes_Gti.xml.gz");
 		
 		Header.printFooter();
 	}
@@ -131,7 +131,7 @@ public class GtiActivityRelocator {
 		if(qtExtent.length == 0){
 			throw new RuntimeException("The QuadTree extent must first be established. Run setupQuadTreeExtentFromStudyArea(String) method first!");
 		}
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84_SA_Albers");
 		
 		/* Set up facility infrastructure */
 		ActivityFacilities facilities = cpr.getScenario().getActivityFacilities();
