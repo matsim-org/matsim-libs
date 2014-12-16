@@ -24,7 +24,7 @@ public class WriteStatistics implements IterationEndsListener {
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "statistics.txt");
 
 		try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)))) {
-		    writer.println("Person \t hasEV \t distTrav \t toll");
+		    writer.println("Person \t hasEV \t distTrav \t toll \t tollEntry \t tollExit");
 		    writer.close();
 		}catch (IOException e) {
 		    System.out.println("Unable to write statistics");
@@ -39,7 +39,7 @@ public class WriteStatistics implements IterationEndsListener {
 			}
 			
 			try(PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)))) {
-			    writer.println(id + "\t" + VehicleInitializer.personHasElectricVehicle.get(id) + "\t" + DistanceTravelledWithCar.distanceTravelled.get(id) + "\t" + TollsManager.tollDisutilities.get(id));
+			    writer.println(id + "\t" + VehicleInitializer.personHasElectricVehicle.get(id) + "\t" + DistanceTravelledWithCar.distanceTravelled.get(id) + "\t" + TollsManager.tollDisutilities.get(id) + "\t" + TollsManager.tollTimeOfEntry.get(id) + "\t" + TollsManager.tollTimeOfExit.get(id));
 			    writer.close();
 			}catch (IOException e) {
 			    System.out.println("Unable to write statistics");

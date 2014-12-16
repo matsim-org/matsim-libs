@@ -22,7 +22,9 @@ import java.util.HashMap;
 public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	public static DoubleValueHashMap<Id> tollDisutilities;
-
+	public static DoubleValueHashMap<Id> tollTimeOfEntry;
+	public static DoubleValueHashMap<Id> tollTimeOfExit;	
+	
 	// personId, linkId
 	public HashMap<Id, Id> previousLinks;
 
@@ -38,6 +40,8 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 	@Override
 	public void reset(int iteration) {
 		tollDisutilities = new DoubleValueHashMap<Id>();
+		tollTimeOfEntry = new DoubleValueHashMap<Id>();
+		tollTimeOfExit = new DoubleValueHashMap<Id>();
 		previousLinks = new HashMap<Id, Id>();
 	}
 
@@ -66,6 +70,15 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 			Link prevLink = network.getLinks().get(previousLinks.get(event.getPersonId()));
 			Link currentLink = network.getLinks().get(event.getLinkId());
 			double radiusInMeters = GlobalTESFParameters.tollAreaRadius;
+			
+			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters && GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters){
+				tollTimeOfEntry.put(event.getPersonId(), event.getTime());				
+			}
+			
+			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) > radiusInMeters && GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) < radiusInMeters){
+				tollTimeOfExit.put(event.getPersonId(), event.getTime());				
+			}
+			
 			if (GeneralLib.getDistance(coordinatesQuaiBridgeZH, currentLink) < radiusInMeters
 					&& GeneralLib.getDistance(coordinatesQuaiBridgeZH, prevLink) > radiusInMeters
 					&& ((GlobalTESFParameters.morningTollStart < event.getTime() && GlobalTESFParameters.morningTollEnd > event.getTime()) 
@@ -73,6 +86,7 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 						)
 				) {
 				tollDisutilities.put(event.getPersonId(), tollDisutility);
+
 			}
 			previousLinks.put(event.getPersonId(), event.getLinkId());
 		}
