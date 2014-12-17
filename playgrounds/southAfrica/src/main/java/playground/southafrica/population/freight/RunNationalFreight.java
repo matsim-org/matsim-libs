@@ -95,8 +95,11 @@ public class RunNationalFreight {
 		/* Config stuff */
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(OUTPUT_DIRECTORY);
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(1);
 		config.controler().setWriteEventsInterval(1);
+		config.global().setNumberOfThreads(40); 	// Hobbes
+		config.global().setRandomSeed(20141217l); 	// Hobbes
+		config.qsim().setNumberOfThreads(40);		// Hobbes
 		
 		config.network().setInputFile(NETWORK);
 		config.plans().setInputFile(POPULATION);
