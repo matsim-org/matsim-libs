@@ -29,18 +29,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-
 public class AccessibilityRuns {
 	private static final Logger log = Logger.getLogger( AccessibilityRuns.class ) ; 
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
-	private Boolean doPopulationWeightedPlot = true;
-	private Boolean doNonPopulationWeightedPlot = false;		
+//	private Boolean doPopulationWeightedPlot = true;
+//	private Boolean doNonPopulationWeightedPlot = false;		
 
 //	@SuppressWarnings("static-method")
 //	@Test
@@ -435,9 +430,9 @@ public class AccessibilityRuns {
 				// now creating a snapshot based on above-created project file
 				// Remember to set the PATH varibales correctly to be able to call "qgis.bat" on the command line
 				String cmd = "qgis.bat " + config.controler().getOutputDirectory() + actType + "/" + mode + "/QGisProjectFile.qgs" +
-						" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/snapshot.png";
+						" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.png";
 				
-				String stdoutFileName = config.controler().getOutputDirectory() + actType + "/" + mode + "/snapshot.log";
+				String stdoutFileName = config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.log";
 				int timeout = 99999;
 		
 				ExeRunner.run(cmd, stdoutFileName, timeout);
