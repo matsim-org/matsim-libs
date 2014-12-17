@@ -35,12 +35,14 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import javax.inject.Inject;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	private Scenario scenario;
 	
+	@Inject
 	public BestReplyLocationChoicePlanStrategy(Scenario scenario) {
 		this.scenario = scenario;
 	}
