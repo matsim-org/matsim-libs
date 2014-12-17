@@ -48,7 +48,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     private double boundingBoxRight;
     private double boundingBoxBottom;
 	
-	private int cellSizeCellBasedAccessibility;
+	private Integer cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
@@ -91,16 +91,24 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return map ;
 	}
 	
+	
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact
 	
 	@StringGetter("cellSizeForCellBasedAccessibility") 
     public int getCellSizeCellBasedAccessibility() {
-        return this.cellSizeCellBasedAccessibility;
+		return this.cellSizeCellBasedAccessibility;
     }
 	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
     public void setCellSizeCellBasedAccessibility(int value) {
-        this.cellSizeCellBasedAccessibility = value;
+		if (value <= 0) {
+			throw new IllegalArgumentException("Cell size must be greater than zero.");
+		}
+		if (value < 100) {
+			log.warn("Cell size is set to " + value + ". This is a comparatively small" +
+					" value, which may lead to computational problems.");
+		}
+		this.cellSizeCellBasedAccessibility = value;
     }
 	@StringGetter("extentOfAccessibilityComputationShapeFile")
     public String getShapeFileCellBasedAccessibility() {

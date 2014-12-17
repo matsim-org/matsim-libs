@@ -488,6 +488,9 @@ implements ShutdownListener, StartupListener {
 	public void generateGridsAndMeasuringPointsByNetwork(double cellSize){
 		log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 		log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
+		if (cellSize <= 0) {
+			new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+		}
 		BoundingBox bb = BoundingBox.createBoundingBox(network);
 		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 	}
