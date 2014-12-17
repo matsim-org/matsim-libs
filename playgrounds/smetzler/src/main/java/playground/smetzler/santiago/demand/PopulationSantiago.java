@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -59,7 +58,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class PopulationSantiago implements Runnable {
 
-	private static final String PLANS_FILE = "C:/Users/Ettan/10. Sem - Uni SS 14/VSP/Santiago/demand/plans_test.xml.gz";
+	private static final String PLANS_FILE = "C:/Users/Ettan/10. Sem - Uni SS 14/VSP/Santiago/demand/plans_testID.xml.gz";
 	private static final String SHAPEFILE = "C:/Users/Ettan/10. Sem - Uni SS 14/VSP/Santiago/demand/poly/santiagoPolyConvex.shp";
 	private static final String INPUTCSV = "C:/Users/Ettan/10. Sem - Uni SS 14/VSP/Santiago/santiago_pt_demand_matrix/raw_data/Aufteilunge nach Zonen_MatrizODviajes_zona777_mediahora_abr2012.csv/MatrizODviajes_zona777_mediahora_abr2012_AUSSCHNITT_DEUTSCH.csv";
 
@@ -175,7 +174,11 @@ public class PopulationSantiago implements Runnable {
 		while (shrinkingTreeMap.size()>0){ 
 			gepaart = false;
 			p++;
-			Person newPerson = population.getFactory().createPerson(new IdImpl(p));
+			
+			//Person newPerson = population.getFactory().createPerson(new IdImpl(p));
+			Person newPerson = population.getFactory().createPerson(Id.createPersonId(p));
+
+			
 			Person person1 = (Person) shrinkingTreeMap.pollFirstEntry().getValue();
 
 			Plan plan1 = person1.getPlans().get(0);
@@ -268,7 +271,7 @@ public class PopulationSantiago implements Runnable {
 				population.addPerson(person1);
 				//	System.out.println("leider keine passende rueckfahrt gefunden");
 			}
-			if (anzahlPaar > 5000)
+			if (anzahlPaar > 1000)
 				break;
 		}
 		System.out.println("Anzahl legs in Map: " + shrinkingTreeMapSize);
@@ -486,9 +489,9 @@ public class PopulationSantiago implements Runnable {
 		return ct.transform(point);
 	}
 
-	@SuppressWarnings("deprecation")
-	private Id createId(int source_zone, int sink_zone, int i, String transportMode, double decimalTime) {
-		return new IdImpl(transportMode + "_" + source_zone + "_" + sink_zone + "_" + i + "_" + decimalTime);
+	
+	private Id<Person> createId(int source_zone, int sink_zone, int i, String transportMode, double decimalTime) {
+		return Id.createPersonId(transportMode + "_" + source_zone + "_" + sink_zone + "_" + i + "_" + decimalTime);
 	}
 
 
