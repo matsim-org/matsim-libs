@@ -95,8 +95,8 @@ public class RunNationalFreight {
 		/* Config stuff */
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(OUTPUT_DIRECTORY);
-		config.controler().setLastIteration(1);
-		config.controler().setWriteEventsInterval(1);
+		config.controler().setLastIteration(100);
+		config.controler().setWriteEventsInterval(20);
 		config.global().setNumberOfThreads(40); 	// Hobbes
 		config.global().setRandomSeed(20141217l); 	// Hobbes
 		config.qsim().setNumberOfThreads(40);		// Hobbes
@@ -130,9 +130,15 @@ public class RunNationalFreight {
 			/* Subpopulation strategy */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		commercialStrategy.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
-		commercialStrategy.setWeight(0.7);
+		commercialStrategy.setWeight(0.85);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
+			/* Subpopulation ReRoute */
+		StrategySettings commercialReRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		commercialReRoute.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.name());
+		commercialReRoute.setWeight(0.15);
+		commercialReRoute.setSubpopulation("commercial");
+		config.strategy().addStrategySettings(commercialReRoute);
 		//TODO Add the custom strategy module.
 //		StrategySettings newStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 //		newStrategy.setModuleName("Digicore1");
