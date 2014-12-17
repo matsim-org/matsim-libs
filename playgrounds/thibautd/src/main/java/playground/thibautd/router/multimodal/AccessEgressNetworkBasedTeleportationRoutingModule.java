@@ -100,6 +100,11 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 		final double egressDistance = getCrowFlyDistance( toFacility , toLink );
 		final double egressTime = egressDistance / crowFlySpeed;
 
+		assert !Double.isNaN( accessDistance );
+		assert !Double.isNaN( accessTime );
+		assert !Double.isNaN( egressDistance );
+		assert !Double.isNaN( egressTime );
+
 		final AccessEgressNetworkBasedTeleportationRoute route =
 			new AccessEgressNetworkBasedTeleportationRoute();
 		route.setStartLinkId( fromFacility.getLinkId() );
