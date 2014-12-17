@@ -46,11 +46,11 @@ import playground.ikaddoura.noise2.ReceiverPoint;
  */
 public class CreateVideoCSVFile {
 
-	private double startTime = 5 * 3600.;
+	private double startTime = 3 * 3600.;
 	private double timeBinSize = 3600.;
-	private double endTime = 8. * 3600.; // < 24
-	private String pathToFilesToMerge = "/Users/ihab/Desktop/test/immissions/";
-	private String receiverPointsFile = "/Users/ihab/Desktop/test/receiverPointsOriginal.csv";
+	private double endTime = 10. * 3600.; // < 24
+	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/baseCase_rpGap25meters/immissions/";
+	private String receiverPointsFile = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
 	private int iteration = 100;
 	private String label = "immission";
@@ -72,7 +72,8 @@ public class CreateVideoCSVFile {
 		
 		try {
 			
-			receiverPoints = readInReceiverPoints();
+//			receiverPoints = readInReceiverPoints();
+			receiverPoints = readInReceiverPoints(4592188., 5813743., 4604284., 5820670.);
 			
 			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 				
@@ -103,10 +104,10 @@ public class CreateVideoCSVFile {
 							value = Double.valueOf(columns[column]); 
 						} else {
 							throw new RuntimeException("More than two columns. Aborting...");
-						}
-						rp2value.put(rp, value);
-						
+						}						
 					}
+					rp2value.put(rp, value);
+
 					lineCounter++;
 					time2rp2value.put(time, rp2value);
 				}
@@ -187,9 +188,60 @@ public class CreateVideoCSVFile {
 					} else {
 						throw new RuntimeException("More than three columns. Aborting...");
 					}
+				}
+				
+				Tuple<Double, Double> coords = new Tuple<Double,Double>(xCoord, yCoord);
+				rp2coords.put(rp, coords);
+				
+				lineCounter++;
+			}
+			
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return rp2coords;
+	}
+	
+	private Map<Id<ReceiverPoint>, Tuple<Double, Double>> readInReceiverPoints(Double xMin, Double yMin, Double xMax, Double yMax) {
+		Map<Id<ReceiverPoint>, Tuple<Double, Double>> rp2coords = new HashMap<Id<ReceiverPoint>, Tuple<Double,Double>>();
+		BufferedReader br = IOUtils.getBufferedReader(this.receiverPointsFile);
+		
+		try {
+			String line = null;
+			line = br.readLine();
+			
+			int lineCounter = 0;
+			System.out.println("Reading lines ");
+			while ((line = br.readLine()) != null) {
+				
+				if (lineCounter % 10000 == 0.) {
+					System.out.println("# " + lineCounter);
+				}
+				
+				String[] columns = line.split(separator);
+				Id<ReceiverPoint> rp = null;
+				Double xCoord = null;
+				Double yCoord = null;
+
+				for (int column = 0; column < columns.length; column++) {
+					if (column == 0) {
+						rp = Id.create(columns[column], ReceiverPoint.class);
+					} else if (column == 1) {
+						xCoord = Double.valueOf(columns[column]);
+					} else if (column == 2) {
+						yCoord = Double.valueOf(columns[column]);
+					} else {
+						throw new RuntimeException("More than three columns. Aborting...");
+					}
+				}
+				
+				if ( (xCoord > xMin) && (xCoord < xMax) && (yCoord > yMin) && (yCoord < yMax) ) {
 					Tuple<Double, Double> coords = new Tuple<Double,Double>(xCoord, yCoord);
 					rp2coords.put(rp, coords);
 				}
+				
 				lineCounter++;
 			}
 			
