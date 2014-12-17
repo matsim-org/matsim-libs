@@ -187,7 +187,16 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			}
 		}
 
-		assert bestDirectWay != null || p != null;
+		if ( bestDirectWay != null ) {
+			final List<PlanElement> withdep = new ArrayList< >( bestDirectWay.size() + 1 );
+			withdep.add( createDeparture( fromFacility ) );
+			withdep.addAll( bestDirectWay );
+			bestDirectWay = withdep;
+		}
+		else if ( p == null ) {
+			throw new RuntimeException( "no path nor direct way!? Should not happen without a bug..." );
+		}
+
 		return bestDirectWay != null ? bestDirectWay :
 			convertPathToTrip(
 					departureTime,
