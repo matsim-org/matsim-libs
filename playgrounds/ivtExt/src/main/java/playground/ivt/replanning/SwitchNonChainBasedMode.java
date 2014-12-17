@@ -29,12 +29,15 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
 public class SwitchNonChainBasedMode implements PlanStrategy {
 	final PlanStrategyImpl delegate;
 
+	@Inject
 	public SwitchNonChainBasedMode(final Scenario sc) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
