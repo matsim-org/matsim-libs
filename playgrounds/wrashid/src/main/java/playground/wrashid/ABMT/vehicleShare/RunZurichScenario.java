@@ -58,12 +58,21 @@ public class RunZurichScenario {
 		Logger.getLogger( org.matsim.core.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR ); // this is location choice
 		Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
+//		final Config config = ConfigUtils.loadConfig(
+//				configFile,
+//				// this adds a new config group, used by the specific scoring function
+//				// we use
+//				new KtiLikeScoringConfigGroup(),
+//				new DestinationChoiceConfigGroup());
+		
+		
+		
 		final Config config = ConfigUtils.loadConfig(
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup(),
-				new DestinationChoiceConfigGroup());
+				new KtiLikeScoringConfigGroup()
+				);
 
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -80,7 +89,8 @@ public class RunZurichScenario {
 
 		connectFacilitiesWithNetwork( controler );
 		
-		initializeLocationChoice( controler );
+		// 
+		//initializeLocationChoice( controler );
 
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
