@@ -67,7 +67,7 @@ public class CompositeStageActivityTypes implements StageActivityTypes {
 	 * considered equal to the parameter instance
 	 * @param checker the instance to use to identify the instance to remove
 	 * @return true if an instance was actually removed, false otherwise.
-	 * Note that this will always return false for {@link EmptyStageActivityTypes}
+	 * Note that this will always return true for {@link EmptyStageActivityTypes}
 	 * instances.
 	 */
 	public boolean removeActivityTypes(final StageActivityTypes checker) {
