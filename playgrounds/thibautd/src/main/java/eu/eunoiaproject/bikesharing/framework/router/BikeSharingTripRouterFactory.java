@@ -26,17 +26,20 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
-
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.InitialNodeRouter;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
@@ -119,14 +122,18 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
 			initialNodeRouters.add( 
 					new InitialNodeRouter(
-							router.getRoutingModule( TransportMode.walk ),
+							new RoutingModuleProxy(
+								TransportMode.walk,
+								router ),
 							scenario.getConfig().transitRouter().getSearchRadius(),
 							1,
 							scoringParams ) );
 			if ( contains( scenario.getConfig().subtourModeChoice().getModes() , BikeSharingConstants.MODE ) ) {
 				initialNodeRouters.add(
 						new InitialNodeRouter(
-								router.getRoutingModule( BikeSharingConstants.MODE ),
+								new RoutingModuleProxy(
+									BikeSharingConstants.MODE,
+									router ),
 								configGroup.getPtSearchRadius(),
 								3, // there is randomness: keep the "best" of a few draws
 								scoringParams ) {
@@ -170,5 +177,38 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 
 	public void setRoutePtUsingSchedule( boolean routePtUsingSchedule ) {
 		this.routePtUsingSchedule = routePtUsingSchedule;
+	}
+
+	// not sure this really corresponds to the "proxy" pattern...
+	// the idea it  to always get the last added routing module,
+	// to avoid problems with "piped" factories.
+	private static class RoutingModuleProxy implements RoutingModule {
+		final String mode;
+		final TripRouter router;
+
+		public RoutingModuleProxy(
+				final String mode,
+				final TripRouter router ) {
+			this.mode = mode;
+			this.router = router;
+		}
+
+		@Override
+		public List<? extends PlanElement> calcRoute(
+				final Facility fromFacility,
+				final Facility toFacility,
+				final double departureTime,
+				final Person person ) {
+			return router.getRoutingModule( mode ).calcRoute(
+					fromFacility,
+					toFacility,
+					departureTime,
+					person );
+		}
+
+		@Override
+		public StageActivityTypes getStageActivityTypes() {
+			return router.getRoutingModule( mode ).getStageActivityTypes();
+		}
 	}
 }
