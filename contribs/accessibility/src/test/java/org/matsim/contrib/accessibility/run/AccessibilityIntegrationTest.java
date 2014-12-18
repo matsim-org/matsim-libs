@@ -99,7 +99,7 @@ public class AccessibilityIntegrationTest {
 			opportunities.addActivityFacility(facility);
 		}
 
-		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
+		org.matsim.contrib.accessibility.run.RunAccessibility.run(sc);
 	}
 
 	@Test
