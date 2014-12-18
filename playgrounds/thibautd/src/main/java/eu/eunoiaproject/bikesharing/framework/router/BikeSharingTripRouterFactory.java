@@ -41,7 +41,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.InitialNodeRouter;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 

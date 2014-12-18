@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -51,7 +50,6 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -182,7 +180,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						departureTime,
 						person );
 			if ( curr.initialCost <= bestCost ) {
-				bestDirectWay = curr.subtrip;
+				bestDirectWay = curr.getSubtrip();
 				bestCost = curr.initialCost;
 			}
 		}
@@ -229,17 +227,17 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
 		trip.add( createDeparture( fromFacility ) );
-		trip.addAll( fromInitialNode.subtrip );
+		trip.addAll( fromInitialNode.getSubtrip() );
 		// there is no Pt interaction in there...
 		trip.addAll(
 				fillWithActivities(
 					convertPathToLegList(
 						departureTime,
-						fromInitialNode.node.getStop().getStopFacility(),
-						toInitialNode.node.getStop().getStopFacility(),
+						fromInitialNode.getNode().getStop().getStopFacility(),
+						toInitialNode.getNode().getStop().getStopFacility(),
 						p,
 						person ) ) );
-		trip.addAll( toInitialNode.subtrip );
+		trip.addAll( toInitialNode.getSubtrip() );
 
 		return trip;
 	}
@@ -542,114 +540,6 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 
 		public Map<Node, InitialNode> getMap() {
 			return new LinkedHashMap<Node, InitialNode>( map );
-		}
-	}
-
-	public static class InitialNodeWithSubTrip extends InitialNode {
-		public final TransitRouterNetworkNode node;
-		public final List<? extends PlanElement> subtrip;
-
-		public InitialNodeWithSubTrip(
-				final TransitRouterNetworkNode node,
-				final double initialCost,
-				final double initialTime,
-				final List<? extends PlanElement> subtrip) {
-			super(initialCost, initialTime);
-			this.node = node;
-			this.subtrip = subtrip;
-		}
-	}
-
-	public static class InitialNodeRouter {
-		private final RoutingModule delegate;
-		private final double searchRadius;
-
-		private final int desiredNumberOfCalls;
-		private final CharyparNagelScoringParameters scoringParams;
-
-		public InitialNodeRouter(
-				final RoutingModule delegate,
-				final double searchRadius,
-				final int desiredNumberOfCalls,
-				final CharyparNagelScoringParameters scoringParams) {
-			this.delegate = delegate;
-			this.searchRadius = searchRadius;
-			this.desiredNumberOfCalls = desiredNumberOfCalls;
-			this.scoringParams = scoringParams;
-		}
-
-		public InitialNodeWithSubTrip calcRoute(
-				final TransitRouterNetworkNode node,
-				final Facility from,
-				final Facility to,
-				final double dep,
-				final Person pers) {
-			final List<? extends PlanElement> trip = delegate.calcRoute( from , to , dep , pers );
-			final double duration = calcDuration( trip );
-			final double cost = calcCost( trip );
-			return new InitialNodeWithSubTrip( node , cost , dep + duration , trip );
-		}
-
-
-		protected double calcDuration(final List<? extends PlanElement> trip) {
-			double tt = 0;
-
-			for ( PlanElement pe : trip ) {
-				if ( pe instanceof Leg ) {
-					final double curr = ((Leg) pe).getTravelTime();
-					if ( curr == Time.UNDEFINED_TIME ) throw new RuntimeException( pe+" has not travel time" );
-					tt += curr;
-				}
-
-				if ( pe instanceof Activity ) {
-					final double dur = ((Activity) pe).getMaximumDuration();
-					if ( dur != Time.UNDEFINED_TIME ) {
-						tt += dur;
-					}
-				}
-
-			}
-
-			return tt;
-		}
-
-		protected double calcCost(final List<? extends PlanElement> trip) {
-			double cost = 0;
-
-			for ( PlanElement pe : trip ) {
-				if ( pe instanceof Leg ) {
-					final Leg leg = (Leg) pe;
-					final double time = leg.getTravelTime();
-					if ( time == Time.UNDEFINED_TIME ) throw new RuntimeException( pe+" has not travel time" );
-					// XXX no distance!
-					// /!\ this is cost, thus minus utility!
-					cost -= scoringParams.modeParams.get( leg.getMode() ).marginalUtilityOfTraveling_s * time;
-					cost -= scoringParams.modeParams.get( leg.getMode() ).constant;
-				}
-			}
-
-			return cost;
-
-		}
-
-		public StageActivityTypes getStageActivities() {
-			return delegate.getStageActivityTypes();
-		}
-
-		/**
-		 * @return the number of time the calcRoute method should be called
-		 * for each origin/destination pair. This should be 1 in most of the cases,
-		 * but higher rates might be useful for randomized routers, such as bike sharing.
-		 */
-		public int getDesiredNumberOfCalls() {
-			return desiredNumberOfCalls;
-		}
-
-		/**
-		 * @return the radius within which the stations should be searched.
-		 */
-		public double getSearchRadius() {
-			return searchRadius;
 		}
 	}
 
