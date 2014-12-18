@@ -19,9 +19,7 @@
 package org.matsim.contrib.accessibility.run;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -82,7 +80,6 @@ final class RunAccessibilityExample {
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
 
