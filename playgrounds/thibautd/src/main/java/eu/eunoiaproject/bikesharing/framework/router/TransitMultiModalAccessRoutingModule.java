@@ -324,7 +324,10 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						facility.getCoord(),
 						Math.min(
 							router.getSearchRadius(),
-							tripLength ) );
+							// do not access a pt stop more than half-way
+							// TODO: make configurable, as anything lower than one
+							// is an approximation...
+							tripLength / 2d ) );
 
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
@@ -367,7 +370,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			}
 		}
 	}
-	
+
 	private double getWalkTime(
 			final Person person,
 			final Coord coord,
