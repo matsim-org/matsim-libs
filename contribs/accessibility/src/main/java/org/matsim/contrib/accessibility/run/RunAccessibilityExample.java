@@ -43,9 +43,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 final class RunAccessibilityExample {
 	// do not change name of class; matsim book refers to it.  kai, dec'14
 
-
 	private static final Logger log = Logger.getLogger(RunAccessibilityExample.class);
 
+	
 	public static void main(String[] args) {
 
 		if ( args.length==0 || args.length>1 ) {
@@ -57,10 +57,9 @@ final class RunAccessibilityExample {
 		
 		// the run method is extracted so that a test can operate on it.
 		run( scenario);
-		
-		
 	}
 
+	
 	public static void run(Scenario scenario) {
 		
 		List<String> activityTypes = new ArrayList<String>() ;
@@ -78,7 +77,7 @@ final class RunAccessibilityExample {
 			}
 		}
 		
-		log.warn( "found activity types: " + activityTypes ); 
+		log.warn( "found the following activity types: " + activityTypes ); 
 		
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some other algorithms,
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
@@ -107,16 +106,18 @@ final class RunAccessibilityExample {
 				new GridBasedAccessibilityControlerListenerV3(opportunities, scenario.getConfig(), scenario.getNetwork());
 
 			// define the modes that will be considered
-			// the following modes are available (see AccessibilityControlerListenerImpl): freeSpeed, car, bike, walk, pt
+			// here, the accessibility computation is only done for freespeed
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 
-			// this has to do with the additional population density column:
+			// add additional facility data to an additional column in the output
+			// here, an additional population density column is used
 			listener.addAdditionalFacilityData(homes) ;
-
-			listener.generateGridsAndMeasuringPointsByNetwork(100.);
-			// yy todo: meaningful error message if this is not set
-			// yy todo: make sure that cell size is taken from config.
 			
+			Double cellSizeForCellBasedAccessibility = 
+					Double.parseDouble(scenario.getConfig().getModule("accessibility").getValue("cellSizeForCellBasedAccessibility"));
+
+			listener.generateGridsAndMeasuringPointsByNetwork(cellSizeForCellBasedAccessibility);
+						
 			listener.writeToSubdirectoryWithName(actType);
 			
 			controler.addControlerListener(listener);
