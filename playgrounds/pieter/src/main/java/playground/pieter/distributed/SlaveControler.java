@@ -38,6 +38,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.contrib.locationchoice.*;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
+import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
@@ -61,6 +62,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
     private final boolean quickReplannning;
+    private final boolean fullTransitPerformanceTransmission;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
@@ -92,6 +94,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private final PlanCatcher plancatcher;
+    private TransitPerformance transitPerformance;
 
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -176,6 +179,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         initialRouting = reader.readBoolean();
         quickReplannning = reader.readBoolean();
+        fullTransitPerformanceTransmission = reader.readBoolean();
+
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
         memoryUsageCalculator = new MemoryUsageCalculator();
@@ -225,6 +230,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
+
         }
 
         if (commandLine.hasOption("s")) {
@@ -335,6 +341,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (config.scenario().isUseTransit()) {
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
+            pSimFactory.setTransitPerformance(transitPerformance);
             if (matsimControler.getTransitRouterFactory() instanceof TransitRouterWSImplFactory) {
                 ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
                 ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
@@ -344,8 +351,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         numberOfIterations++;
     }
 
-
-
     public double getTotalIterationTime() {
         double sumTimes = 0;
         for (long t : iterationTimes) {
@@ -353,9 +358,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         return sumTimes;
     }
-
-
-
 
     private void addPersons(List<PersonSerializable> persons) {
         for (PersonSerializable person : persons) {
@@ -398,6 +400,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (config.scenario().isUseTransit()) {
             stopStopTimes = (StopStopTime) reader.readObject();
             waitTimes = (WaitTime) reader.readObject();
+            if(fullTransitPerformanceTransmission) {
+                Object o = reader.readObject();
+                transitPerformance = (TransitPerformance) o;
+            }
         }
         slaveLogger.warn("RECEIVING travel times completed. Master at iteration number "+masterCurrentIteration);
     }

@@ -12,6 +12,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 
@@ -28,6 +29,7 @@ public class PSimFactory implements MobsimFactory {
 
 
 	private int iteration = 0;
+	private TransitPerformance transitPerformance;
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -36,7 +38,7 @@ public class PSimFactory implements MobsimFactory {
 //		else
 //			iteration++;
 		if (waitTime != null) {
-			return new PSim(sc, eventsManager, plans, travelTime, waitTime, stopStopTime);
+			return new PSim(sc, eventsManager, plans, travelTime, waitTime, stopStopTime, transitPerformance);
 
 		} else {
 			return new PSim(sc, eventsManager, plans, travelTime);
@@ -58,6 +60,9 @@ public class PSimFactory implements MobsimFactory {
 		this.stopStopTime = stopStopTime;
 	}
 
+	public void setTransitPerformance(TransitPerformance transitPerformance){
+		this.transitPerformance = transitPerformance;
+	}
 
 	public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
 		this.travelTime = travelTime;
