@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.PlanStrategy;
@@ -26,7 +27,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	private PlanStrategyImpl delegate;
 	
 	public TransitLocationChoiceStrategy(final Scenario scenario) {
-		String planSelector = scenario.getConfig().findParam("locationchoice", "planSelector");
+		String planSelector = ((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (planSelector.equals("ChangeExpBeta")) {
