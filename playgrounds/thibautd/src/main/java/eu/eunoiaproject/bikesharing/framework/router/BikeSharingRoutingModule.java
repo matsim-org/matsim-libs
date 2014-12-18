@@ -37,6 +37,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
@@ -79,10 +80,26 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		final BikeSharingFacility startStation = chooseCloseStation( fromFacility );
-		final BikeSharingFacility endStation = chooseCloseStation( toFacility );
+		final double directDistance = CoordUtils.calcDistance( fromFacility.getCoord() , toFacility.getCoord() );
 
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
+		final double maxSearchRadius = directDistance / 3d;
+		final BikeSharingFacility startStation = chooseCloseStation( fromFacility , maxSearchRadius );
+		final BikeSharingFacility endStation = chooseCloseStation( toFacility , maxSearchRadius );
+
+		if ( startStation == endStation ) {
+			final List<PlanElement> trip = new ArrayList< >( 2 );
+			// "tag" trip as bike sharing.
+			trip.add( createInteraction( fromFacility ) );
+			trip.addAll(
+					router.calcRoute(
+						TransportMode.walk,
+						fromFacility,
+						toFacility,
+						departureTime,
+						person ) );
+		}
+
+		final List<PlanElement> trip = new ArrayList< >( 5 );
 
 		trip.addAll(
 				createWalkSubtrip(
@@ -176,12 +193,16 @@ public class BikeSharingRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	private BikeSharingFacility chooseCloseStation(final Facility facility) {
+	private BikeSharingFacility chooseCloseStation(
+			final Facility facility,
+			final double maxSearchRadius ) {
 		final Collection<BikeSharingFacility> stationsInRadius =
 			bikeSharingFacilities.getCurrentQuadTree().get(
 					facility.getCoord().getX(),
 					facility.getCoord().getY(),
-					searchRadius );
+					Math.min(
+						searchRadius,
+						maxSearchRadius ) );
 		return stationsInRadius.isEmpty() ?
 			bikeSharingFacilities.getCurrentQuadTree().get(
 					facility.getCoord().getX(),
