@@ -28,6 +28,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.replanning.modules.ChangeLegMode;
 
 /**
  * @author amit
@@ -64,8 +65,8 @@ public class SubpopulationConfig {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(200);
 		config.controler().setMobsim("qsim");
-		config.controler().setWriteEventsInterval(100);
-		config.controler().setWritePlansInterval(100);
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(10);
 		config.controler().setWriteSnapshotsInterval(100);	
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 
@@ -95,33 +96,23 @@ public class SubpopulationConfig {
 			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			reRoute.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.name());
 			reRoute.setWeight(0.1);
-
+			
+			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			modeChoice.setStrategyName("ChangeLegMode_".concat(subPopulations[0]));
+			modeChoice.setWeight(0.05);
+			
 			timeAllocationMutator.setSubpopulation(subPop);
 			reRoute.setSubpopulation(subPop);
 			expChangeBeta.setSubpopulation(subPop);
+			modeChoice.setSubpopulation(subPop);
 			
 			config.strategy().addStrategySettings(expChangeBeta);
 			config.strategy().addStrategySettings(reRoute);
 			config.strategy().addStrategySettings(timeAllocationMutator);
-
+			config.strategy().addStrategySettings(modeChoice);
+			
 		}
 		
-		StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		modeChoice.setStrategyName(PlanStrategyRegistrar.Names.ChangeLegMode.name());
-		modeChoice.setWeight(0.05);
-
-		config.setParam("changeLegMode", "modes", "bike,motorbike,pt,walk");
-		modeChoice.setSubpopulation(subPopulations[0]);
-		config.strategy().addStrategySettings(modeChoice);
-		
-		
-		modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		modeChoice.setStrategyName(PlanStrategyRegistrar.Names.ChangeLegMode.name());
-		modeChoice.setWeight(0.05);
-		
-		config.setParam("changeLegMode", "modes", "car,bike,motorbike,pt,walk");
-		modeChoice.setSubpopulation(subPopulations[1]);
-		config.strategy().addStrategySettings(modeChoice);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
 		config.planCalcScore().setTraveling_utils_hr(0);
