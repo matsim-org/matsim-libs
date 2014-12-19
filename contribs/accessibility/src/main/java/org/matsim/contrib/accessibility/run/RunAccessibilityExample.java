@@ -38,16 +38,16 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel
  *
  */
-final public class RunAccessibility {
+final public class RunAccessibilityExample {
 	// do not change name of class; matsim book refers to it.  kai, dec'14
 
-	private static final Logger log = Logger.getLogger(RunAccessibility.class);
+	private static final Logger log = Logger.getLogger(RunAccessibilityExample.class);
 
 	
 	public static void main(String[] args) {
 
 		if ( args.length==0 || args.length>1 ) {
-			throw new RuntimeException("useage: ...Main config.xml") ;
+			throw new RuntimeException("useage: ... config.xml") ;
 		}
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		

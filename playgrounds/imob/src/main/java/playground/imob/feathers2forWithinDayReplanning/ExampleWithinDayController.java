@@ -50,28 +50,6 @@ import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
  */
 final class ExampleWithinDayController implements StartupListener {
 
-	/*
-	 * Define the Probability that an Agent uses the
-	 * Replanning Strategy. It is possible to assign
-	 * multiple Strategies to the Agents.
-	 */
-//	private double pInitialReplanning = 0.0;
-//	private double pDuringActivityReplanning = 1.0;
-//	private double pDuringLegReplanning = 0.10;
-//	
-//	private InitialIdentifierFactory initialIdentifierFactory;
-//	private DuringActivityIdentifierFactory duringActivityIdentifierFactory;
-//	private DuringLegIdentifierFactory duringLegIdentifierFactory;
-//	private InitialIdentifier initialIdentifier;
-//	private DuringActivityIdentifier duringActivityIdentifier;
-//	private DuringLegIdentifier duringLegIdentifier;
-//	private WithinDayInitialReplannerFactory initialReplannerFactory;
-//	private WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
-//	private WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
-//	private ProbabilityFilterFactory initialProbabilityFilterFactory;
-//	private ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
-//	private ProbabilityFilterFactory duringLegProbabilityFilterFactory;
-	
 	private Scenario scenario;
 	private WithinDayControlerListener withinDayControlerListener;
 	
@@ -90,6 +68,7 @@ final class ExampleWithinDayController implements StartupListener {
 			final Controler controler = new Controler(args);
 			controler.addControlerListener(new ExampleWithinDayController(controler));
 			
+			// cannot do the following since withinday uses its own mobsim factory, which is not additive!
 //			controler.setMobsimFactory( new MobsimFactory() {
 //				@Override
 //				public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
