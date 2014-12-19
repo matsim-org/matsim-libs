@@ -151,8 +151,8 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 					
 					for (int i = 0; i < 25; i++) {
 						double value = 0.0;
-						if (linkId2Count.getValue().getVolume(i) != null) {
-							value = linkId2Count.getValue().getVolume(i).getValue();
+						if (linkId2Count.getValue().getVolume(i+1) != null) {
+							value = linkId2Count.getValue().getVolume(i+1).getValue();
 						}
 						bw.write(separator + value);
 					}

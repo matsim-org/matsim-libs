@@ -81,7 +81,7 @@ public class TransitVehicleVolumeHandler implements TransitDriverStartsEventHand
 	}
 		
 	private void increase(Count count, Double time){
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}

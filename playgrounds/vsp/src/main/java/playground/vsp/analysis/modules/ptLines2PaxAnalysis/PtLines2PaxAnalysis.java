@@ -122,7 +122,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 				w.write(String.valueOf(noStops) + ";" + count.getCsId() + ";" + transitRouteStops.get(noStops).getStopFacility().getName());
 				
 				for(int j = 0; j <= maxSlice; j++){
-					Volume volume = count.getVolume(j);
+					Volume volume = count.getVolume(j+1);
 					String value = (volume == null) ? this.SEP : String.valueOf(volume.getValue());
 					w.write(";" + value);
 				}

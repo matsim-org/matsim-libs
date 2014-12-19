@@ -173,6 +173,7 @@ public class VspAnalyzer {
 				
 			} catch (Exception e) {
 				log.error("Postprocessing of module " + module.getName() + " failed.");
+				e.printStackTrace();
 			}
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 //			log.info("post-processing finished...");
@@ -186,6 +187,7 @@ public class VspAnalyzer {
 				module.writeResults(outputDir);
 			} catch (Exception e) {
 				log.error("Writing the output of module " + module.getName() + " failed.");
+				e.printStackTrace();
 			}
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
 		}

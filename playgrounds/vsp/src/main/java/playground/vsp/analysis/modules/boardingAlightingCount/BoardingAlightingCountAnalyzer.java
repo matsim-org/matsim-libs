@@ -129,7 +129,8 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 			totals.put(c.getLocId(), total);
 		}
 		if(this.writeHeatMaps){
-			createHeatMapTotals(totals, name + "Totals");
+			log.warn("Writing heatmaps seems to be broken for a long time. This function is deactivated for the time beeing.");
+//			createHeatMapTotals(totals, name + "Totals");
 		}
 		return totals;
 	}
@@ -222,10 +223,10 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 						if(count == null){
 							w.write(0. + ";");
 						}else{
-							if(count.getVolume(i) == null){
+							if(count.getVolume(i+1) == null){
 								w.write(0. + ";");
 							}else{
-								w.write(String.valueOf(count.getVolume(i).getValue()) + ";");
+								w.write(String.valueOf(count.getVolume(i+1).getValue()) + ";");
 							}
 						}
 					}

@@ -148,10 +148,10 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 			featureAttribs[1] = c.getLocId().toString();
 			featureAttribs[2] = mode2Total.get(c.getLocId());
 			for(int i = 0; i < this.handler.getMaxTimeSlice() ; i++){
-				if(c.getVolume(i) == null){
+				if(c.getVolume(i+1) == null){
 					featureAttribs[3 + i] = 0.;
 				}else{
-					featureAttribs[3 + i] = c.getVolume(i).getValue();
+					featureAttribs[3 + i] = c.getVolume(i+1).getValue();
 				}
 			}
 			try {

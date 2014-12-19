@@ -201,7 +201,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	}
 
 	private void increaseCount(Count count, double time, double amount) {
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}

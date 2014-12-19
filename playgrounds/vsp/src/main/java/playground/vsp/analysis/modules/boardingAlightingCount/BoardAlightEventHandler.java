@@ -170,7 +170,7 @@ public class BoardAlightEventHandler implements
 			//or get the old one if there is one
 			count = counts.getCount(stopId);
 		}
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}

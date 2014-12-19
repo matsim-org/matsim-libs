@@ -123,7 +123,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 		objects[2] = link.getId().toString();
 		objects[3] = paxValue;
 		for(int i = 0; i < this.handler.getMaxInterval(); i++){
-			objects[4 + i] = this.handler.getPaxCountForLinkId(link.getId(), i);
+			objects[4 + i] = this.handler.getPaxCountForLinkId(link.getId(), i+1);
 		}
 		return objects;
 	}
@@ -176,7 +176,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 		objects[2] = link.getId().toString();
 		objects[3] = paxValue;
 		for(int i = 0; i < this.handler.getMaxInterval(); i++){
-			objects[4 + i] = this.handler.getPaxCountForLinkId(link.getId(), lineId, i);
+			objects[4 + i] = this.handler.getPaxCountForLinkId(link.getId(), lineId, i+1);
 		}
 		return objects;
 	}

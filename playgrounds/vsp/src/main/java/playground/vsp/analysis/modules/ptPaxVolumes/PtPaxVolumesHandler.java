@@ -150,7 +150,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 	}
 	
 	private void increase(Count c, CountVehicle cv, Double time){
-		Integer slice = (int) (time / this.interval);
+		Integer slice = (int) (time / this.interval) + 1;
 		if(slice > this.maxSlice){
 			this.maxSlice = slice;
 		}
