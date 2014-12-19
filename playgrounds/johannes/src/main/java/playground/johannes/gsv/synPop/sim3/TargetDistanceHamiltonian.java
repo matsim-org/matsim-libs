@@ -87,12 +87,13 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 	}
 
 	public static double calcDetourFactor(double beeline) {
-		if(beeline < 100000) {
-			return 2.5;
-		} else if(beeline < 300000) {
-			return 1.3;
-		} else {
-			return 1.0;
-		}
+//		if(beeline < 100000) {
+//			return 2.5;
+//		} else if(beeline < 300000) {
+//			return 1.3;
+//		} else {
+//			return 1.0;
+//		}
+		return 1.0;
 	}
 }

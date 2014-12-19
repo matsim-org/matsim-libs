@@ -17,58 +17,56 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.matrices;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import org.matsim.matrices.Matrix;
+import org.matsim.visum.VisumMatrixWriter;
+
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 
 /**
  * @author johannes
  * 
  */
-public class KeyMatrix {
+public class ODMatrix2Visum {
 
-	private Map<String, Map<String, Double>> matrix;
-	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
-	}
-	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
-		}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Matrix m1 = new Matrix("1", null);
+
+		KeyMatrixXMLReader reader2 = new KeyMatrixXMLReader();
+		reader2.setValidating(false);
+		reader2.parse("/home/johannes/gsv/matrices/miv.avr.xml");
+		KeyMatrix m2 = reader2.getMatrix();
+
+		MatrixOpertaions.applyFactor(m2, 11.0);
+		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
 		
-		return col.put(key2, value);
+		MatrixOpertaions.sysmetrize(m2);
+		
+		
+		Set<String> keys = m2.keys();
+		for (String i : keys) {
+			for (String j : keys) {
+				Double val = m2.get(i, j);
+				if (val != null) {
+					m1.createEntry(i, j, val);
+				}
+			}
+		}
+
+		VisumMatrixWriter writer = new VisumMatrixWriter(m1);
+		writer.writeFile("/home/johannes/gsv/matrices/miv.avr.fma");
+		
+		KeyMatrixXMLWriter xmlWriter = new KeyMatrixXMLWriter();
+		xmlWriter.write(m2, "/home/johannes/gsv/matrices/miv.avr2.xml");
 	}
 
-	public Double get(String key1, String key2) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			return null;
-		} else {
-			return col.get(key2);
-		}
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
-		}
-		
-		return keys;
-	}
 }

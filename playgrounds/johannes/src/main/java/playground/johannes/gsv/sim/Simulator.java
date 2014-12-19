@@ -84,7 +84,7 @@ public class Simulator {
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
-		controler.setMobsimFactory(new MobsimConnectorFactory());
+//		controler.setMobsimFactory(new MobsimConnectorFactory());
 		controler.addControlerListener(new ControllerSetup());
 		/*
 		 * setup mutation module
@@ -128,6 +128,7 @@ public class Simulator {
 		 * setup scoring and cadyts integration
 		 */
 		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("disableCadyts"));
+//		boolean personEqualsVeh = Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("personEqualsVeh"));
         LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getScenario().getPopulation());
 		controler.getEvents().addHandler(calculator);
 		if (!disableCadyts) {
@@ -150,6 +151,7 @@ public class Simulator {
 		controler.addControlerListener(dtv);
 		
 		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
+		
 		
 		controler.setModules(new AbstractModule() {
             @Override

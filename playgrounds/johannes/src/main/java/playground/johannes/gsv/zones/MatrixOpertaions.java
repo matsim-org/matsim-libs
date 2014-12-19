@@ -21,7 +21,10 @@ package playground.johannes.gsv.zones;
 
 import gnu.trove.TObjectDoubleHashMap;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -131,5 +134,73 @@ public class MatrixOpertaions {
 			marginals.put(j, sum);
 		}
 		return marginals;
+	}
+	
+	public static KeyMatrix average(Collection<KeyMatrix> matrices) {
+		Set<String> keys = new HashSet<>();
+		for(KeyMatrix m : matrices) {
+			keys.addAll(m.keys());
+		}
+		
+		KeyMatrix avr = new KeyMatrix();
+		for(KeyMatrix m : matrices) {
+			for(String i : keys) {
+				for(String j : keys) {
+					Double val = m.get(i, j);
+					if(val == null) val = 0.0;
+					
+					Double val2 = avr.get(i, j);
+					if(val2 == null) val2 = 0.0;
+					
+					double sum = val + val2;
+					if(sum > 0)	avr.set(i, j, sum);
+				}
+			}
+		}
+		
+		for(String i : keys) {
+			for(String j : keys) {
+				avr.applyFactor(i, j, 1/(double)matrices.size());
+			}
+		}
+		
+		return avr;
+	}
+	
+	public static void sysmetrize(KeyMatrix m) {
+		List<String> keys = new ArrayList<>(m.keys());
+		
+		for(int i = 0; i < keys.size(); i++) {
+			String key1 = keys.get(i);
+			for(int j = (i+1); j < keys.size(); j++) {
+				String key2 = keys.get(j);
+				Double val1 = m.get(key1, key2);
+				if(val1 == null) val1 = 1.0;
+				
+				Double val2 = m.get(key2, key1);
+				if(val2 == null) val2 = 1.0;
+				
+				double sum = val1 + val2;
+				double p = Math.random() - 0.5;
+				
+				double f = 0.5 + (p * 0.1);
+						
+				double maxf = Math.max(f, 1-f);				
+				
+				double v1;
+				double v2;
+				
+				if(val1 < val2) {
+					v1 = sum * maxf;
+					v2 = sum * (1 - maxf);
+				} else {
+					v1 = sum * (1 - maxf);
+					v2 = sum * maxf;
+				}
+				
+				m.set(key1, key2, v1);
+				m.set(key2, key1, v2);
+			}
+		}
 	}
 }

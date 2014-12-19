@@ -64,6 +64,7 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 						String distStr = leg.getAttribute(CommonKeys.LEG_DISTANCE);
 						if (distStr != null) {
 							double d = Double.parseDouble(distStr);
+							if(d > 100000)
 							stats.addValue(d);//disc.discretize(d));
 						} else {
 							cntNoVal++;

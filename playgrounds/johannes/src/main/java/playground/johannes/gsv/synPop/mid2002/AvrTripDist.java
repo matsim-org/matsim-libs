@@ -17,58 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.synPop.mid2002;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+
+import playground.johannes.gsv.synPop.mid.RowHandler;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class KeyMatrix {
+public class AvrTripDist {
 
-	private Map<String, Map<String, Double>> matrix;
+	private static DescriptivePiStatistics stats;
 	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
-	}
-	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
-		}
+	public static void main(String[] args) throws IOException {
+		stats = new WSMStatsFactory().newInstance();
 		
-		return col.put(key2, value);
+		new Handler().read("/home/johannes/gsv/mid2002/wege.txt");
+		
+		System.out.println(String.format("Average trip length > 100 KM: %s", stats.getMean()));
+
 	}
 
-	public Double get(String key1, String key2) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			return null;
-		} else {
-			return col.get(key2);
-		}
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
+	private static class Handler extends RowHandler {
+
+		@Override
+		protected void handleRow(Map<String, String> attributes) {
+			String dist = attributes.get("W08");
+			String weight = attributes.get("GEW_WB");
+			
+			if(dist != null && weight != null) {
+				double d = Double.parseDouble(dist);
+				double w = Double.parseDouble(weight);
+				
+				if(d > 100 && d < 1000) {
+					stats.addValue(d, 1/w);
+				}
+			}
+			
 		}
 		
-		return keys;
 	}
 }

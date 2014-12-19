@@ -17,58 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.zones.io;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Stack;
+
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
+
+import playground.johannes.gsv.zones.KeyMatrix;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class KeyMatrix {
+public class KeyMatrixXMLReader extends MatsimXmlParser {
 
-	private Map<String, Map<String, Double>> matrix;
+	private KeyMatrix m;
 	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
+	public KeyMatrix getMatrix() {
+		return m;
 	}
 	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if(name.equalsIgnoreCase(ODMatrixXMLWriter.MATRIX_TAG)) {
+			m = new KeyMatrix();
+		} else if(name.equalsIgnoreCase(ODMatrixXMLWriter.CELL_TAG)) {
+			String row = atts.getValue(ODMatrixXMLWriter.ROW_KEY);
+			String col = atts.getValue(ODMatrixXMLWriter.COL_KEY);
+			String val = atts.getValue(ODMatrixXMLWriter.VALUE_KEY);
+			
+			m.set(row, col, new Double(val));
 		}
-		
-		return col.put(key2, value);
+
 	}
 
-	public Double get(String key1, String key2) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			return null;
-		} else {
-			return col.get(key2);
-		}
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
-		}
-		
-		return keys;
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
 	}
 }

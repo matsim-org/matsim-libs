@@ -78,6 +78,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 					Point p2 = MatsimCoordUtils.coordToPoint(thisFac.getCoord());
 
 					double d = calc.distance(p1, p2);
+					if(d > 100000)
 					stats.addValue(d);
 				}
 			}

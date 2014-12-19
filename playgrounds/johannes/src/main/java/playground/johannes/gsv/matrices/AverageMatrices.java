@@ -17,58 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.matrices;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class KeyMatrix {
+public class AverageMatrices {
 
-	private Map<String, Map<String, Double>> matrix;
-	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
-	}
-	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
-		}
+	public static void main(String[] args) {
+		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/miv.512.xml");
+		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
 		
-		return col.put(key2, value);
-	}
-
-	public Double get(String key1, String key2) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			return null;
-		} else {
-			return col.get(key2);
-		}
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
-		}
+		reader = new ODMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/miv.521.xml");
+		KeyMatrix m2 = reader.getMatrix().toKeyMatrix("gsvId");
 		
-		return keys;
+		List<KeyMatrix> list = new ArrayList<>(2);
+		list.add(m1);
+		list.add(m2);
+		
+		KeyMatrix avr = MatrixOpertaions.average(list);
+		
+		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		writer.write(avr, "/home/johannes/gsv/matrices/miv.avr.xml");
 	}
 }

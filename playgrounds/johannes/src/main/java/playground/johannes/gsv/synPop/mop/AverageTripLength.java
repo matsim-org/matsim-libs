@@ -17,58 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.synPop.mop;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 
 /**
  * @author johannes
  * 
  */
-public class KeyMatrix {
+public class AverageTripLength {
 
-	private Map<String, Map<String, Double>> matrix;
-	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
-	}
-	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
+	/**
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		DescriptivePiStatistics stats = new WSMStatsFactory().newInstance();
+
+		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrices/raw/mop/2012-13/TXT-Daten/W12.TXT"));
+
+		String line = reader.readLine();
+
+		while ((line = reader.readLine()) != null) {
+			String tokens[] = line.split("\\s+");
+			double dist = Double.parseDouble(tokens[19]);
+			double w = Double.parseDouble(tokens[22]);
+
+			if (dist > 100) {
+				stats.addValue(dist, 1 / w);
+			}
 		}
+		reader.close();
 		
-		return col.put(key2, value);
+		System.out.println(String.format("Average distance > 100 KM: %s", stats.getMean()));
+
 	}
 
-	public Double get(String key1, String key2) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			return null;
-		} else {
-			return col.get(key2);
-		}
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
-		}
-		
-		return keys;
-	}
 }

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,9 +44,9 @@ import org.matsim.api.core.v01.population.Population;
  */
 public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDepartureEventHandler {
 
-	private TObjectDoubleHashMap<Id> values;
+	private TObjectDoubleHashMap<Id<Link>> values;
 
-	private TObjectIntHashMap<Id> counter;
+	private TObjectIntHashMap<Id<Person>> counter;
 
 	private TObjectDoubleHashMap<String> rates;
 
@@ -53,22 +54,28 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 
 	private Population population;
 
-	public double getOccupancy(Id linkId) {
+	private final boolean personEqualsVeh;
+
+	public double getOccupancy(Id<Link> linkId) {
 		return values.get(linkId);
 	}
 
-	public LinkOccupancyCalculator(Population population) {
+	public LinkOccupancyCalculator(Population population, boolean personEqualsVeh) {
+		this.personEqualsVeh = personEqualsVeh;
 		this.population = population;
 
 		rates = new TObjectDoubleHashMap<String>();
 		rates.put("work", 1.2);
-//		rates.put("work", 1);
 		rates.put("edu", 1.7);
 		rates.put("shop", 1.5);
 		rates.put("private", 1.5);
 		rates.put("leisure", 1.9);
 		rates.put("pickdrop", 1.9);
 
+	}
+
+	public LinkOccupancyCalculator(Population population) {
+		this(population, false);
 	}
 
 	/*
@@ -78,8 +85,8 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	 */
 	@Override
 	public void reset(int iteration) {
-		values = new TObjectDoubleHashMap<Id>(5000);
-		counter = new TObjectIntHashMap<Id>(population.getPersons().size());
+		values = new TObjectDoubleHashMap<Id<Link>>(5000);
+		counter = new TObjectIntHashMap<Id<Person>>(population.getPersons().size());
 
 	}
 
@@ -93,7 +100,7 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		Person person = population.getPersons().get(personId);
 		Plan plan = person.getSelectedPlan();
 		int idx = counter.get(personId);
@@ -104,16 +111,17 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 			type = prevAct.getType();
 		}
 
-		double rate = rates.get(type);
-		if (rate == 0)
-			rate = 1.5;
-
+		double rate = 1;
+		if (!personEqualsVeh) {
+			rates.get(type);
+			if (rate == 0)
+				rate = 1.5;
+		}
 		rate = 1 / rate;
 
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 
 		values.adjustOrPutValue(linkId, rate, rate);
-		// values.adjustOrPutValue(linkId, 1, 1);
 	}
 
 	/*
@@ -124,7 +132,7 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Id id = event.getPersonId();
+		Id<Person> id = event.getPersonId();
 		counter.adjustOrPutValue(id, 2, 1);
 	}
 
@@ -134,8 +142,8 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 
 			writer.write("link\toccupancy");
 			writer.newLine();
-			
-			TObjectDoubleIterator<Id> it = values.iterator();
+
+			TObjectDoubleIterator<Id<Link>> it = values.iterator();
 			for (int i = 0; i < values.size(); i++) {
 				it.advance();
 				writer.write(it.key().toString());

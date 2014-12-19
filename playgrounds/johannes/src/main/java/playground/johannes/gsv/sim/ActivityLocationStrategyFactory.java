@@ -79,9 +79,9 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 		
 		@Override
 		public void run(HasPlansAndId<Plan, Person> person) {
-			if(iteration >= 5) { // because of cadyts
+//			if(iteration >= 5) { // because of cadyts
 				delegate.run(person);
-			}
+//			}
 			
 		}
 
