@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
@@ -89,6 +90,8 @@ public class WithinDayControlerListener implements StartupListener {
 	private TripRouterFactory withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
+	
+	private MobsimFactory originalMobsimFactory = null ;
 
 	/*
 	 * ===================================================================
@@ -227,7 +230,12 @@ public class WithinDayControlerListener implements StartupListener {
 				
 		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
 		this.withinDayEngine = new WithinDayEngine(this.eventsManager);
-		WithinDayQSimFactory mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
+		WithinDayQSimFactory mobsimFactory = null ;
+		if ( this.originalMobsimFactory==null ) {
+			mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
+		} else {
+			mobsimFactory = new WithinDayQSimFactory(withinDayEngine, this.originalMobsimFactory );
+		}
 		controler.setMobsimFactory(mobsimFactory);
 		
 		if (this.numReplanningThreads == 0) {
@@ -330,5 +338,9 @@ public class WithinDayControlerListener implements StartupListener {
 		this.linkReplanningMap = new LinkReplanningMap(this.earliestLinkExitTimeProvider);
 		this.eventsManager.addHandler(linkReplanningMap);
 		this.fosl.addSimulationListener(linkReplanningMap);
+	}
+
+	public void setOriginalMobsimFactory(MobsimFactory originalMobsimFactory) {
+		this.originalMobsimFactory = originalMobsimFactory;
 	}
 }

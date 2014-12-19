@@ -46,7 +46,7 @@ import org.matsim.withinday.utils.EditRoutes;
  * 
  * In fact this should be renamed to NextTripReplanner. cdobler, apr'14
  */
-public class NextActivityAppendingReplanner extends WithinDayDuringActivityReplanner {
+final class NextActivityAppendingReplanner extends WithinDayDuringActivityReplanner {
 	
 	private static Logger logger = Logger.getLogger(NextActivityAppendingReplanner.class);
 

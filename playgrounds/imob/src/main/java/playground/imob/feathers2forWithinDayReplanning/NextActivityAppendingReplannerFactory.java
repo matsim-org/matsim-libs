@@ -22,7 +22,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.replanning.replanners.NextLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -30,12 +29,12 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
  * @author nagel
  *
  */
-public class NextActivityAppendingReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+final class NextActivityAppendingReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 	private final Scenario scenario;
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
-	public NextActivityAppendingReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+	 NextActivityAppendingReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
 			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
