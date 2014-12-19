@@ -34,7 +34,7 @@ import playground.mzilske.cdr.PowerPlans;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class RegimeResource {
+public class RegimeResource {
 
 	private String WD;
 

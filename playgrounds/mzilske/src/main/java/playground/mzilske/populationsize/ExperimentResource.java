@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-class ExperimentResource {
+public class ExperimentResource {
 
 	private final String wd;
 

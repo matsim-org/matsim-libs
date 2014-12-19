@@ -45,7 +45,7 @@ public class WorkerNonWorkerTagesgang {
 
     public static void main(String[] args) {
         final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
-        final RegimeResource uncongested = experiment.getRegime("uncongested2");
+        final RegimeResource uncongested = experiment.getRegime("uncongested3");
         final Scenario baseRun = uncongested.getBaseRun().getOutputScenario();
 
 
@@ -62,7 +62,7 @@ public class WorkerNonWorkerTagesgang {
 
         doIt(predicate, baseRun.getConfig(), uncongested.getBaseRun().getIteration(0));
         for (String rate : Arrays.asList("5", "0")) {
-            final MultiRateRunResource multiRateRun = uncongested.getMultiRateRun("realcountlocations");
+            final MultiRateRunResource multiRateRun = uncongested.getMultiRateRun("randomcountlocations1.0");
             final RunResource run = multiRateRun.getRateRun(rate, "3");
             IterationResource iteration = run.getLastIteration();
             doIt(predicate, baseRun.getConfig(), iteration);

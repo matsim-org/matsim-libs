@@ -25,18 +25,29 @@ public class BerlinRunCongested implements Runnable {
 		config.network().setInputFile(BERLIN_PATH + "network/bb_5_v_scaled_simple.xml.gz"); // only till secondary roads (4), dumped from OSM 20090603, contains 35336 nodes and 61920 links
 		config.counts().setCountsFileName(BERLIN_PATH + "counts/counts4bb_5_v_notscaled_simple.xml");
         config.counts().setOutputFormat("txt");
-		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/congested/output-berlin");
+		config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/congested/temp");
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.qsim().setRemoveStuckVehicles(false);
-        config.qsim().setNumberOfThreads(4);
-        config.parallelEventHandling().setNumberOfThreads(4);
+        config.qsim().setNumberOfThreads(8);
+        config.parallelEventHandling().setNumberOfThreads(2);
         config.global().setNumberOfThreads(8);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
+		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 
 		
 		final Controler controller = new Controler(scenario);
+//        controller.setMobsimFactory(new MobsimFactory() {
+//            @Override
+//            public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
+//                eventsManager.initProcessing();
+//                QSim qsim = new QSim(scenario, eventsManager);
+//                JDEQSimModule.configure(qsim);
+//                PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);
+//                qsim.addAgentSource(agentSource);
+//                return qsim;
+//            }
+//        });
         controller.setOverwriteFiles(true);
 		controller.run();
 		

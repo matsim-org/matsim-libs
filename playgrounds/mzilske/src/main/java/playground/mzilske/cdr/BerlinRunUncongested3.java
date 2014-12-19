@@ -29,12 +29,12 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class BerlinRunUncongested2 implements Runnable {
+public class BerlinRunUncongested3 implements Runnable {
 	
 	final static String BERLIN_PATH = "/Users/michaelzilske/shared-svn/studies/countries/de/berlin/";
 	
 	public static void main(String[] args) {
-		BerlinRunUncongested2 berlinRun = new BerlinRunUncongested2();
+		BerlinRunUncongested3 berlinRun = new BerlinRunUncongested3();
 		berlinRun.run();
 	}
 	
@@ -43,11 +43,11 @@ public class BerlinRunUncongested2 implements Runnable {
 		Config config = new Config();
 		config.addCoreModules();
 		new MatsimConfigReader(config).parse(this.getClass().getResourceAsStream("2kW.15.xml"));
-		config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");  // 18377 persons
-		config.network().setInputFile(BERLIN_PATH + "network/bb_5_v_scaled_simple.xml.gz"); // only till secondary roads (4), dumped from OSM 20090603, contains 35336 nodes and 61920 links
-		config.counts().setCountsFileName(BERLIN_PATH + "counts/counts4bb_5_v_notscaled_simple.xml");
-        config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested2/output-berlin");
-        config.counts().setOutputFormat("txt");
+		config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");
+		config.network().setInputFile(BERLIN_PATH + "counts/iv_counts/network.xml.gz");
+		config.counts().setCountsFileName(BERLIN_PATH + "counts/iv_counts/vmz_di-do.xml");
+        config.controler().setOutputDirectory("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/regimes/uncongested3/output-berlin");
+        config.counts().setOutputFormat("kml");
         config.counts().setWriteCountsInterval(1);
         config.counts().setAverageCountsOverIterations(1);
         config.controler().setMobsim(MobsimType.qsim.toString());

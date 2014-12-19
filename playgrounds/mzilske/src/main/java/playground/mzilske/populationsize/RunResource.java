@@ -40,7 +40,7 @@ import playground.mzilske.ant2014.StreamingOutput;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class RunResource {
+public class RunResource {
 
     public String getWd() {
         return wd;
