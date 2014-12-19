@@ -131,21 +131,25 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			/*Calculate the mean in order to adjust the utility parameters*/
 			Double factorSum=0.0;
 			Double factorMean = 0.0;
+			Double inverseFactorSum=0.0;
+			Double inverseFactorMean=0.0;
 			for(Double incomeFactor:this.incomeFactors.values()){
 				factorSum = factorSum + incomeFactor;
+				inverseFactorSum = inverseFactorSum + (1.0/incomeFactor);
 			}
 			factorMean = factorSum / (double) incomeFactors.size();
+			inverseFactorMean = inverseFactorSum / (double) incomeFactors.size();
 			
 
 		if(simulationType.equals("hetero")){
 			
-				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
-				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				
 				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				}
 			
 
@@ -154,7 +158,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			
 				double performingConst = 	params.marginalUtilityOfPerforming_s;
 			
-				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				
 				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s;
 				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s;
@@ -162,7 +166,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst;
 				
 				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				}
 			
 
@@ -180,8 +184,8 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			
 			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s;
 			
-			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
-			params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+			params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 	
 			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfWaiting_s;
 		}
@@ -190,7 +194,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			
 			double performingConst = 	params.marginalUtilityOfPerforming_s;
 				
-			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/(incomeFactors.get(person.getId())/factorMean));
+			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 			
 			params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * betaFactors.get(person.getId());
 			params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfLateArrival_s * betaFactors.get(person.getId());
@@ -198,7 +202,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - betaFactors.get(person.getId()) * performingConst;
 			
 			for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/(incomeFactors.get(person.getId()) / factorMean));
+				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 			}
 		}
 			
