@@ -53,7 +53,8 @@ public class PricingControler {
 //		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFIle, networkFile, configFile);
 		
 		sc.getConfig().controler().setOutputDirectory(outputDir);
-		sc.getConfig().controler().setWriteEventsInterval(1);
+		sc.getConfig().controler().setWriteEventsInterval(100);
+		sc.getConfig().controler().setWritePlansInterval(100);
 		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
@@ -66,6 +67,12 @@ public class PricingControler {
 		controler.setTravelDisutilityFactory(fact);
 		
 		switch (congestionPricing) {
+		case "implV3":
+		{
+			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), sc)));
+			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
+		}
+		break;
 		case "implV4":
 			{
 				controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), sc)));
