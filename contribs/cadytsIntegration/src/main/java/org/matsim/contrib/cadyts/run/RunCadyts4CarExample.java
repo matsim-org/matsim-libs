@@ -50,7 +50,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  * @author nagel
  *
  */
-public class Cadyts4CarExample {
+public class RunCadyts4CarExample {
 
 	public static void main(String[] args) {
 		final String CADYTS_STRATEGY_NAME = "CadytsAsScoring";
