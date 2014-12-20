@@ -28,6 +28,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import com.google.inject.Inject;
+
 /**
  * 
  * Adds a rerouting strategy that will only reroute pt trips.
@@ -38,6 +40,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public final class PReRoute implements PlanStrategy {
 	private PlanStrategyImpl strategy = null ;
 
+	@Inject
 	public PReRoute(Scenario scenario) {
 		this.strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		this.strategy.addStrategyModule(new PReRouteStrategyModule(scenario)) ;
