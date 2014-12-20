@@ -29,6 +29,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -67,7 +68,8 @@ public class AccessibilityIntegrationTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@Test
+//	@Test
+	@Ignore
 	public void testMainMethod() {
 		Config config = ConfigUtils.createConfig();
 		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
@@ -102,7 +104,8 @@ public class AccessibilityIntegrationTest {
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
 	}
 
-	@Test
+//	@Test
+	@Ignore
 	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig();
 		
@@ -176,7 +179,8 @@ public class AccessibilityIntegrationTest {
 		// compare some results -> done in EvaluateTestResults
 	}
 	
-	@Test
+//	@Test
+	@Ignore
 	public void testWithExtentDeterminedByNetwork() {
 		Config config = ConfigUtils.createConfig();
 
