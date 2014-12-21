@@ -29,7 +29,6 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -63,13 +62,12 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class AccessibilityIntegrationTest {
 	
-	// logger
 	private static final Logger log = Logger.getLogger(AccessibilityIntegrationTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-//	@Test
-	@Ignore
+	@SuppressWarnings("static-method")
+	@Test
 	public void testMainMethod() {
 		Config config = ConfigUtils.createConfig();
 		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
@@ -104,8 +102,7 @@ public class AccessibilityIntegrationTest {
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
 	}
 
-//	@Test
-	@Ignore
+	@Test
 	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig();
 		
@@ -179,8 +176,7 @@ public class AccessibilityIntegrationTest {
 		// compare some results -> done in EvaluateTestResults
 	}
 	
-//	@Test
-	@Ignore
+	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		Config config = ConfigUtils.createConfig();
 
@@ -250,6 +246,7 @@ public class AccessibilityIntegrationTest {
 		Config config = ConfigUtils.createConfig();
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
+
 		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){

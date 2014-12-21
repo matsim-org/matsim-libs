@@ -53,7 +53,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
-	AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
+	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
 
 	// ===
 
@@ -96,7 +96,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// keeping the code compact
 	
 	@StringGetter("cellSizeForCellBasedAccessibility") 
-    public int getCellSizeCellBasedAccessibility() {
+    public Integer getCellSizeCellBasedAccessibility() {
 		return this.cellSizeCellBasedAccessibility;
     }
 	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
