@@ -19,11 +19,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
@@ -31,6 +26,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractController {
 
@@ -126,8 +126,8 @@ public abstract class AbstractController {
             // then shut down.
             logMemorizeAndRequestShutdown(Thread.currentThread(), e);
         } finally {
-            shutdown();
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            shutdown();
             Thread.setDefaultUncaughtExceptionHandler(previousDefaultUncaughtExceptionHandler);
             // Propagate Exception in case Controler.run is called by someone who wants to catch
             // it. It is probably not strictly correct to wrap the exception here.
