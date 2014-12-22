@@ -324,10 +324,10 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 						facility.getCoord(),
 						Math.min(
 							router.getSearchRadius(),
-							// do not access a pt stop more than half-way
+							// do not access a pt stop more than one third of the way
 							// TODO: make configurable, as anything lower than one
 							// is an approximation...
-							tripLength / 2d ) );
+							tripLength / 3d ) );
 
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
