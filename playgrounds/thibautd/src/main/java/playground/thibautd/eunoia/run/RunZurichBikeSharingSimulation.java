@@ -38,8 +38,11 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.router.TransitRouterNetwork;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
+import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
+import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.thibautd.eunoia.scoring.Matsim2010BikeSharingScoringFunctionFactory;
 import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrapper;
@@ -48,6 +51,7 @@ import playground.thibautd.utils.SoftCache;
 
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
 import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 
@@ -126,7 +130,7 @@ public class RunZurichBikeSharingSimulation {
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					slopeScorer,
-					null,
+					createRoutingData( sc ),
 					false ) );
 
 		switch ( relocationGroup.getStrategy() ) {
@@ -148,6 +152,21 @@ public class RunZurichBikeSharingSimulation {
 		Matsim2030Utils.loadControlerListeners( controler );
 
 		controler.run();
+	}
+
+	private static RoutingData createRoutingData( final Scenario sc ) {
+		final ScenarioMergingConfigGroup group = (ScenarioMergingConfigGroup)
+			sc.getConfig().getModule( ScenarioMergingConfigGroup.GROUP_NAME );
+
+		if ( group.getThinnedTransitRouterNetworkFile() == null ) return new RoutingData( sc );
+
+		final TransitRouterNetwork transitRouterNetwork = new TransitRouterNetwork();
+		new TransitRouterNetworkReader(
+				sc.getTransitSchedule(),
+				transitRouterNetwork ).parse(
+					group.getThinnedTransitRouterNetworkFile() );
+
+		return new RoutingData( sc ,  transitRouterNetwork );
 	}
 
 	private static void failIfExists(final String outdir) {
