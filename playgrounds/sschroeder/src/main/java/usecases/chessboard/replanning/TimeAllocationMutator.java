@@ -11,18 +11,18 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 
 public class TimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan>{
 
-	private double reRouteProb = .1;
+	private double mutationProbability = .1;
 	
-	public TimeAllocationMutator(double reRouteProb) {
+	public TimeAllocationMutator(double mutationProbability) {
 		super();
-		this.reRouteProb = reRouteProb;
+		this.mutationProbability = mutationProbability;
 	}
 
 	@Override
 	public void handlePlan(CarrierPlan carrierPlan) {
 		Collection<ScheduledTour> newTours = new ArrayList<ScheduledTour>() ;
 		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
-			if(MatsimRandom.getRandom().nextDouble() < reRouteProb){
+			if(MatsimRandom.getRandom().nextDouble() < mutationProbability){
 				double departureTime = tour.getDeparture() + ( MatsimRandom.getRandom().nextDouble() - 0.5 ) * 3600. * 3. ;
 				if ( departureTime < tour.getVehicle().getEarliestStartTime() ) {
 					departureTime = tour.getVehicle().getEarliestStartTime();

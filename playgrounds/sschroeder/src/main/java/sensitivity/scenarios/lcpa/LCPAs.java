@@ -1,15 +1,5 @@
 package sensitivity.scenarios.lcpa;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jsprit.analysis.toolbox.SolutionPrinter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
@@ -21,7 +11,6 @@ import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.problem.vehicle.VehicleTypeImpl.VehicleCostParams;
 import jsprit.core.util.Solutions;
-
 import org.apache.commons.lang.time.StopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
@@ -31,8 +20,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import sensitivity.scenarios.StopAlgoCompTime;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 
 public class LCPAs {
@@ -83,9 +77,9 @@ public class LCPAs {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("sensitivity/network.xml");
+		new MatsimNetworkReader(scenario).readFile("sschroeder/sensitivity/network.xml");
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sensitivity/output/lcpas.txt")));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sschroeder/sensitivity/output/lcpas.txt")));
 		writer.write("lcpa\trun\tcomptime\trelations\n");
 		List<LCPAFactory> factories = new ArrayList<LCPAFactory>();
 		factories.add(new LCPAFactory("dijstra", LCPAFactories.getFastDijkstraFactory()));
@@ -96,7 +90,7 @@ public class LCPAs {
 			for(int run=0;run<10;run++){
 				StopRouting stopRouting = new StopRouting();
 				VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance();
-				new VrpXMLReader(builder).read("sensitivity/vrp_tight_tw.xml");
+				new VrpXMLReader(builder).read("sschroeder/sensitivity/vrp_tight_tw.xml");
 				NetworkBasedTransportCosts.Builder costBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 				addVehicleTypeSpecificCosts(costBuilder,builder.getAddedVehicles());
 				costBuilder.setThreadSafeLeastCostPathCalculatorFactory(f.factory);
@@ -106,7 +100,7 @@ public class LCPAs {
 
 				VehicleRoutingProblem vrp = builder.build();
 
-				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "sensitivity/algorithm.xml");
+				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "sschroeder/sensitivity/algorithm.xml");
 				StopAlgoCompTime compTimeStopper = new StopAlgoCompTime();
 				vra.getAlgorithmListeners().addListener(compTimeStopper,Priority.HIGH);
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();

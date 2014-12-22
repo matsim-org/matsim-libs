@@ -86,9 +86,9 @@ public class LCPAsWithToll {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("sensitivity/network.xml");
+		new MatsimNetworkReader(scenario).readFile("sschroeder/sensitivity/network.xml");
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sensitivity/output/lcpas-with-toll.txt")));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("sschroeder/sensitivity/output/lcpas-with-distance-toll.txt")));
 		writer.write("lcpa\trun\tcomptime\trelations\n");
 		List<LCPAFactory> factories = new ArrayList<LCPAFactory>();
 		factories.add(new LCPAFactory("dijstra", LCPAFactories.getFastDijkstraFactory()));
@@ -99,7 +99,7 @@ public class LCPAsWithToll {
 			for(int run=0;run<10;run++){
 				StopRouting stopRouting = new StopRouting();
 				VehicleRoutingProblem.Builder builder = VehicleRoutingProblem.Builder.newInstance();
-				new VrpXMLReader(builder).read("sensitivity/vrp_tight_tw.xml");
+				new VrpXMLReader(builder).read("sschroeder/sensitivity/vrp_tight_tw.xml");
 				NetworkBasedTransportCosts.Builder costBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork());
 				addVehicleTypeSpecificCosts(costBuilder,builder.getAddedVehicles());
 				costBuilder.setThreadSafeLeastCostPathCalculatorFactory(f.factory);
@@ -108,7 +108,7 @@ public class LCPAsWithToll {
 				VehicleTypeDependentRoadPricingCalculator roadPricing = new VehicleTypeDependentRoadPricingCalculator();
 				//define and add a roadPricingSchema
 				RoadPricingSchemeImpl cordonToll = new RoadPricingSchemeImpl(); 
-				new RoadPricingReaderXMLv1(cordonToll).parse("sensitivity/cordonToll20.xml");
+				new RoadPricingReaderXMLv1(cordonToll).parse("sschroeder/sensitivity/distanceToll1.xml");
 				roadPricing.addPricingScheme("type1", cordonToll);
 				//finally add roadpricingcalc to netBasedTransportCosts
 				costBuilder.setRoadPricingCalculator(roadPricing);
@@ -119,7 +119,7 @@ public class LCPAsWithToll {
 
 				VehicleRoutingProblem vrp = builder.build();
 
-				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "sensitivity/algorithm.xml");
+				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "sschroeder/sensitivity/algorithm.xml");
 				StopAlgoCompTime compTimeStopper = new StopAlgoCompTime();
 				vra.getAlgorithmListeners().addListener(compTimeStopper,Priority.HIGH);
 				Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();

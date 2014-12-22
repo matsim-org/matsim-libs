@@ -1,11 +1,15 @@
 package usecases.chessboard;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 public class TravelDisutilities {
 	
@@ -33,6 +37,28 @@ public class TravelDisutilities {
 			}
 		};
 	}
+
+
+    public static TravelDisutility withToll(final TravelDisutility base, final VehicleTypeDependentRoadPricingCalculator roadPricing){
+
+        return new TravelDisutility() {
+
+            @Override
+            public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+                double costs = base.getLinkTravelDisutility(link, time, person, vehicle);
+                Id<VehicleType> typeId = vehicle.getType().getId();
+                double toll = roadPricing.getTollAmount(typeId, link, time);
+                return costs + toll;
+            }
+
+            @Override
+            public double getLinkMinimumTravelDisutility(Link link) {
+                return base.getLinkMinimumTravelDisutility(link);
+            }
+
+        };
+
+    }
 	
 
 
