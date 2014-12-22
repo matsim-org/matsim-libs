@@ -28,7 +28,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.replanning.modules.ChangeLegMode;
 
 /**
  * @author amit
@@ -65,8 +64,8 @@ public class SubpopulationConfig {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(200);
 		config.controler().setMobsim("qsim");
-		config.controler().setWriteEventsInterval(10);
-		config.controler().setWritePlansInterval(10);
+		config.controler().setWriteEventsInterval(100);
+		config.controler().setWritePlansInterval(100);
 		config.controler().setWriteSnapshotsInterval(100);	
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 
