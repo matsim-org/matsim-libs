@@ -128,7 +128,7 @@ public class BikeSharingScenarioUtils {
 				new LinkSlopesReader().getLinkSlopes(
 						multimodalConfigGroup,
 						sc.getNetwork());
-			sc.addScenarioElement( LINK_SLOPES_ELEMENT_NAME , linkSlopes );
+			if ( linkSlopes != null ) sc.addScenarioElement( LINK_SLOPES_ELEMENT_NAME , linkSlopes );
 		}
 
 	}
