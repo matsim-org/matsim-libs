@@ -142,7 +142,7 @@ public class MyCarrierPlanGenerator {
 //		vrpBuilder.setFleetSize(FleetSize.valueOf( carrier.getCarrierCapabilities().getFleetSize().name() ));
 		
 		
-				vrpBuilder.addPenaltyVehicles(10000, 100000);
+//				vrpBuilder.addPenaltyVehicles(10000, 100000);
 		NetworkBasedTransportCosts.Builder costsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, vehicleTypes.getVehicleTypes().values());
 		costsBuilder.setTimeSliceWidth(1800);
 		NetworkBasedTransportCosts costs = costsBuilder.build();
