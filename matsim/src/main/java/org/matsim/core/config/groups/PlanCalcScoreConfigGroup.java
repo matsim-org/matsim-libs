@@ -323,7 +323,7 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public Collection<ActivityParams> getActivityParams() {
-		return (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
+			return (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
 	}
 
 	public Map<String, ActivityParams> getActivityParamsPerType() {
@@ -446,7 +446,6 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	/**
 	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
 	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
 	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
 		this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(marginalUtlOfDistancePt);
 	}
@@ -454,8 +453,7 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	/**
 	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
 	 */
-	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-	private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
+		private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
 		this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(marginalUtlOfDistanceCar);
 	}
 
