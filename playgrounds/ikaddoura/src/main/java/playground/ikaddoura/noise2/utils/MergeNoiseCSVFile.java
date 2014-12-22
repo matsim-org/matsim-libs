@@ -45,6 +45,7 @@ public class MergeNoiseCSVFile {
 	private double timeBinSize = 3600.;
 	private double endTime = 30. * 3600.;
 	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/A_reducedSpeeds_rpGap25meters/immissions/";
+	private String receiverPointsFile = "..."; // TODO receiver point coordinates in zweite und dritte Spalte einfügen.
 	private String separator = ";";
 	private int iteration = 100;
 	private String label = "immission";
