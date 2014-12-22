@@ -59,7 +59,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 * 
 	 * <p>If selectePlan in not in plan-collection, it adds it.
 	 * 
-	 * @param selectedPlan
+	 * @param selectedPlan to be set
 	 */
 	@Override
 	public abstract void setSelectedPlan(CarrierPlan selectedPlan);
@@ -67,7 +67,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	/**
 	 * Sets carrierCapabilities.
 	 * 
-	 * @param carrierCapabilities
+	 * @param carrierCapabilities to be set
 	 */
 	public abstract void setCarrierCapabilities(CarrierCapabilities carrierCapabilities);
 

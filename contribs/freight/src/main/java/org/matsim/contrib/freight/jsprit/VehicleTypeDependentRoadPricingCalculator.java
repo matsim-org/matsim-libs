@@ -27,7 +27,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 
 /**
- * Calculator that manages and calculates {@link basics.route.VehicleImpl.VehicleType} dependent {@link RoadPricingScheme}.
+ * Calculator that manages and calculates vehicle type dependent road pricing schemas.
  * 
  * @author stefan schröder
  *
@@ -123,9 +123,11 @@ public class VehicleTypeDependentRoadPricingCalculator {
 		if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON)){
 			calculators.put(pricingScheme.getType(), new CordonCalc());
 		}
-		if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE)){
+		else if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_DISTANCE)){
 			calculators.put(pricingScheme.getType(), new DistanceCalc());
 		}
+        else throw new IllegalStateException("toll type specification missing. if you use xml add specification to root node like this\n"
+            + "<roadpricing type=\"cordon\" name=\"cordon\"> if it is a cordon toll and \n<roadpricing type=\"distance\" name=\"distance\"> if it is a distance toll");
 	}
 	
 	/**

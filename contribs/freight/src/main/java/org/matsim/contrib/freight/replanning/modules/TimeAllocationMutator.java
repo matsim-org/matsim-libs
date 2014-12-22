@@ -33,15 +33,33 @@ import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
  */
 public class TimeAllocationMutator implements GenericPlanStrategyModule<CarrierPlan> {
 
-	@Override
+    private double probability = 1.;
+
+    /**
+     * max. departure time mutation: +/- 0.5 * mutationRange
+     */
+    private double mutationRange = 3600. * 3.;
+
+    public TimeAllocationMutator() {
+    }
+
+    public TimeAllocationMutator(double probability, double mutationRange) {
+        this.probability = probability;
+        this.mutationRange = mutationRange;
+    }
+
+    @Override
 	public void handlePlan(CarrierPlan carrierPlan) {
 		Collection<ScheduledTour> newTours = new ArrayList<ScheduledTour>() ;
 		for ( ScheduledTour tour : carrierPlan.getScheduledTours() ) {
-			double departureTime = tour.getDeparture() + ( MatsimRandom.getRandom().nextDouble() - 0.5 ) * 3600. * 3. ;
-			if ( departureTime < 0. ) {
-				departureTime = 0. ;
-			}
-			newTours.add( ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime) ) ;
+            if(MatsimRandom.getRandom().nextDouble() < probability) {
+                double departureTime = tour.getDeparture() + (MatsimRandom.getRandom().nextDouble() - 0.5) * mutationRange;
+                if ( departureTime < tour.getVehicle().getEarliestStartTime() ) {
+                    departureTime = tour.getVehicle().getEarliestStartTime();
+                }
+                newTours.add(ScheduledTour.newInstance(tour.getTour(), tour.getVehicle(), departureTime));
+            }
+            else newTours.add(tour);
 		}
 		carrierPlan.getScheduledTours().clear(); 
 		carrierPlan.getScheduledTours().addAll( newTours ) ;

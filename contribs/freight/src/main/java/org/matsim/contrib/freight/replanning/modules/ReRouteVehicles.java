@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -45,6 +46,8 @@ public class ReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
 	private Network network;
 	
 	private TravelTime travelTime;
+
+    private double probability = 1.;
 	
 	/**
 	 * Constructs the module with a leastCostPathRouter, network and travelTime.
@@ -61,6 +64,14 @@ public class ReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
 		this.travelTime = travelTime;
 	}
 
+    public ReRouteVehicles(LeastCostPathCalculator router, Network network, TravelTime travelTime, double probability) {
+        super();
+        this.router = router;
+        this.network = network;
+        this.travelTime = travelTime;
+        this.probability = probability;
+    }
+
 	/**
 	 * Routes the carrierPlan in time and space.
 	 * 
@@ -76,7 +87,9 @@ public class ReRouteVehicles implements GenericPlanStrategyModule<CarrierPlan>{
 	
 	private void route(CarrierPlan carrierPlan) {
 		for(ScheduledTour tour : carrierPlan.getScheduledTours()){
-			new TimeAndSpaceTourRouter(router, network, travelTime).route(tour);
+            if(MatsimRandom.getRandom().nextDouble() < probability){
+                new TimeAndSpaceTourRouter(router, network, travelTime).route(tour);
+            }
 		}
 	}
 

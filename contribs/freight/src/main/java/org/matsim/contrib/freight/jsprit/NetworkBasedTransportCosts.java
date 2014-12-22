@@ -55,7 +55,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * - from-locations</br>
  * - to-locations</br>
  * - time and</br>
- * - vehicleTypes (see {@link basics.route.VehicleImpl.VehicleType})</br>
+ * - vehicleTypes
  * 
  * <p>Keep in mind that if you have many locations, small time-bins and many vehicleTypes, calculations get very time- and memory-consuming.
  * 
@@ -73,12 +73,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	}
 	
 	/**
-	 * This creates a matsim-vehicle {@link org.matsim.vehicles.Vehicle} from a matsim-freight-vehicle {@link CarrierVehicle} and jsprit-vehicle {@link basics.route.Vehicle}.
+	 * This creates a matsim-vehicle {@link org.matsim.vehicles.Vehicle} from a matsim-freight-vehicle {@link CarrierVehicle} and jsprit-vehicle .
 	 * 
 	 * @author stefan schröder
 	 *
 	 */
-	static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
+	public static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
 
 		private Id<org.matsim.vehicles.Vehicle> id;
 		
@@ -118,7 +118,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 * - from-locations</br>
 	 * - to-locations</br>
 	 * - time and</br>
-	 * - vehicleTypes (see {@link basics.route.VehicleImpl.VehicleType})</br>
+	 * - vehicleTypes
 	 *  
 	 * <p>The time-value is usually a representative value for a certain time-bin. If the time-bin's width is 1, it calculates and caches each and every transport-data which might be 
 	 * a) very time-consuming and b) very memory-consuming.
@@ -232,8 +232,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		/**
 		 * Constructs travelDisutility according to the builder.
-		 * @param typeSpecificCosts TODO
-		 * @param builder
+		 *
 		 */
 		private BaseVehicleTransportCosts(Map<String, VehicleTypeVarCosts> typeSpecificCosts, TravelTime travelTime){
 			this.travelTime = travelTime;
@@ -592,7 +591,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 */
 	@Override
 	public double getTransportCost(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
-		if(fromId.equals(toId)){
+		if(fromId ==  null || toId == null) throw new IllegalStateException(
+                "either fromId ("+fromId+") or toId ("+toId+") is null [departureTime="+departureTime+"][vehicle="+vehicle+"]");
+        if(fromId.equals(toId)){
 			return 0.0;
 		}
 		if(vehicle == null) throw new IllegalStateException("cannot calculate transport-costs since vehicle is missing");

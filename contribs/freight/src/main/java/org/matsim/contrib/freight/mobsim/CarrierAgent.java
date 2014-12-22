@@ -121,7 +121,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-			currentRoute.add(event.getLinkId());
+            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),Id.createPersonId(event.getVehicleId().toString()),event.getLinkId(),getVehicle().getVehicleId()));
+            currentRoute.add(event.getLinkId());
 		}
 
 		public void handleEvent(ActivityEndEvent event) {
