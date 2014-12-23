@@ -23,6 +23,9 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.misc.Time;
 
+import tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouter;
+import tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRouting;
+
 import java.util.*;
 
 /**
@@ -30,6 +33,8 @@ import java.util.*;
  * compute routes and all registered {@link RoutingModule}s.
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
+ * <p/>
+ * See {@link RunPluggableTripRouter} and {@link RunTeleportationMobsimWithCustomRouting} for examples.
  *
  * @author thibautd
  */
