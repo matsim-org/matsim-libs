@@ -20,6 +20,12 @@
 
 package org.matsim.core.router.util;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.internal.MatsimComparator;
+
 import java.awt.geom.Rectangle2D;
 import java.util.Comparator;
 import java.util.Map;
@@ -27,12 +33,6 @@ import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimComparator;
 
 /**
  * Pre-processes a given network, gathering information which can be used by
@@ -133,7 +133,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			try {
 				executor.awaitTermination(10, TimeUnit.MINUTES);
 			} catch (InterruptedException e) {
-				log.warn("waiting got interrupted", e);
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -176,7 +176,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	
 		private void expandLandmarkFrom() {
 			LandmarksFromTravelTimeComparator comparator = new LandmarksFromTravelTimeComparator(this.nodeData, this.landmarkIdx);
-			PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
+			PriorityQueue<Node> pendingNodes = new PriorityQueue<>(100, comparator);
 			LandmarksData role = (LandmarksData) this.nodeData.get(this.landmark);
 			role.setToLandmarkTravelTime(this.landmarkIdx, 0.0);
 			role.setFromLandmarkTravelTime(this.landmarkIdx, 0.0);
@@ -201,7 +201,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 		private void expandLandmarkTo() {
 			LandmarksToTravelTimeComparator comparator = new LandmarksToTravelTimeComparator(this.nodeData, this.landmarkIdx);
-			PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(100, comparator);
+			PriorityQueue<Node> pendingNodes = new PriorityQueue<>(100, comparator);
 			LandmarksData role = (LandmarksData) this.nodeData.get(this.landmark);
 			role.setToLandmarkTravelTime(this.landmarkIdx, 0.0);
 			role.setFromLandmarkTravelTime(this.landmarkIdx, 0.0);
@@ -295,40 +295,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 	}
 
-	/**
-	 * Sorts the Nodes ascending according to their ToLandmarkTravelTime. We assume that the
-	 * ToLandmarkTravelTime is somewhat similar to the FromLandmarkTravelTime,
-	 * so ordering the nodes according to one of these values produces a similar
-	 * ordered list as if to order them according to the other value...
-	 *
-	 * @author lnicolas
-	 */
-	static class LandmarksTravelTimeComparator implements Comparator<Node>, MatsimComparator {
-		private final Map<Node, DeadEndData> roleData;
-		private final int landmarkIndex;
-
-		protected LandmarksTravelTimeComparator(final Map<Node, DeadEndData> roleData, final int landmarkIndex) {
-			this.roleData = roleData;
-			this.landmarkIndex = landmarkIndex;
-		}
-
-		@Override
-		public int compare(final Node n1, final Node n2) {
-
-			double c1 = ((LandmarksData) this.roleData.get(n1)).getToLandmarkTravelTime(this.landmarkIndex);
-			double c2 = ((LandmarksData) this.roleData.get(n2)).getToLandmarkTravelTime(this.landmarkIndex);
-
-			if (c1 < c2) {
-				return -1;
-			}
-			if (c1 > c2) {
-				return +1;
-			}
-			return n1.getId().compareTo(n2.getId());
-		}
-	}
-
-	/**
+    /**
 	 * Sorts the Nodes ascending according to their ToLandmarkTravelTime.
 	 *
 	 * @author lnicolas

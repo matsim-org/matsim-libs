@@ -20,22 +20,18 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import java.util.HashSet;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -71,23 +67,6 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			filter.filter(net, modes);
 		}
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
-	}
-	
-	@Deprecated
-	public PersonPrepareForSim(final PlanAlgorithm router, final Network network) {
-		super();
-		this.router = router;
-		this.network = network;
-		Network net = network;
-		if (NetworkUtils.isMultimodal(network)) {
-			log.info("Network seems to be multimodal. XY2Links will only use car links.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkImpl.createNetwork();
-			HashSet<String> modes = new HashSet<String>();
-			modes.add(TransportMode.car);
-			filter.filter(net, modes);
-		}
-		this.xy2links = new XY2Links(net);
 	}
 
 	@Override

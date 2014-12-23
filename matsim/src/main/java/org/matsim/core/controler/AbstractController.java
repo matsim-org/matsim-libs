@@ -34,6 +34,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractController {
 
+    private static class InterruptAndJoin extends Thread {
+        private final Thread controllerThread;
+        private AtomicBoolean unexpectedShutdown;
+
+        public InterruptAndJoin(Thread controllerThread, AtomicBoolean unexpectedShutdown) {
+            this.controllerThread = controllerThread;
+            this.unexpectedShutdown = unexpectedShutdown;
+        }
+
+        @Override
+        public void run() {
+            log.error("received unexpected shutdown request.");
+            // Interrupt the controllerThread.
+            unexpectedShutdown.set(true);
+            controllerThread.interrupt();
+            try {
+                // Wait until it has shut down.
+                controllerThread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            // The JVM will exit when this method returns.
+        }
+    }
+
     class UnexpectedShutdownException extends Exception {
     }
 
@@ -89,29 +114,16 @@ public abstract class AbstractController {
 
     protected final void run(Config config) {
         UncaughtExceptionHandler previousDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+        final Thread controllerThread = Thread.currentThread();
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 // We want to shut down when any Thread dies with an Exception.
                 logMemorizeAndRequestShutdown(t, e);
+                controllerThread.interrupt();
             }
         });
-        final Thread controllerThread = Thread.currentThread();
-        Thread shutdownHook = new Thread() {
-            @Override
-						public void run() {
-                log.error("received unexpected shutdown request.");
-                // Request shutdown from the controllerThread.
-                unexpectedShutdown.set(true);
-                try {
-                    // Wait until it has shut down.
-                    controllerThread.join();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                // The JVM will exit when this method returns.
-            }
-        };
+        Thread shutdownHook = new InterruptAndJoin(controllerThread, unexpectedShutdown);
         Runtime.getRuntime().addShutdownHook(shutdownHook);
         try {
             loadCoreListeners();
@@ -126,7 +138,18 @@ public abstract class AbstractController {
             // then shut down.
             logMemorizeAndRequestShutdown(Thread.currentThread(), e);
         } finally {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            try {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            } catch (IllegalStateException e) {
+                // Doesn't matter. Only means that we are already shutting down.
+                // But if we are not, this is neccessary because otherwise the
+                // shutdown hook will try to interrupt and join this thread later where
+                // it may already be used for something else.
+                // I still think all this JVM-stuff should go somewhere outside,
+                // where it is only used when e.g. run from the command line,
+                // and not e.g. from tests or scripts, where multiple
+                // instances of Controler can be run.
+            }
             shutdown();
             Thread.setDefaultUncaughtExceptionHandler(previousDefaultUncaughtExceptionHandler);
             // Propagate Exception in case Controler.run is called by someone who wants to catch
@@ -178,7 +201,18 @@ public abstract class AbstractController {
         if (this.uncaughtException != null) {
         	log.error("Shutdown possibly caused by the following Exception:", this.uncaughtException);
         }
-        this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
+        try {
+            this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
+        } catch (Exception e) {
+            unexpectedShutdown.set(true);
+            log.error("Exception during shutdown:", e);
+            if (this.uncaughtException == null) {
+                // If there has been a previous exception, it is likely more important
+                // than this new one. This new one may just be a consequence of the
+                // previous one.
+                this.uncaughtException = e;
+            }
+        }
         if (this.unexpectedShutdown.get()) {
             log.error("ERROR --- MATSim unexpectedly terminated. Please check the output or the logfile with warnings and errors for hints.");
             log.error("ERROR --- results should not be used for further analysis.");
@@ -297,7 +331,7 @@ public abstract class AbstractController {
         this.stopwatch.beginOperation(iterationStepName);
         iterationStep.run();
         this.stopwatch.endOperation(iterationStepName);
-        if (this.unexpectedShutdown.get()) {
+        if (Thread.interrupted()) {
             throw new UnexpectedShutdownException();
         }
     }

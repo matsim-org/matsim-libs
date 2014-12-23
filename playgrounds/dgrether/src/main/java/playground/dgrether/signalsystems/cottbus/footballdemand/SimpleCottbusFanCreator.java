@@ -19,21 +19,19 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.footballdemand;
 
-import java.util.Collection;
-import java.util.Random;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlanRouter;
@@ -52,12 +50,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import java.util.Collection;
+import java.util.Random;
 
 
 /**
@@ -143,7 +137,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 										new RoutingContextImpl(
 												timeCostCalc,
 												timeCostCalc ) ) );
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, sc.getNetwork());
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, sc);
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());
 		Population fanPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
