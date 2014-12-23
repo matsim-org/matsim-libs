@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author thibautd
  */
-public class SimulateTeleportation {
+public class RunTeleportationMobsimWithCustomRouting {
 	// this assumes the script is launched from matsim/trunk/
 	private static final String configFile = "examples/pt-tutorial/config.xml";
 
