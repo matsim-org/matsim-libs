@@ -44,13 +44,16 @@ public class RunTeleportationMobsimWithCustomRouting {
 	public static void main(final String[] args) {
 		// make sure we get all the log messages in the logfile
 		OutputDirectoryLogging.catchLogEntries();
-		final Config config = ConfigUtils.loadConfig( configFile );
 
-		// please do not do this at home.
-		// This is done here to allow using the standard config file only.
+		// load the config ...
+		final Config config = ConfigUtils.loadConfig( configFile );
+		// ... and add local changes:
 		tuneConfig( config );
 
+		// load the scenario:
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		
+		// load the controler:
 		final Controler controler = new Controler( scenario );
 
 		// create the teleportation station on a central link
@@ -64,6 +67,8 @@ public class RunTeleportationMobsimWithCustomRouting {
 				new MyTripRouterFactory(
 						scenario,
 						teleport));
+		
+		// run the controler:
 		controler.run();
 	}
 

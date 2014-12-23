@@ -66,6 +66,8 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
+import tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter;
+
 import java.util.*;
 
 /**
@@ -524,6 +526,9 @@ public class Controler extends AbstractController {
         return injector.getInstance(TravelTime.class);
 	}
 
+    /**
+     * Returns the factory to build the router so you can build your own.  See {@link RunOwnMobsimAgentUsingRouter} for an example.
+     */
     public final TripRouterFactoryInternal getTripRouterFactory() {
 		return new TripRouterFactoryInternal() {
 
