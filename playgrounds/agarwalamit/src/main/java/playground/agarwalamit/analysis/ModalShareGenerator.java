@@ -47,22 +47,21 @@ public class ModalShareGenerator {
 		// TODO [AA] should get modal share from events as well.
 	}
 	
-	public SortedMap<String, double []> getModalShareFromPlans (Population population){
-		SortedMap<String , double[]> mode2NoOfLegsAndPctShare = new TreeMap<String, double[]>();
+	public SortedMap<String, Double > getMode2PctShareFromPlans (Population population){
+		SortedMap<String , Double> mode2PctShare = new TreeMap<String, Double>();
 		this.logger.info("=====Modal split is calculated using input plans file.=====");
 		SortedSet<String> usedModes = getUsedModes(population);
-		getMode2NoOfLegs(population, usedModes);
-		this.logger.info("=====The following transport modes are are used: " + usedModes+".=====");
-		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population, usedModes);
+
+		this.logger.info("=====The following transport modes are used: " + usedModes+".=====");
+		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population);
 		int totalNoOfLegs = getTotalNoOfLegs(mode2NoOfLegs);
 		
 		for(String mode : mode2NoOfLegs.keySet()){
 			double noOfLegs = (double) mode2NoOfLegs.get(mode);
 			double noOfLegPct = BkNumberUtils.roundDouble(100. * ((double) noOfLegs / (double) totalNoOfLegs), 3);
-			double [] numberOfLegs2PctShare  = {noOfLegs, noOfLegPct};
-			mode2NoOfLegsAndPctShare.put(mode, numberOfLegs2PctShare);
+			mode2PctShare.put(mode, noOfLegPct);
 		}
-		return mode2NoOfLegsAndPctShare;
+		return mode2PctShare;
 	}
 	
 	private int getTotalNoOfLegs(Map<String, Integer> mode2NoOfLegs) {
@@ -74,8 +73,9 @@ public class ModalShareGenerator {
 		return totalNoOfLegs;
 	}
 
-	private Map<String, Integer> getMode2NoOfLegs(Population pop, SortedSet<String> usedModes) {
+	public SortedMap<String, Integer> getMode2NoOfLegs(Population pop) {
 		SortedMap<String, Integer> mode2noOfLegs = new TreeMap<String, Integer>();
+		SortedSet<String> usedModes = getUsedModes(pop);
 		
 		for(String mode : usedModes){
 			int noOfLegs = 0;

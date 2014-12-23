@@ -36,7 +36,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ModalSplitUserGroup {
 
-	private SortedMap<UserGroup, SortedMap<String, double[]>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,double[]>>();
+	private SortedMap<UserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<UserGroup, SortedMap<String,Integer>>();
+	private SortedMap<UserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	
 	public static void main(String[] args) {
 		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
@@ -54,43 +55,45 @@ public class ModalSplitUserGroup {
 		String networkFile = outputDir+"/output_network.xml.gz";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(populationFile, networkFile);
 		
-		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
+		SortedMap<String, Double> wholePop_pctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
+		SortedMap<String, Integer> wholePop_Mode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
 		
 		for(UserGroup ug:UserGroup.values()){
 			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
-			SortedMap<String, double[]> modalSplitPop = msg.getModalShareFromPlans(usrGrpPop);
+			SortedMap<String, Double> modalSplitPop = msg.getMode2PctShareFromPlans(usrGrpPop);
 			this.userGrp2ModalSplit.put(ug, modalSplitPop);
+			this.userGrp2Mode2Legs.put(ug, msg.getMode2NoOfLegs(usrGrpPop));
 		}
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/usrGrpToModalShare.txt");
 		try {
 			writer.write("UserGroup \t");
 			
-			for(String str:modalSplit.keySet()){
+			for(String str:wholePop_pctModalShare.keySet()){
 				writer.write(str+"\t");
 			}
 			writer.write(" \n WholePopulation"+"\t");
-			for(String str:modalSplit.keySet()){ // write Absolute No Of Legs
-				writer.write(modalSplit.get(str)[0]+"\t");
+			for(String str:wholePop_Mode2Legs.keySet()){ // write Absolute No Of Legs
+				writer.write(wholePop_Mode2Legs.get(str)+"\t");
 			}
 			writer.write(" \n WholePopulation"+"\t");
-			for(String str:modalSplit.keySet()){ // write percentage no of legs
-				writer.write(modalSplit.get(str)[1]+"\t");
+			for(String str:wholePop_pctModalShare.keySet()){ // write percentage no of legs
+				writer.write(wholePop_pctModalShare.get(str)+"\t");
 			}
 			writer.newLine();
-			for(UserGroup ug:this.userGrp2ModalSplit.keySet()){
+			for(UserGroup ug:this.userGrp2Mode2Legs.keySet()){
 				writer.write(ug+"\t");
-				for(String str:modalSplit.keySet()){
-					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
-						writer.write(this.userGrp2ModalSplit.get(ug).get(str)[0]+"\t");
+				for(String str:wholePop_pctModalShare.keySet()){
+					if(this.userGrp2Mode2Legs.get(ug).get(str)!=null){
+						writer.write(this.userGrp2Mode2Legs.get(ug).get(str)+"\t");
 					} else
 					writer.write(0.0+"\t");
 				}
 				writer.newLine();
 				writer.write(ug+"\t");
-				for(String str:modalSplit.keySet()){
+				for(String str:wholePop_pctModalShare.keySet()){
 					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
-						writer.write(this.userGrp2ModalSplit.get(ug).get(str)[1]+"\t");
+						writer.write(this.userGrp2ModalSplit.get(ug).get(str)+"\t");
 					} else
 					writer.write(0.0+"\t");
 				}

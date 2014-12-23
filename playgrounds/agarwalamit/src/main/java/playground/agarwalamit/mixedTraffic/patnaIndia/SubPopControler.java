@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -106,7 +108,9 @@ public class SubPopControler {
 		}
 
 		Controler controler = new Controler(sc);
-		controler.setOverwriteFiles(true);
+		
+		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
+		
 		controler.setDumpDataAtEnd(true);
 		controler.setCreateGraphs(true);
 		
