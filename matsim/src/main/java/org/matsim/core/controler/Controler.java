@@ -65,7 +65,6 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
-import tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter;
 
 import java.util.*;
 
@@ -526,9 +525,15 @@ public class Controler extends AbstractController {
 	}
 
     /**
-     * Gives access to a TripRouter.
-     * See {@link RunOwnMobsimAgentUsingRouter} for an example.
+     * Gives access to a {@link org.matsim.core.router.TripRouter} instance.
+     * This is a routing service which you can use
+     * to calculate routes, e.g. from your own replanning code or your own within-day replanning
+     * agent code.
+     * You get a Provider (and not an instance directly) because your code may want to later
+     * create more than one instance. A TripRouter is not guaranteed to be thread-safe, so
+     * you must get() an instance for each thread if you plan to write multi-threaded code.
      *
+     * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
     public final TripRouterProvider getTripRouterProvider() {
 		return new TripRouterProvider() {
@@ -684,6 +689,12 @@ public class Controler extends AbstractController {
 		}
 	}
 
+    /**
+     * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
+     * Do this if your use-case requires custom routing logic, for instance if you
+     * implement your own complex travel mode.
+     * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
+     */
 	public final void setTripRouterFactory(final TripRouterFactory factory) {
 		if (this.componentOfDefaultTripRouterFactoryChanged) {
 			throw new RuntimeException("Setting a new TripRouterFactory means you cannot set a TransitRouterFactory or a LeastCostPathCalculatorFactory before." +

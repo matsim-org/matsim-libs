@@ -22,7 +22,6 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.misc.Time;
-
 import tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouter;
 import tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRouting;
 
@@ -34,7 +33,10 @@ import java.util.*;
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
  * <p/>
- * See {@link RunPluggableTripRouter} and {@link RunTeleportationMobsimWithCustomRouting} for examples.
+ * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter} for an example
+ * how to use this API from your own code.
+ * See {@link RunPluggableTripRouter} and {@link RunTeleportationMobsimWithCustomRouting} for examples
+ * how to replace this behavior with your own.
  *
  * @author thibautd
  */
