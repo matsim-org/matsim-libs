@@ -471,7 +471,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.getTripRouterFactory().instantiateAndConfigureTripRouter());
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.getTripRouterProvider().get());
 		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}

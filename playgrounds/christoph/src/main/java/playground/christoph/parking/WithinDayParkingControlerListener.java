@@ -20,10 +20,6 @@
 
 package playground.christoph.parking;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,13 +41,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -63,7 +53,6 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.InitialParkingSelector;
@@ -75,6 +64,10 @@ import playground.christoph.parking.withinday.identifier.ParkingSearchIdentifier
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFactory;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener, IterationEndsListener {
 
@@ -168,7 +161,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		
 		// This is a workaround since the controler does not return its TripRouterFactory
 		TripRouterFactory tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getControler().getScenario(), 
-				event.getControler().getTripRouterFactory(), leastCostPathCalculatorFactory);
+				event.getControler().getTripRouterProvider(), leastCostPathCalculatorFactory);
 		
 		// we can use the TripRouterFactory that has been initialized by the MultiModalControlerListener
 		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactoryWrapper);
@@ -312,14 +305,14 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	
 	private static class TripRouterFactoryWrapper implements TripRouterFactory {
 
-		private final TripRouterFactoryInternal internalFactory;
+		private final TripRouterProvider internalFactory;
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory modeRouteFactory;
 		private final Network subNetwork;
 		
-		public TripRouterFactoryWrapper(Scenario scenario, TripRouterFactoryInternal internalFactory,
+		public TripRouterFactoryWrapper(Scenario scenario, TripRouterProvider internalFactory,
 				LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
 			this.internalFactory = internalFactory;
 			this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
@@ -336,7 +329,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		
 		@Override
 		public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-			TripRouter tripRouter = internalFactory.instantiateAndConfigureTripRouter();
+			TripRouter tripRouter = internalFactory.get();
 			
 	        LeastCostPathCalculator leastCostPathCalculator = leastCostPathCalculatorFactory.createPathCalculator(
 	        		this.subNetwork, routingContext.getTravelDisutility(), routingContext.getTravelTime());

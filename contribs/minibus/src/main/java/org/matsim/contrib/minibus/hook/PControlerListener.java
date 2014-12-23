@@ -105,7 +105,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return stuckFactory.getReRouteStuck(new PlanRouter(
-						controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+						controler.getTripRouterProvider().get(),
 						controler.getScenario().getActivityFacilities()
 						), ((ScenarioImpl)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}

@@ -80,7 +80,7 @@ public class ReplanningEvent extends ControlerEvent {
 
 			@Override
 			public TripRouter getTripRouter() {
-				return controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
+				return controler.getTripRouterProvider().get();
 			}
 
 		};

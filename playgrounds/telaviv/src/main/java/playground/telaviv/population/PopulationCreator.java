@@ -20,13 +20,6 @@
 
 package playground.telaviv.population;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -59,11 +52,13 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.telaviv.config.XMLParameterParser;
 import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.Emme2ZonesFileParser;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -243,7 +238,7 @@ public class PopulationCreator {
 			}
 			@Override
 			public TripRouter getTripRouter() {
-				return tripRouterFactory.instantiateAndConfigureTripRouter();
+				return tripRouterFactory.get();
 			}
 		};
 		timeAllocationMutator.prepareReplanning(context);

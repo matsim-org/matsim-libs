@@ -20,12 +20,6 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,12 +37,13 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSocialNetwork;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
+
+import java.util.*;
 
 
 /**
@@ -88,7 +83,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		if(event.getIteration() == 0) {
 			PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
 			event.getControler().addControlerListener(passivePlannerManager);
-			event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
+			event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()));
 		}
 	}
 	//Main

@@ -22,7 +22,7 @@ package playground.christoph.passenger;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
@@ -30,12 +30,12 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 public class RideToRidePassengerReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactoryInternal tripRouterFactory;
+	private final TripRouterProvider tripRouterFactory;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	public RideToRidePassengerReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactoryInternal tripRouterFactory, RideToRidePassengerContextProvider rideToRidePassengerContextProvider,
+			TripRouterProvider tripRouterFactory, RideToRidePassengerContextProvider rideToRidePassengerContextProvider,
 			JointDepartureOrganizer jointDepartureOrganizer) {
 		super(withinDayEngine);
 		this.scenario = scenario;
@@ -48,7 +48,7 @@ public class RideToRidePassengerReplannerFactory extends WithinDayInitialReplann
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new RideToRidePassengerReplanner(super.getId(), scenario, 
 				this.getWithinDayEngine().getInternalInterface(),
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(),
+				this.tripRouterFactory.get(),
 				this.rideToRidePassengerContextProvider, this.jointDepartureOrganizer);
 		return replanner;
 	}

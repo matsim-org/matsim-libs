@@ -65,7 +65,6 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
-
 import tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter;
 
 import java.util.*;
@@ -380,7 +379,7 @@ public class Controler extends AbstractController {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(new PlanRouter(
-				getTripRouterFactory().instantiateAndConfigureTripRouter(),
+				getTripRouterProvider().get(),
 				getScenario().getActivityFacilities()
 				), Controler.this.scenarioData );
 			}
@@ -527,13 +526,15 @@ public class Controler extends AbstractController {
 	}
 
     /**
-     * Returns the factory to build the router so you can build your own.  See {@link RunOwnMobsimAgentUsingRouter} for an example.
+     * Gives access to a TripRouter.
+     * See {@link RunOwnMobsimAgentUsingRouter} for an example.
+     *
      */
-    public final TripRouterFactoryInternal getTripRouterFactory() {
-		return new TripRouterFactoryInternal() {
+    public final TripRouterProvider getTripRouterProvider() {
+		return new TripRouterProvider() {
 
 			@Override
-			public TripRouter instantiateAndConfigureTripRouter() {
+			public TripRouter get() {
 				return Controler.this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
 
 					@Override

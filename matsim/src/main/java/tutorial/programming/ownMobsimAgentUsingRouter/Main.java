@@ -40,7 +40,7 @@ import org.matsim.vehicles.VehicleUtils;
  * 
  * @author nagel
  */
-public class RunOwnMobsimAgentUsingRouter {
+public class Main {
 
 	public static void main(String[] args) {
 		

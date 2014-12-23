@@ -1,8 +1,5 @@
 package playground.balac.taxiservice.router;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -14,11 +11,10 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaxiserviceRoutingModule implements RoutingModule {
 
@@ -36,9 +32,9 @@ public class TaxiserviceRoutingModule implements RoutingModule {
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();		
+		TripRouter tripRouter = tripRouterFactory.get();
 
 		for(PlanElement pe1: tripRouter.calcRoute("car", fromFacility, toFacility, departureTime, person)) {
 	    	

@@ -31,7 +31,7 @@ import org.matsim.pt.router.TransitRouterFactory;
  * config file.
  * @author thibautd
  */
-public class TripRouterFactoryImpl implements TripRouterFactoryInternal {
+public class TripRouterFactoryImpl implements TripRouterProvider {
 	private final TripRouterFactory delegate;
 	private final RoutingContext context;
 
@@ -62,7 +62,7 @@ public class TripRouterFactoryImpl implements TripRouterFactoryInternal {
 
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter get() {
 		return delegate.instantiateAndConfigureTripRouter( context );
 	}
 }

@@ -20,8 +20,6 @@
 
 package org.matsim.run;
 
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -35,7 +33,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -43,6 +41,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
+
+import java.util.Iterator;
 
 /**
  * Assigns for each leg of each plan of each person an initial (freespeed) route.
@@ -140,7 +140,7 @@ public class InitRoutes {
 		//plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc,
 		//		new AStarLandmarksFactory(network, timeCostCalc, this.config.global().getNumberOfThreads()), 
 		//		((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory()));
-		TripRouterFactoryInternal tripRouterFact = new TripRouterFactoryImpl( 
+		TripRouterProvider tripRouterFact = new TripRouterFactoryImpl(
 				scenario,
 				new TravelDisutilityFactory() {
 					@Override
@@ -153,7 +153,7 @@ public class InitRoutes {
 				timeCostCalc,
 				new AStarLandmarksFactory( network, timeCostCalc, this.config.global().getNumberOfThreads()),
 				null);
-		plans.addAlgorithm( new PlanRouter( tripRouterFact.instantiateAndConfigureTripRouter() , null ) );
+		plans.addAlgorithm( new PlanRouter( tripRouterFact.get() , null ) );
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(this.config.plans().getInputFile());
 		plans.printPlansCount();

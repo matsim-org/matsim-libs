@@ -132,7 +132,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 		
-		TripRouter tripRouter = new TripRouterFactoryImpl(sc, new TravelTimeAndDistanceBasedTravelDisutilityFactory(), travelTime, new DijkstraFactory(), null).instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = new TripRouterFactoryImpl(sc, new TravelTimeAndDistanceBasedTravelDisutilityFactory(), travelTime, new DijkstraFactory(), null).get();
 		
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), sc).run(sc.getPopulation());

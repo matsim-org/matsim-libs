@@ -19,13 +19,6 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -38,16 +31,22 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author johannes
@@ -134,7 +133,7 @@ public class InitRoutes {
 			
 			final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 			
-			TripRouterFactoryInternal tripRouterFact = new TripRouterFactoryImpl(
+			TripRouterProvider tripRouterFact = new TripRouterFactoryImpl(
 					scenario, new TravelDisutilityFactory() {
 						@Override
 						public TravelDisutility createTravelDisutility(
@@ -145,7 +144,7 @@ public class InitRoutes {
 					}, timeCostCalc, new AStarLandmarksFactory(network,
 							timeCostCalc, 1), null);
 			
-			PlanRouter router = new PlanRouter( tripRouterFact.instantiateAndConfigureTripRouter() , null ) ;
+			PlanRouter router = new PlanRouter( tripRouterFact.get() , null ) ;
 		
 			for(Person person : persons) {
 				router.run(person);

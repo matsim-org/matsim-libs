@@ -458,7 +458,7 @@ public class Matsim2030Utils {
 						// the TravelTimeCalculator to be initialized, which is done
 						// at "prepareForSim", ie AFTER the startup event has been fired.
 						// What a mess.
-						final TripRouter router = controler.getTripRouterFactory().instantiateAndConfigureTripRouter();
+						final TripRouter router = controler.getTripRouterProvider().get();
 						controler.addControlerListener(
 							new TripModeShares(
 								25, // write interval. TODO: pass by config

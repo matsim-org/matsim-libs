@@ -1,11 +1,5 @@
 package playground.sergioo.passivePlanning2012.population.parallelPassivePlanning;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -18,10 +12,15 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.router.TripRouter;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PlanningEngine;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions.SinglePlannerAgent;
 import playground.sergioo.passivePlanning2012.core.utils.misc.Counter;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PassivePlannerManager extends Thread implements BeforeMobsimListener, AfterMobsimListener {
 
@@ -223,7 +222,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		for(int i=0; i<parallelPlanners.length; i++) {
-			parallelPlanners[i] = new ParallelPassivePlanners(counter, counterTotal, counterBad, event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter());
+			parallelPlanners[i] = new ParallelPassivePlanners(counter, counterTotal, counterBad, event.getControler().getTripRouterProvider().get());
 			parallelPlanners[i].setDaemon(true);
 			parallelPlanners[i].start();
 		}

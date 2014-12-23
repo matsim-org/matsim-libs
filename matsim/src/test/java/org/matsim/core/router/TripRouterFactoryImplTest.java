@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -48,6 +44,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Tests the router returned by the default factory.
@@ -110,7 +110,7 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterFactoryInternal factory =
+		TripRouterProvider factory =
 			new TripRouterFactoryImpl(
 					scenario,
 					new OnlyTimeDependentTravelDisutilityFactory(),
@@ -124,7 +124,7 @@ public class TripRouterFactoryImplTest {
 							config.transitRouter(),
 							config.vspExperimental())) );
 
-		TripRouter router = factory.instantiateAndConfigureTripRouter();
+		TripRouter router = factory.get();
 
 		List<? extends PlanElement> trip = router.calcRoute(
 				TransportMode.car,
@@ -182,7 +182,7 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterFactoryInternal factory =
+		TripRouterProvider factory =
 			new TripRouterFactoryImpl(
 					scenario,
 					new OnlyTimeDependentTravelDisutilityFactory(),
@@ -196,7 +196,7 @@ public class TripRouterFactoryImplTest {
 							config.transitRouter(),
 							config.vspExperimental())) );
 
-		TripRouter router = factory.instantiateAndConfigureTripRouter();
+		TripRouter router = factory.get();
 
 		List<? extends PlanElement> trip = router.calcRoute(
 				TransportMode.car,

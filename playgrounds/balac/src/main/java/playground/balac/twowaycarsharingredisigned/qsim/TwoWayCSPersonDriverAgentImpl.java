@@ -27,7 +27,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -356,9 +356,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = tripRouterFactory.get();
 		
 		Network network = scenario.getNetwork();
 		
@@ -409,9 +409,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = tripRouterFactory.get();
 		
 		Network network = scenario.getNetwork();
 		
@@ -458,9 +458,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 		
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = tripRouterFactory.get();
 		
 		Network network = scenario.getNetwork();
 		

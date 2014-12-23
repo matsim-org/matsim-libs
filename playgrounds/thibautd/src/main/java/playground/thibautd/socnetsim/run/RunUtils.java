@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,16 +39,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.utils.TripModeShares;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
@@ -66,29 +52,15 @@ import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
-import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
-import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
-import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
-import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
-import playground.thibautd.socnetsim.analysis.JointTripsStats;
+import playground.thibautd.socnetsim.analysis.*;
 import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.population.*;
 import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupReplanningListenner;
-import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
-import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner;
+import playground.thibautd.socnetsim.replanning.*;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -103,17 +75,15 @@ import playground.thibautd.socnetsim.scoring.FireMoneyEventsForUtilityOfBeingTog
 import playground.thibautd.socnetsim.scoring.GroupSizePreferencesConfigGroup;
 import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
-import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
-import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
-import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+import playground.thibautd.socnetsim.sharedvehicles.*;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 import playground.thibautd.utils.GenericFactory;
 import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
@@ -257,7 +227,7 @@ public class RunUtils {
 
 		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
 		actTypesForAnalysis.addActivityTypes(
-				controller.getRegistry().getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes() );
+				controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
 		actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		controller.addControlerListener(
 				new TripModeShares(

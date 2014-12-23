@@ -89,7 +89,7 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 			new HitchHikerAgentFactory(
 					new TransitAgentFactory(qSim),
                     controler.getScenario().getNetwork(),
-					controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+					controler.getTripRouterProvider().get(),
 					queuesManager,
 					eventsManager,
 					controler.getConfig().planCalcScore().getMonetaryDistanceCostRateCar());

@@ -117,7 +117,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 
 		// ensure that all agents' plans have valid mode chains
 		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
-				this.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+				this.getTripRouterProvider().get(),
 				this.getScenario().getActivityFacilities()
 				));
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});

@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.locationchoice.constrained;
 
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,6 +29,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+import java.util.List;
+import java.util.Random;
+
 public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 
 	private ScenarioImpl scenario;
@@ -40,7 +40,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		scenario = (ScenarioImpl) initializer.getControler().getScenario();
-		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter(), new Random(4711));
+		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterProvider().get(), new Random(4711));
 	}
 
 	public void testConstructor() {

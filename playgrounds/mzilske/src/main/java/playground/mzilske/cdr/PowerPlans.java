@@ -33,7 +33,7 @@ public class PowerPlans {
 					new FreeSpeedTravelTime(),
 					new DijkstraFactory(),
 					null)
-			.instantiateAndConfigureTripRouter();
+			.get();
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Plan plan = person.getSelectedPlan();
 				double distance = PowerPlans.distance(scenario.getNetwork(), plan);

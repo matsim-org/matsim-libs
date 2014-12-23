@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -29,10 +27,9 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
-
 import playground.thibautd.replanning.TourModeUnifierModule;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -44,6 +41,8 @@ import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPla
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
+
+import java.util.List;
 
 /**
  * @author thibautd
@@ -63,42 +62,42 @@ public class GroupPlanStrategyFactoryUtils {
 	// /////////////////////////////////////////////////////////////////////////
 	public static GenericStrategyModule<GroupPlans> createTripsToLegsModule(
 			final Config config,
-			final TripRouterFactoryInternal tripRouterFactory) {
+			final TripRouterProvider tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return new TripsToLegsAlgorithm( tripRouterFactory.instantiateAndConfigureTripRouter() );
+						return new TripsToLegsAlgorithm( tripRouterFactory.get() );
 					}
 				});
 	}
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,
-			final TripRouterFactoryInternal tripRouterFactory) {
+			final TripRouterProvider tripRouterFactory) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
 					config.global().getNumberOfThreads(),
-					tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes() ) );
+					tripRouterFactory.get().getStageActivityTypes() ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
 			final Config config,
 			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterFactoryInternal tripRouterFactory) {
+			final TripRouterProvider tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
 					public PlanAlgorithm getPlanAlgoInstance() {
-						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.instantiateAndConfigureTripRouter() );
+						return planRouterFactory.createPlanRoutingAlgorithm( tripRouterFactory.get() );
 					}
 				});
 	}
 
 	public static GenericStrategyModule<GroupPlans> createJointTripAwareTourModeUnifierModule(
 			final Config config,
-			final TripRouterFactoryInternal tripRouterFactory) {
-		final TripRouter router = tripRouterFactory.instantiateAndConfigureTripRouter();
+			final TripRouterProvider tripRouterFactory) {
+		final TripRouter router = tripRouterFactory.get();
 		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
 		stageTypes.addActivityTypes( router.getStageActivityTypes() );
 		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );

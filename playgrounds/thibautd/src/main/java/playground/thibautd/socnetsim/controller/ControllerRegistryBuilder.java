@@ -19,18 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
@@ -38,15 +30,10 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -55,7 +42,6 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
@@ -75,6 +61,10 @@ import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringF
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+
 /**
  * Allows to build a ControllerRegistry with certain default values
  * @author thibautd
@@ -93,7 +83,7 @@ public class ControllerRegistryBuilder {
 	private TravelDisutilityFactory travelDisutilityFactory = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private MobsimFactory mobsimFactory = null;
-	private TripRouterFactoryInternal tripRouterFactory = null;
+	private TripRouterProvider tripRouterFactory = null;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
@@ -154,7 +144,7 @@ public class ControllerRegistryBuilder {
 	}
 
 	public ControllerRegistryBuilder withTripRouterFactory(
-			final TripRouterFactoryInternal tripRouterFactory2) {
+			final TripRouterProvider tripRouterFactory2) {
 		if ( this.tripRouterFactory != null ) throw new IllegalStateException( "object already set" );
 		this.tripRouterFactory = tripRouterFactory2;
 		return this;
@@ -367,7 +357,7 @@ public class ControllerRegistryBuilder {
 		return leastCostPathCalculatorFactory;
 	}
 
-	public TripRouterFactoryInternal getTripRouterFactory() {
+	public TripRouterProvider getTripRouterFactory() {
 		if ( tripRouterFactory == null ) {
 			final TransitSchedule schedule = scenario.getTransitSchedule();
 			final TransitRouterFactory transitRouterFactory =
@@ -420,9 +410,9 @@ public class ControllerRegistryBuilder {
 					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
 						final PlanAlgorithm routingAlgorithm =
 									getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
-										getTripRouterFactory().instantiateAndConfigureTripRouter() );
+										getTripRouterFactory().get() );
 						final PlanAlgorithm checkJointRoutes =
-							new ImportedJointRoutesChecker( getTripRouterFactory().instantiateAndConfigureTripRouter() );
+							new ImportedJointRoutesChecker( getTripRouterFactory().get() );
 						final PlanAlgorithm xy2link = new XY2Links( scenario.getNetwork() );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override

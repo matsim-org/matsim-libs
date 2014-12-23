@@ -22,7 +22,7 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -65,7 +65,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		TripRouterFactoryInternal tripRouterFactory =
+		TripRouterProvider tripRouterFactory =
 			getAndTuneTripRouterFactory(
 					plan,
 					delay,
@@ -85,7 +85,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		Solution<Plan> initialSolution =
 			new TimeModeChooserSolution(
 					plan,
-					tripRouterFactory.instantiateAndConfigureTripRouter() );
+					tripRouterFactory.get() );
 
 		FitnessFunction<Plan> fitness = new BasicFitness( scoringFunctionFactory );
 		configuration.setFitnessFunction( fitness );
@@ -130,7 +130,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
-	private static TripRouterFactoryInternal getAndTuneTripRouterFactory(
+	private static TripRouterProvider getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
 			final Controler controler ) {
@@ -146,7 +146,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 					null,
 				controler.getConfig().plansCalcRoute(),
 				delay,
-				controler.getTripRouterFactory());
+				controler.getTripRouterProvider());
 	}
 }
 

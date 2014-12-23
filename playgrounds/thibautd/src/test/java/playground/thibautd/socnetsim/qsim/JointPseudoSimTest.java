@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
@@ -36,15 +32,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -53,6 +44,10 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.router.JointPlanRouter;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author thibautd
@@ -84,9 +79,9 @@ public class JointPseudoSimTest {
 				createTestScenario(),
 				new JointPlanRouter(
 					new JointTripRouterFactory(
-						new TripRouterFactoryInternal() {
+						new TripRouterProvider() {
 							@Override
-							public TripRouter instantiateAndConfigureTripRouter() {
+							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
 											new TravelTimeAndDistanceBasedTravelDisutility(
@@ -96,7 +91,7 @@ public class JointPseudoSimTest {
 							}
 						},
 						scenario.getPopulation().getFactory()
-						).instantiateAndConfigureTripRouter(),
+						).get(),
 					null ),
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
@@ -125,9 +120,9 @@ public class JointPseudoSimTest {
 				createTestScenario(),
 				new JointPlanRouter(
 					new JointTripRouterFactory(
-						new TripRouterFactoryInternal() {
+						new TripRouterProvider() {
 							@Override
-							public TripRouter instantiateAndConfigureTripRouter() {
+							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
 											new TravelTimeAndDistanceBasedTravelDisutility(
@@ -137,7 +132,7 @@ public class JointPseudoSimTest {
 							}
 						},
 						scenario.getPopulation().getFactory()
-						).instantiateAndConfigureTripRouter(),
+						).get(),
 					null ),
 				new JointQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,

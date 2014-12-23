@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 
 /**
  * @author nagel
@@ -37,9 +37,9 @@ import org.matsim.core.router.TripRouterFactoryInternal;
  */
 public class MyMobsimFactory implements MobsimFactory {
 
-	private TripRouterFactoryInternal tripRouterFactory;
+	private TripRouterProvider tripRouterFactory;
 
-	MyMobsimFactory(TripRouterFactoryInternal tripRouterFactory) {
+	MyMobsimFactory(TripRouterProvider tripRouterFactory) {
 		this.tripRouterFactory = tripRouterFactory;
 	}
 
@@ -53,7 +53,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.tripRouterFactory.instantiateAndConfigureTripRouter())) ;
+		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.tripRouterFactory.get())) ;
 
 		DefaultAgentFactory fac = new DefaultAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), fac, qSim);

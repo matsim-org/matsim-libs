@@ -123,7 +123,7 @@ public class RetailersLocationListener
         this.lrr.init();
         final PersonAlgorithm router =
     		  new PlanRouter(
-    				  event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter() );
+    				  event.getControler().getTripRouterProvider().get() );
         for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) {
         	r = localIterator.next();
         	this.rsw.write(r, event.getIteration(), this.cfc);

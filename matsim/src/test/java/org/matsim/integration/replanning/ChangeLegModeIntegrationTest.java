@@ -123,7 +123,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).instantiateAndConfigureTripRouter();
+				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).get();
 			}
 			
 		});

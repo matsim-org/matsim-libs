@@ -24,9 +24,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -54,7 +53,7 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 		final Config config = registry.getScenario().getConfig();
-		final TripRouterFactoryInternal tripRouterFactory = registry.getTripRouterFactory();
+		final TripRouterProvider tripRouterFactory = registry.getTripRouterFactory();
 		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();
 
 		strategy.addStrategyModule(
@@ -63,7 +62,7 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 						@Override
 						public PlanAlgorithm getPlanAlgoInstance() {
 							final CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
-							blackList.addActivityTypes( tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes() );
+							blackList.addActivityTypes( tripRouterFactory.get().getStageActivityTypes() );
 							blackList.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
 							final int iteration = getReplanningContext().getIteration();

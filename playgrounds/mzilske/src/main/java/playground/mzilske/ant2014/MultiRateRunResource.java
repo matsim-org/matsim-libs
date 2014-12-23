@@ -390,7 +390,7 @@ class MultiRateRunResource {
                             new FreeSpeedTravelTime(),
                             new DijkstraFactory(),
                             null)
-                            .instantiateAndConfigureTripRouter();
+                            .get();
                     double travelled = sum(PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork()).values());
                     double freespeedDistances = 0.0;
                     for (Person person : scenario.getPopulation().getPersons().values()) {

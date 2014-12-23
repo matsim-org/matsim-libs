@@ -20,11 +20,6 @@
 
 package playground.sergioo.weeklySimulation.run;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -40,18 +35,13 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;
@@ -65,6 +55,11 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
 import playground.sergioo.weeklySimulation.analysis.LegHistogramListener;
 import playground.sergioo.weeklySimulation.scenario.ScenarioUtils;
 import playground.sergioo.weeklySimulation.scoring.CharyparNagelWeekScoringFunctionFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -138,7 +133,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		if(event.getIteration() == 0) {
 			PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
 			event.getControler().addControlerListener(passivePlannerManager);
-			event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
+			event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()));
 		}
 	}
 	//Main

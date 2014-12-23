@@ -20,9 +20,6 @@
 
 package org.matsim.withinday.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,12 +42,15 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditRoutesTest extends MatsimTestCase {
 	
@@ -355,14 +355,14 @@ public class EditRoutesTest extends MatsimTestCase {
 	 */
 	private void createTripRouter() {
 		
-		TripRouterFactoryInternal tripRouterFactory = new TripRouterFactoryImpl(
+		TripRouterProvider tripRouterFactory = new TripRouterFactoryImpl(
 				scenario,
 				new OnlyTimeDependentTravelDisutilityFactory(),
 				new FreeSpeedTravelTime(),
 				new DijkstraFactory(),
 				null);
 		
-		tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();		
+		tripRouter = tripRouterFactory.get();
 	}
 	
 	/**

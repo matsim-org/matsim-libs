@@ -55,7 +55,7 @@ public class PlanRouterTest {
                 new OnlyTimeDependentTravelDisutilityFactory(),
                 new FreeSpeedTravelTime(),
                 new DijkstraFactory(),
-                null).instantiateAndConfigureTripRouter();
+                null).get();
         PlanRouter testee = new PlanRouter(tripRouter);
         Plan plan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
@@ -84,7 +84,7 @@ public class PlanRouterTest {
                 disutilityFactory,
                 travelTime,
                 leastCostAlgoFactory,
-                null).instantiateAndConfigureTripRouter();
+                null).get();
         RoutingModule routingModule = new RoutingModule() {
             @Override
             public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {

@@ -22,14 +22,9 @@ package playground.thibautd.socnetsim.replanning.strategies;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.replanning.*;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
@@ -68,7 +63,7 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								registry.getScenario(),
-								registry.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+								registry.getTripRouterFactory().get(),
 								MatsimRandom.getLocalInstance(),
 								true); // "iterative"
 						}

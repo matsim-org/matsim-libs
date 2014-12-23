@@ -20,11 +20,6 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,12 +38,16 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.PersonHouseholdMapping;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningSocialFactory;
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -103,7 +102,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 			if(event.getControler().getConfig().scenario().isUseHouseholds()) {
 				PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
 				event.getControler().addControlerListener(passivePlannerManager);
-				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter()));
+				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()));
 			}
 			else
 				log.error("Households information is neccesary for passive planning with social");

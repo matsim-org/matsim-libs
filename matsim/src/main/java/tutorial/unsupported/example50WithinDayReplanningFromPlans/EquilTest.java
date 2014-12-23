@@ -25,7 +25,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
@@ -54,7 +54,7 @@ public class EquilTest {
 		controler.run();
 	}
 	
-	private static class WithinDayTripRouterFactory implements TripRouterFactoryInternal {
+	private static class WithinDayTripRouterFactory implements TripRouterProvider {
 
 		private final Controler controler;
 		private final TravelTime travelTime;
@@ -65,13 +65,13 @@ public class EquilTest {
 		}
 		
 		@Override
-		public TripRouter instantiateAndConfigureTripRouter() {
+		public TripRouter get() {
 			return new TripRouterFactoryImpl(
 					controler.getScenario(), 
 					controler.getTravelDisutilityFactory(),
 					travelTime, 
 					controler.getLeastCostPathCalculatorFactory(), 
-					controler.getTransitRouterFactory()).instantiateAndConfigureTripRouter();
+					controler.getTransitRouterFactory()).get();
 		}
 		
 		

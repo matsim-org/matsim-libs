@@ -84,7 +84,7 @@ public class PassengerControlerHandler implements StartupListener {
 		
 		RideToRidePassengerReplannerFactory replannerFactory = new RideToRidePassengerReplannerFactory(
 				event.getControler().getScenario(), this.withinDayControlerListener.getWithinDayEngine(), 
-				event.getControler().getTripRouterFactory(), rideToRidePassengerContextProvider, jointDepartureOrganizer);
+				event.getControler().getTripRouterProvider(), rideToRidePassengerContextProvider, jointDepartureOrganizer);
 		replannerFactory.addIdentifier(identifier);
 		
 		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(replannerFactory);

@@ -22,14 +22,13 @@ package org.matsim.contrib.minibus.hook;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.pt.router.TransitRouterFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Decide which {@link TripRouterFactoryInternal} to use.
+ * Decide which {@link org.matsim.core.router.TripRouterProvider} to use.
  * 
  * @author aneumann, droeder
  *

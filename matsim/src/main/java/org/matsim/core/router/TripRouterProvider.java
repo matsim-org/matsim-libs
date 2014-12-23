@@ -21,10 +21,15 @@ package org.matsim.core.router;
 
 import org.matsim.core.api.internal.MatsimFactory;
 
+import javax.inject.Provider;
 
-public interface TripRouterFactoryInternal extends MatsimFactory {
+/**
+ * Provides a TripRouter instance.
+ *
+ */
+public interface TripRouterProvider extends Provider<TripRouter>, MatsimFactory {
 
-	public TripRouter instantiateAndConfigureTripRouter();
+	public TripRouter get();
 
 }
 

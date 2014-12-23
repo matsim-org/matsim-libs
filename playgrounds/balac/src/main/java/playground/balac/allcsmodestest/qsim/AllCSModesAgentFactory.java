@@ -8,8 +8,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
-
+import org.matsim.core.router.TripRouterProvider;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
@@ -30,9 +29,9 @@ public class AllCSModesAgentFactory implements AgentFactory{
 		this.owvehiclesLocation = owvehiclesLocation;
 		this.twvehiclesLocation = twvehiclesLocation;
 		
-		TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 		
-		tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();	
+		tripRouter = tripRouterFactory.get();
 		
 		
 	}

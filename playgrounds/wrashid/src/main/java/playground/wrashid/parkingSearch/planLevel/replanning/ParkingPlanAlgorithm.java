@@ -231,7 +231,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private static PlanAlgorithm getRoutingAlgorithm(Controler controler) {
-		return new PlanRouter( controler.getTripRouterFactory().instantiateAndConfigureTripRouter() );
+		return new PlanRouter( controler.getTripRouterProvider().get() );
 	}
 
 }

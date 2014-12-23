@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.matsim.core.router.CompositeStageActivityTypes;
-
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
@@ -45,7 +44,7 @@ public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigu
 		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 
 		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
-		stageActs.addActivityTypes( registry.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes() );
+		stageActs.addActivityTypes( registry.getTripRouterFactory().get().getStageActivityTypes() );
 		stageActs.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		strategy.addStrategyModule(
 				//new AllocateVehicleToPlansInGroupPlanModule(

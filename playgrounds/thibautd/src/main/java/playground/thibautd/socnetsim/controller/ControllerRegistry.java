@@ -27,13 +27,12 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -56,7 +55,7 @@ public final class ControllerRegistry {
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final CalcLegTimes legTimes;
 	private final MobsimFactory mobsimFactory;
-	private final TripRouterFactoryInternal tripRouterFactory;
+	private final TripRouterProvider tripRouterFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
@@ -74,7 +73,7 @@ public final class ControllerRegistry {
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final CalcLegTimes legTimes,
 			final MobsimFactory mobsimFactory,
-			final TripRouterFactoryInternal tripRouterFactory,
+			final TripRouterProvider tripRouterFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
@@ -151,7 +150,7 @@ public final class ControllerRegistry {
 		return mobsimFactory;
 	}
 
-	public TripRouterFactoryInternal getTripRouterFactory() {
+	public TripRouterProvider getTripRouterFactory() {
 		return tripRouterFactory;
 	}
 
@@ -194,7 +193,7 @@ public final class ControllerRegistry {
 
 			@Override
 			public TripRouter getTripRouter() {
-				return registry.getTripRouterFactory().instantiateAndConfigureTripRouter();
+				return registry.getTripRouterFactory().get();
 			}
 		};
 	}

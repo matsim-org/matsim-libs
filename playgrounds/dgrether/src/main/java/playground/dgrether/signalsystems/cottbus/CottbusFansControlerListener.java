@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -30,6 +28,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.Random;
 
 
 /**
@@ -54,7 +54,7 @@ public class CottbusFansControlerListener implements BeforeMobsimListener{
 	public void notifyBeforeMobsim(BeforeMobsimEvent e) {
 		Controler c = e.getControler();
 		PlanAlgorithm pcr = new PlanRouter(
-		c.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+		c.getTripRouterProvider().get(),
 		c.getScenario().getActivityFacilities()
 		);
 		for (Person p : pop.getPersons().values()){

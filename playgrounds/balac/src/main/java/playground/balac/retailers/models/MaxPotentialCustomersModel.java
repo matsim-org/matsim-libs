@@ -15,7 +15,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.utils.geometry.CoordImpl;
 import playground.balac.retailers.data.FacilityRetailersImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
@@ -85,9 +85,9 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 		  int fitness = 0;
 		  Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().values();
           Network netowrk = controler.getScenario().getNetwork();
-	     TripRouterFactoryInternal  tripRouterFactory = controler.getTripRouterFactory();
+	     TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
 			
-			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+			TripRouter tripRouter = tripRouterFactory.get();
 			double time = System.currentTimeMillis();
 			 // log.info(System.currentTimeMillis());
 	      for (PersonPrimaryActivity ppa : primaryActivities) {

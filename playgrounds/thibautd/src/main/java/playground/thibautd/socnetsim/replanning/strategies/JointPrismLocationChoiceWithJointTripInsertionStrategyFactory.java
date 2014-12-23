@@ -21,16 +21,11 @@ package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.replanning.*;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
@@ -74,7 +69,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 								MatsimRandom.getLocalInstance(),
 								(SocialNetwork) registry.getScenario().getScenarioElement(  SocialNetwork.ELEMENT_NAME ),
 								(JointTripInsertorConfigGroup) registry.getScenario().getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-								registry.getTripRouterFactory().instantiateAndConfigureTripRouter());
+								registry.getTripRouterFactory().get());
 						}
 						
 						@Override

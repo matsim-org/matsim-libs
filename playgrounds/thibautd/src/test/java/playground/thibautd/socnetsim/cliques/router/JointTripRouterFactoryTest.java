@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,11 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
@@ -52,12 +44,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -169,7 +164,7 @@ public class JointTripRouterFactoryTest {
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
-					factory.instantiateAndConfigureTripRouter() );
+					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			boolean toRoute = false;
@@ -206,7 +201,7 @@ public class JointTripRouterFactoryTest {
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
 			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
-					factory.instantiateAndConfigureTripRouter() );
+					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
 			final List<Id> passengerIds = new ArrayList<Id>();

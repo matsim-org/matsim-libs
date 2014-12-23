@@ -25,23 +25,22 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * @author thibautd
  */
-public class JointTripRouterFactory implements TripRouterFactoryInternal {
-	private final TripRouterFactoryInternal defaultFactory;
+public class JointTripRouterFactory implements TripRouterProvider {
+	private final TripRouterProvider defaultFactory;
 	private final PopulationFactory populationFactory;
 
 	public JointTripRouterFactory(
-			final TripRouterFactoryInternal defaultFactory,
+			final TripRouterProvider defaultFactory,
 			final PopulationFactory populationFactory) {
 		this.defaultFactory = defaultFactory;
 		this.populationFactory = populationFactory;
@@ -75,8 +74,8 @@ public class JointTripRouterFactory implements TripRouterFactoryInternal {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
-		TripRouter instance = defaultFactory.instantiateAndConfigureTripRouter();
+	public TripRouter get() {
+		TripRouter instance = defaultFactory.get();
 
 		instance.setRoutingModule(
 				JointActingTypes.DRIVER,

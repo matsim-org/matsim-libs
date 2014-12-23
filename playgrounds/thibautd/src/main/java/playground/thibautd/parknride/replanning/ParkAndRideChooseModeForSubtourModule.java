@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.replanning;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,15 +27,16 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.parknride.ParkAndRideConfigGroup;
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
+
+import java.util.*;
 
 /**
  * @author thibautd
@@ -59,8 +52,8 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouterFactoryInternal tripRouterFactory = controler.getTripRouterFactory();
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
+		TripRouter tripRouter = tripRouterFactory.get();
 		ParkAndRideFacilities facilities = ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() );
 		ParkAndRideIncluder includer;
 

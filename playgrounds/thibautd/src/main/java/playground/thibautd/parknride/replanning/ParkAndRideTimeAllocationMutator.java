@@ -29,7 +29,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
-
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
 
@@ -91,7 +90,7 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 			if (blackList == null) {
 				// we need this hack, because when initialising the strategy the router factory
 				// may not be set correctly yet...
-				blackList = controler.getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes();
+				blackList = controler.getTripRouterProvider().get().getStageActivityTypes();
 				controler = null;
 			}
 

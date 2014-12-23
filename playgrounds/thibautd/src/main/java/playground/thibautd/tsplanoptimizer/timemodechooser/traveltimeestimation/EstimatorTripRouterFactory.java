@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
@@ -38,8 +38,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 /**
  * @author thibautd
  */
-public class EstimatorTripRouterFactory implements TripRouterFactoryInternal {
-	private final TripRouterFactoryInternal delegate;
+public class EstimatorTripRouterFactory implements TripRouterProvider {
+	private final TripRouterProvider delegate;
 	private final PlansCalcRouteConfigGroup config;
 	private final Plan plan;
 	private final PopulationFactory populationFactory;
@@ -60,7 +60,7 @@ public class EstimatorTripRouterFactory implements TripRouterFactoryInternal {
 			final TransitSchedule transitSchedule,
 			final PlansCalcRouteConfigGroup config,
 			final DepartureDelayAverageCalculator delay,
-			final TripRouterFactoryInternal delegate) {
+			final TripRouterProvider delegate) {
 		this.plan = plan;
 		this.config = config;
 		this.delay = delay;
@@ -74,8 +74,8 @@ public class EstimatorTripRouterFactory implements TripRouterFactoryInternal {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
-		TripRouter instance = delegate.instantiateAndConfigureTripRouter();
+	public TripRouter get() {
+		TripRouter instance = delegate.get();
 
 		for ( String mode : config.getNetworkModes() ) {
 			instance.setRoutingModule(

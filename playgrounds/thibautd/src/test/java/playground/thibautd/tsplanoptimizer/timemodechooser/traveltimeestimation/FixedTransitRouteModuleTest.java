@@ -19,27 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -48,6 +35,11 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -60,7 +52,7 @@ public class FixedTransitRouteModuleTest {
 	public void testRoutes() throws Exception {
 		Config config = utils.loadConfig( utils.getPackageInputDirectory()+"/config.xml" );
 		Scenario scenario = ScenarioUtils.loadScenario( config );
-		TripRouterFactoryInternal tripRouterFactory =  new TripRouterFactoryImpl(
+		TripRouterProvider tripRouterFactory =  new TripRouterFactoryImpl(
 				scenario,
 				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 				new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
@@ -68,7 +60,7 @@ public class FixedTransitRouteModuleTest {
 				new TransitRouterImplFactory(
 					scenario.getTransitSchedule(),
 					new TransitRouterConfig( config )));
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		TripRouter tripRouter = tripRouterFactory.get();
 		TransitRouterWrapper transitRouter = (TransitRouterWrapper) tripRouter.getRoutingModule( TransportMode.pt );
 
 		PlanRouter router = new PlanRouter( tripRouter );
@@ -76,7 +68,7 @@ public class FixedTransitRouteModuleTest {
 			Plan testPlan = p.getSelectedPlan();
 			router.run( testPlan );
 
-			TripRouter tripRouterWithFixedRoutes = tripRouterFactory.instantiateAndConfigureTripRouter();
+			TripRouter tripRouterWithFixedRoutes = tripRouterFactory.get();
 			FixedTransitRouteRoutingModule testee =
 				new FixedTransitRouteRoutingModule(
 						testPlan,
