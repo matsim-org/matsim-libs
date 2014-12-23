@@ -321,6 +321,7 @@ public class Controler extends AbstractController {
                         bindToInstance(IterationStopWatch.class, stopwatch);
                         bindToInstance(Scenario.class, scenarioData);
                         bindToInstance(EventsManager.class, events);
+                        bindToProvider(TripRouter.class, getTripRouterProvider());
                     }
                 });
         this.injector.retrofitScoringFunctionFactory(this.getScoringFunctionFactory());

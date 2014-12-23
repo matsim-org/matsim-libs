@@ -105,6 +105,15 @@ public abstract class AbstractModule {
         binder.bind(type).toProvider(providerType);
     }
 
+    protected final <T> void bindToProvider(Class<T> type, final javax.inject.Provider<? extends T> provider) {
+        binder.bind(type).toProvider(new com.google.inject.Provider<T>() {
+            @Override
+            public T get() {
+                return provider.get();
+            }
+        });
+    }
+
     protected final void addEventHandler(Class<? extends EventHandler> type) {
         eventHandlerMultibinder.addBinding().to(type);
     }
