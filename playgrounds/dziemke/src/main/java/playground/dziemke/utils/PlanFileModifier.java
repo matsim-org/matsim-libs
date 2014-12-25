@@ -24,11 +24,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class PlanFileModifier {
 	// Parameters
 	static double selectionProbability = 1.;
-	static boolean onlyTransferSelectedPlan = false;
+	static boolean onlyTransferSelectedPlan = true;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
-	static int maxNumberOfAgentsConsidered = 100;
+	static int maxNumberOfAgentsConsidered = 1000000;
 	static String runId = "run_145";
 	static int iteration = 150;
 	
@@ -38,7 +38,7 @@ public class PlanFileModifier {
 			+ "/" + runId + "." + iteration + ".plans.xml.gz";
 //	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans.xml.gz";
 	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_reduced.xml.gz";
+			+ "/" + runId + "." + iteration + ".plans_selected2.xml.gz";
 			
 //	if (onlyTransferSelectedPlan == true) {
 //		outputPlansFile = outputPlansFile + "_selected";
