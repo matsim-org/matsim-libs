@@ -180,6 +180,8 @@ public class CemdapStopsParser {
 	}
 	
 	
+	// from documentation
+	// used until cemdap2matsim/29
 //	private final String transformActType(int activityTypeNumber) {
 //		switch (activityTypeNumber) {
 //		case 0: return "shop";
@@ -218,39 +220,74 @@ public class CemdapStopsParser {
 //	}
 	
 	
+	// from UCSB
 	// used for cemdap2matsim/30
+//	private final String transformActType(int activityTypeNumber) {
+//		switch (activityTypeNumber) {
+//		case 0: return "shop";
+//		case 1: return "other";
+//		case 2: return "other";
+//		case 3: return "leis";
+//		case 4: return "other";
+//		case 5: return "leis";
+//		case 6: return "leis";
+//		case 7: return "other";
+//		case 8: return "work";
+//		case 9: return "other";
+//		case 10: return "other";
+//		case 11: return "other";
+//		case 12: return "home";
+//		case 13: return "work";
+//		case 14: return "home";
+//		case 15: return "educ";
+//		case 16: return "leis";
+//		case 17: return "work";
+//		case 18: return "home";
+//		case 19: return "educ";
+//		case 20: return "leis";
+//		case 21: return "leis";
+//		default:
+//			log.error(new IllegalArgumentException("actTypeNo="+activityTypeNumber+" not allowed."));
+//			//Gbl.errorMsg(new IllegalArgumentException("activityTypeNumber="+activityTypeNumber+" is not allowed."));
+//			return null;
+//		}
+//	}
+	
+	
+	// information from Subodh, Nov 2014
+	// coding from UCSB can remain according to this information
 	private final String transformActType(int activityTypeNumber) {
 		switch (activityTypeNumber) {
-		case 0: return "shop";
-		case 1: return "other";
-		case 2: return "other";
-		case 3: return "leis";
-		case 4: return "other";
-		case 5: return "leis";
-		case 6: return "leis";
-		case 7: return "other";
-		case 8: return "work";
-		case 9: return "other";
-		case 10: return "other";
-		case 11: return "other";
-		case 12: return "home";
-		case 13: return "work";
-		case 14: return "home";
-		case 15: return "educ";
-		case 16: return "leis";
-		case 17: return "work";
-		case 18: return "home";
-		case 19: return "educ";
-		case 20: return "leis";
-		case 21: return "leis";
+									//	Activity 	Mapping Code
+		case 0: return "shop";		//	Shopping	0
+		case 1: return "other";		//	Social Activity	1
+		case 2: return "other";		//	Others	2
+		case 3: return "leis";		//	Eating Out	3
+		case 4: return "other";		//	Serving Passengers	4
+		case 5: return "leis";		//	Entertainment	5
+		case 6: return "leis";		//	Active Recreation	6
+		case 7: return "other";		//	Visit friends/family	7
+		case 8: return "work";		//	Work Related	8
+		case 9: return "other";		//	Maintainence	9
+		case 10: return "other";	//	Drop off to school	10
+		case 11: return "other";	//	Pick up from school	11
+		case 12: return "home";		//	Go home adult	12
+		case 13: return "work";		//	Go work adult	13
+		case 14: return "home";		//	Go home child	14
+		case 15: return "educ";		//	Go school child	15
+		case 16: return "leis";		//	Independent discretionary activity	16
+		case 17: return "work";		//	Work	17
+		case 18: return "home";		//	Home	18
+		case 19: return "educ";		//	School	19
+		case 20: return "leis";		//	Joint discretionary with child	20
+		case 21: return "leis";		//	Joint discretionary with parents	21
 		default:
 			log.error(new IllegalArgumentException("actTypeNo="+activityTypeNumber+" not allowed."));
-			//Gbl.errorMsg(new IllegalArgumentException("activityTypeNumber="+activityTypeNumber+" is not allowed."));
 			return null;
 		}
 	}
-	
-	
+
+		
 	// called at the very end
 	// private final void cleanUp(Population population) {
 	private final void cleanUp(Population population, int planNumber) {
