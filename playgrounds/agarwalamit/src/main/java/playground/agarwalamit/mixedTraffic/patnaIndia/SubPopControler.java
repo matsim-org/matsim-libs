@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -52,10 +53,10 @@ public class SubPopControler {
 
 	public static void main(String[] args) {
 
-		SubpopulationConfig subPopConfig = new SubpopulationConfig();
-		subPopConfig.run();
-		Config config = subPopConfig.getPatnaConfig();
-//		Config config = ConfigUtils.loadConfig(args[0]);
+//		SubpopulationConfig subPopConfig = new SubpopulationConfig();
+//		subPopConfig.run();
+//		Config config = subPopConfig.getPatnaConfig();
+		Config config = ConfigUtils.loadConfig(args[0]);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
