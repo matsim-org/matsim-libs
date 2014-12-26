@@ -41,8 +41,10 @@ public class SubpopulationConfig {
 
 	private Config config;
 	private String [] subPopulations = {"slum","nonSlum"}; 
-	private Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
-	private String outputDir = "../../../repos/runs-svn/patnaIndia/run104/output/";
+	private Collection <String> mainModes = Arrays.asList("slum_car","slum_motorbike","slum_bike","nonSlum_car","nonSlum_motorbike","nonSlum_bike");
+	private  String [] allModes = {"slum_car","slum_motorbike","slum_bike","slum_pt","slum_walk","nonSlum_car","nonSlum_motorbike","nonSlum_bike","nonSlum_pt","nonSlum_walk"};
+	//	private  String [] allModesConstants_slum = {"0.","0.","0.","0.","0."};
+	private String outputDir = "../../../repos/runs-svn/patnaIndia/run104/c7/";
 
 	public static void main(String[] args) {
 
@@ -52,7 +54,7 @@ public class SubpopulationConfig {
 	public void run(){
 		//inputs
 		config.network().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/network.xml");
-		
+
 		config.plans().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/plansSubPop.xml.gz");
 		config.plans().setInputPersonAttributeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
 		config.counts().setCountsFileName("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
@@ -77,17 +79,17 @@ public class SubpopulationConfig {
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		config.qsim().setMainModes(mainModes);
 
-		
-		
+
+
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
-		
+
 		config.plans().setSubpopulationAttributeName("incomeGroup");
-		
+
 		for(String subPop : subPopulations){
 			StrategySettings timeAllocationMutator	= new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			timeAllocationMutator.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator.name());
 			timeAllocationMutator.setWeight(0.05);
-			
+
 			StrategySettings expChangeBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			expChangeBeta.setStrategyName("ChangeExpBeta");
 			expChangeBeta.setWeight(0.9);
@@ -95,37 +97,39 @@ public class SubpopulationConfig {
 			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			reRoute.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.name());
 			reRoute.setWeight(0.1);
-			
+
 			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 			modeChoice.setStrategyName("ChangeLegMode_".concat(subPopulations[0]));
 			modeChoice.setWeight(0.05);
-			
+
 			timeAllocationMutator.setSubpopulation(subPop);
 			reRoute.setSubpopulation(subPop);
 			expChangeBeta.setSubpopulation(subPop);
 			modeChoice.setSubpopulation(subPop);
-			
+
 			config.strategy().addStrategySettings(expChangeBeta);
 			config.strategy().addStrategySettings(reRoute);
 			config.strategy().addStrategySettings(timeAllocationMutator);
 			config.strategy().addStrategySettings(modeChoice);
-			
+
 		}
-		
+
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
-		config.planCalcScore().setTraveling_utils_hr(0);
-		config.planCalcScore().setTravelingBike_utils_hr(0);
+		for(String str : allModes){
+			config.planCalcScore().getOrCreateModeParams(str).setConstant(0.);
+		}
 		config.planCalcScore().setTravelingOther_utils_hr(0);
-		config.planCalcScore().setTravelingPt_utils_hr(0);
-		config.planCalcScore().setTravelingWalk_utils_hr(0);
-		
+		config.planCalcScore().setConstantOther(0.);
+
 		config.plansCalcRoute().setNetworkModes(mainModes);
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
-		
-		config.plansCalcRoute().setTeleportedModeSpeed("walk", 4/3.6); 
-		config.plansCalcRoute().setTeleportedModeSpeed("pt", 20/3.6);
-		
+
+		config.plansCalcRoute().setTeleportedModeSpeed("slum_walk", 4/3.6);
+		config.plansCalcRoute().setTeleportedModeSpeed("nonSlum_walk", 4/3.6);
+		config.plansCalcRoute().setTeleportedModeSpeed("slum_pt", 20/3.6);
+		config.plansCalcRoute().setTeleportedModeSpeed("nonSlum_pt", 20/3.6);
+
 		ActivityParams workAct = new ActivityParams("work");
 		workAct.setTypicalDuration(8*3600);
 		config.planCalcScore().addActivityParams(workAct);
@@ -133,7 +137,7 @@ public class SubpopulationConfig {
 		ActivityParams homeAct = new ActivityParams("home");
 		homeAct.setTypicalDuration(12*3600);
 		config.planCalcScore().addActivityParams(homeAct);
-		
+
 		new ConfigWriter(config).write(outputDir+"/configSubPop.xml");
 	}
 

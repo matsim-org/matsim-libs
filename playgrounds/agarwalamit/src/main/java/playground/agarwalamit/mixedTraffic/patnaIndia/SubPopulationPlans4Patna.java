@@ -185,7 +185,7 @@ public class SubPopulationPlans4Patna {
 			case 9999 : travelMode = randomModeSlum();	break;				// 480 such trips are found in which mode was not available so chosing a random mode 
 			case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
 			}
-			createActivities( plan, workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
+			createActivities( plan, workZoneCoordTransform, homeZoneCoordTransform, subPop+"_"+travelMode, tripPurpose);
 			//			}
 			try {
 				line = bufferedReader.readLine();

@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -41,7 +39,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -55,44 +52,75 @@ public class SubPopControler {
 
 	public static void main(String[] args) {
 
-//		SubpopulationConfig subPopConfig = new SubpopulationConfig();
-//		subPopConfig.run();
-		Config config = ConfigUtils.loadConfig(args[0]);
+		SubpopulationConfig subPopConfig = new SubpopulationConfig();
+		subPopConfig.run();
+		Config config = subPopConfig.getPatnaConfig();
+//		Config config = ConfigUtils.loadConfig(args[0]);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
 		((ScenarioImpl) sc).createVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
-		car.setMaximumVelocity(60.0/3.6);
-		car.setPcuEquivalents(1.0);
-		modesType.put("car", car);
-		sc.getVehicles().addVehicleType(car);
+		VehicleType slum_car = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));
+		slum_car.setMaximumVelocity(60.0/3.6);
+		slum_car.setPcuEquivalents(1.0);
+		modesType.put("slum_car", slum_car);
+		sc.getVehicles().addVehicleType(slum_car);
+		
+		VehicleType nonSlum_car = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_car",VehicleType.class));
+		nonSlum_car.setMaximumVelocity(60.0/3.6);
+		nonSlum_car.setPcuEquivalents(1.0);
+		modesType.put("nonSlum_car", nonSlum_car);
+		sc.getVehicles().addVehicleType(nonSlum_car);
 
-		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
-		motorcycle.setMaximumVelocity(60.0/3.6);
-		motorcycle.setPcuEquivalents(0.25);
-		modesType.put("motorbike", motorcycle);
-		sc.getVehicles().addVehicleType(motorcycle);
+		VehicleType slum_motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("slum_motorbike",VehicleType.class));
+		slum_motorbike.setMaximumVelocity(60.0/3.6);
+		slum_motorbike.setPcuEquivalents(0.25);
+		modesType.put("slum_motorbike", slum_motorbike);
+		sc.getVehicles().addVehicleType(slum_motorbike);
+		
+		VehicleType nonSlum_motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_motorbike",VehicleType.class));
+		nonSlum_motorbike.setMaximumVelocity(60.0/3.6);
+		nonSlum_motorbike.setPcuEquivalents(0.25);
+		modesType.put("nonSlum_motorbike", nonSlum_motorbike);
+		sc.getVehicles().addVehicleType(nonSlum_motorbike);
 
-		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
-		bicycle.setMaximumVelocity(15.0/3.6);
-		bicycle.setPcuEquivalents(0.25);
-		modesType.put("bike", bicycle);
-		sc.getVehicles().addVehicleType(bicycle);
+		VehicleType slum_bike = VehicleUtils.getFactory().createVehicleType(Id.create("slum_bike",VehicleType.class));
+		slum_bike.setMaximumVelocity(15.0/3.6);
+		slum_bike.setPcuEquivalents(0.25);
+		modesType.put("slum_bike", slum_bike);
+		sc.getVehicles().addVehicleType(slum_bike);
+		
+		VehicleType nonSlum_bike = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_bike",VehicleType.class));
+		nonSlum_bike.setMaximumVelocity(15.0/3.6);
+		nonSlum_bike.setPcuEquivalents(0.25);
+		modesType.put("nonSlum_bike", nonSlum_bike);
+		sc.getVehicles().addVehicleType(nonSlum_bike);
 
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-		walk.setMaximumVelocity(1.5);
+		VehicleType slum_walk = VehicleUtils.getFactory().createVehicleType(Id.create("slum_walk",VehicleType.class));
+		slum_walk.setMaximumVelocity(1.5);
 		//		walk.setPcuEquivalents(0.10);  			
-		modesType.put("walk",walk);
-		sc.getVehicles().addVehicleType(walk);
+		modesType.put("slum_walk",slum_walk);
+		sc.getVehicles().addVehicleType(slum_walk);
+		
+		VehicleType nonSlum_walk = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_walk",VehicleType.class));
+		nonSlum_walk.setMaximumVelocity(1.5);
+		//		walk.setPcuEquivalents(0.10);  			
+		modesType.put("nonSlum_walk",nonSlum_walk);
+		sc.getVehicles().addVehicleType(nonSlum_walk);
 
-		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
-		pt.setMaximumVelocity(40/3.6);
+		VehicleType slum_pt = VehicleUtils.getFactory().createVehicleType(Id.create("slum_pt",VehicleType.class));
+		slum_pt.setMaximumVelocity(40/3.6);
 		//		pt.setPcuEquivalents(5);  			
-		modesType.put("pt",pt);
-		sc.getVehicles().addVehicleType(pt);
+		modesType.put("slum_pt",slum_pt);
+		sc.getVehicles().addVehicleType(slum_pt);
+		
+		VehicleType nonSlum_pt = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_pt",VehicleType.class));
+		nonSlum_pt.setMaximumVelocity(40/3.6);
+		//		pt.setPcuEquivalents(5);  			
+		modesType.put("nonSlum_pt",nonSlum_pt);
+		sc.getVehicles().addVehicleType(nonSlum_pt);
 
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
@@ -109,13 +137,13 @@ public class SubPopControler {
 
 		Controler controler = new Controler(sc);
 		
-		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
-		
+//		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
+		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
 		controler.setCreateGraphs(true);
 		
 		controler.addPlanStrategyFactory("ChangeLegMode_slum", new PlanStrategyFactory() {
-			String [] availableModes_slum = {"bike","motorbike","pt","walk"};
+			String [] availableModes_slum = {"slum_bike","slum_motorbike","slum_pt","slum_walk"};
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario,
 					EventsManager eventsManager) {
@@ -127,7 +155,7 @@ public class SubPopControler {
 		});
 		
 		controler.addPlanStrategyFactory("ChangeLegMode_nonSlum", new PlanStrategyFactory() {
-			String [] availableModes_nonSlum = {"car","bike","motorbike","pt","walk"};
+			String [] availableModes_nonSlum = {"nonSlum_car","nonSlum_bike","nonSlum_motorbike","nonSlum_pt","nonSlum_walk"};
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario,
 					EventsManager eventsManager) {
@@ -137,6 +165,8 @@ public class SubPopControler {
 				return builder.build();
 			}
 		});
+		
+//		controler.setScoringFunctionFactory(new SubPopulationScoringFactory(controler.getScenario()));
 		controler.run();
 	}
 }
