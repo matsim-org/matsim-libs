@@ -43,7 +43,6 @@ public class SubpopulationConfig {
 	private String [] subPopulations = {"slum","nonSlum"}; 
 	private Collection <String> mainModes = Arrays.asList("slum_car","slum_motorbike","slum_bike","nonSlum_car","nonSlum_motorbike","nonSlum_bike");
 	private  String [] allModes = {"slum_car","slum_motorbike","slum_bike","slum_pt","slum_walk","nonSlum_car","nonSlum_motorbike","nonSlum_bike","nonSlum_pt","nonSlum_walk"};
-	//	private  String [] allModesConstants_slum = {"0.","0.","0.","0.","0."};
 	private String outputDir = "../../../repos/runs-svn/patnaIndia/run104/c7/";
 
 	public static void main(String[] args) {
@@ -79,9 +78,8 @@ public class SubpopulationConfig {
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		config.qsim().setMainModes(mainModes);
 
-
-
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
+		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 
 		config.plans().setSubpopulationAttributeName("incomeGroup");
 
@@ -99,7 +97,7 @@ public class SubpopulationConfig {
 			reRoute.setWeight(0.1);
 
 			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			modeChoice.setStrategyName("ChangeLegMode_".concat(subPopulations[0]));
+			modeChoice.setStrategyName("ChangeLegMode_".concat(subPop));
 			modeChoice.setWeight(0.05);
 
 			timeAllocationMutator.setSubpopulation(subPop);
@@ -118,10 +116,9 @@ public class SubpopulationConfig {
 
 		for(String str : allModes){
 			config.planCalcScore().getOrCreateModeParams(str).setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams(str).setMarginalUtilityOfTraveling(0.);
 		}
-		config.planCalcScore().setTravelingOther_utils_hr(0);
-		config.planCalcScore().setConstantOther(0.);
-
+		
 		config.plansCalcRoute().setNetworkModes(mainModes);
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 

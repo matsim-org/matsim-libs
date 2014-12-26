@@ -161,7 +161,8 @@ public class SubPopulationPlans4Patna {
 			Population population = scenario.getPopulation();
 			PopulationFactory factory = population.getFactory();
 			
-			Person person = factory.createPerson(Id.create((scenario.getPopulation().getPersons().size())+1+"_"+subPop,Person.class));
+			int personId = (scenario.getPopulation().getPersons().size())+1;
+			Person person = factory.createPerson(Id.create(personId+"_"+subPop,Person.class));
 			population.addPerson(person);
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
