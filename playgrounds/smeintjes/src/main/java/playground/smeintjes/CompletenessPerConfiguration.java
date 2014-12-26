@@ -56,18 +56,7 @@ public class CompletenessPerConfiguration {
 	}
 	
 	public static MultiPolygon readInShapefile(String shapefilePath) {
-		//Code from matsim core...don't think this will work...
-//		ShapeFileReader sr = new ShapeFileReader();
-//		sr.readFileAndInitialize(shapefilePath);
-//		Collection<SimpleFeature> features = sr.getFeatureSet();
-		
-//		ShapeFileReader sr = new ShapeFileReader();
-//		sr.readFileAndInitialize(shapefilePath);
-		
-		//Code from jjoubert's playground...hopefully this does what it's supposed
-		//to...how can I test that it does??
-//		MyShapefileReader msr = new MyShapefileReader(shapefilePath);
-//		MultiPolygon area = msr.readMultiPolygon();
+
 
 		MyMultiFeatureReader mmfr = new MyMultiFeatureReader();
 		try {
