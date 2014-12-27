@@ -204,7 +204,7 @@ public class PopulationParser {
 			String gautengShapefile, String ctShapefile, String eThekwiniShapefile) {
 
 		/* Set up paths to input file */
-		String populationFile = String.format("%s/results%d/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, run, pmin, radius, run, populationNumber);
+		String populationFile = String.format("%sresults%d/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, run, pmin, radius, run, populationNumber);
 //		String populationFile = String.format("%s/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, pmin, radius, run, populationNumber);
 		
 		/* Parse this population */
