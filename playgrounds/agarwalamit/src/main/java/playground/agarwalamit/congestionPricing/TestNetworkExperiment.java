@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,9 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -63,6 +66,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 
 /**
  * @author amit
@@ -73,12 +77,12 @@ public class TestNetworkExperiment {
 
 	public static void main(String[] args) {
 		TestNetworkExperiment testEx = new TestNetworkExperiment();
-//		testEx.test4MarginalCongestionCosts();
+		//		testEx.test4MarginalCongestionCosts();
 		testEx.printData();
 	}
 
 	public void test4MarginalCongestionCosts(){
-		String outputDir = "./output/pop20/";
+		String outputDir = "./output/pop10/";
 		new File(outputDir).mkdirs();
 
 		int numberOfPersonInPlan = 10;
@@ -101,24 +105,43 @@ public class TestNetworkExperiment {
 
 
 	public void printData(){
+		Map<Id<Person>, Double> personId2AffectedDelays_v3 = getPersonId2Delays("v3", "affected");
 		Map<Id<Person>, Double> personId2AffectedDelays_v4 = getPersonId2Delays("v4", "affected");
 		Map<Id<Person>, Double> personId2AffectedDelays_v5 = getPersonId2Delays("v5", "affected");
 		Map<Id<Person>, Double> personId2AffectedDelays_v6 = getPersonId2Delays("v6", "affected");
+
+		Map<Id<Person>, Double> personId2CausingDelays_v3 = getPersonId2Delays("v3", "causing");
 		Map<Id<Person>, Double> personId2CausingDelays_v4 = getPersonId2Delays("v4", "causing");
 		Map<Id<Person>, Double> personId2CausingDelays_v5 = getPersonId2Delays("v5", "causing");
 		Map<Id<Person>, Double> personId2CausingDelays_v6 = getPersonId2Delays("v6", "causing");
 
-		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) ");
-		
+		BufferedWriter  writer = IOUtils.getBufferedWriter("./output/comparisonOfPricingImpls.txt");
+		try {
+			writer.write("PersonID \t Delay affected(V3) \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V3) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) \n");
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
+		}
+		//		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) ");
+
 		Set<Id<Person>> personIds = new HashSet<Id<Person>>();
 		personIds.addAll(personId2AffectedDelays_v4.keySet());
 		personIds.addAll(personId2CausingDelays_v4.keySet());
 		personIds.addAll(personId2AffectedDelays_v5.keySet());
 		personIds.addAll(personId2CausingDelays_v5.keySet());
-		
-		for(Id<Person> personId : personIds){
-			System.out.println(personId + "\t" + personId2AffectedDelays_v4.get(personId) + "\t"+ personId2AffectedDelays_v5.get(personId) + "\t"  + personId2AffectedDelays_v6.get(personId) + "\t" + 
-					personId2CausingDelays_v4.get(personId) + "\t" +personId2CausingDelays_v5.get(personId) + "\t" + personId2CausingDelays_v6.get(personId));
+		personIds.addAll(personId2AffectedDelays_v3.keySet());
+		personIds.addAll(personId2CausingDelays_v3.keySet());
+
+
+		try {
+			for(Id<Person> personId : personIds){
+				writer.write(personId + "\t" + personId2AffectedDelays_v3.get(personId) + "\t"+ personId2AffectedDelays_v4.get(personId) + 
+						"\t" + personId2AffectedDelays_v5.get(personId) + "\t"+ personId2AffectedDelays_v6.get(personId) + "\t"  + personId2CausingDelays_v3.get(personId) + "\t" + 
+						personId2CausingDelays_v4.get(personId) + "\t" +personId2CausingDelays_v5.get(personId) + "\t" + personId2CausingDelays_v6.get(personId)+"\n");
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: " + e);
 		}
 	}
 
@@ -146,8 +169,8 @@ public class TestNetworkExperiment {
 				congestionEvents.add(event);
 			}
 		});
-
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl)sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v5")) events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
 
