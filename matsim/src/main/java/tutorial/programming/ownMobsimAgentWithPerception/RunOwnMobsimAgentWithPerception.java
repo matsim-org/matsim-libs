@@ -41,7 +41,7 @@ import org.matsim.vehicles.VehiclesFactory;
  * 
  * @author nagel
  */
-public class Main {
+public class RunOwnMobsimAgentWithPerception {
 
 	public static void main(String[] args) {
 		
