@@ -59,7 +59,7 @@ import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
  *
  * @author Christoph Dobler
  */
-final class ExampleWithinDayController implements StartupListener {
+final class RunWithinDayExample implements StartupListener {
 
 	private Scenario scenario;
 	private WithinDayControlerListener withinDayControlerListener;
@@ -77,7 +77,7 @@ final class ExampleWithinDayController implements StartupListener {
 			System.out.println();
 		} else {
 			final Controler controler = new Controler(args);
-			controler.addControlerListener(new ExampleWithinDayController(controler));
+			controler.addControlerListener(new RunWithinDayExample(controler));
 			
 			controler.setOverwriteFiles(true);
 			
@@ -86,7 +86,7 @@ final class ExampleWithinDayController implements StartupListener {
 		System.exit(0);
 	}
 	
-	public ExampleWithinDayController(Controler controler) {
+	public RunWithinDayExample(Controler controler) {
 		
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
