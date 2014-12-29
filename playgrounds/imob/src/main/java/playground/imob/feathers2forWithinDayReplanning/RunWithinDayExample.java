@@ -52,10 +52,6 @@ import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
  *
  * The path to a config file is needed as argument to run the
  * simulation.
- * 
- * It should be possible to run this class with
- * "src/test/resources/test/scenarios/berlin/config_withinday.xml"
- * as argument.
  *
  * @author Christoph Dobler
  */
