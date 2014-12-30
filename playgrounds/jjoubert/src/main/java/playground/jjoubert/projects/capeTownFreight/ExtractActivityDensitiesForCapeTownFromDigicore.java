@@ -55,11 +55,11 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ExtractActivityDensitiesForCapeTown {
-	private final static Logger LOG = Logger.getLogger(ExtractActivityDensitiesForCapeTown.class);
+public class ExtractActivityDensitiesForCapeTownFromDigicore {
+	private final static Logger LOG = Logger.getLogger(ExtractActivityDensitiesForCapeTownFromDigicore.class);
 
 	public static void main(String[] args) {
-		Header.printHeader(ExtractActivityDensitiesForCapeTown.class.toString(), args);
+		Header.printHeader(ExtractActivityDensitiesForCapeTownFromDigicore.class.toString(), args);
 		
 		String vehicleFolder = args[0];
 		String shapefile = args[1];	
