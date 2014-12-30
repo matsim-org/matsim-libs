@@ -68,7 +68,7 @@ import org.matsim.core.utils.collections.Tuple;
  *  changed their employment status or got a new job are getting new plans.
  * 
  */
-public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
+ class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZone.class);

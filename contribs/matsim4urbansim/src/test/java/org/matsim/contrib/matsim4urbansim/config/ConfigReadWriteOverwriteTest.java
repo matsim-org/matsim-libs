@@ -37,8 +37,6 @@ import org.junit.Test;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

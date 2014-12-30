@@ -27,8 +27,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.OPUSDirectoryUtil;
 import org.matsim.core.config.Config;
 

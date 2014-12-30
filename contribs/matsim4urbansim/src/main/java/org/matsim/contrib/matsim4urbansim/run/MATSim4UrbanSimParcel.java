@@ -88,7 +88,7 @@ import org.matsim.roadpricing.RoadPricing;
  * - Other improvements:
  * 	For a better readability of code some functionality is outsourced into helper classes
  */
-public class MATSim4UrbanSimParcel{
+ class MATSim4UrbanSimParcel{
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcel.class);
@@ -210,7 +210,7 @@ public class MATSim4UrbanSimParcel{
 	/**
 	 * 
 	 */
-	protected void readFromUrbanSim() {
+	 void readFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
 		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
@@ -468,7 +468,7 @@ public class MATSim4UrbanSimParcel{
 	 * cleaning matsim network
 	 * @param network
 	 */
-	void cleanNetwork(Network network){
+	static void cleanNetwork(Network network){
 		log.info("") ;
 		log.info("Cleaning network ...");
 		(new NetworkCleaner() ).run(network);

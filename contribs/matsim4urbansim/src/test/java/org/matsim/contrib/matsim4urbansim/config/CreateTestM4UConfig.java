@@ -10,7 +10,7 @@
  * *********************************************************************** *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
+ *   it under the terms of the GNU General License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.utils;
+package org.matsim.contrib.matsim4urbansim.config;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -65,80 +65,80 @@ import org.xml.sax.SAXException;
 public class CreateTestM4UConfig {
 	private static final Logger log = Logger.getLogger(CreateTestM4UConfig.class) ;
 	
-	public static final int COLD_START = 0;
-	public static final int WARRM_START = 1;
-	public static final int HOT_START = 2;
+	 static final int COLD_START = 0;
+	 static final int WARRM_START = 1;
+	 static final int HOT_START = 2;
 	
-	public static final String DUMMY_FILE = "/dummy.xml";
+	 static final String DUMMY_FILE = "/dummy.xml";
 	
 	private int startMode;
-	protected String dummyPath;
+	String dummyPath;
 	
 	// yy why is all of this public?  could you please write a comment why that design decision was made?  thx.  kai, apr'13
 	
 	private String matsimExternalConfigFileName 				= "";
-	public String networkInputFileName 	 					= "";
-	public String inputPlansFileName 						= "";
-	public String hotstartPlansFileName						= "";
-	public BigInteger firstIteration					= new BigInteger("0");
-	public BigInteger lastIteration						= new BigInteger("1");
-	public String activityType_0						= "home";
-	public String activityType_1						= "work";
-	public BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
-	public BigInteger workActivityTypicalDuration		= new BigInteger("28800");	
-	public BigInteger workActivityOpeningTime			= new BigInteger("25200");
-	public BigInteger workActivityLatestStartTime		= new BigInteger("32400");
-	public BigInteger maxAgentPlanMemorySize			= new BigInteger("5");
-	public Double timeAllocationMutatorProbability		= 0.1;
-	public Double changeExpBetaProbability				= 0.9;
-	public Double reRouteDijkstraProbability			= 0.1;
-	public Double populationSamplingRate				= 1.0;
-	public BigInteger year								= new BigInteger("2000");
-	public String opusHome								= "";
-	public String opusDataPath							= "";
-	public String matsim4opus							= "";
-	public String matsim4opusConfig						= "";
-	public String matsim4opusOutput 					= "";
-	public String matsim4opusTemp						= "";
-	public boolean isTestRun							= false;
-	public Double randomLocationDistributionRadiusForUrbanSimZone	= 0.;
-	public String customParameter							= "";
-	public boolean backupRunData						= false;
-	public boolean zone2zoneImpedance					= true;
-	public boolean agentPerformance						= true;
-	public boolean zoneBasedAccessibility				= true;
-	public boolean cellBasedAccessibility 				= true;
-	public BigInteger cellSizeCellBasedAccessibility	= new BigInteger("100");
-	public String shapeFileCellBasedAccessibilityInputFile	= "";
-	public boolean useCustomBoundingBox 				= false;
-	public Double boundingBoxTop						= 0.;
-	public Double boundingBoxLeft						= 0.;
-	public Double boundingBoxRight 						= 0.;
-	public Double boundingBoxBottom						= 0.;
-	public Double accessibilityDestinationSamplingRate	= 1.0;
-	public boolean useLogitScaleParameterFromMATSim		= true;
-	public boolean useCarParameterFromMATSim			= true;
-	public boolean useWalkParameterFromMATSim			= true;
-	public boolean useRawSumsWithoutLn					= false;
-	public Double logitScaleParameter					= 1.0;
-	public Double betaCarTravelTime						= 0.;
-	public Double betaCarTravelTimePower2				= 0.;
-	public Double betaCarLnTravelTime					= 0.;
-	public Double betaCarTravelDistance					= 0.;
-	public Double betaCarTravelDistancePower2			= 0.;
-	public Double betaCarLnTravelDistance				= 0.;
-	public Double betaCarTravelCost						= 0.;
-	public Double betaCarTravelCostPower2				= 0.;
-	public Double betaCarLnTravelCost					= 0.;
-	public Double betaWalkTravelTime					= 0.;
-	public Double betaWalkTravelTimePower2				= 0.;
-	public Double betaWalkLnTravelTime					= 0.;
-	public Double betaWalkTravelDistance				= 0.;
-	public Double betaWalkTravelDistancePower2			= 0.;
-	public Double betaWalkLnTravelDistance				= 0.;
-	public Double betaWalkTravelCost					= 0.;
-	public Double betaWalkTravelCostPower2				= 0.;
-	public Double betaWalkLnTravelCost					= 0.;
+	 String networkInputFileName 	 					= "";
+	 String inputPlansFileName 						= "";
+	 String hotstartPlansFileName						= "";
+	 BigInteger firstIteration					= new BigInteger("0");
+	 BigInteger lastIteration						= new BigInteger("1");
+	 String activityType_0						= "home";
+	 String activityType_1						= "work";
+	 BigInteger homeActivityTypicalDuration		= new BigInteger("43200");	
+	 BigInteger workActivityTypicalDuration		= new BigInteger("28800");	
+	BigInteger workActivityOpeningTime			= new BigInteger("25200");
+	BigInteger workActivityLatestStartTime		= new BigInteger("32400");
+	BigInteger maxAgentPlanMemorySize			= new BigInteger("5");
+	Double timeAllocationMutatorProbability		= 0.1;
+	Double changeExpBetaProbability				= 0.9;
+	Double reRouteDijkstraProbability			= 0.1;
+	Double populationSamplingRate				= 1.0;
+	BigInteger year								= new BigInteger("2000");
+	String opusHome								= "";
+	String opusDataPath							= "";
+	String matsim4opus							= "";
+	String matsim4opusConfig						= "";
+	String matsim4opusOutput 					= "";
+	String matsim4opusTemp						= "";
+	boolean isTestRun							= false;
+	Double randomLocationDistributionRadiusForUrbanSimZone	= 0.;
+	String customParameter							= "";
+	boolean backupRunData						= false;
+	boolean zone2zoneImpedance					= true;
+	boolean agentPerformance						= true;
+	boolean zoneBasedAccessibility				= true;
+	boolean cellBasedAccessibility 				= true;
+	BigInteger cellSizeCellBasedAccessibility	= new BigInteger("100");
+	String shapeFileCellBasedAccessibilityInputFile	= "";
+	boolean useCustomBoundingBox 				= false;
+	Double boundingBoxTop						= 0.;
+	Double boundingBoxLeft						= 0.;
+	Double boundingBoxRight 						= 0.;
+	Double boundingBoxBottom						= 0.;
+	Double accessibilityDestinationSamplingRate	= 1.0;
+	boolean useLogitScaleParameterFromMATSim		= true;
+	boolean useCarParameterFromMATSim			= true;
+	boolean useWalkParameterFromMATSim			= true;
+	boolean useRawSumsWithoutLn					= false;
+	Double logitScaleParameter					= 1.0;
+	Double betaCarTravelTime						= 0.;
+	Double betaCarTravelTimePower2				= 0.;
+	Double betaCarLnTravelTime					= 0.;
+	Double betaCarTravelDistance					= 0.;
+	Double betaCarTravelDistancePower2			= 0.;
+	Double betaCarLnTravelDistance				= 0.;
+	Double betaCarTravelCost						= 0.;
+	Double betaCarTravelCostPower2				= 0.;
+	Double betaCarLnTravelCost					= 0.;
+	Double betaWalkTravelTime					= 0.;
+	Double betaWalkTravelTimePower2				= 0.;
+	Double betaWalkLnTravelTime					= 0.;
+	Double betaWalkTravelDistance				= 0.;
+	Double betaWalkTravelDistancePower2			= 0.;
+	Double betaWalkLnTravelDistance				= 0.;
+	Double betaWalkTravelCost					= 0.;
+	Double betaWalkTravelCostPower2				= 0.;
+	Double betaWalkLnTravelCost					= 0.;
 	
 	/**
 	 * constructor
@@ -149,7 +149,7 @@ public class CreateTestM4UConfig {
 	 * @param startMode distinguishes between cold, warm and hot start
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
-	public CreateTestM4UConfig(final int startMode, String path){
+	CreateTestM4UConfig(final int startMode, String path){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -172,7 +172,7 @@ public class CreateTestM4UConfig {
 	 * @param startMode distinguishes between cold, warm and hot start
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 */
-	public CreateTestM4UConfig(final int startMode, String path, boolean testrun){
+	CreateTestM4UConfig(final int startMode, String path, boolean testrun){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -198,7 +198,7 @@ public class CreateTestM4UConfig {
 	 * @param path gives the path, were the generated config (and other files) should be stored
 	 * @param externalConfig gives the path, were the external MATSim config is stored
 	 */
-	public CreateTestM4UConfig(final int startMode, String path, String externalConfig){
+	CreateTestM4UConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
 		this.dummyPath = path;
 		this.networkInputFileName 	= path + DUMMY_FILE;
@@ -239,7 +239,7 @@ public class CreateTestM4UConfig {
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
 	@Deprecated // this generates a config in old format, use generateConfigV3 instead
-	public String generateConfigV2(){
+	String generateConfigV2(){
 		
 		ObjectFactory of = new ObjectFactory();	
 		
@@ -359,7 +359,7 @@ public class CreateTestM4UConfig {
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
-	public String generateConfigV3(){
+	public final String generateConfigV3(){
 		
 		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of 
 			= new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
@@ -436,7 +436,7 @@ public class CreateTestM4UConfig {
 	 * populationSamplingRate, etc..
 	 */
 	@Deprecated // this generates a config in old format, use generateConfigV3 instead
-	public String generateMinimalConfig(){
+	String generateMinimalConfig(){
 		
 		ObjectFactory of = new ObjectFactory();	
 		
@@ -629,7 +629,7 @@ public class CreateTestM4UConfig {
 		return null;
 	}
 	
-	public int getStartMode(){
+	int getStartMode(){
 		return this.startMode;
 	}
 	
