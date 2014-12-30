@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4urbansim.usecases;
+package org.matsim.contrib.matrixbasedptrouter;
 
 import org.junit.Assert;
 import org.junit.Rule;
