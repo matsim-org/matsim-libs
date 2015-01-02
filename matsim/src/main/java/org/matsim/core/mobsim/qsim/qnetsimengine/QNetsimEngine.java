@@ -281,6 +281,29 @@ public class QNetsimEngine implements MobsimEngine {
      * this Method does, it should work anyway.
      */
     private void run(double time) {
+    	// yy Acceleration options to try out (kai, jan'15):
+    	
+    	// (a) Try to do without barriers.  With our 
+    	// message-based experiments a decade ago, it was better to let each runner decide locally when to proceed.  For intuition, imagine that
+    	// one runner is slowest on the links, and some other runner slowest on the nodes.  With the barriers, this cannot overlap.
+    	// With message passing, this was achieved by waiting for all necessary messages.  Here, it could (for example) be achieved with runner-local
+    	// clocks:
+    	// for ( all runners that own incoming links to my nodes ) { // (*)
+    	//    wait until runner.getTime() == myTime ;
+    	// }
+    	// processLocalNodes() ;
+    	// mytime += 0.5 ;
+    	// for ( all runners that own toNodes of my links ) { // (**)
+    	//    wait until runner.getTime() == myTime ;
+    	// }
+    	// processLocalLinks() ;
+    	// myTime += 0.5 ;
+
+    	// (b) Do deliberate domain decomposition rather than round robin (fewer runners to wait for at (*) and (**)).
+    	
+    	// (c) One thread that is much faster than all others is much more efficient than one thread that is much slower than all others. 
+    	// So make sure that no thread sticks out in terms of slowness.  Difficult to achieve, though.  A decade back, we used a "typical" run
+    	// as input for the domain decomposition under (b).
 
 //        try {
             // set current Time
