@@ -35,7 +35,7 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-
+	@Ignore
 	public void test() {
 		String path = utils.getOutputDirectory() ;
 		
