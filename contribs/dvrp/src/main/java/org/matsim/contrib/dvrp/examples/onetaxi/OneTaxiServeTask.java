@@ -36,13 +36,6 @@ public class OneTaxiServeTask
         super(beginTime, endTime, link, name);
         this.request = request;
         this.isPickup = link == request.getFromLink();
-
-        if (isPickup) {
-            request.setPickupTask(this);
-        }
-        else {
-            request.setDropoffTask(this);
-        }
     }
 
 

@@ -42,8 +42,6 @@ public class OneTaxiLauncher
     private final String vehiclesFile;
     private final boolean otfVis;
 
-    private final Scenario scenario;
-
 
     public OneTaxiLauncher(boolean otfVis)
     {
@@ -53,25 +51,25 @@ public class OneTaxiLauncher
         netFile = dir + "grid_network.xml";
         plansFile = dir + "one_taxi/one_taxi_population.xml";
         vehiclesFile = dir + "one_taxi/one_taxi_vehicles.xml";
-        scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
     }
 
 
     public void go()
     {
         MatsimVrpContextImpl context = new MatsimVrpContextImpl();
+
+        Scenario scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
         context.setScenario(scenario);
+
+        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFile);
+        context.setVrpData(vrpData);
 
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
-
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
         VrpPathCalculator calculator = new VrpPathCalculatorImpl(router, travelTime,
                 travelDisutility);
-
-        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFile);
-        context.setVrpData(vrpData);
 
         OneTaxiOptimizer optimizer = new OneTaxiOptimizer(context, calculator);
 

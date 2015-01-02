@@ -76,6 +76,7 @@ public class PlanToDynAgentLogicAdapter
             return new StaticDynActivity(act.getType(), act.getEndTime());
         }
         else if (planElem instanceof Leg) {
+            //only the 'car' mode supported right now 
             Leg leg = (Leg)planElem;
             return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
         }

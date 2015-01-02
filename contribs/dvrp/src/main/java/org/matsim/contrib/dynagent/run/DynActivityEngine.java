@@ -31,8 +31,9 @@ import org.matsim.core.utils.misc.Time;
 
 
 /**
- * It might be nicer to have ActivityEngine as a delegate, not as a superclass. But there is a
- * "instanceof ActivityEngine" check in QSim
+ * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a
+ * hardcoded "instanceof ActivityEngine" check in QSim :-(
+ * TODO introduce an ActivityEngine interface?
  */
 public class DynActivityEngine
     extends ActivityEngine

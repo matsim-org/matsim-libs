@@ -62,7 +62,7 @@ public class RandomDynAgentLogic
     {
         //I am tired, I want to stop being simulated (1% chance)
         if (MatsimRandom.getRandom().nextInt(100) == 0) {
-            return new StaticDynActivity("Laziness", Double.POSITIVE_INFINITY);
+            return new StaticDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
         }
 
         //Do I want to stay or drive? (50-50 choice)

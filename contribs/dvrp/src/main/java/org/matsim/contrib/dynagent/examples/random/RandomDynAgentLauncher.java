@@ -35,9 +35,6 @@ public class RandomDynAgentLauncher
     private final boolean otfVis;
     private final int agentCount;
 
-    private final Scenario scenario;
-
-
     public RandomDynAgentLauncher(boolean otfVis)
     {
         this.otfVis = otfVis;
@@ -46,13 +43,12 @@ public class RandomDynAgentLauncher
         netFile = dir + "grid_network.xml";
 
         agentCount = 100;
-
-        scenario = ScenarioUtils.createScenario(DynConfigUtils.createConfig());
     }
 
 
     public void go()
     {
+        Scenario scenario = ScenarioUtils.createScenario(DynConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(netFile);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
@@ -60,7 +56,7 @@ public class RandomDynAgentLauncher
 
         EventsManager events = qSim.getEventsManager();
 
-        if (otfVis) { // OFTVis visualization
+        if (otfVis) { // OTFVis visualization
             DynAgentLauncherUtils.runOTFVis(qSim, true, ColoringScheme.byId);
         }
 

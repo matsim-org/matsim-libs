@@ -34,14 +34,11 @@ public class OneTaxiRequest
     private final Link fromLink;
     private final Link toLink;
 
-    private OneTaxiServeTask pickupTask;
-    private OneTaxiServeTask dropoffTask;
-
 
     public OneTaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
             Link toLink, double time)
     {
-        //I want a taxi now: t0 == t1 == submissionTime
+        //I want a taxi now, i.e. t0 == t1 == submissionTime
         super(id, 1, time, time, time);
         this.passenger = passenger;
         this.fromLink = fromLink;
@@ -67,29 +64,5 @@ public class OneTaxiRequest
     public MobsimPassengerAgent getPassenger()
     {
         return passenger;
-    }
-
-
-    public OneTaxiServeTask getPickupTask()
-    {
-        return pickupTask;
-    }
-
-
-    public OneTaxiServeTask getDropoffTask()
-    {
-        return dropoffTask;
-    }
-
-
-    public void setPickupTask(OneTaxiServeTask pickupTask)
-    {
-        this.pickupTask = pickupTask;
-    }
-
-
-    public void setDropoffTask(OneTaxiServeTask dropoffTask)
-    {
-        this.dropoffTask = dropoffTask;
     }
 }

@@ -38,7 +38,7 @@ public class VrpLeg
     private int currentLinkIdx = 0;
     private boolean askedAboutNextLink = false;
 
-    private final String mode = TransportMode.car;
+    private final String mode = TransportMode.car;//TODO
 
 
     public VrpLeg(VrpPath path)

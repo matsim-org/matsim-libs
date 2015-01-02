@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 public interface VrpPathCalculator
 {
     /**
-     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
+     * ASSUMPTION: A vehicle departs and arrives at links' ends (link.getToNode())
      */
     VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime);
 }
