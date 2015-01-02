@@ -22,7 +22,7 @@ public class CreateTestUrbansimPopulation {
 
 	private static void createPersons(String path, int nPersons) {
 		
-		String fileLocation = path + "/" + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + "2000" + InternalConstants.FILE_TYPE_TAB;
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		
@@ -46,7 +46,7 @@ public class CreateTestUrbansimPopulation {
 	}
 
 	private static void createParcels(String path) {
-		String fileLocation = path + "/" + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + "2000" + InternalConstants.FILE_TYPE_TAB;
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		
@@ -67,7 +67,7 @@ public class CreateTestUrbansimPopulation {
 
 	private static void createJobs(String path, int nPersons) {
 		
-		String fileLocation = path + "/" + InternalConstants.URBANSIM_JOB_DATASET_TABLE + "2010" + InternalConstants.FILE_TYPE_TAB;
+		String fileLocation = path + "/" + InternalConstants.URBANSIM_JOB_DATASET_TABLE + "2000" + InternalConstants.FILE_TYPE_TAB;
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		

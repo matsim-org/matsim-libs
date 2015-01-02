@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.matsim4urbansim.run;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
@@ -35,6 +35,7 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
+
 	public void test() {
 		String path = utils.getOutputDirectory() ;
 		
@@ -45,8 +46,10 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		writer.write( networkFilename);
 		
 		CreateTestM4UConfig creator = new CreateTestM4UConfig(path, networkFilename );
+		String result = creator.generateConfigV3() ;
 		
-		MATSim4UrbanSimParcel.main( null ); 
+		String[] args = { result } ;
+		MATSim4UrbanSimParcel.main( args ); 
 
 	}
 
