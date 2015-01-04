@@ -63,7 +63,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
-class MultiRateRunResource {
+public class MultiRateRunResource {
 
     private static final int LAST_ITERATION = 100;
     private final String WD;
