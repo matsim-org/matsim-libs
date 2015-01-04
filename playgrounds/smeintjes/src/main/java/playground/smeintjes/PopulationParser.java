@@ -35,6 +35,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
@@ -58,6 +59,26 @@ public class PopulationParser {
 	private final static Logger LOG =  Logger.getLogger(PopulationParser.class.toString());
 	private Scenario scenario;
 
+	public static Geometry getGeometryFromShapeFile(String shapefile, int idField) {
+		
+		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
+
+		try {
+			mfr.readMultizoneShapefile(shapefile, idField);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read shapefile from " + shapefile);
+		}
+		List<MyZone> list = mfr.getAllZones();
+		if(list.size() > 1){
+			LOG.warn("There are multiple shapefiles in " + shapefile);
+			LOG.warn("Only the first will be used as the geographic area.");
+		}
+		MultiPolygon area = list.get(0);
+		return area;
+	}
+	
+	
 	/**
 	 * @param inputPath path to the folder where the populations are saved. Do not
 	 * 		  include the trialing "/" - it gets added automatically when creating the 
@@ -83,7 +104,19 @@ public class PopulationParser {
 		int numberOfThreads = Integer.parseInt(args[9]);
 		
 		Counter counter = new Counter("   population # ");
-
+		
+		/*Read in all four shapefiles*/
+		Geometry southAfrica = getGeometryFromShapeFile(saShapefile, 1);
+		Geometry gauteng = getGeometryFromShapeFile(gautengShapefile, 1);
+		Geometry capeTown = getGeometryFromShapeFile(ctShapefile, 2);
+		Geometry eThekwini = getGeometryFromShapeFile(eThekwiniShapefile, 1);
+		/*Get envelopes*/
+		Geometry saEnvelope = southAfrica.getEnvelope();
+		Geometry gautengEnvelope = gauteng.getEnvelope();
+		Geometry capeTownEnvelope = capeTown.getEnvelope();
+		Geometry eThekwiniEnvelope = eThekwini.getEnvelope();
+		
+		
 		/* Set up multi-threaded infrastructure */
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		List<Future<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>>> jobs = 
@@ -94,11 +127,12 @@ public class PopulationParser {
 		for (int i = 1; i < numberRuns; i++) {
 			for (int j = 0; j < numberPopulations; j++) {
 				int population = j*10 + i;
-				Callable<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>> job = new ExtractorCallable(
-						pmin, radius, i, j, population, inputPath, saShapefile, 
-						gautengShapefile, ctShapefile, eThekwiniShapefile, counter);
-				Future<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>> result = threadExecutor.submit(job);
 				
+				Callable<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>> job = new ExtractorCallable(
+						pmin, radius, i, j, population, inputPath, southAfrica, 
+						gauteng, capeTown, eThekwini, counter, saEnvelope, gautengEnvelope,
+						capeTownEnvelope, eThekwiniEnvelope);
+				Future<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>> result = threadExecutor.submit(job);				
 				jobs.add(result);
 			}
 		}
@@ -125,15 +159,10 @@ public class PopulationParser {
 				// Add population
 				int population = quintet.getValue0();
 				LOG.info("Population " + population);
-				//numberOfChainsNoMinor is put into an int[] and added to listArrays
 				int[] numberChainsNoMinorArray = new int[]{quintet.getValue1()};
-				//Add numberChainsNoMinor
 				listArrays.add(numberChainsNoMinorArray);
-				//Add areaArray
 				listArrays.add(quintet.getValue2());
-				//Add hourArray
 				listArrays.add(quintet.getValue3());
-				//Add activityArray
 				listArrays.add(quintet.getValue4());
 				
 				for (Pair<int[], int[]> pair : listArrayPairs) {
@@ -159,6 +188,42 @@ public class PopulationParser {
 
 	}
 	
+	private static void writeResultToFile(
+			Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>> thisResult,
+			String resultOutputFile) {
+		
+		Map<Integer, List<int[]>> resultMap = new TreeMap<Integer, List<int[]>>();
+		List<int[]> listArrays = new ArrayList<int[]>();
+		
+			Quintet<Integer, Integer, int[], int[], int[]> quintet = thisResult.getValue0();
+			List<Pair<int[], int[]>> listArrayPairs = thisResult.getValue1();
+			// Add population
+			int population = quintet.getValue0();
+			LOG.info("Writing population " + population + " to file.");
+			//numberOfChainsNoMinor is put into an int[] and added to listArrays
+			int[] numberChainsNoMinorArray = new int[]{quintet.getValue1()};
+			//Add numberChainsNoMinor
+			listArrays.add(numberChainsNoMinorArray);
+			//Add areaArray
+			listArrays.add(quintet.getValue2());
+			//Add hourArray
+			listArrays.add(quintet.getValue3());
+			//Add activityArray
+			listArrays.add(quintet.getValue4());
+			
+			for (Pair<int[], int[]> pair : listArrayPairs) {
+				int[] first = pair.getValue0();
+				int[] second = pair.getValue1();
+				listArrays.add(first);
+				listArrays.add(second);
+			}
+			resultMap.put(population, listArrays);
+		
+		
+		writePopulationInfo(resultOutputFile, resultMap);
+	}
+
+
 	public PopulationParser() {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
@@ -198,10 +263,15 @@ public class PopulationParser {
 	 *         and the vehicle started its activities.
 	 *    3.2. Find the corresponding element in the hourArray that matches "this" hour, and increment the
 	 *         element by one.         
+	 * @param eThekwiniEnvelope 
+	 * @param ctEnvelope 
+	 * @param gautengEnvelope 
+	 * @param saEnvelope 
 	 */
 	public Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>> parsePopulations(int pmin, int radius, int run, 
-			int populationNumber, int population, String inputPath, String saShapefile,
-			String gautengShapefile, String ctShapefile, String eThekwiniShapefile) {
+			int populationNumber, int population, String inputPath, Geometry saGeometry,
+			Geometry gautengGeometry, Geometry ctGeometry, Geometry eThekwiniGeometry,
+			Geometry saEnvelope, Geometry gautengEnvelope, Geometry ctEnvelope, Geometry eThekwiniEnvelope) {
 
 		/* Set up paths to input file */
 		String populationFile = String.format("%sresults%d/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, run, pmin, radius, run, populationNumber);
@@ -301,7 +371,7 @@ public class PopulationParser {
 			
 		
 		while(personCollection.iterator().hasNext()){
-				LOG.info("Performing analysis for vehicle: " + person);
+//				LOG.info("Performing analysis for vehicle: " + person);
 				
 				boolean inSouthAfrica = false;
 				boolean inGauteng = false;
@@ -350,11 +420,6 @@ public class PopulationParser {
 								boolean activityInGauteng = false;
 								boolean activityInCapeTown = false;
 								boolean activityInEthekwini = false;
-								LOG.info("Boolean values:");
-								LOG.info("inSouthAfrica: " + inSouthAfrica);
-								LOG.info("inGauteng: " + inGauteng);
-								LOG.info("inEthekwini: " + inEthekwini);
-								LOG.info("inCapeTown: " + inCapeTown);
 								/*
 								 * In this while loop, activity location is only checked if the overarching 
 								 * boolean value for this plan is false. If this is the case, we
@@ -362,19 +427,19 @@ public class PopulationParser {
 								 * Only if the activity boolean value is true, do we change the 
 								 * overarching boolean value to true.
 								 */
-								activityInSA = checkActivityInArea(saShapefile, coordinate, 1);
+								activityInSA = checkActivityInArea(saGeometry, saEnvelope, coordinate, 1);
 								if(activityInSA){
 									inSouthAfrica = true;
 									if(!inGauteng){
-										activityInGauteng = checkActivityInArea(gautengShapefile, coordinate, 1);
+										activityInGauteng = checkActivityInArea(gautengGeometry, gautengEnvelope, coordinate, 1);
 										if(activityInGauteng){
 											inGauteng = true;
 										} else if(!inCapeTown){		
-											activityInCapeTown = checkActivityInArea(ctShapefile, coordinate, 2);
+											activityInCapeTown = checkActivityInArea(ctGeometry, ctEnvelope, coordinate, 2);
 											if(activityInCapeTown){
 												inCapeTown = true;
 											} else if(!inEthekwini){
-												activityInEthekwini = checkActivityInArea(eThekwiniShapefile, coordinate, 1);
+												activityInEthekwini = checkActivityInArea(eThekwiniGeometry, eThekwiniEnvelope, coordinate, 1);
 												if(activityInEthekwini){
 													inEthekwini = true;
 												} else{
@@ -382,18 +447,18 @@ public class PopulationParser {
 											}
 										}  
 									} else if(!inCapeTown){
-										activityInCapeTown = checkActivityInArea(ctShapefile, coordinate, 2);
+										activityInCapeTown = checkActivityInArea(ctGeometry, ctEnvelope, coordinate, 2);
 										if(activityInCapeTown){
 											inCapeTown = true;
 										} else if(!inEthekwini){
-											activityInEthekwini = checkActivityInArea(eThekwiniShapefile, coordinate, 2);
+											activityInEthekwini = checkActivityInArea(eThekwiniGeometry, eThekwiniEnvelope, coordinate, 2);
 											if(activityInEthekwini){
 												inEthekwini = true;
 											} else{
 											}
 										} 
 									} else if(!inEthekwini){
-										activityInEthekwini = checkActivityInArea(eThekwiniShapefile, coordinate, 2);
+										activityInEthekwini = checkActivityInArea(eThekwiniGeometry, eThekwiniEnvelope, coordinate, 2);
 										if(activityInEthekwini){
 											inEthekwini = true;
 										} else {
@@ -478,7 +543,6 @@ public class PopulationParser {
 						} 
 			} else{
 				numberChainsNoMinor++;
-				LOG.info("In parsePopulations, numberChainsNoMinor is: " + numberChainsNoMinor);
 			}
 			personCollection.remove(vehicle);
 			person++;
@@ -540,27 +604,17 @@ public class PopulationParser {
 		return hours;
 	}
 	
-	private static boolean checkActivityInArea(String shapefile, Coordinate activity, int idField){
-		
+	private static boolean checkActivityInArea(Geometry area, Geometry envelope, Coordinate activity, int idField){
 		boolean inArea = false;
 		GeometryFactory gf = new GeometryFactory();
 		Point activityPoint = gf.createPoint(activity);
-		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
-		try {
-			mfr.readMultizoneShapefile(shapefile, idField);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read shapefile from " + shapefile);
-		}
-		List<MyZone> list = mfr.getAllZones();
-		if(list.size() > 1){
-			LOG.warn("There are multiple shapefiles in " + shapefile);
-			LOG.warn("Only the first will be used as the geographic area.");
-		}
-		MultiPolygon area = list.get(0);
+//		Geometry envelope = area.getEnvelope();
+//		if(envelope.covers(activityPoint)){
+			
 			if (area.covers(activityPoint)) {
 				inArea = true;
 			}
+//		}
 		return inArea;
 	}
 
@@ -718,60 +772,6 @@ public class PopulationParser {
 		}
 	}
 	
-	public static void writeSpatioTemporalInfo(String spatioTemporalOutputFile, 
-			TreeMap<Integer, Tuple<Coord, Double>> spatioTemporalMap, String originalCRS){
-		
-		CoordinateTransformation ct = null;
-		if(originalCRS != null){
-			ct = TransformationFactory.getCoordinateTransformation(originalCRS, "WGS84");
-		}
-		BufferedWriter bw = IOUtils.getBufferedWriter(spatioTemporalOutputFile);
-		int hour = 100;
-		Double startTime = 10000.0;
-		try {
-			bw.write("activity, long, lat, x, y, startTime, hourOfDay");
-			bw.newLine();
-			Set<Entry<Integer, Tuple<Coord, Double>>> entrySet = spatioTemporalMap.entrySet();
-			for (Entry<Integer, Tuple<Coord, Double>> entry : entrySet) {
-				Integer activity = entry.getKey();
-				startTime = entry.getValue().getSecond();
-				hour = convertSecondsToHourOfDay(startTime);
-				Coord original = entry.getValue().getFirst();
-				Coord wgs84 = null;
-				if(ct != null){
-					wgs84 = ct.transform(original);
-				} else{
-					wgs84 = original;
-				}
-				
-				bw.write(Integer.toString(activity));
-				bw.write(",");
-				bw.write(Double.toString(wgs84.getX()));
-				bw.write(",");
-				bw.write(Double.toString(wgs84.getY()));
-				bw.write(",");
-				bw.write(Double.toString(original.getX()));
-				bw.write(",");
-				bw.write(Double.toString(original.getY()));
-				bw.write(",");
-				bw.write(Double.toString(startTime));
-				bw.write(",");
-				bw.write(Integer.toString(hour));
-				bw.newLine();
-				
-			}
-			
-		} catch (IOException e) {
-			throw new RuntimeException("Could not read from BufferedWrited " + spatioTemporalOutputFile);
-		} finally{
-			try {
-				bw.close();
-			} catch (IOException e) {
-				throw new RuntimeException("Could not close BufferedWriter " + spatioTemporalOutputFile);
-			}
-		}
-	}
-	
 
 	private static class ExtractorCallable implements Callable<Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>>>{
 		
@@ -783,14 +783,18 @@ public class PopulationParser {
 		private int populationNumber;
 		private int population;
 		private String inputPath;
-		private String saShapefile;
-		private String gautengShapefile;
-		private String ctShapefile;
-		private String eThekwiniShapefile;
-		
+		private Geometry saGeometry;
+		private Geometry gautengGeometry;
+		private Geometry ctGeometry;
+		private Geometry eThekwiniGeometry;
+		private Geometry saEnvelope;
+		private Geometry gautengEnvelope;
+		private Geometry ctEnvelope;
+		private Geometry eThekwiniEnvelope;
 	
 		public ExtractorCallable(int pmin, int radius, int i, int j, int population, String inputPath, 
-				String saShapefile, String gautengShapefile, String ctShapefile, String eThekwiniShapefile, Counter counter) {
+				Geometry southAfrica, Geometry gauteng, Geometry capeTown, Geometry eThekwini, Counter counter, 
+				Geometry saEnvelope, Geometry gautengEnvelope, Geometry capeTownEnvelope, Geometry eThekwiniEnvelope) {
 			this.counter = counter;
 			this.pmin = pmin;
 			this.radius = radius;
@@ -798,21 +802,26 @@ public class PopulationParser {
 			this.populationNumber = j;
 			this.population = population;
 			this.inputPath = inputPath;
-			this.saShapefile = saShapefile;
-			this.gautengShapefile = gautengShapefile;
-			this.ctShapefile = ctShapefile;
-			this.eThekwiniShapefile = eThekwiniShapefile;
-			
+			this.saGeometry = southAfrica;
+			this.gautengGeometry = gauteng;
+			this.ctGeometry = capeTown;
+			this.eThekwiniGeometry = eThekwini;
+			this.saEnvelope = saEnvelope;
+			this.gautengEnvelope = gautengEnvelope;
+			this.ctEnvelope = capeTownEnvelope;
+			this.eThekwiniEnvelope = eThekwiniEnvelope;
 		}
 	
 	
 		@Override
 		public Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>> call() throws Exception {
 	
+			String resultOutputFile = String.format("%s/populationAnalyser_%d_%d_%d.csv", inputPath, pmin, radius, population);
 			PopulationParser parser = new PopulationParser();
 			Pair<Quintet<Integer, Integer, int[], int[], int[]>, List<Pair<int[], int[]>>> populationPair = parser.parsePopulations(
-					pmin, radius, run, populationNumber, population, inputPath, saShapefile, gautengShapefile, ctShapefile, eThekwiniShapefile);
-			
+					pmin, radius, run, populationNumber, population, inputPath, saGeometry, gautengGeometry, ctGeometry, eThekwiniGeometry,
+					saEnvelope, gautengEnvelope, ctEnvelope, eThekwiniEnvelope);
+			writeResultToFile(populationPair, resultOutputFile);
 			counter.incCounter();
 			return populationPair;
 		}
