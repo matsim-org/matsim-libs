@@ -171,6 +171,23 @@ public class GeneralGrid{
 	public Geometry getCellGeometry(Point p){
 		return this.geometryCache.get(p);
 	}
+	
+	
+	/**
+	 * Checks if a given {@link Point} falls within one of the grid's cells.
+	 * @param p
+	 * @return
+	 */
+	public boolean isInGrid(Point p){
+		boolean result = false;
+		
+		Point closest = this.qt.get(p.getX(), p.getY());
+		Geometry closestCell = this.getCellGeometry(closest);
+		if(closestCell.covers(p)){
+			result = true;
+		}
+		return result;
+	}
 
 
 	/**
