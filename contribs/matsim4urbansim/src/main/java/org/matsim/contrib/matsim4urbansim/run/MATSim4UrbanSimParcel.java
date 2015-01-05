@@ -362,6 +362,11 @@ import org.matsim.roadpricing.RoadPricing;
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 				zbacl.setComputingAccessibilityForMode(mode, true);
 			}
+			if ( ptMatrix==null ) {
+				zbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+				// somewhat stupid fix. kai, jan'2015
+			}
+			
 			controler.addControlerListener( zbacl );
 			
 			log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
@@ -377,6 +382,10 @@ import org.matsim.roadpricing.RoadPricing;
 																											 scenario.getNetwork() );
 			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 				gbacl.setComputingAccessibilityForMode(mode, true);
+			}
+			if ( ptMatrix==null ) {
+				gbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+				// somewhat stupid fix. kai, jan'2015
 			}
 			
 			if(computeGridBasedAccessibilitiesUsingShapeFile)
