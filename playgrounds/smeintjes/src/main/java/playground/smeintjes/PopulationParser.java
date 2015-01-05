@@ -274,8 +274,8 @@ public class PopulationParser {
 			Geometry saEnvelope, Geometry gautengEnvelope, Geometry ctEnvelope, Geometry eThekwiniEnvelope) {
 
 		/* Set up paths to input file */
-		String populationFile = String.format("%sresults%d/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, run, pmin, radius, run, populationNumber);
-//		String populationFile = String.format("%s/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, pmin, radius, run, populationNumber);
+//		String populationFile = String.format("%sresults%d/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, run, pmin, radius, run, populationNumber);
+		String populationFile = String.format("%s/trainingPopulation_%d_%d_%d_%d.xml.gz", inputPath, pmin, radius, run, populationNumber);
 		
 		/* Parse this population */
 		LOG.info("Reading population " + population + " for configuration " + pmin + "_" + radius);
@@ -371,7 +371,7 @@ public class PopulationParser {
 			
 		
 		while(personCollection.iterator().hasNext()){
-//				LOG.info("Performing analysis for vehicle: " + person);
+//				LOG.info("Performing analysis for vehicle: " + person + " in population: " + population);
 				
 				boolean inSouthAfrica = false;
 				boolean inGauteng = false;
@@ -609,17 +609,18 @@ public class PopulationParser {
 		GeometryFactory gf = new GeometryFactory();
 		Point activityPoint = gf.createPoint(activity);
 //		Geometry envelope = area.getEnvelope();
-//		if(envelope.covers(activityPoint)){
+		if(envelope.covers(activityPoint)){
 			
 			if (area.covers(activityPoint)) {
 				inArea = true;
 			}
-//		}
+		}
 		return inArea;
 	}
 
 
 	public static void writePopulationInfo(String outputFile, Map<Integer, List<int[]>> consolidatedMap){
+		LOG.info("Writing population to " + outputFile);
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		
 		try {
