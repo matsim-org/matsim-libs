@@ -106,7 +106,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		this.zones = zones;
 		assert(parcels != null);
 		this.parcels = parcels;
-		assert(ptMatrix != null);
+//		assert(ptMatrix != null);
 		this.ptMatrix = ptMatrix;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
@@ -224,8 +224,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					double walkTravelTime_min = travelDistance_meter / walkSpeedMeterPerMinute;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
-					if(walkTravelTime_min < 12.)
-						walkTravelTime_min = 12.;
+					if(walkTravelTime_min < 1.2 )
+						walkTravelTime_min = 1.2 ;
+					// changed the above values from 12 to 1.2 in jan'15. kai
 					
 					// pt travel times in minutes
 					double ptTravelTime_min = -1.;
