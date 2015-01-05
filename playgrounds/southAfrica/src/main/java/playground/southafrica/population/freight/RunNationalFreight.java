@@ -97,9 +97,11 @@ public class RunNationalFreight {
 		config.controler().setOutputDirectory(OUTPUT_DIRECTORY);
 		config.controler().setLastIteration(100);
 		config.controler().setWriteEventsInterval(20);
-		config.global().setNumberOfThreads(40); 	// Hobbes
+//		config.global().setNumberOfThreads(40); 	// Hobbes
+		config.global().setNumberOfThreads(4); 		// Ubuntu
 		config.global().setRandomSeed(20141217l); 	// Hobbes
-		config.qsim().setNumberOfThreads(40);		// Hobbes
+//		config.qsim().setNumberOfThreads(40);		// Hobbes
+		config.qsim().setNumberOfThreads(4);		// Ubuntu
 		
 		config.network().setInputFile(NETWORK);
 		config.plans().setInputFile(POPULATION);
