@@ -27,6 +27,6 @@ public class OneTaxiLauncherTest
     @Test
     public void testGo()
     {
-        new OneTaxiLauncher(false).go();
+        new RunOneTaxiExample(false).go();
     }
 }

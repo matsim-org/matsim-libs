@@ -34,7 +34,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 
-public class OneTaxiLauncher
+public class RunOneTaxiExample
 {
     private final String dir;
     private final String netFile;
@@ -43,7 +43,7 @@ public class OneTaxiLauncher
     private final boolean otfVis;
 
 
-    public OneTaxiLauncher(boolean otfVis)
+    public RunOneTaxiExample(boolean otfVis)
     {
         this.otfVis = otfVis;
 
@@ -95,6 +95,6 @@ public class OneTaxiLauncher
 
     public static void main(String... args)
     {
-        new OneTaxiLauncher(true).go();
+        new RunOneTaxiExample(true).go();
     }
 }
