@@ -39,10 +39,10 @@ public class RunCapeTownFreight {
 		
 		String workspace = args[0] + (args[0].endsWith("/") ? "" : "/");
 		
-		String network = workspace + "coct-data/matsim/CapeTown_full.xml.gz";
-		String population = workspace + "coct-data/matsim/capeTownCommercial.xml.gz";
-		String populationAttributes = workspace + "coct-data/matsim/capeTownCommercialAttributes.xml.gz";
-		String outputFolder = workspace + "coct-data/matsim/output/";
+		String network = workspace + "coct-data/matsim/output_clean/output_network.xml.gz";
+		String population = workspace + "coct-data/matsim/output_clean/output_plans.xml.gz";
+		String populationAttributes = workspace + "coct-data/matsim/output_clean/output_personAttributes.xml.gz";
+		String outputFolder = workspace + "coct-data/matsim/output_clean100/";
 		String pathDependentNetwork = workspace + "coct-data/matsim/pathDependentNetwork.xml.gz";
 		
 		/* Check if output folder exists, and DELETE if it is there. */
