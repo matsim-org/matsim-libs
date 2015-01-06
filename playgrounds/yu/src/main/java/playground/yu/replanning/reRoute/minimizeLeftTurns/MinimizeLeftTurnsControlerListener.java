@@ -26,7 +26,6 @@ package playground.yu.replanning.reRoute.minimizeLeftTurns;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-
 import playground.yu.travelCost.SingleReRouteSelectedControler;
 
 /**
@@ -65,7 +64,8 @@ public class MinimizeLeftTurnsControlerListener implements
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
-			ctl.setLeastCostPathCalculatorFactory(new MinimizeLeftTurnsDijkstraFactory());
+//			ctl.setLeastCostPathCalculatorFactory(new MinimizeLeftTurnsDijkstraFactory());
+            throw new RuntimeException();
 		}
 	}
 }

@@ -337,22 +337,6 @@ public class Controler extends AbstractController {
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
 		// must be last being added (=first being executed)
 
-
-		loadControlerListeners();
-	}
-
-	/**
-	 * Loads the default set of {@link org.matsim.core.controler.listener
-	 * ControlerListener} to provide some more basic functionality. Unlike the
-	 * core ControlerListeners the order in which the listeners of this method
-	 * are added must not affect the correctness of the code.
-	 */
-	protected void loadControlerListeners() {
-		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
-		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
-		// The core controler listeners are separate, after all.  kai, feb'13
-		// yyyy should be possible to make this final. kn/mz, nov'14
-
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
             this.events.addHandler(eventHandler);
@@ -361,7 +345,16 @@ public class Controler extends AbstractController {
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             this.addControlerListener(controlerListener);
         }
+
+		loadControlerListeners();
 	}
+
+    /**
+     * Empty hook for subclasses to load more ControlerListeners.
+     * Please do not use. Subclassing Controler is discouraged.
+     */
+    @Deprecated
+	protected void loadControlerListeners() {}
 
 	@Override
 	protected final void prepareForSim() {

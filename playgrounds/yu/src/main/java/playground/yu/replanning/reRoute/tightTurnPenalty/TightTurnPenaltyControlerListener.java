@@ -26,7 +26,6 @@ package playground.yu.replanning.reRoute.tightTurnPenalty;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-
 import playground.yu.travelCost.SingleReRouteSelectedControler;
 
 /**
@@ -40,9 +39,9 @@ public class TightTurnPenaltyControlerListener implements
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
-			ctl
-					.setLeastCostPathCalculatorFactory(new DijkstraWithTightTurnPenaltyFactory());
-		}
+//			ctl.setLeastCostPathCalculatorFactory(new DijkstraWithTightTurnPenaltyFactory());
+            throw new RuntimeException();
+        }
 	}
 
 	public static void main(String[] args) {

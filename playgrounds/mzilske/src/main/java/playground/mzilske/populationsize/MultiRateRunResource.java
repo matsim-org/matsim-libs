@@ -99,7 +99,7 @@ public class MultiRateRunResource {
         }
     }
 
-    private RunResource getBaseRun() {
+    public RunResource getBaseRun() {
         return new RegimeResource(WD + "/../..", regime).getBaseRun();
     }
 

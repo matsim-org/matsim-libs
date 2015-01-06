@@ -23,9 +23,11 @@
 package playground.mzilske.extendtraces;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import playground.mzilske.cdr.Sighting;
 import playground.mzilske.cdr.Sightings;
 import playground.mzilske.populationsize.ExperimentResource;
+import playground.mzilske.populationsize.MultiRateRunResource;
 import playground.mzilske.populationsize.RegimeResource;
 
 import java.util.Arrays;
@@ -37,8 +39,10 @@ public class Main {
 
     public static void main(String[] args) {
         final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
-        final RegimeResource congested = experiment.getRegime("uncongested3");
-        Sightings sightings = congested.getMultiRateRun("randomcountlocations100.0").getSightings("5");
+        final RegimeResource regime = experiment.getRegime("uncongested3");
+        MultiRateRunResource multiRateRun = regime.getMultiRateRun("randomcountlocations100.0");
+        Sightings sightings = multiRateRun.getSightings("5");
+        Network network = multiRateRun.getBaseRun().getConfigAndNetwork().getNetwork();
         final Map<Id, List<Sighting>> map = new HashMap<>();
         int i=0;
         for (Map.Entry<Id, List<Sighting>> entry : sightings.getSightingsPerPerson().entrySet()) {
@@ -54,7 +58,7 @@ public class Main {
         };
         for (double epsilon : Arrays.asList(600.0)) {
             System.out.printf("epsilon: %d seconds\n", (int) epsilon);
-            new TraceQuery(sightings, epsilon, 0.1).query();
+            new TraceQuery(sightings, network, epsilon, 0.2).query();
         }
     }
 

@@ -23,6 +23,8 @@
 package playground.mzilske.extendtraces;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.CoordUtils;
 import playground.mzilske.cdr.Sighting;
 import playground.mzilske.cdr.Sightings;
 
@@ -31,11 +33,13 @@ import java.util.*;
 class TraceQuery {
 
     private Sightings sightings;
+    private Network network;
     private double temporalBufferSeconds;
     private double maxDistanceRatio;
 
-    public TraceQuery(Sightings sightings, double epsilon, double maxDistanceRatio) {
+    public TraceQuery(Sightings sightings, Network network, double epsilon, double maxDistanceRatio) {
         this.sightings = sightings;
+        this.network = network;
         this.temporalBufferSeconds = epsilon;
         this.maxDistanceRatio = maxDistanceRatio;
     }
@@ -86,7 +90,9 @@ class TraceQuery {
     }
 
     private double distance(Sighting a, Sighting b) {
-        return 0.0;
+        return CoordUtils.calcDistance(
+                network.getLinks().get(Id.createLinkId(a.getCellTowerId())).getCoord(),
+                network.getLinks().get(Id.createLinkId(b.getCellTowerId())).getCoord());
     }
 
     static class Event implements Comparable<Event> {
