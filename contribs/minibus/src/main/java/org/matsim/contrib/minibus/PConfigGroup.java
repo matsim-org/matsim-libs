@@ -77,6 +77,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
 	private static final String LOG_OPERATORS = "logOperators";
+	private static final String WRITE_METRICS = "writeMetrics";
 	private static final String WRITE_GEXF_STATS_INTERVAL = "writeGexfStatsInterval";
 	private static final String ROUTE_PROVIDER = "routeProvider";
 	private static final String SPEED_LIMIT_FOR_STOPS = "speedLimitForStops";
@@ -128,6 +129,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private boolean useFranchise = false;
 	private int writeStatsInterval = 0;
 	private boolean logOperators = false;
+	private boolean writeMetrics = false;
 	private int writeGexfStatsInterval = 0;
 	private String routeProvider = "SimpleCircleScheduleProvider";
 	private double speedLimitForStops = Double.MAX_VALUE;
@@ -219,7 +221,9 @@ public final class PConfigGroup extends ConfigGroup{
 		} else if (WRITESTATS_INTERVAL.equals(key)){
 			this.writeStatsInterval = Integer.parseInt(value);
 		} else if (LOG_OPERATORS.equals(key)){
-			this.logOperators = Boolean.parseBoolean(value);			
+			this.logOperators = Boolean.parseBoolean(value);		
+		} else if (WRITE_METRICS.equals(key)){
+			this.writeMetrics = Boolean.parseBoolean(value);		
 		} else if (WRITE_GEXF_STATS_INTERVAL.equals(key)) {
 			this.writeGexfStatsInterval = Integer.parseInt(value);
 		} else if (ROUTE_PROVIDER.equals(key)){
@@ -302,6 +306,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
 		map.put(LOG_OPERATORS, Boolean.toString(this.logOperators));
+		map.put(WRITE_METRICS, Boolean.toString(this.writeMetrics));
 		map.put(WRITE_GEXF_STATS_INTERVAL, Integer.toString(this.writeGexfStatsInterval));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
 		map.put(SPEED_LIMIT_FOR_STOPS, Double.toString(this.speedLimitForStops));
@@ -358,8 +363,9 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(MIN_OPERATION_TIME, "min time of operation of each operator in seconds");
 		map.put(MIN_INITIAL_STOP_DISTANCE, "min distance the two initial stops of a new operator's first route should be apart. Default is 1.0. Set to 0.0 to allow for the same stop being picked as start and end stop.");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
-		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
+		map.put(WRITESTATS_INTERVAL, "interval in which statistics will be plotted. Set to zero to turn this feature off. Set to something larger than the total number of iterations to turn off the plots, but write the statistics file anyway");
 		map.put(LOG_OPERATORS, "will log operators individually if set to true");
+		map.put(WRITE_METRICS, "will calculate common performance metrics if set to true, default is false");
 		map.put(WRITE_GEXF_STATS_INTERVAL, "number of iterations the gexf output gets updated. Set to zero to turn this feature off");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(SPEED_LIMIT_FOR_STOPS, "Link cannot serve as paratransit stop, if its speed limit is equal or higher than the limit set here. Default is +INF");
@@ -499,6 +505,10 @@ public final class PConfigGroup extends ConfigGroup{
 	
 	public boolean getLogOperators() {
 		return this.logOperators;
+	}
+	
+	public boolean getWriteMetrics() {
+		return this.writeMetrics;
 	}
 	
 	public int getGexfInterval(){

@@ -46,7 +46,9 @@ public final class PStatsModule {
         controler.addControlerListener(new GexfPStat(pConfig, false));
         controler.addControlerListener(new GexfPStatLight(pConfig));
         controler.addControlerListener(new Line2GexfPStat(pConfig));
-        controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));
+        
+        if (pConfig.getWriteMetrics()) {controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));}
+        
         controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig));
         controler.addControlerListener(new StartupListener() {
             @Override
