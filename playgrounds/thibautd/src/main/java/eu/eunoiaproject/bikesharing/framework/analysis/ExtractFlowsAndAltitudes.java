@@ -151,16 +151,18 @@ public class ExtractFlowsAndAltitudes {
 		if ( outputFlowsFile != null ) {
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outputFlowsFile );
 
-			writer.write( "station\tx\ty\talt\toutFlow\tinFlow\toutExcess" );
+			writer.write( "station\tx\ty\talt\toutFlow\tsqrtOutFlow\tinFlow\tsqrtInFlow\toutExcess\tsqrtOutExcess" );
 			for ( Map.Entry<Id, AggregatedFlow> e : aggFlows.entrySet() ) {
 				final double alt = (Double) atts.getAttribute( e.getKey().toString() , attributeName );
 				final BikeSharingFacility station = stations.getFacilities().get( e.getKey() );
 				writer.newLine();
+				final double outExcess = e.getValue().outFlow - e.getValue().inFlow;
 				writer.write( e.getKey()+"\t"+
 						station.getCoord().getX()+"\t"+station.getCoord().getY()+"\t"+
 						alt+"\t"+
-						e.getValue().outFlow+"\t"+e.getValue().inFlow+"\t"+
-						( e.getValue().outFlow - e.getValue().inFlow ) );
+						e.getValue().outFlow+"\t"+Math.sqrt( e.getValue().outFlow )+"\t"+
+						e.getValue().inFlow+"\t"+Math.sqrt( e.getValue().inFlow )+"\t"+
+						outExcess+"\t"+Math.sqrt( outExcess ) );
 			}
 			writer.close();
 		}
