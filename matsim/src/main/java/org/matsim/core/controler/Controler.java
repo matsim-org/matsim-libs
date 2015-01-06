@@ -674,15 +674,6 @@ public class Controler extends AbstractController {
 		}
 	}
 
-	public final void setLeastCostPathCalculatorFactory(final LeastCostPathCalculatorFactory factory) {
-		if (!routerCreated) {
-			this.tripRouterFactoryBuilder.setLeastCostPathCalculatorFactory(factory);
-			this.componentOfDefaultTripRouterFactoryChanged = true;
-		} else {
-			throw new RuntimeException("Too late for that.");
-		}
-	}
-
     /**
      * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
      * Do this if your use-case requires custom routing logic, for instance if you

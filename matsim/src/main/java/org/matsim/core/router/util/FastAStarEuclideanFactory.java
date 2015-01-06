@@ -20,14 +20,14 @@
 
 package org.matsim.core.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarEuclidean;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author cdobler
@@ -41,9 +41,8 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 	public FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc) {
 		this(network, fsttc, FastRouterType.ARRAY);		
 	}
-	
-	@Deprecated
-	public FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc, 
+
+	private FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc,
 			FastRouterType fastRouterType) {
 		this.preProcessData = new PreProcessEuclidean(fsttc);
 		this.preProcessData.run(network);

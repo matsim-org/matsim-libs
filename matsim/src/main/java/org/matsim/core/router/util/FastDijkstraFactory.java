@@ -20,14 +20,14 @@
 
 package org.matsim.core.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
@@ -38,18 +38,12 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	public FastDijkstraFactory() {
 		this(null, FastRouterType.ARRAY);
 	}
-	
-	@Deprecated
-	public FastDijkstraFactory(FastRouterType fastRouterType) {
-		this(null, fastRouterType);
-	}
-	
-	public FastDijkstraFactory(final PreProcessDijkstra preProcessData) {
+
+    public FastDijkstraFactory(final PreProcessDijkstra preProcessData) {
 		this(preProcessData, FastRouterType.ARRAY);
 	}
-	
-	@Deprecated
-	public FastDijkstraFactory(final PreProcessDijkstra preProcessData, FastRouterType fastRouterType) {
+
+	private FastDijkstraFactory(final PreProcessDijkstra preProcessData, FastRouterType fastRouterType) {
 		this.preProcessData = preProcessData;
 		
 		this.routingNetworks = new HashMap<Network, RoutingNetwork>();

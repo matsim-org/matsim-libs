@@ -20,14 +20,14 @@
 
 package org.matsim.core.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author cdobler
@@ -41,9 +41,8 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
 		this(network, fsttc, FastRouterType.ARRAY);
 	}
-	
-	@Deprecated
-	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc,
+
+	private FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc,
 			FastRouterType fastRouterType) {
 		this.preProcessData = new PreProcessLandmarks(fsttc);
 		this.preProcessData.run(network);

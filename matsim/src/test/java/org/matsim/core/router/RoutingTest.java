@@ -29,16 +29,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.AStarEuclideanFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarEuclideanFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -77,19 +68,6 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-
-	public void testFastDijkstra_ArrayRoutingNetwork() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstra";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastDijkstraFactory(FastRouterType.ARRAY);
-			}
-		});
-	}
 	
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
@@ -120,21 +98,6 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-
-	public void testFastDijkstraPruneDeadEnds_ArrayRoutingNetwork() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastDijkstraPruneDeadends";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
-				preProcessData.run(network);
-				return new FastDijkstraFactory(preProcessData, FastRouterType.ARRAY);
-			}
-		});
-	}
 	
 	public void testAStarEuclidean() {
 		doTest(new RouterProvider() {
@@ -161,19 +124,6 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-
-	public void testFastAStarEuclidean_ArrayRoutingNetwork() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarEuclidean";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarEuclideanFactory(network, costCalc, FastRouterType.ARRAY);
-			}
-		});
-	}
 	
 	public void testAStarLandmarks() {
 		doTest(new RouterProvider() {
@@ -197,19 +147,6 @@ public class RoutingTest extends MatsimTestCase {
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastAStarLandmarksFactory(network, costCalc);
-			}
-		});
-	}
-	
-	public void testFastAStarLandmarks_ArrayRoutingNetwork() {
-		doTest(new RouterProvider() {
-			@Override
-			public String getName() {
-				return "FastAStarLandmarks";
-			}
-			@Override
-			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory(network, costCalc, FastRouterType.ARRAY);
 			}
 		});
 	}
