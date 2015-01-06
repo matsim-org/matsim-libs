@@ -48,12 +48,13 @@ public class OSM2MixedConvMain {
 		// Get resources:
 		String osmFile = args[0];
 		String hafasFolder = args[1];
-		String outputMultimodalNetwork = args[2];
-		String outputSchedule = args[3];
-		String outputVehicles = args[4];
+		String vehicleFile = args[2];
+		String outputMultimodalNetwork = args[3];
+		String outputSchedule = args[4];
+		String outputVehicles = args[5];
 
 		// **************** Convert ****************
-		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, vehicles, osmFile, hafasFolder);
+		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, vehicles, osmFile, hafasFolder, vehicleFile);
 		converter.convertOSM2MultimodalNetwork();
 		converter.writeOutput(outputMultimodalNetwork, outputSchedule, outputVehicles);
 	}

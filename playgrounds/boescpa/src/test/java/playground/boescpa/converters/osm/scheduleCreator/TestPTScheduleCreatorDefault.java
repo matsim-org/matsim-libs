@@ -32,6 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
@@ -74,7 +75,22 @@ public class TestPTScheduleCreatorDefault {
     }
 
     @Test
+    public void testReadVehicles() {
+        scheduleCreator.readVehicles(utils.getClassInputDirectory() + "VehicleData.csv");
+        assertEquals("Correct reading of vehicles.",
+                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("R", VehicleType.class)).getLength(),
+                2.1, 0.0);
+        assertEquals("Correct reading of vehicles.",
+                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("FUN", VehicleType.class)).getAccessTime(),
+                1.3, 0.0);
+        assertEquals("Correct reading of vehicles.",
+                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("FUN", VehicleType.class)).getEgressTime(),
+                1.4, 0.0);
+    }
+
+    @Test
     public void testReadLines() {
+        scheduleCreator.readVehicles(utils.getClassInputDirectory() + "VehicleData.csv");
         scheduleCreator.readStops(utils.getClassInputDirectory() + "BFKOORD_GEO");
         scheduleCreator.readLines(utils.getClassInputDirectory() + "FPLAN");
         new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");

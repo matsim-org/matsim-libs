@@ -52,49 +52,77 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	}
 
 	@Override
-	public final void createSchedule(String osmFile, String hafasFolder, Network network) {
+	public final void createSchedule(String osmFile, String hafasFolder, Network network, String vehicleFile) {
 		log.info("Creating the schedule...");
-		createPTLines(hafasFolder);
-		complementPTStations(osmFile);
+
+		{ // Create PTLines:
+			log.info("Creating pt lines from HAFAS file...");
+			// 1. Read all vehicles from vehicleFile:
+			readVehicles(vehicleFile);
+			// 2. Read all stops from HAFAS-BFKOORD_GEO
+			readStops(hafasFolder + "/BFKOORD_GEO");
+			// 3. Create all lines from HAFAS-Schedule
+			readLines(hafasFolder + "/FPLAN");
+			log.info("Creating pt lines from HAFAS file... done.");
+		}
+
+		{ // Complement the PTStations:
+			log.info("Correcting pt station coordinates based on OSM...");
+
+			// TODO-boescpa Implement complementPTStations...
+			// Check and correct pt-Station-coordinates with osm-knowledge.
+			// work with this.schedule...
+
+			log.info("Correcting pt station coordinates based on OSM... done.");
+		}
+
 		log.info("Creating the schedule... done.");
 	}
 
-	/**
-	 * Create all pt-lines (stops, schedule, but no routes) of all types of public transport
-	 * using the HAFAS-schedule.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param hafasFolder
-	 */
-	private void createPTLines(String hafasFolder) {
-		log.info("Creating pt lines from HAFAS file...");
-
-		// 1. Read all stops from HAFAS-BFKOORD_GEO
-		readStops(hafasFolder + "/BFKOORD_GEO");
-		// 2. Create all lines from HAFAS-Schedule
-		readLines(hafasFolder + "/FPLAN");
-
-		log.info("Creating pt lines from HAFAS file... done.");
-	}
-
-	/**
-	 * Check and correct pt-Station-coordinates with osm-knowledge.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 *
-	 * @param osmFile
-	 */
-	private void complementPTStations(String osmFile) {
-		log.info("Correcting pt station coordinates based on OSM...");
-
-		// TODO-boescpa Implement complementPTStations...
-		// work with this.schedule...
-
-		log.info("Correcting pt station coordinates based on OSM... done.");
-	}
-
 	////////////////// Local Helpers /////////////////////
+
+	/**
+	 * Reads all the vehicle types from the file specified.
+	 *
+	 * @param vehicleFile
+	 */
+	protected void readVehicles(String vehicleFile) {
+		try {
+			FileReader reader = new FileReader(vehicleFile);
+			BufferedReader readsLines = new BufferedReader(reader);
+			// read header 1 and 2
+			readsLines.readLine();
+			readsLines.readLine();
+			// start the actual readout:
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				String[] newType = newLine.split(";");
+				// The first line without a key breaks the readout.
+				if (newType.length == 0) {
+					break;
+				}
+				// Create the vehicle:
+				Id<VehicleType> typeId = Id.create(newType[0].trim(), VehicleType.class);
+				VehicleType vehicleType = vehicleBuilder.createVehicleType(typeId);
+				vehicleType.setLength(Double.parseDouble(newType[1]));
+				vehicleType.setWidth(Double.parseDouble(newType[2]));
+				vehicleType.setAccessTime(Double.parseDouble(newType[3]));
+				vehicleType.setEgressTime(Double.parseDouble(newType[4]));
+				if (newType[5].matches("serial")) {
+					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.serial);
+				} else if (newType[5].matches("parallel")) {
+					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.parallel);
+				}
+				vehicleType.setPcuEquivalents(Double.parseDouble(newType[6]));
+				vehicles.addVehicleType(vehicleType);
+				// Read the next line:
+				newLine = readsLines.readLine();
+			}
+			readsLines.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	protected void readStops(String BFKOORD_GEOFile) {
 		try {
@@ -260,10 +288,15 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		public void createLine() {
 			TransitLine line = scheduleBuilder.createTransitLine(lineId);
 			for (PtRouteFPLAN route : this.routesFPLAN) {
-				line.addRoute(route.getRoute());
+				TransitRoute transitRoute = route.getRoute();
+				if (transitRoute != null) {
+					line.addRoute(transitRoute);
+				}
 			}
-			schedule.addTransitLine(line);
-			//log.info("Added " + schedule.getTransitLines().get(lineId).toString());
+			if (!line.getRoutes().isEmpty()) {
+				schedule.addTransitLine(line);
+				//log.info("Added " + schedule.getTransitLines().get(lineId).toString());
+			}
 		}
 
 		public void addPtRouteFPLAN(PtRouteFPLAN route) {
@@ -293,10 +326,10 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		public void setUsedVehicle(String usedVehicle) {
 			Id<VehicleType> typeId = Id.create(usedVehicle.trim(), VehicleType.class);
 			usedVehicleType = vehicles.getVehicleTypes().get(typeId);
-			if (usedVehicleType == null) {
+			/*if (usedVehicleType == null) {
 				usedVehicleType = vehicleBuilder.createVehicleType(typeId);
 				vehicles.addVehicleType(usedVehicleType);
-			}
+			}*/
 			usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
 		}
 
@@ -307,12 +340,21 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			this.cycleTime = cycleTime * 60; // Cycle time is given in minutes in HAFAS -> Have to change it here...
 		}
 
+		/**
+		 * Creates a schedule-route with the set characteristics.
+		 * @return TransitRoute or NULL if no departures can be created for the route.
+		 */
 		public TransitRoute getRoute() {
-			TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, "pt");
-			for (Departure departure : this.getDepartures()) {
-				transitRoute.addDeparture(departure);
+			List<Departure> departures = this.getDepartures();
+			if (departures != null) {
+				TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, "pt");
+				for (Departure departure : departures) {
+					transitRoute.addDeparture(departure);
+				}
+				return transitRoute;
+			} else {
+				return null;
 			}
-			return transitRoute;
 		}
 
 		/**
@@ -342,12 +384,18 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		/**
 		 * @return A list of all departures of this route.
 		 * If firstDepartureTime or usedVehicle are not set before this is called, null is returned.
+		 * If vehicleType is not set, the vehicle is not in the list and entry will not be created.
 		 */
 		private List<Departure> getDepartures() {
 			if (firstDepartureTime < 0 || usedVehicleID == null) {
 				log.error("getDepartures before first departureTime and usedVehicleId set.");
 				return null;
 			}
+			if (usedVehicleType == null) {
+				log.warn("vehicleType not defined in vehicles list.");
+				return null;
+			}
+
 			List<Departure> departures = new ArrayList<>();
 			for (int i = 0; i < numberOfDepartures; i++) {
 				// Departure ID

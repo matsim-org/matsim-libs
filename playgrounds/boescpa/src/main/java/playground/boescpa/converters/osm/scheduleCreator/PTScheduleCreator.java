@@ -59,7 +59,8 @@ public abstract class PTScheduleCreator {
 	 * @param osmFile
 	 * @param scheduleFile
 	 * @param network
+	 * @param vehicleFile
 	 */
-	public abstract void createSchedule(String osmFile, String scheduleFile, Network network);
+	public abstract void createSchedule(String osmFile, String scheduleFile, Network network, String vehicleFile);
 
 }

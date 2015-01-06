@@ -46,18 +46,20 @@ public class OSM2MixedConverter {
 	private final Vehicles vehicles;
 	private final String osmFile;
 	private final String scheduleFile;
+	private final String vehicleFile;
 	// TODO-boescpa implement observer for osmFile and scheduleFile so that it hasn't to be read x-times...
 
 	private final MultimodalNetworkCreator multimodalNetworkCreator;
 	private final PTScheduleCreator ptScheduleCreator;
 	private final PTLineRouter ptLineRouter;
 
-	public OSM2MixedConverter(Network network, TransitSchedule schedule, Vehicles vehicles, String osmFile, String scheduleFile) {
+	public OSM2MixedConverter(Network network, TransitSchedule schedule, Vehicles vehicles, String osmFile, String scheduleFile, String vehicleFile) {
 		this.network = network;
 		this.schedule = schedule;
 		this.vehicles = vehicles;
 		this.osmFile = osmFile;
 		this.scheduleFile = scheduleFile;
+		this.vehicleFile = vehicleFile;
 
 		this.multimodalNetworkCreator = new MultimodalNetworkCreatorDefault(this.network);
 		this.ptScheduleCreator = new PTScheduleCreatorDefault(this.schedule, this.vehicles);
@@ -70,7 +72,7 @@ public class OSM2MixedConverter {
 	public void convertOSM2MultimodalNetwork() {
 		log.info("Conversion from OSM to multimodal MATSim network...");
 		multimodalNetworkCreator.createMultimodalNetwork(osmFile);
-		ptScheduleCreator.createSchedule(osmFile, scheduleFile, network);
+		ptScheduleCreator.createSchedule(osmFile, scheduleFile, network, vehicleFile);
 		ptLineRouter.routePTLines(network);
 		log.info("Conversion from OSM to multimodal MATSim network... done.");
 	}
