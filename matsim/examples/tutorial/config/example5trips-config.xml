@@ -16,7 +16,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name="eventsFileFormat" value="xml" />
-		<param name="snapshotFormat" value="otfvis" />
+		<param name="snapshotFormat" value="" />
 	</module>
 
 

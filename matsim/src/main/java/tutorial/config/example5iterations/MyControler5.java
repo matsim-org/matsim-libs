@@ -27,7 +27,7 @@ import org.matsim.run.Controler;
 
 
 /**
- * runs iterations and writes events and visualizer files.  See the config file for configuration details.
+ * runs iterations and writes events files.  See the config file for configuration details.
  * 
  * @author nagel
  *
@@ -44,7 +44,7 @@ public class MyControler5 {
 		Scenario sc = controler.getScenario() ;
 		Config cf = sc.getConfig() ;
 		String dir = cf.controler().getOutputDirectory();
-		log.warn("Output is in " + dir + ".  Use otfvis (preferably hardware-accelerated) to play movies." ) ; 
+		log.warn("Output is in " + dir + ".") ; 
 	}
 
 }

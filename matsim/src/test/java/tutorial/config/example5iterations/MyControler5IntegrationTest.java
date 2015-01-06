@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * MyControler1.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package tutorial.config.example5iterations;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.run.Controler;
+import java.io.File;
 
+import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
- * runs trip-based iterations (=DTA) and writes events files.  
- * See the config file for configuration details.
- * 
  * @author nagel
  *
  */
-public class MyControler5Trips {
-	private static Logger log = Logger.getLogger(MyControler5Trips.class);
+public class MyControler5IntegrationTest {
 
-	public static void main(final String[] args) {
-		String configFile = "examples/tutorial/config/example5trips-config.xml" ;
-		
-		Controler controler = new Controler( configFile ) ;
-		controler.run() ;
-		
-		Scenario sc = controler.getScenario() ;
-		Config cf = sc.getConfig() ;
-		String dir = cf.controler().getOutputDirectory();
-		log.warn("Output is in " + dir + "." ) ; 
+	/**
+	 * Test method for {@link tutorial.config.example5iterations.MyControler5#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testMain() {
+		try {
+			IOUtils.deleteDirectory(new File("./output/example5"),false);
+		} catch ( IllegalArgumentException ee ) {
+			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
+			// and did not remove the directory afterwards.)
+		}
+		MyControler5.main(null);
+		IOUtils.deleteDirectory(new File("./output/example5"),false);
+		// (here, the directory should be there)
 	}
 
 }
