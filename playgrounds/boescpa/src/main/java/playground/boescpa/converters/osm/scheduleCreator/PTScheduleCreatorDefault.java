@@ -44,9 +44,8 @@ import java.util.*;
  */
 public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
-	private Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
-	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
+	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
 
 	public PTScheduleCreatorDefault(TransitSchedule schedule, Vehicles vehicles) {
 		super(schedule, vehicles);
@@ -117,6 +116,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.parallel);
 				}
 				vehicleType.setPcuEquivalents(Double.parseDouble(newType[6]));
+				vehicleType.setDescription(newType[7]);
 				vehicles.addVehicleType(vehicleType);
 				// Read the next line:
 				newLine = readsLines.readLine();
@@ -187,13 +187,13 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						if (linesFPLAN.containsKey(lineId)) {
 							lineFPLAN = linesFPLAN.get(lineId);
 						} else {
-							lineFPLAN = new PtLineFPLAN(lineId.toString());
+							lineFPLAN = new PtLineFPLAN(lineId);
 							linesFPLAN.put(lineId, lineFPLAN);
 						}
 						// Create the new route in this line...
 						int routeNr = 0;
 						Id<TransitRoute> routeId = Id.create(newLine.substring(3, 8).trim() + "_" + String.format("%03d", routeNr), TransitRoute.class);
-						while (lineFPLAN.idRoutesFPLAN.contains(routeId)) {
+						while (lineFPLAN.getIdRoutesFPLAN().contains(routeId)) {
 							routeNr++;
 							routeId = Id.create(newLine.substring(3, 8).trim() + "_" + String.format("%03d", routeNr), TransitRoute.class);
 						}
@@ -224,7 +224,17 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						Ankunftszeitpunkt*/
 						if (currentRouteFPLAN != null) {
 							// Vehicle Id:
-							currentRouteFPLAN.setUsedVehicle(newLine.substring(3, 6));
+							Id<VehicleType> typeId = Id.create(newLine.substring(3, 6).trim(), VehicleType.class);
+							VehicleType vehicleType = vehicles.getVehicleTypes().get(typeId);
+							if (vehicleType == null) {
+								Integer occurances = vehiclesUndefined.get(typeId.toString());
+								if (occurances == null) {
+									vehiclesUndefined.put(typeId.toString(), 1);
+								} else {
+									vehiclesUndefined.put(typeId.toString(), occurances + 1);
+								}
+							}
+							currentRouteFPLAN.setUsedVehicle(typeId, vehicleType);
 							// First Departure:
 							int hourFirstDeparture = Integer.parseInt(newLine.substring(25, 27));
 							int minuteFirstDeparture = Integer.parseInt(newLine.substring(27, 29));
@@ -262,7 +272,9 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						} catch (Exception e) {
 
 						}
-						currentRouteFPLAN.addStop(newLine.substring(0, 7), arrivalTime, departureTime);
+						Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
+						TransitStopFacility stopFacility = schedule.getFacilities().get(stopId);
+						currentRouteFPLAN.addStop(stopId, stopFacility, arrivalTime, departureTime);
 					} else {
 						log.error("Laufweg-Line before appropriate *Z-Line.");
 					}
@@ -272,7 +284,21 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			readsLines.close();
 			// Create lines:
 			for (Id<TransitLine> transitLine : linesFPLAN.keySet()) {
-				linesFPLAN.get(transitLine).createLine();
+				TransitLine line = linesFPLAN.get(transitLine).createLine();
+				if (line != null) {
+					schedule.addTransitLine(line);
+				}
+			}
+			// Create vehicles:
+			for (TransitLine line : schedule.getTransitLines().values()) {
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (Departure departure : route.getDepartures().values()) {
+						Id<Vehicle> vehicleId = departure.getVehicleId();
+						Id<VehicleType> vehicleTypeId = Id.create(vehicleId.toString().split("_")[0], VehicleType.class);
+						VehicleType vehicleType = vehicles.getVehicleTypes().get(vehicleTypeId);
+						vehicles.addVehicle(vehicleBuilder.createVehicle(vehicleId, vehicleType));
+					}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -284,157 +310,4 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			log.warn("Undefined vehicle " + vehicleUndefined + " occured in " + vehiclesUndefined.get(vehicleUndefined) + " routes.");
 		}
 	}
-
-	private class PtLineFPLAN {
-		public final Id<TransitLine> lineId;
-		private final List<PtRouteFPLAN> routesFPLAN = new ArrayList<>();
-		public final Set<Id<TransitRoute>> idRoutesFPLAN = new HashSet<>();
-
-		public PtLineFPLAN(String lineId) {
-			this.lineId = Id.create(lineId, TransitLine.class);
-		}
-
-		public void createLine() {
-			TransitLine line = scheduleBuilder.createTransitLine(lineId);
-			for (PtRouteFPLAN route : this.routesFPLAN) {
-				TransitRoute transitRoute = route.getRoute();
-				if (transitRoute != null) {
-					line.addRoute(transitRoute);
-				}
-			}
-			if (!line.getRoutes().isEmpty()) {
-				schedule.addTransitLine(line);
-				//log.info("Added " + schedule.getTransitLines().get(lineId).toString());
-			}
-		}
-
-		public void addPtRouteFPLAN(PtRouteFPLAN route) {
-			routesFPLAN.add(route);
-			idRoutesFPLAN.add(route.routeId);
-		}
-	}
-
-	private class PtRouteFPLAN {
-		public final Id<TransitLine> idOwnerLine;
-		private final Id<TransitRoute> routeId;
-		private final int numberOfDepartures;
-		private final int cycleTime; // [sec]
-		private final List<TransitRouteStop> stops = new ArrayList<>();
-
-		private int firstDepartureTime = -1; //[sec]
-
-		public void setFirstDepartureTime(int hour, int minute) {
-			if (firstDepartureTime < 0) {
-				this.firstDepartureTime = (hour * 3600) + (minute * 60);
-			}
-		}
-
-		private String usedVehicleID = null;
-		private VehicleType usedVehicleType = null;
-
-		public void setUsedVehicle(String usedVehicle) {
-			Id<VehicleType> typeId = Id.create(usedVehicle.trim(), VehicleType.class);
-			usedVehicleType = vehicles.getVehicleTypes().get(typeId);
-			if (usedVehicleType == null) {
-				Integer occurances = vehiclesUndefined.get(usedVehicle.trim());
-				if (occurances == null) {
-					vehiclesUndefined.put(usedVehicle.trim(), 1);
-				} else {
-					vehiclesUndefined.put(usedVehicle.trim(), occurances + 1);
-				}
-			}
-			usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
-		}
-
-		public PtRouteFPLAN(Id<TransitLine> idOwnerLine, Id<TransitRoute> routeId, int numberOfDepartures, int cycleTime) {
-			this.idOwnerLine = idOwnerLine;
-			this.routeId = routeId;
-			this.numberOfDepartures = numberOfDepartures + 1; // Number gives all occurrences of route additionally to first... => +1
-			this.cycleTime = cycleTime * 60; // Cycle time is given in minutes in HAFAS -> Have to change it here...
-		}
-
-		/**
-		 * Creates a schedule-route with the set characteristics.
-		 * @return TransitRoute or NULL if no departures can be created for the route.
-		 */
-		public TransitRoute getRoute() {
-			List<Departure> departures = this.getDepartures();
-			if (departures != null) {
-				TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, "pt");
-				for (Departure departure : departures) {
-					transitRoute.addDeparture(departure);
-				}
-				return transitRoute;
-			} else {
-				return null;
-			}
-		}
-
-		/**
-		 * @param stopId
-		 * @param arrivalTime   Expected as seconds from midnight or zero if not available.
-		 * @param departureTime Expected as seconds from midnight or zero if not available.
-		 */
-		public void addStop(String stopId, double arrivalTime, double departureTime) {
-			TransitStopFacility stopFacility = schedule.getFacilities().get(Id.create(stopId, TransitStopFacility.class));
-			if (stopFacility == null) {
-				log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId + " not found in facilities. Stop will not be added to route. Please check.");
-				return;
-			}
-			double arrivalDelay = 0.0;
-			if (arrivalTime > 0 && firstDepartureTime > 0) {
-				arrivalDelay = arrivalTime + initialDelay - firstDepartureTime;
-			}
-			double departureDelay = 0.0;
-			if (departureTime > 0 && firstDepartureTime > 0) {
-				departureDelay = departureTime + initialDelay - firstDepartureTime;
-			} else if (arrivalDelay > 0) {
-				departureDelay = arrivalDelay + initialDelay;
-			}
-			stops.add(createRouteStop(stopFacility, arrivalDelay, departureDelay));
-		}
-
-		/**
-		 * @return A list of all departures of this route.
-		 * If firstDepartureTime or usedVehicle are not set before this is called, null is returned.
-		 * If vehicleType is not set, the vehicle is not in the list and entry will not be created.
-		 */
-		private List<Departure> getDepartures() {
-			if (firstDepartureTime < 0 || usedVehicleID == null) {
-				log.error("getDepartures before first departureTime and usedVehicleId set.");
-				return null;
-			}
-			if (usedVehicleType == null) {
-				//log.warn("VehicleType not defined in vehicles list.");
-				return null;
-			}
-
-			List<Departure> departures = new ArrayList<>();
-			for (int i = 0; i < numberOfDepartures; i++) {
-				// Departure ID
-				Id<Departure> departureId = Id.create(idOwnerLine.toString() + "_" + routeId.toString() + "_" + String.format("%04d", i + 1), Departure.class);
-				// Departure time
-				double departureTime = firstDepartureTime + (i * cycleTime) - initialDelay;
-				// Departure vehicle
-				Id<Vehicle> vehicleId = Id.create(usedVehicleID + "_" + String.format("%04d", i + 1), Vehicle.class);
-				vehicles.addVehicle(vehicleBuilder.createVehicle(vehicleId, usedVehicleType));
-				// Departure
-				departures.add(createDeparture(departureId, departureTime, vehicleId));
-			}
-			return departures;
-		}
-
-		private TransitRouteStop createRouteStop(TransitStopFacility stopFacility, double arrivalDelay, double departureDelay) {
-			TransitRouteStop routeStop = scheduleBuilder.createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
-			routeStop.setAwaitDepartureTime(true); // Only *T-Lines (currently not implemented) would have this as false...
-			return routeStop;
-		}
-
-		private Departure createDeparture(Id<Departure> departureId, double departureTime, Id<Vehicle> vehicleId) {
-			Departure departure = scheduleBuilder.createDeparture(departureId, departureTime);
-			departure.setVehicleId(vehicleId);
-			return departure;
-		}
-	}
-
 }
