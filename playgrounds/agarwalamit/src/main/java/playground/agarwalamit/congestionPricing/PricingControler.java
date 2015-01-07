@@ -26,6 +26,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
@@ -69,7 +70,7 @@ public class PricingControler {
 		switch (congestionPricing) {
 		case "implV3":
 		{
-			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), sc)));
+			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;
