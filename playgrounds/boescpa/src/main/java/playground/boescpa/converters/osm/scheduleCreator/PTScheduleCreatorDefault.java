@@ -44,6 +44,7 @@ import java.util.*;
  */
 public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
+	private Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
 
@@ -63,6 +64,8 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			readStops(hafasFolder + "/BFKOORD_GEO");
 			// 3. Create all lines from HAFAS-Schedule
 			readLines(hafasFolder + "/FPLAN");
+			// 4. Print undefined vehicles
+			printVehiclesUndefined();
 			log.info("Creating pt lines from HAFAS file... done.");
 		}
 
@@ -276,6 +279,12 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		}
 	}
 
+	protected void printVehiclesUndefined() {
+		for (String vehicleUndefined : vehiclesUndefined.keySet()) {
+			log.warn("Undefined vehicle " + vehicleUndefined + " occured in " + vehiclesUndefined.get(vehicleUndefined) + " routes.");
+		}
+	}
+
 	private class PtLineFPLAN {
 		public final Id<TransitLine> lineId;
 		private final List<PtRouteFPLAN> routesFPLAN = new ArrayList<>();
@@ -326,10 +335,14 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 		public void setUsedVehicle(String usedVehicle) {
 			Id<VehicleType> typeId = Id.create(usedVehicle.trim(), VehicleType.class);
 			usedVehicleType = vehicles.getVehicleTypes().get(typeId);
-			/*if (usedVehicleType == null) {
-				usedVehicleType = vehicleBuilder.createVehicleType(typeId);
-				vehicles.addVehicleType(usedVehicleType);
-			}*/
+			if (usedVehicleType == null) {
+				Integer occurances = vehiclesUndefined.get(usedVehicle.trim());
+				if (occurances == null) {
+					vehiclesUndefined.put(usedVehicle.trim(), 1);
+				} else {
+					vehiclesUndefined.put(usedVehicle.trim(), occurances + 1);
+				}
+			}
 			usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
 		}
 
@@ -392,7 +405,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 				return null;
 			}
 			if (usedVehicleType == null) {
-				log.warn("vehicleType not defined in vehicles list.");
+				//log.warn("VehicleType not defined in vehicles list.");
 				return null;
 			}
 

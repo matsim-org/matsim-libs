@@ -1,0 +1,5 @@
+vehicleType;length;width;accessTime;egressTime;doorOperation;passengerCarEquivalents;comments
+;m;m;sec/Person;sec/Person;;;[HAFAS-Descr., EN]
+R;2.1;2.2;2.3;2.4;serial;2.6;Regio
+;;;;;;;
+Here other Data may follow...

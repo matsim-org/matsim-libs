@@ -90,10 +90,21 @@ public class TestPTScheduleCreatorDefault {
 
     @Test
     public void testReadLines() {
+        System.out.println("*** Test Read Lines ***");
         scheduleCreator.readVehicles(utils.getClassInputDirectory() + "VehicleData.csv");
         scheduleCreator.readStops(utils.getClassInputDirectory() + "BFKOORD_GEO");
         scheduleCreator.readLines(utils.getClassInputDirectory() + "FPLAN");
         new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");
         new VehicleWriterV1(vehicles).writeFile(utils.getOutputDirectory() + "VehicleTest.xml");
+        scheduleCreator.printVehiclesUndefined();
+    }
+
+    @Test
+    public void testVehiclesNotAvailable() {
+        System.out.println("*** Test Vehicles Not Available ***");
+        scheduleCreator.readVehicles(utils.getClassInputDirectory() + "VehicleData2.csv");
+        scheduleCreator.readStops(utils.getClassInputDirectory() + "BFKOORD_GEO");
+        scheduleCreator.readLines(utils.getClassInputDirectory() + "FPLAN");
+        scheduleCreator.printVehiclesUndefined();
     }
 }
