@@ -69,7 +69,7 @@ import org.matsim.core.config.ConfigGroup;
  * of methods of the type "<tt>getStringRepresentationOfParameterX()</tt>" or
  * "<tt>setParameterXFromStringRepresentation( String v )</tt>".
  * <br>
- * A commented example can be found at {@link tutorial.programming.reflectiveModule.MyModule}.
+ * A commented example can be found at {@link tutorial.programming.reflectiveConfigGroup.MyConfigGroup}.
  * <br>
  * <br>
  * If something is wrong (missing setter or getter, wrong parameter or return type),

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.reflectiveModule;
+package tutorial.programming.reflectiveConfigGroup;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +30,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * Demonstrate how to use ReflectiveModule to easily create typed config groups.
  * Please do not modify this class: it is used from unit tests!
  */
-public class MyModule extends ReflectiveConfigGroup {
+public class MyConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "testModule";
 
 	// TODO: test for ALL primitive types
@@ -44,7 +44,7 @@ public class MyModule extends ReflectiveConfigGroup {
 	// enum: handled especially
 	private MyEnum enumField = null;
 
-	public MyModule() {
+	public MyConfigGroup() {
 		super( GROUP_NAME );
 	}
 

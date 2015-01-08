@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.reflectiveModule;
+package tutorial.programming.reflectiveConfigGroup;
 
 public enum MyEnum {
 	VALUE1, VALUE2;
