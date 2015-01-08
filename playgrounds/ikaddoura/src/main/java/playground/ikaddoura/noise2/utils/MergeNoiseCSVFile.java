@@ -29,7 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -45,7 +47,7 @@ public class MergeNoiseCSVFile {
 	private double timeBinSize = 3600.;
 	private double endTime = 30. * 3600.;
 	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/A_reducedSpeeds_rpGap25meters/immissions/";
-	private String receiverPointsFile = "..."; // TODO receiver point coordinates in zweite und dritte Spalte einfügen.
+	private String receiverPointsFile = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv"; // TODO receiver point coordinates in zweite und dritte Spalte einfügen.
 	private String separator = ";";
 	private int iteration = 100;
 	private String label = "immission";
@@ -104,10 +106,50 @@ public class MergeNoiseCSVFile {
 				}
 			}
 			
+			BufferedReader br = IOUtils.getBufferedReader(this.receiverPointsFile);
+			String line = br.readLine();
+			
+			Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
+			int lineCounter = 0;
+			
+			System.out.println("Reading receiver points file");
+			
+			while( (line = br.readLine()) != null){
+				
+				if (lineCounter % 10000 == 0.) {
+					System.out.println("# " + lineCounter);
+				}
+				
+				String[] columns = line.split(this.separator);
+				Id<ReceiverPoint> rpId = null;
+				double x = 0;
+				double y = 0;
+				
+				for(int i = 0; i < columns.length; i++){
+					
+					switch(i){
+					
+					case 0: rpId = Id.create(columns[i], ReceiverPoint.class);
+							break;
+					case 1: x = Double.valueOf(columns[i]);
+							break;
+					case 2: y = Double.valueOf(columns[i]);
+							break;
+					default: throw new RuntimeException("More than three columns. Aborting...");
+					
+					}
+					
+				}
+				
+				lineCounter++;
+				rp2Coord.put(rpId, new CoordImpl(x, y));
+				
+			}
+			
 			bw = new BufferedWriter(new FileWriter(outputFile));
 			
 			// write headers
-			bw.write("Receiver Point Id");
+			bw.write("Receiver Point Id;x;y");
 			
 			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 				bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
@@ -117,7 +159,7 @@ public class MergeNoiseCSVFile {
 
 			// fill table
 			for (Id<ReceiverPoint> rp : time2rp2value.get(endTime).keySet()) {
-				bw.write(rp.toString());
+				bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
 				
 				for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 					bw.write(";" + time2rp2value.get(time).get(rp));
