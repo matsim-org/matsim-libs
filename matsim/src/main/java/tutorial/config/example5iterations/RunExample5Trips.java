@@ -33,8 +33,8 @@ import org.matsim.run.Controler;
  * @author nagel
  *
  */
-public class MyControler5Trips {
-	private static Logger log = Logger.getLogger(MyControler5Trips.class);
+public class RunExample5Trips {
+	private static Logger log = Logger.getLogger(RunExample5Trips.class);
 
 	public static void main(final String[] args) {
 		String configFile = "examples/tutorial/config/example5trips-config.xml" ;

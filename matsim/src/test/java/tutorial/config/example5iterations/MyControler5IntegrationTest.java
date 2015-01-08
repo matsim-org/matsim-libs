@@ -30,7 +30,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class MyControler5IntegrationTest {
 
 	/**
-	 * Test method for {@link tutorial.config.example5iterations.MyControler5#main(java.lang.String[])}.
+	 * Test method for {@link tutorial.config.example5iterations.RunExample5#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
@@ -41,7 +41,7 @@ public class MyControler5IntegrationTest {
 			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
 			// and did not remove the directory afterwards.)
 		}
-		MyControler5.main(null);
+		RunExample5.main(null);
 		IOUtils.deleteDirectory(new File("./output/example5"),false);
 		// (here, the directory should be there)
 	}

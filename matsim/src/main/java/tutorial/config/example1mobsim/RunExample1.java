@@ -18,33 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.config.example5iterations;
+package tutorial.config.example1mobsim;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.run.Controler;
 
 
 /**
- * runs iterations and writes events files.  See the config file for configuration details.
+ * runs a mobsim and writes events output.  See the config file for configuration details.
  * 
  * @author nagel
  *
  */
-public class MyControler5 {
-	private static Logger log = Logger.getLogger(MyControler5.class);
+public class RunExample1 {
 
 	public static void main(final String[] args) {
-		String configFile = "examples/tutorial/config/example5-config.xml" ;
+		String configFile = "examples/tutorial/config/example1-config.xml" ;
 		
 		Controler controler = new Controler( configFile ) ;
 		controler.run() ;
-		
-		Scenario sc = controler.getScenario() ;
-		Config cf = sc.getConfig() ;
-		String dir = cf.controler().getOutputDirectory();
-		log.warn("Output is in " + dir + ".") ; 
 	}
 
 }
