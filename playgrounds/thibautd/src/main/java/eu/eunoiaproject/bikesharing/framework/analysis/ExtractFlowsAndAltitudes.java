@@ -162,11 +162,16 @@ public class ExtractFlowsAndAltitudes {
 						alt+"\t"+
 						e.getValue().outFlow+"\t"+Math.sqrt( e.getValue().outFlow )+"\t"+
 						e.getValue().inFlow+"\t"+Math.sqrt( e.getValue().inFlow )+"\t"+
-						outExcess+"\t"+Math.sqrt( outExcess ) );
+						outExcess+"\t"+signSqrt( outExcess ) );
 			}
 			writer.close();
 		}
 
+	}
+
+	private static double signSqrt( double outExcess ) {
+		final double signum = Math.signum( outExcess );
+		return signum * Math.sqrt( signum * outExcess );
 	}
 
 	public static BikeSharingFacilities readStations( final String stationsFile ) {
