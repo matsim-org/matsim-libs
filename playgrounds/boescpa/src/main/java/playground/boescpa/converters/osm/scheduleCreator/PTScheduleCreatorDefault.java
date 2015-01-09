@@ -29,6 +29,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
@@ -115,8 +116,12 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 				} else if (newType[5].matches("parallel")) {
 					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.parallel);
 				}
-				vehicleType.setPcuEquivalents(Double.parseDouble(newType[6]));
-				vehicleType.setDescription(newType[7]);
+				VehicleCapacity vehicleCapacity = vehicleBuilder.createVehicleCapacity();
+				vehicleCapacity.setSeats(Integer.parseInt(newType[6]));
+				vehicleCapacity.setStandingRoom(Integer.parseInt(newType[7]));
+				vehicleType.setCapacity(vehicleCapacity);
+				vehicleType.setPcuEquivalents(Double.parseDouble(newType[8]));
+				vehicleType.setDescription(newType[9]);
 				vehicles.addVehicleType(vehicleType);
 				// Read the next line:
 				newLine = readsLines.readLine();
