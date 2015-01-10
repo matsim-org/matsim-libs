@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TripRouterModule.java
+ *  * TripRouterFactoryModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -22,51 +22,24 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.util.Providers;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterModule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-public class TripRouterModule extends AbstractModule {
-
+public class TripRouterFactoryModule extends AbstractModule {
     @Override
     public void install() {
-        include(new TripRouterFactoryModule());
-        bindToProvider(TripRouter.class, RealTripRouterProvider.class);
-    }
-
-    private static class RealTripRouterProvider implements Provider<TripRouter> {
-
-        final TripRouterFactory tripRouterFactory;
-        final Provider<TravelDisutility> travelDisutility;
-        final Provider<TravelTime> travelTime;
-
-        @Inject
-        RealTripRouterProvider(TripRouterFactory tripRouterFactory, Provider<TravelDisutility> travelDisutility, Provider<TravelTime> travelTime) {
-            this.travelDisutility = travelDisutility;
-            this.tripRouterFactory = tripRouterFactory;
-            this.travelTime = travelTime;
+        include(new LeastCostPathCalculatorModule());
+        if (getConfig().scenario().isUseTransit()) {
+            include(new TransitRouterModule());
+        } else {
+            bindToProvider(TransitRouterFactory.class, Providers.<TransitRouterFactory>of(null));
         }
-
-        @Override
-        public TripRouter get() {
-            return tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
-
-                @Override
-                public TravelDisutility getTravelDisutility() {
-                    return travelDisutility.get();
-                }
-
-                @Override
-                public TravelTime getTravelTime() {
-                    return travelTime.get();
-                }
-
-            });
+        if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
+            bindAsSingleton(TripRouterFactory.class, LinkToLinkTripRouterFactory.class);
+        } else {
+            bindAsSingleton(TripRouterFactory.class, DefaultTripRouterFactoryImpl.class);
         }
-
     }
-
 }

@@ -26,7 +26,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
     public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
-                new TripRouterModule(),
+                new TripRouterFactoryModule(),
                 new AbstractModule() {
                     @Override
                     public void install() {
