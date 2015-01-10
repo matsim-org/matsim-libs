@@ -167,18 +167,21 @@ public class PopulationParser2 {
 				try{
 					for(Future<List<int[]>> job : jobs){
 						List<int[]> thisJob = job.get();
+						int indexArray = 0;
 						for (int[] intArray : thisJob) {
 //							LOG.info("thisJob's intArray: " + intArray[0] + ", " + intArray[1] + ", " + intArray[2] + ", " + intArray[3] + ", " + intArray[4] + " etc.");
-							int indexOfIntArray = thisJob.indexOf(intArray);
+//							int indexOfIntArray = thisJob.indexOf(intArray);
 							for (int k = 0; k < intArray.length; k++) {
 								int valueAtK = intArray[k];
 //								LOG.info("Value at k: " + valueAtK);
 //								int populationValueAtK = consolidatedPopulationInfo.get(indexOfIntArray)[k];
 //								LOG.info("Population value at k: " + populationValueAtK);
 //								consolidatedPopulationInfo.get(indexOfIntArray)[k] = populationValueAtK + valueAtK;
-								consolidatedPopulationInfo.get(indexOfIntArray)[k] += valueAtK;
+//								consolidatedPopulationInfo.get(indexOfIntArray)[k] += valueAtK;
+								consolidatedPopulationInfo.get(indexArray)[k] += valueAtK;
 //								LOG.info("New population value at k: " + consolidatedPopulationInfo.get(indexOfIntArray)[k]);
 							}
+							indexArray++;
 						}
 
 					}
