@@ -26,22 +26,24 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 
+import javax.inject.Provider;
+
 /**
  * Default factory, which sets the routing modules according to the
  * config file.
  * @author thibautd
  */
-public class TripRouterFactoryImpl implements TripRouterProvider {
+public class TripRouterProviderImpl implements Provider<TripRouter> {
 	private final TripRouterFactory delegate;
 	private final RoutingContext context;
 
 
-	public TripRouterFactoryImpl(
-			final Scenario scenario,
-			final TravelDisutilityFactory disutilityFactory,
-			final TravelTime travelTime,
-			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-			final TransitRouterFactory transitRouterFactory) {
+	public TripRouterProviderImpl(
+            final Scenario scenario,
+            final TravelDisutilityFactory disutilityFactory,
+            final TravelTime travelTime,
+            final LeastCostPathCalculatorFactory leastCostAlgoFactory,
+            final TransitRouterFactory transitRouterFactory) {
 		this.delegate = new DefaultTripRouterFactoryImpl(
 				scenario,
 				leastCostAlgoFactory,

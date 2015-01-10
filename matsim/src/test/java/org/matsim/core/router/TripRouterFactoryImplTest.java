@@ -45,6 +45,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -110,8 +111,8 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterProvider factory =
-			new TripRouterFactoryImpl(
+		Provider<TripRouter> factory =
+			new TripRouterProviderImpl(
 					scenario,
 					new OnlyTimeDependentTravelDisutilityFactory(),
 					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
@@ -182,8 +183,8 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterProvider factory =
-			new TripRouterFactoryImpl(
+		Provider<TripRouter> factory =
+			new TripRouterProviderImpl(
 					scenario,
 					new OnlyTimeDependentTravelDisutilityFactory(),
 					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),

@@ -27,13 +27,13 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -332,7 +332,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
+		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
 		
@@ -392,7 +392,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
+		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
 		

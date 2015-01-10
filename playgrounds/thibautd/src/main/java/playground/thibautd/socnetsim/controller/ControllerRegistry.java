@@ -27,7 +27,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -42,6 +41,8 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 
+import javax.inject.Provider;
+
 /**
  * @author thibautd
  */
@@ -55,7 +56,7 @@ public final class ControllerRegistry {
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final CalcLegTimes legTimes;
 	private final MobsimFactory mobsimFactory;
-	private final TripRouterProvider tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
@@ -73,7 +74,7 @@ public final class ControllerRegistry {
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final CalcLegTimes legTimes,
 			final MobsimFactory mobsimFactory,
-			final TripRouterProvider tripRouterFactory,
+			final Provider<TripRouter> tripRouterFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
@@ -150,7 +151,7 @@ public final class ControllerRegistry {
 		return mobsimFactory;
 	}
 
-	public TripRouterProvider getTripRouterFactory() {
+	public Provider<TripRouter> getTripRouterFactory() {
 		return tripRouterFactory;
 	}
 

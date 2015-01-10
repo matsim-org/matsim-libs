@@ -39,7 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -218,7 +218,7 @@ public class PopulationCreator {
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-		final TripRouterFactoryImpl tripRouterFactory = new TripRouterFactoryImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
+		final TripRouterProviderImpl tripRouterFactory = new TripRouterProviderImpl(scenario, travelDisutilityFactory, travelTime, new DijkstraFactory(), null);
 		ReplanningContext context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {

@@ -26,7 +26,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.router.*;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -36,6 +39,7 @@ import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +56,7 @@ public class FixedTransitRouteModuleTest {
 	public void testRoutes() throws Exception {
 		Config config = utils.loadConfig( utils.getPackageInputDirectory()+"/config.xml" );
 		Scenario scenario = ScenarioUtils.loadScenario( config );
-		TripRouterProvider tripRouterFactory =  new TripRouterFactoryImpl(
+		Provider<TripRouter> tripRouterFactory =  new TripRouterProviderImpl(
 				scenario,
 				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 				new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),

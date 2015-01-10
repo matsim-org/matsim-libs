@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
@@ -34,6 +34,8 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
+
+import javax.inject.Provider;
 
 public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
 	private static final Logger log =
@@ -53,7 +55,7 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy = instantiateStrategy( registry );
 		final Config config = registry.getScenario().getConfig();
-		final TripRouterProvider tripRouterFactory = registry.getTripRouterFactory();
+		final Provider<TripRouter> tripRouterFactory = registry.getTripRouterFactory();
 		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();
 
 		strategy.addStrategyModule(

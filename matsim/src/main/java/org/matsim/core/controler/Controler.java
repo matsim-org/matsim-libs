@@ -54,7 +54,6 @@ import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -71,6 +70,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
+import javax.inject.Provider;
 import java.util.*;
 
 /**
@@ -504,15 +504,8 @@ public class Controler extends AbstractController {
      *
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
-    public final TripRouterProvider getTripRouterProvider() {
-		return new TripRouterProvider() {
-
-			@Override
-			public TripRouter get() {
-				return Controler.this.injector.getInstance(TripRouter.class);
-			}
-
-		};
+    public final Provider<TripRouter> getTripRouterProvider() {
+		return this.injector.getProvider(TripRouter.class);
 	}
 	
 	public final TravelDisutility createTravelDisutilityCalculator() {

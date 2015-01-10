@@ -22,13 +22,14 @@ package playground.thibautd.tsplanoptimizer.timemodechooser;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.tsplanoptimizer.framework.*;
 import playground.thibautd.tsplanoptimizer.timemodechooser.traveltimeestimation.EstimatorTripRouterFactory;
 
+import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		TripRouterProvider tripRouterFactory =
+		Provider<TripRouter> tripRouterFactory =
 			getAndTuneTripRouterFactory(
 					plan,
 					delay,
@@ -130,7 +131,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
-	private static TripRouterProvider getAndTuneTripRouterFactory(
+	private static Provider<TripRouter> getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
 			final Controler controler ) {

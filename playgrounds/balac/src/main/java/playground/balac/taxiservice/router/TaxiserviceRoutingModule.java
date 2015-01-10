@@ -11,8 +11,12 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.*;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class TaxiserviceRoutingModule implements RoutingModule {
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		
-		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
+		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
 

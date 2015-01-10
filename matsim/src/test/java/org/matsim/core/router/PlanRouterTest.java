@@ -50,7 +50,7 @@ public class PlanRouterTest {
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
         config.plans().setInputFile("test/scenarios/equil/plans1.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        TripRouter tripRouter = new TripRouterFactoryImpl(
+        TripRouter tripRouter = new TripRouterProviderImpl(
                 scenario,
                 new OnlyTimeDependentTravelDisutilityFactory(),
                 new FreeSpeedTravelTime(),
@@ -79,7 +79,7 @@ public class PlanRouterTest {
 
         // A trip router which provides vehicle ids by itself.
         final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        TripRouter tripRouter = new TripRouterFactoryImpl(
+        TripRouter tripRouter = new TripRouterProviderImpl(
                 scenario,
                 disutilityFactory,
                 travelTime,

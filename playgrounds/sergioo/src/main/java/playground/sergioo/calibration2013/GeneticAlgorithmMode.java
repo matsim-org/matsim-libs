@@ -22,7 +22,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -249,7 +249,7 @@ public class GeneticAlgorithmMode {
 			}
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterFactoryImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
+				return new TripRouterProviderImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
 			}
 		};
 		ReRoute module = new ReRoute(scenario);

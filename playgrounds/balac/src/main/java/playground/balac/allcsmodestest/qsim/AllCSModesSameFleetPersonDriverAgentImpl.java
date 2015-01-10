@@ -26,7 +26,6 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -38,6 +37,7 @@ import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRD
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -421,7 +421,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 		
-		TripRouterProvider tripRouterFactory = controler.getTripRouterProvider();
+		Provider<TripRouter> tripRouterFactory = controler.getTripRouterProvider();
 		
 		TripRouter tripRouter = tripRouterFactory.get();
 		

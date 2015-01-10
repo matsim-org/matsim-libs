@@ -28,7 +28,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Decide which {@link org.matsim.core.router.TripRouterProvider} to use.
+ * Decide which {@link org.matsim.core.router.TripRouterFactory} to use.
  * 
  * @author aneumann, droeder
  *

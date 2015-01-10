@@ -24,23 +24,24 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
+import javax.inject.Provider;
+
 /**
  * @author thibautd
  */
-public class JointTripRouterFactory implements TripRouterProvider {
-	private final TripRouterProvider defaultFactory;
+public class JointTripRouterFactory implements Provider<TripRouter> {
+	private final Provider<TripRouter> defaultFactory;
 	private final PopulationFactory populationFactory;
 
 	public JointTripRouterFactory(
-			final TripRouterProvider defaultFactory,
+			final Provider<TripRouter> defaultFactory,
 			final PopulationFactory populationFactory) {
 		this.defaultFactory = defaultFactory;
 		this.populationFactory = populationFactory;
@@ -53,7 +54,7 @@ public class JointTripRouterFactory implements TripRouterProvider {
 			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final TransitRouterFactory transitRouterFactory) {
 		this(
-			new TripRouterFactoryImpl(
+			new TripRouterProviderImpl(
 					scenario,
 					disutilityFactory,
 					travelTime,

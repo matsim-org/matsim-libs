@@ -29,25 +29,13 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -76,7 +64,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	private Controler controler;
 
 	/**
-	 * based on {@link TripRouterFactoryImpl}. Own Implementation is just necessary to add pt-submodes.
+	 * based on {@link org.matsim.core.router.TripRouterProviderImpl}. Own Implementation is just necessary to add pt-submodes.
 	 * @param controler
 	 * @param transitRouterFactory 
 	 */

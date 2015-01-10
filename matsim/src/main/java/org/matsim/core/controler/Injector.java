@@ -29,6 +29,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -116,4 +117,7 @@ public class Injector {
         injector.injectMembers(scoringFunctionFactory);
     }
 
+    <T> Provider<T> getProvider(Class<T> type) {
+        return injector.getProvider(type);
+    }
 }

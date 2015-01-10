@@ -27,7 +27,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -322,7 +322,7 @@ public class GeneticAlgorithmDC {
 			}
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterFactoryImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
+				return new TripRouterProviderImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
 			}
 		};
 		DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);

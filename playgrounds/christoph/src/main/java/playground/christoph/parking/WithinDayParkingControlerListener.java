@@ -65,6 +65,7 @@ import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFa
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
+import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -308,14 +309,14 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	
 	private static class TripRouterFactoryWrapper implements TripRouterFactory {
 
-		private final TripRouterProvider internalFactory;
+		private final Provider<TripRouter> internalFactory;
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory modeRouteFactory;
 		private final Network subNetwork;
 		
-		public TripRouterFactoryWrapper(Scenario scenario, TripRouterProvider internalFactory,
+		public TripRouterFactoryWrapper(Scenario scenario, Provider<TripRouter> internalFactory,
 				LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
 			this.internalFactory = internalFactory;
 			this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;

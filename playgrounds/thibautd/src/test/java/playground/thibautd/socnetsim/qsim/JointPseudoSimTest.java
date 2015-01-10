@@ -32,7 +32,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.*;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
@@ -45,6 +48,7 @@ import playground.thibautd.socnetsim.router.JointPlanRouter;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -79,7 +83,7 @@ public class JointPseudoSimTest {
 				createTestScenario(),
 				new JointPlanRouter(
 					new JointTripRouterFactory(
-						new TripRouterProvider() {
+						new Provider<TripRouter>() {
 							@Override
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
@@ -120,7 +124,7 @@ public class JointPseudoSimTest {
 				createTestScenario(),
 				new JointPlanRouter(
 					new JointTripRouterFactory(
-						new TripRouterProvider() {
+						new Provider<TripRouter>() {
 							@Override
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(

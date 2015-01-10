@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.*;
@@ -61,6 +60,7 @@ import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringF
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
+import javax.inject.Provider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -83,7 +83,7 @@ public class ControllerRegistryBuilder {
 	private TravelDisutilityFactory travelDisutilityFactory = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private MobsimFactory mobsimFactory = null;
-	private TripRouterProvider tripRouterFactory = null;
+	private Provider<TripRouter> tripRouterFactory = null;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
@@ -144,7 +144,7 @@ public class ControllerRegistryBuilder {
 	}
 
 	public ControllerRegistryBuilder withTripRouterFactory(
-			final TripRouterProvider tripRouterFactory2) {
+			final Provider<TripRouter> tripRouterFactory2) {
 		if ( this.tripRouterFactory != null ) throw new IllegalStateException( "object already set" );
 		this.tripRouterFactory = tripRouterFactory2;
 		return this;
@@ -357,7 +357,7 @@ public class ControllerRegistryBuilder {
 		return leastCostPathCalculatorFactory;
 	}
 
-	public TripRouterProvider getTripRouterFactory() {
+	public Provider<TripRouter> getTripRouterFactory() {
 		if ( tripRouterFactory == null ) {
 			final TransitSchedule schedule = scenario.getTransitSchedule();
 			final TransitRouterFactory transitRouterFactory =

@@ -22,20 +22,22 @@ package playground.christoph.passenger;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
+import javax.inject.Provider;
+
 public class RideToRidePassengerReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterProvider tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	public RideToRidePassengerReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterProvider tripRouterFactory, RideToRidePassengerContextProvider rideToRidePassengerContextProvider,
+			Provider<TripRouter> tripRouterFactory, RideToRidePassengerContextProvider rideToRidePassengerContextProvider,
 			JointDepartureOrganizer jointDepartureOrganizer) {
 		super(withinDayEngine);
 		this.scenario = scenario;

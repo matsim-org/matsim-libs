@@ -30,8 +30,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -41,6 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 
+import javax.inject.Provider;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -133,7 +134,7 @@ public class InitRoutes {
 			
 			final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 			
-			TripRouterProvider tripRouterFact = new TripRouterFactoryImpl(
+			Provider<TripRouter> tripRouterFact = new TripRouterProviderImpl(
 					scenario, new TravelDisutilityFactory() {
 						@Override
 						public TravelDisutility createTravelDisutility(

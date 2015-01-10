@@ -32,8 +32,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterProvider;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -42,6 +42,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
+import javax.inject.Provider;
 import java.util.Iterator;
 
 /**
@@ -140,7 +141,7 @@ public class InitRoutes {
 		//plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc,
 		//		new AStarLandmarksFactory(network, timeCostCalc, this.config.global().getNumberOfThreads()), 
 		//		((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory()));
-		TripRouterProvider tripRouterFact = new TripRouterFactoryImpl(
+		Provider<TripRouter> tripRouterFact = new TripRouterProviderImpl(
 				scenario,
 				new TravelDisutilityFactory() {
 					@Override

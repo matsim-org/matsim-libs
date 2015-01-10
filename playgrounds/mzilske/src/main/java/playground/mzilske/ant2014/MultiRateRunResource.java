@@ -24,7 +24,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -384,7 +384,7 @@ class MultiRateRunResource {
             public void write(PrintWriter pw) throws IOException {
                 for (String rate : getRates()) {
                     Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
-                    TripRouter tripRouter = new TripRouterFactoryImpl(
+                    TripRouter tripRouter = new TripRouterProviderImpl(
                             scenario,
                             new OnlyTimeDependentTravelDisutilityFactory(),
                             new FreeSpeedTravelTime(),

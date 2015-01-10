@@ -27,7 +27,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProvider;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import playground.thibautd.replanning.TourModeUnifierModule;
@@ -42,6 +41,7 @@ import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 
+import javax.inject.Provider;
 import java.util.List;
 
 /**
@@ -62,7 +62,7 @@ public class GroupPlanStrategyFactoryUtils {
 	// /////////////////////////////////////////////////////////////////////////
 	public static GenericStrategyModule<GroupPlans> createTripsToLegsModule(
 			final Config config,
-			final TripRouterProvider tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
@@ -74,7 +74,7 @@ public class GroupPlanStrategyFactoryUtils {
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,
-			final TripRouterProvider tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
 					config.global().getNumberOfThreads(),
@@ -84,7 +84,7 @@ public class GroupPlanStrategyFactoryUtils {
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
 			final Config config,
 			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterProvider tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
@@ -96,7 +96,7 @@ public class GroupPlanStrategyFactoryUtils {
 
 	public static GenericStrategyModule<GroupPlans> createJointTripAwareTourModeUnifierModule(
 			final Config config,
-			final TripRouterProvider tripRouterFactory) {
+			final Provider<TripRouter> tripRouterFactory) {
 		final TripRouter router = tripRouterFactory.get();
 		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
 		stageTypes.addActivityTypes( router.getStageActivityTypes() );

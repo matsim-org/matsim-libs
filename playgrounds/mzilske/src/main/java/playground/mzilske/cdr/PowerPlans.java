@@ -27,7 +27,7 @@ public class PowerPlans {
 		PrintWriter pw = null;
 		try {
 			pw = new PrintWriter(file);
-			TripRouter tripRouter = new TripRouterFactoryImpl(
+			TripRouter tripRouter = new TripRouterProviderImpl(
 					scenario, 
 					new OnlyTimeDependentTravelDisutilityFactory(), 
 					new FreeSpeedTravelTime(),
