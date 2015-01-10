@@ -27,6 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
@@ -50,6 +51,7 @@ public class Main {
                 // but leave out TravelTimeCalculator.
                 // You can just comment out these lines if you don't want them,
                 // these modules are optional.
+                include(new TripRouterModule());
                 include(new LinkStatsModule());
                 include(new VolumesAnalyzerModule());
                 include(new LegHistogramModule());

@@ -51,6 +51,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -156,6 +157,7 @@ public class Simulator {
 		controler.setModules(new AbstractModule() {
             @Override
             public void install() {
+               include(new TripRouterModule());
                bindToInstance(TravelTime.class, MobsimConnectorFactory.getTravelTimeCalculator(1.5));
             }
         });

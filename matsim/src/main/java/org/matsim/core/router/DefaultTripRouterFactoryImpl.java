@@ -1,11 +1,11 @@
 package org.matsim.core.router;
 
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -16,20 +16,32 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import java.util.Collections;
+
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryImpl.class);
 
-    public static DefaultTripRouterFactoryImpl createRichTripRouterFactoryImpl(Scenario scenario) {
-		return new TripRouterFactoryBuilderWithDefaults().build(scenario);
-		
+    public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
+        return Injector.createInjector(scenario.getConfig(),
+                new TripRouterModule(),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        bindToInstance(Scenario.class, scenario);
+                    }
+                })
+                .getInstance(TripRouterFactory.class);
 	}
 
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private final TransitRouterFactory transitRouterFactory;
     private final Scenario scenario;
 
-    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
+    @Inject
+    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, @Nullable TransitRouterFactory transitRouterFactory) {
     	this.scenario = scenario;
     	this.transitRouterFactory = transitRouterFactory;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;

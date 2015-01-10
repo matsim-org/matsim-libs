@@ -10,9 +10,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.roadpricing.RoadPricing;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtConfigGroup;
@@ -57,8 +55,8 @@ public class KTIScenarioWithRoadPricing {
 					+ "If you really need to configure this via a config group, please construct your own config group for that purpose.  kai, sep'14");
 		
 			log.info( "adding the roadpricing listenner." );
-			controler.addControlerListener( new RoadPricing() );
-//		}
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+        //		}
 //		else {
 //			log.info( "NOT adding the roadpricing listenner." );
 //		}

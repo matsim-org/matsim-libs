@@ -20,19 +20,6 @@
 
 package playground.christoph.dissertation;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,22 +33,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -92,6 +74,11 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Demonstrate the influence of age and gender on persons' walk speed.
@@ -209,10 +196,9 @@ public class MultiModalDemo {
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
-		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
-		controler.addControlerListener(multiModalControlerListener);
-		
-		// TravelTimeAnalyzer
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+        // TravelTimeAnalyzer
 		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(scenario);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
@@ -423,10 +409,9 @@ public class MultiModalDemo {
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
-		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
-		controler.addControlerListener(multiModalControlerListener);
-		
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+        TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
 		
@@ -464,10 +449,9 @@ public class MultiModalDemo {
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
-		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
-		controler.addControlerListener(multiModalControlerListener);
-		
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+        TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
 		

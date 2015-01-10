@@ -20,9 +20,6 @@
 
 package playground.christoph.strc2014;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,9 +36,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.WithinDayParkingControlerListener;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class STRC2014Runner {
 	
@@ -101,7 +100,7 @@ public class STRC2014Runner {
 			MultiModalControlerListener multiModalControlerListener = null;
 //			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
 			WithinDayParkingControlerListener parkingControlerListener = new WithinDayParkingControlerListener(scenario,
-					multiModalControlerListener, initialParkingTypes, allParkingTypes, capacityFactor);
+                    initialParkingTypes, allParkingTypes, capacityFactor);
 
 			/*
 			 * Controler listeners are called in reverse order. Since the parkingControlerListener

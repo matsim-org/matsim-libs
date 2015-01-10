@@ -27,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.roadpricing.RoadPricing;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ModuleTest {
@@ -49,7 +48,7 @@ public class ModuleTest {
     public void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Controler controler = new Controler(config);
-        controler.addControlerListener(new RoadPricing());
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler.run();
     }
 

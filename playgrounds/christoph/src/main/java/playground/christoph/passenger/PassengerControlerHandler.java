@@ -22,7 +22,6 @@ package playground.christoph.passenger;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
@@ -45,18 +44,18 @@ import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
+import javax.inject.Provider;
 import java.util.Map;
 
 public class PassengerControlerHandler implements StartupListener {
 
 	private final WithinDayControlerListener withinDayControlerListener;
-	private final MultiModalControlerListener multiModalControlerListener;
-	
+	private final Provider<Map<String, TravelTime>> multiModalTravelTimes;
+
 	public PassengerControlerHandler(WithinDayControlerListener withinDayControlerListener,
-			MultiModalControlerListener multiModalControlerListener) {
+			Provider<Map<String, TravelTime>> multiModalControlerListener) {
 		this.withinDayControlerListener = withinDayControlerListener;
-		this.multiModalControlerListener = multiModalControlerListener;
-		
+		this.multiModalTravelTimes = multiModalControlerListener;
 		this.withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
 	}
 
@@ -89,7 +88,7 @@ public class PassengerControlerHandler implements StartupListener {
 		
 		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(replannerFactory);
 		
-		MobsimFactory mobsimFactory = new PassengerQSimFactory(this.multiModalControlerListener.getMultiModalTravelTimes(), 
+		MobsimFactory mobsimFactory = new PassengerQSimFactory(this.multiModalTravelTimes.get(),
 				this.withinDayControlerListener.getWithinDayEngine(), jointDepartureOrganizer);
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}

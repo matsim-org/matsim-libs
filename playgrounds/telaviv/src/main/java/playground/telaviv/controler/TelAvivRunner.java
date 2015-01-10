@@ -27,8 +27,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.roadpricing.RoadPricing;
-
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.locationchoice.matsimdc.DCScoringFunctionFactory;
@@ -46,9 +45,9 @@ public class TelAvivRunner {
 		 * Add road pricing contrib.
 		 * It registers a adapted TravelDisutilityFactory which replaces the one used by default.
 		 */
-		 controler.addControlerListener(new RoadPricing());
-		
-		// use an adapted MobsimFactory
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+
+        // use an adapted MobsimFactory
 		controler.setMobsimFactory(new TTAQSimFactory());
 		
 		controler.addControlerListener(new TelAvivControlerListener());

@@ -23,7 +23,6 @@
 		<param name="outputDirectory" value="output/Test1" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
-		<param name="mobsim" value="queueSimulation" />
 	</module>
 
 	<module name="planCalcScore">

@@ -26,7 +26,6 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -95,6 +94,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabili
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
+import javax.inject.Provider;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -103,7 +103,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private static final Logger log = Logger.getLogger(EvacuationControlerListener.class);
 	
 	private final WithinDayControlerListener withinDayControlerListener;
-	private final MultiModalControlerListener multiModalControlerListener;
+	private final Provider<Map<String, TravelTime>> multiModalControlerListener;
 	
 	/*
 	 * Data collectors and providers
@@ -180,7 +180,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private final FixedOrderControlerListener fixedOrderControlerListener = new FixedOrderControlerListener();
 	
 	public EvacuationControlerListener(WithinDayControlerListener withinDayControlerListener, 
-			MultiModalControlerListener multiModalControlerListener) {
+			Provider<Map<String, TravelTime>> multiModalControlerListener) {
 		this.withinDayControlerListener = withinDayControlerListener;
 		this.multiModalControlerListener = multiModalControlerListener;
 	}
@@ -205,8 +205,8 @@ public class EvacuationControlerListener implements StartupListener {
 		 */
 		Scenario scenario = event.getControler().getScenario();
 		EvacuationQSimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
-				((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer, 
-				this.multiModalControlerListener.getMultiModalTravelTimes());
+				scenario.getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer,
+				this.multiModalControlerListener.get());
 		event.getControler().setMobsimFactory(mobsimFactory);
 		event.getControler().addControlerListener(mobsimFactory);	// only to write some files for debugging
 	}
@@ -360,7 +360,7 @@ public class EvacuationControlerListener implements StartupListener {
 		Scenario scenario = controler.getScenario();
 		
 		this.withinDayTravelTimes = new HashMap<String, TravelTime>();
-		this.withinDayTravelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
+		this.withinDayTravelTimes.putAll(this.multiModalControlerListener.get());
 		this.withinDayTravelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		/*
@@ -413,7 +413,7 @@ public class EvacuationControlerListener implements StartupListener {
 				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()));
 		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, 
 				EvacuationConfig.compassProbability);
-		this.withinDayLeastCostPathCalculatorFactory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, 
+		this.withinDayLeastCostPathCalculatorFactory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory,
 				this.decisionModelRunner.getDecisionDataProvider());
 		
 //		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
@@ -429,7 +429,7 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		// TODO: EvacuationTransitRouterFactory is not a TransitRouterFactory so far!
 		this.withinDayTripRouterFactory = new EvacuationTripRouterFactory(scenario, this.withinDayTravelTimes, 
-				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, evacuationTransitRouterFactory);		
+				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, evacuationTransitRouterFactory);
 	}
 	
 	private void initIdentifiers(Controler controler) {

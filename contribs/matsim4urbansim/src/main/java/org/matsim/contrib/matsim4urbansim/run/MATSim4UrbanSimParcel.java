@@ -51,8 +51,8 @@ import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -61,7 +61,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 
 /**
@@ -276,8 +276,8 @@ import org.matsim.roadpricing.RoadPricing;
 		
 		Controler controler = new Controler(scenario);
         if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
-			controler.addControlerListener(new RoadPricing());
-			//  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
+            controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+            //  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
 			

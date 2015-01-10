@@ -27,6 +27,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.pt.router.TransitRouterFactory;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 /**
  * @author thibautd
@@ -35,28 +39,27 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	private static final Logger log =
 		Logger.getLogger(LinkToLinkTripRouterFactory.class);
 
-	private final DefaultTripRouterFactoryImpl delegate;
+	private final TripRouterFactory delegate;
 	private final Scenario scenario;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final LinkToLinkTravelTime travelTimes;
 	private final PopulationFactory populationFactory;
 
-	public LinkToLinkTripRouterFactory(
-			final Scenario scenario,
-			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-			final TravelDisutilityFactory travelDisutilityFactory,
-			final LinkToLinkTravelTime travelTimes,
-			final PopulationFactory populationFactory,
-			final DefaultTripRouterFactoryImpl delegate) {
+    @Inject
+	LinkToLinkTripRouterFactory(
+            Scenario scenario,
+            LeastCostPathCalculatorFactory leastCostAlgoFactory,
+            TravelDisutilityFactory travelDisutilityFactory,
+            LinkToLinkTravelTime travelTimes,
+            @Nullable TransitRouterFactory transitRouterFactory) {
 		this.scenario = scenario;
-		this.leastCostAlgoFactory = delegate.getLeastCostPathCalculatorFactory();
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.travelTimes = travelTimes;
-		this.populationFactory = populationFactory;
-		this.delegate = delegate;
+		this.populationFactory = scenario.getPopulation().getFactory();
+		this.delegate = new DefaultTripRouterFactoryImpl(scenario, leastCostAlgoFactory, transitRouterFactory);
+        this.leastCostAlgoFactory = leastCostAlgoFactory;
 	}
-
 
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {

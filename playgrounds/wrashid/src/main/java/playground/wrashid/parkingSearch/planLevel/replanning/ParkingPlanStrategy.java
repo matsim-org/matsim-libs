@@ -30,6 +30,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import javax.inject.Inject;
+
 public class ParkingPlanStrategy implements PlanStrategy {
 	
 	PlanStrategyImpl planStrategyDelegate = null ;
@@ -37,6 +39,7 @@ public class ParkingPlanStrategy implements PlanStrategy {
 	/**
 	 * @param scenario needs to be there because of the class loader 
 	 */
+    @Inject
 	public ParkingPlanStrategy(Scenario scenario) {
 		this.planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() ) ;
 		this.addStrategyModule(new ParkingStrategyModule());

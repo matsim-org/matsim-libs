@@ -65,10 +65,13 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 		this.scenario = scenario;
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.travelDisutilityFactory = travelDisutilityFactory;
-		
-		DefaultTripRouterFactoryImpl tripRouterFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
-		this.leastCostPathCalculatorFactory = tripRouterFactory.getLeastCostPathCalculatorFactory();
-		this.delegateFactory = tripRouterFactory;
+
+        // commented this out because constructor is deprecated. hope it's ok. mz
+//		DefaultTripRouterFactoryImpl tripRouterFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+//		this.leastCostPathCalculatorFactory = tripRouterFactory.getLeastCostPathCalculatorFactory();
+//		this.delegateFactory = tripRouterFactory;
+        this.leastCostPathCalculatorFactory = null;
+        this.delegateFactory = null;
 	}
 	
 	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,

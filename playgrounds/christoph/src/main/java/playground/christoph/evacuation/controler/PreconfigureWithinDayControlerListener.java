@@ -22,7 +22,6 @@ package playground.christoph.evacuation.controler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.router.util.PersonalizedTravelTime;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -30,6 +29,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 
+import javax.inject.Provider;
 import java.util.Map;
 
 /**
@@ -42,12 +42,12 @@ import java.util.Map;
 public class PreconfigureWithinDayControlerListener implements StartupListener {
 
 	private final WithinDayControlerListener withinDayControlerListener;
-	private final MultiModalControlerListener multiModalControlerListener;
+	private final Provider<Map<String, TravelTime>> multiModalTravelTimes;
 	
 	public PreconfigureWithinDayControlerListener(WithinDayControlerListener withinDayControlerListener, 
-			MultiModalControlerListener multiModalControlerListener) {
+			Provider<Map<String, TravelTime>> multiModalTravelTimes) {
 		this.withinDayControlerListener = withinDayControlerListener;
-		this.multiModalControlerListener = multiModalControlerListener;
+		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class PreconfigureWithinDayControlerListener implements StartupListener {
 		 * Set the TravelTime objects which are used to calculate agents' earliest link
 		 * exit times. For car trip, a free speed travel time calculator is used.
 		 */
-		Map<String, TravelTime> multiModalTravelTimes = this.multiModalControlerListener.getMultiModalTravelTimes();
+		Map<String, TravelTime> multiModalTravelTimes = this.multiModalTravelTimes.get();
 		this.withinDayControlerListener.addMultiModalTravelTimes(multiModalTravelTimes);
 		this.withinDayControlerListener.addMultiModalTravelTime(TransportMode.car, new FreeSpeedTravelTime());
 		

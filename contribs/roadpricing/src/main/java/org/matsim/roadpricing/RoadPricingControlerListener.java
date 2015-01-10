@@ -21,8 +21,6 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -33,6 +31,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
 
 /**
  * Integrates the RoadPricing functionality into the MATSim Controler.  Does the following:
@@ -49,74 +49,28 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public class RoadPricing implements StartupListener, AfterMobsimListener, 
+class RoadPricingControlerListener implements StartupListener, AfterMobsimListener,
 IterationEndsListener, ShutdownListener {
-	// public is needed (for obvious reasons: this is the entry point). kai, sep'14
 
-	private RoadPricingScheme scheme = null ;
-	private CalcPaidToll calcPaidToll = null;
-	private CalcAverageTolledTripLength cattl = null;
+	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
-	final static private Logger log = Logger.getLogger(RoadPricing.class);
-	private RoadPricingConfigGroup rpConfig;
+    private final RoadPricingScheme scheme;
+    private final CalcPaidToll calcPaidToll;
+    private final CalcAverageTolledTripLength cattl;
 
-	/**
-	 * This constructor will pull the road pricing scheme from the file in the config.
-	 */
-	public RoadPricing() {
-		// public is needed (for obvious reasons: this is the entry point). kai, sep'14
-		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
+    @Inject
+    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl) {
+        this.scheme = scheme;
+        this.calcPaidToll = calcPaidToll;
+        this.cattl = cattl;
+        Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
-	/**
-	 * This constructor will take the road pricing scheme given to it.
-	 */
-	public RoadPricing( RoadPricingScheme scheme ) {
-		this() ;
-		this.scheme = scheme ;
-	}
-
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-		final Controler controler = event.getControler();
-		rpConfig = ConfigUtils.addOrGetModule(controler.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-		if ( this.scheme == null ) {
-			String tollLinksFile = rpConfig.getTollLinksFile();
-			if ( tollLinksFile == null ) {
-				throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
-						+ "Such an execution path is not allowed.  If you want a base case without toll, "
-						+ "construct a zero toll file and insert that. ") ;
-			}
-			RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-			new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
-			this.scheme = rpsImpl ;
-		}
-
-		// add scheme as top level container into scenario: 
-		event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
-
-		// add the events handler to calculate the tolls paid by agents
-        this.calcPaidToll = new CalcPaidToll(controler.getScenario().getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.calcPaidToll);
-
-		// replace the travelCostCalculator with a toll-dependent one if required
-		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) 
-				|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())
-				|| RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) )
-			// yy this is historically without area toll but it might be better to do it also with area toll
-			// when the randomizing router is used.  I do think, however, that the current specification
-			// of the area toll disutility will not work in that way.  kai, sep'14
-		{
-			TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
-					controler.getTravelDisutilityFactory(), scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
-					) ;
-			travelDisutilityFactory.setSigma( rpConfig.getRoutingRandomness() );
-			controler.setTravelDisutilityFactory(travelDisutilityFactory);
-		}
-
-        this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
-		controler.getEvents().addHandler(this.cattl);
-	}
+    @Override
+    public void notifyStartup(final StartupEvent event) {
+        // add scheme as top level container into scenario:
+        event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
+    }
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {

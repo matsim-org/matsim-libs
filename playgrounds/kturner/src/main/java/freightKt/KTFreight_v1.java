@@ -52,11 +52,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-
 
 import java.io.File;
 import java.io.FileWriter;
@@ -187,9 +186,9 @@ public class KTFreight_v1 {
 		final Controler ctrl = new Controler( scenario ) ;
 
 		if (addingToll){		 //Added RoadpricingScheme to MATSIM-Controler Added, KT, 02.12.2014
-			RoadPricing roadPricing = new RoadPricing(scheme1);	
-			ctrl.addControlerListener(roadPricing);
-		}
+            ctrl.setModules(new ControlerDefaultsWithRoadPricingModule(scheme1));
+
+        }
 
 		//		Bringt aktuell (18.nov.14) NullPointerExeption at org.matsim.core.controler.Controler.getLinkTravelTimes(Controler.java:551)
 		//		PlanCalcScoreConfigGroup cnScoringGroup = ctrl.getConfig().planCalcScore() ;

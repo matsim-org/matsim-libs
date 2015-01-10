@@ -51,9 +51,14 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterProvider;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -103,6 +108,7 @@ public class Controler extends AbstractController {
 	protected final EventsManager events;
 
     private Injector injector;
+    private boolean injectorCreated = false;
 
     public static interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
@@ -122,6 +128,9 @@ public class Controler extends AbstractController {
     // and only include what you want.
     private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
 
+    // The module which is currently defined by the sum of the setXX methods called on this Controler.
+    private AbstractModule overrides = AbstractModule.emptyModule();
+
     private ScoringFunctionFactory scoringFunctionFactory = null;
 	private StrategyManager strategyManager = null;
 
@@ -129,12 +138,7 @@ public class Controler extends AbstractController {
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
-	private TravelDisutilityFactory travelCostCalculatorFactory ; 
-
 	private MobsimFactory thisMobsimFactory = null;
-
-	private TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
-	private TripRouterFactory tripRouterFactory = null;
 
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
@@ -144,10 +148,7 @@ public class Controler extends AbstractController {
 	private boolean dumpDataAtEnd = true; 
 	private boolean overwriteFiles = false;
 
-	private boolean routerCreated = false;
-	private boolean componentOfDefaultTripRouterFactoryChanged = false;
-
-	public static void main(final String[] args) {
+    public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
@@ -215,7 +216,6 @@ public class Controler extends AbstractController {
 		
 		this.events = EventsUtils.createEventsManager(this.config);
 
-		this.travelCostCalculatorFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 
 		this.config.parallelEventHandling().makeLocked();
 	}
@@ -313,17 +313,18 @@ public class Controler extends AbstractController {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        for (AbstractModule module : modules) {
-                            include(module);
-                        }
+                        // Use all the modules set with setModules, but overriding them with things set with
+                        // other setters on this Controler.
+                        include(AbstractModule.override(modules, overrides));
+
                         // Bootstrap it with the Scenario and some controler context.
                         bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
                         bindToInstance(IterationStopWatch.class, stopwatch);
                         bindToInstance(Scenario.class, scenarioData);
                         bindToInstance(EventsManager.class, events);
-                        bindToProvider(TripRouter.class, getTripRouterProvider());
                     }
                 });
+        this.injectorCreated = true;
         this.injector.retrofitScoringFunctionFactory(this.getScoringFunctionFactory());
         PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.getScoringFunctionFactory());
 		this.addCoreControlerListener(plansScoring);
@@ -391,33 +392,7 @@ public class Controler extends AbstractController {
 	 * </ul>
 	 */
 	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
-	protected void setUp() {
-		// yyyy MZ will, class by class, see if other constructs are possible.  kn/mz, nov'14
-		
-		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
-        if ( tripRouterFactory == null ) {
-			// This builder is just for compatibility, in case somebody
-			// uses setTransitRouter or setLeastCostPathCalculatorFactory.
-			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData );
-
-			// Special case
-			/* dg 09-2013: I do not see the "special" case for link to link routing. Compared to the other "special cases" that are considered 
-			* in TripRouterFactoryImpl explicitly, creating a inverted network (a line graph for routing) considering turning move restrictions
-			* during construction of the graph used for routing seems to be conceptually straight forward to be used with 
-			* shortest path algorithms. */
-			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
-                tripRouterFactory = new LinkToLinkTripRouterFactory(
-						getScenario(),
-						new DijkstraFactory(),
-						getTravelDisutilityFactory(),
-                        injector.getInstance(LinkToLinkTravelTime.class),
-						getScenario().getPopulation().getFactory(),
-						(DefaultTripRouterFactoryImpl) tripRouterFactory);
-			}
-		}
-		routerCreated = true;
-
-	}
+	protected void setUp() {}
 
     /**
 	 * @return A fully initialized StrategyManager for the plans replanning.
@@ -534,34 +509,18 @@ public class Controler extends AbstractController {
 
 			@Override
 			public TripRouter get() {
-				return Controler.this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
-
-					@Override
-					public TravelDisutility getTravelDisutility() {
-						return createTravelDisutilityCalculator();
-					}
-
-					@Override
-					public TravelTime getTravelTime() {
-						return getLinkTravelTimes();
-					}
-
-				});
+				return Controler.this.injector.getInstance(TripRouter.class);
 			}
 
 		};
 	}
 	
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return this.travelCostCalculatorFactory.createTravelDisutility(
-                getLinkTravelTimes(), this.config.planCalcScore());
+        return this.injector.getInstance(TravelDisutility.class);
 	}
 
 	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
-		if (!(this.tripRouterFactory instanceof DefaultTripRouterFactoryImpl)) {
-			throw new RuntimeException("You've set a custom TripRouter. Then please also keep the routing algorithm by yourself.");
-		}
-		return ((DefaultTripRouterFactoryImpl) this.tripRouterFactory).getLeastCostPathCalculatorFactory();
+		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
 	}
 
 	/**
@@ -616,14 +575,11 @@ public class Controler extends AbstractController {
 	}
 
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
-		return this.travelCostCalculatorFactory;
+		return this.injector.getInstance(TravelDisutilityFactory.class);
 	}
 
 	public final TransitRouterFactory getTransitRouterFactory() {
-		if (!(this.tripRouterFactory instanceof DefaultTripRouterFactoryImpl)) {
-			throw new RuntimeException("You've set a custom TripRouter. Then please also keep the routing algorithm by yourself.");
-		}
-		return ((DefaultTripRouterFactoryImpl) this.tripRouterFactory).getTransitRouterFactory();
+        return this.injector.getInstance(TransitRouterFactory.class);
 	}
 
 
@@ -648,7 +604,12 @@ public class Controler extends AbstractController {
 
 	public final void setTravelDisutilityFactory(
 			final TravelDisutilityFactory travelCostCalculatorFactory) {
-		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
+		this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(TravelDisutilityFactory.class, travelCostCalculatorFactory);
+            }
+        });
 	}
 
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
@@ -666,12 +627,12 @@ public class Controler extends AbstractController {
 
 	public final void setTransitRouterFactory(
 			final TransitRouterFactory transitRouterFactory) {
-		if (!routerCreated) {
-			this.tripRouterFactoryBuilder.setTransitRouterFactory(transitRouterFactory);
-			this.componentOfDefaultTripRouterFactoryChanged = true;
-		} else {
-			throw new RuntimeException("Too late for that.");
-		}
+        this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(TransitRouterFactory.class, transitRouterFactory);
+            }
+        });
 	}
 
     /**
@@ -681,18 +642,22 @@ public class Controler extends AbstractController {
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
 	public final void setTripRouterFactory(final TripRouterFactory factory) {
-		if (this.componentOfDefaultTripRouterFactoryChanged) {
-			throw new RuntimeException("Setting a new TripRouterFactory means you cannot set a TransitRouterFactory or a LeastCostPathCalculatorFactory before." +
-											" A custom TripRouterFactory should instantiate its own components.");
-		}
-		if (!routerCreated) {
-			tripRouterFactory = factory;
-		} else {
-			throw new RuntimeException("Too late for that.");
-		}
+        this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(TripRouterFactory.class, factory);
+            }
+        });
 	}
 
-	/**
+    private void addOverridingModule(AbstractModule abstractModule) {
+        if (this.injectorCreated) {
+            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+        }
+        this.overrides = AbstractModule.override(Arrays.asList(this.overrides), abstractModule);
+    }
+
+    /**
 	 * Sets whether the Controler is allowed to overwrite files in the output
 	 * directory or not. <br>
 	 * When starting, the Controler can check that the output directory is empty
@@ -756,6 +721,9 @@ public class Controler extends AbstractController {
 	// ******** --------- *******
 
     public final void setModules(AbstractModule... modules) {
+        if (this.injectorCreated) {
+            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+        }
         this.modules = Arrays.asList(modules);
     }
 

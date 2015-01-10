@@ -20,22 +20,28 @@
 
 package playground.christoph.evacuation.controler;
 
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
+import playground.christoph.evacuation.trafficmonitoring.EvacuationPTTravelTimeFactory;
 import playground.meisterk.kti.config.KtiConfigGroup;
+
+import javax.inject.Provider;
+import java.util.Map;
 
 public class EvacuationRunner {
 
@@ -69,38 +75,36 @@ public class EvacuationRunner {
 			 */
 			config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * EvacuationConfig.speedFactor);
 			config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * EvacuationConfig.speedFactor);
-		
-			// create Controler Listeners; add them afterwards in a meaningful order
-			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
-			WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
-			PreconfigureMultiModalControlerListener preconfigureMultiModalControlerListener = new PreconfigureMultiModalControlerListener(
-					multiModalControlerListener);
-			PreconfigureWithinDayControlerListener preconfigureWithinDayControlerListener = new PreconfigureWithinDayControlerListener(
-					withinDayControlerListener, multiModalControlerListener);
-			EvacuationControlerListener evacuationControlerListener = new EvacuationControlerListener(withinDayControlerListener,
-					multiModalControlerListener);
-			
-			// Analysis stuff
-			controler.addControlerListener(new ActivitiesAnalyzer());
-			controler.addControlerListener(new TripsAnalyzer());
-			
-			// Evacuation stuff
-			controler.addControlerListener(evacuationControlerListener);
-			
-			// Within-day Replanning
-			withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
-			controler.addControlerListener(withinDayControlerListener);
-			
-			// pre-configure within-day controler listener with outcomes from the multi-modal controler listener
-			controler.addControlerListener(preconfigureWithinDayControlerListener);			
-			
-			// Configuration
-			controler.addControlerListener(multiModalControlerListener);
-			
-			// pre-configure multi-modal controler listener
-			controler.addControlerListener(preconfigureMultiModalControlerListener);			
-			
-			
+	        controler.setModules(new AbstractModule() {
+                @Override
+                public void install() {
+                    // create Controler Listeners; add them afterwards in a meaningful order
+                    ControlerDefaultsWithMultiModalModule controlerDefaultsWithMultiModalModule = new ControlerDefaultsWithMultiModalModule();
+                    controlerDefaultsWithMultiModalModule.addAdditionalTravelTimeFactory(TransportMode.pt, new EvacuationPTTravelTimeFactory(TransportMode.pt, controler.getConfig().plansCalcRoute()));
+                    include(controlerDefaultsWithMultiModalModule);
+                    WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
+                    Provider<Map<String, TravelTime>> multiModalTravelTimes = getProvider(new TypeLiteral<Map<String, TravelTime>>(){});
+
+                    PreconfigureWithinDayControlerListener preconfigureWithinDayControlerListener = new PreconfigureWithinDayControlerListener(
+                            withinDayControlerListener, multiModalTravelTimes);
+                    EvacuationControlerListener evacuationControlerListener = new EvacuationControlerListener(withinDayControlerListener,
+                            multiModalTravelTimes);
+
+                    // Analysis stuff
+                    addControlerListener(new ActivitiesAnalyzer());
+                    addControlerListener(new TripsAnalyzer());
+
+                    // Evacuation stuff
+                    addControlerListener(evacuationControlerListener);
+
+                    // Within-day Replanning
+                    withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
+                    addControlerListener(withinDayControlerListener);
+
+                    // pre-configure within-day controler listener with outcomes from the multi-modal controler listener
+                    addControlerListener(preconfigureWithinDayControlerListener);
+                }
+            });
 			controler.setOverwriteFiles(true);
 			controler.run();
 		}

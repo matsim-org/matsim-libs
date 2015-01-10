@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -89,7 +89,9 @@ public class StuckAgentTest {
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
 		config.plansCalcRoute().setTeleportedModeSpeed("unknown", unknownModeSpeed);
-		
+
+        config.travelTimeCalculator().setFilterModes(true);
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		Node node0 = scenario.getNetwork().getFactory().createNode(Id.create("n0", Node.class), new CoordImpl(0.0, 0.0));
@@ -142,10 +144,9 @@ public class StuckAgentTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		
 		// controler listener that initializes the multi-modal simulation
-		MultiModalControlerListener listener = new MultiModalControlerListener();
-		controler.addControlerListener(listener);
-		
-		EventsCollector collector = new EventsCollector();
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+        EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 		controler.getEvents().addHandler(new EventsPrinter());
 		

@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TransitRouterModule.java
+ *  * TravelDisutilityModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -20,42 +20,40 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.pt.router;
+package org.matsim.core.router.costcalculators;
 
-import com.google.inject.util.Providers;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class TransitRouterModule extends AbstractModule {
+public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        if (getConfig().scenario().isUseTransit()) {
-            bindToProviderAsSingleton(TransitRouterFactory.class, TransitRouterFactoryProvider.class);
-        } else {
-            bindToProviderAsSingleton(TransitRouterFactory.class, Providers.<TransitRouterFactory>of(null));
-        }
+        bindTo(TravelDisutilityFactory.class, TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+        bindToProvider(TravelDisutility.class, TravelDisutilityProvider.class);
     }
 
-    static class TransitRouterFactoryProvider implements Provider<TransitRouterFactory> {
+    private static class TravelDisutilityProvider implements Provider<TravelDisutility> {
+
+        final TravelDisutilityFactory travelDisutilityFactory;
+        final Config config;
+        final TravelTime travelTime;
 
         @Inject
-        Scenario scenario;
+        TravelDisutilityProvider(TravelDisutilityFactory travelDisutilityFactory, Config config, TravelTime travelTime) {
+            this.travelDisutilityFactory = travelDisutilityFactory;
+            this.config = config;
+            this.travelTime = travelTime;
+        }
 
         @Override
-        public TransitRouterFactory get() {
-            Config config = scenario.getConfig();
-            return new TransitRouterImplFactory(
-                    scenario.getTransitSchedule(),
-                    new TransitRouterConfig(
-                            config.planCalcScore(),
-                            config.plansCalcRoute(),
-                            config.transitRouter(),
-                            config.vspExperimental()));
+        public TravelDisutility get() {
+            return travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
         }
 
     }

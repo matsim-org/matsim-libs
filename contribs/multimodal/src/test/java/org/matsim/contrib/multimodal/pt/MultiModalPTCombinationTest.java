@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -87,18 +87,18 @@ public class MultiModalPTCombinationTest {
 		
 		config.plansCalcRoute().setNetworkModes(CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.walk + 
 				"," + TransportMode.transit_walk));
-		
+
+        config.travelTimeCalculator().setFilterModes(true);
+
 		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 		
-		// controler listener that initializes the multi-modal simulation
-		MultiModalControlerListener listener = new MultiModalControlerListener();
-		controler.addControlerListener(listener);
-		
-		LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+        LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
 		
 		controler.run();

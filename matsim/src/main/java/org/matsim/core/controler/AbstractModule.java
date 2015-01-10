@@ -22,16 +22,17 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Binder;
-import com.google.inject.Inject;
-import com.google.inject.Module;
-import com.google.inject.Singleton;
+import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.util.Modules;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * "Designed for inheritance."
@@ -101,6 +102,15 @@ public abstract class AbstractModule {
         binder.bind(type).toProvider(providerType).in(Singleton.class);
     }
 
+    protected final <T> void bindToProviderAsSingleton(Class<T> type, final javax.inject.Provider<? extends T> provider) {
+        binder.bind(type).toProvider(new com.google.inject.Provider<T>() {
+            @Override
+            public T get() {
+                return provider.get();
+            }
+        });
+    }
+
     protected final <T> void bindToProvider(Class<T> type, Class<? extends javax.inject.Provider<? extends T>> providerType) {
         binder.bind(type).toProvider(providerType);
     }
@@ -140,6 +150,32 @@ public abstract class AbstractModule {
 
     protected final Object getDelegate() {
         return binder;
+    }
+
+    protected final <T> javax.inject.Provider<T> getProvider(TypeLiteral<T> typeLiteral) {
+        return binder.getProvider(Key.get(typeLiteral));
+    }
+
+    public static AbstractModule override(final Iterable<AbstractModule> modules, final AbstractModule abstractModule) {
+        return new AbstractModule() {
+            @Override
+            public void install() {
+                final List<com.google.inject.Module> guiceModules = new ArrayList<>();
+                for (AbstractModule module : modules) {
+                    bootstrapInjector.injectMembers(module);
+                    guiceModules.add(AbstractModule.toGuiceModule(module));
+                }
+                bootstrapInjector.injectMembers(abstractModule);
+                ((Binder) getDelegate()).install(Modules.override(guiceModules).with(AbstractModule.toGuiceModule(abstractModule)));
+            }
+        };
+    }
+
+    public static AbstractModule emptyModule() {
+        return new AbstractModule() {
+            @Override
+            public void install() {}
+        };
     }
 
 }

@@ -20,16 +20,13 @@
 
 package playground.christoph.parking;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
@@ -37,9 +34,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.christoph.parking.core.facilities.OtherFacilityCreator;
 import playground.christoph.parking.core.facilities.ParkingFacilityCreator;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class WithinDayParkingRunner {
 	
@@ -102,9 +101,8 @@ public class WithinDayParkingRunner {
 			allParkingTypes.add(ParkingTypes.PRIVATEOUTSIDEPARKING);
 			
 			// initialize Controler listeners
-			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
 			WithinDayParkingControlerListener parkingControlerListener = new WithinDayParkingControlerListener(scenario,
-					multiModalControlerListener, initialParkingTypes, allParkingTypes, capacityFactor);
+                    initialParkingTypes, allParkingTypes, capacityFactor);
 
 			/*
 			 * Controler listeners are called in reverse order. Since the parkingControlerListener
@@ -112,9 +110,9 @@ public class WithinDayParkingRunner {
 			 */
 			Controler controler = new Controler(scenario);
 			controler.addControlerListener(parkingControlerListener);
-			controler.addControlerListener(multiModalControlerListener);
-			
-			controler.setOverwriteFiles(true);
+            controler.setModules(new ControlerDefaultsWithMultiModalModule());
+
+            controler.setOverwriteFiles(true);
 			controler.run();
 			
 			System.exit(0);			

@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
@@ -54,6 +55,7 @@ public class CDREquilTest {
         Controler controler = new Controler(new OneWorkplace().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new TripRouterModule(),
                 new TravelTimeCalculatorModule(),
                 new VolumesAnalyzerModule(),
                 new CollectSightingsModule(),
@@ -72,6 +74,7 @@ public class CDREquilTest {
         Controler controler = new Controler(new TwoWorkplaces().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new TripRouterModule(),
                 new TravelTimeCalculatorModule(),
                 new VolumesAnalyzerModule(),
                 new CollectSightingsModule(),

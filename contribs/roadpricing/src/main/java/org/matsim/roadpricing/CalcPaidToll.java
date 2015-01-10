@@ -20,9 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,6 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
+import javax.inject.Inject;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * Calculates the toll agents pay during a simulation by analyzing events. Add an instance of this class as an EventHandler.
  * 
@@ -45,7 +46,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  * @author mrieser
  */
 public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandler {
-	// public is currently needed. kai, sep'13
 
 	Logger log = Logger.getLogger( CalcPaidToll.class ) ;
 
@@ -60,15 +60,8 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 
 	private final TollBehaviourI handler;
 
-	/**
-	 * Design comments:<ul>
-	 * <li> yy I don't think that we really need Population.  kai, mar'12
-	 * <li> yyyy However, would need EventsManager if toll is sent to agent at arrival. kai, mar'12
-	 * </ul>
-	 */
+    @Inject
 	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
-		// public is currently needed. kai, sep'13
-
 		super();
 		this.network = network;
 		this.scheme = scheme;

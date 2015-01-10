@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -30,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -40,11 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
@@ -52,12 +44,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiModalControlerListenerTest {
 
@@ -105,6 +99,8 @@ public class MultiModalControlerListenerTest {
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
 		config.plansCalcRoute().setTeleportedModeSpeed("unknown", unknownModeSpeed);
+
+        config.travelTimeCalculator().setFilterModes(true);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -157,10 +153,9 @@ public class MultiModalControlerListenerTest {
 		controler.setOverwriteFiles(true);
 
 		// controler listener that initializes the multi-modal simulation
-		MultiModalControlerListener listener = new MultiModalControlerListener();
-		controler.addControlerListener(listener);
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
 
-		LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
+        LinkModeChecker linkModeChecker = new LinkModeChecker(scenario.getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
 
 		controler.run();
@@ -204,6 +199,8 @@ public class MultiModalControlerListenerTest {
 		// added by me to fix the test.  If you normally run with the default setting (now tryEndTimeThenDuration), I would suggest to remove
 		// the above line and adapt the test outcome.  Kai, feb'14
 
+        config.travelTimeCalculator().setFilterModes(true);
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
@@ -234,10 +231,9 @@ public class MultiModalControlerListenerTest {
 		controler.setOverwriteFiles(true);
 
 		// controler listener that initializes the multi-modal simulation
-		MultiModalControlerListener listener = new MultiModalControlerListener();
-		controler.addControlerListener(listener);
+        controler.setModules(new ControlerDefaultsWithMultiModalModule());
 
-		LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
+        LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
 		
 		controler.run();

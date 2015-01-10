@@ -1,7 +1,7 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TransitRouterModule.java
+ *  * ScenarioElementsModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
@@ -17,45 +17,48 @@
  *  *   (at your option) any later version.                                   *
  *  *   See also COPYING, LICENSE and WARRANTY file                           *
  *  *                                                                         *
- *  * ***********************************************************************
+ *  * *********************************************************************** 
  */
 
-package org.matsim.pt.router;
+package org.matsim.core.scenario;
 
-import com.google.inject.util.Providers;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class TransitRouterModule extends AbstractModule {
-
+public class ScenarioElementsModule extends AbstractModule {
+    
     @Override
     public void install() {
-        if (getConfig().scenario().isUseTransit()) {
-            bindToProviderAsSingleton(TransitRouterFactory.class, TransitRouterFactoryProvider.class);
-        } else {
-            bindToProviderAsSingleton(TransitRouterFactory.class, Providers.<TransitRouterFactory>of(null));
-        }
+        bindToProvider(Network.class, NetworkProvider.class);
+        bindToProvider(Population.class, PopulationProvider.class);
     }
 
-    static class TransitRouterFactoryProvider implements Provider<TransitRouterFactory> {
+    private static class NetworkProvider implements Provider<Network> {
 
         @Inject
         Scenario scenario;
 
         @Override
-        public TransitRouterFactory get() {
-            Config config = scenario.getConfig();
-            return new TransitRouterImplFactory(
-                    scenario.getTransitSchedule(),
-                    new TransitRouterConfig(
-                            config.planCalcScore(),
-                            config.plansCalcRoute(),
-                            config.transitRouter(),
-                            config.vspExperimental()));
+        public Network get() {
+            return scenario.getNetwork();
+        }
+
+    }
+
+    private static class PopulationProvider implements Provider<Population> {
+
+        @Inject
+        Scenario scenario;
+
+
+        @Override
+        public Population get() {
+            return scenario.getPopulation();
         }
 
     }

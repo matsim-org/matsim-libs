@@ -22,8 +22,6 @@
  */
 package playground.southafrica.gauteng;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -55,20 +53,17 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricing;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
-
+import org.matsim.vehicles.*;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.utilities.Header;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
+
+import java.util.Arrays;
 
 /**
  * 
@@ -251,11 +246,11 @@ public class GautengControler_subpopulations {
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 		
 		// ROAD PRICING:
-		controler.addControlerListener( new RoadPricing( new RoadPricingSchemeUsingTollFactor(
-				roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
-				) ) ) ;
-		
-		// PLANS REMOVAL
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule(new RoadPricingSchemeUsingTollFactor(
+                roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
+        )));
+
+        // PLANS REMOVAL
 		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
 		builder.setActTypeWeight(5.);
 		builder.setLocationWeight(5.);

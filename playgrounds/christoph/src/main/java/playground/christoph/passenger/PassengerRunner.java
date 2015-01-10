@@ -20,13 +20,12 @@
 
 package playground.christoph.passenger;
 
-import java.util.Map;
-
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
@@ -36,13 +35,10 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
@@ -53,8 +49,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-
 import playground.christoph.evacuation.mobsim.LegModeChecker;
+
+import javax.inject.Provider;
+import java.util.Map;
 
 public class PassengerRunner {
 
@@ -90,20 +88,17 @@ public class PassengerRunner {
 			checkLegModes(scenario, createTripRouterInstance(scenario, createTripRouterFactory(scenario)));
 			
 			Controler controler = new Controler(scenario);
-			
-			// initialize Controler listeners
-			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
-			WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
-			PassengerControlerHandler passengerControlerHandler = new PassengerControlerHandler(withinDayControlerListener,
-					multiModalControlerListener);
-			
-			/*
-			 * Controler listeners are called in reverse order. Since the withinDayControlerListener
-			 * depends on the outcomes of the multiModalControlerListener, we add the later last.
-			 */
-			controler.addControlerListener(passengerControlerHandler);
-			controler.addControlerListener(withinDayControlerListener);
-			controler.addControlerListener(multiModalControlerListener);
+            controler.setModules(new AbstractModule() {
+                @Override
+                public void install() {
+                    include(new ControlerDefaultsWithMultiModalModule());
+                    Provider<Map<String, TravelTime>> multiModalTravelTimes = getProvider(new TypeLiteral<Map<String, TravelTime>>(){});
+                    WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
+                    PassengerControlerHandler passengerControlerHandler = new PassengerControlerHandler(withinDayControlerListener, multiModalTravelTimes);
+                    addControlerListener(passengerControlerHandler);
+                    addControlerListener(withinDayControlerListener);
+                }
+            });
 			
 			controler.setOverwriteFiles(true);
 			controler.run();

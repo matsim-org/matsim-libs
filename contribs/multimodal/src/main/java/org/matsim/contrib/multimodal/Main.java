@@ -28,6 +28,7 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -60,8 +61,8 @@ public class Main {
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes, 
-				controler.getTravelDisutilityFactory(), defaultDelegateFactory, new FastDijkstraFactory());
+		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
+                ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
 
 		MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(multiModalTravelTimes);
 		controler.setTripRouterFactory(multiModalTripRouterFactory);
