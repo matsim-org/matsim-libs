@@ -544,10 +544,14 @@ public class PopulationParser2 {
 			if(firstMajor instanceof Activity){
 				ActivityImpl activity = (ActivityImpl) firstMajor;
 				double endTime = activity.getEndTime();
-				startHour  = convertSecondsToHourOfDay(endTime);
+				if (endTime >= 0) {
+					startHour  = convertSecondsToHourOfDay(endTime);
+					incrementArray(startHour, hourArray);
+				} else {
+					LOG.info("Chain start time is negative: " + endTime);
+				}
 //				LOG.info("endTime is " + endTime);
 //				LOG.info("startHour is " + startHour);
-				incrementArray(startHour, hourArray);
 			} else {
 				LOG.info("First plan element in plan is not an activity therefore" +
 						" the chain start time cannot be captured!");
@@ -556,7 +560,12 @@ public class PopulationParser2 {
 			/* Get the number of minor activities */
 			int numberPlanElements = plan.getPlanElements().size();
 			int numberMinorActivities  = (int) ((numberPlanElements - 1)/2.0 - 1);
-			incrementArray(numberMinorActivities, activityArray);
+			if (numberMinorActivities >= 0) {
+				incrementArray(numberMinorActivities, activityArray);
+				
+			} else {
+				LOG.info("numberMinorActivities less than 0: " + numberMinorActivities);
+			}
 //			LOG.info("numberMinorActivities is " + numberMinorActivities);
 
 			/* Get the areas in which this chain's activities are performed */
