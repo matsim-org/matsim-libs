@@ -58,13 +58,15 @@ public class PopulationParser2 {
 		/* Read in arguments*/
 		int pmin = Integer.parseInt(args[0]);
 		int radius = Integer.parseInt(args[1]);
-		int numberRuns = Integer.parseInt(args[2]);
-		int numberPopulations = Integer.parseInt(args[3]);
-		String saShapefile = args[4];
-		String gautengShapefile = args[5];
-		String ctShapefile = args[6];
-		String eThekwiniShapefile = args[7];
-		int numberOfThreads = Integer.parseInt(args[8]);
+		int minRuns = Integer.parseInt(args[2]);
+		int numberRuns = Integer.parseInt(args[3]);
+		int minPopulations = Integer.parseInt(args[4]);
+		int numberPopulations = Integer.parseInt(args[5]);
+		String saShapefile = args[6];
+		String gautengShapefile = args[7];
+		String ctShapefile = args[8];
+		String eThekwiniShapefile = args[9];
+		int numberOfThreads = Integer.parseInt(args[10]);
 
 //		PopulationParser2 pp2 = new PopulationParser2();
 		PopulationParser pp = new PopulationParser();
@@ -79,9 +81,12 @@ public class PopulationParser2 {
 
 		Map<Integer, List<int[]>> consolidatedMap = new TreeMap<Integer, List<int[]>>();
 
-		/* Iterate through the 100 populations and populate the populationMap */
-		for (int i = 1; i < numberRuns; i++) {
-			for (int j = 5; j < numberPopulations; j++) {
+		/* Iterate through the 100 populations and populate the populationMap.
+		 * To run through all 100 populations, set minRuns = 1, numberRuns = 11,
+		 * minPopulations = 0, and numberPopulations = 10.
+		 */
+		for (int i = minRuns; i < numberRuns; i++) {
+			for (int j = minPopulations; j < numberPopulations; j++) {
 				
 				Counter counter = new Counter("   vehicle # ");
 				/* Set up multi-threaded infrastructure */
@@ -549,7 +554,11 @@ public class PopulationParser2 {
 				double endTime = activity.getEndTime();
 				if (endTime >= 0) {
 					startHour  = convertSecondsToHourOfDay(endTime);
-					incrementArray(startHour, hourArray);
+					if (startHour < 24) {
+						incrementArray(startHour, hourArray);
+					} else{
+						LOG.info("startHour is greater than 23 and won't be added to the hourArray: " + startHour);
+					}
 				} else {
 					LOG.info("Chain start time is negative: " + endTime);
 				}
@@ -597,47 +606,83 @@ public class PopulationParser2 {
 			boolean[] booleanArray = new boolean[]{inGauteng, inCapeTown, inEthekwini, inSouthAfrica};
 			if(Arrays.equals(booleanArray, a1)){
 				incrementArray(0, areaArray);
-				incrementArray(startHour, hourArray1);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray1);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray1: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray1);
 //				LOG.info("a1 matched.");
 			} else if(Arrays.equals(booleanArray, a2)){
 				incrementArray(1, areaArray);
-				incrementArray(startHour, hourArray2);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray2);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray2: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray2);
 //				LOG.info("a2 matched.");			
 			} else if(Arrays.equals(booleanArray, a3)){
 				incrementArray(2, areaArray);
-				incrementArray(startHour, hourArray3);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray3);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray3: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray3);
 //				LOG.info("a3 matched.");
 			} else if(Arrays.equals(booleanArray, a4)){
 				incrementArray(3, areaArray);
-				incrementArray(startHour, hourArray4);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray4);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray4: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray4);
 //				LOG.info("a4 matched.");
 			} else if(Arrays.equals(booleanArray, a5)){
 				incrementArray(4, areaArray);
-				incrementArray(startHour, hourArray5);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray5);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray5: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray5);
 //				LOG.info("a5 matched.");
 			} else if(Arrays.equals(booleanArray, a6)){
 				incrementArray(5, areaArray);
-				incrementArray(startHour, hourArray6);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray6);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray6: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray6);
 //				LOG.info("a6 matched.");
 			} else if(Arrays.equals(booleanArray, a7)){
 				incrementArray(6, areaArray);
-				incrementArray(startHour, hourArray7);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray7);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray7: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray7);
 //				LOG.info("a7 matched.");
 			} else if(Arrays.equals(booleanArray, a8)){
 				incrementArray(7, areaArray);
-				incrementArray(startHour, hourArray8);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray8);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray8: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray8);
 //				LOG.info("a8 matched.");
 			} else if(Arrays.equals(booleanArray, a9)){
 				incrementArray(8, areaArray);
-				incrementArray(startHour, hourArray9);
+				if (startHour < 24) {
+					incrementArray(startHour, hourArray9);
+				} else{
+					LOG.info("startHour is greater than 23 and won't be added to the hourArray9: " + startHour);
+				}
 				incrementArray(numberMinorActivities, activityArray9);								
 //				LOG.info("a9 matched.");
 			} else{
