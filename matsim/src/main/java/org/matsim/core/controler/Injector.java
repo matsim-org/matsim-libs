@@ -23,6 +23,7 @@
 package org.matsim.core.controler;
 
 import com.google.inject.*;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -39,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class Injector {
+
+    private static Logger logger = Logger.getLogger(Injector.class);
 
     private com.google.inject.Injector injector;
 
@@ -63,7 +66,11 @@ public class Injector {
             bootstrapInjector.injectMembers(module);
             guiceModules.add(AbstractModule.toGuiceModule(module));
         }
-        return fromGuiceInjector(bootstrapInjector.createChildInjector(guiceModules));
+        com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
+        for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
+            logger.debug(String.format("%s -> %s", entry.getKey(), entry.getValue()));
+        }
+        return fromGuiceInjector(realInjector);
     }
 
     public static Injector fromGuiceInjector(com.google.inject.Injector injector) {
