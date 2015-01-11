@@ -81,7 +81,7 @@ public class PopulationParser2 {
 
 		/* Iterate through the 100 populations and populate the populationMap */
 		for (int i = 1; i < numberRuns; i++) {
-			for (int j = 0; j < numberPopulations; j++) {
+			for (int j = 5; j < numberPopulations; j++) {
 				
 				Counter counter = new Counter("   vehicle # ");
 				/* Set up multi-threaded infrastructure */
