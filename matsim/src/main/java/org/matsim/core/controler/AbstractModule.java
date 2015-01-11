@@ -70,7 +70,10 @@ public abstract class AbstractModule {
     }
 
     final void configure(Binder binder) {
-        this.binder = binder;
+        // Guice error messages should give the code location of the error in the user's module,
+        // not in this class.
+        this.binder = binder.skipSources(AbstractModule.class);
+
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);

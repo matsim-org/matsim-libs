@@ -111,7 +111,7 @@ public class MyCarrierSimulation {
 		controler.setOverwriteFiles(true);
 
 		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
-		//		carrierController.setEnableWithinDayActivityReScheduling(false); // FIXME commented out, as it's not compiling
+		carrierController.setPhysicallyEnforceTimeWindowBeginnings(false);
 		controler.addControlerListener(carrierController);
 
 		mcs.prepareFreightOutput(controler, carriers);
