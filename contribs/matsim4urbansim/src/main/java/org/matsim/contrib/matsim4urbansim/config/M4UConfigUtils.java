@@ -22,10 +22,6 @@
  */
 package org.matsim.contrib.matsim4urbansim.config;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -36,21 +32,16 @@ import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4Ur
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.*;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.PlanStrategyRegistrar.Names;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author nagel
@@ -358,19 +349,19 @@ public class M4UConfigUtils {
 		config.strategy().setMaxAgentPlanMemorySize( 5 );
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-		changeExpBeta.setStrategyName(Selector.ChangeExpBeta.toString());
+		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 		changeExpBeta.setWeight( 0.8 ) ;
 		config.strategy().addStrategySettings(changeExpBeta);
 
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-		timeAlocationMutator.setStrategyName(Names.TimeAllocationMutator.toString()); 
+		timeAlocationMutator.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator.toString());
 		timeAlocationMutator.setWeight( 0.1 ); 
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		config.timeAllocationMutator().setMutationRange(7200.) ;
 
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(Id.create(3, StrategySettings.class));
-		reroute.setStrategyName(Names.ReRoute.toString());  
+		reroute.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.toString());
 		reroute.setWeight( 0.1 );
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);

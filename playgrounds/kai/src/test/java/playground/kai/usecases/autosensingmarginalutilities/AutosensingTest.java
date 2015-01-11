@@ -23,11 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -36,7 +32,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -67,7 +63,7 @@ public class AutosensingTest {
 		config.planCalcScore().setMarginalUtilityOfMoney(marginalUtilityOfMoneyCONFIG);
 		
 		StrategySettings stratSets = new StrategySettings( Id.create(1, StrategySettings.class) ) ;
-		stratSets.setStrategyName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
+		stratSets.setStrategyName( DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString() );
 		stratSets.setWeight(1.);
 		config.strategy().addStrategySettings(stratSets);
 		

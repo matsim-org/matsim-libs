@@ -22,25 +22,19 @@
  */
 package org.matsim.contrib.matsim4urbansim.config;
 
-import java.math.BigInteger;
-
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.*;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.math.BigInteger;
 
 /**
  * @author thomas
@@ -189,7 +183,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		// strategy module
 		ConfigGroup strategyModule = config.createModule(strategyModuleName);
 		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
-		strategyModule.addParam(startegyModule4ParamName, PlanStrategyRegistrar.Names.ChangeLegMode.toString() );
+		strategyModule.addParam(startegyModule4ParamName, DefaultPlanStrategiesModule.Names.ChangeLegMode.toString() );
 		
 		// generating already existing MATSim4UrbanSim entries in external MATsim config
 		

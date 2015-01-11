@@ -22,16 +22,6 @@
  */
 package org.matsim.contrib.wagonSim;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,14 +30,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author balmermi
@@ -274,11 +266,11 @@ public class Utils {
 		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		// I think we should use SelectRandom here, as I'm not really sure what will
 		// happen when we use ChangeExpBeta (own scoring). //dr, oct'13
-		settings.setStrategyName(PlanStrategyRegistrar.Selector.SelectRandom.toString());
+		settings.setStrategyName(DefaultPlanStrategiesModule.Selector.SelectRandom.toString());
 		settings.setWeight(0.8);
 		config.strategy().addStrategySettings(settings);
 		settings = new StrategySettings(Id.create("2", StrategySettings.class));
-		settings.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.toString());
+		settings.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.toString());
 		settings.setWeight(0.2);
 		config.strategy().addStrategySettings(settings);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);

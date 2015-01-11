@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -50,6 +49,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingQSimFactory.Que
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -149,7 +149,7 @@ public class GfipQueuePassingControler extends Controler{
 		/* Subpopulations */
 		StrategySettings best = new StrategySettings();
 		best.setWeight(1.0);
-		best.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+		best.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 		config.strategy().addStrategySettings(best);
 		
 		/* Set input files */

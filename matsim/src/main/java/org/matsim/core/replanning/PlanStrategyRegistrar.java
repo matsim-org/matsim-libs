@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SnapshotWriterRegistrar
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler;
+package org.matsim.core.replanning;
 
-import java.util.HashMap;
-import java.util.Map;
+public class PlanStrategyRegistrar {
 
-import org.matsim.core.replanning.PlanStrategyFactory;
+	private PlanStrategyFactoryRegister register = new PlanStrategyFactoryRegister();
 
-public class PlanStrategyFactoryRegister {
-
-	private Map<String, PlanStrategyFactory> factoryMap = new HashMap<String, PlanStrategyFactory>();
-
-	public PlanStrategyFactory getInstance(String strategyType) {
-		if (!factoryMap.containsKey(strategyType)) {
-			throw new IllegalArgumentException("Plan strategy " + strategyType
-					+ " doesn't exist.");
-		}
-		return factoryMap.get(strategyType);
-	}
-
-	public void register(String string, PlanStrategyFactory strategyFactory) {
-		if (string.contains(".")) {
-			throw new IllegalArgumentException("Plan strategy names with a '.' are reserved for direct class loading.");
-		}
-		factoryMap.put(string, strategyFactory);
+	public PlanStrategyFactoryRegister getFactoryRegister() {
+		return register;
 	}
 
 }

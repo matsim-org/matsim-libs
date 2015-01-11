@@ -18,16 +18,16 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @author amit
@@ -85,7 +85,7 @@ public class SubpopulationConfig {
 
 		for(String subPop : subPopulations){
 			StrategySettings timeAllocationMutator	= new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			timeAllocationMutator.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator.name());
+			timeAllocationMutator.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator.name());
 			timeAllocationMutator.setWeight(0.05);
 
 			StrategySettings expChangeBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
@@ -93,7 +93,7 @@ public class SubpopulationConfig {
 			expChangeBeta.setWeight(0.9);
 
 			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRoute.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.name());
+			reRoute.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.name());
 			reRoute.setWeight(0.1);
 
 			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));

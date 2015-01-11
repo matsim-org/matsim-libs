@@ -22,7 +22,6 @@
 
 package org.matsim.contrib.multimodal;
 
-import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Id;
@@ -66,8 +65,8 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
             }
         }));
         addControlerListener(MultiModalControlerListener.class);
-        ((Binder) getDelegate()).bind(new TypeLiteral<Map<String, TravelTime>>() {}).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
-        ((Binder) getDelegate()).bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {}).toInstance(additionalTravelTimeFactories);
+        binder().bind(new TypeLiteral<Map<String, TravelTime>>() {}).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
+        binder().bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {}).toInstance(additionalTravelTimeFactories);
     }
 
     private static class MultiModalTravelTimeLoader implements Provider<Map<String, TravelTime>> {

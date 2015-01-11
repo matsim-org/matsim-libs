@@ -20,9 +20,6 @@
 
 package playground.singapore.typesPopulation.replanning;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,23 +28,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.*;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.Selector;
 import org.matsim.core.replanning.modules.ExternalModule;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-
+import org.matsim.core.replanning.selectors.*;
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup;
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup.StrategySettings;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -105,7 +94,7 @@ public final class StrategyManagerPopsConfigLoader {
 				// --- begin new ---
 				if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 					boolean innovative = true ;
-					for ( Selector sel : Selector.values() ) {
+					for ( Selector sel : DefaultPlanStrategiesModule.Selector.values() ) {
 						System.out.flush();
 						if ( moduleName.equals( sel.toString() ) ) {
 							innovative = false ;

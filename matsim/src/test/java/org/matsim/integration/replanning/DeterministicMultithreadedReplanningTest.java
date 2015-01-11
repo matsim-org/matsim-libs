@@ -21,6 +21,7 @@
 package org.matsim.integration.replanning;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -30,6 +31,8 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
+
+import javax.inject.Provider;
 
 /**
  * Tests that the re-planning process of MATSim generates the same results every time, even when
@@ -243,10 +246,20 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 			this.getConfig().controler().setWriteEventsInterval(1);
 			this.setDumpDataAtEnd(false);
 			this.manager = manager ;
+            addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+                        @Override
+                        public StrategyManager get() {
+                            return myLoadStrategyManager();
+                        }
+                    });
+                }
+            });
 		}
 
-		@Override
-		protected StrategyManager loadStrategyManager() {
+		private StrategyManager myLoadStrategyManager() {
 			return this.manager ;
 		}
 	}

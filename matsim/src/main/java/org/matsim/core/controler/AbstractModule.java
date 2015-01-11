@@ -26,10 +26,16 @@ import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +54,7 @@ public abstract class AbstractModule {
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
     private Multibinder<ControlerListener> controlerListenerMultibinder;
+    private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
     @Inject
@@ -67,6 +74,7 @@ public abstract class AbstractModule {
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
+        this.planSelectorMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
         this.install();
     }
 
@@ -108,7 +116,7 @@ public abstract class AbstractModule {
             public T get() {
                 return provider.get();
             }
-        });
+        }).in(Singleton.class);
     }
 
     protected final <T> void bindToProvider(Class<T> type, Class<? extends javax.inject.Provider<? extends T>> providerType) {
@@ -144,11 +152,26 @@ public abstract class AbstractModule {
         controlerListenerMultibinder.addBinding().toInstance(instance);
     }
 
-    protected final void addPlanStrategyByProvider(String strategyName, Class<? extends javax.inject.Provider<? extends PlanStrategy>> providerType) {
-        planStrategyMultibinder.addBinding(strategyName).toProvider(providerType);
+    protected final void addPlanStrategyBindingToFactory(String strategyName, final PlanStrategyFactory factory) {
+        final Provider<Scenario> scenarioProvider = binder.getProvider(Scenario.class);
+        final Provider<EventsManager> eventsManagerProvider = binder.getProvider(EventsManager.class);
+        planStrategyMultibinder.addBinding(strategyName).toProvider(new Provider<PlanStrategy>() {
+            @Override
+            public PlanStrategy get() {
+                return factory.createPlanStrategy(scenarioProvider.get(), eventsManagerProvider.get());
+            }
+        });
     }
 
-    protected final Object getDelegate() {
+    protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorBinding(String selectorName) {
+        return planSelectorMultibinder.addBinding(selectorName);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {
+        return planStrategyMultibinder.addBinding(selectorName);
+    }
+
+    protected final Binder binder() {
         return binder;
     }
 
@@ -166,7 +189,7 @@ public abstract class AbstractModule {
                     guiceModules.add(AbstractModule.toGuiceModule(module));
                 }
                 bootstrapInjector.injectMembers(abstractModule);
-                ((Binder) getDelegate()).install(Modules.override(guiceModules).with(AbstractModule.toGuiceModule(abstractModule)));
+                binder().install(Modules.override(guiceModules).with(AbstractModule.toGuiceModule(abstractModule)));
             }
         };
     }

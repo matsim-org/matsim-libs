@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -54,6 +55,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -270,10 +272,20 @@ public class BetaTravelTest extends MatsimTestCase {
 
 		protected TestControler(final Scenario scenario) {
 			super(scenario);
+            addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+                        @Override
+                        public StrategyManager get() {
+                            return myLoadStrategyManager();
+                        }
+                    });
+                }
+            });
 		}
 
-		@Override
-		protected StrategyManager loadStrategyManager() {
+		private StrategyManager myLoadStrategyManager() {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 

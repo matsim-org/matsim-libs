@@ -1,5 +1,19 @@
 package playground.artemc.annealing;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.Selector;
+import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.StrategyManager;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,19 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.StrategyManager;
 
 /**
  * @author fouriep
@@ -228,7 +229,7 @@ ControlerListener {
 			// --- begin new ---
 			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 				boolean innovative = true ;
-				for ( Selector sel : Selector.values() ) {
+				for ( Selector sel : DefaultPlanStrategiesModule.Selector.values() ) {
 					System.out.flush();
 					if ( moduleName.equals( sel.toString() ) ) {
 						innovative = false ;

@@ -22,8 +22,6 @@
  */
 package playground.southafrica.population.freight;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,23 +35,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.*;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-
+import org.matsim.vehicles.*;
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.utilities.Header;
+
+import java.util.Arrays;
 
 /**
  * @author jwjoubert
@@ -126,18 +117,18 @@ public class RunNationalFreight {
 		
 			/* Generic strategy */
 		StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		changeExpBetaStrategySettings.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 		changeExpBetaStrategySettings.setWeight(0.8);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 			/* Subpopulation strategy */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		commercialStrategy.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+		commercialStrategy.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 		commercialStrategy.setWeight(0.85);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
 			/* Subpopulation ReRoute */
 		StrategySettings commercialReRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		commercialReRoute.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.name());
+		commercialReRoute.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.name());
 		commercialReRoute.setWeight(0.15);
 		commercialReRoute.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialReRoute);

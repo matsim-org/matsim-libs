@@ -2,7 +2,6 @@ package playground.pieter.distributed.replanning;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.*;
@@ -34,7 +33,7 @@ import java.util.Map;
  *         <p/>
  *         <p/>
  *         Each strategy name is taken from the enum in the
- *         {@link org.matsim.core.controler.PlanStrategyRegistrar} to ensure future consistency
+ *         {@link org.matsim.core.replanning.PlanStrategyRegistrar} to ensure future consistency
  *         <p/>
  *         <p/>
  *         <B>NOTE:</B> to save processing overhead, selector strategies are set

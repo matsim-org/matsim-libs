@@ -23,17 +23,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -108,13 +104,13 @@ public class SubpopulationsExample {
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			timeStrategySettings.setStrategyName(PlanStrategyRegistrar.Names.TimeAllocationMutator.toString());
+			timeStrategySettings.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator.toString());
 			timeStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			timeStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			changeExpBetaStrategySettings.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
@@ -123,13 +119,13 @@ public class SubpopulationsExample {
 			/* Set up the `reroute' subpopulation to consider rerouting as a 
 			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			rerouteStrategySettings.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.toString());
+			rerouteStrategySettings.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.toString());
 			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			rerouteStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			changeExpBetaStrategySettings.setStrategyName(PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);

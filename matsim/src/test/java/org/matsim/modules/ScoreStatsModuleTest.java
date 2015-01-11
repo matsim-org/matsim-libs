@@ -33,6 +33,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
@@ -58,6 +59,7 @@ public class ScoreStatsModuleTest {
                 new TravelTimeCalculatorModule(),
                 new TravelDisutilityModule(),
                 new ScoreStatsModule(),
+                new StrategyManagerModule(),
                 new AbstractModule() {
                     @Override
                     public void install() {

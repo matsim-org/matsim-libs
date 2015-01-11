@@ -23,10 +23,13 @@
 package org.matsim.core.controler;
 
 import com.google.inject.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import javax.inject.Provider;
@@ -60,7 +63,11 @@ public class Injector {
             bootstrapInjector.injectMembers(module);
             guiceModules.add(AbstractModule.toGuiceModule(module));
         }
-        return new Injector(bootstrapInjector.createChildInjector(guiceModules));
+        return fromGuiceInjector(bootstrapInjector.createChildInjector(guiceModules));
+    }
+
+    public static Injector fromGuiceInjector(com.google.inject.Injector injector) {
+        return new Injector(injector);
     }
 
     /**
@@ -106,9 +113,16 @@ public class Injector {
         ));
     }
 
-    Map<String, PlanStrategy> getPlanStrategiesDeclaredByModules() {
+    public Map<String, PlanStrategy> getPlanStrategiesDeclaredByModules() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Map<String, PlanStrategy>>() {
+                }
+        ));
+    }
+
+    public Map<String, GenericPlanSelector<Plan, Person>> getPlanSelectorsDeclaredByModules() {
+        return injector.getInstance(Key.get(
+                new TypeLiteral<Map<String, GenericPlanSelector<Plan, Person>>>() {
                 }
         ));
     }

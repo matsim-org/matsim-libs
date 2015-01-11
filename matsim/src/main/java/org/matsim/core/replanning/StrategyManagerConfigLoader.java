@@ -24,13 +24,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import java.util.Map;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -46,14 +49,10 @@ public final class StrategyManagerConfigLoader {
 	private static int externalCounter = 0;
 
 	public static void load(final Controler controler, final StrategyManager manager) {
-		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
-		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-        PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
-        PlanSelectorFactoryRegister planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
-		load(controler.getInjector(), planStrategyFactoryRegister, planSelectorFactoryRegister, manager);
+		load(controler.getInjector(), controler.getInjector().getPlanStrategiesDeclaredByModules(), controler.getInjector().getPlanSelectorsDeclaredByModules(), manager);
 	}
 
-    public static void load(Injector injector, PlanStrategyFactoryRegister planStrategyFactoryRegister, PlanSelectorFactoryRegister planSelectorFactoryRegister, StrategyManager manager) {
+    public static void load(Injector injector, Map<String, PlanStrategy> planStrategyFactoryRegister, Map<String, GenericPlanSelector<Plan, Person>> planSelectorFactoryRegister, StrategyManager manager) {
         Config config = injector.getInstance(Config.class);
         manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -95,12 +94,12 @@ public final class StrategyManagerConfigLoader {
         String name = config.strategy().getPlanSelectorForRemoval();
         if ( name != null ) {
             // ``manager'' has a default setting.
-            GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.getInstance(name).createPlanSelector(injector.getInstance(Scenario.class));
+            GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.get(name);
             manager.setPlanSelectorForRemoval(planSelector) ;
         }
     }
 
-    private static PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister, Injector injector) {
+    private static PlanStrategy loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Map<String, PlanStrategy> planStrategyFactoryRegister, Injector injector) {
 		if (name.equals("ExternalModule")) {
 			externalCounter++;
             String exePath = settings.getExePath();
@@ -110,9 +109,8 @@ public final class StrategyManagerConfigLoader {
 		} else if (name.contains(".")) {
             return tryToLoadPlanStrategyByName(name, injector);
 		} else {
-			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-            return planStrategyFactory.createPlanStrategy(injector.getInstance(Scenario.class), injector.getInstance(EventsManager.class));
-		} 
+			return planStrategyFactoryRegister.get(name);
+		}
 	} 
 
 	private static PlanStrategy tryToLoadPlanStrategyByName(final String name, Injector injector) {

@@ -179,7 +179,7 @@ public class CadytsRandomTrips {
                     @Override
                     public void install() {
                         addControlerListener(LegTimesHistogramControlerListener.class);
-                        addPlanStrategyByProvider("NewRandomTrip", RandomTripProvider.class);
+                        addPlanStrategyBinding("NewRandomTrip").toProvider(RandomTripProvider.class);
                     }
                 });
         controler.setScoringFunctionFactory(new CadytsAndLegHistogramScoringFunctionFactory());

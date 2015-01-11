@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -58,19 +59,27 @@ public class ControlerPTW extends Controler {
 		config.removeModule(StrategyConfigGroup.GROUP_NAME);
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
-		ControlerPTW controler = new ControlerPTW(ScenarioUtils.loadScenario(config));
+		final ControlerPTW controler = new ControlerPTW(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
         controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
         controler.addCoreControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
-		controler.run();
+        AbstractModule myStrategyManagerModule = new AbstractModule() {
+
+            @Override
+            public void install() {
+                bindToInstance(StrategyManager.class, controler.myLoadStrategyManager());
+            }
+        };
+        controler.addOverridingModule(myStrategyManagerModule);
+        controler.run();
 	}
-	@Override
+
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	protected StrategyManager loadStrategyManager() {
+	private StrategyManager myLoadStrategyManager() {
 		StrategyManagerPops manager = new StrategyManagerPops();
 		StrategyManagerPopsConfigLoader.load(this, manager);
 		return manager;

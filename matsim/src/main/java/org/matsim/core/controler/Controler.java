@@ -46,10 +46,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -71,7 +69,10 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 import javax.inject.Provider;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -132,7 +133,6 @@ public class Controler extends AbstractController {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
     private ScoringFunctionFactory scoringFunctionFactory = null;
-	private StrategyManager strategyManager = null;
 
 	private boolean scenarioLoaded = false;
 
@@ -142,8 +142,6 @@ public class Controler extends AbstractController {
 
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
-	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
-    private PlanSelectorFactoryRegister planSelectorFactoryRegister;
 
 	private boolean dumpDataAtEnd = true; 
 	private boolean overwriteFiles = false;
@@ -209,11 +207,7 @@ public class Controler extends AbstractController {
 		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
-		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
-		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-        PlanSelectorRegistrar planSelectorRegistrar = new PlanSelectorRegistrar();
-        this.planSelectorFactoryRegister = planSelectorRegistrar.getFactoryRegister();
-		
+
 		this.events = EventsUtils.createEventsManager(this.config);
 
 
@@ -329,8 +323,7 @@ public class Controler extends AbstractController {
         PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.getScoringFunctionFactory());
 		this.addCoreControlerListener(plansScoring);
 
-		this.strategyManager = loadStrategyManager() ;
-        this.addCoreControlerListener(new PlansReplanning(this.getStrategyManager(), getScenario().getPopulation()));
+        this.addCoreControlerListener(new PlansReplanning(this.injector.getInstance(StrategyManager.class), getScenario().getPopulation()));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
 
@@ -394,32 +387,7 @@ public class Controler extends AbstractController {
 	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
 	protected void setUp() {}
 
-    /**
-	 * @return A fully initialized StrategyManager for the plans replanning.
-	 */
-	protected StrategyManager loadStrategyManager() {
-		// yy cannot make this final: overridden at about 40 locations.  kai, jan'2013
-		// now about 20 locations.  kai, may'2013
-		// now about 15 locations.  kai, oct'14
-		
-		// this is not too bad since this is essentially a factory method.  So overwriting this method essentially means replacing the factory.
-		// With current coding standard, would need setStrategyManagerFactory(...).  However, with future coding standard, this
-		// will just be a module which can be replaced.  kai/mz, nov'14
-		
-        for (final Map.Entry<String, PlanStrategy> entry : this.injector.getPlanStrategiesDeclaredByModules().entrySet()) {
-            this.planStrategyFactoryRegister.register(entry.getKey(), new PlanStrategyFactory() {
-                @Override
-                public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-                    return entry.getValue();
-                }
-            });
-        }
-		StrategyManager manager = new StrategyManager();
-        StrategyManagerConfigLoader.load(injector, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister, manager);
-		return manager;
-	}
-
-	@Override
+    @Override
 	protected final boolean continueIterations(int it) {
 		return terminationCriterion.continueIterations(it);
 	}
@@ -643,7 +611,7 @@ public class Controler extends AbstractController {
         });
 	}
 
-    private void addOverridingModule(AbstractModule abstractModule) {
+    public void addOverridingModule(AbstractModule abstractModule) {
         if (this.injectorCreated) {
             throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
         }
@@ -735,11 +703,21 @@ public class Controler extends AbstractController {
 	}
 
 	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
-		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
+		this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addPlanStrategyBindingToFactory(planStrategyFactoryName, planStrategyFactory);
+            }
+        });
 	}
 
     public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
-        this.planSelectorFactoryRegister.register(planSelectorFactoryName, planSelectorFactory);
+        this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addPlanSelectorFactory(planSelectorFactoryName, planSelectorFactory);
+            }
+        });
     }
 
 
@@ -757,7 +735,7 @@ public class Controler extends AbstractController {
 	 */
 	@Deprecated // see javadoc above
 	public final StrategyManager getStrategyManager() {
-		return this.strategyManager;
+		return this.injector.getInstance(StrategyManager.class);
 	}
 
 	protected boolean isScenarioLoaded() {

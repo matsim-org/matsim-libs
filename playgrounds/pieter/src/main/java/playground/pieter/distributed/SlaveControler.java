@@ -30,6 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -216,6 +217,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             public void install() {
 //                include(new ScoreStatsModule());
                 include(new TripRouterModule());
+                include(new StrategyManagerModule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });

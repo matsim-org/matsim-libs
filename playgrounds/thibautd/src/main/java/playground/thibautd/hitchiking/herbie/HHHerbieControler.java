@@ -28,6 +28,7 @@ import herbie.running.scoring.TravelScoringFunction;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
@@ -37,6 +38,8 @@ import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
 import playground.thibautd.hitchiking.spotweights.SpotWeighter;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
@@ -54,6 +57,17 @@ public class HHHerbieControler extends HitchHikingControler {
 			final SpotWeighter weighter) {
 		super( scenario , weighter );
 		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
+        addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+                    @Override
+                    public StrategyManager get() {
+                        return myLoadStrategyManager();
+                    }
+                });
+            }
+        });
 	}
 
 	@Override
@@ -114,8 +128,8 @@ public class HHHerbieControler extends HitchHikingControler {
 	  * during the replanning phase. They either keep their selected plan or
 	  * replan it.
 	  */
-	 @Override
-	 protected StrategyManager loadStrategyManager() {
+
+	 private StrategyManager myLoadStrategyManager() {
 	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
 	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 	  StrategyManagerConfigLoader.load(this, manager);

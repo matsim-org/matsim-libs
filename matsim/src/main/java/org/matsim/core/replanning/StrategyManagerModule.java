@@ -1,11 +1,11 @@
 /*
  *  *********************************************************************** *
  *  * project: org.matsim.*
- *  * TrajectoryReRealizerModules.java
+ *  * StrategyManagerModule.java
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
- *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  * copyright       : (C) 2015 by the members listed in the COPYING, *
  *  *                   LICENSE and WARRANTY file.                            *
  *  * email           : info at matsim dot org                                *
  *  *                                                                         *
@@ -20,48 +20,43 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.cdr;
+package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import playground.mzilske.clones.CloneService;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
-public class TrajectoryReRealizerModule extends AbstractModule {
-
+public class StrategyManagerModule extends AbstractModule {
     @Override
     public void install() {
-        addPlanStrategyBinding("ReRealize").toProvider(TrajectoryReRealizerProvider.class);
+        include(new DefaultPlanStrategiesModule());
+        bindToProviderAsSingleton(StrategyManager.class, StrategyManagerProvider.class);
     }
 
-    static class TrajectoryReRealizerProvider implements Provider<PlanStrategy> {
-        private Scenario scenario;
-        private Sightings sightings;
-        private ZoneTracker.LinkToZoneResolver zones;
-        private CloneService cloneService;
+    private static class StrategyManagerProvider implements Provider<StrategyManager> {
+
+        private Injector injector;
+        private Map<String, GenericPlanSelector<Plan, Person>> planSelectorsDeclaredByModules;
+        private Map<String, PlanStrategy> planStrategiesDeclaredByModules;
 
         @Inject
-        TrajectoryReRealizerProvider(Scenario scenario, Sightings sightings, ZoneTracker.LinkToZoneResolver zones, CloneService cloneService) {
-            this.scenario = scenario;
-            this.sightings = sightings;
-            this.zones = zones;
-            this.cloneService = cloneService;
+        StrategyManagerProvider(com.google.inject.Injector injector, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsDeclaredByModules, Map<String, PlanStrategy> planStrategiesDeclaredByModules) {
+            this.injector = Injector.fromGuiceInjector(injector);
+            this.planSelectorsDeclaredByModules = planSelectorsDeclaredByModules;
+            this.planStrategiesDeclaredByModules = planStrategiesDeclaredByModules;
         }
 
         @Override
-        public PlanStrategy get() {
-            PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-            planStrategy.addStrategyModule(new TrajectoryReRealizer(scenario, sightings, zones, cloneService));
-            planStrategy.addStrategyModule(new ReRoute(scenario));
-            return planStrategy;
+        public StrategyManager get() {
+            StrategyManager manager = new StrategyManager();
+            StrategyManagerConfigLoader.load(injector, this.planStrategiesDeclaredByModules, this.planSelectorsDeclaredByModules, manager);
+            return manager;
         }
     }
 }

@@ -19,11 +19,7 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import junit.framework.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,36 +30,22 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.v20.*;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.data.signalcontrol.v20.*;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataFactory;
@@ -71,12 +53,11 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.signalsystems.model.Signal;
-import org.matsim.signalsystems.model.SignalGroup;
-import org.matsim.signalsystems.model.SignalPlan;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signalsystems.model.*;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class InvertedNetworkRoutingTest {
 
@@ -244,7 +225,7 @@ public class InvertedNetworkRoutingTest {
 			config.qsim().setStartTime(0.0);
 			config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 			StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
-			stratSets.setStrategyName(PlanStrategyRegistrar.Names.ReRoute.toString());
+			stratSets.setStrategyName(DefaultPlanStrategiesModule.Names.ReRoute.toString());
 			stratSets.setWeight(1.0);
 			config.strategy().addStrategySettings(stratSets);
 			config.planCalcScore().setTraveling_utils_hr(-1200.0);

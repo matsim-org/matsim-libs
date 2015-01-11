@@ -23,7 +23,6 @@
 package org.matsim.core.replanning;
 
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,8 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar.Names;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -68,25 +65,25 @@ public class InnovationSwitchOffTest {
 
 		{
 			StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class)) ;
-			settings.setStrategyName( Selector.BestScore.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.Selector.BestScore.toString() ) ;
 			settings.setWeight(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(2, StrategySettings.class)) ;
-			settings.setStrategyName( Selector.ChangeExpBeta.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString() ) ;
 			settings.setWeight(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(3, StrategySettings.class)) ;
-			settings.setStrategyName( Names.TimeAllocationMutator.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.Names.TimeAllocationMutator.toString() ) ;
 			settings.setWeight(0.1) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(4, StrategySettings.class)) ;
-			settings.setStrategyName( Names.ReRoute.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.Names.ReRoute.toString() ) ;
 			settings.setWeight(0.1) ;
 			settings.setDisableAfter(11) ;
 			config.strategy().addStrategySettings(settings) ;

@@ -27,6 +27,7 @@ import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
+import javax.inject.Singleton;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ import java.util.List;
  * @author mrieser
  * @author kai
  */
+@Singleton
 public class StrategyManager implements MatsimManager {
 
 	protected final GenericStrategyManager<Plan, Person> delegate;

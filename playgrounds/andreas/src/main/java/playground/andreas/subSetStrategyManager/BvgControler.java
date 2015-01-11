@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -52,15 +53,7 @@ public class BvgControler extends Controler {
 
 	private static String singleTripPersonsFile;
 
-	public BvgControler(final String[] args) {
-		super(args);
-	}
-
-	public BvgControler(final Config config) {
-		super(config);
-	}
-
-	public BvgControler(final Scenario scenario) {
+    public BvgControler(final Scenario scenario) {
 		super(scenario);
 	}
 
@@ -82,8 +75,7 @@ public class BvgControler extends Controler {
 		simulation.run();
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
+	private StrategyManager myLoadStrategyManager() {
 		SubSetStrategyManager manager = new SubSetStrategyManager();
 		StrategyManagerConfigLoader.load(this, manager); // load defaults
 
@@ -133,9 +125,16 @@ public class BvgControler extends Controler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-		BvgControler c = new BvgControler(sc);
+		final BvgControler c = new BvgControler(sc);
         c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
+        AbstractModule myStrategyManagerModule = new AbstractModule() {
 
-		c.run();
+            @Override
+            public void install() {
+                bindToInstance(StrategyManager.class, c.myLoadStrategyManager());
+            }
+        };
+        c.addOverridingModule(myStrategyManagerModule);
+        c.run();
 	}
 }

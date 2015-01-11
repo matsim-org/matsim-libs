@@ -27,6 +27,7 @@ import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
+import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioElementsModule;
@@ -43,6 +44,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         include(new TravelTimeCalculatorModule());
         include(new TravelDisutilityModule());
         include(new TripRouterModule());
+        include(new StrategyManagerModule());
         include(new LinkStatsModule());
         include(new VolumesAnalyzerModule());
         include(new LegHistogramModule());

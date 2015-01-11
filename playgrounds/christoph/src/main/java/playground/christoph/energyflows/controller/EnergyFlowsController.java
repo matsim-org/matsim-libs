@@ -26,12 +26,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
+
+import javax.inject.Provider;
 
 public class EnergyFlowsController extends Controler {
 
@@ -44,8 +47,7 @@ public class EnergyFlowsController extends Controler {
 	 * during the replanning phase. They either keep their selected plan or
 	 * replan it.
 	 */
-	@Override
-	protected StrategyManager loadStrategyManager() {
+	private StrategyManager myLoadStrategyManager() {
 		log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
 		StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 		StrategyManagerConfigLoader.load(this, manager);
@@ -100,6 +102,17 @@ public class EnergyFlowsController extends Controler {
 		super(args[0]);
 		this.reroutingShare = Double.parseDouble(args[1]);
 		log.info("Use transit agent rerouting share of " + Double.parseDouble(args[1]));
+        addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+                    @Override
+                    public StrategyManager get() {
+                        return myLoadStrategyManager();
+                    }
+                });
+            }
+        });
 	}
 
 	public static void main(final String[] args) {
@@ -118,4 +131,5 @@ public class EnergyFlowsController extends Controler {
 		
 		System.exit(0);
 	}
+
 }

@@ -22,14 +22,11 @@
 
 package playground.mzilske.cadyts;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Binder;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,21 +42,21 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Binder;
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Set;
 
 public class CadytsModule extends AbstractModule {
 
     @Override
     public void install() {
-        Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder((Binder) getDelegate(), new TypeLiteral<MeasurementLoader<Link>>(){});
+        Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder((Binder) binder(), new TypeLiteral<MeasurementLoader<Link>>(){});
         bindToProviderAsSingleton(AnalyticalCalibrator.class, CalibratorProvider.class);
         bindAsSingleton(PlanToPlanStepBasedOnEvents.class);
         bindAsSingleton(PlansTranslator.class, PlanToPlanStepBasedOnEvents.class);

@@ -23,14 +23,14 @@ package playground.sergioo.typesPopulation2013.controler;
 //import java.util.HashSet;
 
 //import org.matsim.api.core.v01.Id;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
-
-//import playground.artemc.calibration.CalibrationStatsListener;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQSimFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
@@ -40,6 +40,8 @@ import playground.sergioo.typesPopulation2013.controler.corelisteners.LegHistogr
 import playground.sergioo.typesPopulation2013.replanning.StrategyManagerPops;
 import playground.sergioo.typesPopulation2013.replanning.StrategyManagerPopsConfigLoader;
 import playground.sergioo.typesPopulation2013.scenario.ScenarioUtils;
+
+//import playground.artemc.calibration.CalibrationStatsListener;
 
 
 /**
@@ -61,7 +63,7 @@ public class ControlerWS extends Controler {
 		config.removeModule(StrategyConfigGroup.GROUP_NAME);
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
-		ControlerWS controler = new ControlerWS(ScenarioUtils.loadScenario(config));
+		final ControlerWS controler = new ControlerWS(ScenarioUtils.loadScenario(config));
 		controler.setMobsimFactory(new PTQSimFactory());
 		controler.setOverwriteFiles(true);
         controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
@@ -72,13 +74,21 @@ public class ControlerWS extends Controler {
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		controler.setTransitRouterFactory(factory);
-		controler.run();
+        AbstractModule myStrategyManagerModule = new AbstractModule() {
+
+            @Override
+            public void install() {
+                bindToInstance(StrategyManager.class, controler.myLoadStrategyManager());
+            }
+        };
+        controler.addOverridingModule(myStrategyManagerModule);
+        controler.run();
 	}
-	@Override
+
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	protected StrategyManager loadStrategyManager() {
+	private StrategyManager myLoadStrategyManager() {
 		StrategyManagerPops manager = new StrategyManagerPops();
 		StrategyManagerPopsConfigLoader.load(this, manager);
 		return manager;

@@ -20,13 +20,6 @@
 
 package org.matsim.contrib.grips.io;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,18 +28,17 @@ import org.matsim.contrib.grips.evacuationptlineseditor.BusStop;
 import org.matsim.contrib.grips.evacuationptlineseditor.PTLinesGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleWriterV1;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * all i/origin functions involving the configuration files
@@ -125,11 +117,11 @@ public class ConfigIO
 		
 		//settings to activate pt simulation
 		config.strategy().addParam("maxAgentPlanMemorySize", "3");
-		config.strategy().addParam("Module_1", PlanStrategyRegistrar.Names.ReRoute.toString());
+		config.strategy().addParam("Module_1", DefaultPlanStrategiesModule.Names.ReRoute.toString());
 		config.strategy().addParam("ModuleProbability_1", "0.1");
-		config.strategy().addParam("Module_2", PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
+		config.strategy().addParam("Module_2", DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString());
 		config.strategy().addParam("ModuleProbability_2", "0.8");
-		config.strategy().addParam("Module_3", PlanStrategyRegistrar.Names.ChangeLegMode.toString());
+		config.strategy().addParam("Module_3", DefaultPlanStrategiesModule.Names.ChangeLegMode.toString());
 		config.strategy().addParam("ModuleProbability_3", "0.4");
 		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
 		

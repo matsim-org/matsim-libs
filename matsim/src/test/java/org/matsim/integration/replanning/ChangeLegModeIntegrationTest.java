@@ -33,8 +33,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.PlanSelectorRegistrar;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -43,7 +41,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -95,10 +93,10 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
             public void install() {
                 bindToInstance(Scenario.class, scenario);
                 bindToInstance(EventsManager.class, EventsUtils.createEventsManager());
+                include(new StrategyManagerModule());
             }
         });
-		final StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(injector, new PlanStrategyRegistrar().getFactoryRegister(), new PlanSelectorRegistrar().getFactoryRegister(), manager);
+		final StrategyManager manager = injector.getInstance(StrategyManager.class);
 		manager.run(population, new ReplanningContext() {
 
 			@Override

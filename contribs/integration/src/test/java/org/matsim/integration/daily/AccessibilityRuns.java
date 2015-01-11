@@ -1,12 +1,5 @@
 package org.matsim.integration.daily;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,13 +14,20 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesUtils;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AccessibilityRuns {
 	public static final Logger log = Logger.getLogger( AccessibilityRuns.class ) ;
@@ -58,7 +58,7 @@ public class AccessibilityRuns {
 		
 		{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) );
-			stratSets.setStrategyName( PlanStrategyRegistrar.Selector.ChangeExpBeta.toString() );
+			stratSets.setStrategyName( DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString() );
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}

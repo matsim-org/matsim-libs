@@ -28,6 +28,7 @@ import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -38,6 +39,8 @@ import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
+
+import javax.inject.Provider;
 
 /**
  * Quick and dirty way to obtain a {@link MultiLegRoutingControler} with 
@@ -58,6 +61,17 @@ public class UglyHerbieMultilegControler extends Controler {
 	public UglyHerbieMultilegControler( final Scenario scenario ) {
 		super( scenario );
 		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
+        addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+                    @Override
+                    public StrategyManager get() {
+                        return myLoadStrategyManager();
+                    }
+                });
+            }
+        });
 	}
 
 	@Override
@@ -124,8 +138,8 @@ public class UglyHerbieMultilegControler extends Controler {
 	  * during the replanning phase. They either keep their selected plan or
 	  * replan it.
 	  */
-	 @Override
-	 protected StrategyManager loadStrategyManager() {
+
+	 private StrategyManager myLoadStrategyManager() {
 	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
 	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 	  StrategyManagerConfigLoader.load(this, manager);
