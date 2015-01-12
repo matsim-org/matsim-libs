@@ -19,13 +19,13 @@
 
 package org.matsim.core.population.routes;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mrieser / senozon
@@ -42,8 +42,8 @@ public class ModeRouteFactory {
 	
 	/**
 	 * @param transportMode the transport mode the route should be for
-	 * @param startLink the link where the route starts
-	 * @param endLink the link where the route ends
+	 * @param startLinkId the link where the route starts
+	 * @param endLinkId the link where the route ends
 	 * @return a new Route for the specified mode
 	 *
 	 * @see #setRouteFactory(String, RouteFactory)
