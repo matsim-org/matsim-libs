@@ -46,6 +46,16 @@ public class LoadMyScenarios {
 	}
 	
 	/**
+	 * Returns scenario using standard output files from specified outputdir. 
+	 */
+	public static Scenario loadScenarioFromOutputDir(String outputDir) {
+		String configFile = outputDir+"/output_config.xml";
+		String plansFile = outputDir+"/output_plans.xml.gz";
+		String networkFile = outputDir+"/output_network.xml.gz";
+		return LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
+	}
+	
+	/**
 	 * Returns scenario from specified plans and network file.
 	 */
 	public static Scenario loadScenarioFromPlansAndNetwork(String populationFile, String networkFile) {
