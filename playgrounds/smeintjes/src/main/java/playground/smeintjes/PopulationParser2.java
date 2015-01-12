@@ -92,7 +92,7 @@ public class PopulationParser2 {
 				/* Set up multi-threaded infrastructure */
 				ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 				List<Future<List<int[]>>> jobs = new ArrayList<Future<List<int[]>>>();
-				
+				jobs.clear();
 				/* Parse this population */
 				String populationFile = String.format("results%d/trainingPopulation_%d_%d_%d_%d.xml.gz", i, pmin, radius, i, j);
 //				String populationFile = String.format("C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/trainingPopulation_%d_%d_%d_%d.xml.gz", pmin, radius, i, j);
