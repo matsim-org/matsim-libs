@@ -35,11 +35,11 @@ public class TruncateDistances implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(ProxyObject leg : plan.getLegs()) {
-			String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+			String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 			if(val != null) {
 				double d = Double.parseDouble(val);
 				if(d > limit) {
-					leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(limit));
+					leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(limit));
 				}
 			}
 		}

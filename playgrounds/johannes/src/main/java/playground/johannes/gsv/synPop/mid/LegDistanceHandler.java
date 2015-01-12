@@ -41,9 +41,9 @@ public class LegDistanceHandler implements LegAttributeHandler, AttributeSeriali
 		double d = Double.parseDouble(att);
 		if(d < 9994) {
 			d = d * 1000;
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
+			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(d));
 		} else {
-			leg.setAttribute(CommonKeys.LEG_DISTANCE, null);
+			leg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, null);
 		}
 
 	}

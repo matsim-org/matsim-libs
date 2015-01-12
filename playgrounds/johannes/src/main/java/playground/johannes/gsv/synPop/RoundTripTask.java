@@ -59,10 +59,10 @@ public class RoundTripTask implements ProxyPlanTask {
 			 * half the leg duration and distance
 			 */
 			toLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegStart + dur/2 - 1));
-			String distStr = toLeg.getAttribute(CommonKeys.LEG_DISTANCE);
+			String distStr = toLeg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 			if(distStr != null) {
 				double dist = Double.parseDouble(distStr);
-				toLeg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(dist/2.0));
+				toLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(dist/2.0));
 			}
 			/*
 			 * insert a dummy activity with duration 1 s.
@@ -77,7 +77,7 @@ public class RoundTripTask implements ProxyPlanTask {
 			ProxyObject fromLeg = new ProxyObject();
 			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(toLegStart + dur/2));
 			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
-			fromLeg.setAttribute(CommonKeys.LEG_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_DISTANCE));
+			fromLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
 			fromLeg.setAttribute(CommonKeys.LEG_MODE, toLeg.getAttribute(CommonKeys.LEG_MODE));
 			
 			ProxyObject nextAct = plan.getActivities().get(i);

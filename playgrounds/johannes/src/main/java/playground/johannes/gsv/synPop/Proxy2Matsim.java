@@ -111,7 +111,7 @@ public class Proxy2Matsim {
 						mode = "undefined";
 					}
 					Leg leg = factory.createLeg(mode);
-					String val = proxyLeg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String val = proxyLeg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						leg.setTravelTime(Double.parseDouble(val)); //FIME: temporary hack!
 					}

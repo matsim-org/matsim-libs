@@ -86,7 +86,7 @@ public class Simulator {
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
-//		controler.setMobsimFactory(new MobsimConnectorFactory());
+		controler.setMobsimFactory(new MobsimConnectorFactory());
 		controler.addControlerListener(new ControllerSetup());
 		/*
 		 * setup mutation module

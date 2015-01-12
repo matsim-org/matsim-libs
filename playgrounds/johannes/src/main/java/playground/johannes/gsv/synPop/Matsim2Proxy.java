@@ -76,7 +76,7 @@ public class Matsim2Proxy {
 					Leg matsimLeg = (Leg) matsimPlan.getPlanElements().get(i);
 					ProxyObject proxyLeg = proxyPlan.getLegs().get((i-1)/2);
 					
-					proxyLeg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(matsimLeg.getRoute().getDistance())); // not sure if this is maintained
+					proxyLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(matsimLeg.getRoute().getDistance())); // not sure if this is maintained
 				}
 			}
 			

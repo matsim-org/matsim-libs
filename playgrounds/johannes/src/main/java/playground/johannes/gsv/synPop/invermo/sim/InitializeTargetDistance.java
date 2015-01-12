@@ -73,9 +73,9 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 				
 				double d = dCalc.distance(source, dest);
 //				d = d * detourFactor;
-				d = d * TargetDistanceHamiltonian.calcDetourFactor(d);
+//				d = d * TargetDistanceHamiltonian.calcDetourFactor(d);
 				
-				leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
+				leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(d));
 			}
 		}
 

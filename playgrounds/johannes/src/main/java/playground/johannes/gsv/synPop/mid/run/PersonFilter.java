@@ -40,13 +40,15 @@ public class PersonFilter {
 	private static final Logger logger = Logger.getLogger(PersonFilter.class);
 	
 	public static void main(String args[]) {
-		String outDir = "/home/johannes/gsv/mid2008/pop/";
+//		String outDir = "/home/johannes/gsv/mid2008/pop/";
+		String outDir = "/Users/jillenberger/Dropbox/work/raw/";
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		XMLWriter writer = new XMLWriter();
 		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+//		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
+		parser.parse("/Users/jillenberger/Dropbox/work/raw/pop.xml");
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 

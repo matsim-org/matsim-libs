@@ -67,7 +67,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 				ProxyPlan plan = person.getPlan();
 				for(ProxyObject leg : plan.getLegs()) {
 					if(mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-					String distVal = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String distVal = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);
 					String endVal = leg.getAttribute(CommonKeys.LEG_END_TIME);
 					

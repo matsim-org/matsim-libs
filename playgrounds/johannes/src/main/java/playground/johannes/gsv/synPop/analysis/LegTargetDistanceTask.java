@@ -61,7 +61,7 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 			for (ProxyObject leg : plan.getLegs()) {
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					if (purpose == null || purpose.equalsIgnoreCase((String) leg.getAttribute(CommonKeys.LEG_PURPOSE))) {
-						String distStr = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+						String distStr = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 						if (distStr != null) {
 							double d = Double.parseDouble(distStr);
 							if(d > 100000)

@@ -42,14 +42,14 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 	
 	private final AtomicLong iter;
 	
-	private final TargetDistanceHamiltonian h;
+	private final Hamiltonian h;
 	
 	private final String outdir;
 	
-	public ErrorTargetDistanceLogger(long logInterval, String outdir) {
+	public ErrorTargetDistanceLogger(Hamiltonian h, long logInterval, String outdir) {
 		this.logInterval = logInterval;
 		this.iter = new AtomicLong();
-		this.h = new TargetDistanceHamiltonian();
+		this.h = h;
 		this.outdir = outdir;
 	}
 	
@@ -64,7 +64,7 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 				err[i] = h.evaluate(person);
 				double sum = 0;
 				for(ProxyObject leg : person.getPlans().get(0).getLegs()) {
-					String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						sum += Double.parseDouble(val);
 					}

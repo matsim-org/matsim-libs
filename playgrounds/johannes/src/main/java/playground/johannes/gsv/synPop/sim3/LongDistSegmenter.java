@@ -53,7 +53,7 @@ public class LongDistSegmenter implements PopulationSegmenter {
 			double max = 0;
 			for(ProxyPlan plan : person.getPlans()) {
 				for(ProxyObject leg : plan.getLegs()) {
-					String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);
 					}

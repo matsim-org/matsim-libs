@@ -56,7 +56,7 @@ public class ExtractLongDistancePersons {
 		for(ProxyPerson person : parser.getPersons()) {
 			for(ProxyPlan plan : person.getPlans()) {
 				for(ProxyObject leg : plan.getLegs()) {
-					String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						double d = Double.parseDouble(val);
 						

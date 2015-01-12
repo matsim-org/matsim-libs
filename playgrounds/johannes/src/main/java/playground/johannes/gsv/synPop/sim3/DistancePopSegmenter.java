@@ -52,7 +52,7 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 			double max = 0;
 			for(ProxyPlan plan : person.getPlans()) {
 				for(ProxyObject leg : plan.getLegs()) {
-					String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);
 					}

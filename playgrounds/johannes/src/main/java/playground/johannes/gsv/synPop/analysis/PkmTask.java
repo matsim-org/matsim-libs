@@ -46,7 +46,7 @@ public class PkmTask extends AnalyzerTask {
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan :person.getPlans()) {
 				for(ProxyObject leg : plan.getLegs()) {
-					String value = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(value != null) {
 						pkm += Double.parseDouble(value);
 					}

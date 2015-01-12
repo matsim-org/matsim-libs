@@ -47,7 +47,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 	public void apply(ProxyPlan plan) {
 		for (int i = 0; i < plan.getLegs().size(); i++) {
 			ProxyObject leg = plan.getLegs().get(i);
-			String value = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+			String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 			if (value != null) {
 				double dist = Double.parseDouble(value);
 				if (shortTrips) {

@@ -33,6 +33,7 @@ import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -79,6 +80,12 @@ public class SetActivityLocations {
 		logger.info("Replacing activity types...");
 		ProxyTaskRunner.run(new ReplaceActTypes(), persons);
 
+		logger.info("Calculating geo distances from route distances...");
+		double A = Double.parseDouble(config.getParam(MODULE_NAME, "A"));
+		double alpha = Double.parseDouble(config.getParam(MODULE_NAME, "alpha"));
+		double min = Double.parseDouble(config.getParam(MODULE_NAME, "min"));
+		ProxyTaskRunner.run(new Route2GeoDistance(A, alpha, min), persons);
+
 		logger.info("Truncating distances...");
 		ProxyTaskRunner.run(new TruncateDistances(1000000), persons);
 		
@@ -101,8 +108,9 @@ public class SetActivityLocations {
 		/*
 		 * Build a hamiltonian to evaluate the target distance
 		 */
+		boolean weighted = Boolean.parseBoolean(config.getParam(MODULE_NAME, "weighted"));
 		HamiltonianComposite H = new HamiltonianComposite();
-		TargetDistanceHamiltonian distance = new TargetDistanceHamiltonian();
+		TargetDistanceHamiltonian distance = new TargetDistanceHamiltonian(weighted);
 		H.addComponent(distance, 10000);
 		// TargetDistanceAbsolute distance = new TargetDistanceAbsolute();
 		// H.addComponent(distance, 1);
@@ -121,7 +129,7 @@ public class SetActivityLocations {
 		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
 
 		if (dumpInterval % logInterval != 0) {
-			throw new RuntimeException("The dump intervall needs to be a multiple of the log intervall.");
+			throw new RuntimeException("The dump interval needs to be a multiple of the log interval.");
 		}
 		/*
 		 * add loggers
@@ -138,7 +146,7 @@ public class SetActivityLocations {
 		listener.addComponent(new CopyFacilityUserData(dumpInterval));
 		listener.addComponent(new PopulationWriter(outputDir, dumpInterval));
 		listener.addComponent(new AnalyzerListener(dataPool, outputDir, dumpInterval));
-		listener.addComponent(new ErrorTargetDistanceLogger(logInterval, outputDir));
+		listener.addComponent(new ErrorTargetDistanceLogger(distance, logInterval, outputDir));
 		/*
 		 * need to copy activity location user key to activity attributes
 		 */

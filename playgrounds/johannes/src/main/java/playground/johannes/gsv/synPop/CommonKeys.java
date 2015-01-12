@@ -25,12 +25,12 @@ package playground.johannes.gsv.synPop;
  */
 public interface CommonKeys {
 	
-	public static final String PERSON_HOME_COORD_X = "personhomecoordx";
-	
-	public static final String PERSON_HOME_COORD_Y = "personhomecoordy";
-	
-	public static final String PERSON_HOME_POINT = "personHomePoint";
-	
+//	public static final String PERSON_HOME_COORD_X = "personhomecoordx";
+//
+//	public static final String PERSON_HOME_COORD_Y = "personhomecoordy";
+//
+//	public static final String PERSON_HOME_POINT = "personHomePoint";
+
 	public static final String PERSON_WEIGHT = "weight";
 
 	public static final String LEG_START_TIME = "startTime";
@@ -43,10 +43,12 @@ public interface CommonKeys {
 	
 	public static final String LEG_ROUNDTRIP = "roundTrip";
 	
-	public static final String LEG_DISTANCE = "distance";
-	
+	public static final String LEG_ROUTE_DISTANCE = "routeDistance";
+
+	public static final String LEG_GEO_DISTANCE = "geoDistance";
+
 	public static final String LEG_MODE = "mode";
-	
+
 	public static final String LEG_MODE_PED = "walk";
 	
 	public static final String LEG_MODE_BIKE = "bike";

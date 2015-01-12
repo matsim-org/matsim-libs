@@ -31,45 +31,65 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  *
  */
 public class TargetDistanceHamiltonian implements Hamiltonian {
-	
-//	public static final double DEFAULT_DETOUR_FACTOR = 1.3;
-	
-//	private double detourFactor = DEFAULT_DETOUR_FACTOR;
 
 	private static final Object TARGET_DISTANCE_KEY = new Object();
 
+	private final boolean weighted;
+
+	public TargetDistanceHamiltonian() {
+		this(true);
+	}
+
+	public TargetDistanceHamiltonian(boolean weighted) {
+		this.weighted = weighted;
+	}
+
 	public double evaluate(ProxyPerson person) {
+		double targetSum = 0;
+		double realSum = 0;
 		double errSum = 0;
+		double cnt = 0;
 		
 		for (int i = 1; i < person.getPlan().getActivities().size(); i++) {
 			ProxyObject leg = person.getPlan().getLegs().get(i - 1);
 			Double targetDistance = (Double) leg.getUserData(TARGET_DISTANCE_KEY);
 			
 			if (targetDistance == null) {
-				String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+				String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 				if (val != null) {
 					targetDistance = new Double(val);
 				}
 			}
 
 			if (targetDistance != null) {
+				targetSum += targetDistance;
+
 				ProxyObject prev = person.getPlan().getActivities().get(i - 1);
 				ProxyObject next = person.getPlan().getActivities().get(i);
-				
 				double dist = distance(prev, next);
+				realSum += dist;
+
 				targetDistance = Math.max(targetDistance, 100);
-				
-//				detourFactor = - 1/600.0 * targetDistance/1000.0 + 2;
-//				detourFactor = Math.max(detourFactor, 1);
-				
-//				dist = dist * detourFactor;
-				dist = dist * calcDetourFactor(dist);
-				double delta = Math.abs(dist - targetDistance)/targetDistance;
-				errSum += delta;
+				double error = Math.abs(dist - targetDistance)/targetDistance;
+				errSum += error;
+
+				cnt++;
 			}
 		}
-		
-		return errSum;
+
+		if(weighted) {
+			if(cnt == 0) {
+				return 0.0;
+			} else {
+				/*
+				 * Dividing by count is not necessary for the markov chain but is more convenient for analysis.
+				 */
+				return errSum / cnt;
+			}
+		} else {
+			targetSum = Math.max(targetSum, 100);
+			return Math.abs((realSum - targetSum) / targetSum);
+		}
 	}
 	
 	private double distance(ProxyObject origin, ProxyObject destination) {
@@ -84,16 +104,5 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		double d = Math.sqrt(dx*dx + dy*dy); 
 		
 		return d;
-	}
-
-	public static double calcDetourFactor(double beeline) {
-//		if(beeline < 100000) {
-//			return 2.5;
-//		} else if(beeline < 300000) {
-//			return 1.3;
-//		} else {
-//			return 1.0;
-//		}
-		return 1.0;
 	}
 }

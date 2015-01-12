@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -76,11 +75,11 @@ public class InitHomeBasedActLocations implements ProxyPlanTask {
 					ProxyObject prev = plan.getActivities().get(i - 1);
 					ProxyObject leg = plan.getLegs().get(i - 1);
 					ActivityFacility prevFac = (ActivityFacility) prev.getUserData(ActivityLocationMutator.USER_DATA_KEY);
-					String targetDist = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					String targetDist = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if (prevFac != null && targetDist != null) {
 						double d = Double.parseDouble(targetDist);
 //						d = d/TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR;
-						d = d/TargetDistanceHamiltonian.calcDetourFactor(d);
+//						d = d/TargetDistanceHamiltonian.calcDetourFactor(d);
 						f = getFacility(prevFac.getCoord(), d, type);
 						act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
 					} else {

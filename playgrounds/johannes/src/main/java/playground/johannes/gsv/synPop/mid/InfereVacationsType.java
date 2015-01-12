@@ -38,7 +38,7 @@ public class InfereVacationsType implements ProxyPlanTask {
 		for(ProxyObject act : plan.getActivities()) {
 			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("vacations")) {
 				int days = Integer.parseInt(plan.getAttribute("journeydays"));
-				if(days > 4) {
+				if(days > 1) {
 					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");
 				} else {
 					act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_short");

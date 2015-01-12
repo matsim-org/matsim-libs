@@ -72,7 +72,7 @@ public class LegMainPurposeHandler implements LegAttributeHandler {
 				} else if(subtype.equalsIgnoreCase("Besuch einer Veranstaltung (z.B. Fußballspiel, Markt)")) {
 					leg.setAttribute(CommonKeys.LEG_PURPOSE, "culture");
 				} else if(subtype.equalsIgnoreCase("Sport (selbst aktiv), Sportverein")) {
-					leg.setAttribute(CommonKeys.LEG_DISTANCE, "sport");
+					leg.setAttribute(CommonKeys.LEG_PURPOSE, "sport");
 				} else if(subtype.equalsIgnoreCase("Restaurant, Gaststätte, Mittagessen etc.")) {
 					leg.setAttribute(CommonKeys.LEG_PURPOSE, "gastro");
 				} else if(subtype.equalsIgnoreCase("Tagesausflug, mehrtägiger Ausflug (bis 4 Tage)")) {

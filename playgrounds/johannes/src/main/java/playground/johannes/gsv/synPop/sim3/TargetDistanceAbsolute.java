@@ -44,7 +44,7 @@ public class TargetDistanceAbsolute implements Hamiltonian {
 			Double targetDistance = (Double) leg.getUserData(TARGET_DISTANCE_KEY);
 			
 			if (targetDistance == null) {
-				String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+				String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 				if (val != null) {
 					targetDistance = new Double(val);
 				}
@@ -56,7 +56,7 @@ public class TargetDistanceAbsolute implements Hamiltonian {
 				
 				double dist = distance(prev, next);
 //				dist = dist * detourFactor;
-				dist = dist * TargetDistanceHamiltonian.calcDetourFactor(dist);
+//				dist = dist * TargetDistanceHamiltonian.calcDetourFactor(dist);
 				double delta = Math.abs(dist - targetDistance);
 //				if(targetDistance > 1000000)
 //					System.err.println();

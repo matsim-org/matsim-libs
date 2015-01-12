@@ -112,7 +112,7 @@ public class ActivityLocationMutator implements SingleMutator {
 //	
 //				if (prevFac.equals(nextFac)) {
 //					ProxyObject leg = person.getPlan().getLegs().get(idx - 1);
-//					String value = leg.getAttribute(MIDKeys.LEG_DISTANCE);
+//					String value = leg.getAttribute(MIDKeys.LEG_ROUTE_DISTANCE);
 //					if (value != null) {
 //						double dist = Double.parseDouble(value);
 //						// QuadTree<ActivityFacility> quadTree =
