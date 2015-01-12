@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package air.run;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import air.pathsize.PathSizeLogitSelector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -33,9 +31,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
-import air.pathsize.PathSizeLogitSelector;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -54,7 +53,7 @@ public class FlightControllerPSRemove {
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		controler.addControlerListener(lis);
 		if (flightConfig.doRandomizedTTAndDisutilityRouting()) {
-			controler.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+			controler.addOverridingModule(new RandomizedTransitRouterModule());
 			log.info("Enabled RandomizedTravelTimeAndDisutilityRouting...");
 		}
 		if (flightConfig.doRerouteStuckedPersons()){

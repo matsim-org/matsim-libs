@@ -61,7 +61,7 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 		
 		ctrl.setOverwriteFiles(true) ;
 		
-		ctrl.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+		ctrl.addOverridingModule(new RandomizedTransitRouterModule());
 		
 		if (doVisualization){
 		ctrl.setMobsimFactory(new MobsimFactory(){

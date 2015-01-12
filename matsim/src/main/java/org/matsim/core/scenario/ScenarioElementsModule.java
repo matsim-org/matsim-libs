@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,6 +37,9 @@ public class ScenarioElementsModule extends AbstractModule {
     public void install() {
         bindToProvider(Network.class, NetworkProvider.class);
         bindToProvider(Population.class, PopulationProvider.class);
+        if (getConfig().scenario().isUseTransit()) {
+            bindToProvider(TransitSchedule.class, TransitScheduleProvider.class);
+        }
     }
 
     private static class NetworkProvider implements Provider<Network> {
@@ -59,6 +63,18 @@ public class ScenarioElementsModule extends AbstractModule {
         @Override
         public Population get() {
             return scenario.getPopulation();
+        }
+
+    }
+
+    private static class TransitScheduleProvider implements Provider<TransitSchedule> {
+
+        @Inject
+        Scenario scenario;
+
+        @Override
+        public TransitSchedule get() {
+            return scenario.getTransitSchedule();
         }
 
     }

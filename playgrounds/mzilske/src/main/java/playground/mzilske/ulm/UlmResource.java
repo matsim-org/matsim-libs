@@ -19,11 +19,11 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
-
 import playground.mzilske.ant2014.RunResource;
 import playground.mzilske.gtfs.GtfsConverter;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
-public class UlmResource {
+class UlmResource {
 	
 	private static final String CRS = "EPSG:3395";
 
@@ -59,6 +59,7 @@ public class UlmResource {
 	public void run() {
 		Scenario scenario = loadScenario();
 		Controler controler = new Controler(scenario);
+        controler.addOverridingModule(new RandomizedTransitRouterModule());
 		controler.run();
 	}
 	
@@ -83,7 +84,7 @@ public class UlmResource {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setEndTime(35*60*60);
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory(wd + "/output");
 		
 		ActivityParams home = new ActivityParams("home");
@@ -97,15 +98,15 @@ public class UlmResource {
 		
 		StrategySettings change = new StrategySettings(Id.create(1, StrategySettings.class));
 		change.setStrategyName("ChangeExpBeta");
-		change.setWeight(0.8);
+		change.setWeight(0.0);
 	
 		StrategySettings reRoute = new StrategySettings(Id.create(2, StrategySettings.class));
 		reRoute.setStrategyName("ReRoute");
-		reRoute.setWeight(0.1);
+		reRoute.setWeight(0.5);
 		
 		StrategySettings time = new StrategySettings(Id.create(3, StrategySettings.class));
 		time.setStrategyName("TimeAllocationMutator");
-		time.setWeight(0.1);
+		time.setWeight(0.5);
 	
 		config.strategy().addStrategySettings(change);
 		config.strategy().addStrategySettings(reRoute);

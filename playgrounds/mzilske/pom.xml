@@ -84,6 +84,12 @@
 			<version>0.7.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+        <dependency>
+            <groupId>playground</groupId>
+            <artifactId>vsp</artifactId>
+            <version>0.7.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>

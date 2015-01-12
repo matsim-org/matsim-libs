@@ -27,8 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
 /**
  * Runs the MATSim Controler with some additions for the flight model.
@@ -47,7 +46,7 @@ public class FlightController {
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		controler.addControlerListener(lis);
 		if (flightConfig.doRandomizedTTAndDisutilityRouting()) {
-			controler.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+			controler.addOverridingModule(new RandomizedTransitRouterModule());
 			log.info("Enabled RandomizedTravelTimeAndDisutilityRouting...");
 		}
 		if (flightConfig.doRerouteStuckedPersons()){

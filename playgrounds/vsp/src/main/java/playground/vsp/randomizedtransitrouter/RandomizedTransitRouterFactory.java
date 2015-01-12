@@ -20,28 +20,25 @@
 package playground.vsp.randomizedtransitrouter;
 
 import org.matsim.core.config.Config;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
+
+import javax.inject.Inject;
 
 
 /**
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterTravelTimeAndDisutilityFactory implements TransitRouterFactory{
+public class RandomizedTransitRouterFactory implements TransitRouterFactory {
 
 	private TransitRouterConfig trConfig;
 	private TransitSchedule schedule;
 	private TransitRouterNetwork routerNetwork;
 
-	public RandomizedTransitRouterTravelTimeAndDisutilityFactory(Config config, TransitSchedule schedule) {
+    @Inject
+	RandomizedTransitRouterFactory(Config config, TransitSchedule schedule) {
 		this.trConfig = new TransitRouterConfig(config);
 		this.schedule = schedule;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);

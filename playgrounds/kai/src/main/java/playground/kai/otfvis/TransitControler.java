@@ -20,7 +20,6 @@
 
 package playground.kai.otfvis;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -37,8 +36,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
 
 public class TransitControler {
 	
@@ -69,7 +66,7 @@ public class TransitControler {
 		tc.setOverwriteFiles(true);
 		
 //		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
-//		tc.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+//		tc.addOverridingModule(new RandomizedTransitRouterModule());
 
 		tc.setMobsimFactory(new MyMobsimFactory()) ;
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
