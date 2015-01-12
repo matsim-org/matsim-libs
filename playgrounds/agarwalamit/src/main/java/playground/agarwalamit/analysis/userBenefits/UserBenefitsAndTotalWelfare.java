@@ -58,7 +58,7 @@ public class UserBenefitsAndTotalWelfare {
 		new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	private void runAndWrite(String [] runCases){
+	public void runAndWrite(String [] runCases){
 
 		double [] userBenefits_money = new double [runCases.length];
 		double [] monetaryPayments = new double [runCases.length];
