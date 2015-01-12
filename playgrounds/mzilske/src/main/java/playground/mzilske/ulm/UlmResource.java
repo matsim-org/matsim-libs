@@ -2,6 +2,7 @@ package playground.mzilske.ulm;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
@@ -11,8 +12,10 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -132,5 +135,30 @@ class UlmResource {
 		Config config = getConfig();
         return ScenarioUtils.loadScenario(config);
 	}
-	
+
+    void compareOutcome() {
+        TransitSchedule transitSchedule = readTransitSchedule();
+        System.out.println(transitSchedule.getTransitLines().size());
+        Population population0 = readPopulation(0);
+        Population population10 = readPopulation(10);
+        System.out.println(population0.getPersons().size());
+        System.out.println(population10.getPersons().size());
+    }
+
+    private TransitSchedule readTransitSchedule() {
+        Config config = ConfigUtils.createConfig();
+        config.scenario().setUseTransit(true);
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        new TransitScheduleReader(scenario).readFile(wd + "/output/output_transitSchedule.xml.gz");
+        return scenario.getTransitSchedule();
+    }
+
+    private Population readPopulation(int it) {
+        Config config = ConfigUtils.createConfig();
+        config.scenario().setUseTransit(true);
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        new MatsimPopulationReader(scenario).readFile(wd + "/output/ITERS/it."+it+"/"+it+".experienced_plans.xml.gz");
+        return scenario.getPopulation();
+    }
+
 }
