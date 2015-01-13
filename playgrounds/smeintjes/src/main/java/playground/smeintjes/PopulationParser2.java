@@ -51,6 +51,7 @@ import com.vividsolutions.jts.geom.Point;
 public class PopulationParser2 {
 	private final static Logger LOG = Logger.getLogger(PopulationParser2.class.toString()); 
 	private Scenario scenario;
+	private PopulationReaderMatsimV5 reader;
 
 	public static void main(String[] args) {
 		Header.printHeader(PopulationParser2.class.toString(), args);
@@ -69,9 +70,9 @@ public class PopulationParser2 {
 		int numberOfThreads = Integer.parseInt(args[10]);
 
 //		PopulationParser2 pp2 = new PopulationParser2();
-		PopulationParser pp = new PopulationParser();
-		String outputFile = "./populationAnalyser.csv";
-//		String outputFile = "C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/populationAnalyser.csv";
+//		PopulationParser pp = new PopulationParser();
+//		String outputFile = "./populationAnalyser.csv";
+		String outputFile = "C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/populationAnalyser.csv";
 
 		/*Read in all four shapefiles*/
 		Geometry southAfrica = getGeometryFromShapeFile(saShapefile, 1);
@@ -92,17 +93,18 @@ public class PopulationParser2 {
 				/* Set up multi-threaded infrastructure */
 				ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 				List<Future<List<int[]>>> jobs = new ArrayList<Future<List<int[]>>>();
-				jobs.clear();
+				
 				/* Parse this population */
-				String populationFile = String.format("results%d/trainingPopulation_%d_%d_%d_%d.xml.gz", i, pmin, radius, i, j);
-//				String populationFile = String.format("C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/trainingPopulation_%d_%d_%d_%d.xml.gz", pmin, radius, i, j);
+//				String populationFile = String.format("results%d/trainingPopulation_%d_%d_%d_%d.xml.gz", i, pmin, radius, i, j);
+				String populationFile = String.format("C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/trainingPopulation_%d_%d_%d_%d.xml.gz", pmin, radius, i, j);
 				int population = j*10 + i;
-//				String populationOutputFile = String.format("C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/population_%d.csv", population);
-				String populationOutputFile = String.format("./population_%d.csv", population);
+				String populationOutputFile = String.format("C:/Users/sumarie/Documents/Honneurs/SVC 791/Data/TrainingSyntheticPopulations/population_%d.csv", population);
+//				String populationOutputFile = String.format("./population_%d.csv", population);
 				
 				LOG.info("Reading population " + population);
 				PopulationParser2 pp2 = new PopulationParser2();
 				Collection<? extends Person> personCollection = pp2.readPopulation(populationFile);
+//				Collection<? extends Person> personCollection = pp2.readPopulation(populationFile);
 				Iterator<? extends Person> iterator = personCollection.iterator();
 
 				while (iterator.hasNext()) {
@@ -174,32 +176,21 @@ public class PopulationParser2 {
 						List<int[]> thisJob = job.get();
 						int indexArray = 0;
 						for (int[] intArray : thisJob) {
-//							LOG.info("thisJob's intArray: " + intArray[0] + ", " + intArray[1] + ", " + intArray[2] + ", " + intArray[3] + ", " + intArray[4] + " etc.");
-//							int indexOfIntArray = thisJob.indexOf(intArray);
 							for (int k = 0; k < intArray.length; k++) {
 								int valueAtK = intArray[k];
-//								LOG.info("Value at k: " + valueAtK);
-//								int populationValueAtK = consolidatedPopulationInfo.get(indexOfIntArray)[k];
-//								LOG.info("Population value at k: " + populationValueAtK);
-//								consolidatedPopulationInfo.get(indexOfIntArray)[k] = populationValueAtK + valueAtK;
-//								consolidatedPopulationInfo.get(indexOfIntArray)[k] += valueAtK;
 								consolidatedPopulationInfo.get(indexArray)[k] += valueAtK;
-//								LOG.info("New population value at k: " + consolidatedPopulationInfo.get(indexOfIntArray)[k]);
 							}
 							indexArray++;
 						}
-
 					}
-
-
 				} catch (ExecutionException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Couldn't get thread job result.");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Couldn't get thread job result.");
+				
 				}
-
 				consolidatedMap.put(population, consolidatedPopulationInfo);
 				writeOnePopulationInfo(populationOutputFile, consolidatedPopulationInfo, population);
 			}
@@ -224,6 +215,7 @@ public class PopulationParser2 {
 					bw.write(",");
 				}
 			}
+			bw.newLine();
 
 			
 		} catch (IOException e) {
@@ -391,17 +383,22 @@ public class PopulationParser2 {
 			}
 		}
 	}
-//	
-//	public PopulationParser2() {
-//		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//	}
+	
+	public PopulationParser2() {
+		this.scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.reader = new PopulationReaderMatsimV5(this.scenario);
+	}
 
 	public Collection<? extends Person> readPopulation(String populationFile) {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(sc);
-		popReader.parse(populationFile);
-//		Collection<? extends Person> personCollection = this.scenario.getPopulation().getPersons().values();
-		Collection<? extends Person> personCollection = sc.getPopulation().getPersons().values();
+//		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(sc);
+
+//		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		PopulationReaderMatsimV5 popReader = new PopulationReaderMatsimV5(this.scenario);
+		this.reader.parse(populationFile);
+//		popReader.parse(populationFile);
+		Collection<? extends Person> personCollection = this.scenario.getPopulation().getPersons().values();
+//		Collection<? extends Person> personCollection = sc.getPopulation().getPersons().values();
 
 		return personCollection;
 	}
@@ -554,16 +551,10 @@ public class PopulationParser2 {
 				double endTime = activity.getEndTime();
 				if (endTime >= 0) {
 					startHour  = convertSecondsToHourOfDay(endTime);
-					if (startHour < 24) {
 						incrementArray(startHour, hourArray);
-					} else{
-						LOG.info("startHour is greater than 23 and won't be added to the hourArray: " + startHour);
-					}
 				} else {
 					LOG.info("Chain start time is negative: " + endTime);
 				}
-//				LOG.info("endTime is " + endTime);
-//				LOG.info("startHour is " + startHour);
 			} else {
 				LOG.info("First plan element in plan is not an activity therefore" +
 						" the chain start time cannot be captured!");
@@ -574,11 +565,9 @@ public class PopulationParser2 {
 			int numberMinorActivities  = (int) ((numberPlanElements - 1)/2.0 - 1);
 			if (numberMinorActivities >= 0) {
 				incrementArray(numberMinorActivities, activityArray);
-				
 			} else {
 				LOG.info("numberMinorActivities less than 0: " + numberMinorActivities);
 			}
-//			LOG.info("numberMinorActivities is " + numberMinorActivities);
 
 			/* Get the areas in which this chain's activities are performed */
 			boolean inSouthAfrica = false;
@@ -606,85 +595,40 @@ public class PopulationParser2 {
 			boolean[] booleanArray = new boolean[]{inGauteng, inCapeTown, inEthekwini, inSouthAfrica};
 			if(Arrays.equals(booleanArray, a1)){
 				incrementArray(0, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray1);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray1: " + startHour);
-				}
+				incrementArray(startHour, hourArray1);
 				incrementArray(numberMinorActivities, activityArray1);
-//				LOG.info("a1 matched.");
 			} else if(Arrays.equals(booleanArray, a2)){
 				incrementArray(1, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray2);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray2: " + startHour);
-				}
+				incrementArray(startHour, hourArray2);
 				incrementArray(numberMinorActivities, activityArray2);
-//				LOG.info("a2 matched.");			
 			} else if(Arrays.equals(booleanArray, a3)){
 				incrementArray(2, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray3);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray3: " + startHour);
-				}
+				incrementArray(startHour, hourArray3);
 				incrementArray(numberMinorActivities, activityArray3);
-//				LOG.info("a3 matched.");
 			} else if(Arrays.equals(booleanArray, a4)){
 				incrementArray(3, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray4);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray4: " + startHour);
-				}
+				incrementArray(startHour, hourArray4);
 				incrementArray(numberMinorActivities, activityArray4);
-//				LOG.info("a4 matched.");
 			} else if(Arrays.equals(booleanArray, a5)){
 				incrementArray(4, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray5);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray5: " + startHour);
-				}
+				incrementArray(startHour, hourArray5);
 				incrementArray(numberMinorActivities, activityArray5);
-//				LOG.info("a5 matched.");
 			} else if(Arrays.equals(booleanArray, a6)){
 				incrementArray(5, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray6);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray6: " + startHour);
-				}
+				incrementArray(startHour, hourArray6);
 				incrementArray(numberMinorActivities, activityArray6);
-//				LOG.info("a6 matched.");
 			} else if(Arrays.equals(booleanArray, a7)){
 				incrementArray(6, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray7);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray7: " + startHour);
-				}
+				incrementArray(startHour, hourArray7);
 				incrementArray(numberMinorActivities, activityArray7);
-//				LOG.info("a7 matched.");
 			} else if(Arrays.equals(booleanArray, a8)){
 				incrementArray(7, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray8);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray8: " + startHour);
-				}
+				incrementArray(startHour, hourArray8);
 				incrementArray(numberMinorActivities, activityArray8);
-//				LOG.info("a8 matched.");
 			} else if(Arrays.equals(booleanArray, a9)){
 				incrementArray(8, areaArray);
-				if (startHour < 24) {
-					incrementArray(startHour, hourArray9);
-				} else{
-					LOG.info("startHour is greater than 23 and won't be added to the hourArray9: " + startHour);
-				}
-				incrementArray(numberMinorActivities, activityArray9);								
-//				LOG.info("a9 matched.");
+				incrementArray(startHour, hourArray9);
+				incrementArray(numberMinorActivities, activityArray9);		
 			} else{
 				LOG.info("booleanArray does not match any a1 to a9.");
 			}
