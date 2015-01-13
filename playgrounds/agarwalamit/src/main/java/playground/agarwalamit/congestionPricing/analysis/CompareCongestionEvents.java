@@ -18,13 +18,21 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing.analysis;
 
+import java.io.BufferedWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
+import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
+import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
 
 
 /**
@@ -37,50 +45,66 @@ public class CompareCongestionEvents  {
 	private String eventsFile_v4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV4/ITERS/it.1000/1000.events.xml.gz";
 
 	private List<MarginalCongestionEvent>  getCongestionEvents (String eventsFile){
-		
-		CongestionEventHandler ceh = new CongestionEventHandler();
-		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-		
-		eventsManager.addHandler(ceh);
-		reader.readFile(eventsFile);
 
-		return ceh.getCongestionEventsAsList();
+		final List<MarginalCongestionEvent> congestionevents = new ArrayList<MarginalCongestionEvent>();
+
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		MarginalCongestionEventsReader reader = new MarginalCongestionEventsReader(eventsManager);
+
+		eventsManager.addHandler(new MarginalCongestionEventHandler () {
+			@Override
+			public void reset(int iteration) {
+				congestionevents.clear();
+			}
+
+			@Override
+			public void handleEvent(MarginalCongestionEvent event) {
+				congestionevents.add(event);
+			}
+		});
+		reader.parse(eventsFile);
+
+		return congestionevents;
 	}
 
 	public static void main(String[] args) {
-		new CompareCongestionEvents().run();
+		new CompareCongestionEvents().run("/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/analysis/");
 	} 
 
-	private void run(){
+	private void run(String outputFolder){
 
-		int wrongAgentsCount = 0;
-		double wronglyChargedDelays = 0;
-
-		int unchargedAgentsCount =0;
-		double unchargedDelays =0;
-
-		List<MarginalCongestionEvent> eventsImpl3 = getCongestionEvents(eventsFile_v3);
+ 		List<MarginalCongestionEvent> eventsImpl3 = getCongestionEvents(eventsFile_v3);
 		List<MarginalCongestionEvent> eventsImpl4 = getCongestionEvents(eventsFile_v4);
 
-		for(MarginalCongestionEvent e3 : eventsImpl3){
-			if(eventsImpl4.contains(e3)){
-				//everything is fine.
-				eventsImpl4.remove(e3);
-			} else {
-				wrongAgentsCount++;
-				wronglyChargedDelays += e3.getDelay();
-			}
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/congestionEventsInfo.txt");
+		try {
+			writer.write("Particulars \t implV3 \t implV4 \n");
+			
+			writer.write("number of congestion events \t "+eventsImpl3.size()+"\t"+eventsImpl4.size()+"\n");
+			
+			writer.write("number of affected persons \t "+getAffectedPersons(eventsImpl3).size()+"\t"+getAffectedPersons(eventsImpl4).size()+"\n");
+			writer.write("number of causing persons \t "+getCausingPersons(eventsImpl3).size()+"\t"+getCausingPersons(eventsImpl4).size()+"\n");
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
 		}
-
-		unchargedAgentsCount = eventsImpl4.size();
-
-		for(MarginalCongestionEvent e4 : eventsImpl4){
-			unchargedDelays += e4.getDelay();
-		}
-
-		System.out.println(wrongAgentsCount+ " number of persons are wrongly charged and total wrongly charged delays in hr are "+ wronglyChargedDelays/3600);
-		System.out.println(unchargedAgentsCount+ " number of persons are not charged and total uncharged delays in hr are "+ unchargedDelays/3600);
 	}
+	
+	private Set<Id<Person>> getAffectedPersons(List<MarginalCongestionEvent> mce){
+		Set<Id<Person>> affectedPersons = new HashSet<Id<Person>>();
+		for(MarginalCongestionEvent e : mce) {
+			affectedPersons.add(e.getAffectedAgentId());
+		}
+		return affectedPersons;
+	}
+	
+	private Set<Id<Person>> getCausingPersons(List<MarginalCongestionEvent> mce){
+		Set<Id<Person>> causingPersons = new HashSet<Id<Person>>();
+		for(MarginalCongestionEvent e : mce) {
+			causingPersons.add(e.getCausingAgentId());
+		}
+		return causingPersons;
+	}
+	
 }
