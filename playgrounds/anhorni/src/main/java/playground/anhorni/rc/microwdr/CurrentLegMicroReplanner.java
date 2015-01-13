@@ -85,7 +85,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		
 		Route route = leg.getRoute();
 
-		// if the route type is not supported (e.g. because it is a walking agent)
+		// if the route type is not supported (e.g., because it is a walking agent)
 		if (!(route instanceof NetworkRoute)) return false;
 
 		NetworkRoute oldRoute = (NetworkRoute) route;
@@ -94,21 +94,21 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		 *  Get the Id of the current Link.
 		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
 		 */
-		List<Id<Link>> allLinkIds = getRouteLinkIds(oldRoute);
-		Id<Link> currentLinkId = allLinkIds.get(currentLinkIndex);
+		List<Id<Link>> allLinkIds = getRouteLinkIds(oldRoute); // {0, 1, 2, 6, 7}
+		Id<Link> currentLinkId = allLinkIds.get(currentLinkIndex); // link 1, currentLinkIndex = 1
 
 		Link fromLink = network.getLinks().get(currentLinkId);
 		
-		int links2go = allLinkIds.size() - currentLinkIndex;
-		int toLinkIndex = (currentLinkIndex + Math.min(2, links2go)); // jump over one link if possible
+		int links2go = allLinkIds.size() - (currentLinkIndex + 1); // 3
+		int toLinkIndex = (currentLinkIndex + Math.min(2, links2go)); // jump over one link if possible // 3 -> link 6 
 		
-		Id<Link> toLinkId = allLinkIds.get(toLinkIndex);
-		Link toLink = network.getLinks().get(toLinkId);
+		Id<Link> toLinkId = allLinkIds.get(toLinkIndex); // [3] -> 6
+		Link toLink = network.getLinks().get(toLinkId); // -> link 6
 		
 		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
 		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
 		
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person);
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person); // 3, 5
 		
 		if (planElements.size() != 1) {
 			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
@@ -121,19 +121,31 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		// start of the old route
-		linkIds.addAll(allLinkIds.subList(0, currentLinkIndex));
+		linkIds.addAll(allLinkIds.subList(0, currentLinkIndex)); // [0, 1] -> 0, 1 
 
 		// micro-reroute part of route
-		Leg newLeg = (Leg) planElements.get(0);
+		Leg newLeg = (Leg) planElements.get(0); 
 		Route newRoute = newLeg.getRoute();
-		linkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
+		linkIds.add(((NetworkRoute) newRoute).getStartLinkId());
+		linkIds.addAll(((NetworkRoute) newRoute).getLinkIds()); // 1, 3, 5, 6
+		linkIds.add(((NetworkRoute) newRoute).getEndLinkId());
 		
 		// remainder of the old route
-		linkIds.addAll(allLinkIds.subList(toLinkIndex + 1, allLinkIds.size()-1));
+		// if route is not yet finished:
+		if (toLinkIndex + 1 <= allLinkIds.size()-1) {
+			if (toLinkIndex + 1 == allLinkIds.size() -1 ) {
+				linkIds.add(allLinkIds.get(allLinkIds.size()-1));
+			}
+			else {
+				linkIds.addAll(allLinkIds.subList(toLinkIndex + 1, allLinkIds.size()-1)); 
+			}
+		}
 
 		// Overwrite old Route
 		if (linkIds.size() > 2) {
-			oldRoute.setLinkIds(linkIds.get(0), linkIds.subList(1, linkIds.size()-2), linkIds.get(linkIds.size()-1));
+			List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()- 1); // to is exclusive
+			Id<Link> endLink = linkIds.get(linkIds.size()-1);
+			oldRoute.setLinkIds(linkIds.get(0), middleLinks , endLink);
 		} // else do not replace route
 		
 		return true;

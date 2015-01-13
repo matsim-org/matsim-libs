@@ -26,6 +26,7 @@ public class StuckAgentsFilter implements AgentFilter {
 			Network network) {
 		this.agents = agents;
 		this.network = network;	
+		this.traveltimeCollector = traveltimeCollector;
 	}
 
 	@Override
@@ -42,9 +43,7 @@ public class StuckAgentsFilter implements AgentFilter {
 		double freeflowTraveltime = length / speed;
 		
 		double currentLinkTravelTime = traveltimeCollector.getLinkTravelTime(currentLink, 0.0, null, null);
-				
-		Plan plan = ((Person)agent).getSelectedPlan();
-		
+						
 		if (currentLinkTravelTime > 2.0 * freeflowTraveltime) {
 			return true;
 		} else {

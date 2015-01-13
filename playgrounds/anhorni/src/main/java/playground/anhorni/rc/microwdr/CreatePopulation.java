@@ -79,11 +79,11 @@ public class CreatePopulation {
 		for (int i = 0; i<nPersons; i++) {
 			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			p.setEmployed(true);
-			
+						
 			homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class));
 			workFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(2, ActivityFacility.class));
 
-			double timeOffset = 0;
+			double timeOffset = i;
 			this.scenario.getPopulation().addPerson(p);
 			this.generateWorkPlan(p, homeFacility, workFacility, timeOffset);
 		}
@@ -110,7 +110,7 @@ public class CreatePopulation {
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(Id.create(1, Link.class)); 
 		linkIds.add(Id.create(2, Link.class));
-		linkIds.add(Id.create(4, Link.class));	
+	//	linkIds.add(Id.create(4, Link.class));	
 		linkIds.add(Id.create(6, Link.class));
 		
 		NetworkRoute route = new LinkNetworkRouteImpl(Id.create(0, Link.class), linkIds, Id.create(7, Link.class));
