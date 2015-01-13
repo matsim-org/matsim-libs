@@ -81,10 +81,10 @@ public class TestPTScheduleCreatorDefault {
                 scheduleCreator.vehicles.getVehicleTypes().get(Id.create("R", VehicleType.class)).getLength(),
                 2.1, 0.0);
         assertEquals("Correct reading of vehicles.",
-                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("FUN", VehicleType.class)).getAccessTime(),
+                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("BUS", VehicleType.class)).getAccessTime(),
                 1.3, 0.0);
         assertEquals("Correct reading of vehicles.",
-                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("FUN", VehicleType.class)).getEgressTime(),
+                scheduleCreator.vehicles.getVehicleTypes().get(Id.create("BUS", VehicleType.class)).getEgressTime(),
                 1.4, 0.0);
     }
 

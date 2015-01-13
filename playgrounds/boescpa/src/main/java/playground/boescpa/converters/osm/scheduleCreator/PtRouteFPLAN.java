@@ -29,7 +29,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A public transport route as read out from HAFAS FPLAN.
@@ -42,6 +44,16 @@ public class PtRouteFPLAN {
 	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
 
 	private static TransitScheduleFactory scheduleBuilder = new TransitScheduleFactoryImpl();
+
+	public static final String BUS = "bus";
+	private static enum allBusses {
+		BUS, NFB, TX, KB, NFO, EXB, NB
+	}
+	public final static String TRAM = "tram";
+	private static enum allTrams {
+		T, NFT
+	}
+	public final static String PT = "pt";
 
 	private final Id<TransitLine> idOwnerLine;
 	private final Id<TransitRoute> routeId;
@@ -61,12 +73,22 @@ public class PtRouteFPLAN {
 		}
 	}
 
-	// Used vehicle type and Id:
+	// Used vehicle type, Id and mode:
 	private String usedVehicleID = null;
 	private VehicleType usedVehicleType = null;
+	private String usedMode = PT;
 	public void setUsedVehicle(Id<VehicleType> typeId, VehicleType type) {
 		usedVehicleType = type;
 		usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
+		if (usedVehicleType != null) {
+			if (isTypeOf(allBusses.class, usedVehicleType.getId().toString())) {
+				usedMode = BUS;
+			} else if (isTypeOf(allTrams.class, usedVehicleType.getId().toString())) {
+				usedMode = TRAM;
+			} else {
+				usedMode = PT;
+			}
+		}
 	}
 
 	public PtRouteFPLAN(Id<TransitLine> idOwnerLine, Id<TransitRoute> routeId, int numberOfDepartures, int cycleTime) {
@@ -83,7 +105,7 @@ public class PtRouteFPLAN {
 	public TransitRoute getRoute() {
 		List<Departure> departures = this.getDepartures();
 		if (departures != null) {
-			TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, "pt");
+			TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, usedMode);
 			for (Departure departure : departures) {
 				transitRoute.addDeparture(departure);
 			}
@@ -155,5 +177,14 @@ public class PtRouteFPLAN {
 		Departure departure = scheduleBuilder.createDeparture(departureId, departureTime);
 		departure.setVehicleId(vehicleId);
 		return departure;
+	}
+
+	private static boolean isTypeOf(Class<? extends Enum> vehicleGroup, String vehicle) {
+		for (Object val : vehicleGroup.getEnumConstants()) {
+			if (((Enum) val).name().equals(vehicle)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -129,29 +129,29 @@ public class OsmNetworkReaderWithPT {
 			this.setHighwayDefaults("residential",   1,  30.0/3.6, 1.0,  600);
 			this.setHighwayDefaults("living_street", 1,  15.0/3.6, 1.0,  300);
 			// Set railway-defaults (and with it the filter...)
-			this.setRailwayDefaults("rail", 		  1, 120.0/3.6, 1.0,  100);
+			//this.setRailwayDefaults("rail", 		  1, 120.0/3.6, 1.0,  100);
 			this.setRailwayDefaults("tram", 		  1,  80.0/3.6, 1.0,  100, true);
-			this.setRailwayDefaults("funicular",	  1,  40.0/3.6, 1.0,  100);
-			this.setRailwayDefaults("light_rail",	  1,  80.0/3.6, 1.0,  100);
-			this.setRailwayDefaults("subway",		  1,  80.0/3.6, 1.0,  100, true);
+			//this.setRailwayDefaults("funicular",	  1,  40.0/3.6, 1.0,  100);
+			//this.setRailwayDefaults("light_rail",	  1,  80.0/3.6, 1.0,  100);
+			//this.setRailwayDefaults("subway",		  1,  80.0/3.6, 1.0,  100, true);
 			// Set pt-defaults (and with it the filter...)
-			this.setPTDefaults("ferry", 	  1, 120.0/3.6, 1.0,  100);
-			this.setPTDefaults("ship",		  1,  80.0/3.6, 1.0,  100);
-			this.setPTDefaults("cable_car",	  1,  80.0/3.6, 1.0,  100);
+			//this.setPTDefaults("ferry", 	  1, 120.0/3.6, 1.0,  100);
+			//this.setPTDefaults("ship",		  1,  80.0/3.6, 1.0,  100);
+			//this.setPTDefaults("cable_car",	  1,  80.0/3.6, 1.0,  100);
 			// Set default pt-filter:
-			this.setPTFilter("train");
-			this.setPTFilter("rail");
-			this.setPTFilter("railway");
-			this.setPTFilter("light_rail");
+			//this.setPTFilter("train");
+			//this.setPTFilter("rail");
+			//this.setPTFilter("railway");
+			//this.setPTFilter("light_rail");
 			this.setPTFilter("bus");
 			this.setPTFilter("trolleybus");
 			this.setPTFilter("tram");
-			this.setPTFilter("ship");
-			this.setPTFilter("ferry");
-			this.setPTFilter("cable_car");
-			this.setPTFilter("funicular");
-			this.setPTFilter("funiculair");
-			this.setPTFilter("subway");
+			//this.setPTFilter("ship");
+			//this.setPTFilter("ferry");
+			//this.setPTFilter("cable_car");
+			//this.setPTFilter("funicular");
+			//this.setPTFilter("funiculair");
+			//this.setPTFilter("subway");
 		}
 	}
 
@@ -509,7 +509,7 @@ public class OsmNetworkReaderWithPT {
 		// define modes allowed on link(s)
 		//	basic type:
 		Set<String> modes = new HashSet<String>();
-		if (highway != null) {modes.add("street");}
+		if (highway != null) {modes.add("car");}
 		if (railway != null) {modes.add(railway);}
 		if (ptway != null) {modes.add(ptway);}
 		if (modes.isEmpty()) {modes.add("unknownStreetType");}
@@ -517,7 +517,17 @@ public class OsmNetworkReaderWithPT {
 		for (OsmRelation relation : this.relations.values()) {
 			for (OsmParser.OsmRelationMember member : relation.members) {
 				if ((member.type == OsmParser.OsmRelationMemberType.WAY) && (member.refId == way.id)) {
-					modes.add(relation.tags.get("name"));
+					String mode = relation.tags.get("name");
+					// mark that it is a link used by any pt:
+					if (mode == null) {
+						break;
+					} else {
+						modes.add("pt");
+					}
+					if (mode.indexOf(":") > 0 && mode.indexOf(" ") > 0 && mode.indexOf(" ") < mode.indexOf(":")) {
+						modes.add(mode.toLowerCase().substring(mode.indexOf(" "), mode.indexOf(":")).trim());
+					}
+					//modes.add(relation.tags.get("name"));
 					break;
 				}
 			}
