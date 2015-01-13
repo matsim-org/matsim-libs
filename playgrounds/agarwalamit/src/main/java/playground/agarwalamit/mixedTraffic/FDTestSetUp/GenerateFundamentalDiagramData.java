@@ -366,8 +366,9 @@ public class GenerateFundamentalDiagramData {
 
 		events.addHandler(globalFlowDynamicsUpdator);
 
+		EventWriterXML eventWriter = new EventWriterXML(RUN_DIR+"/events.xml");
 		if(writeInputFiles){
-			events.addHandler(new EventWriterXML(RUN_DIR+"/events.xml"));
+			events.addHandler(eventWriter);
 		}
 
 		Netsim qSim = createModifiedQSim(this.scenario, events);
@@ -431,6 +432,8 @@ public class GenerateFundamentalDiagramData {
 			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
 			outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 		}
+		
+		if(writeInputFiles) eventWriter.closeFile();
 	}
 
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
