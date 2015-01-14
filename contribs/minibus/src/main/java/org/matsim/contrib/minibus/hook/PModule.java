@@ -50,6 +50,7 @@ public class PModule {
     }
     public void configureControler(Controler controler) {
         PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+        pConfig.validate();
         PBox pBox = new PBox(pConfig);
         controler.setMobsimFactory(new PQSimFactory());
 

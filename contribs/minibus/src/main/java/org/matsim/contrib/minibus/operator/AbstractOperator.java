@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants.OperatorState;
+import org.matsim.contrib.minibus.performance.PTransitLineMerger;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
@@ -54,6 +55,7 @@ abstract class AbstractOperator implements Operator{
 	final double costPerVehicleSell;
 	private final double costPerVehicleAndDay;
 	private final double minOperationTime;
+	private final boolean mergeTransitLine;
 	
 	OperatorState operatorState;
 
@@ -71,6 +73,7 @@ abstract class AbstractOperator implements Operator{
 	PRouteProvider routeProvider;
 	int currentIteration;
 
+
 	AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
@@ -78,6 +81,7 @@ abstract class AbstractOperator implements Operator{
 		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
 		this.costPerVehicleAndDay = pConfig.getCostPerVehicleAndDay();
 		this.minOperationTime = pConfig.getMinOperationTime();
+		this.mergeTransitLine = pConfig.getMergeTransitLine();
 		this.franchise = franchise;
 	}
 
@@ -172,6 +176,11 @@ abstract class AbstractOperator implements Operator{
 		if (this.currentTransitLine == null) {
 			this.updateCurrentTransitLine();
 		}
+		
+		if (this.mergeTransitLine) {
+			this.currentTransitLine = PTransitLineMerger.mergeTransitLine(this.currentTransitLine);
+		}
+		
 		return this.currentTransitLine;		
 	}	
 

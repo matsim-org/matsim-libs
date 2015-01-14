@@ -90,6 +90,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
 	private static final String PASSENGERS_BOARD_EVERY_LINE = "passengersBoardEveryLine";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
+	private static final String MERGE_TRANSIT_LINE = "mergeTransitLine";
 	private static final String PT_ENABLER = "ptEnabler";
 	private static final String OPERATIONMODE = "OperationMode";
 	private static final String TOPOTYPESFORSTOPS = "TopoTypesForStops";
@@ -142,6 +143,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private boolean reRouteAgentsStuck = false;
 	private boolean passengersBoardEveryLine = false;
 	private String transitScheduleToStartWith = null;
+	private boolean mergeTransitLine = false;
 	private String ptEnabler = null;
 	private String operationMode = TransportMode.pt;
 	private String topoTypesForStops = null;
@@ -248,6 +250,8 @@ public final class PConfigGroup extends ConfigGroup{
 			this.passengersBoardEveryLine = Boolean.parseBoolean(value);
 		} else if (TRANSIT_SCHEDULE_TO_START_WITH.equals(key)){
 			this.transitScheduleToStartWith = value;
+		} else if (MERGE_TRANSIT_LINE.equals(key)){
+			this.mergeTransitLine = Boolean.parseBoolean(value);
 		} else if (PT_ENABLER.equals(key)){
 			this.ptEnabler = value;
 		} else if(OPERATIONMODE.equals(key)){
@@ -319,6 +323,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
+		map.put(MERGE_TRANSIT_LINE, Boolean.toString(this.mergeTransitLine));
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
 		
@@ -378,6 +383,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one operator for each transit line with the given time of operation and number of vehicles");
+		map.put(MERGE_TRANSIT_LINE, "Merges all routes of a transit line that have the same sequence of stops. Does not respect the time profile of the routes. Default is false.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		
@@ -558,6 +564,10 @@ public final class PConfigGroup extends ConfigGroup{
 	public String getTransitScheduleToStartWith() {
 		return this.transitScheduleToStartWith;
 	}
+
+	public boolean getMergeTransitLine() {
+		return this.mergeTransitLine;
+	}
 	
 	public String getPtEnabler() {
 		return this.ptEnabler;
@@ -671,6 +681,15 @@ public final class PConfigGroup extends ConfigGroup{
 		}
 
 	}
-
+	
+	public void validate(){
+		if (this.mergeTransitLine) {
+			log.info("All routes of a minibus transit line with the same stop sequence will be merged into one single transit route. Note that the transit schedules written to the output directory do not contain all minibus routes anymore.");
+			
+			if (!logOperators) {
+				log.warn("Transit lines will be merged. Activate the operator logger to retrieve more detailed information on particular routes.");
+			}
+		}
+	}
 
 }
