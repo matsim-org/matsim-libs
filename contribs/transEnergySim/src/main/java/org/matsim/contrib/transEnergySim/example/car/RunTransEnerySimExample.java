@@ -46,12 +46,12 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 
 
-public class ElectricCarMain {
+public class RunTransEnerySimExample {
 	
 	private Scenario sc;
 	
-	private static final Logger log = Logger.getLogger(ElectricCarMain.class);
-	private static final String CONFIG = "C:/local_jb/workspace/contrib/transEnergySim/test/input/org/matsim/contrib/transEnergySim/controllers/TestInductiveChargingController/config.xml";
+	private static final Logger log = Logger.getLogger(RunTransEnerySimExample.class);
+	private static final String CONFIG = "test/input/org/matsim/contrib/transEnergySim/controllers/TestInductiveChargingController/config.xml";
 	private static final String ESTATS =  "output/estats.txt"; //fairly simple statistics about energy consumption on each link
 	private DisChargingControler c;
 	
@@ -65,7 +65,7 @@ public class ElectricCarMain {
 		
 	}
 	public static void main(String[] args){
-		ElectricCarMain runner = new ElectricCarMain();
+		RunTransEnerySimExample runner = new RunTransEnerySimExample();
 		runner.setUpControler(CONFIG);
 		runner.run();
 	}
