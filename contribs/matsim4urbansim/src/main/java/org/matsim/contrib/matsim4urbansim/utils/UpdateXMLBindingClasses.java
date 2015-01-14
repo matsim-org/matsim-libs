@@ -23,7 +23,7 @@
  */
 package org.matsim.contrib.matsim4urbansim.utils;
 
-import com.sun.tools.internal.xjc.XJCFacade;
+import com.sun.tools.xjc.XJCFacade;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
