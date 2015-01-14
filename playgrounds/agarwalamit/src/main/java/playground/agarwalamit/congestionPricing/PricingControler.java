@@ -65,17 +65,18 @@ public class PricingControler {
 		
 		TollHandler tollHandler = new TollHandler(sc);
 		TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
-		controler.setTravelDisutilityFactory(fact);
 		
 		switch (congestionPricing) {
 		case "implV3":
 		{
+			controler.setTravelDisutilityFactory(fact);
 			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;
 		case "implV4":
 			{
+				controler.setTravelDisutilityFactory(fact);
 				controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), sc)));
 				Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 4.");
 			}
@@ -83,6 +84,7 @@ public class PricingControler {
 		
 		case "implV5":
 		{
+			controler.setTravelDisutilityFactory(fact);
 			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 5.");
 		}
@@ -90,6 +92,7 @@ public class PricingControler {
 		
 		case "implV6":
 		{
+			controler.setTravelDisutilityFactory(fact);
 			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV6(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 		}
