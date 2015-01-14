@@ -20,26 +20,19 @@
 
 package org.matsim.core.utils.io;
 
+import org.apache.log4j.Logger;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Stack;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.apache.log4j.Logger;
-import org.xml.sax.Attributes;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * An abstract XML-Parser which can be easily extended for reading custom XML-formats. This class handles all the low level
@@ -247,9 +240,11 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		if (source == null) {
 			// We could neither get the remote nor the local version of the dtd, show a warning
 			log.warn("Could neither get the DTD from the web nor a local one. " + systemId);
-		}
+		} else {
+            source.setSystemId(systemId);
+        }
 		return source;
-	}
+    }
 
 	private InputSource findDtdInRemoteLocation(final String fullSystemId) {
 		log.info("Trying to load " + fullSystemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
