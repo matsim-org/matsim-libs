@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package playground.vsp.energy.trafficstate;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * @author dgrether

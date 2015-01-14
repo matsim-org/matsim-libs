@@ -23,9 +23,7 @@
  */
 package org.matsim.contrib.matsim4urbansim.utils;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.sun.tools.internal.xjc.XJCFacade;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
@@ -33,7 +31,8 @@ import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
 import org.matsim.contrib.matsim4urbansim.utils.securitymanager.ExitException;
 import org.matsim.contrib.matsim4urbansim.utils.securitymanager.NoExitSecurityManager;
 
-import com.sun.tools.xjc.XJCFacade;
+import java.io.File;
+import java.io.IOException;
 
 
 /**

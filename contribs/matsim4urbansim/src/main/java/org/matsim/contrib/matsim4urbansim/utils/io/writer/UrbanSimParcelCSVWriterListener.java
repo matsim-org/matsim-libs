@@ -1,9 +1,5 @@
 package org.matsim.contrib.matsim4urbansim.utils.io.writer;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
@@ -14,7 +10,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
-import com.sun.tools.xjc.reader.RawTypeSet.Mode;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeInterface {
 	
