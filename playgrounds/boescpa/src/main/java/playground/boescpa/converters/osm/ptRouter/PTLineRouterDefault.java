@@ -138,14 +138,14 @@ public class PTLineRouterDefault extends PTLineRouter {
 
 				//	find closest street-link crossing within search radius of stop-position and, if available, opposite direction link.
 				Id<Link> closestLink = findClosestLink(newStopFacility, network);
-				Id<Link>[] oppositeDirectionLink = null;
+				Id<Link>[] oppositeDirectionLinks = null;
 				if (closestLink != null) {
-					oppositeDirectionLink = getOppositeDirection(closestLink, network);
+					oppositeDirectionLinks = getOppositeDirection(closestLink, network);
 				} else {
 					//	if no closest link found, create link linking the stop to the former stop and one to the following link. attach station to the incoming link. do this for both directions!
 					if (formerStop != null && nextStop != null) {
 						closestLink = createBidirectionallyLinksBetweenStops(formerStop, currentStop);
-						oppositeDirectionLink = new Id[]{createBidirectionallyLinksBetweenStops(nextStop, currentStop)};
+						oppositeDirectionLinks = new Id[]{createBidirectionallyLinksBetweenStops(nextStop, currentStop)};
 					} else if (formerStop != null) {
 						closestLink = createBidirectionallyLinksBetweenStops(formerStop, currentStop);
 					} else if (nextStop != null) {
@@ -154,17 +154,17 @@ public class PTLineRouterDefault extends PTLineRouter {
 				}
 
 				//	link stop-position(s) to the respective link(s).
-				if (oppositeDirectionLink == null) {
+				if (oppositeDirectionLinks == null) {
 					newStopFacility.setLinkId(closestLink);
 					derivativesCurrentStop.put(mode, new Id[]{newStopFacility.getId()});
 				} else {
 					//	if street-link has opposite direction, then split stop-position before linking.
-					TransitStopFacility[] newStopFacilities = multiplyStop(newStopFacility, oppositeDirectionLink.length);
+					TransitStopFacility[] newStopFacilities = multiplyStop(newStopFacility, oppositeDirectionLinks.length);
 					Id<TransitStopFacility>[] newStopFacilityIds = new Id[newStopFacilities.length];
 					newStopFacilities[0].setLinkId(closestLink);
 					newStopFacilityIds[0] = newStopFacilities[0].getId();
-					for (int j = 0; j < oppositeDirectionLink.length; j++) {
-						newStopFacilities[j+1].setLinkId(oppositeDirectionLink[j]);
+					for (int j = 0; j < oppositeDirectionLinks.length; j++) {
+						newStopFacilities[j+1].setLinkId(oppositeDirectionLinks[j]);
 						newStopFacilityIds[j+1] = newStopFacilities[j+1].getId();
 					}
 					derivativesCurrentStop.put(mode, newStopFacilityIds);
@@ -218,24 +218,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				return nearestLink.getId();
 			} else {
 				// Else, look in circles around the stopFacility for another nearest link, that might fullfil all requirements.
-				Set<Link> potentialLinks = new HashSet<>();
-				for (double r = 0.1; r <= 0.5; r += 0.1) {
-					for (double phi = 0; phi < 2 * Math.PI; phi += Math.PI / 4) {
-						Coord searchCoords = new CoordImpl(
-								stopFacility.getCoord().getX() + this.searchRadius * r * Math.cos(phi),
-								stopFacility.getCoord().getY() + this.searchRadius * r * Math.sin(phi)
-						);
-						Link newNearestLink = NetworkUtils.getNearestLink(network, searchCoords);
-						if (!newNearestLink.getId().toString().equals(nearestLink.getId().toString())
-								&& !potentialLinks.contains(newNearestLink)) {
-							// This means we have actually found a new link...
-							if (NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), nearestLink.getCoord()) <= this.searchRadius
-									&& nearestLink.getAllowedModes().contains(this.mode)) {
-								potentialLinks.add(newNearestLink);
-							}
-						}
-					}
-				}
+				Set<Link> potentialLinks = getLinksWithinSearchRadius(stopFacility.getCoord(), network);
 				if (!potentialLinks.isEmpty()) {
 					// Search for the potential Link with the shortest distance:
 					double currentRadius = this.searchRadius;
@@ -254,21 +237,70 @@ public class PTLineRouterDefault extends PTLineRouter {
 		return null;
 	}
 
+	private Set<Link> getLinksWithinSearchRadius(Coord centralCoords, Network network) {
+		Set<Link> linksWithinRadius = new HashSet<>();
+		for (double r = 0.1; r <= 0.5; r += 0.1) {
+            for (double phi = 0; phi < 2 * Math.PI; phi += Math.PI / 4) {
+                Coord searchCoords = new CoordImpl(
+						centralCoords.getX() + this.searchRadius * r * Math.cos(phi),
+						centralCoords.getY() + this.searchRadius * r * Math.sin(phi)
+                );
+                Link nearestLink = NetworkUtils.getNearestLink(network, searchCoords);
+                if (!linksWithinRadius.contains(nearestLink)) {
+                    // This means we have actually found a new link...
+                    if (NetworkUtils.getEuclidianDistance(centralCoords, nearestLink.getCoord()) <= this.searchRadius
+                            && nearestLink.getAllowedModes().contains(this.mode)) {
+                        linksWithinRadius.add(nearestLink);
+                    }
+                }
+            }
+        }
+		return linksWithinRadius;
+	}
+
 	/**
 	 * Looks in the network if the link has an opposite direction link and if so returns it.
 	 * In the case of non-street-modes (e.g. TRAM), it looks also geographically because
 	 * stations might be large and the opposite direction link therefore further away. It then returns all
 	 * such surronding links.
 	 *
-	 * @param link
+	 * @param linkId
 	 * @param network
-	 * @return Opposite direction link
+	 * @return Null if no other direction links could be found...
 	 */
-	private Id<Link>[] getOppositeDirection(Id<Link> link, Network network) {
+	private Id<Link>[] getOppositeDirection(Id<Link> linkId, Network network) {
+		// If we find one with "opposite" direction, we return only this.
+		Link lowerLink = network.getLinks().get(Id.createLinkId(Integer.parseInt(linkId.toString()) - 1));
+		Link link = network.getLinks().get(linkId);
+		Link upperLink = network.getLinks().get(Id.createLinkId(Integer.parseInt(linkId.toString()) + 1));
+		if (lowerLink != null
+				&& lowerLink.getFromNode().getId().toString().equals(link.getToNode().getId().toString())
+				&& lowerLink.getToNode().getId().toString().equals(link.getFromNode().getId().toString())
+				&& lowerLink.getAllowedModes().contains(this.mode)) {
+			return new Id[]{lowerLink.getId()};
+		}
+		if (upperLink != null
+				&& upperLink.getFromNode().getId().toString().equals(link.getToNode().getId().toString())
+				&& upperLink.getToNode().getId().toString().equals(link.getFromNode().getId().toString())
+				&& upperLink.getAllowedModes().contains(this.mode)) {
+			return new Id[]{upperLink.getId()};
+		}
 
-		// TODO-boescpa
-		// Even if none found with Id, if mode tram then have to check if one with same mode geographically...
-		// Attention: Search in the network is mode dependent!!
+		// Else we return all links we find within search radius around link.
+		Set<Link> linksWithinRadius = getLinksWithinSearchRadius(link.getCoord(), network);
+		if (linksWithinRadius != null) {
+			Id<Link>[] links = new Id[linksWithinRadius.size()-1];
+			int i = 0;
+			for (Link presentLink : linksWithinRadius) {
+				if (!presentLink.getId().toString().equals(link.getId().toString())) {
+					links[i] = presentLink.getId();
+					i++;
+				}
+			}
+			return links;
+		}
+
+		// No opposite link is found, and not any in the souroundings, null is returned.
 		return null;
 	}
 
