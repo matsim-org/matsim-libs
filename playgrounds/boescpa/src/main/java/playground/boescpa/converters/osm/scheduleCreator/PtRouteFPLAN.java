@@ -29,9 +29,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A public transport route as read out from HAFAS FPLAN.
@@ -116,7 +114,7 @@ public class PtRouteFPLAN {
 	}
 
 	/**
-	 * @param stopId
+	 * @param stopId Id of the stop to add...
 	 * @param arrivalTime   Expected as seconds from midnight or zero if not available.
 	 * @param departureTime Expected as seconds from midnight or zero if not available.
 	 */
