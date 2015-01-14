@@ -172,14 +172,21 @@
 
 	<repositories>
 		<repository>
+            <!-- Geotools is not on Maven central -->
 			<id>geotools</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
-		<repository>
-			<id>matsim</id>
-			<url>http://matsim.org/m2repo</url>
-		</repository>
+        <repository>
+            <!-- For some dependencies of Geotools which are not on Maven central -->
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+        <repository>
+            <id>matsim</id>
+            <url>http://dl.bintray.com/matsim/matsim</url>
+        </repository>
 	</repositories>
 
 	<profiles>
@@ -364,33 +371,6 @@
 			<artifactId>kml</artifactId>
 			<version>2.2.0</version>
 		</dependency>
-		<!-- jaxb 2.1.7 dependencies -->
-		<dependency>
-			<groupId>javax.xml.bind.jaxb</groupId>
-			<artifactId>activation</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind.jaxb</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind.jaxb</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind.jaxb</groupId>
-			<artifactId>jaxb-xjc</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind.jaxb</groupId>
-			<artifactId>jsr173</artifactId>
-			<version>2.1.7</version>
-		</dependency>
-		<!--End of jaxb 2.1.7 dependencies -->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
