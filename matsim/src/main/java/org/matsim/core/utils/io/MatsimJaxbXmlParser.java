@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Stack;
+import org.apache.log4j.Logger;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
-
-import org.apache.log4j.Logger;
-import org.apache.xerces.jaxp.validation.XMLSchemaFactory;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import javax.xml.validation.SchemaFactory;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Stack;
 
 
 /**
@@ -72,7 +72,7 @@ public abstract class MatsimJaxbXmlParser extends MatsimXmlParser {
 	
 	protected void validateFile(String filename, Unmarshaller u) throws SAXException, ParserConfigurationException, IOException{
 		URL schemaUrl = null;
-		XMLSchemaFactory schemaFac = new XMLSchemaFactory();
+		SchemaFactory schemaFac = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = null;
 		try {
 			//first check if we are online 
