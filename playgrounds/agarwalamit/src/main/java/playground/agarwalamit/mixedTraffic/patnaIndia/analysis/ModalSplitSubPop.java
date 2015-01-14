@@ -39,7 +39,7 @@ public class ModalSplitSubPop {
 	}
 	
 	private void run(){
-		String outFolder = "c5";
+		String outFolder = "c24";
 //		String plansFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/inputs/plansSubPop.xml.gz";
 		String plansFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run104/"+outFolder+"/output_plans.xml.gz";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
@@ -65,10 +65,7 @@ public class ModalSplitSubPop {
 			
 			writer.write("slum \t");
 			for(String mode :wholePop_modalSplot.keySet()){
-				if(msg.getMode2PctShareFromPlans(PopulationFilter.getSlumPopulation(pop)).containsKey(mode)){
 				writer.write(msg.getMode2PctShareFromPlans(PopulationFilter.getSlumPopulation(pop)).get(mode)+"\t");
-				}
-				else writer.write(0+"\t");
 			}
 			writer.newLine();
 			
@@ -80,8 +77,7 @@ public class ModalSplitSubPop {
 			writer.close();
 			
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
 }
