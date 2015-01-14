@@ -96,7 +96,7 @@ public class PricingControler {
 		break;
 		
 		default:
-			throw new RuntimeException("Congestion pricing implementation does not match. Possible options are implV4 implV5 implV6. Aborting ...");
+			Logger.getLogger(PricingControler.class).warn("Congestion pricing implementation does not match. Possible options are implV4 implV5 implV6. No pricing implementation is introduced.");
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));

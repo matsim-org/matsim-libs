@@ -97,6 +97,8 @@ PersonStuckEventHandler
 	double totalDelay = 0.0;
 	double totalStorageDelay = 0.0;
 	double delayNotInternalized_roundingErrors = 0.0;
+	
+	private List<MarginalCongestionEvent> congestionEventsList = new ArrayList<MarginalCongestionEvent>();
 
 	public MarginalCongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -124,6 +126,7 @@ PersonStuckEventHandler
 		this.totalInternalizedDelay = 0.0;
 		this.delayNotInternalized_roundingErrors = 0.0;
 		this.linkId2congestionInfo.clear();
+		this.congestionEventsList.clear();
 
 		storeLinkInfo();
 
@@ -374,8 +377,9 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-								System.out.println(congestionEvent.toString());
-				this.events.processEvent(congestionEvent);	
+//								System.out.println(congestionEvent.toString());
+				this.events.processEvent(congestionEvent);
+				this.congestionEventsList.add(congestionEvent);
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
 		} else if(delayToPayFor > 0){
@@ -388,8 +392,9 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-								System.out.println(congestionEvent.toString());
+//								System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
+				this.congestionEventsList.add(congestionEvent);
 			}
 			delayToPayFor = 0.;
 		}
@@ -489,5 +494,9 @@ PersonStuckEventHandler
 
 	public double getDelayNotInternalizedRoundingErrors() {
 		return delayNotInternalized_roundingErrors;
+	}
+	
+	public List<MarginalCongestionEvent> getCongestionEventsAsList(){
+		return this.congestionEventsList;
 	}
 }
