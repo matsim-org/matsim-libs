@@ -96,7 +96,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 *
 	 * Writes the resulting schedule into this.schedule.
 	 *
-	 * @param network
+	 * @param network the stations are linked to.
 	 */
 	private void linkStationsToNetwork(Network network) {
 		log.info("Linking pt stations to network...");
@@ -190,18 +190,28 @@ public class PTLineRouterDefault extends PTLineRouter {
 	}
 
 	/**
-	 * Create and add to schedule two new stops with the id-endings "_0" to "_numberOfCopies" by copying the provided stop.
-	 * Return those two stops.
+	 * Create and add to schedule new stops with the id-endings "_0" to "_numberOfCopies"
+	 * by copying the provided stop.
 	 *
-	 * @param stop
-	 * @param numberOfCopies
+	 * @param stop which will be copied. The original remains unchanged.
+	 * @param numberOfCopies of stop plus a zero-copy of the stop which are created.
 	 * @return TransitStopFacilities stop_0 to stop_numberOfCopies
 	 */
 	private TransitStopFacility[] multiplyStop(TransitStopFacility stop, int numberOfCopies) {
-		// TODO-boescpa
-		return null;
+		TransitStopFacility[] facilities = new TransitStopFacility[numberOfCopies + 1];
+		for (int i = 0; i <= numberOfCopies; i++) {
+			// Copy facility at stop:
+			Id<TransitStopFacility> idNewFacility = Id.create(stop.getId().toString() + "_" + i, TransitStopFacility.class);
+			TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
+					idNewFacility, stop.getCoord(), stop.getIsBlockingLane()
+			);
+			newFacility.setName(stop.getName());
+			// Add new facility to schedule and to array:
+			schedule.addStopFacility(newFacility);
+			facilities[i] = newFacility;
+		}
+		return facilities;
 	}
-
 
 	/**
 	 * Search for the closest link within search radius that has the current mode as allowed travel mode and returns it.
@@ -264,8 +274,8 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * stations might be large and the opposite direction link therefore further away. It then returns all
 	 * such surronding links.
 	 *
-	 * @param linkId
-	 * @param network
+	 * @param linkId of the link for which opposite direction links are searched.
+	 * @param network in which opposite direction links are searched.
 	 * @return Null if no other direction links could be found...
 	 */
 	private Id<Link>[] getOppositeDirection(Id<Link> linkId, Network network) {
@@ -308,7 +318,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * Add new TransitStopFacility to schedule and to the provided stop,
 	 * which is a copy of the provided stop.getStopFacility() except for the type is now of vehicleType.
 	 *
-	 * @param stop
+	 * @param stop which is dublicated with a mode dependent version.
 	 * @return Type-dependent stop facility.
 	 */
 	private TransitStopFacility createTypeDependentStopFacility(TransitRouteStop stop) {
