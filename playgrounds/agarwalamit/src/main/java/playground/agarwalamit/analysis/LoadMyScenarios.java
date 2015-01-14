@@ -52,7 +52,9 @@ public class LoadMyScenarios {
 		String configFile = outputDir+"/output_config.xml";
 		String plansFile = outputDir+"/output_plans.xml.gz";
 		String networkFile = outputDir+"/output_network.xml.gz";
-		return LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
+		sc.getConfig().controler().setOutputDirectory(outputDir);
+		return sc;
 	}
 	
 	/**
