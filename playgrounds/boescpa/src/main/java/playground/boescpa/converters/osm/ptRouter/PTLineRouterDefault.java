@@ -185,7 +185,9 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * @return Created From-To-Link.
 	 */
 	private Id<Link> createBidirectionallyLinksBetweenStops(TransitRouteStop fromStop, TransitRouteStop toStop) {
-		// TODO-boescpa
+		// TODO-boescpa nodes have to be available at both stops to link them... Think about it...
+
+		// TODO-boescpa implement createBidirectionallyLinksBetweenStops
 		return null;
 	}
 
