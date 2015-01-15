@@ -22,20 +22,14 @@
 
 package org.matsim.core.router;
 
-import com.google.inject.util.Providers;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterModule;
 
 public class TripRouterFactoryModule extends AbstractModule {
     @Override
     public void install() {
         include(new LeastCostPathCalculatorModule());
-        if (getConfig().scenario().isUseTransit()) {
-            include(new TransitRouterModule());
-        } else {
-            bindToProvider(TransitRouterFactory.class, Providers.<TransitRouterFactory>of(null));
-        }
+        include(new TransitRouterModule());
         if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
             bindAsSingleton(TripRouterFactory.class, LinkToLinkTripRouterFactory.class);
         } else {

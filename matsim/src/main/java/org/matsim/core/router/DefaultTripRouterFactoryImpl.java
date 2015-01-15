@@ -16,7 +16,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 
@@ -41,7 +40,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
     private final Scenario scenario;
 
     @Inject
-    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, @Nullable TransitRouterFactory transitRouterFactory) {
+    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
     	this.scenario = scenario;
     	this.transitRouterFactory = transitRouterFactory;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;

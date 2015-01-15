@@ -22,7 +22,6 @@
 
 package org.matsim.pt.router;
 
-import com.google.inject.util.Providers;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -37,7 +36,7 @@ public class TransitRouterModule extends AbstractModule {
         if (getConfig().scenario().isUseTransit()) {
             bindToProviderAsSingleton(TransitRouterFactory.class, TransitRouterFactoryProvider.class);
         } else {
-            bindToProviderAsSingleton(TransitRouterFactory.class, Providers.<TransitRouterFactory>of(null));
+            bindTo(TransitRouterFactory.class, DummyTransitRouterFactory.class);
         }
     }
 
@@ -58,6 +57,13 @@ public class TransitRouterModule extends AbstractModule {
                             config.vspExperimental()));
         }
 
+    }
+
+    static class DummyTransitRouterFactory implements TransitRouterFactory {
+        @Override
+        public TransitRouter createTransitRouter() {
+            throw new RuntimeException("Transit not enabled.");
+        }
     }
 
 }

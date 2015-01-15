@@ -29,7 +29,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -52,7 +51,7 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
             LeastCostPathCalculatorFactory leastCostAlgoFactory,
             TravelDisutilityFactory travelDisutilityFactory,
             LinkToLinkTravelTime travelTimes,
-            @Nullable TransitRouterFactory transitRouterFactory) {
+            TransitRouterFactory transitRouterFactory) {
 		this.scenario = scenario;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.travelTimes = travelTimes;
