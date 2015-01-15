@@ -100,54 +100,65 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		Link fromLink = network.getLinks().get(currentLinkId);
 		
 		int links2go = allLinkIds.size() - (currentLinkIndex + 1); // 3
-		int toLinkIndex = (currentLinkIndex + Math.min(2, links2go)); // jump over one link if possible // 3 -> link 6 
 		
-		Id<Link> toLinkId = allLinkIds.get(toLinkIndex); // [3] -> 6
-		Link toLink = network.getLinks().get(toLinkId); // -> link 6
-		
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
-		
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person); // 3, 5
-		
-		if (planElements.size() != 1) {
-			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
-					"but the returned list contained " + planElements.size() + " elements."); 
-		}
-		
-		
-		// compose the new route -----------------------
-		// The linkIds of the new Route
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-
-		// start of the old route
-		linkIds.addAll(allLinkIds.subList(0, currentLinkIndex)); // [0, 1] -> 0, 1 
-
-		// micro-reroute part of route
-		Leg newLeg = (Leg) planElements.get(0); 
-		Route newRoute = newLeg.getRoute();
-		linkIds.add(((NetworkRoute) newRoute).getStartLinkId());
-		linkIds.addAll(((NetworkRoute) newRoute).getLinkIds()); // 1, 3, 5, 6
-		linkIds.add(((NetworkRoute) newRoute).getEndLinkId());
-		
-		// remainder of the old route
-		// if route is not yet finished:
-		if (toLinkIndex + 1 <= allLinkIds.size()-1) {
-			if (toLinkIndex + 1 == allLinkIds.size() -1 ) {
-				linkIds.add(allLinkIds.get(allLinkIds.size()-1));
+		if (links2go >= 3) {
+			int toLinkIndex = (currentLinkIndex + Math.min(2, links2go)); // jump over one link if possible // 3 -> link 6 
+			
+			Id<Link> toLinkId = allLinkIds.get(toLinkIndex); // [3] -> 6
+			Link toLink = network.getLinks().get(toLinkId); // -> link 6
+			
+			Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
+			Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
+			
+			List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person); // 3, 5
+			
+			if (planElements.size() != 1) {
+				throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
+						"but the returned list contained " + planElements.size() + " elements."); 
 			}
-			else {
-				linkIds.addAll(allLinkIds.subList(toLinkIndex + 1, allLinkIds.size()-1)); 
+			
+			
+			// compose the new route -----------------------
+			// The linkIds of the new Route
+			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+	
+			// start of the old route
+			linkIds.addAll(allLinkIds.subList(0, currentLinkIndex)); // [0, 1] -> 0, 1 
+	
+			// micro-reroute part of route
+			Leg newLeg = (Leg) planElements.get(0); 
+			Route newRoute = newLeg.getRoute();
+			linkIds.addAll(getRouteLinkIds(newRoute));
+			
+//			linkIds.add(((NetworkRoute) newRoute).getStartLinkId());
+//			linkIds.addAll(((NetworkRoute) newRoute).getLinkIds()); // 1, 3, 5, 6
+//			linkIds.add(((NetworkRoute) newRoute).getEndLinkId());
+			
+			// remainder of the old route
+			// if route is not yet finished:
+			if (toLinkIndex + 1 <= allLinkIds.size()-1) {
+				if (toLinkIndex + 1 == allLinkIds.size() -1 ) {
+					// linkIds.add(allLinkIds.get(allLinkIds.size()- 2));
+				}
+				else {
+					linkIds.addAll(allLinkIds.subList(toLinkIndex + 1, allLinkIds.size() - 1)); 
+				}
 			}
+	
+			// Overwrite old Route
+			if (linkIds.size() > 2) {
+				List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()); // to is exclusive
+				Id<Link> endLink = allLinkIds.get(allLinkIds.size()-1);
+				
+				logger.info("--------" + person.getId() + " :" + oldRoute.toString());
+				
+				oldRoute.setLinkIds(linkIds.get(0), middleLinks , endLink);
+				
+				if (getRouteLinkIds(oldRoute).size() != allLinkIds.size() - 1) { 
+					logger.info("--------" + person.getId() + " :" + oldRoute.toString());
+				}
+			} // else do not replace route
 		}
-
-		// Overwrite old Route
-		if (linkIds.size() > 2) {
-			List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()- 1); // to is exclusive
-			Id<Link> endLink = linkIds.get(linkIds.size()-1);
-			oldRoute.setLinkIds(linkIds.get(0), middleLinks , endLink);
-		} // else do not replace route
-		
 		return true;
 	}
 		
