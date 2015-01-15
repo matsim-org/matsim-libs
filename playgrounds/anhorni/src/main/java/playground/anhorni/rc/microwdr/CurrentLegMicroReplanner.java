@@ -149,7 +149,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 			if (linkIds.size() > 2) {
 				List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()); // to is exclusive
 				Id<Link> endLink = allLinkIds.get(allLinkIds.size()-1);
-				
+								
 //				logger.info("--------" + person.getId() + " :" + oldRoute.toString());
 				
 				oldRoute.setLinkIds(linkIds.get(0), middleLinks , endLink);
