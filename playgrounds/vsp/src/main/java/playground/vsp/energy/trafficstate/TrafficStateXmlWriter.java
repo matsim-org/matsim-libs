@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.vsp.energy.trafficstate;
 
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -50,8 +50,11 @@ public class TrafficStateXmlWriter {
 		GregorianCalendar cal = new GregorianCalendar(2012,03,16,00,00,00);
 		cal.setTimeZone(zone);
 		cal.add(Calendar.SECOND, seconds);
-		XMLGregorianCalendar xmlCal = new XMLGregorianCalendarImpl(cal);
-		return xmlCal;
+        try {
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+        } catch (DatatypeConfigurationException e) {
+            throw new RuntimeException(e);
+        }
 	}
 	
 	private String getTimeString(double time){
@@ -63,7 +66,7 @@ public class TrafficStateXmlWriter {
 		XMLOutputFactory xof =  XMLOutputFactory.newInstance();
 		XMLStreamWriter xtw = null;
 		try {
-			xtw = new IndentingXMLStreamWriter(xof.createXMLStreamWriter(IOUtils.getOutputStream(filename)));
+			xtw = xof.createXMLStreamWriter(IOUtils.getOutputStream(filename));
 			xtw.writeStartDocument("utf-8","1.0");
 //			
 			xtw.writeStartElement("traffic_state");
