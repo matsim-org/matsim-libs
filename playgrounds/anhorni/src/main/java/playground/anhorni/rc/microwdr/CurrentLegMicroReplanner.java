@@ -144,7 +144,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 					linkIds.addAll(allLinkIds.subList(toLinkIndex + 1, allLinkIds.size() - 1)); 
 				}
 			}
-	
+				
 			// Overwrite old Route
 			if (linkIds.size() > 2) {
 				List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()); // to is exclusive
