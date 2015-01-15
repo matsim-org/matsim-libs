@@ -149,12 +149,16 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 			if (linkIds.size() > 2) {
 				List<Id<Link>> middleLinks = linkIds.subList(1, linkIds.size()); // to is exclusive
 				Id<Link> endLink = allLinkIds.get(allLinkIds.size()-1);
-								
-				logger.info("--------" + person.getId() + " :" + oldRoute.toString());
 				
+				String str = oldRoute.toString();
+				int lo = oldRoute.getLinkIds().size();
+								
 				oldRoute.setLinkIds(linkIds.get(0), middleLinks , endLink);
 				
-				logger.info("--------" + person.getId() + " :" + oldRoute.toString());
+				if (oldRoute.getLinkIds().size() != lo) {
+					logger.info(person.getId() + " :" + str + "\n" +
+							oldRoute.toString());
+				}
 
 			} // else do not replace route
 		}
