@@ -23,7 +23,9 @@ package playground.boescpa.converters.osm.ptRouter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
 /**
  * Provides the contract for an implementation of pt-lines routing.
@@ -35,6 +37,9 @@ public abstract class PTLineRouter {
 	protected static Logger log = Logger.getLogger(PTLineRouter.class);
 
 	protected final TransitSchedule schedule;
+	protected final TransitScheduleFactory scheduleFactory;
+	protected Network network;
+	protected NetworkFactory networkFactory;
 
 	/**
 	 * The provided schedule is expected to already contain for each line
@@ -47,6 +52,12 @@ public abstract class PTLineRouter {
 	 */
 	protected PTLineRouter(TransitSchedule schedule) {
 		this.schedule = schedule;
+		this.scheduleFactory = this.schedule.getFactory();
+	}
+
+	protected PTLineRouter(TransitSchedule schedule, Network network) {
+		this(schedule);
+		this.setNetwork(network);
 	}
 
 	/**
@@ -55,4 +66,9 @@ public abstract class PTLineRouter {
 	 * @param network is a multimodal network (see MultimodalNetworkCreator)
 	 */
 	public abstract void routePTLines(Network network);
+
+	protected void setNetwork(Network network) {
+		this.network = network;
+		this.networkFactory = network.getFactory();
+	}
 }
