@@ -303,6 +303,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity inFrontOfMe = this.ds.peekForAgent();
 			if (inFrontOfMe != null && this.usl != null) {
 				if (inFrontOfMe.getNextLinkId().equals(this.usl.getId())) {
+					// double d = Math.min(getD(a), getD(inFrontOfMe));
 					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a, this, time + d + this.tFree);
@@ -410,6 +411,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 			if (inFrontOfMe != null) {
 				if (inFrontOfMe.getNextLinkId().equals(this.dsl.getId())) { // oncoming
 
+					// double d = Math.min(getD(a), getD(inFrontOfMe));
 					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a, this, time + d + this.tFree);
@@ -468,7 +470,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
-		if (a.getNextLinkId() == null) {
+		if (a.getNextLinkId() == null && this.ds.peekForAgent() == null) {
 			letAgentArrive(a, time, this.size - 1);
 			checkPostConditionForPersonBehindOnDownStreamAdvance(this.size - 1,
 					time);
@@ -516,6 +518,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForOneSelfOnNodeAdvance(CASingleLaneNode n,
 			CAMoveableEntity a, double time) {
 		Id<Link> nextCALinkId = a.getNextLinkId();
+		if (nextCALinkId == null) {
+			n.letAgentArrive(a, time);
+			return;
+		}
 		CASingleLaneLink nextCALink = (CASingleLaneLink) this.net
 				.getCALink(nextCALinkId);
 		int nextNextA;
@@ -534,6 +540,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		CAMoveableEntity inFrontOfMe = nextCALink.getParticles()[nextNextA];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == nextRevDir) { // oncoming
+			// double d = Math.min(getD(a), getD(inFrontOfMe));
 				double d = getD(a);
 				d *= this.ratio;
 				triggerSWAP(a, n, time + d + this.tFree);
@@ -563,7 +570,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
-		if (a.getNextLinkId() == null) {
+		if (a.getNextLinkId() == null && this.us.peekForAgent() == null) {
 			this.lastLeftTimes[0] = time;
 			this.particles[0] = null;
 			letAgentArrive(a, time, 0);

@@ -35,6 +35,7 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 	private MobsimDriverAgent agent;
 	private CANetworkEntity currentCANetorkEntity;
 	private final int hash;
+	private CANetworkEntity lastCANetworkEntity;
 
 	public CAVehicle(Id<Vehicle> vehicleId, MobsimDriverAgent agent, CALink link) {
 		this.id = vehicleId;
@@ -45,11 +46,6 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 	public Id<Vehicle> getVehicleId() {
 		return this.id;
-	}
-
-	@Override
-	public Vehicle getVehicle() {
-		return null;
 	}
 
 	@Override
@@ -88,18 +84,24 @@ public class CAVehicle extends CAMoveableEntity implements MobsimVehicle {
 
 	@Override
 	public void moveToNode(CANode n) {
+		this.lastCANetworkEntity = this.currentCANetorkEntity;
 		this.currentCANetorkEntity = n;
 	}
 
 	@Override
-	public Link getCurrentLink() {
-		return null;
+	public CANetworkEntity getLastCANetworkEntity() {
+		return this.lastCANetworkEntity;
 	}
 
-	// @Override
-	// public int hashCode() {
-	// return hash;
-	// }
+	@Override
+	public Link getCurrentLink() {
+		throw new RuntimeException("unsed method");
+	}
+
+	@Override
+	public Vehicle getVehicle() {
+		throw new RuntimeException("unimplemented method");
+	}
 
 	// /////////////////////////////////////
 

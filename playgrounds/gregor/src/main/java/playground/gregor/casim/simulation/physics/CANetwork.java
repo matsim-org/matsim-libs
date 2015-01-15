@@ -24,7 +24,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.gregor.casim.monitoring.CALinkMonitorExact;
+import playground.gregor.casim.monitoring.Monitor;
 
 public interface CANetwork {
 
@@ -38,10 +38,10 @@ public interface CANetwork {
 
 	void registerAgent(CAMoveableEntity a);
 
-	void run();
+	void run(double d);
 
-	void addMonitor(CALinkMonitorExact monitor);
+	void addMonitor(Monitor monitor);
 
-	public List<CALinkMonitorExact> getMonitors();
+	public List<Monitor> getMonitors();
 
 }

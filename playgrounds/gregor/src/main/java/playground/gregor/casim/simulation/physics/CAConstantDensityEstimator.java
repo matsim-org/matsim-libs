@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,16 +19,19 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
+public class CAConstantDensityEstimator implements CADensityEstimatorKernel {
 
-import playground.gregor.casim.simulation.CANetsimEngine;
+	private static final double RHO = 6;
 
-public interface CANetworkFactory {
+	@Override
+	public double estRho(CAMoveableEntity e) {
+		return RHO;
+	}
 
-	public CANetwork createCANetwork(Network net, EventsManager em,
-			CANetsimEngine caNetsimEngine);
+	@Override
+	public void report() {
+		// TODO Auto-generated method stub
 
-	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac);
+	}
 
 }

@@ -35,7 +35,7 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 
 	public CAMultiLaneNetwork(Network net, EventsManager em,
 			CANetsimEngine engine) {
-		super(net, em, engine);
+		super(net, em, engine, null);
 		init();
 		if (STATIC_VIS_HANDLER != null) {
 			((CASimVisRequestHandler) STATIC_VIS_HANDLER).intitialize(this);

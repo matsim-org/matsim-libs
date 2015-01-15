@@ -28,7 +28,6 @@ import processing.core.PImage;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-
 public class Tile {
 
 	private final double tx;
@@ -38,15 +37,16 @@ public class Tile {
 	private PImage img;
 	private final MathTransform transform;
 
-	public Tile(double tx, double ty, double bx, double by, MathTransform transform) {
-		this.tx = Math.min(tx,bx);
-		this.ty = Math.min(ty,by);
-		this.bx = Math.max(tx,bx);
-		this.by = Math.max(ty,by);
+	public Tile(double tx, double ty, double bx, double by,
+			MathTransform transform) {
+		this.tx = Math.min(tx, bx);
+		this.ty = Math.min(ty, by);
+		this.bx = Math.max(tx, bx);
+		this.by = Math.max(ty, by);
 		this.transform = transform;
-//		System.out.println(tx + "\t" + bx);
+		// System.out.println(tx + "\t" + bx);
 	}
-	
+
 	public double getTx() {
 		return this.tx;
 	}
@@ -54,19 +54,19 @@ public class Tile {
 	public double getTy() {
 		return this.ty;
 	}
-	
+
 	public double getBx() {
 		return this.bx;
 	}
-	
+
 	public double getBy() {
 		return this.by;
 	}
 
 	public String getUrl() {
-		Coordinate src = new Coordinate(this.tx,this.ty);
+		Coordinate src = new Coordinate(this.tx, this.ty);
 		Coordinate dest = new Coordinate();
-		Coordinate src1 = new Coordinate(this.bx,this.by);
+		Coordinate src1 = new Coordinate(this.bx, this.by);
 		Coordinate dest1 = new Coordinate();
 		try {
 			JTS.transform(src, dest, this.transform);
@@ -75,27 +75,26 @@ public class Tile {
 			e.printStackTrace();
 		}
 
-		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=bwb&styles=&bbox=" +
-				dest.x +
-				"," +
-				dest.y +
-				"," +
-				dest1.x +
-				"," +
-				dest1.y +
-				"&width=256&height=256&srs=EPSG:4326&format=image/jpeg&BGCOLOR=0xFFFFFF";
-
+		String url = "http://localhost:8080/geoserver/wms?service=WMS&version=1.1.0&request=GetMap&layers=bwb&styles=&bbox="
+				+ dest.x
+				+ ","
+				+ dest.y
+				+ ","
+				+ dest1.x
+				+ ","
+				+ dest1.y
+				+ "&width=256&height=256&srs=EPSG:4326&format=image/jpeg&BGCOLOR=0xFFFFFF";
 
 		return url;
 	}
 
 	public void setPImage(PImage img) {
 		this.img = img;
-		
+
 	}
 
 	public PImage getPImage() {
 		return this.img;
 	}
-	
+
 }

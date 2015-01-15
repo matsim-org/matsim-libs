@@ -41,7 +41,6 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Control;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.FrameSaver;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Tile;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.TileMap;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.VisDebuggerOverlay;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -188,6 +187,9 @@ public class EventsBasedVisDebugger extends PApplet {
 
 		synchronized (this.additionalDrawers) {
 			for (VisAdditionalDrawer d : this.additionalDrawers) {
+				if (d instanceof VisOverlay) {
+					continue;
+				}
 				d.draw(this);
 			}
 		}
@@ -198,7 +200,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		synchronized (this.additionalDrawers) {
 			for (VisAdditionalDrawer d : this.additionalDrawers) {
-				if (d instanceof VisDebuggerOverlay) {
+				if (d instanceof VisOverlay) {
 					continue;
 				}
 				d.drawText(this);
@@ -241,6 +243,15 @@ public class EventsBasedVisDebugger extends PApplet {
 			}
 		}
 
+		synchronized (this.additionalDrawers) {
+			for (VisAdditionalDrawer d : this.additionalDrawers) {
+				if (d instanceof VisOverlay) {
+					d.draw(this);
+				}
+
+			}
+		}
+
 		popMatrix();
 		if (recording) {
 			this.recorder.popMatrix();
@@ -264,7 +275,7 @@ public class EventsBasedVisDebugger extends PApplet {
 
 		synchronized (this.additionalDrawers) {
 			for (VisAdditionalDrawer d : this.additionalDrawers) {
-				if (d instanceof VisDebuggerOverlay) {
+				if (d instanceof VisOverlay) {
 					d.drawText(this);
 				}
 			}
@@ -412,9 +423,14 @@ public class EventsBasedVisDebugger extends PApplet {
 		// }
 		stroke(l.r, l.g, l.b, a);
 		// stroke(20);
-		// strokeWeight(2);
-
-		line(l.x0, l.y0, l.x1, l.y1);
+		// strokeWeight(10);
+		if (l.width != -1) {
+			strokeWeight(l.width);
+			line(l.x0, l.y0, l.x1, l.y1);
+			strokeWeight((float) (2 / this.zoomer.getZoomScale()));
+		} else {
+			line(l.x0, l.y0, l.x1, l.y1);
+		}
 
 	}
 
@@ -485,6 +501,23 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	}
 
+	public void addLineStatic(double x0, double y0, double x1, double y1,
+			int r, int g, int b, int a, int minScale, double width) {
+		Line l = new Line();
+		l.x0 = (float) (x0 + this.getOffsetX());
+		l.x1 = (float) (x1 + this.getOffsetX());
+		l.y0 = (float) -(y0 + this.getOffsetY());
+		l.y1 = (float) -(y1 + this.getOffsetY());
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		l.minScale = minScale;
+		l.width = (float) width;
+		addElementStatic(l);
+
+	}
+
 	/* package */void addCircleStatic(double x, double y, float rr, int r,
 			int g, int b, int a, int minScale) {
 		Circle c = new Circle();
@@ -511,6 +544,23 @@ public class EventsBasedVisDebugger extends PApplet {
 		l.b = b;
 		l.a = a;
 		l.minScale = minScale;
+		addElement(l);
+
+	}
+
+	public void addLine(double x0, double y0, double x1, double y1, int r,
+			int g, int b, int a, int minScale, double width) {
+		Line l = new Line();
+		l.x0 = (float) (x0 + this.getOffsetX());
+		l.x1 = (float) (x1 + this.getOffsetX());
+		l.y0 = (float) -(y0 + this.getOffsetY());
+		l.y1 = (float) -(y1 + this.getOffsetY());
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		l.minScale = minScale;
+		l.width = (float) width;
 		addElement(l);
 
 	}
@@ -645,6 +695,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	private static final class Line {
 		float x0, x1, y0, y1;
 		int r, g, b, a, minScale = 0;
+		float width = -1;
 	}
 
 	private static final class Rect {

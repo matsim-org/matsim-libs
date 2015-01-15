@@ -19,7 +19,11 @@
 
 package playground.gregor.scenariogen.casmimfzj;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -120,6 +124,20 @@ public class CASimFZJ {
 		for (Link l : sc.getNetwork().getLinks().values()) {
 			l.setAllowedModes(modes);
 			l.setCapacity(2);
+		}
+		Iterator<?> it = sc.getNetwork().getLinks().entrySet().iterator();
+		List<Id<Link>> rm = new ArrayList<>();
+		while (it.hasNext()) {
+			Entry<Id<Link>, ? extends Link> next = (Entry<Id<Link>, ? extends Link>) it
+					.next();
+			if (next.getKey().toString().contains("el")
+					&& !next.getKey().toString().equals("el1")) {
+				rm.add(next.getKey());
+			}
+
+		}
+		for (Id<Link> r : rm) {
+			sc.getNetwork().removeLink(r);
 		}
 		((NetworkImpl) sc.getNetwork()).setCapacityPeriod(1);
 

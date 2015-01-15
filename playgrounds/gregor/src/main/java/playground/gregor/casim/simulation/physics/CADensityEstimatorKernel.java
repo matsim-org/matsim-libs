@@ -19,16 +19,10 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
+public interface CADensityEstimatorKernel {
 
-import playground.gregor.casim.simulation.CANetsimEngine;
+	double estRho(CAMoveableEntity e);
 
-public interface CANetworkFactory {
-
-	public CANetwork createCANetwork(Network net, EventsManager em,
-			CANetsimEngine caNetsimEngine);
-
-	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac);
+	public void report();
 
 }

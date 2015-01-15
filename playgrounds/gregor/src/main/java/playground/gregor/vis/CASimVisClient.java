@@ -66,7 +66,7 @@ public class CASimVisClient {
 	private EventsBasedVisDebugger drawer;
 
 	private final Map<String, CircleProperty> circProps = new HashMap<>();
-	private final Map<String, LinkInfoPoly> linkPolys = new HashMap<>();
+	private final Map<String, LinkInfo> linkInfos = new HashMap<>();
 	private final CircleProperty defaultCp = new CircleProperty();
 	private long lastUpdate;
 	private Control keyControl;
@@ -102,6 +102,7 @@ public class CASimVisClient {
 			Scenario scRsp = visService.reqScn(cntr, scReq);
 			this.drawer = new EventsBasedVisDebugger(scRsp, null);
 			this.drawer.addAdditionalDrawer(new InfoBox());
+
 			init();
 			ZoomPan zoomer = this.drawer.zoomer;
 			int w = this.drawer.getWidth();
@@ -118,11 +119,11 @@ public class CASimVisClient {
 				PVector tlC = zoomer.getDispToCoord(tl);
 
 				FrameRqst frReq = FrameRqst.newBuilder()
-						.setTlX(tlC.x - drawer.getOffsetX())
-						.setTlY(-(drawer.getOffsetY() + tlC.y))
-						.setBrX(brC.x - drawer.getOffsetX())
-						.setBrY(-(drawer.getOffsetY() + brC.y)).setTime(0)
-						.setId(id).build();
+						.setTlX(tlC.x - drawer.getOffsetX() - 100)
+						.setTlY(-(drawer.getOffsetY() + tlC.y) + 100)
+						.setBrX(brC.x - drawer.getOffsetX() + 100)
+						.setBrY(-(drawer.getOffsetY() + brC.y) - 100)
+						.setTime(0).setId(id).build();
 				Frame frame = visService.reqFrame(cntr, frReq);
 				handleFrame(frame);
 			}
@@ -153,35 +154,41 @@ public class CASimVisClient {
 			b2.append(from.getId());
 			String refId = b2.toString();
 
-			LinkInfoPoly p = new LinkInfoPoly();
-			double dx = (to.getX() - from.getX());
-			double dy = (to.getY() - from.getY());
-			double length = Math.sqrt(dx * dx + dy * dy);
-			dx /= length;
-			dy /= length;
-			double x0 = from.getX() - dy * l.getCapacity() / 2;
-			double y0 = from.getY() + dx * l.getCapacity() / 2;
-			double x1 = from.getX() + dy * l.getCapacity() / 2;
-			double y1 = from.getY() - dx * l.getCapacity() / 2;
-			double x2 = to.getX() + dy * l.getCapacity() / 2;
-			double y2 = to.getY() - dx * l.getCapacity() / 2;
-			double x3 = to.getX() - dy * l.getCapacity() / 2;
-			double y3 = to.getY() + dx * l.getCapacity() / 2;
-			p.x = new double[] { x0, x1, x2, x3, x0 };
-			p.y = new double[] { y0, y1, y2, y3, y0 };
-
+			LinkInfo i = new LinkInfo();
+			i.x0 = from.getX();
+			i.y0 = from.getY();
+			i.x1 = to.getX();
+			i.y1 = to.getY();
+			i.width = l.getCapacity() * 3;
+			// LinkInfoPoly p = new LinkInfoPoly();
+			// double dx = (to.getX() - from.getX());
+			// double dy = (to.getY() - from.getY());
+			// double length = Math.sqrt(dx * dx + dy * dy);
+			// dx /= length;
+			// dy /= length;
+			// double x0 = from.getX() - dy * l.getCapacity() / 2;
+			// double y0 = from.getY() + dx * l.getCapacity() / 2;
+			// double x1 = from.getX() + dy * l.getCapacity() / 2;
+			// double y1 = from.getY() - dx * l.getCapacity() / 2;
+			// double x2 = to.getX() + dy * l.getCapacity() / 2;
+			// double y2 = to.getY() - dx * l.getCapacity() / 2;
+			// double x3 = to.getX() - dy * l.getCapacity() / 2;
+			// double y3 = to.getY() + dx * l.getCapacity() / 2;
+			// p.x = new double[] { x0, x1, x2, x3, x0 };
+			// p.y = new double[] { y0, y1, y2, y3, y0 };
+			//
 			double area = l.getLength() * l.getCapacity();
-			p.area = area;
-
-			this.linkPolys.put(l.getId(), p);
-
+			i.area = area;
+			//
+			// this.linkPolys.put(l.getId(), p);
+			this.linkInfos.put(l.getId(), i);
 			if (handled.contains(refId)) {
 				continue;
 			}
 			handled.add(id);
 
 			this.drawer.addLineStatic(from.getX(), from.getY(), to.getX(),
-					to.getY(), 128, 128, 128, 128, 0);
+					to.getY(), 192, 192, 192, 255, 0, 3 * l.getCapacity());
 
 		}
 
@@ -286,8 +293,8 @@ public class CASimVisClient {
 	}
 
 	private void handleLinkInfEvent(Event e) {
-		LinkInfoPoly p = this.linkPolys.get(e.getId());
-		double density = e.getNrAgents() / p.area;
+		LinkInfo i = this.linkInfos.get(e.getId());
+		double density = e.getNrAgents() / i.area;
 		int r, g, b;
 		if (density < 1) {
 			r = 0;
@@ -310,7 +317,8 @@ public class CASimVisClient {
 			g = 0;
 			b = 128;
 		}
-		this.drawer.addPolygon(p.x, p.y, r, g, b, 255, 0);
+		// this.drawer.addPolygon(p.x, p.y, r, g, b, 255, 0);
+		this.drawer.addLine(i.x0, i.y0, i.x1, i.y1, r, g, b, 255, 0, i.width);
 
 	}
 
@@ -372,5 +380,14 @@ public class CASimVisClient {
 		double[] x;
 		double[] y;
 		double area;
+	}
+
+	private static final class LinkInfo {
+		public double area;
+		double x0;
+		double x1;
+		double y0;
+		double y1;
+		double width;
 	}
 }

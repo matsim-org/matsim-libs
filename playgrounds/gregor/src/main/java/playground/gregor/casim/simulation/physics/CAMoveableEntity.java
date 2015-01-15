@@ -68,6 +68,8 @@ public abstract class CAMoveableEntity {
 
 	public abstract CANetworkEntity getCurrentCANetworkEntity();
 
+	public abstract CANetworkEntity getLastCANetworkEntity();
+
 	public abstract void moveToNode(CANode n);
 
 	public CAEvent getCurrentEvent() {

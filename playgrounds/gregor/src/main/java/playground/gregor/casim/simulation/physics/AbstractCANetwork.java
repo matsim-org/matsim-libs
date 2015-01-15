@@ -42,11 +42,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
-import playground.gregor.casim.monitoring.CALinkMonitorExact;
+import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
-import playground.gregor.proto.ProtoFrame.Frame.Event;
-import playground.gregor.proto.ProtoFrame.Frame.Event.Type;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.vis.VisRequestHandler;
 
@@ -86,7 +84,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 	protected final Map<Id<Link>, CALink> caLinks = new HashMap<Id<Link>, CALink>();
 	private final EventsManager em;
 
-	private List<CALinkMonitorExact> monitors = new ArrayList<>();
+	private List<Monitor> monitors = new ArrayList<>();
 
 	private Set<CAMoveableEntity> agents = new HashSet<CAMoveableEntity>();
 
@@ -94,7 +92,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	private static int EXP_WARN_CNT;
 
-	public static int NR_THREADS = 4;
+	public static int NR_THREADS = 1;
 
 	public static VisRequestHandler STATIC_VIS_HANDLER = null;
 	private final CyclicBarrier barrier1 = new CyclicBarrier(NR_THREADS + 1);
@@ -112,12 +110,12 @@ abstract public class AbstractCANetwork implements CANetwork {
 	private final CANetsimEngine engine;
 
 	public AbstractCANetwork(Network net, EventsManager em,
-			CANetsimEngine engine) {
+			CANetsimEngine engine, CASimDensityEstimatorFactory fac) {
 		this.net = net;
 		this.em = em;
 		this.engine = engine;
 		init();
-		this.dens = new CASimDensityEstimator(this);
+		this.dens = new CASimDensityEstimator(this, fac);
 
 	}
 
@@ -144,7 +142,10 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	/* package */void unregisterAgent(CAMoveableEntity a) {
 		if (!this.agents.remove(a)) {
-			throw new RuntimeException("Could not unregister agent: " + a + "!"
+			// throw new RuntimeException("Could not unregister agent: " + a +
+			// "!"
+			// + " has already been removed:");
+			log.warn("Could not unregister agent: " + a + "!"
 					+ " has already been removed:");
 		}
 	}
@@ -236,23 +237,43 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	@Override
 	@Deprecated
-	public void run() {
+	public void run(double endTime) {
+		this.workerMap.clear();
 		// draw2();
 		updateRho();
 		double time = 0;
+		double time2 = 0;
+		for (Monitor monitor : this.monitors) {
+			monitor.trigger(this.events.peek().getEventExcexutionTime());
+		}
 		while (this.events.peek() != null) {
-			if (this.events.peek().getEventExcexutionTime() > time + 1) {
-				updateRho();
+
+			if (this.events.peek().getEventExcexutionTime() > time + 1
+					/ (V_HAT * RHO_HAT)) {
 				time = this.events.peek().getEventExcexutionTime();
+
+				if (EMIT_VIS_EVENTS) {
+					// updateDensity();
+					draw2(time);
+					// draw3(time);
+				}
+			}
+
+			if (time > endTime) {
+				break;
 			}
 
 			CAEvent e = this.events.poll();
+
 			// log.info("==> " + e);
 
-			if (this.monitors.size() > 0) {
-				for (CALinkMonitorExact monitor : this.monitors) {
+			if (e.getEventExcexutionTime() > time2) {
+				time2 = e.getEventExcexutionTime();
+				for (Monitor monitor : this.monitors) {
 					monitor.trigger(e.getEventExcexutionTime());
 				}
+				updateRho();
+
 			}
 
 			if (e.isObsolete()) {
@@ -267,84 +288,10 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 			// this.workers[e.getCANetworkEntity().threadNR()].add(e);
 			e.getCANetworkEntity().handleEvent(e);
-		}
-		if (EMIT_VIS_EVENTS) {
-			// updateDensity();
-			draw2(time);
-			// draw3(time);
+
 		}
 
 		afterSim();
-	}
-
-	private void drawCAMultiLaneNode(CAMultiLaneNode n, double time,
-			List<Event> e,
-			playground.gregor.proto.ProtoFrame.Frame.Event.Builder eb) {
-		int lanes = n.getNRLanes();
-		double laneWidth = n.getWidth() / lanes;
-
-		double x = n.getNode().getCoord().getX();
-		double y0 = n.getNode().getCoord().getY() - laneWidth * lanes / 2
-				+ laneWidth / 2;
-
-		for (int slot = 0; slot < lanes; slot++) {
-			CAMoveableEntity agent = n.peekForAgentInSlot(slot);
-			if (agent != null) {
-				Event ev = eb.setX(x).setY(y0).setVx(0).setVy(0)
-						.setEvntType(Type.POS).setId(agent.getId().toString())
-						.build();
-				e.add(ev);
-			}
-			y0 += laneWidth;
-		}
-
-	}
-
-	private void drawCAMultiLaneLink(CAMultiLaneLink l, double time,
-			List<Event> e,
-			playground.gregor.proto.ProtoFrame.Frame.Event.Builder eb) {
-		double dx = l.getLink().getToNode().getCoord().getX()
-				- l.getLink().getFromNode().getCoord().getX();
-		double dy = l.getLink().getToNode().getCoord().getY()
-				- l.getLink().getFromNode().getCoord().getY();
-		double length = Math.sqrt(dx * dx + dy * dy);
-		dx /= length;
-		dy /= length;
-		double ldx = dx;
-		double ldy = dy;
-		double incr = l.getLink().getLength() / l.getNumOfCells();
-		dx *= incr;
-		dy *= incr;
-		double laneWidth = l.getLaneWidth();
-		double hx = -ldy;
-		double hy = ldx;
-		hx *= laneWidth;
-		hy *= laneWidth;
-		int lanes = l.getNrLanes();
-		double x0 = l.getLink().getFromNode().getCoord().getX() - hx * lanes
-				/ 2 + hx / 2 + dx / 2;
-		double y0 = l.getLink().getFromNode().getCoord().getY() - hy * lanes
-				/ 2 + hy / 2 + dy / 2;
-		for (int lane = 0; lane < l.getNrLanes(); lane++) {
-			double x = x0 + lane * hx;
-			double y = y0 + lane * hy;
-			for (int i = 0; i < l.getNumOfCells(); i++) {
-				if (l.getParticles(lane)[i] != null) {
-					double ddx = 1;
-					if (l.getParticles(lane)[i].getDir() == -1) {
-						ddx = -1;
-					}
-					Event ev = eb.setEvntType(Type.POS).setX(x).setY(y)
-							.setVx(ldx * ddx).setVy(ldy * ddx)
-							.setId(l.getParticles(lane)[i].getId().toString())
-							.build();
-					e.add(ev);
-				}
-				x += dx;
-				y += dy;
-			}
-		}
-
 	}
 
 	private void draw2(double time) {
@@ -459,7 +406,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 		hy *= PED_WIDTH;
 
 		double lanes = l.getLink().getCapacity() / PED_WIDTH;
-
+		// lanes = 1;
 		double incr = l.getLink().getLength() / l.getNumOfCells();
 		dx *= incr;
 		dy *= incr;
@@ -470,7 +417,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 			if (l.getParticles()[i] != null) {
 
 				double lane = l.getParticles()[i].hashCode() % lanes;
-
+				lane = lanes / 2;
 				double ddx = 1;
 				if (l.getParticles()[i].getDir() == -1) {
 					ddx = -1;
@@ -534,7 +481,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	@Override
-	public void addMonitor(CALinkMonitorExact m) {
+	public void addMonitor(Monitor m) {
 		this.monitors.add(m);
 	}
 
@@ -718,7 +665,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	@Override
-	public List<CALinkMonitorExact> getMonitors() {
+	public List<Monitor> getMonitors() {
 		return monitors;
 	}
 

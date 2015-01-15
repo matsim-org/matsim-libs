@@ -17,18 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.utils;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
+/**
+ * A class for incremental variance computation. The algorithm has been adapted
+ * from http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+ * 
+ * @author laemmel
+ *
+ */
+public class Variance {
 
-import playground.gregor.casim.simulation.CANetsimEngine;
+	double K = 0;
+	double n = 0;
+	double Ex = 0;
+	double Ex2 = 0;
 
-public interface CANetworkFactory {
+	public void addVar(double x) {
+		if (n == 0) {
+			K = x;
+		}
+		n++;
+		Ex = Ex + (x - K);
+		Ex2 = Ex2 + (x - K) * (x - K);
+	}
 
-	public CANetwork createCANetwork(Network net, EventsManager em,
-			CANetsimEngine caNetsimEngine);
+	public void removeVar(double x) {
+		n = n - 1;
+		Ex = Ex - (x - K);
+		Ex2 = Ex2 - (x - K) * (x - K);
+	}
 
-	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac);
+	public double getMean() {
+		return K + Ex / n;
+	}
 
+	public double getVar() {
+		return (Ex2 - (Ex * Ex) / n) / (n - 1);
+	}
 }

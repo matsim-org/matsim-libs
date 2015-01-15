@@ -32,4 +32,10 @@ public class CAMultiLaneNetworkFactory implements CANetworkFactory {
 		return new CAMultiLaneNetwork(net, em, engine);
 	}
 
+	@Override
+	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac) {
+		throw new RuntimeException("not implemented yet!");
+
+	}
+
 }

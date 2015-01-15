@@ -15,8 +15,9 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CALink;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
+import playground.gregor.utils.Variance;
 
-public class CALinkMonitorExact implements Monitor {
+public class CALinkMonitorExactIIUniRR extends CALinkMonitorExact {
 
 	// private CALink l;
 	private CAMoveableEntity[] parts;
@@ -38,9 +39,11 @@ public class CALinkMonitorExact implements Monitor {
 	private CALink l;
 	private double lastSpaceTimeSeriesReport = 0;
 	private CAMoveableEntity[] parts2;
+	private final int cellRange;
 
-	public CALinkMonitorExact(CALink l, double range, CAMoveableEntity[] parts,
-			double laneWidth) {
+	public CALinkMonitorExactIIUniRR(CALink l, double range,
+			CAMoveableEntity[] parts, double laneWidth) {
+		super(l, range, parts, laneWidth);
 		this.l = l;
 		this.parts = parts;
 		int num = l.getNumOfCells();
@@ -50,14 +53,17 @@ public class CALinkMonitorExact implements Monitor {
 		this.to = (int) (num / 2. + cells / 2 + .5);
 		this.h = (to - from) / 4.;
 		this.realRange = (1 + to - from) * cellWidth;
+		this.cellRange = (1 + to - from);
 
 	}
 
+	@Override
 	public void addSpaceTimePlotter(BufferedWriter bw, CAMoveableEntity[] parts2) {
 		this.spaceTimePlotter = bw;
 		this.parts2 = parts2;
 	}
 
+	@Override
 	public void init() {
 
 		for (int i = this.from; i <= this.to; i++) {
@@ -92,9 +98,6 @@ public class CALinkMonitorExact implements Monitor {
 		trigger(0);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.gregor.casim.monitoring.Monitor#trigger(double)
-	 */
 	@Override
 	public void trigger(double time) {
 		if (time <= lastTriggered) {
@@ -106,6 +109,20 @@ public class CALinkMonitorExact implements Monitor {
 			lastSpaceTimeSeriesReport = time;
 		}
 		lastTriggered = time;
+
+		for (int i = this.from - 1; i <= this.to + 1; i++) {
+			CAMoveableEntity p = this.parts[i];
+			if (p != null) {
+				AgentInfo ai = this.ais.get(p.getId());
+				if (ai == null) {
+					ai = new AgentInfo(p.getDir(), 0);
+					ai.lastPosTime = 0;
+					ai.lastpos = i;
+					this.ais.put(p.getId(), ai);
+				}
+			}
+		}
+
 		// 1. check density
 		int cnt = 0;
 		// int dsCnt = 0;
@@ -164,43 +181,77 @@ public class CALinkMonitorExact implements Monitor {
 		}
 
 		double dsRho = 0;
-		double usRho = 0;
 		double rho = 0;
-		double usCnt = 0;
 		double dsCnt = 0;
 		int center = (this.from + this.to) / 2;
 		// int spdRange = (to - 2) - (from + 2) - 1;
 		// double spdH = spdRange / 4.;
+
+		Variance vDs = new Variance();
+		// int dsCnt = 0;
 		for (int i = this.from; i <= this.to; i++) {
+
 			if (this.parts[i] != null) {
 
 				AgentInfo ai = this.ais.get(this.parts[i].getId());
 				rho += AbstractCANetwork.RHO_HAT
 						* a1DBSplineKernel(Math.abs(i - center), this.h);
 				if (this.parts[i].getDir() == 1) {
+					dsCnt++;
+					updateVariance(vDs, i, 1, ai, time);
 					// if (i > from + 10 && i < to - 10) {
 					m.dsAis.add(ai);
 					// }
 					// * a1DBSplineKernel(Math.abs(i - center), this.h);
-					dsRho += AbstractCANetwork.RHO_HAT
-							* a1DBSplineKernel(Math.abs(i - center), this.h);
-				} else {
-					// if (i > from + 10 && i < to - 10) {
-					m.usAis.add(ai);
-					// }
+					// dsRho += AbstractCANetwork.RHO_HAT
 					// * a1DBSplineKernel(Math.abs(i - center), this.h);
-					usRho += AbstractCANetwork.RHO_HAT
-							* a1DBSplineKernel(Math.abs(i - center), this.h);
+					dsRho += ai.timeRho.get(time);
+				} else {
 				}
 			}
 		}
 
-		m.dsRho = dsRho;
-		m.usRho = usRho;
-		if (time > 1 && this.parts[center] != null) {
+		dsRho /= dsCnt;
+		m.dsRho = dsRho; // dsCnt;
+		m.rho = rho;
+		double meanDs = vDs.getMean();
+		double varDs = vDs.getVar();
+		// if (time > 10) {
+		// System.out.println("stop");
+		// }
+		if (Math.sqrt(varDs) < 0.1 * meanDs && time > 5) {
 			this.ms.add(m);
 		}
 	}
+
+	private void updateVariance(Variance v, int center, int dir, AgentInfo ai,
+			double time) {
+		double rho = 0;
+		for (int i = center - this.cellRange / 2; i <= center + this.cellRange
+				/ 2; i++) {
+			if (this.parts[i] != null && this.parts[i].getDir() == dir) {
+				// double V = getVolume(i, dir);
+				rho += AbstractCANetwork.RHO_HAT
+						* a1DBSplineKernel(Math.abs(i - center), this.h);// * V;
+			}
+
+		}
+		ai.timeRho.put(time, rho);
+		v.addVar(rho);
+	}
+
+	// private double getVolume(int center, int dir) {
+	// double V = 0;
+	// for (int i = center - this.cellRange / 2; i <= center + this.cellRange
+	// / 2; i++) {
+	// if (this.parts[i] != null && this.parts[i].getDir() == dir) {
+	// V += a1DBSplineKernel(Math.abs(i - center), this.h);
+	// }
+	//
+	// }
+	// V = 1 / V;
+	// return V;
+	// }
 
 	private void reportSpaceTimeSeries(double time) {
 
@@ -220,76 +271,44 @@ public class CALinkMonitorExact implements Monitor {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.gregor.casim.monitoring.Monitor#report(java.io.BufferedWriter)
-	 */
 	@Override
 	public void report(BufferedWriter bw) throws IOException {
 
 		for (Measure m : this.ms) {
-			cmptSpd(m);
-			// bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho
-			// + " " + m.usSpd + "\n");
+			if (!cmptSpd(m)) {
+				m.dsRho = Double.NaN;
+			}
 		}
-		// if (true) {
-		// return;
-		// }
 
-		double dsRho = -1;
-		double usRho = -1;
-		double rho = -1;
-		double dsSpd = -1;
-		double usSpd = -1;
 		List<Tuple<Integer, Integer>> ranges = new ArrayList<Tuple<Integer, Integer>>();
 		int from = 0;
 		int to = 0;
-		// double mxDiff = 0.075;
-		double mxDiff = 0.15;
-		int mnRange = 5;
-		double oldT = 0;
 		int cnt = 0;
+		Variance vDs = new Variance();
 		for (Measure m : this.ms) {
 			cnt++;
-			// bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho
-			// + " " + m.usSpd + "\n");
-			double usRhoDiff = Math.abs(usRho - m.usRho);
-			double dsRhoDiff = Math.abs(dsRho - m.dsRho);
-			double rhoDiff = Math.abs(rho - (m.dsRho + m.usRho));
-			double dsSpdDiff = Math.abs(dsSpd - m.dsSpd);
-			double usSpdDiff = Math.abs(usSpd - m.usSpd);
-			// if (rhoDiff > rho * mxDiff || usRhoDiff > usRho * mxDiff
-			// || dsRhoDiff > dsRho * mxDiff || dsSpdDiff > dsSpd * mxDiff
-			// || usSpdDiff > usSpd * mxDiff || cnt == this.ms.size()) {
-			double blancing = m.usRho / m.dsRho;
-			if (dsSpdDiff > dsSpd * mxDiff || dsRhoDiff > dsRho * mxDiff
-					|| usSpdDiff > usSpd * mxDiff || usRhoDiff > usRho * mxDiff
-					|| cnt == this.ms.size() || (m.time - oldT) >= mnRange) {
-				int range = to - from;
-				if ((m.time - oldT) >= mnRange && !Double.isNaN(blancing)
-						&& blancing <= 1.2 && blancing >= 0.83333) {
+			vDs.addVar(m.dsRho);
+			if (cnt < 2) {
+				continue;
+			}
+			double stdDs = Math.sqrt(vDs.getVar());
+
+			if (stdDs > 0.1 * vDs.getMean() || cnt == ms.size()) {
+				if (cnt > 5) {
 					ranges.add(new Tuple<Integer, Integer>(from, to));
 				}
-				oldT = m.time;
-				from = to;
-				dsRho = m.dsRho;
-				usRho = m.usRho;
-				rho = (m.usRho + m.dsRho);
-				usSpd = m.usSpd;
-				dsSpd = m.dsSpd;
+				vDs = new Variance();
+				cnt = 0;
 			}
 
 			to++;
 		}
+		double stdDs = Math.sqrt(vDs.getVar());
 		int ccnt = 0;
-		int cccnt = 0;
 		for (Tuple<Integer, Integer> t : ranges) {
-			// if (ccnt++ <= ranges.size() / 2 || ccnt > ranges.size() / 1.75
-			// || cccnt++ > 10) {
-			// continue; // skip first since it is 0
-			// }
-			// if (ccnt++ > 10 || ccnt > 100) {
-			// continue;
-			// }
+			if (ccnt++ < ranges.size() / 2 || ccnt > ranges.size() / 2 + 20) {
+				continue;
+			}
 			double range = t.getSecond() - t.getFirst();
 			Measure m = new Measure(0);
 			for (int i = t.getFirst(); i < t.getSecond(); i++) {
@@ -299,26 +318,21 @@ public class CALinkMonitorExact implements Monitor {
 				m.usRho += c.usRho / range;
 				m.usSpd += c.usSpd / range;
 				m.time += c.time / range;
+				m.rho += c.rho / range;
 			}
 			bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho
-					+ " " + m.usSpd + "\n");
+					+ " " + m.usSpd + " " + m.rho + "\n");
 		}
 		bw.flush();
-		// for (Measure m : this.ms){
-		// // if (m.time<20 || m.time >100) {
-		// //// return;
-		// // continue;
-		// // }
-		// bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho +
-		// " " + m.usSpd +"\n");
-		// }
 
 	}
 
-	private void cmptSpd(Measure m) {
+	private boolean cmptSpd(Measure m) {
 		double dsSpd = 0;
 		double time = m.time;
 		int cnt = 0;
+		// Variance vDsSpd = new Variance();
+		double totalDsSpace = 0;
 		for (AgentInfo ai : m.dsAis) {
 			Entry<Double, Integer> floor = ai.timePos.floorEntry(time - 1.5);
 			Entry<Double, Integer> ceil = ai.timePos.ceilingEntry(time + 1.5);
@@ -327,36 +341,32 @@ public class CALinkMonitorExact implements Monitor {
 			}
 			cnt++;
 			double tt = ceil.getKey() - floor.getKey();
-			double dist = (ceil.getValue() - floor.getValue())
-					/ (AbstractCANetwork.PED_WIDTH * AbstractCANetwork.RHO_HAT);
-			dsSpd += (dist / tt);
+			double dist = (ceil.getValue() - floor.getValue()) * this.cellWidth;
+			// / (AbstractCANetwork.PED_WIDTH * AbstractCANetwork.RHO_HAT);
+			double spd = (dist / tt);
+			double rhoF = ai.timeRho.floorEntry(time).getValue();
+			double rhoC = ai.timeRho.ceilingEntry(time).getValue();
+			double rho = (rhoF + rhoC) / 2;
+			double space = 1 / rho;
+			// vDsSpd.addVar(spd);
+			dsSpd += spd * space;
+			totalDsSpace += space;
 		}
 		if (cnt > 0)
-			dsSpd /= cnt;
+			dsSpd /= totalDsSpace;
 		m.dsSpd = dsSpd;
 
-		double usSpd = 0;
-		cnt = 0;
-		for (AgentInfo ai : m.usAis) {
-			Entry<Double, Integer> floor = ai.timePos.floorEntry(time - 1.5);
-			Entry<Double, Integer> ceil = ai.timePos.ceilingEntry(time + 1.5);
-			if (floor == null || ceil == null) {
-				continue;
-			}
-			cnt++;
-			double tt = ceil.getKey() - floor.getKey();
-			double dist = (ceil.getValue() - floor.getValue())
-					/ (AbstractCANetwork.PED_WIDTH * AbstractCANetwork.RHO_HAT);
-			usSpd -= (dist / tt);
-		}
-		if (cnt > 0)
-			usSpd /= cnt;
-		m.usSpd = usSpd;
+		// if (Math.sqrt(vDsSpd.getVar()) < 0.2 * vDsSpd.getMean()
+		// && Math.sqrt(vUsSpd.getVar()) < 0.2 * vUsSpd.getMean()) {
+		// return true;
+		// }
+		return true;
 
 	}
 
 	private static final class AgentInfo {
 		TreeMap<Double, Integer> timePos = new TreeMap<>();
+		TreeMap<Double, Double> timeRho = new TreeMap<>();
 
 		public double lastLastLastPosTime;
 		public double lastLastPosTime;
@@ -366,6 +376,7 @@ public class CALinkMonitorExact implements Monitor {
 		public AgentInfo(int dir, double enterT) {
 			this.dir = dir;
 			this.enterT = enterT;
+
 		};
 
 		int lastpos;
@@ -387,6 +398,7 @@ public class CALinkMonitorExact implements Monitor {
 		double dsRho;
 		double usSpd;
 		double usRho;
+		double rho;
 		double time;
 		List<AgentInfo> dsAis = new ArrayList<>();
 		List<AgentInfo> usAis = new ArrayList<>();
@@ -408,8 +420,14 @@ public class CALinkMonitorExact implements Monitor {
 		return 0;
 	}
 
+	@Override
 	public void clean() {
-
+		super.clean();
+		for (AgentInfo ai : this.ais.values()) {
+			ai.timePos.clear();
+			ai.timeRho.clear();
+		}
+		this.ais.clear();
+		this.agents.clear();
 	}
-
 }

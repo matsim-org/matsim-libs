@@ -33,15 +33,17 @@ public class CASimpleDynamicAgent extends CAMoveableEntity {
 
 	private final List<Link> links;
 	private int next;
-	
-	
-	private int cnt =0;
-	
+
+	private int cnt = 0;
+
 	private final Id<CASimpleDynamicAgent> id;
 
-	public CASimpleDynamicAgent(List<Link> links, int i, Id<CASimpleDynamicAgent> id, CALink caLink) {
+	private CANetworkEntity lastLink;
+
+	public CASimpleDynamicAgent(List<Link> links, int next,
+			Id<CASimpleDynamicAgent> id, CALink caLink) {
 		this.links = links;
-		this.next = i;
+		this.next = next;
 		this.id = id;
 		this.currentEntity = caLink;
 	}
@@ -50,28 +52,30 @@ public class CASimpleDynamicAgent extends CAMoveableEntity {
 	Id<Link> getNextLinkId() {
 		if (next < this.links.size()) {
 			return this.links.get(this.next).getId();
-		} 
+		}
 		return null;
 	}
 
 	@Override
 	public void moveToNode(CANode n) {
+		this.lastLink = this.currentEntity;
 		this.currentEntity = n;
 	}
 
 	@Override
 	void moveOverNode(CALink link, double time) {
+
 		this.currentEntity = link;
 		this.next++;
-//		if (this.next == this.links.size()) {
-//			this.next = this.links.size()-1;
-//			this.letAgentArrive();
-//		}
+		// if (this.next == this.links.size()) {
+		// this.next = this.links.size()-1;
+		// this.letAgentArrive();
+		// }
 	}
-	
+
 	@Override
 	public Link getCurrentLink() {
-		return this.links.get(next-1);
+		return this.links.get(next - 1);
 	}
 
 	@Override
@@ -84,6 +88,9 @@ public class CASimpleDynamicAgent extends CAMoveableEntity {
 		return id;
 	}
 
-	
+	@Override
+	public CANetworkEntity getLastCANetworkEntity() {
+		return this.lastLink;
+	}
 
 }

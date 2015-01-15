@@ -29,8 +29,8 @@ import playground.gregor.casim.simulation.CANetsimEngine;
 public class CASingleLaneNetwork extends AbstractCANetwork {
 
 	public CASingleLaneNetwork(Network net, EventsManager em,
-			CANetsimEngine engine) {
-		super(net, em, engine);
+			CANetsimEngine engine, CASimDensityEstimatorFactory fac) {
+		super(net, em, engine, fac);
 		init();
 	}
 
@@ -41,10 +41,10 @@ public class CASingleLaneNetwork extends AbstractCANetwork {
 			this.caNodes.put(n.getId(), caNode);
 		}
 		for (Link l : this.net.getLinks().values()) {
-			CASingleLaneNode us = (CASingleLaneNode) this.caNodes.get(l.getFromNode()
-					.getId());
-			CASingleLaneNode ds = (CASingleLaneNode) this.caNodes.get(l.getToNode()
-					.getId());
+			CASingleLaneNode us = (CASingleLaneNode) this.caNodes.get(l
+					.getFromNode().getId());
+			CASingleLaneNode ds = (CASingleLaneNode) this.caNodes.get(l
+					.getToNode().getId());
 			Link rev = null;
 			for (Link ll : l.getToNode().getOutLinks().values()) {
 				if (ll.getToNode() == l.getFromNode()) {

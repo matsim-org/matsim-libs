@@ -500,8 +500,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			log.info("situation at link's upstream end for agent: " + a
-					+ " has changed, dropping event.");
+			// log.info("situation at link's upstream end for agent: " + a
+			// + " has changed, dropping event.");
 			return;
 		}
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
@@ -640,8 +640,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			log.info("situation at link's downstream end for agent: " + a
-					+ " has changed, dropping event.");
+			// log.info("situation at link's downstream end for agent: " + a
+			// + " has changed, dropping event.");
 			return;
 		}
 

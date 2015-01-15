@@ -136,6 +136,13 @@ public class BypassTest extends MatsimTestCase {
 		factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
 		controller.addMobsimFactory("casim", factory);
 
+		// AbstractCANetwork.EMIT_VIS_EVENTS = true;
+		//
+		// VisRequestHandler rHandle = new CASimVisRequestHandler();
+		// VisServer s = new VisServer(sc, rHandle);
+		// // AbstractCANetwork.STATIC_VIS_SERVER = s;
+		// AbstractCANetwork.STATIC_VIS_HANDLER = rHandle;
+
 		controller.run();
 
 		String ref = getInputDirectory() + "/20.events.xml.gz";

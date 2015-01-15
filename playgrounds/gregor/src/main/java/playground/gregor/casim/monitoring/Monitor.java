@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.casim.simulation.physics;
+package playground.gregor.casim.monitoring;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-import playground.gregor.casim.simulation.CANetsimEngine;
+public interface Monitor {
 
-public interface CANetworkFactory {
+	public abstract void trigger(double time);
 
-	public CANetwork createCANetwork(Network net, EventsManager em,
-			CANetsimEngine caNetsimEngine);
+	public abstract void report(BufferedWriter bw) throws IOException;
 
-	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac);
+	void init();
 
 }

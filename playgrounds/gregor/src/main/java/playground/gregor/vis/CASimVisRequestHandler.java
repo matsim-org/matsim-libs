@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class CASimVisRequestHandler implements VisRequestHandler {
 
-	private static final int MAX_AGENTS = 500;
+	private static final int MAX_AGENTS = 2000;
 
 	private TwoDTree<EventContainer> sceneTree;// = new TwoDTree<>(e);
 	private final Map<String, List<EventContainer>> sceneViews = new HashMap<>();

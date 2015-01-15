@@ -34,9 +34,7 @@ public class CASimDensityEstimator {
 	public static int LOOK_AHEAD = 6;
 	/* package */static final int MX_TRAVERSE = 20;
 
-	public static int H = 13;
-	private static final int CUTTOFF_DIST = 2 * H;
-	private static final boolean USE_SPH = false;
+	public static boolean USE_SPH = false;
 
 	private final AbstractCANetwork net;
 
@@ -45,9 +43,12 @@ public class CASimDensityEstimator {
 	private final Worker[] workers = new Worker[nrThreads];
 
 	private final Set<CALink> safeLinks = new HashSet<>();
+	private final CASimDensityEstimatorFactory fac;
 
-	public CASimDensityEstimator(AbstractCANetwork net) {
+	public CASimDensityEstimator(AbstractCANetwork net,
+			CASimDensityEstimatorFactory fac) {
 		this.net = net;
+		this.fac = fac;
 		init();
 	}
 
@@ -59,186 +60,14 @@ public class CASimDensityEstimator {
 		}
 
 		for (int i = 0; i < nrThreads; i++) {
-			workers[i] = new Worker(barrier);
+			workers[i] = new Worker(barrier,
+					this.fac.createCASimDensityEstimator(net));
 			Thread t = new Thread(workers[i]);
 			t.setDaemon(true);
 			t.setName(CASimDensityEstimator.class.toString() + i);
 			t.start();
 		}
 
-	}
-
-	private double estRho(CAMoveableEntity a) {
-		if (a.getCurrentCANetworkEntity() instanceof CASingleLaneNode
-				|| a.getNextLinkId() == null
-				|| a.getCurrentCANetworkEntity() instanceof CAMultiLaneNode) {
-			return a.getRho();
-		}
-		if (this.safeLinks.contains(a.getCurrentCANetworkEntity())) {
-			return 0;
-		}
-		CALink current = (CALink) a.getCurrentCANetworkEntity();
-		CAMoveableEntity[] currentParts = null;// = current.getParticles();
-		if (current instanceof CASingleLaneLink) {
-			currentParts = ((CASingleLaneLink) current).getParticles();
-		} else if (current instanceof CAMultiLaneLink) {
-			currentParts = ((CAMultiLaneLink) current)
-					.getParticles(a.getLane());
-		}
-		int pos = a.getPos();
-		int dir = a.getDir();
-		int[] spacings;// = new int []{0,0};
-		// if (currentParts.length <= pos) {
-		// Log.error("got you!" + a);
-		// throw new RuntimeException(a.toString());
-		// }
-		if (currentParts[pos] != a) {
-			// agent on node
-			// log.warn("not yet implemented!!");
-			return a.getRho();
-		} else {
-
-			double rho = bSplinesKernel(0);
-			spacings = new int[] { 0, 0 };
-			rho += traverseLink(currentParts, dir, pos + dir, spacings, rho);
-			// check next node
-
-			if (USE_SPH && spacings[1] < CUTTOFF_DIST || !USE_SPH
-					&& spacings[0] < LOOK_AHEAD && spacings[1] < MX_TRAVERSE) {
-				// if (spacings[1] < MX_TRAVERSE){
-				CANode n;
-				if (dir == 1) {
-					n = current.getDownstreamCANode();
-				} else {
-					n = current.getUpstreamCANode();
-				}
-				// TODO bSplineKernel needs to be updated here as well!!! [GL
-				// Nov. '12]
-
-				spacings[1]++;
-				if (n instanceof CASingleLaneNode) {
-					if (((CASingleLaneNode) n).peekForAgent() != null) {
-						spacings[0]++;
-					}
-				} else if (n instanceof CAMultiLaneNode) {
-					CAMultiLaneNode npq = (CAMultiLaneNode) n;
-					// int lane = a.getDesiredLane(npq.getNRLanes());
-					int lane = 0;// it is not clear to which lane the agent will
-									// moved to, under the assumption of
-									// homogeneity over
-					// the lanes we can just assume any lane for density
-					// estimation [GL Nov. '14]
-					if (npq.peekForAgentInSlot(lane) != null) {
-						spacings[0]++;
-					}
-
-				}
-
-				// check next link(s)? TODO it would make sense to check all
-				// outgoing links not only the next one ...
-				if (USE_SPH && spacings[1] < CUTTOFF_DIST || !USE_SPH
-						&& spacings[0] < LOOK_AHEAD
-						&& spacings[1] < MX_TRAVERSE) {
-					// if (spacings[1] < MX_TRAVERSE){
-					CALink next = this.net.getCALink(a.getNextLinkId());
-					CANode nn = next.getUpstreamCANode();
-					int nextDir;
-					int nextPos;
-					CAMoveableEntity[] nextParts = null;// =
-														// next.getParticles();
-					if (next instanceof CASingleLaneLink) {
-						nextParts = ((CASingleLaneLink) next).getParticles();
-					} else if (next instanceof CAMultiLaneLink) {
-						nextParts = ((CAMultiLaneLink) next).getParticles(0);// it
-																				// is
-																				// not
-																				// clear
-																				// to
-																				// which
-																				// lane
-																				// the
-																				// agent
-																				// will
-																				// moved
-																				// to,
-																				// under
-																				// the
-																				// assumption
-																				// of
-																				// homogeneity
-																				// over
-						// the lanes we can just assume any lane for density
-						// estimation [GL Nov. '14]
-					}
-					if (n == nn) {
-						nextDir = 1;
-						nextPos = 0;
-					} else {
-						nextDir = -1;
-						nextPos = nextParts.length - 1;
-					}
-					rho += traverseLink(nextParts, nextDir, nextPos, spacings,
-							rho);
-				}
-			}
-			double coeff = (double) spacings[0] / (double) spacings[1];
-			double cmp = AbstractCANetwork.RHO_HAT * coeff;
-			// rho *= RHO_HAT;
-			if (USE_SPH) {
-				return rho;
-			} else {
-				return cmp;
-			}
-		}
-	}
-
-	private double traverseLink(CAMoveableEntity[] parts, int dir, int idx,
-			int[] spacings, double rho) {
-		if (idx < 0 || idx >= parts.length) {
-			return rho;
-		}
-		int toMx = dir == -1 ? 0 : parts.length - 1;
-		for (; idx != toMx; idx += dir) {
-			spacings[1]++;
-			if (parts[idx] != null) {
-				spacings[0]++;
-				rho += bSplinesKernel(spacings[1]);
-				if (!USE_SPH && spacings[0] >= LOOK_AHEAD) {
-					return rho;
-				}
-			}
-			if (USE_SPH && spacings[1] >= CUTTOFF_DIST || !USE_SPH
-					&& spacings[1] >= MX_TRAVERSE) {
-				return rho;
-			}
-		}
-		return rho;
-	}
-
-	private double bSplinesKernel(double r) {
-		// r = H-r;
-		final double v = r / H;
-		final double hCube = Math.pow(H, 3);
-		if (v < 0) {
-			return 0;
-		}
-		if (v <= 1) {
-			final double term1 = 3. / (4. * Math.PI * Math.pow(H, 3.));
-			// final double term1 = 1./6.;
-			final double term2 = 10. / 3. - 7 * Math.pow(v, 2) + 4
-					* Math.pow(v, 3.);
-			// final double term2 = 3*Math.pow(v, 3) - 6*Math.pow(v, 2) + 4;
-			return term1 * term2 * hCube;
-		} else if (v <= 2) {
-			final double term1 = 3. / (4. * Math.PI * Math.pow(H, 3.));
-			// final double term1 = 1./6.;
-			final double term2 = Math.pow(2 - v, 2) * ((5. - 4. * v) / 3.);
-			// final double term2 = - Math.pow(v, 3) + 6.*Math.pow(v, 2) - 12*v
-			// +8;
-			return term1 * term2 * hCube;
-		}
-
-		return 0.;
 	}
 
 	public void handle(CAMoveableEntity a) {
@@ -262,9 +91,11 @@ public class CASimDensityEstimator {
 
 		private final LinkedBlockingQueue<CAMoveableEntity> queue = new LinkedBlockingQueue<>();
 		private CyclicBarrier barrier;
+		private CADensityEstimatorKernel k;
 
-		public Worker(CyclicBarrier barrier) {
+		public Worker(CyclicBarrier barrier, CADensityEstimatorKernel k) {
 			this.barrier = barrier;
+			this.k = k;
 		}
 
 		@Override
@@ -278,10 +109,12 @@ public class CASimDensityEstimator {
 					} else if (e instanceof ShutdownElement) {
 						break;
 					}
-					double rho = CASimDensityEstimator.this.estRho(e);
-					e.setRho((e.getRho() + rho) / 2);
+					double rho = this.k.estRho(e);
+					// e.setRho((e.getRho() + rho) / 2);
+					e.setRho(rho);
 
 				}
+				this.k.report();
 			} catch (InterruptedException | BrokenBarrierException e) {
 				throw new RuntimeException(e);
 			}
@@ -342,6 +175,12 @@ public class CASimDensityEstimator {
 			return null;
 		}
 
+		@Override
+		public CANetworkEntity getLastCANetworkEntity() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 	}
 
 	private static final class LastElement extends CAMoveableEntity {
@@ -378,6 +217,12 @@ public class CASimDensityEstimator {
 
 		@Override
 		public Link getCurrentLink() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public CANetworkEntity getLastCANetworkEntity() {
 			// TODO Auto-generated method stub
 			return null;
 		}

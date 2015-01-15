@@ -46,7 +46,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
 import playground.gregor.casim.monitoring.CALinkMonitorII;
+import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.physics.CAEvent;
+import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
@@ -55,7 +57,6 @@ import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.casim.simulation.physics.CASimDensityEstimator;
 import playground.gregor.casim.simulation.physics.CASimpleDynamicAgent;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
-import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -113,11 +114,11 @@ public class CASimParallelQueuesExperiment_ZhangJ2012aIII {
 	public static void main(String[] args) throws IOException {
 		double timeOffset = 0;
 
-		for (int R = 6; R <= 6; R++) {
+		for (int R = 4; R <= 4; R++) {
 			CASimDensityEstimator.LOOK_AHEAD = R;
 			try {
 				bw2 = new BufferedWriter(new FileWriter(new File(
-						"/Users/laemmel/devel/bipedca/plot_dynamicIII/sp_avg_zhangJ2012"
+						"/Users/laemmel/devel/bipedca/ant/sp_avg_zhangJ2012"
 								+ R)));
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -343,9 +344,9 @@ public class CASimParallelQueuesExperiment_ZhangJ2012aIII {
 
 		}
 
-		caNet.run();
+		caNet.run(3600);
 		try {
-			for (CALinkMonitorExact monitor : caNet.getMonitors()) {
+			for (Monitor monitor : caNet.getMonitors()) {
 				monitor.report(bw2);
 			}
 		} catch (IOException e) {

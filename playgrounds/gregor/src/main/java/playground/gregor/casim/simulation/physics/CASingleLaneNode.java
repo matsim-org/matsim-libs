@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 
 /**
@@ -84,6 +85,10 @@ public class CASingleLaneNode implements CANode {
 			if (l.getCapacity() > width) {
 				width = l.getCapacity();
 			}
+		}
+		if (node.getId().toString().equals("2")
+				|| node.getId().toString().equals("3")) {
+			width = 10;
 		}
 		this.width = width;
 		this.node = node;
@@ -147,7 +152,8 @@ public class CASingleLaneNode implements CANode {
 	private void handleTTA(CAMoveableEntity a, double time) {
 
 		Id<Link> nextLinkId = a.getNextLinkId();
-		CASingleLaneLink nextLink = (CASingleLaneLink) this.net.getCALink(nextLinkId);
+		CASingleLaneLink nextLink = (CASingleLaneLink) this.net
+				.getCALink(nextLinkId);
 
 		if (nextLink.getDownstreamCANode() == this) {
 			handleTTAEnterNextLinkFromDownstreamEnd(nextLink, a, time);
@@ -159,8 +165,8 @@ public class CASingleLaneNode implements CANode {
 
 	}
 
-	private void handleTTAEnterNextLinkFromUpstreamEnd(CASingleLaneLink nextLink,
-			CAMoveableEntity a, double time) {
+	private void handleTTAEnterNextLinkFromUpstreamEnd(
+			CASingleLaneLink nextLink, CAMoveableEntity a, double time) {
 
 		// check pre-condition
 		if (nextLink.getParticles()[0] == null) {
@@ -195,7 +201,7 @@ public class CASingleLaneNode implements CANode {
 
 		// check post-condition and generate events
 		// first for persons behind
-		triggerPrevAgent(time, a);
+		triggerPrevAgent(time);
 
 		// second for oneself
 		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
@@ -207,6 +213,8 @@ public class CASingleLaneNode implements CANode {
 		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[1];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) { // oncoming
+				// double d = Math.min(nextLink.getD(a),
+				// nextLink.getD(inFrontOfMe));
 				double d = nextLink.getD(a);
 				d *= this.ratio;
 				triggerSWAP(a, nextLink, time + d + nextLink.getTFree());
@@ -270,7 +278,7 @@ public class CASingleLaneNode implements CANode {
 
 		// check post-condition and generate events
 		// first for persons behind
-		triggerPrevAgent(time, a);
+		triggerPrevAgent(time);
 
 		// second for oneself
 		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a,
@@ -284,6 +292,8 @@ public class CASingleLaneNode implements CANode {
 				.getNumOfCells() - 2];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) { // oncoming
+				// double d = Math.min(nextLink.getD(a),
+				// nextLink.getD(inFrontOfMe));
 				double d = nextLink.getD(a);
 				d *= this.ratio;
 				triggerSWAP(a, nextLink, time + d + nextLink.getTFree());
@@ -320,7 +330,7 @@ public class CASingleLaneNode implements CANode {
 
 	// ======================================================
 
-	private void triggerPrevAgent(double time, CAMoveableEntity a) {
+	private void triggerPrevAgent(double time) {
 
 		double cap = 0;
 		List<Tuple<CASingleLaneLink, CAMoveableEntity>> cands = new ArrayList<Tuple<CASingleLaneLink, CAMoveableEntity>>();
@@ -328,15 +338,15 @@ public class CASingleLaneNode implements CANode {
 			if (l.getDownstreamCANode() == this) {
 				if (l.getParticles()[l.getNumOfCells() - 1] != null
 						&& l.getParticles()[l.getNumOfCells() - 1].getDir() == 1) {
-					cands.add(new Tuple<CASingleLaneLink, CAMoveableEntity>(l, l
-							.getParticles()[l.getNumOfCells() - 1]));
+					cands.add(new Tuple<CASingleLaneLink, CAMoveableEntity>(l,
+							l.getParticles()[l.getNumOfCells() - 1]));
 					cap += l.getLink().getCapacity();
 				}
 			} else if (l.getUpstreamCANode() == this) {
 				if (l.getParticles()[0] != null
 						&& l.getParticles()[0].getDir() == -1) {
-					cands.add(new Tuple<CASingleLaneLink, CAMoveableEntity>(l, l
-							.getParticles()[0]));
+					cands.add(new Tuple<CASingleLaneLink, CAMoveableEntity>(l,
+							l.getParticles()[0]));
 					cap += l.getLink().getCapacity();
 				}
 			}
@@ -367,7 +377,8 @@ public class CASingleLaneNode implements CANode {
 
 	private void handelSwap(CAMoveableEntity a, double time) {
 		Id<Link> nextLinkId = a.getNextLinkId();
-		CASingleLaneLink nextLink = (CASingleLaneLink) this.net.getCALink(nextLinkId);
+		CASingleLaneLink nextLink = (CASingleLaneLink) this.net
+				.getCALink(nextLinkId);
 
 		if (nextLink.getDownstreamCANode() == this) {
 			handleSwapWithDownStreamEnd(a, time, nextLink);
@@ -402,7 +413,12 @@ public class CASingleLaneNode implements CANode {
 	private void checkPostConditionForAgentSwapedToNode(CAMoveableEntity swapA,
 			double time) {
 		Id<Link> nextLinkId = swapA.getNextLinkId();
-		CASingleLaneLink nextLink = (CASingleLaneLink) this.net.getCALink(nextLinkId);
+		if (nextLinkId == null) {
+			letAgentArrive(swapA, time);
+			return;
+		}
+		CASingleLaneLink nextLink = (CASingleLaneLink) this.net
+				.getCALink(nextLinkId);
 		if (nextLink.getDownstreamCANode() == this) {
 			checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromDownstreamEnd(
 					swapA, nextLink, time);
@@ -413,12 +429,24 @@ public class CASingleLaneNode implements CANode {
 
 	}
 
+	void letAgentArrive(CAMoveableEntity a, double time) {
+		this.pollAgent(time);
+		CANetsimEngine engine = this.net.getEngine();
+		if (engine != null) {
+			engine.letVehicleArrive((CAVehicle) a);
+		}
+		this.net.unregisterAgent(a);
+		triggerPrevAgent(time);
+	}
+
 	private void checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd(
 			CAMoveableEntity swapA, CASingleLaneLink nextLink, double time) {
 
 		CAMoveableEntity inFrontOfMe = nextLink.getParticles()[0];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) {
+				// double d = Math.min(nextLink.getD(swapA),
+				// nextLink.getD(inFrontOfMe));
 				double d = nextLink.getD(swapA);
 				d *= this.ratio;
 				triggerSWAP(swapA, this, time + d + this.tFree);
@@ -435,6 +463,8 @@ public class CASingleLaneNode implements CANode {
 				.getNumOfCells() - 1];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) {
+				// double d = Math.min(nextLink.getD(swapA),
+				// nextLink.getD(inFrontOfMe));
 				double d = nextLink.getD(swapA);
 				d *= this.ratio;
 				triggerSWAP(swapA, this, time + d + this.tFree);

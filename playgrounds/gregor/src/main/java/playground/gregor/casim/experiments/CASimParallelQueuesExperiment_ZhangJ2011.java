@@ -45,8 +45,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.monitoring.CALinkMonitorExact;
+import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CAEvent;
+import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
@@ -55,7 +57,6 @@ import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.casim.simulation.physics.CASimDensityEstimator;
 import playground.gregor.casim.simulation.physics.CASimpleDynamicAgent;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
-import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -440,8 +441,8 @@ public class CASimParallelQueuesExperiment_ZhangJ2011 {
 		int agents = 0;
 
 		{
-			CAMultiLaneLink caLink = (CAMultiLaneLink) caNet
-					.getCALink(linksLR.get(0).getId());
+			CAMultiLaneLink caLink = (CAMultiLaneLink) caNet.getCALink(linksLR
+					.get(0).getId());
 
 			for (int lane = 0; lane < caLink.getNrLanes(); lane++) {
 				CAMoveableEntity[] particles = caLink.getParticles(lane);
@@ -487,9 +488,9 @@ public class CASimParallelQueuesExperiment_ZhangJ2011 {
 			monitor.init();
 
 		}
-		caNet.run();
+		caNet.run(3600);
 		try {
-			for (CALinkMonitorExact monitor : caNet.getMonitors()) {
+			for (Monitor monitor : caNet.getMonitors()) {
 				monitor.report(bw2);
 			}
 		} catch (IOException e) {
