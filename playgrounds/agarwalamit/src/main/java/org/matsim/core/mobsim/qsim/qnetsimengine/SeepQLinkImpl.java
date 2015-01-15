@@ -176,7 +176,7 @@ public final class SeepQLinkImpl extends AbstractQLink implements SignalizeableI
 				continue ;
 			}
 
-			if (veh.getDriver().chooseNextLinkId() == null) {
+			if (veh.getDriver().isWantingToArriveOnCurrentLink( )) {
 				// If the driver wants to stop on this link, give them a special treatment.
 				// addFromWait doesn't work here, because after that, they cannot stop anymore.
 				road.addTransitSlightlyUpstreamOfStop(veh) ;

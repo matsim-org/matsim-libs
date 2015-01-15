@@ -18,12 +18,13 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 
 public class MyFirstControler {
 
 	static final String  outputDir ="../../../repos/runs-svn/patnaIndia/run103/";
-	static final boolean seepage = false;
+	static final boolean seepage = true;
 	
 	public static void main(String[] args) {
 
@@ -37,31 +38,31 @@ public class MyFirstControler {
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
-		car.setMaximumVelocity(60.0/3.6);
+		car.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("car"));
 		car.setPcuEquivalents(1.0);
 		modesType.put("car", car);
 		sc.getVehicles().addVehicleType(car);
 
 		VehicleType motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
-		motorbike.setMaximumVelocity(60.0/3.6);
+		motorbike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("motorbike"));
 		motorbike.setPcuEquivalents(0.25);
 		modesType.put("motorbike", motorbike);
 		sc.getVehicles().addVehicleType(motorbike);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
-		bike.setMaximumVelocity(15.0/3.6);
+		bike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("bike"));
 		bike.setPcuEquivalents(0.25);
 		modesType.put("bike", bike);
 		sc.getVehicles().addVehicleType(bike);
 
 		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-		walk.setMaximumVelocity(1.2);
+		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
 		//		walk.setPcuEquivalents(0.10);  			
 		modesType.put("walk",walk);
 		sc.getVehicles().addVehicleType(walk);
 
 		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
-		pt.setMaximumVelocity(20/3.6);
+		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("pt",pt);
 		sc.getVehicles().addVehicleType(pt);

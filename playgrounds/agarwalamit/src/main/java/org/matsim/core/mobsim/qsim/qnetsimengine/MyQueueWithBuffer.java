@@ -438,7 +438,8 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 
 			// Check if veh has reached destination:
-			if ((driver.chooseNextLinkId() == null)) {
+//			if ((driver.chooseNextLinkId() == null)) {
+			if ((driver.isWantingToArriveOnCurrentLink())) {
 				letVehicleArrive(now, veh);
 				continue;
 			}
