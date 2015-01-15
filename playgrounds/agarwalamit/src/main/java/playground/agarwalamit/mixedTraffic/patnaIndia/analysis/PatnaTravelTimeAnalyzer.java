@@ -55,8 +55,9 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalyisModule {
 	
 	
 	public static void main(String[] args) {
-		String eventFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run102/carMotorbikeBike/ITERS/it.200/200.events.xml.gz";
-		String outputFolder = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run102/carMotorbikeBike/analysis/";
+		String dir = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run103/";
+		String eventFile = dir+"/seepage/ITERS/it.200/200.events.xml.gz";
+		String outputFolder = dir+"/seepage/analysis/";
 		PatnaTravelTimeAnalyzer timeAnalyzer  = new PatnaTravelTimeAnalyzer(eventFile);
 		timeAnalyzer.preProcessData();
 		timeAnalyzer.postProcessData();
