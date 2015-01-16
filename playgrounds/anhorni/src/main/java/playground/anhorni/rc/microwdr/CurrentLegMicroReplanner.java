@@ -67,7 +67,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
-
+		
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		if (!(currentPlanElement instanceof Leg)) return false;
 		Leg currentLeg = (Leg) currentPlanElement;
@@ -91,6 +91,8 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 		// if the route type is not supported (e.g., because it is a walking agent)
 		if (!(route instanceof NetworkRoute)) return false;
+		
+		if (random.nextFloat() > 0.2) return false;  // only 20% replanners
 		
 		PersonImpl p = (PersonImpl)person;
 		int legnr = plan.getPlanElements().indexOf(leg);
