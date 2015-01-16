@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Stack;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -51,6 +52,7 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.ObjectPool;
+import playground.thibautd.utils.SoftCache;
 
 /**
  * @author thibautd
@@ -66,6 +68,8 @@ public class RunArentzeModel {
 		final SocialNetworkGenerationConfigGroup config = new SocialNetworkGenerationConfigGroup();
 		final TRBModelConfigGroup pars = new TRBModelConfigGroup();
 		loadAndLogGroups( configFile , config , pars );
+
+		Logger.getLogger( SoftCache.class ).setLevel( Level.TRACE );
 
 		MoreIOUtils.initOut( config.getOutputDirectory() );
 
