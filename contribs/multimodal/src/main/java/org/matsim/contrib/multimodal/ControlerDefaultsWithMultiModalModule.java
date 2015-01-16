@@ -44,7 +44,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -98,7 +97,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
         private TravelDisutilityFactory travelDisutilityFactory;
 
         @Inject
-        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, @Nullable TransitRouterFactory transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, TravelDisutilityFactory travelDisutilityFactory) {
+        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, TravelDisutilityFactory travelDisutilityFactory) {
             this.scenario = scenario;
             this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
             this.transitRouterFactory = transitRouterFactory;
