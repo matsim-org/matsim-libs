@@ -56,6 +56,8 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	private final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<>();
 	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
 	private double totalDelay = 0;
+	private double roundingErrors =0;
+	private double nonInternalizedDelay=0;
 
 	/**
 	 * @param events
@@ -78,9 +80,9 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
 		this.linkId2congestionInfo.clear();
-		
+
 		storeLinkInfo();
-		
+
 	}
 
 	private void storeLinkInfo(){
@@ -90,7 +92,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 			linkId2congestionInfo.put(link.getId(), linkInfo);
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		String travelMode = event.getLegMode();
@@ -124,9 +126,20 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 
 		if(delay > 0.){
 			totalDelay += delay;
+			if (linkInfo.getLastLeavingAgent()==null){
+				if(delay==1) {
+					roundingErrors+=delay;
+					log.error("Agent "+event.getPersonId()+" is leaving link "+event.getLinkId()+" at time "+event.getTime()+". Delay is 1 sec and no one left link before (no causing agent). \n"
+							+ "Thus, possible reason is throwing of wait2Link and departure event at different time steps.");
+				} else {
+					nonInternalizedDelay+=delay;
+					log.error("Agent "+event.getPersonId()+" is leaving link "+event.getLinkId()+" at time "+event.getTime()+". Delay is "+delay+ "sec but no causing agents. \n "
+							+ "Possibly due to spill back delays.");
+					//				throw new RuntimeException("Delays are more than 0. and there is no causing agent."
+					//					+ "this should not happen.");
+				}
+			}
 			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
-			if (causingAgent==null) throw new RuntimeException("Delays are more than 0. and there is no causing agent."
-					+ "this should not happen.");
 
 			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, "Delay", causingAgent, 
 					personId, delay, linkId, linkInfo.getPersonId2linkEnterTime().get(causingAgent));
@@ -135,7 +148,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 		}
 		linkInfo.setLastLeavingAgent(personId);
 	}
-	
+
 	/**
 	 * @param link to get link length and maximum allowed (legal) speed on link
 	 * @param travelMode to get maximum speed of vehicle
@@ -144,7 +157,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	private double getEarliestLinkExitTime(Link link, String travelMode){
 		if(!travelMode.equals(TransportMode.car)) throw new RuntimeException("Travel mode other than car is not implemented yet. Thus aborting ...");
 		double linkLength = link.getLength(); // see org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator.java
-//		Id<VehicleType> vehTyp = Id.create(travelMode,VehicleType.class);
+		//		Id<VehicleType> vehTyp = Id.create(travelMode,VehicleType.class);
 		double vehSpeed = VehicleUtils.getDefaultVehicleType().getMaximumVelocity(); //VehicleUtils.createVehiclesContainer().getVehicleTypes().get(vehTyp).getMaximumVelocity();
 		double maxFreeSpeed = Math.min(link.getFreespeed(), vehSpeed);
 		double minLinkTravelTime = Math.floor(linkLength / maxFreeSpeed );
@@ -154,4 +167,13 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	public double getTotalDelay() {
 		return totalDelay;
 	}
+	
+	public double getNonInternalizedDelay() {
+		return nonInternalizedDelay;
+	}
+
+	public double getRoundingErrors() {
+		return roundingErrors;
+	}
+	
 }
