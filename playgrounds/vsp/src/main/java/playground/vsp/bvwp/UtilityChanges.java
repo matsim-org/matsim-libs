@@ -23,14 +23,36 @@ abstract class UtilityChanges {
 	
 	Map<Mode, Map<Attribute,Double>> verlagertRVAb = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
 	Map<Mode, Map<Attribute,Double>> verlagertRVAuf = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
+	
+	Map<Mode, Double[]> verlagertNMAb = new HashMap<>();
+	Map<Mode, Double[]> verlagertNMAuf = new HashMap<>();
+	
+    //verlagertNMAb/Auf: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
+	
 	Map<Mode, Double> verlagertImpAb = new HashMap<MultiDimensionalArray.Mode, Double>();
 	Map<Mode, Double> verlagertImpAuf = new HashMap<MultiDimensionalArray.Mode, Double>();
 	
 	Map<Mode, Map<Attribute,Double>> induziertRV = new HashMap<MultiDimensionalArray.Mode, Map<Attribute,Double>>();
 	Map<Mode, Double> induziertImp = new HashMap<MultiDimensionalArray.Mode, Double>();
+    Double[] induziertNM = {0.,0.,0.,0.,0.,0.};
+
+	
+
+    private HashMap<DemandSegment, Double> besetzungsgradeKurz;
+    private HashMap<DemandSegment, Double> besetzungsgradeLang;
+
 	
 	UtilityChanges() {
 		System.out.println("Setting utility computation method to " + this.getClass() ) ;
+		fillBesetzungsgrad();
+		for (Mode mode : Mode.values()){
+		    Double[] da = {0.,0.,0.,0.,0.,0.};
+		    verlagertNMAb.put(mode, da);
+		    Double[] db = {0.,0.,0.,0.,0.,0.};
+		    verlagertNMAuf.put(mode, db);
+
+		}
+		
 	}
 
 	final void computeAndPrintResults( Values economicValues, ScenarioForEvalData nullfall, ScenarioForEvalData planfall ) {
@@ -134,7 +156,7 @@ abstract class UtilityChanges {
 						final double utilsBefore = utils ;
 
 						utils += computeAndPrintGivingOrReceiving(econValuesReceiving, attributesNullfallReceiving, attributesPlanfallReceiving, 
-								econValues, attributesNullfall, attributesPlanfall, mode, html);
+								econValues, attributesNullfall, attributesPlanfall, mode, html, segm);
 						
 						if ( utils != utilsBefore ) {
 							Utils.writePartialSum(html, "Nutzen&auml;nderung aus &Auml;nderung Ressourcenverzehr bei Verlagerung:", utils - utilsBefore);
@@ -168,7 +190,23 @@ abstract class UtilityChanges {
 				System.out.println( " amount induced: " + amountInduced ) ;
 				Utils.writeSubHeaderInduziert(html, id, segm, improvedMode, amountInduced);
 				double partialUtl = 0. ;
-
+				
+	            //induzNM: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
+				induziertNM[0]+=amountInduced;
+				final double distance = attributesPlanfallReceiving.getByEntry(Attribute.Distanz_km);
+				final double pkm = amountInduced*distance; 
+				induziertNM[1]+= pkm;
+				final double besetzungsgrad = returnBesetzungsgrad(segm, distance);
+				final double pkwKm = pkm / besetzungsgrad;
+				induziertNM[2]+= pkwKm;
+				final double pH = amountInduced*attributesPlanfallReceiving.getByEntry(Attribute.Reisezeit_h);
+				induziertNM[3] += pH;
+				final double pkwH = pH / besetzungsgrad;
+				induziertNM[4] += pkwH;
+				
+				induziertNM[5] += attributesPlanfallReceiving.getByEntry(Attribute.Nutzerkosten_Eu)*amountInduced;
+				
+				
 				for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
 					if ( attribute != Attribute.XX && attribute != Attribute.Nutzerkosten_Eu ) {
 						// aufnehmende Seite:
@@ -182,6 +220,7 @@ abstract class UtilityChanges {
 
 						if ( utlChange!=0. ) {
 							Utils.addUtlToMap(induziertRV, improvedMode, attribute , utlChange);
+							
 							Utils.writeAufnehmendRow(html, -amountInduced, attribute, attributeValuePlanfallReceiving, utlChangesPerItem, utlChange);
 						}
 					}
@@ -237,7 +276,7 @@ abstract class UtilityChanges {
 		Utils.writeRoh(html, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfits);
 		Utils.endOutput(html);
 		
-		double sum = Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp);
+		double sum = Utils.writeOverallOutputTable(totalHtml, verbleibendRV, verlagertRVAuf, verlagertRVAb, verlagertImpAuf, verlagertImpAb, induziertRV, induziertImp, verlagertNMAb, verlagertNMAuf, induziertNM);
 		double diff = sum - (utilsUserFromRoHOldUsers + utilsUserFromRoHNewUsers + operatorProfit);
 		Utils.writeOperatorProfit(operatorProfits, totalHtml);
 		Utils.writeRoh(totalHtml, utilsUserFromRoHOldUsers, utilsUserFromRoHNewUsers, operatorProfits);
@@ -286,12 +325,69 @@ abstract class UtilityChanges {
 	}
 
 	private double computeAndPrintGivingOrReceiving(Attributes econValuesReceiving, Attributes attributesNullfallReceiving,
-			Attributes attributesPlanfallReceiving, Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Mode mode, Html html) {
+			Attributes attributesPlanfallReceiving, Attributes econValues, Attributes attributesNullfall, Attributes attributesPlanfall, Mode mode, Html html, DemandSegment ds) {
 
 		double utils = 0. ;
 
 		final double deltaAmounts = attributesPlanfall.getByEntry(Attribute.XX) - attributesNullfall.getByEntry(Attribute.XX) ;
 		// negative, since this is never called for the receiving mode
+		
+		if (deltaAmounts != 0. ){
+            //verlagertNMAb/Auf: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
+		    {
+		    this.verlagertNMAb.get(mode)[0] += deltaAmounts;
+		    
+		    
+		    final double distance = attributesPlanfall.getByEntry(Attribute.Distanz_km);
+		    final double besetzungsgrad = this.returnBesetzungsgrad(ds, distance);
+
+		    final double personenKMChange = distance * deltaAmounts;
+            final double pkwKMChange = personenKMChange / besetzungsgrad;
+            this.verlagertNMAb.get(mode)[1] += personenKMChange;
+            this.verlagertNMAb.get(mode)[2] += pkwKMChange;
+            
+            final double fahrzeit = attributesPlanfall.getByEntry(Attribute.Reisezeit_h);
+            final double personenHChange = fahrzeit * deltaAmounts;
+            final double pkwHChange= personenHChange / besetzungsgrad;
+            
+            this.verlagertNMAb.get(mode)[3] += personenHChange;
+            this.verlagertNMAb.get(mode)[4] += pkwHChange;
+            
+            final double nutzerkosten = attributesPlanfall.getByEntry(Attribute.Nutzerkosten_Eu);
+
+            this.verlagertNMAb.get(mode)[5] += nutzerkosten*deltaAmounts; 
+
+
+		    }
+		    //aufnehmend
+		    {
+		    
+		    this.verlagertNMAuf.get(mode)[0] -= deltaAmounts;
+	        final double distance = attributesPlanfallReceiving.getByEntry(Attribute.Distanz_km);
+	        final double besetzungsgrad = this.returnBesetzungsgrad(ds, distance);
+
+	            final double personenKMChange = distance * -deltaAmounts;
+	            final double pkwKMChange = personenKMChange / besetzungsgrad;
+	            this.verlagertNMAuf.get(mode)[1] += personenKMChange;
+	            this.verlagertNMAuf.get(mode)[2] += pkwKMChange;
+	            
+	            final double fahrzeit = attributesPlanfallReceiving.getByEntry(Attribute.Reisezeit_h);
+	            final double personenHChange = fahrzeit * -deltaAmounts;
+	            final double pkwHChange= personenHChange / besetzungsgrad;
+	            
+	            this.verlagertNMAuf.get(mode)[3] += personenHChange;
+	            this.verlagertNMAuf.get(mode)[4] += pkwHChange;
+	            
+	            final double nutzerkosten = attributesPlanfallReceiving.getByEntry(Attribute.Nutzerkosten_Eu);
+
+	            this.verlagertNMAuf.get(mode)[5] += nutzerkosten*deltaAmounts;
+		    }
+		}
+		
+		
+		
+		
+
 
 		for ( Attribute attribute : Attribute.values() ) { // for all entries (e.g. km or hrs)
 			double partialUtils = 0. ;
@@ -310,8 +406,12 @@ abstract class UtilityChanges {
 						Utils.writeAbgebendRow(html, deltaAmounts, attribute, attributeValueNullfall, attributeValuePlanfall, utlChangesPerItem, utlChange);
 						Utils.addUtlToMap(verlagertRVAb, mode, attribute, utlChange);
 					}
+
+
+					
+			
 				}
-				{
+					{
 					// aufnehmende Seite:
 					final double attributeValuePlanfallReceiving = attributesPlanfallReceiving.getByEntry(attribute);
 					final double attributeValueNullfallReceiving = attributesNullfallReceiving.getByEntry(attribute);
@@ -324,10 +424,11 @@ abstract class UtilityChanges {
 					if ( utlChange!=0. ) {
 						// wir sind aufnehmend; utl gains should be negative
 						Utils.writeAufnehmendRow(html, -deltaAmounts, attribute, attributeValuePlanfallReceiving, utlChangesPerItem, utlChange);
-
 						Utils.addUtlToMap(verlagertRVAuf, mode, attribute, utlChange);
 
 					}
+
+
 				}
 			}
 				if ( partialUtils != 0. ) {
@@ -435,4 +536,41 @@ abstract class UtilityChanges {
 			double quantityNullfall, double quantityPlanfall, double econVal);
 	abstract double computeImplicitUtilityPerItem(Attributes econValues, Attributes quantitiesNullfall, 
 			Attributes quantitiesPlanfall) ;
+
+private void fillBesetzungsgrad()
+{
+    this.besetzungsgradeKurz = new HashMap<DemandSegment, Double>();
+    this.besetzungsgradeLang = new HashMap<DemandSegment, Double>();
+    
+    this.besetzungsgradeKurz.put(DemandSegment.PV_ARBEIT, 1.1);
+    this.besetzungsgradeLang.put(DemandSegment.PV_ARBEIT, 1.1);
+
+    this.besetzungsgradeKurz.put(DemandSegment.PV_AUSBILDUNG, 1.7);
+    this.besetzungsgradeLang.put(DemandSegment.PV_AUSBILDUNG, 1.3);
+    
+    this.besetzungsgradeKurz.put(DemandSegment.PV_GESCHAEFT, 1.0);
+    this.besetzungsgradeLang.put(DemandSegment.PV_GESCHAEFT, 1.1);
+    
+    this.besetzungsgradeKurz.put(DemandSegment.PV_EINKAUF, 1.3);
+    this.besetzungsgradeLang.put(DemandSegment.PV_EINKAUF, 1.8);
+    
+    this.besetzungsgradeKurz.put(DemandSegment.PV_SONST, 1.6);
+    this.besetzungsgradeLang.put(DemandSegment.PV_SONST, 2.0);
+    
+    this.besetzungsgradeKurz.put(DemandSegment.PV_URLAUB, 1.6);
+    this.besetzungsgradeLang.put(DemandSegment.PV_URLAUB, 2.3);
+    
+}
+
+private double returnBesetzungsgrad(DemandSegment ds, double distance){
+    
+    if (distance<50) {
+        return this.besetzungsgradeKurz.get(ds);
+        }
+    else {
+        return this.besetzungsgradeLang.get(ds);
+        }
+    }
+
+    
 }

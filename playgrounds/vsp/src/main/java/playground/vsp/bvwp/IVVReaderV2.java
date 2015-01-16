@@ -127,10 +127,10 @@ public class IVVReaderV2 {
 		throw new IllegalStateException();
 		}
 		for (String fromId : nullFallDataByFromId.keySet()){
-//			runBVWP2015(nullFallDataByFromId.get(fromId),planFallDataByFromId.get(fromId), fromId.toString());
+			runBVWP2015(nullFallDataByFromId.get(fromId),planFallDataByFromId.get(fromId), fromId.toString());
 		}
-		analyse(nullfallData, planfallData);
-//		runBVWP2015(nullfallData, planfallData, "all_out");
+//		analyse(nullfallData, planfallData);
+		runBVWP2015(nullfallData, planfallData, "all_out");
 		log.info("fertig.");
 //		writeDiffs();
 	}
@@ -772,10 +772,10 @@ public class IVVReaderV2 {
 
 	public static void main(String[] args) {
 		IVVReaderConfigGroup config = new IVVReaderConfigGroup();
-		String dir = "/Users/nagel/shared-svn/projects/bvwp/fe2-bewertung/testrechnungen_strasse/IVV_NeubauA14/MD_only/" ;
+//		String dir = "/Users/nagel/shared-svn/projects/bvwp/fe2-bewertung/testrechnungen_strasse/IVV_NeubauA14/MD_only/" ;
 //		String dir = "/Users/jb/tucloud/bvwp/data/P2030_Daten_IVV_20131210/";
 //		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/P2030_Daten_IVV_20131210/";
-//		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/MD_only/";
+		String dir = "C:/local_jb/testrechnungen_strasse/IVV_NeubauA14/MD_only/";
 		config.setDemandMatrixFile(dir + "P2030_2010_BMVBS_ME2_131008.csv");
 		config.setRemainingDemandMatrixFile(dir + "P2030_2010_verbleibend_ME2.csv");
 		config.setNewDemandMatrixFile(dir + "P2030_2010_neuentstanden_ME2.csv");

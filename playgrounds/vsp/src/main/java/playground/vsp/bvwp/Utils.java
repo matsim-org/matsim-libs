@@ -354,7 +354,11 @@ class Utils {
 				Map<Mode, Double> verlagertImpAuf,
 				Map<Mode, Double> verlagertImpAb,
 				Map<Mode, Map<Attribute, Double>> induziertRV,
-				Map<Mode, Double> induziertImp) {
+				Map<Mode, Double> induziertImp,
+				Map<Mode, Double[]> verlagertNMAb,
+				Map<Mode, Double[]> verlagertNMAuf,
+				Double[] induziertNM 
+		        ) {
 			 
 				totalHtml.beginTableMulticolumnRow();
 				totalHtml.write("<b>Summen ueber alle Relationen und Zwecke (Angabe in EUR)</b>");
@@ -417,6 +421,30 @@ class Utils {
 					totalHtml.beginTableMulticolumnRow();
 					totalHtml.write("<b>"+mode.toString()+":</b>");
 					totalHtml.endTableRow();
+		            //verlagertNMAb/Auf: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
+				
+					line.add("Verlagerte Fahrleistung:");
+					line.add(Math.round(verlagertNMAuf.get(mode)[2])+" PKW-KM/Jahr");
+					totalHtml.tableRowFromList(line,false);
+					line.clear();
+	                
+	                line.add("Mittlere Fahrweite des verlagerten Verkehrs:");
+                    line.add(Math.round(verlagertNMAuf.get(mode)[1]/Math.abs(verlagertNMAuf.get(mode)[0]))+"km");
+	                totalHtml.tableRowFromList(line,false);
+	                line.clear();
+										
+					line.add("Verlagerte Fahrzeit:");
+					line.add(Math.round(verlagertNMAuf.get(mode)[4])+" PKW-h/Jahr");
+					totalHtml.tableRowFromList(line,false);
+					line.clear();
+					
+					line.add("Mittlere Nutzerkosten des verlagerten Verkehrs:");
+                    line.add(Math.round(Math.abs(verlagertNMAuf.get(mode)[5]*100/verlagertNMAuf.get(mode)[2]))+" c/PKW-km");
+                    totalHtml.tableRowFromList(line,false);
+                    line.clear();
+                    
+                    
+					
 					double zws =0.;
 					Map <Attribute,Double> attAbmap = new HashMap<Attribute,Double>();
 						if (verlagertRVAb.containsKey(mode)) attAbmap = verlagertRVAb.get(mode);
@@ -424,6 +452,7 @@ class Utils {
 						if (verlagertRVAuf.containsKey(mode)) attAufmap = verlagertRVAuf.get(mode);
 
 						for (Attribute attr : relAttr){
+		
 							double zzws = 0.;
 							if (attAbmap.containsKey(attr)) {
 								line.add(attr.toString() + " abgebend");
@@ -449,6 +478,7 @@ class Utils {
 							line.clear();
 							zws += zzws;
 							}
+						
 						}
 
 						line.add("Nutzenaenderung aus Aenderung Ressourcenverzehr bei Verlagerung");
@@ -507,6 +537,28 @@ class Utils {
 				totalHtml.beginTableMulticolumnRow();
 				totalHtml.write("<b>Induzierter Verkehr</b>");
 				totalHtml.endTableRow();
+				
+                //induziertNM: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
+
+			    line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[2])+" PKW-KM/Jahr");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                                
+                line.add("Mittlere Fahrweite des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[1]/Math.abs(induziertNM[0]))+"km");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                                    
+                line.add("Zus&auml;tzliche Fahrzeit des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[4])+" PKW-h/Jahr");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                
+                line.add("Mittlere Nutzerkosten des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[5]*100/induziertNM[2])+" c/PKW-km");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
 				
 				double indSum = 0.;
 				
