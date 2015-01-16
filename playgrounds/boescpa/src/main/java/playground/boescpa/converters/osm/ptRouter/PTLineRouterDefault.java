@@ -25,13 +25,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.transitSchedule.api.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
 import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
@@ -47,6 +50,15 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private final static double SEARCH_RADIUS_TRAM = 10; //[m]
 
 	private final Map<Id<TransitStopFacility>, Map<String, Id<TransitStopFacility>[]>> linkedStopFacilities = new HashMap<>();
+	private PTLRouter router = null;
+
+	public PTLineRouterDefault(TransitSchedule schedule) {
+		super(schedule);
+	}
+
+	public PTLineRouterDefault(TransitSchedule schedule, Network network) {
+		super(schedule, network);
+	}
 
 	private String mode;
 	private double searchRadius;
@@ -68,14 +80,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 				this.searchRadius = 0;
 			}
 		}
-	}
-
-	public PTLineRouterDefault(TransitSchedule schedule) {
-		super(schedule);
-	}
-
-	public PTLineRouterDefault(TransitSchedule schedule, Network network) {
-		super(schedule, network);
 	}
 
 	@Override
@@ -365,6 +369,22 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private void createPTRoutes() {
 		log.info("Creating pt routes...");
 
+		this.router = new PTLRFastAStarLandmarks(this.network);
+
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				if (route.getTransportMode().equals(BUS)) {
+					setMode(BUS);
+					routeLine(route);
+				} else if (route.getTransportMode().equals(TRAM)) {
+					setMode(TRAM);
+					routeLine(route);
+				} else {
+					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
+				}
+			}
+		}
+
 		// TODO-boescpa Implement createPTRoutes...
 
 		// 	For tram and bus routes for each line in schedule:
@@ -374,6 +394,32 @@ public class PTLineRouterDefault extends PTLineRouter {
 		//		costFunction: if non-pt-link, then even much more expensive...
 
 		log.info("Creating pt routes... done.");
+	}
+
+	private void routeLine(TransitRoute route) {
+		List<Id<Link>> links = new ArrayList<>();
+		int i = 0;
+		// TODO-boescpa Implement a special treatment for the very first and second stop of each route. There the checking of the different links they can (possibly) be assigned to has to be done with both varying, the first and the second stop together. After that for all following routings, the from-stop can be assumed to have the link fixed and only for the to-stop the different possible links need to be checked for the fastest one...
+		links.add(this.network.getLinks().get(route.getStops().get(0).getStopFacility().getLinkId()).getId());
+		while (i < (route.getStops().size()-1)) {
+			TransitRouteStop fromStop = route.getStops().get(i);
+			TransitRouteStop toStop = route.getStops().get(i+1);
+			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop);
+			for (Link link : path.links) {
+				links.add(link.getId());
+			}
+			links.add(this.network.getLinks().get(route.getStops().get(i+1).getStopFacility().getLinkId()).getId());
+			i++;
+		}
+		route.setRoute(new LinkNetworkRouteImpl(links.get(0),links,links.get(links.size()-1)));
+	}
+
+	// TODO-boescpa Extend dublication above in linking process from facilities to stops. Because a stop can only have one facility and a facility can only have one link the same applies to stops as to stop facilities, that is a bus stop is not the same as a tram stop. And here I need the different stops (at least one in each direction and for each mode...).
+	private LeastCostPathCalculator.Path getShortestPath(TransitRouteStop fromStop, TransitRouteStop toStop) {
+		// TODO-boescpa At the moment it just takes the assigned links and routes between them. Change this to checking for all possible directions of this stop (all possible links it is linked to and chose the one which results in the shortest path. Set this one as the stop for this transit route at this stop position.
+		Node fromNode = this.network.getLinks().get(fromStop.getStopFacility().getLinkId()).getToNode();
+		Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
+		return this.router.calcLeastCostPath(fromNode, toNode, this.mode);
 	}
 
 	/**
