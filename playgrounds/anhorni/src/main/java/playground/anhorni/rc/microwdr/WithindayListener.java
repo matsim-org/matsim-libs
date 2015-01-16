@@ -50,14 +50,12 @@ public class WithindayListener implements StartupListener, IterationStartsListen
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
 		// Use a Scoring Function, that only scores the travel times!
-		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
+		//controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
+		//controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		
-		//controler.setScoringFunctionFactory(new DesiresAndOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
-		
+				
 	}
 
 	@Override
