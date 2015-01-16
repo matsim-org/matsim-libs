@@ -44,7 +44,7 @@ public class StuckAgentsFilter implements AgentFilter {
 		
 		double currentLinkTravelTime = traveltimeCollector.getLinkTravelTime(currentLink, 0.0, null, null);
 						
-		if (currentLinkTravelTime > 2.0 * freeflowTraveltime) {
+		if (currentLinkTravelTime > 4.0 * freeflowTraveltime) {
 			return true;
 		} else {
 			return false;
