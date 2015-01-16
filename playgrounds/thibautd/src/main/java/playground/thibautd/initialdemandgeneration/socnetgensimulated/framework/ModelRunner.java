@@ -55,7 +55,8 @@ public class ModelRunner<T extends Agent> {
 	private final int nThreads;
 
 	public ModelRunner(
-			final SocialPopulation<T> population , TieUtility<T> utility ,
+			final SocialPopulation<T> population ,
+			final TieUtility<T> utility ,
 			final double primarySampleRate ,
 			final double secondarySampleRate ,
 			final int nThreads ) {
