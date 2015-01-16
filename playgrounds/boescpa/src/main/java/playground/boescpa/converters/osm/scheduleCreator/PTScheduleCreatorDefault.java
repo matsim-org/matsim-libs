@@ -54,32 +54,18 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
 	@Override
 	public final void createSchedule(String osmFile, String hafasFolder, Network network, String vehicleFile) {
-		log.info("Creating the schedule...");
+		log.info("Creating the schedule based on HAFAS...");
 
-		{ // Create PTLines:
-			log.info("Creating pt lines from HAFAS file...");
-			// 1. Read all vehicles from vehicleFile:
-			readVehicles(vehicleFile);
-			// 2. Read all stops from HAFAS-BFKOORD_GEO
-			readStops(hafasFolder + "/BFKOORD_GEO");
-			// 3. Create all lines from HAFAS-Schedule
-			readLines(hafasFolder + "/FPLAN");
-			// 4. Print undefined vehicles
-			printVehiclesUndefined();
-			log.info("Creating pt lines from HAFAS file... done.");
-		}
+		// 1. Read all vehicles from vehicleFile:
+		readVehicles(vehicleFile);
+		// 2. Read all stops from HAFAS-BFKOORD_GEO
+		readStops(hafasFolder + "/BFKOORD_GEO");
+		// 3. Create all lines from HAFAS-Schedule
+		readLines(hafasFolder + "/FPLAN");
+		// 4. Print undefined vehicles
+		printVehiclesUndefined();
 
-		{ // Complement the PTStations:
-			log.info("Correcting pt station coordinates based on OSM...");
-
-			// TODO-boescpa Implement complementPTStations...
-			// Check and correct pt-Station-coordinates with osm-knowledge.
-			// work with this.schedule...
-
-			log.info("Correcting pt station coordinates based on OSM... done.");
-		}
-
-		log.info("Creating the schedule... done.");
+		log.info("Creating the schedule based on HAFAS... done.");
 	}
 
 	////////////////// Local Helpers /////////////////////
@@ -87,7 +73,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	/**
 	 * Reads all the vehicle types from the file specified.
 	 *
-	 * @param vehicleFile
+	 * @param vehicleFile from which the vehicle-specifications will be read. For an example of file-structure see test/input/playground/boescpa/converters/osm/scheduleCreator/TestPTScheduleCreatorDefault/VehicleData.csv.
 	 */
 	protected void readVehicles(String vehicleFile) {
 		try {
@@ -111,9 +97,9 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 				vehicleType.setWidth(Double.parseDouble(newType[2]));
 				vehicleType.setAccessTime(Double.parseDouble(newType[3]));
 				vehicleType.setEgressTime(Double.parseDouble(newType[4]));
-				if (newType[5].matches("serial")) {
+				if ("serial".matches(newType[5])) {
 					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.serial);
-				} else if (newType[5].matches("parallel")) {
+				} else if ("parallel".matches(newType[5])) {
 					vehicleType.setDoorOperationMode(VehicleType.DoorOperationMode.parallel);
 				}
 				VehicleCapacity vehicleCapacity = vehicleBuilder.createVehicleCapacity();
@@ -207,8 +193,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						try {
 							numberOfDepartures = Integer.parseInt(newLine.substring(22, 25));
 							cycleTime = Integer.parseInt(newLine.substring(26, 29));
-						} catch (Exception e) {
-						}
+						} catch (Exception e) {	}
 						currentRouteFPLAN = new PtRouteFPLAN(lineId, routeId, numberOfDepartures, cycleTime);
 						lineFPLAN.addPtRouteFPLAN(currentRouteFPLAN);
 					} else if (newLine.charAt(1) == 'T') {
@@ -268,15 +253,12 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 						try {
 							arrivalTime = Double.parseDouble(newLine.substring(31, 33)) * 60 * 60 +
 									Double.parseDouble(newLine.substring(33, 35)) * 60;
-						} catch (Exception e) {
-						}
+						} catch (Exception e) {	}
 						double departureTime = 0;
 						try {
 							departureTime = Double.parseDouble(newLine.substring(38, 40)) * 60 * 60 +
 									Double.parseDouble(newLine.substring(40, 42)) * 60;
-						} catch (Exception e) {
-
-						}
+						} catch (Exception e) {	}
 						Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 						TransitStopFacility stopFacility = schedule.getFacilities().get(stopId);
 						currentRouteFPLAN.addStop(stopId, stopFacility, arrivalTime, departureTime);
