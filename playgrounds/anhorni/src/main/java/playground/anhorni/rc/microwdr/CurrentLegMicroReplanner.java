@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -57,10 +58,6 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		this.tripRouter = tripRouter;
 	}
 
-	
-/*
- * should prohibit multiple replannings -> can lead to strange cycles
- */
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
@@ -78,7 +75,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 		// new Route for current Leg
 		this.microRouteCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time, 
-				scenario.getNetwork(), tripRouter, random); 
+				scenario.getNetwork(), tripRouter, random, executedPlan); 
 		
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
@@ -88,13 +85,25 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 	}
 		
 	private boolean microRouteCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, 
-			Network network, TripRouter tripRouter, Random random) {
+			Network network, TripRouter tripRouter, Random random, Plan plan) {
 		
 		Route route = leg.getRoute();
 
 		// if the route type is not supported (e.g., because it is a walking agent)
 		if (!(route instanceof NetworkRoute)) return false;
-
+		
+		PersonImpl p = (PersonImpl)person;
+		int legnr = plan.getPlanElements().indexOf(leg);
+				
+	//	logger.warn(legnr);
+		
+		if (p.getAge() == legnr) {
+	//		logger.error("agent already replanned");
+			return false; // agent has been replanned already
+		} else {
+			p.setAge(legnr);
+		}
+				
 		NetworkRoute oldRoute = (NetworkRoute) route;
 
 		/*
@@ -155,7 +164,6 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 //					logger.info(person.getId() + " :" + str + "\n" +
 //							oldRoute.toString());
 //				}
-
 			} // else do not replace route
 		}
 		return true;

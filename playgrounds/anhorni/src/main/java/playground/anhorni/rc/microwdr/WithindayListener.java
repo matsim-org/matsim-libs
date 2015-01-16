@@ -21,9 +21,14 @@ package playground.anhorni.rc.microwdr;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -34,7 +39,7 @@ import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 
 
-public class WithindayListener implements StartupListener {
+public class WithindayListener implements StartupListener, IterationStartsListener {
 	
 	protected Scenario scenario;
 	protected WithinDayControlerListener withinDayControlerListener;
@@ -80,5 +85,13 @@ public class WithindayListener implements StartupListener {
 		duringLegReplannerFactory.addIdentifier(duringLegIdentifierFactory.createIdentifier());
 		
 		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		Population pop = event.getControler().getScenario().getPopulation();
+		for (Person p : pop.getPersons().values()) {
+			((PersonImpl)p).setAge(100);
+		}	
 	}
 }
