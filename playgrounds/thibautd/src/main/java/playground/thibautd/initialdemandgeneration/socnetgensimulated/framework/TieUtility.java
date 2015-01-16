@@ -59,7 +59,7 @@ public class TieUtility<T extends Agent> {
 		final double sampledError = errorTerm.calcError( seed );
 		cache.put( seed , sampledError );
 
-		return deterministicPart.calcDeterministicPart( ego , alter ) + cached;
+		return deterministicPart.calcDeterministicPart( ego , alter ) + sampledError;
 	}
 
 	public static interface DeterministicPart< T extends Agent> {
