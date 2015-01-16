@@ -71,6 +71,15 @@ public class TieUtility<T extends Agent> {
 	}
 
 	public static class GumbelErrorTerm implements ErrorTerm {
+		// avoid re-instanciating random over and over,
+		// while remaining thread-safe
+		private final ThreadLocal<Random> random =
+			new ThreadLocal<Random>() {
+				@Override
+				protected Random initialValue() {
+					return new Random();
+				}
+			};
 		private final double scale;
 
 		public GumbelErrorTerm( ) {
@@ -83,7 +92,8 @@ public class TieUtility<T extends Agent> {
 
 		@Override
 		public double calcError( int seed ) {
-			final Random rnd = new Random( seed );
+			final Random rnd = random.get();
+			rnd.setSeed( seed );
 
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {

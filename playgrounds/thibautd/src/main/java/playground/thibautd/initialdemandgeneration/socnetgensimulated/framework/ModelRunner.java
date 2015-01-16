@@ -102,10 +102,17 @@ public class ModelRunner<T extends Agent> {
 					@Override
 					public void run() {
 						final Random random = new Random( randomSeed + threadNumber );
+						// initialize out loop to reduce stress on GC
+						final List<T> potentialAlters = new ArrayList< >();
+
 						for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
 							final T ego = agents.get( agentIndex );
 
-							final List<T> potentialAlters = new ArrayList< >( agents.subList( agentIndex + 1 , agents.size() ) );
+							potentialAlters.clear();
+							for ( int pa=agentIndex + 1; pa < agents.size(); pa++ ) {
+								potentialAlters.add( agents.get( pa ) );
+							}
+
 							int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
 
 							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
