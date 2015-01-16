@@ -38,17 +38,14 @@ import playground.johannes.gsv.zones.MatrixOpertaions;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
-import playground.johannes.socialnetworks.statistics.WeightedSampleMean;
 
 import com.vividsolutions.jts.algorithm.MinimumDiameter;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,30 +64,30 @@ public class MatrixCompare2 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "522";
+		String runId = "550";
 		
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/raw/ivv/ivv.xml");
+		reader.parse("/home/johannes/gsv/matrices/refmatrices/ivv.xml");
 		KeyMatrix m1 = reader.getMatrix();
 //		ODMatrixXMLReader reader = new ODMatrixXMLReader();
 //		reader.setValidating(false);
-//		reader.parse("/home/johannes/gsv/matrices/itp.xml");
+//		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
 //		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
 		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
 
-//		reader = new ODMatrixXMLReader();
-//		reader.setValidating(false);
-//		reader.parse("/home/johannes/gsv/matrices/miv." + runId + ".xml");
-//		KeyMatrix m2 = reader.getMatrix().toKeyMatrix("gsvId");
+		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
+		reader2.setValidating(false);
+		reader2.parse("/home/johannes/gsv/matrices/simmatrices/miv." + runId + ".xml");
+		KeyMatrix m2 = reader2.getMatrix().toKeyMatrix("gsvId");
 
-		 KeyMatrixXMLReader reader2 =new KeyMatrixXMLReader();
-		 reader2.setValidating(false);
-		 reader2.parse("/home/johannes/gsv/matrices/miv.avr2.xml");
-		 KeyMatrix m2 = reader2.getMatrix();
+		// KeyMatrixXMLReader reader2 =new KeyMatrixXMLReader();
+		// reader2.setValidating(false);
+		// reader2.parse("/home/johannes/gsv/matrices/miv.avr2.xml");
+		// KeyMatrix m2 = reader2.getMatrix();
 
-//		MatrixOpertaions.applyFactor(m2, 11.0);
-//		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
+		MatrixOpertaions.applyFactor(m2, 11.0);
+		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
 
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
@@ -105,11 +102,11 @@ public class MatrixCompare2 {
 
 		KeyMatrix itp_d = distanceMatrix(m1, zones);
 		TDoubleDoubleHashMap hist = writeDistanceHist(m1, itp_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/itp.dist.txt");
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/ivv.dist.txt");
 
 		KeyMatrix m_d = distanceMatrix(m2, zones);
 		hist = writeDistanceHist(m2, m_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/" + runId + ".dist.txt");
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.txt");
 		
 		System.out.println(String.format("PKM Intraplan (> 100 KM): %s", pkm(m1, itp_d)));
 		System.out.println(String.format("PKM matsim (> 100 KM): %s", pkm(m2, m_d)));
@@ -217,15 +214,15 @@ public class MatrixCompare2 {
 		for (String i : keys) {
 			for (String j : keys) {
 				if(i.equals(j)) {
-					Zone zone = zones.get(i);
-					MinimumDiameter dia = new MinimumDiameter(zone.getGeometry());
-					LineString ls = dia.getDiameter();
-					Coordinate pi = ls.getCoordinateN(0);
-					Coordinate pj = ls.getCoordinateN(1);
-//					double d = dia.getLength();
-					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
-					m_d.set(i, j, d);
-					
+//					Zone zone = zones.get(i);
+//					MinimumDiameter dia = new MinimumDiameter(zone.getGeometry());
+//					LineString ls = dia.getDiameter();
+//					Coordinate pi = ls.getCoordinateN(0);
+//					Coordinate pj = ls.getCoordinateN(1);
+////					double d = dia.getLength();
+//					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
+//					m_d.set(i, j, d);
+					m_d.set(i, j, -1.0);
 				} else {
 				Point pi = zones.get(i).getGeometry().getCentroid();
 				Point pj = zones.get(j).getGeometry().getCentroid();
@@ -255,7 +252,8 @@ public class MatrixCompare2 {
 			}
 		}
 
-		return Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 100), true);
+//		return Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 100), true);
+		return Histogram.createHistogram(stats, new LinearDiscretizer(50000), false);
 	}
 
 	private static double pkm(KeyMatrix m, KeyMatrix m_d) {

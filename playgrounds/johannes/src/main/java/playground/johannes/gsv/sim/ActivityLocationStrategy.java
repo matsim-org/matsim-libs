@@ -65,7 +65,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	private String blacklist;
 
-	private double mutationError = 0.1;
+	private final double mutationError;
 
 	private ActivityFacilities facilities;
 
@@ -79,10 +79,11 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	private final Map<Person, double[]> targetDistances = new ConcurrentHashMap<>();
 
-	public ActivityLocationStrategy(ActivityFacilities facilities, Random random, int numThreads, String blacklist) {
+	public ActivityLocationStrategy(ActivityFacilities facilities, Random random, int numThreads, String blacklist, double mutationError) {
 		this.random = random;
 		this.facilities = facilities;
 		this.blacklist = blacklist;
+		this.mutationError = mutationError;
 		executor = Executors.newFixedThreadPool(numThreads);
 
 	}
@@ -303,7 +304,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 				for (int i = 1; i < plan.getPlanElements().size(); i+=2) {
 
 					Leg leg = (Leg) plan.getPlanElements().get(i);
-					double d = leg.getTravelTime();
+					double d = leg.getTravelTime(); //FIXME (hopefully) temporary hack
 					if(d > 0 && !Double.isInfinite(d) && !Double.isNaN(d)) {
 						distances[(i - 1)/2] = d;
 					} else {

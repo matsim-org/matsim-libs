@@ -161,6 +161,7 @@ public class ProxyPlans2Matrix {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		parser.parse(args[0]);
+		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 		
 		Set<ProxyPlan> plans = new HashSet<>(parser.getPersons().size());
 		for(ProxyPerson person : parser.getPersons()) {

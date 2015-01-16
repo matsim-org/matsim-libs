@@ -62,7 +62,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.coopsim.analysis.TripDistanceDegreeTask;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
@@ -146,7 +146,7 @@ public class PlansAnalyzer {
 
 		composite.addTask(new ArrivalTimeTask());
 		composite.addTask(new ActivityDurationTask());
-		composite.addTask(new TripDistanceTask(scenario.getActivityFacilities()));
+		composite.addTask(new TripGeoDistanceTask(scenario.getActivityFacilities()));
 		composite.addTask(new TripDurationTask());
 		composite.addTask(new ActTypeShareTask());
 		composite.addTask(new JointActivityTask(graph, tracker));

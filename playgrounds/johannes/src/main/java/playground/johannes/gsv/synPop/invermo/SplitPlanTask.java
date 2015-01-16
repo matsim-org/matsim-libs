@@ -33,6 +33,7 @@ import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
@@ -77,7 +78,14 @@ public class SplitPlanTask implements ProxyPersonTask {
 				return;
 			}
 			
-			if (current.dayOfYear().get() != prev.dayOfYear().get()) {
+			int currentDays = current.dayOfYear().get() + (365 * current.year().get());
+			int prevDays = prev.dayOfYear().get() + (365 * prev.year().get());
+			int nights = currentDays - prevDays;
+			
+//			if (current.dayOfYear().get() != prev.dayOfYear().get()) {
+			if (nights > 0) {
+				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+
 				subPlan.addActivity(act.clone());
 				newPlans.add(subPlan);
 				
@@ -85,6 +93,8 @@ public class SplitPlanTask implements ProxyPersonTask {
 				subPlan.addActivity(act.clone());
 				subPlan.addLeg(leg.clone());
 			} else {
+				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+				
 				subPlan.addActivity(act.clone());
 				subPlan.addLeg(leg.clone());
 			}

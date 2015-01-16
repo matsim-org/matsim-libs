@@ -49,7 +49,7 @@ public class Route2GeoDistance implements ProxyPlanTask {
                 rDist = rDist / 1000.0;
 
                 double factor = 1 - A * Math.pow(rDist, alpha);
-                factor = Math.max(0.5, factor);
+                factor = Math.max(min, factor);
 
                 double gDist = rDist * factor * 1000.0;
 

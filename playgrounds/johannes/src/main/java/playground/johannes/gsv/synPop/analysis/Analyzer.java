@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.ApplySampleProbas;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
@@ -57,7 +58,7 @@ public class Analyzer {
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom();
 		persons = PersonCloner.weightedClones(persons, 200000, random);
-//		new ApplySampleProbas(82000000).apply(persons);
+		new ApplySampleProbas(82000000).apply(persons);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
 //		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/pop.nuts3.shp");
@@ -75,8 +76,13 @@ public class Analyzer {
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.addTask(new ActivityChainTask());
-		task.addTask(new LegTargetDistanceTask("car"));
-//		task.addTask(new ActivityDistanceTask(facilities));
+		task.addTask(new LegGeoDistanceTask("car"));
+		task.addTask(new LegGeoDistanceTask("car", 100000));
+		task.addTask(new LegRouteDistanceTask("car"));
+		task.addTask(new LegRouteDistanceTask("car", 100000));
+//		task.addTask(new ActivityDistanceTask(facilities, "car"));
+//		task.addTask(new ActivityDistanceTruncatedTask(facilities, "car", 100000));
+		task.addTask(new DistanceJourneyDaysTask("car"));
 //		task.addTask(new SpeedFactorAnalyzer());
 //		task.addTask(new SeasonsTask());
 //		task.addTask(new PkmTask());

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
@@ -37,31 +36,34 @@ import org.matsim.core.replanning.ReplanningContext;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 
 	private Strategy strategy;
-	
+
 	private Random random;
-	
+
 	private String blacklist;
-	
+
 	private final int numThreads;
-	
+
 	private final Controler controler;
-	
-	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler) {
+
+	private final double mutationError;
+
+	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler, double mutationError) {
 		this.random = random;
 		this.numThreads = numThreads;
 		this.blacklist = blacklist;
 		this.controler = controler;
+		this.mutationError = mutationError;
 	}
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario,	EventsManager eventsManager) {
-		if(strategy == null) {
-			strategy = new Strategy(new ActivityLocationStrategy(scenario.getActivityFacilities(), random, numThreads, blacklist));
+	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+		if (strategy == null) {
+			strategy = new Strategy(new ActivityLocationStrategy(scenario.getActivityFacilities(), random, numThreads, blacklist, mutationError));
 			controler.addControlerListener(strategy);
 		}
 		return strategy;
@@ -70,19 +72,19 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 	private class Strategy implements PlanStrategy, IterationStartsListener {
 
 		private GenericPlanStrategy<Plan, Person> delegate;
-		
+
 		private int iteration;
-		
+
 		public Strategy(GenericPlanStrategy<Plan, Person> delegate) {
 			this.delegate = delegate;
 		}
-		
+
 		@Override
 		public void run(HasPlansAndId<Plan, Person> person) {
-//			if(iteration >= 5) { // because of cadyts
+			if (iteration >= 5) { // because of cadyts
 				delegate.run(person);
-//			}
-			
+			}
+
 		}
 
 		@Override
@@ -95,14 +97,18 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 			delegate.finish();
 		}
 
-		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.matsim.core.controler.listener.IterationStartsListener#
+		 * notifyIterationStarts
+		 * (org.matsim.core.controler.events.IterationStartsEvent)
 		 */
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			iteration = event.getIteration();
-			
+
 		}
-		
+
 	}
 }

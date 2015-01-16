@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.sim.RailCountsCollector;
 
@@ -69,7 +69,7 @@ public class Analyzer {
 		ActivityFacilities facilities = generateFacilities(scenario);
 		
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-		task.addTask(new TripDistanceTask(facilities));
+		task.addTask(new TripGeoDistanceTask(facilities));
 		task.addTask(new ModeShareTask());
 		
 		RailCountsCollector countsCollector = new RailCountsCollector(attribs);

@@ -74,7 +74,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
@@ -625,7 +625,7 @@ public class Simulator {
 		composite.addTask(new PlansWriterTask(network));
 		composite.addTask(new ArrivalTimeTask());
 		composite.addTask(new ActivityDurationTask());
-		composite.addTask(new TripDistanceTask(facilities, CartesianDistanceCalculator.getInstance()));
+		composite.addTask(new TripGeoDistanceTask(facilities, CartesianDistanceCalculator.getInstance()));
 		composite.addTask(new TripDurationTask());
 		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
 		scoreTask = new ScoreTask();

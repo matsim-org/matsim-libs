@@ -22,7 +22,6 @@
  */
 package playground.johannes.gsv.sim.cadyts;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
@@ -37,21 +36,21 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  *
  */
 public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CadytsScoring.class);
+//	@SuppressWarnings("unused")
+//	private static final Logger log = Logger.getLogger(CadytsScoring.class);
 
 	private double score = 0. ;
 	private PlansTranslator<T> ptPlanToPlanStep;
 	private AnalyticalCalibrator<T> matsimCalibrator;
 	private Plan plan;
-	private final double beta ;
+//	private final double beta ;
 	private double weightOfCadytsCorrection = 1. ;
 
 	public CadytsScoring(final Plan plan, Config config, final CadytsContextI<T> context ) {
 		this.ptPlanToPlanStep = context.getPlansTranslator() ;
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
-		this.beta = config.planCalcScore().getBrainExpBeta() ;
+//		this.beta = config.planCalcScore().getBrainExpBeta() ;
 	}
 	
 	@Override

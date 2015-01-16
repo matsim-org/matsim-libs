@@ -17,27 +17,61 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid;
+package playground.johannes.gsv.synPop.analysis;
 
-import java.util.Map;
+import java.util.Collection;
 
-import playground.johannes.gsv.synPop.ProxyPlan;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class JourneyDaysHandler implements PlanAttributeHandler {
+public class LegGeoDistanceTask extends LegDistanceTask {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.gsv.synPop.ProxyPlan, java.util.Map)
-	 */
-	@Override
-	public void hanle(ProxyPlan plan, Map<String, String> attributes) {
-		int nights = Integer.parseInt(attributes.get("p1014"));
-		
-		if(nights < 995)
-			plan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
+	private final double threshold;
+
+	public LegGeoDistanceTask(String mode) {
+		super(CommonKeys.LEG_GEO_DISTANCE, mode);
+		threshold = 0;
+	}
+	
+	public LegGeoDistanceTask(String mode, double threshold) {
+		super(CommonKeys.LEG_GEO_DISTANCE, mode);
+		this.threshold = threshold;
 	}
 
+	@Override
+	protected DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
+		DescriptiveStatistics stats = super.statistics(persons, purpose, mode);
+
+		if (threshold > 0) {
+			DescriptiveStatistics newStats = new DescriptiveStatistics();
+			for (int i = 0; i < stats.getN(); i++) {
+				double val = stats.getElement(i);
+				if (val >= threshold) {
+					newStats.addValue(val);
+				}
+			}
+
+			return newStats;
+		} else {
+			return stats;
+		}
+	}
+
+	@Override
+	protected String getKey(String purpose, String attKey) {
+		String key = super.getKey(purpose, attKey);
+		if(threshold > 0) {
+			key = String.format("%s.%d", key, (int)threshold);
+		}
+		
+		return key;
+	}
+
+	
 }

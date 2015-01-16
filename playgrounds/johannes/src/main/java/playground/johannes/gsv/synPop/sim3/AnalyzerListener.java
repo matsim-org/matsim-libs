@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.analysis.LegTargetDistanceTask;
+import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.analysis.TrajectoryProxyBuilder;
 import playground.johannes.gsv.synPop.data.DataPool;
@@ -65,7 +65,7 @@ public class AnalyzerListener implements SamplerListener {
 		// task.addTask(new FacilityOccupancyTask(facilities));
 //		task.addTask(new TripDistanceTask(data.getAll(), CartesianDistanceCalculator.getInstance()));
 
-		pTask = new LegTargetDistanceTask("car");
+		pTask = new LegGeoDistanceTask("car");
 		ProxyAnalyzer.setAppend(true);
 
 	}

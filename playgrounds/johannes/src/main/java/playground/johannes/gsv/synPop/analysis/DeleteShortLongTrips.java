@@ -86,6 +86,17 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 			}
 		}
 
+		/*
+		 * if there is only one leg
+		 */
+		if(plan.getLegs().size() == 1) {
+			ProxyObject leg = plan.getLegs().get(0);
+			if ("true".equalsIgnoreCase(leg.getAttribute(CommonKeys.DELETE))) {
+				plan.getActivities().clear();
+				plan.getLegs().clear();
+			}
+		} else {
+		
 		boolean flag = true;
 		while (flag) {
 			for (int i = 0; i < plan.getActivities().size(); i++) {
@@ -108,6 +119,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 					flag = false;
 				}
 			}
+		}
 		}
 	}
 

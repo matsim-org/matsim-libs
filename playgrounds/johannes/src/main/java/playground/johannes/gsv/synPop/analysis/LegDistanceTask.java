@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -36,36 +36,41 @@ import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class LegTargetDistanceTask extends AnalyzerTask {
-
-	private static final Logger logger = Logger.getLogger(LegTargetDistanceTask.class);
-
-	public static final String KEY = "d.target";
+public class LegDistanceTask extends AnalyzerTask {
 	
-	private final String modeFilter;
+	private static final Logger logger = Logger.getLogger(LegDistanceTask.class);
+
+	private final String attKey;
 	
-	public LegTargetDistanceTask(String mode) {
-		this.modeFilter = mode;
+	private final String mode;
+	
+	public LegDistanceTask(String key, String mode) {
+		this.attKey = key;
+		this.mode = mode;
 	}
-
-	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
+	
+	protected DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
 		int cntNoVal = 0;
 
-		LinearDiscretizer disc = new LinearDiscretizer(100);
 		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			for (ProxyObject leg : plan.getLegs()) {
+
+			for(int i = 0; i < plan.getLegs().size(); i++) {
+				ProxyObject leg = plan.getLegs().get(i);
+				ProxyObject act = plan.getActivities().get(i + 1);
+			
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-					if (purpose == null || purpose.equalsIgnoreCase((String) leg.getAttribute(CommonKeys.LEG_PURPOSE))) {
-						String distStr = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+					
+					if (purpose == null || purpose.equalsIgnoreCase((String) act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						
+						String distStr = leg.getAttribute(attKey);
 						if (distStr != null) {
 							double d = Double.parseDouble(distStr);
-							if(d > 100000)
-							stats.addValue(d);//disc.discretize(d));
+							stats.addValue(d);
 						} else {
 							cntNoVal++;
 						}
@@ -80,6 +85,17 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 		return stats;
 	}
 
+	protected String getKey(String purpose, String attKey) {
+		String key = String.format("%s.%s", "d", purpose);
+		if(attKey.equalsIgnoreCase(CommonKeys.LEG_GEO_DISTANCE)) {
+			key = String.format("%s.%s", "d.geo", purpose);
+		} else if(attKey.equalsIgnoreCase(CommonKeys.LEG_ROUTE_DISTANCE)){
+			key = String.format("%s.%s", "d.route", purpose);
+		}
+		
+		return key;
+	}
+	
 	@Override
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
@@ -93,18 +109,19 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 		purposes.add(null);
 
 		for (String purpose : purposes) {
-			DescriptiveStatistics stats = statistics(persons, purpose, modeFilter);
+			DescriptiveStatistics stats = statistics(persons, purpose, mode);
 
 			if (purpose == null)
 				purpose = "all";
 
-			String key = String.format("%s.%s", KEY, purpose);
+			String key = getKey(purpose, attKey);
+			
 			results.put(key, stats);
 
 			if (outputDirectoryNotNull()) {
 				try {
 					writeHistograms(stats, key, 1000, 50);
-					writeHistograms(stats, new LinearDiscretizer(500), key, false);
+					writeHistograms(stats, new LinearDiscretizer(50000), key, false);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -112,4 +129,5 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 
 		}
 	}
+
 }

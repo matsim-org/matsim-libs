@@ -92,7 +92,7 @@ public class LeiDisParser {
 		writer.close();
 	}
 	
-	private static Map<String, Coord> loadCoordinates(String filename) throws IOException {
+	public static Map<String, Coord> loadCoordinates(String filename) throws IOException {
 		Map<String, TableHandler> handlers = new HashMap<String, NetFileReader.TableHandler>();
 		NodeHandler handler = new NodeHandler();
 		handlers.put("KNOTEN", handler);

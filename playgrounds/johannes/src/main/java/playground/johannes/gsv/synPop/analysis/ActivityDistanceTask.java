@@ -42,73 +42,78 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class ActivityDistanceTask extends AnalyzerTask {
 
 	public final static String KEY = "d.act";
-	
+
 	private final ActivityFacilities facilities;
-	
+
 	private final DistanceCalculator calc = CartesianDistanceCalculator.getInstance();
+
+	private final String mode;
 	
-	public ActivityDistanceTask(ActivityFacilities facilities) {
+	public ActivityDistanceTask(ActivityFacilities facilities, String mode) {
 		this.facilities = facilities;
+		this.mode = mode;
 	}
-	
-	private DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose) {
+
+	protected DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		
-		for(ProxyPerson person : persons) {
+
+		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			
-			for(int i = 1; i < plan.getActivities().size(); i++) {
-				
+
+			for (int i = 1; i < plan.getActivities().size(); i++) {
+
 				ProxyObject thisAct = plan.getActivities().get(i);
-			
-				if (purpose == null	|| purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-					ProxyObject prevAct = plan.getActivities().get(i - 1);
-					Id<ActivityFacility> prevId = Id.create(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
-					ActivityFacility prevFac = facilities.getFacilities().get(prevId);
+				ProxyObject leg = plan.getLegs().get(i - 1);
 
-					Id<ActivityFacility> thisId = Id.create(thisAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
-					ActivityFacility thisFac = facilities.getFacilities().get(thisId);
+				if (mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
+					if (purpose == null || purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+						ProxyObject prevAct = plan.getActivities().get(i - 1);
+						Id<ActivityFacility> prevId = Id.create(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
+						ActivityFacility prevFac = facilities.getFacilities().get(prevId);
 
-					Point p1 = MatsimCoordUtils.coordToPoint(prevFac.getCoord());
-					Point p2 = MatsimCoordUtils.coordToPoint(thisFac.getCoord());
+						Id<ActivityFacility> thisId = Id.create(thisAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
+						ActivityFacility thisFac = facilities.getFacilities().get(thisId);
 
-					double d = calc.distance(p1, p2);
-					if(d > 100000)
-					stats.addValue(d);
+						Point p1 = MatsimCoordUtils.coordToPoint(prevFac.getCoord());
+						Point p2 = MatsimCoordUtils.coordToPoint(thisFac.getCoord());
+
+						double d = calc.distance(p1, p2);
+						stats.addValue(d);
+					}
 				}
 			}
 		}
-		
+
 		return stats;
 	}
 
 	@Override
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> types = new HashSet<String>();
-		for(ProxyPerson person : persons) {
+		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			for(ProxyObject act : plan.getActivities()) {
+			for (ProxyObject act : plan.getActivities()) {
 				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}
-		
+
 		types.add(null);
-		
+
 		for (String type : types) {
-			DescriptiveStatistics stats = statistics(persons, type);
-			
-			if(type == null)
+			DescriptiveStatistics stats = statistics(persons, type, mode);
+
+			if (type == null)
 				type = "all";
-			
-			String key = String.format("%s.%s", KEY, type);
+
+			String key = getKey(type);
 			results.put(key, stats);
-			
-			if(outputDirectoryNotNull()) {
+
+			if (outputDirectoryNotNull()) {
 				try {
 					writeHistograms(stats, key, 1000, 100);
 				} catch (IOException e) {
@@ -116,5 +121,9 @@ public class ActivityDistanceTask extends AnalyzerTask {
 				}
 			}
 		}
+	}
+
+	protected String getKey(String type) {
+		return String.format("%s.%s", KEY, type);
 	}
 }

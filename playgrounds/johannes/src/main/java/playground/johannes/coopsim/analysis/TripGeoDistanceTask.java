@@ -36,18 +36,18 @@ import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
  * @author illenberger
  * 
  */
-public class TripDistanceTask extends TrajectoryAnalyzerTask {
+public class TripGeoDistanceTask extends TrajectoryAnalyzerTask {
 
 	private final ActivityFacilities facilities;
 
 	private final DistanceCalculator calculator;
 
-	public TripDistanceTask(ActivityFacilities facilities) {
+	public TripGeoDistanceTask(ActivityFacilities facilities) {
 		this.facilities = facilities;
 		calculator = OrthodromicDistanceCalculator.getInstance();
 	}
 
-	public TripDistanceTask(ActivityFacilities facilities, DistanceCalculator calculator) {
+	public TripGeoDistanceTask(ActivityFacilities facilities, DistanceCalculator calculator) {
 		this.facilities = facilities;
 		this.calculator = calculator;
 	}
@@ -55,43 +55,20 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		Map<String, PlanElementConditionComposite<Leg>> map = Conditions.getLegConditions(trajectories);
-//		Set<String> purposes = TrajectoryUtils.getTypes(trajectories);
-//		purposes.add(null);
-//
-//		Set<String> modes = TrajectoryUtils.getModes(trajectories);
-//		modes.add(null);
-//
+
 		TripDistanceMean tripDistance = new TripDistanceMean(facilities, calculator);
-//		for (String mode : modes) {
-//			PlanElementConditionComposite<Leg> condition = new PlanElementConditionComposite<Leg>();
-//			if (mode == null) {
-//				condition.addComponent(DefaultCondition.getInstance());
-//			} else {
-//				condition.addComponent(new LegModeCondition(mode));
-//			}
-//			for (String purpose : purposes) {
-//				if (purpose != null) {
-//					condition.addComponent(new LegPurposeCondition(purpose));
-//				}
-		for(Entry<String, PlanElementConditionComposite<Leg>> entry : map.entrySet()) {
-				tripDistance.setCondition(entry.getValue());
-				DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
 
-//				if(mode == null) {
-//					mode = "all";
-//				}
-//				if (purpose == null)
-//					purpose = "all";
-//				String key = String.format("d.trip.%s.%s", mode, purpose);
-				String key = String.format("d.trip.%s", entry.getKey());
-				results.put(key, stats);
-				try {
-					writeHistograms(stats, key, 100, 50);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-//			}
+		for (Entry<String, PlanElementConditionComposite<Leg>> entry : map.entrySet()) {
+			tripDistance.setCondition(entry.getValue());
+			DescriptiveStatistics stats = tripDistance.statistics(trajectories, true);
 
+			String key = String.format("d.trip.%s", entry.getKey());
+			results.put(key, stats);
+			try {
+				writeHistograms(stats, key, 100, 50);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -95,4 +95,6 @@ public interface MIDKeys {
 	
 	public static final String MID_TRIPS = "midtrips";
 	
+	public static final String JOURNEY_DAYS = "journeydays";
+	
 }

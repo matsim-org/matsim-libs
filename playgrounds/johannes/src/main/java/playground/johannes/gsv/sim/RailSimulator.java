@@ -42,7 +42,7 @@ import org.matsim.core.population.ActivityImpl;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.*;
 
@@ -68,7 +68,7 @@ public class RailSimulator {
 		controler.setMobsimFactory(new MobsimConnectorFactory());
 		
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-        task.addTask(new TripDistanceTask(controler.getScenario().getActivityFacilities()));
+        task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
 		task.addTask(new ModeShareTask());
 		task.addTask(new LineSwitchTask());
 		
