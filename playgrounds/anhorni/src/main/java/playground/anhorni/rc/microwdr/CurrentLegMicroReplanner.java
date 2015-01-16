@@ -22,6 +22,7 @@ package playground.anhorni.rc.microwdr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -49,6 +50,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 	private final TripRouter tripRouter;
 	private static final Logger logger = Logger.getLogger(CurrentLegMicroReplanner.class);
+	Random random = new Random();
 	
 	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
@@ -61,6 +63,8 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
  */
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
+		
+		random.setSeed(Integer.parseInt(withinDayAgent.getId().toString()));
 
 		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
@@ -74,7 +78,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 		// new Route for current Leg
 		this.microRouteCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time, 
-				scenario.getNetwork(), tripRouter); 
+				scenario.getNetwork(), tripRouter, random); 
 		
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
@@ -84,7 +88,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 	}
 		
 	private boolean microRouteCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, 
-			Network network, TripRouter tripRouter) {
+			Network network, TripRouter tripRouter, Random random) {
 		
 		Route route = leg.getRoute();
 
@@ -114,8 +118,9 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 			// micro-reroute part of route --------------------------- 
 			Id<Link> currentLinkId = allLinkIds.get(currentLinkIndex); // link 1, currentLinkIndex = 1
 			Link fromLink = network.getLinks().get(currentLinkId);
-			
-			int toLinkIndex = (currentLinkIndex + 2); // jump over one link //
+					
+			int jump = random.nextInt(links2go - 2) + 2 ; // start with 2
+			int toLinkIndex = (currentLinkIndex + jump); // jump over one link //
 			Id<Link> toLinkId = allLinkIds.get(toLinkIndex); // 
 			Link toLink = network.getLinks().get(toLinkId); // 
 			
