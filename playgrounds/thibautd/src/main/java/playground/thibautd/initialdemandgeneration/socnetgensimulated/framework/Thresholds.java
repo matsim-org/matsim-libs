@@ -43,7 +43,7 @@ public class Thresholds {
 	}
 
 	public void setResultingAverageDegree( double resultingAverageDegree ) {
-		if ( !Double.isNaN( resultingAverageDegree ) ) throw new IllegalStateException( "average degree already set" );
+		if ( !Double.isNaN( this.resultingAverageDegree ) ) throw new IllegalStateException( "average degree already set" );
 		this.resultingAverageDegree = resultingAverageDegree;
 	}
 
@@ -53,7 +53,7 @@ public class Thresholds {
 	}
 
 	public void setResultingClustering( double resultingClustering ) {
-		if ( !Double.isNaN( resultingClustering ) ) throw new IllegalStateException( "clustering already set" );
+		if ( !Double.isNaN( this.resultingClustering ) ) throw new IllegalStateException( "clustering already set" );
 		this.resultingClustering = resultingClustering;
 	}
 
