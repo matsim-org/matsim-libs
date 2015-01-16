@@ -67,7 +67,7 @@ public class Thresholds {
 
 	@Override
 	public String toString() {
-		return "[Thresholds: primary="+primaryThreshold+" secondary="+secondaryThreshold+"; clustering="+resultingClustering+"; avgDegree"+resultingAverageDegree+"]";
+		return "[Thresholds: primary="+primaryThreshold+" secondary="+secondaryThreshold+"; clustering="+resultingClustering+"; avgDegree="+resultingAverageDegree+"]";
 	}
 }
 
