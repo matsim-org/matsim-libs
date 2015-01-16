@@ -38,18 +38,22 @@ public class Thresholds {
 	}
 	
 	public double getResultingAverageDegree() {
+		if ( Double.isNaN( resultingAverageDegree ) ) throw new IllegalStateException( "no average degree to get" );
 		return resultingAverageDegree;
 	}
 
 	public void setResultingAverageDegree( double resultingAverageDegree ) {
+		if ( !Double.isNaN( resultingAverageDegree ) ) throw new IllegalStateException( "average degree already set" );
 		this.resultingAverageDegree = resultingAverageDegree;
 	}
 
 	public double getResultingClustering() {
+		if ( Double.isNaN( resultingClustering ) ) throw new IllegalStateException( "no clustering set" );
 		return resultingClustering;
 	}
 
 	public void setResultingClustering( double resultingClustering ) {
+		if ( !Double.isNaN( resultingClustering ) ) throw new IllegalStateException( "clustering already set" );
 		this.resultingClustering = resultingClustering;
 	}
 
@@ -59,6 +63,11 @@ public class Thresholds {
 
 	public double getSecondaryThreshold() {
 		return secondaryThreshold;
+	}
+
+	@Override
+	public String toString() {
+		return "[Thresholds: primary="+primaryThreshold+" secondary="+secondaryThreshold+"; clustering="+resultingClustering+"; avgDegree"+resultingAverageDegree+"]";
 	}
 }
 
