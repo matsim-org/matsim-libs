@@ -88,46 +88,40 @@ public class ModelRunner<T extends Agent> {
 
 		// TODO threads
 		final Counter counter = new Counter( "consider primary pair # " );
+		final ThreadGroup threads = new ThreadGroup();
 
 		final List<T> agents = new ArrayList< >( population.getAgents() );
-		final List<Thread> threads = new ArrayList< >();
 
 		for ( int i=0; i < nThreads; i++ ) {
 			final int threadNumber = i;
 			final int startThreadAgents = i * agents.size() / nThreads;
 			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
 
-			final Thread t = new Thread( new Runnable() {
-				@Override
-				public void run() {
-					final Random random = new Random( randomSeed + threadNumber );
-					for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-						final T ego = agents.get( agentIndex );
+			threads.add(
+				new Runnable() {
+					@Override
+					public void run() {
+						final Random random = new Random( randomSeed + threadNumber );
+						for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
+							final T ego = agents.get( agentIndex );
 
-						final List<T> potentialAlters = new ArrayList< >( agents.subList( agentIndex + 1 , agents.size() ) );
-						int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
+							final List<T> potentialAlters = new ArrayList< >( agents.subList( agentIndex + 1 , agents.size() ) );
+							int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
 
-						while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
-							counter.incCounter();
-							final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
+								counter.incCounter();
+								final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 
-							if ( utility.getTieUtility( ego , alter ) > thresholds.getPrimaryThreshold() ) {
-								sn.get( ego.getId() ).add( alter.getId() );
+								if ( utility.getTieUtility( ego , alter ) > thresholds.getPrimaryThreshold() ) {
+									sn.get( ego.getId() ).add( alter.getId() );
+								}
 							}
 						}
 					}
-				}
-			} );
-			threads.add( t );
-			t.start();
+				} );
 		}
 
-		try {
-			for ( Thread t : threads ) t.join();
-		}
-		catch ( InterruptedException e ) {
-			throw new RuntimeException( e );
-		}
+		threads.run();
 		counter.printCounter();
 
 		log.info( "fill in network with primary ties" );
@@ -141,7 +135,6 @@ public class ModelRunner<T extends Agent> {
 		return net;
 	}
 
-
 	private void runSecondary(
 			final Thresholds thresholds,
 			final SocialNetwork sn ) {
@@ -152,7 +145,7 @@ public class ModelRunner<T extends Agent> {
 		for ( T agent : population.getAgents() ) newTies.put( agent.getId() , new HashSet<Id<Person>>() );
 
 		final Counter counter = new Counter( "consider secondary pair # " );
-		final List<Thread> threads = new ArrayList< >();
+		final ThreadGroup threads = new ThreadGroup();
 
 		for ( int i=0; i < nThreads; i++ ) {
 			final int startThreadAgents = i * agents.size() / nThreads;
@@ -166,42 +159,36 @@ public class ModelRunner<T extends Agent> {
 			}
 
 			final Random random = new Random( randomSeed + 20140107 + i );
-			final Thread t = new Thread( new Runnable() {
-				@Override
-				public void run() {
-					for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-						final T ego = agents.get( agentIndex );
-						allowedAlters.remove( ego.getId() );
+			threads.add(
+					new Runnable() {
+						@Override
+						public void run() {
+							for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
+								final T ego = agents.get( agentIndex );
+								allowedAlters.remove( ego.getId() );
 
-						final List<T> potentialAlters =
-							getUnknownFriendsOfFriends(
-								ego,
-								sn,
-								allowedAlters );
+								final List<T> potentialAlters =
+									getUnknownFriendsOfFriends(
+										ego,
+										sn,
+										allowedAlters );
 
-						for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
-								remainingChecks > 0 && !potentialAlters.isEmpty();
-								remainingChecks--) {
-							counter.incCounter();
-							final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+								for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
+										remainingChecks > 0 && !potentialAlters.isEmpty();
+										remainingChecks--) {
+									counter.incCounter();
+									final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 
-							if ( utility.getTieUtility( ego , alter ) > thresholds.getSecondaryThreshold() ) {
-								newTies.get( ego.getId() ).add( alter.getId() );
+									if ( utility.getTieUtility( ego , alter ) > thresholds.getSecondaryThreshold() ) {
+										newTies.get( ego.getId() ).add( alter.getId() );
+									}
+								}
 							}
 						}
-					}
-				}
-			} );
-			threads.add( t );
-			t.start();
+					} );
 		}
 
-		try {
-			for ( Thread t : threads ) t.join();
-		}
-		catch ( InterruptedException e ) {
-			throw new RuntimeException( e );
-		}
+		threads.run();
 
 		counter.printCounter();
 
@@ -243,5 +230,36 @@ public class ModelRunner<T extends Agent> {
 		return list;
 	}
 
+	private static class ThreadGroup {
+		final List<Thread> threads = new ArrayList< >();
+		final List<Throwable> exceptions = new ArrayList< >();
+		final Thread.UncaughtExceptionHandler exceptionHandler =
+			 new Thread.UncaughtExceptionHandler() {
+				@Override
+				public void uncaughtException(
+						final Thread t ,
+						final Throwable e ) {
+					exceptions.add( e );
+				}
+			};
+
+		public void add( final Runnable r ) {
+			final Thread t = new Thread( r );
+			t.setUncaughtExceptionHandler( exceptionHandler );
+			threads.add( t );
+		}
+
+		public void run() {
+			for ( Thread t : threads ) t.start();
+			try {
+				for ( Thread t : threads ) t.join();
+			}
+			catch ( InterruptedException e ) {
+				throw new RuntimeException( e );
+			}
+
+			if ( !exceptions.isEmpty() ) throw new RuntimeException( "got "+exceptions.size()+" exceptions while running threads" );
+		}
+	}
 }
 
