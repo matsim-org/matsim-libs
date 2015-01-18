@@ -42,20 +42,24 @@ public class TqMatsimPlansReader{
 		protected Map<Id<Person>, Person> personsSorted = new LinkedHashMap<Id<Person>, Person>(); 
 		protected Map<Id<Person>, Integer> firstDepartures = new HashMap<Id<Person>, Integer>();
 		protected Map<Id<Person>, Integer> firstDeparturesSorted = new LinkedHashMap<Id<Person>, Integer>();
-		protected Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		protected Scenario scenarioSorted = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		protected Population pop = scenario.getPopulation();
-		protected Population popSorted = scenarioSorted.getPopulation();
+		protected Scenario scenario;
+		protected Scenario scenarioSorted;
+		protected Population pop;
+		protected Population popSorted;
 		
-		public TqMatsimPlansReader() {
+		public TqMatsimPlansReader(String fileName) {
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.pop = this.scenario.getPopulation();
+			new MatsimPopulationReader(this.scenario).readFile(fileName);
+			
+			this.scenarioSorted = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.popSorted = this.scenarioSorted.getPopulation();
 		}
 
-		public Map<Id<Person>, Person> getPlans(String fileName) {
-			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimPopulationReader(scenario).readFile(fileName);
-			persons = scenario.getPopulation().getPersons();
+		public Map<Id<Person>, Person> getPlans() {
+			this.persons = this.scenario.getPopulation().getPersons();
 			
-			return (Map<Id<Person>, Person>) persons;
+			return (Map<Id<Person>, Person>) this.persons;
 		}
 		
 		public Map<Id<Person>, Person> sortPlans(Map<Id<Person>, Person> map){
@@ -65,25 +69,19 @@ public class TqMatsimPlansReader{
 				Person p = (Person) pairs.getValue();
 				PlanImpl pi = (PlanImpl) p.getSelectedPlan();
 				ActivityImpl act = (ActivityImpl) pi.getFirstActivity();
-				firstDepartures.put(p.getId(), (int) act.getEndTime());
+				this.firstDepartures.put(p.getId(), (int) act.getEndTime());
 			}
-			firstDeparturesSorted = sortHashMapByValues(firstDepartures);
+			this.firstDeparturesSorted = sortHashMapByValues(this.firstDepartures);
 			
-			Iterator<?> j = firstDeparturesSorted.keySet().iterator();
+			Iterator<?> j = this.firstDeparturesSorted.keySet().iterator();
 			while (j.hasNext()) {
 				Id<Person> id = (Id<Person>) j.next();
 				Person p = map.get(id);
-				System.out.println("id: " + id + "     Person: " + p);
-				personsSorted.put(id, p);
-				popSorted.addPerson(p);
+				this.personsSorted.put(id, p);
+				this.popSorted.addPerson(p);
 			}
 			
-			SortedPopulationWriter sortedPopulationWriter = new SortedPopulationWriter(popSorted);
-			String filename = "D:/MA/workspace.bak/master/output/siouxfalls-2014/TestSorted.xml";
-
-	  		sortedPopulationWriter.write(filename);
-			
-			return personsSorted;
+			return this.personsSorted;
 		}
 		
 		public Population getSortedPopulation(){
@@ -118,7 +116,6 @@ public class TqMatsimPlansReader{
 						mapKeys.remove(key);
 						Id<Person> id = null;
 						id = id.createPersonId(key.toString());
-						System.out.println("id: " + id);
 						sortedMap.put(id, (Integer) value);
 						break;
 					}
@@ -126,27 +123,6 @@ public class TqMatsimPlansReader{
 			}
 			return sortedMap;
 		}
-
-//		@SuppressWarnings("rawtypes")
-//		public void test(Map<Id, Person> map){
-//			Iterator<?> it = map.entrySet().iterator();
-//			while (it.hasNext()) {
-//				Map.Entry pairs = (Map.Entry) it.next();
-//				Person p = (Person) pairs.getValue();
-//				PlanImpl pi = (PlanImpl) p.getSelectedPlan();
-//				ActivityImpl act = (ActivityImpl) pi.getFirstActivity();
-//				LegImpl li = (LegImpl) pi.getNextLeg(act);
-//				Route r = li.getRoute(); 
-//				if (r.toString().contains("GenericRouteImpl")){
-//					System.out.println(li.getMode() + " GRI " + act.getEndTime() + " -> " + pi.getNextLeg(pi.getNextActivity(li)).getMode() + " " + ((GenericRouteImpl) pi.getNextLeg(pi.getNextActivity(li)).getRoute()).getRouteDescription());
-//				}else 
-//					if (r.toString().contains("LinkNetworkRouteImpl")){
-//						String route = ((LinkNetworkRouteImpl) li.getRoute()).getLinkIds().toString();
-//						System.out.println(route.substring(1, route.length()-1).replace(",", "") + " " + act.getEndTime());
-//					}else
-//						System.out.println(r.toString() + " " + act.getEndTime());
-//			}
-//		}
 	}
 
 
