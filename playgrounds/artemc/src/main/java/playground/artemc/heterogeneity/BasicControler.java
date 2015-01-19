@@ -39,6 +39,7 @@ public class BasicControler {
         Scenario scenario = initSampleScenario();
         System.setProperty("matsim.preferLocalDtds", "true");
         controler = new Controler(scenario);
+        controler.run();
     }
 
     private static Scenario initSampleScenario() {
