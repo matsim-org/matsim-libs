@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
@@ -44,7 +43,7 @@ public class StuckAgentsFilter implements AgentFilter {
 		
 		double currentLinkTravelTime = traveltimeCollector.getLinkTravelTime(currentLink, 0.0, null, null);
 						
-		if (currentLinkTravelTime > 4.0 * freeflowTraveltime) {
+		if (currentLinkTravelTime > 3.0 * freeflowTraveltime) {
 			return true;
 		} else {
 			return false;

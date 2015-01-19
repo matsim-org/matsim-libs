@@ -92,7 +92,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		// if the route type is not supported (e.g., because it is a walking agent)
 		if (!(route instanceof NetworkRoute)) return false;
 		
-		if (random.nextFloat() > 0.2) return false;  // only 20% replanners
+		if (random.nextFloat() > 0.3) return false;  // only 30% replanners
 		
 		PersonImpl p = (PersonImpl)person;
 		int legnr = plan.getPlanElements().indexOf(leg);
@@ -101,9 +101,9 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 		
 		if (p.getAge() == legnr) {
 	//		logger.error("agent already replanned");
-			return false; // agent has been replanned already
+	//		return false; // agent has been replanned already
 		} else {
-			p.setAge(legnr);
+	//		p.setAge(legnr);
 		}
 				
 		NetworkRoute oldRoute = (NetworkRoute) route;
