@@ -1,28 +1,33 @@
 <?xml version="1.0" ?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <!-- Fairly minimalistic config file.  See config dump in console or in log file for more options, and some explanations. -->
 <config>
 
 	<module name="network">
 		<param name="inputNetworkFile" value="examples/equil/network.xml" />
+		<!-- 		DO NOT CHANGE THE ABOVE PATH.  It is referenced from the book, and this here tests it. -->	
 	</module>
 
 	<module name="plans">
 		<param name="inputPlansFile" value="examples/equil/plans100.xml" />
+		<!-- 		DO NOT CHANGE THE ABOVE PATH.  It is referenced from the book, and this here tests it. -->	
 	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="./output/example1" />
-		<param name="eventsFileFormat" value="xml" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 	</module>
 
 	<module name="planCalcScore" >
-		<param name="activityType_0" value="h" />
-		<param name="activityType_1" value="w" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<parameterset type="activityParams" >
+			<param name="activityType" value="h" />
+			<param name="typicalDuration" value="12:00:00" />
+		</parameterset>
+		<parameterset type="activityParams" >
+			<param name="activityType" value="w" />
+			<param name="typicalDuration" value="08:00:00" />
+		</parameterset>
 	</module>
 
 

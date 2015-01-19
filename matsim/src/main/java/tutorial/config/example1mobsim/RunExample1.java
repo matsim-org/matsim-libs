@@ -33,6 +33,7 @@ public class RunExample1 {
 
 	public static void main(final String[] args) {
 		String configFile = "examples/tutorial/config/example1-config.xml" ;
+		// DO NOT CHANGE THE ABOVE PATH.  It is referenced from the book, and this here tests it.
 		
 		Controler controler = new Controler( configFile ) ;
 		controler.run() ;
