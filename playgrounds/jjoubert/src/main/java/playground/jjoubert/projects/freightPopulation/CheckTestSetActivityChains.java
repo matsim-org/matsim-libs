@@ -271,6 +271,8 @@ public class CheckTestSetActivityChains {
 	}
 
 	private static List<String> readAbnormalDays(String filename){
+		LOG.info("Reading abnormal days from " + filename);
+		
 		List<String> list = new ArrayList<String>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try{
