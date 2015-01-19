@@ -428,6 +428,12 @@ class Utils {
 					totalHtml.tableRowFromList(line,false);
 					line.clear();
 	                
+					line.add("Mittlerer Besetzungsgrad:");
+					Double bsg = verlagertNMAuf.get(mode)[1] / verlagertNMAuf.get(mode)[2];
+                    line.add(bsg.toString());
+                    totalHtml.tableRowFromList(line,false);
+                    line.clear();
+					
 	                line.add("Mittlere Fahrweite des verlagerten Verkehrs:");
                     line.add(Math.round(verlagertNMAuf.get(mode)[1]/Math.abs(verlagertNMAuf.get(mode)[0]))+"km");
 	                totalHtml.tableRowFromList(line,false);
@@ -539,14 +545,39 @@ class Utils {
 				totalHtml.endTableRow();
 				
                 //induziertNM: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
-
-			    line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[2])+" PKW-KM/Jahr");
+				
+			    line.add("Zus&auml;tzliche Fahrten des induzierten Verkehrs:");
+	            line.add(Math.round(induziertNM[0])+" <b>Personen</b>/Jahr");
+	            totalHtml.tableRowFromList(line,false);
+	            line.clear();
+				
+	            Double bsg = induziertNM[1] / induziertNM[2];
+	            
+	            line.add("Zus&auml;tzliche Fahrten des induzierten Verkehrs:");
+	            double pkwf = induziertNM[0]/bsg ;
+                line.add(Math.round(pkwf)+" <b>PKW</b>/Jahr");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
-                                
+	            
+	            line.add("Mittlerer Besetzungsgrad:");
+                line.add(bsg.toString());
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                
+	            
+			    line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[2])+" <b>PKW</b>-KM/Jahr");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                
+                line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
+                line.add(Math.round(induziertNM[1])+" <b>Personen</b>-KM/Jahr");
+                totalHtml.tableRowFromList(line,false);
+                line.clear();
+                           
+                               
                 line.add("Mittlere Fahrweite des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[1]/Math.abs(induziertNM[0]))+"km");
+                line.add(Math.round(induziertNM[2]/pkwf)+"km");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
                                     
