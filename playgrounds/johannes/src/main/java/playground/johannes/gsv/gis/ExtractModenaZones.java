@@ -27,7 +27,6 @@ import java.nio.file.StandardOpenOption;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.gsv.zones.io.ZoneCollection2GeoJSON;
 import playground.johannes.gsv.zones.io.ZoneCollectionSHPReader;
 
 /**

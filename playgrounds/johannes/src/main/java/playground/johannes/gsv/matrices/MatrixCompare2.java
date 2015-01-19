@@ -66,14 +66,14 @@ public class MatrixCompare2 {
 	public static void main(String[] args) throws IOException {
 		String runId = "550";
 		
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/ivv.xml");
-		KeyMatrix m1 = reader.getMatrix();
-//		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+//		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 //		reader.setValidating(false);
-//		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-//		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
+//		reader.parse("/home/johannes/gsv/matrices/refmatrices/ivv.xml");
+//		KeyMatrix m1 = reader.getMatrix();
+		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
+		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
 		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
 
 		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
