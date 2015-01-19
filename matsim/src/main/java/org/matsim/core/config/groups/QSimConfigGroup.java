@@ -102,6 +102,7 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
+	private boolean usingThreadpool = false ;
 
 	public static final String LINK_WIDTH = "linkWidth";
 
@@ -203,6 +204,8 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 		}
         map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
 		map.put(USE_DEFAULT_VEHICLES, "If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
+		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
+				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
         return map;
 	}
 
@@ -430,6 +433,16 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
     @StringSetter(USE_DEFAULT_VEHICLES)
     public void setUseDefaultVehicles(boolean useDefaultVehicles) {
         this.useDefaultVehicles = useDefaultVehicles;
+    }
+    
+    private static final String USING_THREADPOOL = "usingThreadpool" ;
+    @StringGetter(USING_THREADPOOL)
+    public boolean isUsingThreadpool() {
+    	return this.usingThreadpool ;
+    }
+    @StringSetter(USING_THREADPOOL)
+    public void setUsingThreadpool( boolean val ) {
+    	this.usingThreadpool = val ;
     }
 
 }

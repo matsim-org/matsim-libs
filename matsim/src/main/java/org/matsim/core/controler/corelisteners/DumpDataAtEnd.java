@@ -21,6 +21,8 @@ package org.matsim.core.controler.corelisteners;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -93,9 +95,14 @@ public class DumpDataAtEnd implements ShutdownListener {
 							controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
-			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
-			File fromFile = new File(controlerIO.getIterationFilename(scenarioData.getConfig().controler().getLastIteration(), "events.xml.gz"));
-			IOUtils.copyFile(fromFile, toFile);
+			try {
+				File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
+				File fromFile = new File(controlerIO.getIterationFilename(scenarioData.getConfig().controler().getLastIteration(), "events.xml.gz"));
+				IOUtils.copyFile(fromFile, toFile);
+			} catch ( Exception ee ) {
+				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+						+ "generated in the final iteration") ;
+			}
 		}
 	}
 

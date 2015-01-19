@@ -152,7 +152,8 @@ public class GautengControler_subpopulations {
 		config.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
 		config.controler().setLastIteration(1000);
 		if ( user==User.kai ) {
-			config.controler().setLastIteration(100);
+			config.controler().setFirstIteration(9) ;
+			config.controler().setLastIteration(9);
 		}
 		
 		double sampleFactor = 0.01 ;
@@ -172,6 +173,7 @@ public class GautengControler_subpopulations {
 			config.parallelEventHandling().setNumberOfThreads(1); // I don't think that it helps to have more than one here.  
 			config.qsim().setNumberOfThreads(6);
 //			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+			config.qsim().setUsingThreadpool( true );
 			
 			config.controler().setSnapshotFormat( Arrays.asList( "otfvis" ) );
 			config.controler().setWriteSnapshotsInterval(100);

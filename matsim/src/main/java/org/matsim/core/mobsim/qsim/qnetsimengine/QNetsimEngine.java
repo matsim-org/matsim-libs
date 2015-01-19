@@ -20,11 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 
 import org.apache.log4j.Logger;
@@ -73,39 +77,44 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private double infoTime = 0;
 
-    private final int numOfThreads;
+	private final int numOfThreads;
 
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 
+	private List<QNetsimEngineRunner> engines ;
 
-    private QNetsimEngineRunner[] engines;
+	private Phaser startBarrier;
+	private Phaser endBarrier;
 
-    private Phaser startBarrier;
-    private Phaser endBarrier;
-    
-    private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<>();
+	private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<>();
 
 	/*package*/ InternalInterface internalInterface = null ;
+
+	private int numOfRunners;
+
+	private ExecutorService pool;
+
+	private final boolean usingThreadpool;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
-	
-//	/**
-//	 * A design thought to provide a configurable default factory that also allows to make the direct constructors non-public.
-//	 * 
-//	 * @author nagel
-//	 */
-//	public static final class Builder implements QNetsimEngineFactory {
-//		private NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory = null ;
-//		public void setNetworkFactory( NetsimNetworkFactory<QNode, ? extends QLinkInternalI> factory ) {
-//			this.netsimNetworkFactory = factory ;
-//		}
-//		@Override
-//		public QNetsimEngine createQSimEngine(Netsim sim) {
-//			return new QNetsimEngine( (QSim) sim, netsimNetworkFactory ) ;
-//		}
-//	}
+
+	//	/**
+	//	 * A design thought to provide a configurable default factory that also allows to make the direct constructors non-public.
+	//	 * 
+	//	 * @author nagel
+	//	 */
+	//	public static final class Builder implements QNetsimEngineFactory {
+	//		private NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory = null ;
+	//		public void setNetworkFactory( NetsimNetworkFactory<QNode, ? extends QLinkInternalI> factory ) {
+	//			this.netsimNetworkFactory = factory ;
+	//		}
+	//		@Override
+	//		public QNetsimEngine createQSimEngine(Netsim sim) {
+	//			return new QNetsimEngine( (QSim) sim, netsimNetworkFactory ) ;
+	//		}
+	//	}
 
 	public QNetsimEngine(final QSim sim) {
 		this(sim, null);
@@ -116,6 +125,8 @@ public class QNetsimEngine implements MobsimEngine {
 
 		final QSimConfigGroup qsimConfigGroup = sim.getScenario().getConfig().qsim();
 		this.stucktimeCache = qsimConfigGroup.getStuckTime();
+		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool() ;
+
 
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
@@ -183,7 +194,7 @@ public class QNetsimEngine implements MobsimEngine {
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 
 
-        this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
@@ -220,33 +231,37 @@ public class QNetsimEngine implements MobsimEngine {
 		 * info at the very first timestep already 
 		 */
 
-        initQSimEngineThreads();
+		initQSimEngineThreads();
 	}
 
 	@Override
 	public void afterSim() {
 
-        /*
+		/*
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-        for (QNetsimEngineRunner engine : this.engines) {
-            engine.afterSim();
-        }
+		for (QNetsimEngineRunner engine : this.engines) {
+			engine.afterSim();
+		}
 
 		/*
 		 * Triggering the startBarrier of the QSimEngineThreads.
 		 * They will check whether the Simulation is still running.
 		 * It is not, so the Threads will stop running.
 		 */
-//        try {
-//            this.startBarrier.await();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        } catch (BrokenBarrierException e) {
-//            throw new RuntimeException(e);
-//        }
-        this.startBarrier.arriveAndAwaitAdvance();
+		//        try {
+		//            this.startBarrier.await();
+		//        } catch (InterruptedException e) {
+		//            throw new RuntimeException(e);
+		//        } catch (BrokenBarrierException e) {
+		//            throw new RuntimeException(e);
+		//        }
+		if ( !this.usingThreadpool ) {
+			this.startBarrier.arriveAndAwaitAdvance();
+		} else {
+			pool.shutdown(); 
+		}
 
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -264,65 +279,81 @@ public class QNetsimEngine implements MobsimEngine {
 	 */
 	@Override
 	public void doSimStep(final double time) {
-        run(time);
+		run(time);
 
-        this.printSimLog(time);
+		this.printSimLog(time);
 	}
 
 
-    /*
-     * The Threads are waiting at the startBarrier.
-     * We trigger them by reaching this Barrier. Now the
-     * Threads will start moving the Nodes and Links. We wait
-     * until all of them reach the endBarrier to move
-     * on. We should not have any Problems with Race Conditions
-     * because even if the Threads would be faster than this
-     * Thread, means the reach the endBarrier before
-     * this Method does, it should work anyway.
-     */
-    private void run(double time) {
-    	// yy Acceleration options to try out (kai, jan'15):
-    	
-    	// (a) Try to do without barriers.  With our 
-    	// message-based experiments a decade ago, it was better to let each runner decide locally when to proceed.  For intuition, imagine that
-    	// one runner is slowest on the links, and some other runner slowest on the nodes.  With the barriers, this cannot overlap.
-    	// With message passing, this was achieved by waiting for all necessary messages.  Here, it could (for example) be achieved with runner-local
-    	// clocks:
-    	// for ( all runners that own incoming links to my nodes ) { // (*)
-    	//    wait until runner.getTime() == myTime ;
-    	// }
-    	// processLocalNodes() ;
-    	// mytime += 0.5 ;
-    	// for ( all runners that own toNodes of my links ) { // (**)
-    	//    wait until runner.getTime() == myTime ;
-    	// }
-    	// processLocalLinks() ;
-    	// myTime += 0.5 ;
+	/*
+	 * The Threads are waiting at the startBarrier.
+	 * We trigger them by reaching this Barrier. Now the
+	 * Threads will start moving the Nodes and Links. We wait
+	 * until all of them reach the endBarrier to move
+	 * on. We should not have any Problems with Race Conditions
+	 * because even if the Threads would be faster than this
+	 * Thread, means the reach the endBarrier before
+	 * this Method does, it should work anyway.
+	 */
+	private void run(double time) {
+		// yy Acceleration options to try out (kai, jan'15):
 
-    	// (b) Do deliberate domain decomposition rather than round robin (fewer runners to wait for at (*) and (**)).
-    	
-    	// (c) One thread that is much faster than all others is much more efficient than one thread that is much slower than all others. 
-    	// So make sure that no thread sticks out in terms of slowness.  Difficult to achieve, though.  A decade back, we used a "typical" run
-    	// as input for the domain decomposition under (b).
+		// (a) Try to do without barriers.  With our 
+		// message-based experiments a decade ago, it was better to let each runner decide locally when to proceed.  For intuition, imagine that
+		// one runner is slowest on the links, and some other runner slowest on the nodes.  With the barriers, this cannot overlap.
+		// With message passing, this was achieved by waiting for all necessary messages.  Here, it could (for example) be achieved with runner-local
+		// clocks:
+		// for ( all runners that own incoming links to my nodes ) { // (*)
+		//    wait until runner.getTime() == myTime ;
+		// }
+		// processLocalNodes() ;
+		// mytime += 0.5 ;
+		// for ( all runners that own toNodes of my links ) { // (**)
+		//    wait until runner.getTime() == myTime ;
+		// }
+		// processLocalLinks() ;
+		// myTime += 0.5 ;
 
-//        try {
-            // set current Time
-            for (QNetsimEngineRunner engine : this.engines) {
-                engine.setTime(time);
-            }
+		// (b) Do deliberate domain decomposition rather than round robin (fewer runners to wait for at (*) and (**)).
 
-//            this.startBarrier.await();
-//
-//            this.endBarrier.await();
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        } catch (BrokenBarrierException e) {
-//            throw new RuntimeException(e);
-//        }
-            this.startBarrier.arriveAndAwaitAdvance();
-            
-            this.endBarrier.arriveAndAwaitAdvance();
-    }
+		// (c) One thread that is much faster than all others is much more efficient than one thread that is much slower than all others. 
+		// So make sure that no thread sticks out in terms of slowness.  Difficult to achieve, though.  A decade back, we used a "typical" run
+		// as input for the domain decomposition under (b).
+
+		//        try {
+		// set current Time
+		for (QNetsimEngineRunner engine : this.engines) {
+			engine.setTime(time);
+		}
+
+		//            this.startBarrier.await();
+		//
+		//            this.endBarrier.await();
+		//        } catch (InterruptedException e) {
+		//            throw new RuntimeException(e);
+		//        } catch (BrokenBarrierException e) {
+		//            throw new RuntimeException(e);
+		//        }
+
+		if ( this.usingThreadpool ) {
+			try {
+				for ( QNetsimEngineRunner engine : this.engines ) {
+					engine.setMovingNodes(true);
+				}
+				pool.invokeAll( this.engines ) ;
+				for ( QNetsimEngineRunner engine : this.engines ) {
+					engine.setMovingNodes(false);
+				}
+				pool.invokeAll( this.engines ) ;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new RuntimeException("something went wrong during thread pool execution") ;
+			}
+		} else {
+			this.startBarrier.arriveAndAwaitAdvance();
+			this.endBarrier.arriveAndAwaitAdvance();
+		}
+	}
 
 
 	/*package*/ void printSimLog(double time) {
@@ -336,27 +367,27 @@ public class QNetsimEngine implements MobsimEngine {
 		}
 	}
 
-    public int getNumberOfSimulatedLinks() {
+	public int getNumberOfSimulatedLinks() {
 
-        int numLinks = 0;
+		int numLinks = 0;
 
-        for (QNetsimEngineRunner engine : this.engines) {
-            numLinks = numLinks + engine.getNumberOfSimulatedLinks();
-        }
+		for (QNetsimEngineRunner engine : this.engines) {
+			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
+		}
 
-        return numLinks;
-    }
+		return numLinks;
+	}
 
-    public int getNumberOfSimulatedNodes() {
+	public int getNumberOfSimulatedNodes() {
 
-        int numNodes = 0;
+		int numNodes = 0;
 
-        for (QNetsimEngineRunner engine : this.engines) {
-            numNodes = numNodes + engine.getNumberOfSimulatedNodes();
-        }
+		for (QNetsimEngineRunner engine : this.engines) {
+			numNodes = numNodes + engine.getNumberOfSimulatedNodes();
+		}
 
-        return numNodes;
-    }
+		return numNodes;
+	}
 
 
 	QSim getMobsim() {
@@ -417,79 +448,90 @@ public class QNetsimEngine implements MobsimEngine {
 		return this.linkSpeedCalculator;
 	}
 
-    private void initQSimEngineThreads() {
+	private void initQSimEngineThreads() {
 
-        this.engines = new QNetsimEngineRunner[this.numOfThreads];
+		this.engines = new ArrayList<>() ;
 
-        this.startBarrier = new Phaser(this.numOfThreads + 1);
-        Phaser separationBarrier = new Phaser(this.numOfThreads);
-        this.endBarrier = new Phaser(this.numOfThreads + 1);
-       
-        // setup threads
-        for (int i = 0; i < this.numOfThreads; i++) {
-            QNetsimEngineRunner engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
-            Thread thread = new Thread(engine);
-            thread.setName("QNetsimEngineRunner_" + i);
-            thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
-            this.engines[i] = engine;
+		this.startBarrier = new Phaser(this.numOfThreads + 1);
+		Phaser separationBarrier = new Phaser(this.numOfThreads);
+		this.endBarrier = new Phaser(this.numOfThreads + 1);
 
-            thread.start();
-        }
+		numOfRunners = this.numOfThreads;
+		if ( usingThreadpool ) {
+			numOfRunners *= 10 ;
+			this.pool = Executors.newFixedThreadPool( this.numOfThreads ) ;
+		}
+
+		// setup threads
+		for (int i = 0; i < numOfRunners; i++) {
+			QNetsimEngineRunner engine ;
+			if ( usingThreadpool ) {
+				engine = new QNetsimEngineRunner();
+			} else {
+				engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
+				Thread thread = new Thread(engine);
+				thread.setName("QNetsimEngineRunner_" + i);
+				thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+				thread.start();
+			}
+			this.engines.add( engine ) ;
+
+		}
 
 		/*
 		 *  Assign every Link and Node to an Activator. By doing so, the
 		 *  activateNode(...) and activateLink(...) methods in this class
 		 *  should become obsolete.
 		 */
-        assignNetElementActivators();
-    }
+		assignNetElementActivators();
+	}
 
-    /*
+	/*
 	 * Within the MoveThreads Links are only activated when a Vehicle is moved
 	 * over a Node which is processed by that Thread. So we can assign each QLink
 	 * to the Thread that handles its InNode.
 	 */
-    private void assignNetElementActivators() {
+	private void assignNetElementActivators() {
 
-        // only for statistics
-        int nodes[] = new int[this.engines.length];
-        int links[] = new int[this.engines.length];
+		// only for statistics
+		int nodes[] = new int[numOfRunners];
+		int links[] = new int[numOfRunners];
 
-        int roundRobin = 0;
-        for (QNode node : network.getNetsimNodes().values()) {
-            int i = roundRobin % this.numOfThreads;
-            node.setNetElementActivator(this.engines[i]);
-            nodes[i]++;
+		int roundRobin = 0;
+		for (QNode node : network.getNetsimNodes().values()) {
+			int i = roundRobin % this.numOfRunners;
+			node.setNetElementActivator(this.engines.get(i));
+			nodes[i]++;
 
-            // set activator for out links
-            for (Link outLink : node.getNode().getOutLinks().values()) {
-                AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
-                // (must be of this type to work.  kai, feb'12)
+			// set activator for out links
+			for (Link outLink : node.getNode().getOutLinks().values()) {
+				AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
+				// (must be of this type to work.  kai, feb'12)
 
-                // removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-                qLink.setNetElementActivator(this.engines[i]);
+				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
+				qLink.setNetElementActivator(this.engines.get(i)) ;
 
 				/*
 				 * If the QLink contains agents that end their activity in the first time
 				 * step, the link should be activated.
 				 */
-                if (linksToActivateInitially.remove(qLink)) {
-                    this.engines[i].activateLink(qLink);
-                }
+				if (linksToActivateInitially.remove(qLink)) {
+					this.engines.get(i).activateLink(qLink);
+				}
 
-                links[i]++;
+				links[i]++;
 
-            }
+			}
 
-            roundRobin++;
-        }
+			roundRobin++;
+		}
 
-        // print some statistics
-        for (int i = 0; i < this.engines.length; i++) {
-            log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
-        }
+		// print some statistics
+		for (int i = 0; i < this.engines.size(); i++) {
+			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
+		}
 
-        this.linksToActivateInitially.clear();
-    }
+		this.linksToActivateInitially.clear();
+	}
 
 }

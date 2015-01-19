@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.core.gbl.Gbl;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Phaser;
 
@@ -32,7 +33,7 @@ import java.util.concurrent.Phaser;
  * @author (of this documentation) nagel
  *
  */
-class QNetsimEngineRunner extends NetElementActivator implements Runnable {
+class QNetsimEngineRunner extends NetElementActivator implements Runnable, Callable<Boolean> {
 
 	private double time = 0.0;
 
@@ -41,7 +42,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 	private final Phaser startBarrier;
 	private final Phaser separationBarrier;
 	private final Phaser endBarrier;
-	
+
 	/*
 	 * This needs to be thread-safe since QNodes could be activated concurrently
 	 * from multiple threads. In previous implementations, this data structure was
@@ -58,9 +59,9 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 	 * no concurrent add operation can occur.
 	 * cdobler, sep'14
 	 */
-//	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
+	//	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 	private final List<QLinkInternalI> linksList = new LinkedList<>();
-	
+
 	/*
 	 * Ensure that nodes and links are only activate during times where we expect it.
 	 * Otherwise this could result in unpredictable behavior. Therefore we throw
@@ -72,11 +73,20 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 	 */
 	private boolean lockNodes = false;
 	private boolean lockLinks = false;
-		
+
+	private boolean movingNodes;
+
 	/*package*/ QNetsimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
+	}
+	QNetsimEngineRunner() {
+		// this is the execution path with invokeAll and the threadpool; it does not need (and should not use) the barriers.
+		// kai, jan'14
+		this.startBarrier = null ;
+		this.separationBarrier = null ;
+		this.endBarrier = null ;
 	}
 
 	/*package*/ void setTime(final double t) {
@@ -88,57 +98,103 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 	}
 
 	@Override
+	public Boolean call() {
+		// implementing "call" and "run" side by side because it seems the easier way to 
+		// experimentally switch between the two types of threading.
+		// kai, jan'14
+
+		// Check if Simulation is still running. Otherwise print CPU usage and end thread.
+		if (!simulationRunning) {
+			Gbl.printCurrentThreadCpuTime();
+			return false;
+		}
+
+		boolean remainsActive;
+
+		if ( this.movingNodes ) {
+
+			// move nodes
+			this.lockNodes = true;
+			QNode node;
+			Iterator<QNode> simNodes = this.nodesQueue.iterator();
+			while (simNodes.hasNext()) {
+				node = simNodes.next();
+				remainsActive = node.doSimStep(time);
+				if (!remainsActive) simNodes.remove();
+			}
+			this.lockNodes = false;
+
+		} else {
+
+			// move links
+			lockLinks = true;
+			QLinkInternalI link;
+			ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+			while (simLinks.hasNext()) {
+				link = simLinks.next();
+
+				remainsActive = link.doSimStep(time);
+
+				if (!remainsActive) simLinks.remove();
+			}
+			lockLinks = false;
+
+		}
+		return true ;
+	}
+
+	@Override
 	public void run() {
 
 		// The method is ended when the simulationRunning flag is set to false.
 		while(true) {
 
-				/*
-				 * The threads wait at the startBarrier until they are triggered in the next 
-				 * time step by the run() method in the QNetsimEngine.
-				 */
-				startBarrier.arriveAndAwaitAdvance();
-				
-				// Check if Simulation is still running. Otherwise print CPU usage and end thread.
-				if (!simulationRunning) {
-					Gbl.printCurrentThreadCpuTime();
-					return;
-				}
+			/*
+			 * The threads wait at the startBarrier until they are triggered in the next 
+			 * time step by the run() method in the QNetsimEngine.
+			 */
+			startBarrier.arriveAndAwaitAdvance();
 
-				boolean remainsActive;
-				
-				// move nodes
-				this.lockNodes = true;
-				QNode node;
-				Iterator<QNode> simNodes = this.nodesQueue.iterator();
-				while (simNodes.hasNext()) {
-					node = simNodes.next();
-					remainsActive = node.doSimStep(time);
-					if (!remainsActive) simNodes.remove();
-				}
-				this.lockNodes = false;
-				
-				// After moving the QNodes all we use a Phaser to synchronize the threads.
-				this.separationBarrier.arriveAndAwaitAdvance();
+			// Check if Simulation is still running. Otherwise print CPU usage and end thread.
+			if (!simulationRunning) {
+				Gbl.printCurrentThreadCpuTime();
+				return;
+			}
 
-				// move links
-				lockLinks = true;
-				QLinkInternalI link;
-				ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
-				while (simLinks.hasNext()) {
-					link = simLinks.next();
+			boolean remainsActive;
 
-					remainsActive = link.doSimStep(time);
+			// move nodes
+			this.lockNodes = true;
+			QNode node;
+			Iterator<QNode> simNodes = this.nodesQueue.iterator();
+			while (simNodes.hasNext()) {
+				node = simNodes.next();
+				remainsActive = node.doSimStep(time);
+				if (!remainsActive) simNodes.remove();
+			}
+			this.lockNodes = false;
 
-					if (!remainsActive) simLinks.remove();
-				}
-				lockLinks = false;
+			// After moving the QNodes all we use a Phaser to synchronize the threads.
+			this.separationBarrier.arriveAndAwaitAdvance();
 
-				/*
-				 * The end of moving is synchronized with the endBarrier. If all threads 
-				 * reach this barrier the main thread can go on.
-				 */
-				this.endBarrier.arriveAndAwaitAdvance();
+			// move links
+			lockLinks = true;
+			QLinkInternalI link;
+			ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+			while (simLinks.hasNext()) {
+				link = simLinks.next();
+
+				remainsActive = link.doSimStep(time);
+
+				if (!remainsActive) simLinks.remove();
+			}
+			lockLinks = false;
+
+			/*
+			 * The end of moving is synchronized with the endBarrier. If all threads 
+			 * reach this barrier the main thread can go on.
+			 */
+			this.endBarrier.arriveAndAwaitAdvance();
 		}
 	}
 
@@ -178,5 +234,9 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 	@Override
 	public int getNumberOfSimulatedNodes() {
 		return this.nodesQueue.size();
+	}
+
+	public void setMovingNodes(boolean movingNodes) {
+		this.movingNodes = movingNodes;
 	}
 }
