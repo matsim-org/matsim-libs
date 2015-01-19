@@ -11,7 +11,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 import playground.michalm.taxi.data.TaxiRequest;
 
-public class PrtMPRequest extends RequestImpl implements PassengerRequest {
+public class PrtNPersonsRequest extends RequestImpl implements PassengerRequest {
 	
 	private final List<MobsimPassengerAgent> passengers;
 	private final Link fromLink;
@@ -19,7 +19,7 @@ public class PrtMPRequest extends RequestImpl implements PassengerRequest {
 	private double t0;
 	private double t1;
 	
-	public PrtMPRequest(Id<Request> id, List<MobsimPassengerAgent> passengers, Link fromLink, Link toLink, double quantity, double t0, double t1,
+	public PrtNPersonsRequest(Id<Request> id, List<MobsimPassengerAgent> passengers, Link fromLink, Link toLink, double quantity, double t0, double t1,
 			double submissionTime) {
 		super(id, quantity, t0, t1, submissionTime);
 		this.passengers = passengers;

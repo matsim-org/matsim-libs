@@ -2,21 +2,22 @@ package playground.dhosse.prt.task;
 
 import java.util.List;
 
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiPickupStayTask;
+import playground.michalm.taxi.schedule.TaxiDropoffDriveTask;
 
-public class MPPickupStayTask extends TaxiPickupStayTask {
+public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
 
-	List<TaxiRequest> requests;
+	private List<TaxiRequest> requests;
 	
-	public MPPickupStayTask(double beginTime, double endTime,
-			List<TaxiRequest> requests) {
-		super(beginTime, endTime, requests.get(0));
+	public NPersonsDropoffDriveTask(VrpPathWithTravelData path, List<TaxiRequest> requests) {
 		
+		super(path, requests.get(0));
 		this.requests = requests;
 		
 		for(TaxiRequest request : requests){
-			request.setPickupStayTask(this);
+			request.setDropoffDriveTask(this);
 		}
 		
 	}
@@ -25,7 +26,7 @@ public class MPPickupStayTask extends TaxiPickupStayTask {
     public void removeFromRequest()
     {
 		for(TaxiRequest request : this.requests){
-			request.setPickupStayTask(null);
+			request.setDropoffDriveTask(null);
 		}
     }
 
@@ -33,7 +34,7 @@ public class MPPickupStayTask extends TaxiPickupStayTask {
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.PICKUP_STAY;
+        return TaxiTaskType.DROPOFF_DRIVE;
     }
 
 
@@ -53,10 +54,5 @@ public class MPPickupStayTask extends TaxiPickupStayTask {
     {
         return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
     }
-    
-    public void appendRequest(TaxiRequest request){
-		this.requests.add(request);
-		request.setPickupStayTask(this);
-	}
 
 }

@@ -1,9 +1,7 @@
 package playground.dhosse.prt.optimizer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Link;
@@ -14,13 +12,13 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathCost;
 
-public class MPProblem {
+public class NPersonsProblem {
 	
 	private final TaxiOptimizerConfiguration optimConfig;
     private final VehicleRequestPathCost vrpComparator;
 
 
-    public MPProblem(TaxiOptimizerConfiguration optimConfig)
+    public NPersonsProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
         this.vrpComparator = optimConfig.getVrpCost();

@@ -5,17 +5,16 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
-import playground.dhosse.prt.task.MPDropoffDriveTask;
-import playground.dhosse.prt.task.MPDropoffStayTask;
-import playground.dhosse.prt.task.MPPickupDriveTask;
-import playground.dhosse.prt.task.MPPickupStayTask;
+import playground.dhosse.prt.task.NPersonsDropoffDriveTask;
+import playground.dhosse.prt.task.NPersonsDropoffStayTask;
+import playground.dhosse.prt.task.NPersonsPickupDriveTask;
+import playground.dhosse.prt.task.NPersonsPickupStayTask;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.TaxiSchedules;
@@ -81,11 +80,11 @@ public class PrtScheduler extends TaxiScheduler {
     	  req.add(p.request);
       }
 
-      bestSched.addTask(new MPPickupDriveTask(best.path, req));
+      bestSched.addTask(new NPersonsPickupDriveTask(best.path, req));
 
       double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
               + params.pickupDuration;
-      bestSched.addTask(new MPPickupStayTask(best.path.getArrivalTime(), t3, req));
+      bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
       if (params.destinationKnown) {
           appendDropoffAfterPickup(bestSched);
@@ -101,13 +100,16 @@ public class PrtScheduler extends TaxiScheduler {
 		
 		for(TaxiTask task : sched.getTasks()){
 			
-			if(task instanceof MPPickupDriveTask){
-				for(VehicleRequestPath vrp : requests)
-					((MPPickupDriveTask)task).appendRequest(vrp.request);
-			}
-			if(task instanceof MPPickupStayTask){
+			if(task instanceof NPersonsPickupDriveTask){
 				for(VehicleRequestPath vrp : requests){
-					((MPPickupStayTask)task).appendRequest(vrp.request);
+					if(vrp.request.getT0() < task.getBeginTime())
+						((NPersonsPickupDriveTask)task).appendRequest(vrp.request);
+				}
+			}
+			if(task instanceof NPersonsPickupStayTask){
+				for(VehicleRequestPath vrp : requests){
+					if(vrp.request.getT0() < task.getBeginTime())
+						((NPersonsPickupStayTask)task).appendRequest(vrp.request);
 				}
 			}
 			
@@ -118,27 +120,27 @@ public class PrtScheduler extends TaxiScheduler {
 	@Override
 	public void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
-        MPPickupStayTask pickupStayTask = (MPPickupStayTask)Schedules.getLastTask(schedule);
+        NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules.getLastTask(schedule);
 
         // add DELIVERY after SERVE
-        List<TaxiRequest> reqs = ((MPPickupStayTask)pickupStayTask).getRequests();
-        TaxiRequest req = ((MPPickupStayTask)pickupStayTask).getRequest();
+        List<TaxiRequest> reqs = ((NPersonsPickupStayTask)pickupStayTask).getRequests();
+        TaxiRequest req = ((NPersonsPickupStayTask)pickupStayTask).getRequest();
         Link reqFromLink = req.getFromLink();
         Link reqToLink = req.getToLink();
         double t3 = pickupStayTask.getEndTime();
 
         VrpPathWithTravelData path = calculator.calcPath(reqFromLink, reqToLink, t3);
-        schedule.addTask(new MPDropoffDriveTask(path, reqs));
+        schedule.addTask(new NPersonsDropoffDriveTask(path, reqs));
 
         double t4 = path.getArrivalTime();
-        double t5 = t4 + params.dropoffDuration;
-        schedule.addTask(new MPDropoffStayTask(t4, t5, reqs));
+        double t5 = t4 + pickupStayTask.getRequests().size()*params.dropoffDuration;
+        schedule.addTask(new NPersonsDropoffStayTask(t4, t5, reqs));
     }
 
 	@Override
     public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
     {
-        MPDropoffStayTask dropoffStayTask = (MPDropoffStayTask)Schedules.getLastTask(schedule);
+        NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules.getLastTask(schedule);
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();

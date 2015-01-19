@@ -5,11 +5,11 @@ import java.util.List;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiDropoffStayTask;
 
-public class MPDropoffStayTask extends TaxiDropoffStayTask {
+public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
 
 	List<TaxiRequest> requests;
 	
-	public MPDropoffStayTask(double beginTime, double endTime,
+	public NPersonsDropoffStayTask(double beginTime, double endTime,
 			List<TaxiRequest> requests) {
 		super(beginTime, endTime, requests.get(0));
 		this.requests = requests;

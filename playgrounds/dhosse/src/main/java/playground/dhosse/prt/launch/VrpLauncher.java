@@ -5,6 +5,14 @@ import java.io.PrintWriter;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
@@ -15,7 +23,6 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -29,33 +36,26 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.ChartUtils;
 import playground.dhosse.prt.data.PrtData;
-import playground.dhosse.prt.optimizer.PrtMPOptimizer;
+import playground.dhosse.prt.optimizer.PrtNPersonsOptimizer;
 import playground.dhosse.prt.optimizer.PrtScheduler;
-import playground.dhosse.prt.request.MPVehicleRequestPathFinder;
+import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.dhosse.prt.request.PrtRequestCreator;
-import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.data.TaxiData;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.RESTaxiOptimizer;
 import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
 import playground.michalm.taxi.optimizer.filter.FilterFactory;
-import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 public class VrpLauncher {
 	
@@ -125,7 +125,7 @@ public class VrpLauncher {
         TaxiOptimizerConfiguration optimConfig = initOptimizerConfiguration();
 //        APSTaxiOptimizer optimizer = new APSTaxiOptimizer(optimConfig);
 //        RESTaxiOptimizer optimizer = new RESTaxiOptimizer(optimConfig);
-        PrtMPOptimizer optimizer = new PrtMPOptimizer(optimConfig);
+        PrtNPersonsOptimizer optimizer = new PrtNPersonsOptimizer(optimConfig);
 //        OTSTaxiOptimizer optimizer = new OTSTaxiOptimizer(optimizerConfig);
 //        NOSTaxiOptimizer optimizer = new NOSTaxiOptimizer(optimConfig);
         
@@ -140,7 +140,7 @@ public class VrpLauncher {
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
         
-        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new NPersonsActionCreator(
                 passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, params.pickupDuration));
 
         EventsManager events = qSim.getEventsManager();
@@ -165,7 +165,7 @@ public class VrpLauncher {
         legHistogram.write("C:/Users/Daniel/Desktop/dvrp/hist.txt");
         LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist.png", "prt");
         
-//        generateOutput();
+        generateOutput();
         
 	}
 	
@@ -197,9 +197,9 @@ public class VrpLauncher {
 	
 	private TaxiOptimizerConfiguration initOptimizerConfiguration(){
 		
-		params = new TaxiSchedulerParams(true, 30, 30);
+		params = new TaxiSchedulerParams(false, 30, 30);
 		PrtScheduler scheduler = new PrtScheduler(context, calculator, params);
-		MPVehicleRequestPathFinder vrpFinder = new MPVehicleRequestPathFinder(calculator, scheduler);
+		NPersonsVehicleRequestPathFinder vrpFinder = new NPersonsVehicleRequestPathFinder(calculator, scheduler);
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
 		return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
