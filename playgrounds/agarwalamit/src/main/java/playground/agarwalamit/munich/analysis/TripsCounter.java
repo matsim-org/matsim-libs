@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls;
+package playground.agarwalamit.munich.analysis;
 
 import java.io.BufferedWriter;
 
@@ -30,36 +30,45 @@ import playground.agarwalamit.analysis.TripAndPersonCounter;
 /**
  * @author amit
  */
-public class AvgTollPerPersonAndPerTrip {
+
+public class TripsCounter {
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
-		String [] runs = {"run201","run202","run203","run204"};
-		AvgTollPerPersonAndPerTrip avgTollPersonTrip = new AvgTollPerPersonAndPerTrip();
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis500Its/tripAndPersonsCounter.txt");
+
+		String dir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+		String runCases[] ={"baseCaseCtd","ei","ci","eci"};
+
+		TripsCounter cnt = new TripsCounter();
+		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/tripsAndPersonCountInfo.txt");
+
 		try {
-			writer.write("run \t numberOfTrips \t numberOfPersons \n");
-			for (String str:runs){
-				String eventsFile = runDir+str+"/ITERS/it.500/500.events.xml.gz";
-				int [] cntr = avgTollPersonTrip.run(eventsFile);
-				writer.write(str+"\t"+cntr[0]+"\t"+cntr[1]+"\n");
+			writer.write("scenario \t numberOfCarTrips \n numberOfCarPersons \t totalTrips \t totalPesons \n");
+
+			for(int i=0;i<runCases.length;i++){
+				String eventsFile = dir+runCases[i]+"/ITERS/it.1500/1500.events.xml.gz";
+				String countInfo = cnt.run(eventsFile,writer);
+				writer.write(runCases[i]+"\t"+countInfo+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written to file. Reason "+e);
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
 		}
+
 	}
 
-	private int [] run(String eventsFile){
-		int counter [] = new int [2];
-		EventsManager manager = EventsUtils.createEventsManager();
-		TripAndPersonCounter tripCounter = new TripAndPersonCounter();
-		manager.addHandler(tripCounter);
 
-		MatsimEventsReader reader = new MatsimEventsReader(manager);
+	private String run(String eventsFile, BufferedWriter writer) {
+
+		EventsManager events = EventsUtils.createEventsManager();
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+
+		TripAndPersonCounter counter = new TripAndPersonCounter();
+		events.addHandler(counter);
+
 		reader.readFile(eventsFile);
-		counter[0] = tripCounter.getNumberOfCarTrips();
-		counter[1] = tripCounter.getNumberOfCarPersons();
-		return counter;
+
+		return counter.getNumberOfCarTrips()+"\t"+counter.getNumberOfCarPersons()+"\t"+counter.getTotalNumberOfTrips()+"\t"+counter.getTotalNumberOfPersons();
 	}
+
 }

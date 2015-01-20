@@ -42,7 +42,7 @@ public class AbsoluteDelays  {
 	}
 
 	public static void main(String[] args) {
-		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run6/";
+		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};
 		
 		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
@@ -64,7 +64,7 @@ public class AbsoluteDelays  {
 	}
 
 	private double getVTTS_car(String runCase){
-		String configFile = outputDir+runCase+"/output_config.xml.gz";
+		String configFile = outputDir+runCase+"/output_config.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader reader = new MatsimConfigReader(config);

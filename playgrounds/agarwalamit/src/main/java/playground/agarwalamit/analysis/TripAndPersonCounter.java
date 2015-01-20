@@ -38,17 +38,20 @@ import org.matsim.api.core.v01.population.Person;
 public class TripAndPersonCounter implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	public TripAndPersonCounter() {
-		this.personId2TripCounter = new HashMap<Id<Person>, Integer>();
+		this.personId2CarTripCounter = new HashMap<Id<Person>, Integer>();
+		this.personId2AllTripCounter = new HashMap<>();
 		this.departureList = new ArrayList<Id<Person>>();
 	}
 
-	private Map<Id<Person>,Integer> personId2TripCounter;
+	private Map<Id<Person>,Integer> personId2CarTripCounter;
+	private Map<Id<Person>,Integer> personId2AllTripCounter;
 	private List<Id<Person>> departureList;
 	private final Logger logger = Logger.getLogger(TripAndPersonCounter.class);
 
 	@Override
 	public void reset(int iteration) {
-		this.personId2TripCounter.clear();
+		this.personId2CarTripCounter.clear();
+		this.personId2AllTripCounter.clear();
 		this.departureList.clear();
 	}
 
@@ -61,32 +64,55 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	public void handleEvent(PersonDepartureEvent event) {
 		this.departureList.add(event.getPersonId());
 		if(event.getLegMode().equals(TransportMode.car)){
-			if (this.personId2TripCounter.containsKey(event.getPersonId())) {
-				int oldTrips = this.personId2TripCounter.get(event.getPersonId());
+			if (this.personId2CarTripCounter.containsKey(event.getPersonId())) {
+				int oldTrips = this.personId2CarTripCounter.get(event.getPersonId());
 				int newTrips = oldTrips+1;
-				this.personId2TripCounter.put(event.getPersonId(), newTrips);
+				this.personId2CarTripCounter.put(event.getPersonId(), newTrips);
 			} else {
-				this.personId2TripCounter.put(event.getPersonId(), 1);
+				this.personId2CarTripCounter.put(event.getPersonId(), 1);
 			}
 		}
+		
+		if (this.personId2AllTripCounter.containsKey(event.getPersonId())) {
+			int oldTrips = this.personId2AllTripCounter.get(event.getPersonId());
+			int newTrips = oldTrips+1;
+			this.personId2AllTripCounter.put(event.getPersonId(), newTrips);
+		} else {
+			this.personId2AllTripCounter.put(event.getPersonId(), 1);
+		}
+		
 	}
 	
-	public int getNumberOfPersons(){
+	public int getTotalNumberOfPersons(){
 		checkPersonNotArrived();
-		return this.personId2TripCounter.size();
+		return this.personId2AllTripCounter.size();
 	}
 	
-	public int getNumberOfTrips(){
+	public int getNumberOfCarPersons(){
+		checkPersonNotArrived();
+		return this.personId2CarTripCounter.size();
+	}
+	
+	public int getTotalNumberOfTrips(){
 		checkPersonNotArrived();
 		int sumTrips =0;
-		for(Id<Person> id:this.personId2TripCounter.keySet()){
-			sumTrips += this.personId2TripCounter.get(id);
+		for(Id<Person> id:this.personId2AllTripCounter.keySet()){
+			sumTrips += this.personId2AllTripCounter.get(id);
 		}
 		return sumTrips;
 	}
 	
-	public double getAverageTripsPerPerson(){
-		return ((double) getNumberOfTrips() / (double) getNumberOfPersons());
+	public int getNumberOfCarTrips(){
+		checkPersonNotArrived();
+		int sumTrips =0;
+		for(Id<Person> id:this.personId2CarTripCounter.keySet()){
+			sumTrips += this.personId2CarTripCounter.get(id);
+		}
+		return sumTrips;
+	}
+	
+	public double getAverageCarTripPerCarPerson(){
+		return ((double) getNumberOfCarTrips() / (double) getNumberOfCarPersons());
 	}
 	
 	private void checkPersonNotArrived(){

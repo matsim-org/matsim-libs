@@ -44,20 +44,20 @@ public class MunichSpatialPlots {
 	
 	String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	String bau = runDir+"/baseCaseCtd";
-	String ei = runDir+"/ci";
+	String policyScenario = runDir+"/ci";
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		plots.writeCongestionCells();
-		plots.writeEmissionCells();
+//		plots.writeEmissionCells();
 	}
 
-	private void writeCongestionCells(){
+	public void writeCongestionCells(){
 		Map<Double, Map<Id, Double>> linkDelaysBau = new HashMap<>();
 		Map<Double, Map<Id, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
 		inputs.setGridInfo(GridType.HEX, 500);
 		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -127,12 +127,12 @@ public class MunichSpatialPlots {
 	}
 
 	
-	private void writeEmissionCells(){
+	public void writeEmissionCells(){
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau = new HashMap<>();
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
 		
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,ei);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
 		inputs.setGridInfo(GridType.HEX, 500);
 		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
