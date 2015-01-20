@@ -32,15 +32,17 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 
 	int expectedRoad;
 	boolean expectedRoadSelected;
-	String actualRoadSelected;
+	int actualRoadSelected;
 
 	public InternalizationRoutingTestHandler(int expectedRoad) {
 		this.expectedRoad = expectedRoad;
-		expectedRoadSelected = false;
+		this.reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
+		expectedRoadSelected = false;
+		actualRoadSelected =0;
 
 	}
 
@@ -48,10 +50,12 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().equals(Id.create(expectedRoad, Link.class))){
 			expectedRoadSelected = true;
-		} else {
-			if(event.getLinkId().equals(Id.create("9", Link.class))) 			actualRoadSelected = "9,";
-			else if(event.getLinkId().equals(Id.create("11", Link.class)))		actualRoadSelected = "11";
-			else if(event.getLinkId().equals(Id.create("13", Link.class))) 	actualRoadSelected = "13";
+			actualRoadSelected = expectedRoad;
+		}
+		else {
+			if(event.getLinkId().equals(Id.create("9", Link.class))) 			actualRoadSelected = 9;
+			else if(event.getLinkId().equals(Id.create("11", Link.class)))		actualRoadSelected = 11;
+			else if(event.getLinkId().equals(Id.create("13", Link.class))) 	actualRoadSelected = 13;
 		}
 	}
 
@@ -59,7 +63,7 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 		return expectedRoadSelected;
 	}
 
-	public String getActualRoadSelected() {
+	public int getActualRoadSelected() {
 		return actualRoadSelected;
 	}
 }
