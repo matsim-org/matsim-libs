@@ -130,5 +130,54 @@ public class DigicoreUtils {
 	}
 
 		
+	/**
+	 * Reads a file that contains one date per line in the format <code>YYYY/MM/DD</code>.
+	 *  
+	 * @param filename path to the file containing the abnormal days.
+	 * @return a {@link List}<{@link String}>s where each string is a date in the format
+	 * 		   <code>YYYY/MM/DD</code>.
+	 */
+	public static List<String> readAbnormalDays(String filename){
+		LOG.info("Reading abnormal days from " + filename);
+		
+		List<String> list = new ArrayList<String>();
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = null;
+			while((line=br.readLine()) != null){
+				list.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from abnormal days file.");
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close abnormal days file.");
+			}
+		}
+		LOG.info("Number of abnormal days read: " + list.size());
+		return list;
+	}
+	
+	
+	/**
+	 * Converts a {@link GregorianCalendar} to an easy-to-read {@link String} 
+	 * in the format <code>YYYY/MM/DD</code>.
+	 * @param cal
+	 * @return
+	 */
+	public static String getShortDate(GregorianCalendar cal){
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH)+1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		
+		return String.format("%d/%02d/%02d", year, month, day);
+	}
+	
+
+
 
 }
