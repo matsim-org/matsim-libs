@@ -42,7 +42,7 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 	@Override
 	public void reset(int iteration) {
 		expectedRoadSelected = false;
-		actualRoadSelected =0;
+		actualRoadSelected = 0;
 
 	}
 
@@ -55,7 +55,8 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 		else {
 			if(event.getLinkId().equals(Id.create("9", Link.class))) 			actualRoadSelected = 9;
 			else if(event.getLinkId().equals(Id.create("11", Link.class)))		actualRoadSelected = 11;
-			else if(event.getLinkId().equals(Id.create("13", Link.class))) 	actualRoadSelected = 13;
+			else if(event.getLinkId().equals(Id.create("13", Link.class))) 		actualRoadSelected = 13;
+			else if(event.getLinkId().equals(Id.create("14", Link.class)))		actualRoadSelected = 14;
 		}
 	}
 

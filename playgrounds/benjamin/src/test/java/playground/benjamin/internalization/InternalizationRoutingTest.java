@@ -22,6 +22,7 @@ package playground.benjamin.internalization;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,8 +43,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -62,6 +61,7 @@ import org.matsim.vehicles.Vehicles;
  *
  */
 public class InternalizationRoutingTest extends MatsimTestCase{
+	private static final Logger logger = Logger.getLogger(InternalizationRoutingTest.class);
 
 	static boolean isUsingDetailedEmissionCalculation = false;
 
@@ -72,53 +72,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
-	public void testEmissionRouting() {
-		this.config = super.loadConfig(null); // automatically sets the correct output directory
-//		this.config.addCoreModules();
-
-		this.scenario = ScenarioUtils.createScenario(this.config);
-
-		createNetwork();
-		createActiveAgents();
-		createVehicles();
-
-		this.controler = new Controler(this.scenario);
-		specifyControler();
-
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
-//		emissionModule.setEmissionEfficiencyFactor(0.8);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-
-		emissionCostModule = new EmissionCostModule(1.0);
-
-		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6.000);
-		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.0001);
-
-		installEmissionDisutilityCalculatorFactory();
-		installEmissionInternalizationListener();
-		
-		//link 9 time, link 11 distance, link 13 emissions and time and distance
-		int expectedRoad = 13;
-		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
-
-		StartupListener startupListener = new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
-			}
-		};
-
-		this.controler.addControlerListener(startupListener);
-		this.controler.run();
-		assertTrue("Person was expected to be routed through link " + expectedRoad + ", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
-
-	}
-
-		public void testDistanceRouting() {
-		this.config = super.loadConfig(null); // automatically sets the correct output directory
+	public void testDistanceRouting() {
+		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
 
 		createNetwork();
@@ -129,11 +84,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
+		pcs.setPerforming_utils_hr(0.0);
 		pcs.setTraveling_utils_hr(0.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		pcs.setMonetaryDistanceCostRateCar(-0.0001);
+		pcs.setMonetaryDistanceCostRateCar(-0.001);
 
-		//link 9 time, link 11 distance, link 13 emissions and time and distance
+		//link 11 distance
 		int expectedRoad = 11;
 		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
 
@@ -146,11 +102,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
+		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
 	public void testTimeRouting() {
-		this.config = super.loadConfig(null); // automatically sets the correct output directory
+		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
 
 		createNetwork();
@@ -161,12 +118,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		specifyControler();
 
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		pcs.setTraveling_utils_hr(-6000.0);
+		pcs.setPerforming_utils_hr(0.0);
+		pcs.setTraveling_utils_hr(-6.0);
 		pcs.setMarginalUtilityOfMoney(1.0);
-		//pcs.setMonetaryDistanceCostRateCar(-0.0001);
-		pcs.setMonetaryDistanceCostRateCar(0.000);
+		pcs.setMonetaryDistanceCostRateCar(-0.0);
 
-		//link 9 time, link 11 distance, link 13 emissions and time and distance
+		//link 9 time
 		int expectedRoad = 9;
 		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
 
@@ -179,13 +136,90 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
+		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+	}
+
+	public void testTimeDistanceRouting() {
+		this.config = super.loadConfig(null);
+		this.scenario = ScenarioUtils.createScenario(this.config);
+
+		createNetwork();
+		createActiveAgents();
+		createVehicles();
+
+		this.controler = new Controler(this.scenario);
+		specifyControler();
+
+		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
+		pcs.setPerforming_utils_hr(0.0);
+		pcs.setTraveling_utils_hr(-6.0);
+		pcs.setMarginalUtilityOfMoney(1.0);
+		pcs.setMonetaryDistanceCostRateCar(-0.001);
+
+		//link 13 time AND distance
+		int expectedRoad = 13;
+		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
+
+		StartupListener startupListener = new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(handler);
+			}
+		};
+
+		this.controler.addControlerListener(startupListener);
+		this.controler.run();
+		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+	}
+
+	public void testTimeDistanceEmissionRouting() {
+		this.config = super.loadConfig(null);
+		this.scenario = ScenarioUtils.createScenario(this.config);
+
+		createNetwork();
+		createActiveAgents();
+		createVehicles();
+
+		this.controler = new Controler(this.scenario);
+		specifyControler();
+
+		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+		emissionCostModule = new EmissionCostModule(100.0);
+
+		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
+		pcs.setPerforming_utils_hr(0.0);
+		pcs.setTraveling_utils_hr(-6.0);
+		pcs.setMarginalUtilityOfMoney(1.0);
+		pcs.setMonetaryDistanceCostRateCar(-0.001);
+
+		installEmissionDisutilityCalculatorFactory();
+		installEmissionInternalizationListener();
+
+		//link 14 time AND distance AND emissions
+		int expectedRoad = 14;
+		final InternalizationRoutingTestHandler handler = new InternalizationRoutingTestHandler(expectedRoad) ;
+
+		StartupListener startupListener = new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(handler);
+			}
+		};
+
+		this.controler.addControlerListener(startupListener);
+		this.controler.run();
+		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
+		assertTrue("Person was expected to be routed through link " + expectedRoad + ", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
 	private void installEmissionInternalizationListener() {
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 	}
-	
+
 	private void installEmissionDisutilityCalculatorFactory() {
 		EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 		controler.setTravelDisutilityFactory(emissiondcf);
@@ -199,13 +233,11 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setFirstIteration(0);
-		//set to one iteration, use "ccg.setLastIteration(9)" for ten iterations
 		ccg.setLastIteration(0);
 		ccg.setMobsim("qsim");
 		Set<EventsFileFormat> set = new HashSet<EventsFileFormat>();
 		set.add(EventsFileFormat.xml);
 		ccg.setEventsFileFormats(set);
-		//		ccg.setRunId("321");
 		ccg.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 
 		// qsimConfigGroup
@@ -229,33 +261,28 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.addActivityParams(act2Params);
 
 		pcs.setBrainExpBeta(1.0);
-		pcs.setTraveling_utils_hr(-6.0);
-		pcs.setMarginalUtilityOfMoney(0.6);
-		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
 		// strategyConfigGroup
-		StrategyConfigGroup scg = controler.getConfig().strategy();
-
-		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
-		//		changePlan.setModuleName("BestScore");
-		changePlan.setStrategyName("ChangeExpBeta");
-		changePlan.setWeight(0.7);
-
-		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
-		reRoute.setStrategyName("ReRoute");
-		reRoute.setWeight(0.3);
-
-		scg.addStrategySettings(changePlan);
-		scg.addStrategySettings(reRoute);
+		//		StrategyConfigGroup scg = controler.getConfig().strategy();
+		//
+		//		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
+		//		changePlan.setStrategyName("BestScore");
+		////		changePlan.setStrategyName("ChangeExpBeta");
+		//		changePlan.setWeight(0.0);
+		//
+		//		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
+		//		reRoute.setStrategyName("ReRoute");
+		//		reRoute.setWeight(1.0);
+		//
+		//		scg.addStrategySettings(changePlan);
+		//		scg.addStrategySettings(reRoute);
 
 		// define emission tool input files	
-	    EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-	    controler.getConfig().addModule(ecg);
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+		controler.getConfig().addModule(ecg);
 		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
-
 		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
 		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
-
 
 		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
@@ -264,14 +291,12 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 
 	private void createPassiveAgents() {
 		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		
 		Id<Link> homeLinkId = Id.create("11", Link.class);
-		
 		for(Integer i=0; i<10; i++){
-			Person person = pFactory.createPerson(Id.create(i.toString(), Person.class)); //new PersonImpl (new IdImpl(i));
-			Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
+			Person person = pFactory.createPerson(Id.create(i.toString(), Person.class));
+			Plan plan = pFactory.createPlan();
 
-			Activity home = pFactory.createActivityFromLinkId("home", homeLinkId); //plan.createAndAddActivity("home", Id.create("11"));
+			Activity home = pFactory.createActivityFromLinkId("home", homeLinkId);
 			home.setEndTime(6 * 3600);
 			Leg leg = pFactory.createLeg(TransportMode.walk);
 			Activity home2 = pFactory.createActivityFromLinkId("home", homeLinkId);
@@ -316,7 +341,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.emissionVehicles.addVehicleType(vehicleType);
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), vehicleType);
-			this.emissionVehicles.addVehicle(vehicle); // addVehicle( vehicle);
+			this.emissionVehicles.addVehicle(vehicle);
 		}
 	}
 
@@ -346,9 +371,10 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		network.createAndAddLink(Id.create("10", Link.class), node3, node9, 5000, 27.78, 3600, 1, null, "22");
 		network.createAndAddLink(Id.create("12", Link.class), node3, node10, 5000, 27.78, 3600, 1, null, "22");
 
-		//9 time, 11 distance, 13 emissions
-		network.createAndAddLink(Id.create("9", Link.class), node8, node4, 5000, 27.78, 3600, 1, null, "22");
+		//link 9 time, link 11 distance, link 13 time AND distance, link 14 time AND distance AND emissions
+		network.createAndAddLink(Id.create("9", Link.class), node8, node4, 5000, 50.00, 3600, 1, null, "22");
 		network.createAndAddLink(Id.create("11", Link.class), node9, node4, 2500, 10.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("13", Link.class), node10, node4, 3750, 20.80, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("13", Link.class), node10, node4, 2600, 21.67, 3600, 1, null, "85");
+		network.createAndAddLink(Id.create("14", Link.class), node10, node4, 2600, 21.65, 3600, 1, null, "22");
 	}
 }
