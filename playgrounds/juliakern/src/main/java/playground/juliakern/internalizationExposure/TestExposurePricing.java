@@ -61,7 +61,7 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 
 
 /**
- * @author benjamin
+ * @author julia after benjamin
  *
  */
 public class TestExposurePricing {
