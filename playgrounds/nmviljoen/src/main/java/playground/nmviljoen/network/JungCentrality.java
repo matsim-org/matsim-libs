@@ -15,8 +15,8 @@ import org.apache.commons.collections15.Transformer;
 
 import cern.colt.matrix.impl.SparseDoubleMatrix2D;
 
-import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyLink;
-import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyNode;
+import playground.nmviljoen.network.NmvLink;
+import playground.nmviljoen.network.NmvNode;
 import edu.uci.ics.jung.algorithms.scoring.BetweennessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.ClosenessCentrality;
 import edu.uci.ics.jung.algorithms.scoring.EigenvectorCentrality;
@@ -25,16 +25,22 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 
 
 public class JungCentrality {
-	public static void calculateAndWriteUnweightedCloseness(DirectedGraph<MyNode,MyLink> myGraph, String nodeCloseUnweighted,
-			ArrayList<MyNode> nodeList) {
-		ClosenessCentrality<MyNode, MyLink> ranker = new ClosenessCentrality<MyNode, MyLink>(myGraph);
+	public static void calculateAndWriteUnweightedCloseness(DirectedGraph<NmvNode,NmvLink> myGraph, String nodeCloseUnweighted,
+			ArrayList<NmvNode> nodeList) {
+		ClosenessCentrality<NmvNode, NmvLink> ranker = new ClosenessCentrality<NmvNode, NmvLink>(myGraph);
 			BufferedWriter bw = IOUtils.getBufferedWriter(nodeCloseUnweighted);
 			try{
 				bw.write("NodeID,X,Y,Long,Lat,C_C");
 				bw.newLine();
 				for(int i=0;i<nodeList.size();i++)
 				{
-					bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+					bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", 
+							nodeList.get(i).getId(),
+							nodeList.get(i).getXAsString(), 
+							nodeList.get(i).getYAsString(),
+							null,
+							null,
+							ranker.getVertexScore(nodeList.get(i))));
 
 				}
 			} catch (IOException e) {
@@ -52,21 +58,27 @@ public class JungCentrality {
 			ranker = null;
 		}
 			
-	public static void calculateAndWriteWeightedCloseness(DirectedGraph<MyNode,MyLink> myGraph, String nodeCloseWeighted,
-			ArrayList<MyNode> nodeList) {
-		Transformer<MyLink, Double> wtTransformer = new Transformer<MyLink,Double>(){
-			public Double transform(MyLink link){
+	public static void calculateAndWriteWeightedCloseness(DirectedGraph<NmvNode,NmvLink> myGraph, String nodeCloseWeighted,
+			ArrayList<NmvNode> nodeList) {
+		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
+			public Double transform(NmvLink link){
 				return link.getWeight();
 			}
 		};
-		ClosenessCentrality<MyNode, MyLink> ranker = new ClosenessCentrality<MyNode, MyLink>(myGraph, wtTransformer);
+		ClosenessCentrality<NmvNode, NmvLink> ranker = new ClosenessCentrality<NmvNode, NmvLink>(myGraph, wtTransformer);
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodeCloseWeighted);
 		try{
 			bw.write("NodeID,X,Y,Long,Lat,C_C");
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -83,17 +95,23 @@ public class JungCentrality {
 		ranker = null;
 	}
 		
-	public static void calculateAndWriteUnweightedBetweenness(DirectedGraph<MyNode,MyLink> myGraph,String nodeBetUnweighted,
-			String edgeBetUnweighted, ArrayList<MyNode> nodeList,
-			LinkedList<MyLink> linkList) {
-		BetweennessCentrality<MyNode, MyLink> ranker = new BetweennessCentrality<MyNode, MyLink>(myGraph);
+	public static void calculateAndWriteUnweightedBetweenness(DirectedGraph<NmvNode,NmvLink> myGraph,String nodeBetUnweighted,
+			String edgeBetUnweighted, ArrayList<NmvNode> nodeList,
+			LinkedList<NmvLink> linkList) {
+		BetweennessCentrality<NmvNode, NmvLink> ranker = new BetweennessCentrality<NmvNode, NmvLink>(myGraph);
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodeBetUnweighted);
 		try{
 			bw.write("NodeID,X,Y,Long,Lat,C_B");
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -110,22 +128,28 @@ public class JungCentrality {
 		ranker = null;
 	}
 
-	public static void calculateAndWriteWeightedBetweenness(DirectedGraph<MyNode,MyLink> myGraph,String nodeBetWeighted,
-			String edgeBetWeighted, ArrayList<MyNode> nodeList,
-			LinkedList<MyLink> linkList) {
-		Transformer<MyLink, Double> wtTransformer = new Transformer<MyLink,Double>(){
-			public Double transform(MyLink link){
+	public static void calculateAndWriteWeightedBetweenness(DirectedGraph<NmvNode,NmvLink> myGraph,String nodeBetWeighted,
+			String edgeBetWeighted, ArrayList<NmvNode> nodeList,
+			LinkedList<NmvLink> linkList) {
+		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
+			public Double transform(NmvLink link){
 				return link.getWeight();
 			}
 		};
-		BetweennessCentrality<MyNode, MyLink> ranker = new BetweennessCentrality<MyNode, MyLink>(myGraph,wtTransformer);
+		BetweennessCentrality<NmvNode, NmvLink> ranker = new BetweennessCentrality<NmvNode, NmvLink>(myGraph,wtTransformer);
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodeBetWeighted);
 		try{
 			bw.write("NodeID,X,Y,Long,Lat,C_B");
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.5f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -142,9 +166,9 @@ public class JungCentrality {
 		ranker = null;
 	}
 
-	public static void calculateAndWriteUnweightedEigenvector(DirectedGraph<MyNode,MyLink> myGraph, String nodeEigenUnweighted,
-			ArrayList<MyNode> nodeList) {
-		EigenvectorCentrality<MyNode, MyLink> ranker = new EigenvectorCentrality<MyNode, MyLink>(myGraph);
+	public static void calculateAndWriteUnweightedEigenvector(DirectedGraph<NmvNode,NmvLink> myGraph, String nodeEigenUnweighted,
+			ArrayList<NmvNode> nodeList) {
+		EigenvectorCentrality<NmvNode, NmvLink> ranker = new EigenvectorCentrality<NmvNode, NmvLink>(myGraph);
 		ranker.acceptDisconnectedGraph(true);
 		ranker.evaluate();
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodeEigenUnweighted);
@@ -153,7 +177,13 @@ public class JungCentrality {
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -170,8 +200,8 @@ public class JungCentrality {
 		ranker = null;
 	}
 	
-	public static void calculateAndWriteWeightedEigenvector(DirectedGraph<MyNode,MyLink> myGraph, String nodeEigenWeighted,
-			ArrayList<MyNode> nodeList,final LinkedList<MyLink> linkList) {
+	public static void calculateAndWriteWeightedEigenvector(DirectedGraph<NmvNode,NmvLink> myGraph, String nodeEigenWeighted,
+			ArrayList<NmvNode> nodeList,final LinkedList<NmvLink> linkList) {
 
 		//Create adjacency graph with edgeWeights as values
 		SparseDoubleMatrix2D adj;
@@ -329,7 +359,7 @@ public class JungCentrality {
 		
 		//Set the transition probabilities - METHOD 1 OUT Edges
 		for (int i = 0; i<nodeList.size();i++){
-			MyNode begin = nodeList.get(i);
+			NmvNode begin = nodeList.get(i);
 			int debug = 0;
 //			System.out.println(begin.getId());
 //			System.out.println(myGraph.getOutEdges(begin));
@@ -342,9 +372,9 @@ public class JungCentrality {
 //				}
 				//no idea why it never goes in here!
 
-				MyLink e = (MyLink) o_iter.next();
+				NmvLink e = (NmvLink) o_iter.next();
 				if(e.getTransProb()==-99){
-					MyNode end = myGraph.getOpposite(begin,e);
+					NmvNode end = myGraph.getOpposite(begin,e);
 					int j = nodeList.indexOf(end);
 					double roundOff = (double) Math.round((transProb[i][j]) * 1000000) / 1000000;
 					e.setTransProb(roundOff);
@@ -355,7 +385,7 @@ public class JungCentrality {
 //					}
 				}else{
 					//This is to test whether there are multiple edges with multiple values but there aren't this is not the problem
-					MyNode end = myGraph.getOpposite(begin,e);
+					NmvNode end = myGraph.getOpposite(begin,e);
 					int j = nodeList.indexOf(end);
 					if(e.getTransProb()!=transProb[i][j]){
 						System.out.println("VarkSteaks!!");
@@ -383,10 +413,10 @@ public class JungCentrality {
 		
 		for (int i = 0; i<nodeList.size();i++){
 			double sum=0;
-			MyNode testNode = nodeList.get(i);
+			NmvNode testNode = nodeList.get(i);
 			for (Iterator o_iter = myGraph.getOutEdges(testNode).iterator(); o_iter.hasNext(); )
 			{
-				MyLink e = (MyLink) o_iter.next();
+				NmvLink e = (NmvLink) o_iter.next();
 				sum=sum+e.getTransProb();
 			
 			}
@@ -398,7 +428,7 @@ public class JungCentrality {
 					//add to the smallest element
 					
 					while (s==true&&o_iter.hasNext()){
-						MyLink e = (MyLink) o_iter.next();
+						NmvLink e = (NmvLink) o_iter.next();
 						double current = e.getTransProb();
 						//check that by adding you don't make one element bigger than 1
 						if(current+1-sum<1){
@@ -411,7 +441,7 @@ public class JungCentrality {
 					
 					Iterator o_iter = myGraph.getOutEdges(testNode).iterator();
 					while (s==true&&o_iter.hasNext()){
-						MyLink e = (MyLink) o_iter.next();
+						NmvLink e = (NmvLink) o_iter.next();
 						double current = e.getTransProb();
 						//check that you don't make any element negative
 						if(current-(sum-1)>0){
@@ -435,10 +465,10 @@ public class JungCentrality {
 		System.out.println("TESTING");
 		for (int i = 0; i<nodeList.size();i++){
 			double sum2=0;
-			MyNode testNode2 = nodeList.get(i);
+			NmvNode testNode2 = nodeList.get(i);
 			for (Iterator o_iter = myGraph.getOutEdges(testNode2).iterator(); o_iter.hasNext(); )
 			{
-				MyLink e = (MyLink) o_iter.next();
+				NmvLink e = (NmvLink) o_iter.next();
 				sum2=sum2+e.getTransProb();
 
 			}
@@ -447,12 +477,12 @@ public class JungCentrality {
 			}
 		}
 		
-		Transformer<MyLink, Double> wtTransformer = new Transformer<MyLink,Double>(){
-			public Double transform(MyLink link){
+		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
+			public Double transform(NmvLink link){
 				return link.getTransProb();
 			}
 		};
-		EigenvectorCentrality<MyNode, MyLink> ranker = new EigenvectorCentrality<MyNode, MyLink>(myGraph, wtTransformer);
+		EigenvectorCentrality<NmvNode, NmvLink> ranker = new EigenvectorCentrality<NmvNode, NmvLink>(myGraph, wtTransformer);
 		ranker.acceptDisconnectedGraph(true);
 		ranker.evaluate();
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodeEigenWeighted);
@@ -461,7 +491,13 @@ public class JungCentrality {
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.15f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.15f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 
 			}
 		} catch (IOException e) {
@@ -477,8 +513,8 @@ public class JungCentrality {
 		}
 		System.out.println("Weighted Eigenvector written to file");
 	}
-	public static void calculateAndWriteDegreeCentrality(DirectedGraph<MyNode,MyLink> myGraph, String degreeFile,
-			ArrayList<MyNode> nodeList,final LinkedList<MyLink> linkList){
+	public static void calculateAndWriteDegreeCentrality(DirectedGraph<NmvNode,NmvLink> myGraph, String degreeFile,
+			ArrayList<NmvNode> nodeList,final LinkedList<NmvLink> linkList){
 		int currentDegree;
 		int currentInDegree;
 		int currentOutDegree;
@@ -487,11 +523,17 @@ public class JungCentrality {
 			bdegree.write("NodeID,X,Y,Long,Lat,C_Dtot,C_Din,C_Dout");
 			bdegree.newLine();
 			for (int i=0;i<nodeList.size();i++){
-				MyNode current = nodeList.get(i);
+				NmvNode current = nodeList.get(i);
 				currentDegree=myGraph.degree(current);
 				currentInDegree=myGraph.inDegree(current);
 				currentOutDegree=myGraph.outDegree(current);
-				bdegree.write(String.format("%s,%s,%s,%.6f,%.6f,%d,%d,%d\n", current.getId(),current.getX(), current.getY(),null,null,currentDegree,currentInDegree,currentOutDegree));
+				bdegree.write(String.format("%s,%s,%s,%.6f,%.6f,%d,%d,%d\n", 
+						current.getId(),
+						current.getXAsString(), 
+						current.getYAsString(),
+						null,
+						null,
+						currentDegree,currentInDegree,currentOutDegree));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -506,10 +548,10 @@ public class JungCentrality {
 		}
 		
 	}
-	public static void calculateAndWriteUnweightedPageRank(DirectedGraph<MyNode,MyLink> myGraph, String nodePageRankUnweighted,
-			ArrayList<MyNode> nodeList) {
+	public static void calculateAndWriteUnweightedPageRank(DirectedGraph<NmvNode,NmvLink> myGraph, String nodePageRankUnweighted,
+			ArrayList<NmvNode> nodeList) {
 		double alpha = 0;
-		PageRank<MyNode, MyLink> ranker = new PageRank<MyNode, MyLink>(myGraph,alpha);
+		PageRank<NmvNode, NmvLink> ranker = new PageRank<NmvNode, NmvLink>(myGraph,alpha);
 		ranker.acceptDisconnectedGraph(true);
 		ranker.evaluate();
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodePageRankUnweighted);
@@ -518,7 +560,13 @@ public class JungCentrality {
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), 
+						nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -534,14 +582,14 @@ public class JungCentrality {
 		System.out.println("Unweighted PageRank written to file");
 	}
 
-	public static void calculateAndWriteWeightedPageRank(DirectedGraph<MyNode,MyLink> myGraph, String nodePageRankWeighted,
-			ArrayList<MyNode> nodeList) {
-		Transformer<MyLink, Double> wtTransformer = new Transformer<MyLink,Double>(){
-			public Double transform(MyLink link){
+	public static void calculateAndWriteWeightedPageRank(DirectedGraph<NmvNode,NmvLink> myGraph, String nodePageRankWeighted,
+			ArrayList<NmvNode> nodeList) {
+		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
+			public Double transform(NmvLink link){
 				return link.getWeight();
 			}
 		};
-		EigenvectorCentrality<MyNode, MyLink> ranker = new EigenvectorCentrality<MyNode, MyLink>(myGraph, wtTransformer);
+		EigenvectorCentrality<NmvNode, NmvLink> ranker = new EigenvectorCentrality<NmvNode, NmvLink>(myGraph, wtTransformer);
 		ranker.acceptDisconnectedGraph(true);
 		ranker.evaluate();
 		BufferedWriter bw = IOUtils.getBufferedWriter(nodePageRankWeighted);
@@ -550,7 +598,12 @@ public class JungCentrality {
 			bw.newLine();
 			for(int i=0;i<nodeList.size();i++)
 			{
-				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", nodeList.get(i).getId(),nodeList.get(i).getX(), nodeList.get(i).getY(),null,null,ranker.getVertexScore(nodeList.get(i))));
+				bw.write(String.format("%s,%s,%s,%.6f,%.6f,%.10f\n", 
+						nodeList.get(i).getId(),
+						nodeList.get(i).getXAsString(), nodeList.get(i).getYAsString(),
+						null,
+						null,
+						ranker.getVertexScore(nodeList.get(i))));
 
 			}
 		} catch (IOException e) {
@@ -566,18 +619,18 @@ public class JungCentrality {
 		}
 		System.out.println("Weighted PageRank written to file");
 	}
-	 public static SparseDoubleMatrix2D nadiaGraphToSparseMatrix(DirectedGraph<MyNode,MyLink> g, ArrayList<MyNode> nodeList)
+	 public static SparseDoubleMatrix2D nadiaGraphToSparseMatrix(DirectedGraph<NmvNode,NmvLink> g, ArrayList<NmvNode> nodeList)
 	  {
 		 int numVertices = g.getVertices().size();
 	        SparseDoubleMatrix2D matrix = new SparseDoubleMatrix2D(numVertices,numVertices);
 	        for (int i = 0; i < numVertices; i++)
 	         {
-	            MyNode v = nodeList.get(i);
+	            NmvNode v = nodeList.get(i);
 	            
 	             for (Iterator o_iter = g.getOutEdges(v).iterator(); o_iter.hasNext(); )
 	             {
-	                MyLink e = (MyLink) o_iter.next();
-	                 MyNode w = g.getOpposite(v,e);
+	                NmvLink e = (NmvLink) o_iter.next();
+	                 NmvNode w = g.getOpposite(v,e);
 	                
 	                //find it's position in nodeList
 	                 int j = nodeList.indexOf(w);

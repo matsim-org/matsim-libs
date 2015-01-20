@@ -18,37 +18,6 @@
  * *********************************************************************** */
 
 package playground.nmviljoen.network;
-import edu.uci.ics.jung.graph.DirectedGraph;
-import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
-import edu.uci.ics.jung.graph.Graph;
-import edu.uci.ics.jung.graph.Hypergraph;
-import edu.uci.ics.jung.graph.util.Context;
-import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.algorithms.matrix.GraphMatrixOperations;
-import edu.uci.ics.jung.algorithms.shortestpath.BFSDistanceLabeler;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
-import java.util.Map;
-
-
-import org.apache.commons.collections15.Transformer;
-import org.geotools.filter.expression.ThisPropertyAccessorFactory;
-
-import cern.colt.matrix.impl.SparseDoubleMatrix2D;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,24 +25,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
-import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.algorithms.layout.StaticLayout;
-import edu.uci.ics.jung.algorithms.metrics.Metrics;
-import edu.uci.ics.jung.algorithms.importance.BetweennessCentrality;
-import edu.uci.ics.jung.algorithms.scoring.ClosenessCentrality;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
-
-import java.awt.BasicStroke;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
+import edu.uci.ics.jung.graph.DirectedGraph;
+import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
+import edu.uci.ics.jung.graph.util.EdgeType;
 
 
 /**
@@ -94,7 +51,7 @@ public class MyDirectedGraphCreatorVer2 {
 		private static Double aspectRatioXY = null;
 
 		/** MyNode and MyLink are classes at the end of the script*/
-		DirectedGraph<MyNode, MyLink> myGraph; 
+		DirectedGraph<NmvNode, NmvLink> myGraph; 
 
 		/** Creates a new instance of BasicDirectedGraph */
 		public MyDirectedGraphCreatorVer2() {       
@@ -107,7 +64,7 @@ public class MyDirectedGraphCreatorVer2 {
 		 * AND adds them to an ArrayList for later duplicate prevention*/
 		public void constructGraph(String nodeFile, String numNodes, String linkFile, String weightI) throws FileNotFoundException{
 			System.out.println("Loading nodes into array list...");
-			myGraph = new DirectedSparseMultigraph<MyNode, MyLink>();
+			myGraph = new DirectedSparseMultigraph<NmvNode, NmvLink>();
 
 			//read in and assign nodes
 			String csvFile1 = nodeFile;
@@ -121,8 +78,8 @@ public class MyDirectedGraphCreatorVer2 {
 			int weightIndex = Integer.parseInt(weightI);
 			String[] nodeId = new String[number];
 			int counter =0;
-			ArrayList<MyNode> nodeList = new ArrayList<MyNode>();
-			MyNode currentNode = new MyNode("","", 0, 0);
+			ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>();
+			NmvNode currentNode = new NmvNode("","", 0, 0);
 			try {
 				br1 = new BufferedReader(new FileReader(csvFile1));
 				while ((lineNode = br1.readLine()) != null) {
@@ -134,7 +91,7 @@ public class MyDirectedGraphCreatorVer2 {
 					currentNodeY = Double.parseDouble(nodeData[5]);//for road data files
 //					currentNodeX = Double.parseDouble(nodeData[1]);//for test data files
 //					currentNodeY = Double.parseDouble(nodeData[2]);//for test data files
-					currentNode = new MyNode(counterID,currentNodeId,currentNodeX,currentNodeY);
+					currentNode = new NmvNode(counterID,currentNodeId,currentNodeX,currentNodeY);
 					nodeId[counter]=currentNodeId;
 					nodeList.add(counter, currentNode);
 					counter++;
@@ -190,7 +147,7 @@ public class MyDirectedGraphCreatorVer2 {
 					indexFrom = getNode(nodeList,currentFromId);
 					indexTo = getNode(nodeList,currentToId);
 					currentTransProb = 0;
-					myGraph.addEdge(new MyLink(currentLinkId,currentLinkWeight,currentTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
+					myGraph.addEdge(new NmvLink(currentLinkId,currentLinkWeight,currentTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
 					//System.out.println("Edge "+counter1+" added"); //if you want to track progress
 					counter1++;
 				}
@@ -208,12 +165,12 @@ public class MyDirectedGraphCreatorVer2 {
 					}
 				}
 			}
-			LinkedList<MyLink> linkList = new LinkedList(myGraph.getEdges());
+			LinkedList<NmvLink> linkList = new LinkedList(myGraph.getEdges());
 			System.out.println("Graph created");
 
 		}
 
-		public void testFiles(DirectedGraph<MyNode, MyLink> myGraph2, String graphTestFile, String nodeTestFile, String linkTestFile) throws FileNotFoundException{
+		public void testFiles(DirectedGraph<NmvNode, NmvLink> myGraph2, String graphTestFile, String nodeTestFile, String linkTestFile) throws FileNotFoundException{
 			System.out.println("Writing graph, node set and link set to files... (self-check procedure)");
 			try {
 				File fileNode = new File(graphTestFile);
@@ -303,8 +260,8 @@ public class MyDirectedGraphCreatorVer2 {
 			final MyDirectedGraphCreatorVer2 myApp = new MyDirectedGraphCreatorVer2(); //this was made "final" by one of the visualization transformers
 			myApp.constructGraph(nodeFile,numNodes,linkFile, weightI);  
 			System.out.println("Graph constructed");
-			LinkedList<MyLink> linkList = new LinkedList(myApp.myGraph.getEdges());
-			ArrayList<MyNode> nodeList = new ArrayList<MyNode>(myApp.myGraph.getVertices());
+			LinkedList<NmvLink> linkList = new LinkedList(myApp.myGraph.getEdges());
+			ArrayList<NmvNode> nodeList = new ArrayList<NmvNode>(myApp.myGraph.getVertices());
 			
 
 
@@ -330,7 +287,7 @@ public class MyDirectedGraphCreatorVer2 {
 
 		}
 		//
-		private int getNode(ArrayList<MyNode> list,String id){
+		private int getNode(ArrayList<NmvNode> list,String id){
 			int index = 999999;
 			for (int i=0; i<list.size();i++){ 
 				if(list.get(i).getId().equals(id)){
@@ -340,59 +297,4 @@ public class MyDirectedGraphCreatorVer2 {
 			}
 			return index;
 		}
-
-		class MyNode {
-			String intID;
-			String id;
-			double X;
-			double Y;
-			public MyNode(String intID, String id, double X, double Y) {
-				this.intID = intID;
-				this.id = id;
-				this.X =X;
-				this.Y=Y;
-			}
-			public String toString() {
-				return intID +" "+ id+" "+X+" "+Y+'\n';
-			}        
-			public String getId(){
-				return id;
-			}
-			public String getX(){
-				return Double.toString(X);
-			}
-			public String getY(){
-				return Double.toString(Y);
-			}
-		}
-
-		class MyLink {
-			String id;
-			double weight;//capacity in this case
-			double transProb;
-			public MyLink(String id, double weight, double transProb) {
-				this.id = id;
-				this.weight = weight;
-				this.transProb = -99;
-			} 
-			public String getId(){
-				return id;
-			}
-			public double getWeight(){
-				return weight;
-			}
-			public void setTransProb(double newTransProb){
-				transProb = newTransProb;
-			}
-			public double getTransProb(){
-				return transProb;
-			}
-			public String toString() {
-				return id+" "+weight+'\n';
-			}
-			
-
-		}
-
-	
 }

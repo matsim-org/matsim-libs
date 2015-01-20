@@ -6,16 +6,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
-import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyLink;
-import playground.nmviljoen.network.MyDirectedGraphCreatorVer2.MyNode;
 import edu.uci.ics.jung.algorithms.metrics.Metrics;
 import edu.uci.ics.jung.algorithms.metrics.TriadicCensus;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 
 public class JungClusters {
-	public static void calculateAndWriteClusteringCoefficient(DirectedGraph<MyNode,MyLink> myGraph, String clusterFile){
-		final Map<MyNode,Double> clustCoeffMap;
+	public static void calculateAndWriteClusteringCoefficient(DirectedGraph<NmvNode,NmvLink> myGraph, String clusterFile){
+		final Map<NmvNode,Double> clustCoeffMap;
 		clustCoeffMap= Metrics.clusteringCoefficients(myGraph);
 //		int counter = 0;
 		String nodeID ="";
@@ -35,9 +33,9 @@ public class JungClusters {
 			e.printStackTrace();
 		}
 	}
-	public static void calculateAndWriteWeakComponents(DirectedGraph<MyNode,MyLink> myGraph, String weakCompFile){
-		Set<Set<MyNode>> clusterSet = new HashSet<Set<MyNode>>();
-		WeakComponentClusterer< MyNode, MyLink> weakComps = new WeakComponentClusterer();
+	public static void calculateAndWriteWeakComponents(DirectedGraph<NmvNode,NmvLink> myGraph, String weakCompFile){
+		Set<Set<NmvNode>> clusterSet = new HashSet<Set<NmvNode>>();
+		WeakComponentClusterer< NmvNode, NmvLink> weakComps = new WeakComponentClusterer();
 		clusterSet = weakComps.transform(myGraph);
 		Iterator iter = clusterSet.iterator();
 		try {
@@ -48,11 +46,11 @@ public class JungClusters {
 			bw.write("Component#,NodeID,X,Y");
 			bw.newLine();
 			while (iter.hasNext()) {
-				Set<MyNode> thisCluster = (Set<MyNode>) iter.next();
+				Set<NmvNode> thisCluster = (Set<NmvNode>) iter.next();
 				Iterator nodeIter = thisCluster.iterator();
 				while(nodeIter.hasNext()){
-					MyNode thisNode = (MyNode) nodeIter.next();
-					bw.write(String.format("%d,%s,%s,%s\n", cluster, thisNode.getId(), thisNode.getX(), thisNode.getY()));
+					NmvNode thisNode = (NmvNode) nodeIter.next();
+					bw.write(String.format("%d,%s,%s,%s\n", cluster, thisNode.getId(), thisNode.getXAsString(), thisNode.getYAsString()));
 				}
 				cluster++;
 			}
@@ -65,7 +63,7 @@ public class JungClusters {
 				
 		
 	}
-	public static void calculateAndWriteTriadicCensus(DirectedGraph<MyNode,MyLink> myGraph, String triadFile){
+	public static void calculateAndWriteTriadicCensus(DirectedGraph<NmvNode,NmvLink> myGraph, String triadFile){
 		String[] triadConfig = new String[]{"","003","012","102","021D","021U","021C","111D","111U","030T","030C","201","120D","120U","120C","210","300"};
 		int count;
 		long[] triadArray;
