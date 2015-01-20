@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -31,6 +32,7 @@ import playground.southafrica.utilities.Header;
  * @author jwjoubert
  */
 public class BasicChainAnalyser {
+	final private static Logger LOG = Logger.getLogger(BasicChainAnalyser.class);
 
 	/**
 	 * @param args
@@ -84,6 +86,7 @@ public class BasicChainAnalyser {
 		List<Future<List<String>>> listOfJobs = new ArrayList<Future<List<String>>>();
 		
 		/* Assign each vehicle to a thread. */
+		LOG.info("Processing vehicles (" + files.size() + ")...");
 		Counter counter = new Counter("   vehicles # ");
 		for(File file : files){
 			Callable<List<String>> job = new ProcessorCallable(file, abnormalDays, counter);
@@ -94,8 +97,11 @@ public class BasicChainAnalyser {
 		threadExecutor.shutdown();
 		while(!threadExecutor.isTerminated()){
 		}
+		counter.printCounter();
+		LOG.info("Done processing vehicles.");
 
 		/* Run through all the output and print to file. */
+		LOG.info("Aggregating multi-threaded output.");
 		for(Future<List<String>> job : listOfJobs){
 
 			/* Write this vehicle's output. */
