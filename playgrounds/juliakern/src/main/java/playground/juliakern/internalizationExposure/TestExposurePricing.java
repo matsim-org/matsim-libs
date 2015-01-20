@@ -64,7 +64,7 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
  * @author benjamin
  *
  */
-public class TestEmissionPricing {
+public class TestExposurePricing {
 	
 	static String inputPath = "../../detailedEval/emissions/testScenario/input/";
 	
@@ -110,7 +110,7 @@ public class TestEmissionPricing {
 	
 	public static void main(String[] args) {
 		
-		logger = Logger.getLogger(TestEmissionPricing.class);
+		logger = Logger.getLogger(TestExposurePricing.class);
 		
 		Config config = new Config();
 		config.addCoreModules();
