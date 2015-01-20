@@ -16,7 +16,7 @@ public class CSVWriter extends TableWriter {
 	private final String path;
      private CsvListWriter csvListWriter;
 
-	private CSVWriter(String tableName, String path,
+	public CSVWriter(String tableName, String path,
                       int batchSize, List<PostgresqlColumnDefinition> columns) {
 		super(tableName, batchSize, columns);
 		this.tableName = tableName.toLowerCase().endsWith(".csv")?tableName:tableName+".csv";

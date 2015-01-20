@@ -105,7 +105,7 @@ class PlanResetter {
     public void run() {
         for (Person person : population.getPersons().values()) {
             for (Plan plan : person.getPlans()) {
-                String mode  = Math.random()>0.5?TransportMode.car:TransportMode.pt;
+                String mode  = Math.random()>0.1?TransportMode.car:TransportMode.pt;
                 double lastDepartureTime = 0;
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Activity) {
@@ -113,9 +113,9 @@ class PlanResetter {
                         String type = act.getType();
                         PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getActivityParams(type);
                         if (lastDepartureTime > 0) {
-                            act.setStartTime(lastDepartureTime + random() * 3600);
+                            act.setStartTime(lastDepartureTime + random() *5* 3600);
                         }
-                        act.setEndTime(Math.max(0, act.getStartTime()) + Math.max(random() * 3600, random() * params.getTypicalDuration()));
+                        act.setEndTime(Math.max(0, act.getStartTime()) + random() * 24 * 3600);
                         lastDepartureTime = act.getEndTime();
                     }
                     if (planElement instanceof Leg) {

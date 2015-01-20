@@ -54,7 +54,7 @@ public class TransitPerformanceRecorder {
         return transitPerformance;
     }
 
-    private final TransitPerformance transitPerformance;
+    private TransitPerformance transitPerformance;
     private VehicleTrackerCollection vehicletrackers;
     private Map<Id<Departure>, TransitRoute> departureIdToRoute;
 
@@ -97,6 +97,7 @@ public class TransitPerformanceRecorder {
         @Override
         public void reset(int iteration) {
             vehicletrackers = new VehicleTrackerCollection(scenario.getVehicles().getVehicles().size());
+            transitPerformance = new TransitPerformance();
         }
 
 

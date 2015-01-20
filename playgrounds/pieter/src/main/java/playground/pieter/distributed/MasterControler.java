@@ -30,6 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStats;
 import playground.pieter.distributed.listeners.controler.SlaveScoreWriter;
+import playground.pieter.distributed.listeners.events.transit.BoardingModelStochasticLinear;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformanceRecorder;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
@@ -194,6 +195,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             //order is important
             slave.sendNumber(slaveUniqueNumber++);
             slave.sendNumber(numberOfPSimIterations);
+            slave.sendNumber(config.controler().getLastIteration()*numberOfPSimIterations+numberOfPSimIterations*2);
             slave.sendBoolean(initialRoutingOnSlaves);
             slave.sendBoolean(QuickReplanning);
             slave.sendBoolean(FullTransitPerformanceTransmission);
@@ -270,8 +272,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
-            if(FullTransitPerformanceTransmission)
-                transitPerformanceRecorder = new TransitPerformanceRecorder(scenario,matsimControler.getEvents());
+            if(FullTransitPerformanceTransmission) {
+                transitPerformanceRecorder = new TransitPerformanceRecorder(scenario, matsimControler.getEvents());
+                transitPerformanceRecorder.getTransitPerformance().setBoardingModel(new BoardingModelStochasticLinear());
+            }
         }
 
         matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
@@ -965,6 +969,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     //order is important
                     slave.sendNumber(i);
                     slave.sendNumber(numberOfPSimIterations);
+                    slave.sendNumber(config.controler().getLastIteration()*numberOfPSimIterations);
                     slave.sendBoolean(false);
                     slave.sendBoolean(QuickReplanning);
                     slave.sendBoolean(FullTransitPerformanceTransmission);

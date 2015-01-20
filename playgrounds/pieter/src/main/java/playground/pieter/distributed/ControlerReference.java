@@ -39,12 +39,12 @@ public class ControlerReference {
         this.delegate = new Controler(scenario);
 		delegate.setOverwriteFiles(true);
         delegate.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(delegate.getConfig().planCalcScore(), delegate.getScenario()));
-        delegate.addPlanStrategyFactory("TransitLocationChoice", new PlanStrategyFactory() {
-            @Override
-            public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-                return new TransitLocationChoiceStrategy(scenario);
-            }
-        });
+//        delegate.addPlanStrategyFactory("TransitLocationChoice", new PlanStrategyFactory() {
+//            @Override
+//            public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+//                return new TransitLocationChoiceStrategy(scenario);
+//            }
+//        });
 
         for (Link link : scenario.getNetwork().getLinks().values()) {
             Set<String> modes = new HashSet<>(link.getAllowedModes());

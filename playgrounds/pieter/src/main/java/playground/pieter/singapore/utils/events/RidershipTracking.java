@@ -38,9 +38,14 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -55,6 +60,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
+import playground.pieter.singapore.utils.postgresql.CSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
@@ -120,84 +126,79 @@ public class RidershipTracking {
 		}
 	}
 
-	class RidershipHandler implements BasicEventHandler {
-		private final Set<String> filteredEvents;
-		{
-			filteredEvents = new HashSet<>();
-			filteredEvents.add(TransitDriverStartsEvent.EVENT_TYPE);
-			filteredEvents.add(VehicleArrivesAtFacilityEvent.EVENT_TYPE);
-			filteredEvents.add(VehicleDepartsAtFacilityEvent.EVENT_TYPE);
-			filteredEvents.add(PersonEntersVehicleEvent.EVENT_TYPE);
-			filteredEvents.add(PersonLeavesVehicleEvent.EVENT_TYPE);
-		}
+	class RidershipHandler implements  TransitDriverStartsEventHandler,VehicleArrivesAtFacilityEventHandler,VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+
 
 		@Override
 		public void reset(int iteration) {
+			vehicletrackers = new HashMap<>();
+		}
+
+
+		@Override
+		public void handleEvent(PersonEntersVehicleEvent event) {
+			RidershipTracker tracker = vehicletrackers.get(event.getAttributes().get("vehicle"));
+			//skip car drivers
+			if(tracker == null)	return;
+			tracker.ridershipIncrement(event);
 		}
 
 		@Override
-		public void handleEvent(Event event) {
-			if (filteredEvents.contains(event.getEventType())) {
-				RidershipTracker tracker = null;
-
-				tracker = vehicletrackers.get(event.getAttributes().get("vehicle"));
-				if (tracker == null) {
-					// it's a transit driver starts event, so has a different
-					// attribute for vehid
-					TransitDriverStartsEvent tdse = (TransitDriverStartsEvent) event;
-					tracker = new RidershipTracker(new FullDeparture(tdse.getTransitLineId(), tdse.getTransitRouteId(),
-							tdse.getVehicleId(), tdse.getDepartureId()), tdse.getDriverId());
-					vehicletrackers.put(event.getAttributes().get("vehicleId"), tracker);
-				}
-				if (event.getEventType().equals(VehicleArrivesAtFacilityEvent.EVENT_TYPE)) {
-					VehicleArrivesAtFacilityEvent vehArr = (VehicleArrivesAtFacilityEvent) event;
-					tracker.incrementStopsVisited();
-					Object[] args = { 
-							tracker.fullDeparture.vehicleId, 
-							tracker.fullDeparture.routeId,
-							tracker.fullDeparture.lineId, 
-							vehArr.getFacilityId(),
-                            tracker.stopsVisited,
-                            vehArr.getTime(),
-							tracker.ridership ,
-							tracker.getIncrement()};
-					ridershipWriter.addLine(args);
-				}
-				if (event.getEventType().equals(VehicleDepartsAtFacilityEvent.EVENT_TYPE)) {
-					VehicleDepartsAtFacilityEvent vehDep = (VehicleDepartsAtFacilityEvent) event;
-					Object[] args = { 
-							tracker.fullDeparture.vehicleId, 
-							tracker.fullDeparture.routeId,
-							tracker.fullDeparture.lineId, 
-							vehDep.getFacilityId(),
-                            tracker.stopsVisited,
-                            vehDep.getTime(),
-							tracker.ridership,
-							tracker.getIncrement()};
-					ridershipWriter.addLine(args);
-				}
-				if (event.getEventType().equals(PersonEntersVehicleEvent.EVENT_TYPE)) {
-					tracker.ridershipIncrement((PersonEntersVehicleEvent) event);
-				}
-				if (event.getEventType().equals(PersonLeavesVehicleEvent.EVENT_TYPE)) {
-					tracker.ridershipDecrement((PersonLeavesVehicleEvent) event);
-				}
-
-			}
-
+		public void handleEvent(PersonLeavesVehicleEvent event) {
+			RidershipTracker tracker = vehicletrackers.get(event.getAttributes().get("vehicle"));
+//			skip car drivers
+			if(tracker == null)	return;
+			tracker.ridershipDecrement( event);
 		}
 
+		@Override
+		public void handleEvent(TransitDriverStartsEvent event) {
+			RidershipTracker tracker = new RidershipTracker(new FullDeparture(event.getTransitLineId(), event.getTransitRouteId(),
+					event.getVehicleId(), event.getDepartureId()), event.getDriverId());
+			vehicletrackers.put(event.getAttributes().get("vehicleId"), tracker);
+		}
+
+		@Override
+		public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+			RidershipTracker tracker = vehicletrackers.get(event.getAttributes().get("vehicle"));
+			tracker.incrementStopsVisited();
+			Object[] args = {
+					tracker.fullDeparture.vehicleId,
+					tracker.fullDeparture.routeId,
+					tracker.fullDeparture.lineId,
+					event.getFacilityId(),
+					tracker.stopsVisited,
+					event.getTime(),
+					tracker.ridership ,
+					tracker.getIncrement()};
+			ridershipWriter.addLine(args);
+		}
+
+		@Override
+		public void handleEvent(VehicleDepartsAtFacilityEvent event) {
+			RidershipTracker tracker = vehicletrackers.get(event.getAttributes().get("vehicle"));
+			Object[] args = {
+					tracker.fullDeparture.vehicleId,
+					tracker.fullDeparture.routeId,
+					tracker.fullDeparture.lineId,
+					event.getFacilityId(),
+					tracker.stopsVisited,
+					event.getTime(),
+					tracker.ridership,
+					tracker.getIncrement()};
+			ridershipWriter.addLine(args);
+		}
 	}
 
 	private final ScenarioImpl loRes;
 
-    private final Map<String, RidershipTracker> vehicletrackers;
+    private Map<String, RidershipTracker> vehicletrackers;
 
 	private final String eventsFile;
 	private HashMap<Id, TransitRoute> departureIdToRoute;
 	private final double maxSpeed = 80 / 3.6;
 
-	private PostgresqlCSVWriter ridershipWriter;
+	private CSVWriter ridershipWriter;
 
 	private RidershipTracking(String loResNetwork, String loResSchedule, String loResEvents) {
 		loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -226,13 +227,12 @@ public class RidershipTracking {
 
 	}
 
-	void initWriter(File connectionProperties, String schemaName, String suffix)
+	void initWriter( String suffix)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException,
 			NoConnectionException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
-		// start with activities
-		String actTableName = "" + schemaName + ".matsim_ridership" + suffix;
+		// start with activities		String actTableName = "" + schemaName + ".matsim_ridership" + suffix;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("veh_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("route_id", PostgresType.TEXT));
@@ -242,8 +242,7 @@ public class RidershipTracking {
 		columns.add(new PostgresqlColumnDefinition("time", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("ridership", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("ridership_increment", PostgresType.INT));
-		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
-		ridershipWriter = new PostgresqlCSVWriter("RIDERSHIP", actTableName, actDBA, 1000, columns);
+		ridershipWriter = new CSVWriter("RIDERSHIP", "./",  1000, columns);
 		ridershipWriter.addComment(String.format("MATSim ridership from events file %s, created on %s.", eventsFile,
 				formattedDate));
 	}
@@ -269,7 +268,7 @@ public class RidershipTracking {
 		String loResEvents = args[2];
 		RidershipTracking xfer = new RidershipTracking(loResNetwork, loResSchedule, loResEvents);
 
-		xfer.initWriter(new File(args[3]), args[4], args[5]);
+		xfer.initWriter( args[3]);
 		xfer.run();
 	}
 

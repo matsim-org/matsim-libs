@@ -32,6 +32,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -54,12 +56,13 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculato
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener,Runnable {
+public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, Runnable {
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
@@ -72,8 +75,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private int numberOfIterations = -1;
 
     private int executedPlanCount;
-    private int currentIteration=0;
-    private int masterCurrentIteration=-1;
+    private int currentIteration = 0;
+    private int masterCurrentIteration = -1;
 
     public Config getConfig() {
         return config;
@@ -98,7 +101,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final PlanCatcher plancatcher;
     private TransitPerformance transitPerformance;
 
-    public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
@@ -113,7 +116,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         if (commandLine.hasOption("c")) {
             try {
-                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"),new DestinationChoiceConfigGroup() ) ;;
+                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"), new DestinationChoiceConfigGroup());
+                ;
 
             } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
@@ -156,7 +160,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         /*
         * INITIALIZING COMMS
         * */
-        Socket socket;
+        Socket socket = null;
         int socketNumber = 12345;
         if (commandLine.hasOption("p")) {
             try {
@@ -169,7 +173,15 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         } else {
             System.err.println("Will accept connections on default port number 12345");
         }
-        socket = new Socket(hostname, socketNumber);
+        boolean connected = false;
+        while (!connected) {
+            try {
+                socket = new Socket(hostname, socketNumber);
+                connected = true;
+            } catch (ConnectException e) {
+                Thread.sleep(1000);
+            }
+        }
         this.reader = new ObjectInputStream(socket.getInputStream());
         this.writer = new ObjectOutputStream(socket.getOutputStream());
 
@@ -178,7 +190,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         numberOfPSimIterationsPerCycle = reader.readInt();
         slaveLogger.warn("Running " + numberOfPSimIterationsPerCycle + " PSim iterations for every QSim iter");
-
+        config.controler().setLastIteration(reader.readInt());
         initialRouting = reader.readBoolean();
         quickReplannning = reader.readBoolean();
         fullTransitPerformanceTransmission = reader.readBoolean();
@@ -203,10 +215,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         loadScenario();
 
 
-        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config,quickReplannning,numberOfPSimIterationsPerCycle);
+        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
-        new DistributedPlanStrategyTranslationAndRegistration(this.matsimControler,plancatcher,quickReplannning,numberOfPSimIterationsPerCycle);
+        new DistributedPlanStrategyTranslationAndRegistration(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
         linkTravelTimes = new FreeSpeedTravelTime();
@@ -218,6 +230,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //                include(new ScoreStatsModule());
                 include(new TripRouterModule());
                 include(new StrategyManagerModule());
+                include(new TravelDisutilityModule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });
@@ -292,7 +305,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private void loadScenario() {
         slaveLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
         new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-        if(config.facilities().getInputFile()!=null)new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
+        if (config.facilities().getInputFile() != null)
+            new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
         if (config.scenario().isUseTransit()) {
             new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
             if (this.config.scenario().isUseVehicles()) {
@@ -301,7 +315,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         SlaveControler slave = new SlaveControler(args);
         new Thread(slave).start();
         System.out.printf("Enter KILL to kill the slave: ");
@@ -389,7 +403,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
         plansCopyForSending = tempPlansCopyForSending;
-        slaveLogger.warn("Sending " + plansCopyForSending.size()+" plans...");
+        slaveLogger.warn("Sending " + plansCopyForSending.size() + " plans...");
         writer.writeInt(currentIteration);
         writer.writeInt(masterCurrentIteration);
         writer.writeObject(plansCopyForSending);
@@ -399,17 +413,17 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     public void transmitTravelTimes() throws IOException, ClassNotFoundException {
         slaveLogger.warn("RECEIVING travel times...");
-        masterCurrentIteration  =reader.readInt();
+        masterCurrentIteration = reader.readInt();
         linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
         if (config.scenario().isUseTransit()) {
             stopStopTimes = (StopStopTime) reader.readObject();
             waitTimes = (WaitTime) reader.readObject();
-            if(fullTransitPerformanceTransmission) {
+            if (fullTransitPerformanceTransmission) {
                 Object o = reader.readObject();
                 transitPerformance = (TransitPerformance) o;
             }
         }
-        slaveLogger.warn("RECEIVING travel times completed. Master at iteration number "+masterCurrentIteration);
+        slaveLogger.warn("RECEIVING travel times completed. Master at iteration number " + masterCurrentIteration);
     }
 
     public void transmitPerformance() throws IOException {
@@ -454,12 +468,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void distributePersons() throws IOException, ClassNotFoundException {
-        int masterCurrentIteration  =reader.readInt();
+        int masterCurrentIteration = reader.readInt();
         List<PersonSerializable> personSerializables = (List<PersonSerializable>) reader.readObject();
         addPersons(personSerializables);
         iterationTimes = new ArrayList<>();
         executedPlanCount = 0;
-        slaveLogger.warn("Received " + personSerializables.size()+" persons. Master.currentIteration = "+ masterCurrentIteration);
+        slaveLogger.warn("Received " + personSerializables.size() + " persons. Master.currentIteration = " + masterCurrentIteration);
     }
 
     public void poolPersons() throws IOException {
@@ -536,7 +550,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     private void dumpPlans() throws IOException {
         List<PersonSerializable> temp = new ArrayList<>();
-        for(Person p: scenario.getPopulation().getPersons().values())
+        for (Person p : scenario.getPopulation().getPersons().values())
             temp.add(new PersonSerializable((PersonImpl) p));
         writer.writeObject(temp);
     }
@@ -554,23 +568,24 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         return matsimControler;
     }
 
-    public void addPlansForPsim(Plan plan){
+    public void addPlansForPsim(Plan plan) {
         plancatcher.addPlansForPsim(plan);
     }
+
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
         selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
-        if (event.getIteration()==0) {
+        if (event.getIteration() == 0) {
             plancatcher.init();
             for (Person person : scenario.getPopulation().getPersons().values()) {
                 plancatcher.addPlansForPsim(person.getSelectedPlan());
             }
-        }else{
+        } else {
             for (Person person : scenario.getPopulation().getPersons().values()) {
-                selectedPlanScoreMemory.put(person.getId(),person.getSelectedPlan().getScore());
+                selectedPlanScoreMemory.put(person.getId(), person.getSelectedPlan().getScore());
             }
-            for(Plan plan:plancatcher.getPlansForPSim()){
+            for (Plan plan : plancatcher.getPlansForPSim()) {
                 selectedPlanScoreMemory.remove(plan.getPerson().getId());
             }
         }
@@ -584,7 +599,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         Iterator<Map.Entry<Id<Person>, Double>> iterator = selectedPlanScoreMemory.entrySet().iterator();
         StopStopTimeCalculatorSerializable.printCallStatisticsAndReset();
         WaitTimeCalculatorSerializable.printCallStatisticsAndReset();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Map.Entry<Id<Person>, Double> entry = iterator.next();
             scenario.getPopulation().getPersons().get(entry.getKey()).getSelectedPlan().setScore(entry.getValue());
         }
