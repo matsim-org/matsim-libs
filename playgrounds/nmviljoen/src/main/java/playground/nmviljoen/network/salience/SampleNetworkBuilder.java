@@ -12,14 +12,12 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.swing.JFrame;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.collections15.Factory;
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.xml.sax.SAXException;
 
 import playground.nmviljoen.network.NmvLink;
 import playground.nmviljoen.network.NmvNode;
@@ -81,7 +79,7 @@ public class SampleNetworkBuilder {
 		return generator.create();
 	}
 	
-	public void writeGraphML(Graph<NmvNode, NmvLink> graph, String filename){
+	public static void writeGraphML(Graph<NmvNode, NmvLink> graph, String filename){
 		/* Build all the node transformers. */
 		Transformer<NmvNode, String> nodeIdT = new Transformer<NmvNode, String>() {
 			@Override
@@ -199,7 +197,7 @@ public class SampleNetworkBuilder {
 
 		/* Build the sample network. */
 		SampleNetworkBuilder snb = new SampleNetworkBuilder(seed);
-		Graph<NmvNode, NmvLink> graph1 = snb.buildEppsteinGraph(2000, 500000, 1000);
+		Graph<NmvNode, NmvLink> graph1 = snb.buildEppsteinGraph(2000, 200000, 20000);
 		Graph<NmvNode, NmvLink> graph2 = snb.buildTestGraph();
 		Graph<NmvNode, NmvLink> graph = graph1;
 		
@@ -207,6 +205,16 @@ public class SampleNetworkBuilder {
 		snb.writeGraphML(graph, filename);
 
 		/* Visualise the graph. */
+//		snb.visualizeGraph(graph);
+		
+		/* Now read the graph back in. */
+//		Graph<NmvNode, NmvLink> newGraph = snb.readGraphML(filename);
+//		graph.equals(newGraph);
+		
+		Header.printFooter();
+	}
+	
+	private void visualizeGraph(Graph<NmvNode, NmvLink> graph){
 		Layout<NmvNode, NmvLink> layoutCircle = new CircleLayout<NmvNode, NmvLink>(graph);
 		Transformer<NmvNode, Point2D> transformer = new Transformer<NmvNode, Point2D>() {
 			@Override
@@ -217,7 +225,7 @@ public class SampleNetworkBuilder {
 			}
 		};
 		Layout<NmvNode, NmvLink> layoutStatic = new StaticLayout<NmvNode, NmvLink>(graph, transformer );
-
+		
 		layoutStatic.setSize(new Dimension(400,400));
 		BasicVisualizationServer<NmvNode, NmvLink> vv =
 				new BasicVisualizationServer<NmvNode,NmvLink>(layoutCircle);
@@ -227,12 +235,6 @@ public class SampleNetworkBuilder {
 		frame.getContentPane().add(vv);
 		frame.pack();
 		frame.setVisible(true);
-		
-		/* Now read the graph back in. */
-		Graph<NmvNode, NmvLink> newGraph = snb.readGraphML(filename);
-		graph.equals(newGraph);
-		
-		Header.printFooter();
 	}
 
 	private Graph<NmvNode, NmvLink> buildTestGraph() {

@@ -2,11 +2,16 @@ package playground.nmviljoen.network.salience;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
@@ -19,7 +24,6 @@ import org.matsim.matrices.Matrix;
 import playground.nmviljoen.network.NmvLink;
 import playground.nmviljoen.network.NmvNode;
 import playground.southafrica.utilities.Header;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraDistance;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.Graph;
@@ -43,13 +47,16 @@ public class SalienceCalculator {
 		Header.printHeader(SalienceCalculator.class.toString(), args);
 		
 		String graphFilename = args[0];
-		String outputFilename = args[1];
+		String salienceFilename = args[1];
+		String degreeFilename = args[2];
+		int numberOfThreads = Integer.parseInt(args[3]);
 		
 		Graph<NmvNode, NmvLink> graph = SampleNetworkBuilder.readGraphML(graphFilename);
 		
 		SalienceCalculator sc = new SalienceCalculator(graph);
-		Map<NmvLink, Double> salienceMap = sc.calculateShortestPathTrees();
-		sc.writeSalienceToFile(outputFilename, salienceMap);
+		sc.writeDegreeDistributionToFile(degreeFilename, graph);
+		Map<NmvLink, Double> salienceMap = sc.calculateSalience(numberOfThreads);
+		sc.writeSalienceToFile(salienceFilename, salienceMap);
 
 		Header.printFooter();
 	}
@@ -59,7 +66,7 @@ public class SalienceCalculator {
 		this.graph = graph;
 	}
 	
-	private Map<NmvLink, Double> calculateShortestPathTrees(){
+	private Map<NmvLink, Double> calculateSalience(int numberOfThreads){
 		Transformer<NmvLink, Double> weightTransformer = new Transformer<NmvLink, Double>() {
 			@Override
 			public Double transform(NmvLink arg0) {
@@ -71,20 +78,140 @@ public class SalienceCalculator {
 		LOG.info("Calculating the shortest path trees for all root nodes.");
 		Matrices matrices = new Matrices();
 		
+		/* Set up the multi-threaded infrastructure. */
+		ExecutorService threadExecutorSpt = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<Matrix>> listOfJobsSpt = new ArrayList<Future<Matrix>>();
+		
 		DijkstraShortestPath<NmvNode, NmvLink> dsp = new DijkstraShortestPath<NmvNode, NmvLink>(this.graph, weightTransformer);
 		Iterator<NmvNode> iteratorO = graph.getVertices().iterator();
+		
+		Counter sptCounter = new Counter("   root node # ");
 		while(iteratorO.hasNext()){
-			NmvNode source = iteratorO.next();
-//			LOG.info("Source node: " + source.getId());
-			Matrix matrix = matrices.createMatrix(source.getId(), "");
+			NmvNode node = iteratorO.next();
+			Callable<Matrix> job = new sptCallable(this.graph, node, dsp, sptCounter);
+			Future<Matrix> result = threadExecutorSpt.submit(job);
+			listOfJobsSpt.add(result);
+		}
+
+		threadExecutorSpt.shutdown();
+		while(!threadExecutorSpt.isTerminated()){
+		}
+		sptCounter.printCounter();
+		
+		/* Aggregate the output. */
+		for(Future<Matrix> job : listOfJobsSpt){
+			Matrix matrix = null;
+			try {
+				matrix = job.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot get multithreaded shortest path tree for root node.");
+			}
+			matrices.getMatrices().put(matrix.getId(), matrix);
+		}
+		LOG.info("Done calculating the shortest path trees.");
+		LOG.info("  |_ Number of matrices: " + matrices.getMatrices().size());
+		
+		
+		/* Calculate the salience for each link. First set up the multi-threaded 
+		 * infrastructure*/
+		LOG.info("Calculating link salience for each link...");
+		ExecutorService threadExecutorSalience = Executors.newFixedThreadPool(numberOfThreads);
+		List<Future<Map<NmvLink, Double>>> listOfJobsSalience = new ArrayList<Future<Map<NmvLink, Double>>>();
+		
+		Counter salienceCounter = new Counter("   links # ");
+		Iterator<NmvLink> linkIterator = this.graph.getEdges().iterator();
+		while(linkIterator.hasNext()){
+			NmvLink link = linkIterator.next();
+			Callable<Map<NmvLink, Double>> job = new salienceCallable(this.graph, matrices, link, salienceCounter);
+			Future<Map<NmvLink, Double>> result = threadExecutorSalience.submit(job);
+			listOfJobsSalience.add(result);
+		}
+		
+		threadExecutorSalience.shutdown();
+		while(!threadExecutorSalience.isTerminated()){
+		}
+		salienceCounter.printCounter();
+		
+		/* Aggregate the output. */
+		Map<NmvLink, Double> salienceMap = new TreeMap<NmvLink, Double>();
+		for(Future<Map<NmvLink, Double>> job : listOfJobsSalience){
+			Map<NmvLink, Double> result = null;
+			try {
+				result = job.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot get multithreaded salience results.");
+			}
+			for(NmvLink link : result.keySet()){
+				salienceMap.put(link, result.get(link));
+			}
+		}
+		
+		LOG.info("Done calculating the salience.");
+		return salienceMap;
+	}
+	
+	private class salienceCallable implements Callable<Map<NmvLink, Double>>{
+		private Graph<NmvNode, NmvLink> graph;
+		private Matrices matrices;
+		private NmvLink link;
+		private Counter counter;
+		
+		public salienceCallable(Graph<NmvNode, NmvLink> graph, Matrices matrices, NmvLink link, Counter counter) {
+			this.graph = graph;
+			this.matrices = matrices;
+			this.link = link;
+			this.counter = counter;
+		}
+		
+		@Override
+		public Map<NmvLink, Double> call() throws Exception {
+			Map<NmvLink, Double> result = new TreeMap<NmvLink, Double>();
 			
-			Iterator<NmvNode> iteratorD = graph.getVertices().iterator();
+			Pair<NmvNode> nodes = this.graph.getEndpoints(this.link);
+			String o = nodes.getFirst().getId();
+			String d = nodes.getSecond().getId();
+			double total = 0.0;
+			for(Matrix m : this.matrices.getMatrices().values()){
+				Entry entry = m.getEntry(o, d);
+				if(entry != null){
+					total += entry.getValue();
+				}
+			}
+			
+			double salience = total / ((double) this.graph.getVertexCount());
+			result.put(this.link, salience);
+			
+			this.counter.incCounter();
+			return result;
+		}
+	}
+	
+	private class sptCallable implements Callable<Matrix>{
+		private DijkstraShortestPath<NmvNode, NmvLink> dsp;
+		private Graph<NmvNode, NmvLink> graph;
+		private NmvNode node;
+		private Counter counter;
+		
+		public sptCallable(Graph<NmvNode, NmvLink> graph, NmvNode node, DijkstraShortestPath<NmvNode, NmvLink> dijkstra, Counter counter) {
+			this.graph = graph;
+			this.node = node;
+			this.dsp = dijkstra;
+			this.counter = counter;
+		}
+		
+		@Override
+		public Matrix call() throws Exception {
+			NmvNode source = this.node;
+			Matrix matrix = new Matrix(this.node.getId(), "");
+			
+			Iterator<NmvNode> iteratorD = this.graph.getVertices().iterator();
 			while(iteratorD.hasNext()){
 				NmvNode target = iteratorD.next();
-//				LOG.info("Target node: " + target.getId());
-				List<NmvLink> path = dsp.getPath(source, target);
+				List<NmvLink> path = this.dsp.getPath(source, target);
 				for(NmvLink link : path){
-					Pair<NmvNode> nodes = graph.getEndpoints(link);
+					Pair<NmvNode> nodes = this.graph.getEndpoints(link);
 					
 					/* Check if the entry already exists. */
 					String o = nodes.getFirst().getId();
@@ -94,50 +221,9 @@ public class SalienceCalculator {
 					} 
 				}
 			}
+			this.counter.incCounter();
+			return matrix;
 		}
-		LOG.info("Done calculating the shortest path trees.");
-		
-		/* Calculate the salience for each link. */
-		LOG.info("Calculating link salience for each link...");
-		Counter counter = new Counter("  links # ");
-		Map<NmvLink, Double> salienceMap = new TreeMap<NmvLink, Double>();
-		Iterator<NmvLink> linkIterator = graph.getEdges().iterator();
-		while(linkIterator.hasNext()){
-			NmvLink link = linkIterator.next();
-			Pair<NmvNode> nodes = graph.getEndpoints(link);
-			String o = nodes.getFirst().getId();
-			String d = nodes.getSecond().getId();
-			double total = 0.0;
-			for(Matrix m : matrices.getMatrices().values()){
-				Entry entry = m.getEntry(o, d);
-				if(entry != null){
-					total += entry.getValue();
-				}
-			}
-			
-			double salience = total / ((double) graph.getVertexCount());
-			salienceMap.put(link, salience);
-			counter.incCounter();
-		}
-		counter.printCounter();
-		
-		LOG.info("Done calculating the salience.");
-		return salienceMap;
-	}
-	
-	private class sptCallable implements Callable<Matrix>{
-		private DijkstraShortestPath<NmvNode, NmvLink> dsp;
-		
-		public sptCallable(DijkstraShortestPath<NmvNode, NmvLink> dijkstra) {
-			this.dsp = dijkstra;
-		}
-		
-		@Override
-		public Matrix call() throws Exception {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
 	}
 	
 	public void writeSalienceToFile(String filename, Map<NmvLink, Double> salience){
@@ -164,6 +250,34 @@ public class SalienceCalculator {
 		}
 		
 		LOG.info("Done writing salience results to file.");
+	}
+	
+	public void writeDegreeDistributionToFile(String filename, Graph<NmvNode, NmvLink> graph){
+		LOG.info("Writing degree data to " + filename);
+		
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try{
+			bw.write("Id,inDegree,outDegree,degree");
+			bw.newLine();
+			
+			for(NmvNode node : graph.getVertices()){
+				int in = graph.getPredecessorCount(node);
+				int out = graph.getSuccessorCount(node);
+				bw.write(String.format("%s,%d,%d,%d\n", node.getId(), in, out, in+out));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		
+		
 	}
 	
 	
