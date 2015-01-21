@@ -1,6 +1,5 @@
 package playground.jjoubert.projects.freightPopulation;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -22,12 +21,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
@@ -35,6 +28,12 @@ import playground.southafrica.freight.digicore.io.DigicoreVehicleReader;
 import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 public class CheckTestSetActivityChains {
 	final private static Logger LOG = Logger.getLogger(CheckTestSetActivityChains.class);
@@ -85,7 +84,7 @@ public class CheckTestSetActivityChains {
 		}
 		LOG.info("Total number of vehicles identified: " + vehicles.size());
 		
-		ABNORMAL_LIST = readAbnormalDays(abnormalDaysFile);
+		ABNORMAL_LIST = DigicoreUtils.readAbnormalDays(abnormalDaysFile);
 		setUpAreaGeometries(shapefileFolder);
 		
 		CheckTestSetActivityChains ctsa = new CheckTestSetActivityChains();
@@ -174,7 +173,7 @@ public class CheckTestSetActivityChains {
 		/* Read Cape Town */
 		ShapeFileReader ctReader = new ShapeFileReader();
 		ctReader.readFileAndInitialize(folder + "CapeTown/zones/CapeTown_MN2011_SA-Albers.shp");
-		SimpleFeature ctFeature = gReader.getFeatureSet().iterator().next(); /* Just get the first one. */
+		SimpleFeature ctFeature = ctReader.getFeatureSet().iterator().next(); /* Just get the first one. */
 		if(ctFeature.getDefaultGeometry() instanceof MultiPolygon){
 			CAPETOWN = (MultiPolygon)ctFeature.getDefaultGeometry();
 			CAPETOWN_ENVELOPE = CAPETOWN.getEnvelope();
@@ -185,7 +184,7 @@ public class CheckTestSetActivityChains {
 		etReader.readFileAndInitialize(folder + "eThekwini/zones/eThekwini_MN2011_SA-Albers.shp");
 		SimpleFeature etFeature = etReader.getFeatureSet().iterator().next(); /* Just get the first one. */
 		if(etFeature.getDefaultGeometry() instanceof MultiPolygon){
-			ETHEKWINI = (MultiPolygon)saFeature.getDefaultGeometry();
+			ETHEKWINI = (MultiPolygon)etFeature.getDefaultGeometry();
 			ETHEKWINI_ENVELOPE = ETHEKWINI.getEnvelope();
 		}
 		LOG.info("Done parsing geometries.");
@@ -270,38 +269,6 @@ public class CheckTestSetActivityChains {
 		return found;
 	}
 
-	private static List<String> readAbnormalDays(String filename){
-		LOG.info("Reading abnormal days from " + filename);
-		
-		List<String> list = new ArrayList<String>();
-		BufferedReader br = IOUtils.getBufferedReader(filename);
-		try{
-			String line = null;
-			while((line=br.readLine()) != null){
-				list.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read from abnormal days file.");
-		} finally{
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close abnormal days file.");
-			}
-		}
-		LOG.info("Number of abnormal days read: " + list.size());
-		return list;
-	}
-	
-	private String getShortDate(GregorianCalendar cal){
-		int year = cal.get(Calendar.YEAR);
-		int month = cal.get(Calendar.MONTH)+1;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		
-		return String.format("%d/%02d/%02d", year, month, day);
-	}
 	
 	private boolean isValidDay(GregorianCalendar cal){
 		boolean valid = false;
@@ -310,7 +277,7 @@ public class CheckTestSetActivityChains {
 		/* Check that it is a weekday. */
 		if(dayOfWeek > 1 && dayOfWeek < 7){
 			/* Check that it is a normal day. */
-			String s = getShortDate(cal);
+			String s = DigicoreUtils.getShortDate(cal);
 			if(!ABNORMAL_LIST.contains(s)){
 				valid = true;
 			}
@@ -349,7 +316,7 @@ public class CheckTestSetActivityChains {
 					String extent = evaluateExtent(chain);
 					
 					this.outputList.add(String.format("%s,%s,%d,%d,%s\n", 
-							dv.getId().toString(), getShortDate(chainStart), hour, numberOfActivities, extent));
+							dv.getId().toString(), DigicoreUtils.getShortDate(chainStart), hour, numberOfActivities, extent));
 				}
 			}
 			
