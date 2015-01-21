@@ -1,22 +1,6 @@
 package playground.tobiqui.master;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -26,19 +10,19 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 
 public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	
-	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
+	private List<Person> persons;
 	private Map<Id<VehicleType>, VehicleType> vehicleTypes = new LinkedHashMap<Id<VehicleType>, VehicleType>();
 	private Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<Id<Vehicle>, Vehicle>();
 	private Map<Id<Vehicle>, Integer> vehicles2BSorted = new LinkedHashMap<Id<Vehicle>, Integer>();
@@ -48,7 +32,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	private List<Tuple<String,String>> vType = new ArrayList<Tuple<String,String>>();
 	private List<Tuple<String,String>> list = new ArrayList<Tuple<String,String>>();
 	
-	public TqSumoRoutesWriter(Map<Id<Person>, Person> persons, Map<Id<VehicleType>, VehicleType> vehicleTypes, 
+	public TqSumoRoutesWriter(List<Person> persons, Map<Id<VehicleType>, VehicleType> vehicleTypes,
 								Map<Id<Vehicle>, Vehicle> vehicles, TransitSchedule transitSchedule, String outputfile){
 		this.persons = persons;
 		this.vehicleTypes = vehicleTypes;
@@ -225,7 +209,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	}
 	
 	public void writePersons(){
-		Iterator<?> ii = persons.entrySet().iterator();
+		Iterator<?> ii = persons.iterator();
 		while (ii.hasNext()) {
 			Map.Entry<Id<Person>, Person> pairs = (Entry<Id<Person>, Person>) ii.next();
 			Id<Person> id = pairs.getKey();
@@ -304,12 +288,11 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 //		Id<Vehicle>> pairsV = (Entry<Id<Vehicle>>) i.next();
 //		Id<Vehicle> idV = (Id<Vehicle>) i.next();
 		while (i.hasNext()){
-			Iterator<?> ii = persons.entrySet().iterator();
+			Iterator<Person> ii = persons.iterator();
 			Id<Vehicle> idV = (Id<Vehicle>) i.next();
 			while (ii.hasNext()) {
-				Map.Entry<Id<Person>, Person> pairs = (Entry<Id<Person>, Person>) ii.next();
-				Id<Person> id = pairs.getKey();
-				Person p = (Person) pairs.getValue();
+				Person p = ii.next();
+				Id<Person> id = p.getId();
 				PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 				Boolean next = false;
 				
@@ -421,7 +404,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	}
 	
 	public Set<Id<Vehicle>> getVehiclesSortedByDeparture(){
-		Iterator<?> ii = persons.entrySet().iterator();
+		Iterator<?> ii = persons.iterator();
 		while (ii.hasNext()) {
 			Map.Entry<Id<Person>, Person> pairs = (Entry<Id<Person>, Person>) ii.next();
 			Id<Person> id = pairs.getKey();

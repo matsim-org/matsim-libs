@@ -1,22 +1,14 @@
 package playground.tobiqui.master;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -40,8 +32,7 @@ public class Test {
 		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo.xml";
 		String populationOutput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestSorted.xml"; //if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
 		
-		Map<Id<Person>, Person> persons = new HashMap<Id<Person>, Person>(); 
-		Map<Id<Person>, Person> personsSorted = new LinkedHashMap<Id<Person>, Person>(); //id's sorted by end_times of first activity of selectedPlans 
+		Map<Id<Person>, Person> persons = new HashMap<Id<Person>, Person>();
 		Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
 		Map<Id<VehicleType>, VehicleType> vehicleTypes = new HashMap<Id<VehicleType>, VehicleType>();
 		
@@ -56,15 +47,28 @@ public class Test {
 		TqMatsimPlansReader pr = new TqMatsimPlansReader(populationInput);
 		persons = pr.getPlans();
 		System.out.println("getPlans completed");
-		
-	//if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
+
+        List<Person> personsSorted = new ArrayList<Person>(persons.values()); //id's sorted by end_times of first activity of selectedPlans
+        Collections.sort(personsSorted, new Comparator<Person>() {
+            @Override
+            public int compare(Person o1, Person o2) {
+                return Double.compare(firstActivityEndTime(o1), firstActivityEndTime(o2));
+            }
+
+            private double firstActivityEndTime(Person o1) {
+                return ((Activity) o1.getSelectedPlan().getPlanElements().get(0)).getEndTime();
+            }
+        });
+
+
+        //if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
 //		personsSorted = pr.sortPlans(persons);
 //		System.out.println("sortPlans completed");
 //		pr.writeSortedPopulation(pr.getSortedPopulation(), populationOutput);
 //		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(personsSorted, vehicleTypes, vehicles, transitSchedule, output);
 		
 	//else if inputPopulation (input) already sorted by end_times of activity of selectedPlans:
-		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(persons, vehicleTypes, vehicles, transitSchedule, output); 
+		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(personsSorted, vehicleTypes, vehicles, transitSchedule, output);
 		
 		routesWriter.writeFile();
 	}
