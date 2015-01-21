@@ -69,25 +69,25 @@ public class ElectricCBMain
         this.scenario = ScenarioUtils.loadScenario(config);
         
         ChargingHandler ch = new ChargingHandler();
-        for (Person person : scenario.getPopulation().getPersons().values()){
-            Id<Person> personId = person.getId();
-            String pNoString = personId.toString().split("_")[0];
-            if (pNoString.endsWith("00")){
-                
-                Id<Vehicle> vid =  Id.create(personId, Vehicle.class);
-                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600,vid);
-                this.bevs.put(vid, bev);
-                
-                Activity act = (Activity)person.getPlans().get(0).getPlanElements().get(2);
-                Id<Link> linkId = act.getLinkId();
-                Id<Charger> chargerId = Id.create(linkId+"_"+pNoString, Charger.class);
-                ChargerImpl c = new ChargerImpl(chargerId, linkId, 4, 1);
-                ch.addCharger(c);
-                
-            }
-            
-        }
-        ch.addVehicles(bevs);
+//        for (Person person : scenario.getPopulation().getPersons().values()){
+//            Id<Person> personId = person.getId();
+//            String pNoString = personId.toString().split("_")[0];
+//            if (pNoString.endsWith("00")){
+//                
+//                Id<Vehicle> vid =  Id.create(personId, Vehicle.class);
+//                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600,vid);
+//                this.bevs.put(vid, bev);
+//                
+//                Activity act = (Activity)person.getPlans().get(0).getPlanElements().get(2);
+//                Id<Link> linkId = act.getLinkId();
+//                Id<Charger> chargerId = Id.create(linkId+"_"+pNoString, Charger.class);
+//                ChargerImpl c = new ChargerImpl(chargerId, linkId, 4, 1);
+//                ch.addCharger(c);
+//                
+//            }
+//            
+//        }
+//        ch.addVehicles(bevs);
         EnergyConsumptionTracker ect = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
         EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
         

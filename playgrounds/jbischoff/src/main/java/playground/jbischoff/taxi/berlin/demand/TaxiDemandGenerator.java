@@ -54,7 +54,7 @@ public class TaxiDemandGenerator
     public static void main(String[] args)
     {
 
-        for (double i = 1.0; i<3.1; i = i+0.1){
+        for (double i = 1.0; i<5.1; i = i+0.1){
         TaxiDemandGenerator tdg = new TaxiDemandGenerator();
         tdg.generateDemand("20130416040000", "20130417030000",i);
         tdg.writeDemand(i);

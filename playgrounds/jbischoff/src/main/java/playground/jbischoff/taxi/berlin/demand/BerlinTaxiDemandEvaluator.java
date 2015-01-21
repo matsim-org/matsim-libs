@@ -34,8 +34,8 @@ public class BerlinTaxiDemandEvaluator
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat filenameformat = new SimpleDateFormat("yyyyMMddHHmmss");
 
-//   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
-   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\";
+   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
+//   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\";
 
 
     /**
@@ -46,10 +46,16 @@ public class BerlinTaxiDemandEvaluator
     {
         BerlinTaxiDemandEvaluator bte = new BerlinTaxiDemandEvaluator();
 //        Date start = filenameformat.parse("20130415000000");
-        Date start = filenameformat.parse("20140407000000");
+//        Date start = filenameformat.parse("20140407000000");
 //        Date end = filenameformat.parse("20130421230000");
-        Date end = filenameformat.parse("20140413230000");
+//        Date end = filenameformat.parse("20140413230000");
 //        bte.read(fileprefix+"demandMatrices.xml",start, end);
+        
+        
+        Date start = filenameformat.parse("20130416040000");
+        Date end = filenameformat.parse("20130417040100");
+      
+        
         bte.dumpSym(fileprefix+"demandMatrices.xml",start, end);
 //        Id alex = Id.create("01011303");
 //        Id friedrichshain = Id.create("02040701");
@@ -155,13 +161,13 @@ public class BerlinTaxiDemandEvaluator
         allZones.addAll(toDemand.keySet());
         
         try {
-            BufferedWriter bw = IOUtils.getBufferedWriter(fileprefix+"symdemand.txt");
+            BufferedWriter bw = IOUtils.getBufferedWriter(fileprefix+"symdemand_tuesday.txt");
             for (Id<Zone> zid : allZones){
                 double from = 0;
                 double to = 0;
                 if (fromDemand.containsKey(zid)) from = fromDemand.get(zid);
                 if (toDemand.containsKey(zid)) to= toDemand.get(zid);
-                bw.append(zid.toString()+"\t"+from+"\t"+to+"\n");
+                bw.append(zid.toString()+"\t"+Math.round(from)+"\t"+Math.round(to)+"\t"+Math.round(from+to)+"\n");
             }
             bw.flush();
             bw.close();

@@ -157,7 +157,7 @@ public class TaxiStatusDataAnalyser
     public static void main(String[] args)
     {
 //        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
-        String dir = "c:/local_jb/data/taxi_berlin/2013/status/";
+        String dir = "c:/local_jb/data/taxi_berlin/2014/status/";
         String statusMatricesFile = dir + "statusMatrix.xml.gz";
 
         String averagesFile = dir + "averages.csv";
@@ -169,15 +169,85 @@ public class TaxiStatusDataAnalyser
         String avgStatusMatricesXmlFile = dir + "statusMatrixAvg.xml";
         String avgStatusMatricesTxtFile = dir + "statusMatrixAvg.txt";
 
+        String zonalStatuses = dir + "statusByZone.txt";
+
+//
         Matrices statusMatrices = MatrixUtils.readMatrices(statusMatricesFile);
+//
+//                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
+//                        taxisOverTimeFile);
+//
+        writeStatusByZone(statusMatrices, zonalStatuses);
+//        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
+//        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
+//
+//        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
+//                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
+    }
 
-                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
-                        taxisOverTimeFile);
 
-        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
-        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
-
-        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
-                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
+    private static void writeStatusByZone(Matrices statusMatrices, String zonalStatuses)
+    {   
+            Map<String,IdleStatusEntry> statuses = new TreeMap<String, IdleStatusEntry>();
+            for (Matrix m: statusMatrices.getMatrices().values()){
+                for (ArrayList<Entry> l : m.getFromLocations().values()){
+                    
+                    for (Entry e : l ){
+                        if (!statuses.containsKey(e.getFromLocation())){
+                            statuses.put(e.getFromLocation(), new IdleStatusEntry(e.getFromLocation()));
+                        }
+                        IdleStatusEntry ent = statuses.get(e.getFromLocation()); 
+                        if (e.getToLocation().equals("65")) ent.inc65(e.getValue());
+                        if (e.getToLocation().equals("70")) ent.inc70(e.getValue());
+                        if (e.getToLocation().equals("80")) ent.inc80(e.getValue());
+                        if (e.getToLocation().equals("83")) ent.inc83(e.getValue());
+                    }
+                }
+            }
+        BufferedWriter bw = IOUtils.getBufferedWriter(zonalStatuses);
+        try {
+            bw.append("zone\t65\t70\t80\t83\tsum");
+            bw.newLine();
+            for (IdleStatusEntry ise : statuses.values()) {
+                bw.append(ise.toString());
+                bw.newLine();
+            }
+            bw.flush();
+            bw.close();
+            
+        }
+        catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+            
     }
 }
+    class IdleStatusEntry{
+        private String zone;
+        private double status65 = 0;
+        private double status70 = 0;
+        private double status80 = 0;
+        private double status83 = 0;
+        
+        public IdleStatusEntry(String zone){
+            this.zone = zone;
+        }
+        
+        public void inc65(double value){
+            status65+=value;
+        }
+        public void inc70(double value){
+            status70+=value;
+        }
+        public void inc80(double value){
+            status80+=value;
+        }
+        public void inc83(double value){
+            status83+=value;
+        }
+      
+        public String toString(){
+            return zone+"\t"+Math.round(status65)+"\t"+Math.round(status70)+"\t"+Math.round(status80)+"\t"+Math.round(status83)+"\t"+Math.round(status70+status80+status65+status83);
+        }
+    } 

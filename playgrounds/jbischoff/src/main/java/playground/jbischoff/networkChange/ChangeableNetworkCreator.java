@@ -28,9 +28,13 @@ public class ChangeableNetworkCreator {
 	private List<NetworkChangeEvent> networkChangeEvents;
 	private final int ENDTIME = 30*3600;
 	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "C:/local_jb/tucloud/taxi/berlin/2kW.15.output_network.xml.gz";
-	private final String EVENTSFILE =  "C:/local_jb/tucloud/taxi/berlin/2kW.15.1000.events.xml.gz";
-	private final String CHANGEFILE = "C:/local_jb/tucloud/taxi/berlin/changeevents_min.xml";
+//	private final String NETWORKFILE = "C:/local_jb/tucloud/taxi/berlin/2kW.15.output_network.xml.gz";
+//	private final String EVENTSFILE =  "C:/local_jb/tucloud/taxi/berlin/2kW.15.1000.events.xml.gz";
+//	private final String CHANGEFILE = "C:/local_jb/tucloud/taxi/berlin/changeevents_min.xml";
+	 private final String NETWORKFILE = "C:/local_jb/cottbus/network.xml.gz";
+	 private final String EVENTSFILE =  "C:/local_jb/cottbus/1212.0.events_nosig.xml.gz";
+	 private final String CHANGEFILE = "C:/local_jb/cottbus/changeevents.xml";
+	
 	private final double MINIMUMFREESPEED = 0;
 
 	public ChangeableNetworkCreator(){
@@ -56,7 +60,6 @@ public class ChangeableNetworkCreator {
 		for (Link l : network.getLinks().values()){
 			double length = l.getLength();
 			double previousTravelTime=l.getLength()/l.getFreespeed()	;	
-			double capacity = l.getCapacity();
 			
 			for (double time = 0; time<ENDTIME ; time = time+TIMESTEP){
 				
@@ -69,7 +72,6 @@ public class ChangeableNetworkCreator {
 					ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE, newFreespeed);
 					nce.setFreespeedChange(freespeedChange);
 					
-					nce.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity));
 					
 					this.networkChangeEvents.add(nce);
 					previousTravelTime= newTravelTime;
