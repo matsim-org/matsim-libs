@@ -19,13 +19,21 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.population.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.misc.Time;
-import tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouter;
-import tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRouting;
-
-import java.util.*;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -35,7 +43,7 @@ import java.util.*;
  * <p/>
  * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter} for an example
  * how to use this API from your own code.
- * See {@link RunPluggableTripRouter} and {@link RunTeleportationMobsimWithCustomRouting} for examples
+ * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouter} and {@link tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRouting} for examples
  * how to replace this behavior with your own.
  *
  * @author thibautd
