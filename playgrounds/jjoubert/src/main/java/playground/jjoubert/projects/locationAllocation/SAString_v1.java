@@ -60,6 +60,7 @@ public class SAString_v1 {
 	private List<String> demandPoints;
 	private List<String> fixedSites;
 	private int numberOfThreads;
+	Map<String,Matrix> matrixCache = new TreeMap<String, Matrix>();
 
 	private Map<String, Double> demandPointWeights;
 	private final static int[] SAMPLE_SIZE = {
@@ -81,6 +82,7 @@ public class SAString_v1 {
 		424, 425, 430, 433, 447, 457, 470, 472, 481, 483, 485, 
 		488, 490, 491, 501, 509, 512, 513, 523, 533, 534, 536, 
 		539, 547, 556, 600};
+//	private final static int[] SAMPLE_SIZE = {10};
 
 	/**
 	 * @param args
@@ -838,24 +840,39 @@ public class SAString_v1 {
 			}
 		} while (initial.size() < numberOfSites);
 		
+		Solution s = new Solution(initial);
 		LOG.info("Demand-driven initial solution generated.");
-		return new Solution(initial);
+		return s;
 	}
 	
-		
+	
 	private class Solution {
 		public List<String> representation;
 		public Map<String, String> allocation;
+		private Matrix solutionMatrix;
 		public double objective;
 
 		public Solution(List<String> representation) {
-			this(representation, 0.0);
+			this(representation, 0.0, null);
+			
 			this.objective = calculateObjective();
 		}
 		
-		public Solution(List<String> representation, double objective){
+		public Solution(List<String> representation, double objective, Matrix matrix){
 			this.representation = representation;
 			this.objective = objective;
+			if(matrix == null){
+//				/* Build the current distance matrix. */
+//				this.solutionMatrix = new Matrix("current", "Current solution's distance matrix");
+//				for(String s : representation){
+//					List<Entry> entries = distanceMatrix.getToLocEntries(s);
+//					for(Entry e : entries){
+//						solutionMatrix.createEntry(e.getFromLocation(), e.getToLocation(), e.getValue());
+//					}
+//				}
+			} else{
+				this.solutionMatrix = matrix;
+			}
 		}
 		
 		public double calculateObjective() {
@@ -866,9 +883,27 @@ public class SAString_v1 {
 			ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 			List<Future<Tuple<Tuple<String, String>, Double>>> listOfJobs = new ArrayList<Future<Tuple<Tuple<String, String>, Double>>>();
 			
+			
+//			String s = this.toString();
+			Matrix matrix;
+//			if(matrixCache.containsKey(s)){
+//				matrix = matrixCache.get(s);
+//			} else{
+				/* Calculate the local matrix. */
+				matrix = new Matrix("tmp", "tmp");
+				for(String rep : this.representation){
+					List<Entry> entries = distanceMatrix.getToLocEntries(rep);
+					for(Entry e : entries){
+						matrix.createEntry(e.getFromLocation(), e.getToLocation(), e.getValue());
+					}
+				}
+//				matrixCache.put(s, matrix);
+//			}
+			
+
 			/* Assign to each demand point its closest site. */
 			for(String demandPointId : demandPoints){
-				Callable<Tuple<Tuple<String, String>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, this.representation);
+				Callable<Tuple<Tuple<String, String>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, this.representation, matrix);
 				Future<Tuple<Tuple<String, String>, Double>> result = threadExecutor.submit(job);
 				listOfJobs.add(result);
 			}
@@ -905,7 +940,7 @@ public class SAString_v1 {
 			}
 			
 			/* Copy the objective. */
-			Solution ss = new Solution(newRepresentation, this.getObjective());
+			Solution ss = new Solution(newRepresentation, this.getObjective(), this.solutionMatrix);
 		
 			/* Copy the allocation. */
 			Map<String, String> newAllocation = new HashMap<String, String>();
@@ -969,6 +1004,9 @@ public class SAString_v1 {
 			/* Remove the old site, and add the new. */
 			this.representation.remove(oldId);
 			this.representation.add(newId);
+			
+			/*TODO Check if this works. */
+//			updateSolutionMatrix(oldId, newId);
 
 			/* Re-calculate the objective function. The allocation will also be 
 			 * updated. */
@@ -988,6 +1026,26 @@ public class SAString_v1 {
 			return string;
 		}
 		
+		
+		private void updateSolutionMatrix(String outId, String inId){
+			/* Remove all the entries from the site that is taken out. */
+			List<Entry> remove = solutionMatrix.getToLocEntries(outId);
+			List<String> removeS = new ArrayList<String>();
+			for(Entry e : remove){
+				removeS.add(e.getFromLocation() + "," + e.getToLocation() + "," + String.valueOf(e.getValue()));
+			}
+			remove = null;
+			for(String s : removeS){
+				String[] sa = s.split(",");
+				solutionMatrix.removeEntry(sa[0], sa[1]);
+			}
+			
+			/* Add all the distance entries of the incoming site. */
+			List<Entry> add = distanceMatrix.getToLocEntries(inId);
+			for(Entry e : add){
+				solutionMatrix.createEntry(e.getFromLocation(), e.getToLocation(), e.getValue());
+			}
+		}
 	}
 	
 	
@@ -1029,10 +1087,12 @@ public class SAString_v1 {
 	class EvaluateClosestSiteCallable implements Callable<Tuple<Tuple<String,String>, Double>> {
 		private String id;
 		private List<String> currentSites;
+		private final Matrix matrix;
 		
-		public EvaluateClosestSiteCallable(String id, List<String> currentSites) {
+		public EvaluateClosestSiteCallable(String id, List<String> currentSites, final Matrix matrix) {
 			this.id = id;
 			this.currentSites = currentSites;
+			this.matrix = matrix;
 		}
 
 		@Override
@@ -1040,13 +1100,20 @@ public class SAString_v1 {
 			String closest = getClosestSite();
 			
 			Tuple<String, String> idPair = new Tuple<String, String>(this.id, closest);
-			Double distance = distanceMatrix.getEntry(id, closest).getValue();
+			
+			/*TODO Old way */
+//			Double distance = distanceMatrix.getEntry(id, closest).getValue();
+			/*TODO New way way */
+			Double distance = matrix.getEntry(id, closest).getValue();
 			return new Tuple<Tuple<String, String>, Double>(idPair, distance);
 		}
 		
 		public String getClosestSite(){
 			String closest = null;
-			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
+			/*TODO Old way */
+//			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
+			/*TODO New way */
+			List<Entry> thisDemandPointSites =  matrix.getFromLocEntries(id);
 			Comparator<Entry> entryComparator = new Comparator<Entry>() {
 				@Override
 				public int compare(Entry e1, Entry e2) {
@@ -1063,6 +1130,27 @@ public class SAString_v1 {
 					closest = thisSite;
 				}
 			}
+			return closest;
+		}
+		
+		public String getClosestSite2(){
+			String closest = null;
+			double min = Double.MAX_VALUE;
+
+			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
+			
+			Iterator<Entry> iterator = thisDemandPointSites.iterator();
+			while(iterator.hasNext()){
+				Entry e = iterator.next();
+				String s = e.getToLocation();
+				if(currentSites.contains(s)){
+					if(e.getValue() < min){
+						min = e.getValue();
+						closest = s;
+					}
+				}
+			}
+			
 			return closest;
 		}
 		
