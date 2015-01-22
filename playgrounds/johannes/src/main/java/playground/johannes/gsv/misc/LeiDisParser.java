@@ -35,6 +35,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import playground.johannes.gsv.visum.NetFileReader;
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
 
+import com.vividsolutions.jts.geom.Point;
+
 /**
  * @author johannes
  *
@@ -46,8 +48,9 @@ public class LeiDisParser {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Map<String, Coord> coords = loadCoordinates("/home/johannes/gsv/matsim/studies/netz2030/data/raw/network.net");
-		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/Schreibtisch/gsu_leidis_zlm_2014.06.15.txt"));
+//		Map<String, Coord> coords = loadCoordinates("/home/johannes/gsv/matsim/studies/netz2030/data/raw/network.net");
+		Map<String, Point> coords = LeiDis2Trajectory.loadCoordinates("/home/johannes/gsv/fpd/fraunhofer/ShapeFile_Strecken_Fernverkehr_link_node.SHP");
+		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/gsu_leidis_zlm_2014.12.12.txt"));
 		String line;
 		
 		Map<String, String> timeStamps = new TreeMap<String, String>();
@@ -55,7 +58,7 @@ public class LeiDisParser {
 		while((line = reader.readLine()) != null) {
 			String tokens[] = line.split("\\s+");
 			String trainId = tokens[1];
-			if(trainId.equalsIgnoreCase("512M")) {
+			if(trainId.equalsIgnoreCase("90M")) {
 				String nodeId = tokens[2];
 				String record = tokens[3];
 				
@@ -71,11 +74,11 @@ public class LeiDisParser {
 			
 		}
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/Schreibtisch/ice512.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/ice90.txt"));
 		writer.write("time\tnode\tlong\tlat");
 		writer.newLine();
 		for(Entry<String, String> entry : timeStamps.entrySet()) {
-			Coord coord = coords.get(entry.getValue());
+			Point coord = coords.get(entry.getValue());
 			if (coord != null) {
 				writer.write(entry.getKey());
 				writer.write("\t");

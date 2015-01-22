@@ -64,31 +64,34 @@ public class MatrixCompare2 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "550";
-		
-//		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-//		reader.setValidating(false);
-//		reader.parse("/home/johannes/gsv/matrices/refmatrices/ivv.xml");
-//		KeyMatrix m1 = reader.getMatrix();
-		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		String runId = "593";
+		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
+		/*
+		 * load ref matrix
+		 */
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
+		reader.parse(refFile);
+		KeyMatrix m1 = reader.getMatrix();
+
 		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
 
-		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
-		reader2.setValidating(false);
-		reader2.parse("/home/johannes/gsv/matrices/simmatrices/miv." + runId + ".xml");
-		KeyMatrix m2 = reader2.getMatrix().toKeyMatrix("gsvId");
+		/*
+		 * load simulated matrix
+		 */
+//		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
+//		reader2.setValidating(false);
+//		reader2.parse(simFile);
+		reader.parse(simFile);
+		KeyMatrix m2 = reader.getMatrix();
+//		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
 
-		// KeyMatrixXMLReader reader2 =new KeyMatrixXMLReader();
-		// reader2.setValidating(false);
-		// reader2.parse("/home/johannes/gsv/matrices/miv.avr2.xml");
-		// KeyMatrix m2 = reader2.getMatrix();
-
-		MatrixOpertaions.applyFactor(m2, 11.0);
+		MatrixOpertaions.applyFactor(m2, 22.0);
 		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
-
+		/*
+		 * load zones
+		 */
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
@@ -206,7 +209,7 @@ public class MatrixCompare2 {
 		private String j;
 	}
 
-	private static KeyMatrix distanceMatrix(KeyMatrix m, ZoneCollection zones) {
+	public static KeyMatrix distanceMatrix(KeyMatrix m, ZoneCollection zones) {
 		GeometryFactory factory = new GeometryFactory();
 		
 		KeyMatrix m_d = new KeyMatrix();

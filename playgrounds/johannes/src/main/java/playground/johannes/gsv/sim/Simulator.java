@@ -23,10 +23,12 @@
 package playground.johannes.gsv.sim;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,13 +66,14 @@ import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripCountTask;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
@@ -79,6 +82,7 @@ import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
+import playground.johannes.gsv.synPop.Proxy2Matsim;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -87,10 +91,10 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
  */
 public class Simulator {
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
+	public static final String GSV_CONFIG_MODULE_NAME = "gsv";
+	
+	private static final Logger logger = Logger.getLogger(Simulator.class);
+	
 	public static void main(String[] args) throws IOException {
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
@@ -102,12 +106,14 @@ public class Simulator {
 		 */
 		Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
 
+		logger.info("Setting up activity location strategy...");
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setStrategyName("activityLocations");
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
-		double mutationError = Double.parseDouble(controler.getConfig().getParam("gsv", "mutationError"));
+		double mutationError = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "mutationError"));
+		double threshold = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "distThreshold"));
 		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home", controler,
-				mutationError));
+				mutationError, threshold));
 
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setStrategyName("doNothing");
@@ -135,26 +141,19 @@ public class Simulator {
 		/*
 		 * setup scoring and cadyts integration
 		 */
-		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("disableCadyts"));
-		// boolean personEqualsVeh =
-		// Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("personEqualsVeh"));
+		logger.info("Setting up cadyts...");
+		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule(GSV_CONFIG_MODULE_NAME).getValue("disableCadyts"));
 		LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getScenario().getPopulation());
 		controler.getEvents().addHandler(calculator);
 		if (!disableCadyts) {
 			CadytsContext context = new CadytsContext(controler.getScenario().getConfig(), null, calculator);
-			// controler.addControlerListener(context);
 			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getScenario().getNetwork()));
 
 			controler.addControlerListener(context);
-			// Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
-			// context.notifyStartup(event);
-			// Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
 			controler.addControlerListener(new CadytsRegistration(context));
-			// controler.addPlanSelectorFactory("mySelector", new
-			// SelectorFactory());
 		}
 		Config config = controler.getConfig();
-		String countsFile = config.findParam("gsv", "countsfile");
+		String countsFile = config.findParam(GSV_CONFIG_MODULE_NAME, "countsfile");
 		double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
 
 		DTVAnalyzer dtv = new DTVAnalyzer(controler.getScenario().getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
@@ -162,6 +161,7 @@ public class Simulator {
 
 		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
 
+		logger.info("Setting up controler modules...");
 		controler.setModules(new AbstractModule() {
 			@Override
 			public void install() {
@@ -187,6 +187,14 @@ public class Simulator {
 		});
 
 		// controler.addOverridingModule(abstractModule);
+		/*
+		 * load person attributes
+		 */
+		logger.info("Loading person attributes...");
+		ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(controler.getScenario().getPopulation().getPersonAttributes());
+		oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
+		oaReader.parse(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "attributesFile"));
+		
 		controler.run();
 
 	}
@@ -199,16 +207,18 @@ public class Simulator {
 			/*
 			 * connect facilities to links
 			 */
+			logger.info("Connecting facilities to links...");
 			NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 			for (ActivityFacility facility : controler.getScenario().getActivityFacilities().getFacilities().values()) {
 				Coord coord = facility.getCoord();
 				Link link = NetworkUtils.getNearestLink(network, coord);
 				((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			}
-
+			
 			/*
 			 * setup analysis modules
 			 */
+			logger.info("Setting up analysis modules...");
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
 			task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));

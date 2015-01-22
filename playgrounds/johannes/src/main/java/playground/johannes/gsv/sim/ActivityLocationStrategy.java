@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -46,8 +47,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.johannes.gsv.misc.QuadTree;
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.util.ProgressLogger;
 
 /**
@@ -78,12 +81,15 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 	private final Queue<TripRouter> routers = new ConcurrentLinkedQueue<TripRouter>();
 
 	private final Map<Person, double[]> targetDistances = new ConcurrentHashMap<>();
+	
+	private final Population population;
 
-	public ActivityLocationStrategy(ActivityFacilities facilities, Random random, int numThreads, String blacklist, double mutationError) {
+	public ActivityLocationStrategy(ActivityFacilities facilities, Population population, Random random, int numThreads, String blacklist, double mutationError) {
 		this.random = random;
 		this.facilities = facilities;
 		this.blacklist = blacklist;
 		this.mutationError = mutationError;
+		this.population = population;
 		executor = Executors.newFixedThreadPool(numThreads);
 
 	}
@@ -301,14 +307,19 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 				Plan plan = person.getSelectedPlan();
 				distances = new double[(plan.getPlanElements().size() - 1) / 2];
+				ObjectAttributes oatts = population.getPersonAttributes();
+				List<Double> atts = (List<Double>) oatts.getAttribute(person.getId().toString(), CommonKeys.LEG_GEO_DISTANCE);
 				for (int i = 1; i < plan.getPlanElements().size(); i+=2) {
 
-					Leg leg = (Leg) plan.getPlanElements().get(i);
-					double d = leg.getTravelTime(); //FIXME (hopefully) temporary hack
-					if(d > 0 && !Double.isInfinite(d) && !Double.isNaN(d)) {
-						distances[(i - 1)/2] = d;
+//					Leg leg = (Leg) plan.getPlanElements().get(i);
+//					double d = leg.getTravelTime(); //FIXME (hopefully) temporary hack
+					
+					int idx = (i - 1)/2;
+					Double d = atts.get(idx);
+					if(d != null && d > 0 && !Double.isInfinite(d) && !Double.isNaN(d)) {
+						distances[idx] = d;
 					} else {
-						distances[(i - 1)/2] = getDistance(plan, i);
+						distances[idx] = getDistance(plan, i);
 					}
 					
 				}

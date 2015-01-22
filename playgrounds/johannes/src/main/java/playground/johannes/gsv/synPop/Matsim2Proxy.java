@@ -20,7 +20,9 @@
 package playground.johannes.gsv.synPop;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,8 +62,12 @@ public class Matsim2Proxy {
 			proxyPresons.put(person.getId(), person);
 		}
 		
+		Set<ProxyPerson> newProxyPersons = new HashSet<>(matsimPersons.size());
+		
 		for(Person matsimPerson : matsimPersons.values()) {
 			ProxyPerson proxyPerson = proxyPresons.get(matsimPerson.getId().toString());
+			newProxyPersons.add(proxyPerson);
+			
 			ProxyPlan proxyPlan = proxyPerson.getPlans().get(0);
 			Plan matsimPlan = matsimPerson.getSelectedPlan();
 			for(int i = 0; i < matsimPlan.getPlanElements().size(); i++) {
@@ -83,6 +89,6 @@ public class Matsim2Proxy {
 		}
 		
 		XMLWriter writer = new XMLWriter();
-		writer.write(args[2], proxyPresons.values());
+		writer.write(args[2], newProxyPersons);
 	}
 }

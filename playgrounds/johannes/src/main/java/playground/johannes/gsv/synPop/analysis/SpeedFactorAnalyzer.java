@@ -34,6 +34,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -102,7 +103,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 			
 			if(outputDirectoryNotNull()) {
 		
-			TDoubleDoubleHashMap map = Correlations.mean(distances.toNativeArray(), durations.toNativeArray());
+			TDoubleDoubleHashMap map = Correlations.mean(distances.toNativeArray(), durations.toNativeArray(), new LinearDiscretizer(1000));
 			try {
 				TXTWriter.writeMap(map, "Distance", "Traveltime", getOutputDirectory() + key + ".txt");
 			} catch (IOException e) {

@@ -68,7 +68,7 @@ public class LeiDis2Trajectory {
 		 */
 		Trajectory targetT = new Trajectory();
 //		List<String> nodes = readNodes();
-		List<String> nodes = new ArrayList<>(loadCoordinates().keySet());
+		List<String> nodes = new ArrayList<>(loadCoordinates("/home/johannes/gsv/fpd/trajectories/nodes.shp").keySet());
 		
 		while ((line = reader.readLine()) != null) {
 			String trainId = parseTrainId(line);
@@ -181,7 +181,7 @@ public class LeiDis2Trajectory {
 		 */
 		trajectories.remove("71439M");
 		
-		Map<String, Point> coords = loadCoordinates();
+		Map<String, Point> coords = loadCoordinates("/home/johannes/gsv/fpd/trajectories/nodes.shp");
 		/*
 		 * write
 		 */
@@ -295,9 +295,9 @@ public class LeiDis2Trajectory {
 
 	}
 	
-	private static <T> Map<String, Point> loadCoordinates() throws IOException {
+	public static <T> Map<String, Point> loadCoordinates(String file) throws IOException {
 		Map<String, Point> coords = new LinkedHashMap<>();
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/fpd/trajectories/nodes.shp");
+		Set<SimpleFeature> features = FeatureSHP.readFeatures(file);
 		for(SimpleFeature feature : features) {
 			String code = (String) feature.getAttribute("CODE");
 			Point p = ((Geometry)feature.getDefaultGeometry()).getCentroid();

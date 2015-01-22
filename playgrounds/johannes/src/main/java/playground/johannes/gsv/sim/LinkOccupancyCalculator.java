@@ -113,7 +113,7 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 
 		double rate = 1;
 		if (!personEqualsVeh) {
-			rates.get(type);
+			rate = rates.get(type);
 			if (rate == 0)
 				rate = 1.5;
 		}

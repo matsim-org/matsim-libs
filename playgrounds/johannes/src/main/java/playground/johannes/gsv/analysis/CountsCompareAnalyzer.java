@@ -78,6 +78,7 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 		
 		TDoubleArrayList errorVals = new TDoubleArrayList();
 		TDoubleArrayList caps = new TDoubleArrayList();
+		TDoubleArrayList speeds = new TDoubleArrayList();
 
 		for (Count count : counts.getCounts().values()) {
 			double obsVal = 0;
@@ -98,6 +99,7 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 				Link link = network.getLinks().get(count.getLocId());
 				errorVals.add(Math.abs(err));
 				caps.add(link.getCapacity());
+				speeds.add(link.getFreespeed());
 			}
 		}
 
@@ -113,6 +115,10 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 		try {
 			TDoubleDoubleHashMap map = Correlations.mean(caps.toNativeArray(), errorVals.toNativeArray());
 			TXTWriter.writeMap(map, "capacity", "counts", String.format("%s/countsError.capacity.txt", outdir));
+			
+			map = Correlations.mean(speeds.toNativeArray(), errorVals.toNativeArray());
+			TXTWriter.writeMap(map, "speed", "counts", String.format("%s/countsError.speed.txt", outdir));
+			
 			TXTWriter.writeMap(Histogram.createHistogram(error, new LinearDiscretizer(0.1), false), "Error", "Frequency", String.format("%s/countsError.hist.txt", outdir));
 			TXTWriter.writeMap(Histogram.createHistogram(errorAbs, new LinearDiscretizer(0.1), false), "Error (absolute)", "Frequency", String.format("%s/countsErrorAbs.hist.txt", outdir));
 			TXTWriter.writeMap(Histogram.createHistogram(errorWeighted, new LinearDiscretizer(0.1), true), "Error (weighted)", "Frequency", String.format("%s/countsErrorWeighted.hist.txt", outdir));

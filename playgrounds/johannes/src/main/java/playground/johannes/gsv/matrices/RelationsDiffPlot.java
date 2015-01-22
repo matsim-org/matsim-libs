@@ -53,41 +53,52 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class RelationsDiffPlot {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "550";
-		
-//		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-//		reader.setValidating(false);
-//		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-//		KeyMatrix m1 = reader.getMatrix();
-		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		String runId = "593";
+//		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String simFile = "/home/johannes/gsv/matrices/refmatrices/bmbv2010.xml";
+		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
+		/*
+		 * load ref matrix
+		 */
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
-		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
+		reader.parse(refFile);
+		KeyMatrix reference = reader.getMatrix();
 
-		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
-		reader2.setValidating(false);
-		reader2.parse("/home/johannes/gsv/matrices/simmatrices/miv." + runId + ".xml");
-		KeyMatrix m2 = reader2.getMatrix().toKeyMatrix("gsvId");
+//		MatrixOpertaions.applyFactor(reference, 1 / 365.0);
 
-		MatrixOpertaions.applyFactor(m2, 11.0);
-		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
-		
+		/*
+		 * load simulated matrix
+		 */
+//		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
+//		reader2.setValidating(false);
+//		reader2.parse(simFile);
+		reader.parse(simFile);
+		KeyMatrix simulation = reader.getMatrix();
+//		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
+
+//		MatrixOpertaions.applyFactor(simulation, 22.0);
+//		MatrixOpertaions.applyDiagonalFactor(simulation, 1.3);
+		/*
+		 * load zones
+		 */
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
-		
-		data = writeGeoJSON(zones, urbanZones(zones.zoneSet()), m2, m1);
+		/*
+		 * compare
+		 */
+		data = writeGeoJSON(zones, urbanZones(zones.zoneSet()), simulation, reference);
 		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/matrixdiff.json"), data.getBytes(), StandardOpenOption.CREATE);
 	}
 
@@ -96,48 +107,64 @@ public class RelationsDiffPlot {
 		/*
 		 * write zone polygons
 		 */
-//		builder.append(Zone2GeoJSON.toJson(zones.zoneSet()));
+		// builder.append(Zone2GeoJSON.toJson(zones.zoneSet()));
 		/*
 		 * create a line string for each relation
 		 */
 		GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 		GeoJSONWriter jsonWriter = new GeoJSONWriter();
 		List<Feature> features = new ArrayList<>();
-		
-		for(Zone i : relationZones) {
-			for(Zone j : relationZones) {
-				if(i != j) {
+
+		for (Zone i : relationZones) {
+			for (Zone j : relationZones) {
+				if (i != j) {
 					Double val1 = m1.get(i.getAttribute("gsvId"), j.getAttribute("gsvId"));
-					if(val1 == null) val1 = 0.0;
+					if (val1 == null)
+						val1 = 0.0;
 					Double val2 = m2.get(i.getAttribute("gsvId"), j.getAttribute("gsvId"));
-					if(val2 == null) val2 = 0.0;
-					
-					double err = (val1 - val2)/ val2;
-					
+					if (val2 == null)
+						val2 = 0.0;
+
+					double err = (val1 - val2) / val2;
+
 					Point start = i.getGeometry().getCentroid();
 					Point end = j.getGeometry().getCentroid();
-					
+
 					Coordinate[] coords = new Coordinate[2];
 					coords[0] = start.getCoordinate();
 					coords[1] = end.getCoordinate();
+
+					double deltaX = coords[1].x - coords[0].x;
+					double deltaY = coords[1].y - coords[0].y;
+					
+					double rotation = Math.atan(deltaY/deltaX) * 180/Math.PI;
+					
+					coords[1].x = coords[0].x + deltaX/2.0;
+					coords[1].y = coords[0].y + deltaY/2.0;
+					
+					double labelX = coords[1].x + deltaX/4.0;
+					double labelY = coords[1].y + deltaY/4.0;
 					
 					LineString line = factory.createLineString(coords);
-					
+
 					GeoJSON json = jsonWriter.write(line);
 					Geometry geom = (Geometry) GeoJSONFactory.create(json.toString());
-					
+
 					Map<String, Object> atts = new HashMap<>();
 					atts.put("error", err);
+					atts.put("labelX", labelX);
+					atts.put("labelY", labelY);
+					atts.put("rotation", rotation);
 					features.add(new Feature(geom, atts));
 				}
 			}
 		}
-		
+
 		builder.append(jsonWriter.write(features).toString());
-		
+
 		return builder.toString();
 	}
-	
+
 	private static Collection<Zone> urbanZones(Collection<Zone> zones) {
 		final double threshold = 600000;
 

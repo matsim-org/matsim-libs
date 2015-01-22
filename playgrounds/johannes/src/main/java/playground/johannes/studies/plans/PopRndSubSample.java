@@ -19,18 +19,22 @@
  * *********************************************************************** */
 package playground.johannes.studies.plans;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author illenberger
@@ -44,35 +48,37 @@ public class PopRndSubSample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		String input = args[0];
-		String input = "/home/johannes/sge/prj/matsim/run/106/output/plans.routed.xml.gz";
-//		String output = args[1];
-		String output = "/home/johannes/gsv/ger/data/plans.routed.sub.xml.gz";
-//		int numSamples = Integer.parseInt(args[2]);
-		int numSamples = 10000;
+		String input = args[0];
+//		String input = "/home/johannes/sge/prj/matsim/run/106/output/plans.routed.xml.gz";
+		String output = args[1];
+//		String output = "/home/johannes/gsv/ger/data/plans.routed.sub.xml.gz";
+		int numSamples = Integer.parseInt(args[2]);
+//		int numSamples = 10000;
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(input);
 
 		Population pop = scenario.getPopulation();
-		List<Person> persons = new LinkedList<Person>(scenario.getPopulation().getPersons().values());
+		List<Person> persons = new ArrayList<Person>(scenario.getPopulation().getPersons().values());
+		logger.info("Shuffling persons...");
+		Collections.shuffle(persons);
 		
+		Population newPop = PopulationUtils.createPopulation(config);
 		int numDelete = persons.size() - numSamples;
 		if(numDelete > -1) {
-			logger.info(String.format("Deleting %1$s persons...", numDelete));
+			logger.info(String.format("Extracting %1$s persons...", numDelete));
+			ProgressLogger.init(numSamples, 1, 10);
 			
-			Random random = new Random();
-			for(int i = 0; i < numDelete; i++) {
-				int idx = random.nextInt(persons.size());
-				
-				Person person = persons.remove(idx);
-				pop.getPersons().remove(person.getId());				
+			for(int i = 0; i < numSamples; i++) {
+				newPop.addPerson(persons.get(i));
+				ProgressLogger.step();
 			}
-		
+			ProgressLogger.termiante();
 			logger.info(String.format("New population size: %1$s.", pop.getPersons().size()));
 			
-			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(output);
+			new PopulationWriter(newPop, scenario.getNetwork()).write(output);
 		} else {
 			logger.warn(String.format("Sample size (%1$s) greater than population size (%2$s)!", numSamples, pop.getPersons().size()));
 		}

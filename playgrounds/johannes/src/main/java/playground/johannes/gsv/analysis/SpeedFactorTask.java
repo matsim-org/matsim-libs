@@ -39,6 +39,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
 import playground.johannes.coopsim.analysis.TripDuration;
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -112,7 +113,7 @@ public class SpeedFactorTask extends TrajectoryAnalyzerTask {
 			
 			if(outputDirectoryNotNull()) {
 		
-			TDoubleDoubleHashMap map = Correlations.mean(distArray.toNativeArray(), durArray.toNativeArray());
+			TDoubleDoubleHashMap map = Correlations.mean(distArray.toNativeArray(), durArray.toNativeArray(), new LinearDiscretizer(1000));
 			try {
 				TXTWriter.writeMap(map, "Distance", "Traveltime", getOutputDirectory() + "/" + key + ".txt");
 			} catch (IOException e) {

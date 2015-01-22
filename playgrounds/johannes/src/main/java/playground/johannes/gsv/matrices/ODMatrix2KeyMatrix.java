@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,63 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.gsv.matrices;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class KeyMatrix {
+public class ODMatrix2KeyMatrix {
 
-	private Map<String, Map<String, Double>> matrix;
-	
-	public KeyMatrix() {
-		matrix = new HashMap<>();
-	}
-	
-	public Double set(String key1, String key2, Double value) {
-		Map<String, Double> col = matrix.get(key1);
-		if(col == null) {
-			col = new HashMap<String, Double>();
-			matrix.put(key1, col);
-		}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
+		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
 		
-		return col.put(key2, value);
-	}
+		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		writer.write(m1, "/home/johannes/gsv/matrices/refmatrices/itp.xml");
 
-	public Double get(String key1, String key2) {
-//		Map<String, Double> row = matrix.get(key1);
-		Map<String, Double> row = getRow(key1);
-		if(row == null) {
-			return null;
-		} else {
-			return row.get(key2);
-		}
 	}
 	
-	public Map<String, Double> getRow(String key) {
-		return matrix.get(key);
-	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
-		}
-	}
-	
-	public Set<String> keys() {
-		Set<String> keys = new HashSet<>(matrix.keySet());
-		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-			keys.addAll(entry.getValue().keySet());
-		}
-		
-		return keys;
-	}
 }
