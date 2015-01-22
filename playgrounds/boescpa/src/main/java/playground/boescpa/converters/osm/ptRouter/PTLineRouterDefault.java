@@ -289,7 +289,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 		newFacility.setName(stop.getStopFacility().getName());
 		// Add new facility to schedule and to stop:
 		this.schedule.addStopFacility(newFacility);
-		stop.setStopFacility(newFacility);
 		// Return new facility:
 		return newFacility;
 	}
@@ -381,17 +380,10 @@ public class PTLineRouterDefault extends PTLineRouter {
 					routeLine(route);
 				} else {
 					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
+					// TODO-boescpa Implement other modes...
 				}
 			}
 		}
-
-		// TODO-boescpa Implement createPTRoutes...
-
-		// 	For tram and bus routes for each line in schedule:
-		//		route from each stop to next (respectively from link to link...).
-		//		for trams make sure use only "tram"-links.
-		//		costFunction: if non-that-line-number-link, then much more expensive...
-		//		costFunction: if non-pt-link, then even much more expensive...
 
 		log.info("Creating pt routes... done.");
 	}
@@ -399,7 +391,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private void routeLine(TransitRoute route) {
 		List<Id<Link>> links = new ArrayList<>();
 		int i = 0;
-		// TODO-boescpa Implement a special treatment for the very first and second stop of each route. There the checking of the different links they can (possibly) be assigned to has to be done with both varying, the first and the second stop together. After that for all following routings, the from-stop can be assumed to have the link fixed and only for the to-stop the different possible links need to be checked for the fastest one...
 		links.add(this.network.getLinks().get(route.getStops().get(0).getStopFacility().getLinkId()).getId());
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
@@ -414,12 +405,59 @@ public class PTLineRouterDefault extends PTLineRouter {
 		route.setRoute(new LinkNetworkRouteImpl(links.get(0),links,links.get(links.size()-1)));
 	}
 
-	// TODO-boescpa Extend dublication above in linking process from facilities to stops. Because a stop can only have one facility and a facility can only have one link the same applies to stops as to stop facilities, that is a bus stop is not the same as a tram stop. And here I need the different stops (at least one in each direction and for each mode...).
 	private LeastCostPathCalculator.Path getShortestPath(TransitRouteStop fromStop, TransitRouteStop toStop) {
-		// TODO-boescpa At the moment it just takes the assigned links and routes between them. Change this to checking for all possible directions of this stop (all possible links it is linked to and chose the one which results in the shortest path. Set this one as the stop for this transit route at this stop position.
-		Node fromNode = this.network.getLinks().get(fromStop.getStopFacility().getLinkId()).getToNode();
-		Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
-		return this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+		LeastCostPathCalculator.Path shortestPath = null;
+
+		Map<String, Id<TransitStopFacility>[]> derivativesFromStop
+				= this.linkedStopFacilities.get(fromStop.getStopFacility().getId());
+		Map<String, Id<TransitStopFacility>[]> derivativesToStop
+				= this.linkedStopFacilities.get(toStop.getStopFacility().getId());
+		// If derivatives is non-empty, this means that the stop wasn't assigned a mode-specific facility yet and ergo that we have to check all possible facilities. Else we just take the assigned facilities.
+
+		if (derivativesFromStop != null) {
+			for (Id<TransitStopFacility> fromStopFacilityId : derivativesFromStop.get(this.mode)) {
+				Node fromNode = this.network.getLinks().get(this.schedule.getFacilities().get(fromStopFacilityId).getLinkId()).getToNode();
+				if (derivativesToStop != null) {
+					// We have to loop over both, fromStops and toStops, and have to set both as soon as found...
+					for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
+						Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
+						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+						if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+							shortestPath = tempShortestPath;
+							fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
+							toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
+						}
+					}
+				} else {
+					// We have to loop over fromStops and assign it, but not over toStop. (This should actually never be the case...)
+					Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+						shortestPath = tempShortestPath;
+						fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
+					}
+				}
+			}
+		} else {
+			Node fromNode = this.network.getLinks().get(fromStop.getStopFacility().getLinkId()).getToNode();
+			if (derivativesToStop != null) {
+				// We have to loop over toStops and assign it, but not over fromStop. (This should be the standard case...)
+				for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
+					Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+						shortestPath = tempShortestPath;
+						toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
+					}
+				}
+			} else {
+				// We have to loop over none of the two...
+				Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
+				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+			}
+		}
+
+		return shortestPath;
 	}
 
 	/**
