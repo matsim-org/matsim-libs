@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -62,7 +63,8 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 		this.scheduler = scheduler;
 		this.calculator = calculator; 
 		this.idleVehicleFinder = vehicleFinder;
-		this.unplannedRequests = new ArrayList<TaxiRequest>();
+		this.unplannedRequests = new ArrayList<TaxiRequest>() {
+		};
 		
 	}
 	
@@ -72,30 +74,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 			scheduleUnplannedRequests();
 			this.requiresReoptimization = false;
 		}
-//		sendIdlingVehiclesHome(e.getSimulationTime());
 	}
-	
-	private void sendIdlingVehiclesHome(double time)
-    {
-        for (Vehicle veh : this.context.getVrpData().getVehicles()) {
-            if (!this.scheduler.isIdle(veh))
-                continue;
-            if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
-                continue;
-            if (! (Schedules.getLastTask(veh.getSchedule()).getTaskIdx() == veh.getSchedule()
-                    .getCurrentTask().getTaskIdx()))
-                continue;
-
-            if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY) && 
-            		!veh.getAgentLogic().getDynAgent().getCurrentLinkId().equals(veh.getStartLink().getId())) {
-
-                        scheduleRankReturn(veh, time, false, true);
-                
-
-            }
-
-        }        
-    }
 	
 	@Override
 	public void requestSubmitted(Request request) {
@@ -168,20 +147,6 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
             }
         }
     }
-	
-	private static class RankModeAVScheduler extends TaxiScheduler{
-		
-		private boolean rankmode;
-		private VrpPathCalculator calculator;
-
-		public RankModeAVScheduler(MatsimVrpContext context,
-				VrpPathCalculator calculator,
-				TaxiSchedulerParams params) {
-			super(context, calculator, params);
-			this.calculator = calculator;
-		}
-		
-	}
 	
 	protected void scheduleRankReturn(Vehicle veh, double time, boolean charge, boolean home)
     {

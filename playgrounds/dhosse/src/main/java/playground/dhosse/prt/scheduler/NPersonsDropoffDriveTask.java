@@ -1,21 +1,23 @@
-package playground.dhosse.prt.task;
+package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiDropoffStayTask;
+import playground.michalm.taxi.schedule.TaxiDropoffDriveTask;
 
-public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
+public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
 
-	List<TaxiRequest> requests;
+	private List<TaxiRequest> requests;
 	
-	public NPersonsDropoffStayTask(double beginTime, double endTime,
-			List<TaxiRequest> requests) {
-		super(beginTime, endTime, requests.get(0));
+	public NPersonsDropoffDriveTask(VrpPathWithTravelData path, List<TaxiRequest> requests) {
+		
+		super(path, requests.get(0));
 		this.requests = requests;
 		
 		for(TaxiRequest request : requests){
-			request.setDropoffStayTask(this);
+			request.setDropoffDriveTask(this);
 		}
 		
 	}
@@ -24,7 +26,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
     public void removeFromRequest()
     {
 		for(TaxiRequest request : this.requests){
-			request.setDropoffStayTask(null);
+			request.setDropoffDriveTask(null);
 		}
     }
 
@@ -32,7 +34,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DROPOFF_STAY;
+        return TaxiTaskType.DROPOFF_DRIVE;
     }
 
 

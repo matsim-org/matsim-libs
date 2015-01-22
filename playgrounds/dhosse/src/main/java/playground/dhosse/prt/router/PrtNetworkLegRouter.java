@@ -1,4 +1,4 @@
-package playground.dhosse.prt.launch;
+package playground.dhosse.prt.router;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.pt.router.TransitRouter;
 
 import playground.dhosse.prt.data.PrtData;
-import playground.dhosse.prt.request.PrtRequestCreator;
+import playground.dhosse.prt.passenger.PrtRequestCreator;
 
 public class PrtNetworkLegRouter implements TransitRouter {
 

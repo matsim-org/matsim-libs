@@ -1,4 +1,4 @@
-package playground.dhosse.prt.request;
+package playground.dhosse.prt.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

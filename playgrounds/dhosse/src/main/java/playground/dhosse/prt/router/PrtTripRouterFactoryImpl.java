@@ -1,4 +1,4 @@
-package playground.dhosse.prt.launch;
+package playground.dhosse.prt.router;
 
 import java.util.Collections;
 
@@ -32,7 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.dhosse.prt.request.PrtRequestCreator;
+import playground.dhosse.prt.passenger.PrtRequestCreator;
 
 public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 	

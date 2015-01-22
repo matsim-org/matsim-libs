@@ -6,7 +6,7 @@ import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.dhosse.prt.task.NPersonsPickupStayTask;
+import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -95,7 +95,7 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
     		
     		NPersonsPickupStayTask task = (NPersonsPickupStayTask)lastTask;
 
-    		if(task.getLink().equals(req.getFromLink()) && task.getRequest().getToLink().equals(req.getToLink())){
+    		if(task.getLink().equals(req.getFromLink()) && task.getRequest().getToLink().equals(req.getToLink()) && task.getRequests().size() < 4){
     			
     			double begin = task.getBeginTime();
         		
@@ -108,12 +108,10 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
         		}
     		}
     		
-    	} else{
-
-//    		if(veh.getSchedule().getTasks().size() < 2){
-    			departure = scheduler.getEarliestIdleness(veh);
-//    		}
+    	} else if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.WAIT_STAY)){
     		
+    			departure = scheduler.getEarliestIdleness(veh);
+    			
     	}
     	
         return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),

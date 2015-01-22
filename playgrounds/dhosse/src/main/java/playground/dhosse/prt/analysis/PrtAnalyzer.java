@@ -15,6 +15,10 @@ public class PrtAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile("C:/Users/Daniel/Desktop/dvrp/events.xml");
 		
+		double meanWaitTime = handler.diff / handler.counter;
+		
+		System.out.println("max: " + handler.max + "\tmin: " + handler.min + "\tmean: " + meanWaitTime + " [s]");
+		
 	}
 
 }

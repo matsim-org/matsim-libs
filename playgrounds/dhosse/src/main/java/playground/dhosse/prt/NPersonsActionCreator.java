@@ -1,6 +1,8 @@
-package playground.dhosse.prt.launch;
+package playground.dhosse.prt;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
+import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
@@ -12,6 +14,8 @@ import playground.dhosse.prt.passenger.NPersonsPickupActivity;
 import playground.dhosse.prt.scheduler.NPersonsDropoffStayTask;
 import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
 import playground.michalm.taxi.TaxiActionCreator;
+import playground.michalm.taxi.schedule.TaxiDropoffStayTask;
+import playground.michalm.taxi.schedule.TaxiPickupStayTask;
 import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiWaitStayTask;
 

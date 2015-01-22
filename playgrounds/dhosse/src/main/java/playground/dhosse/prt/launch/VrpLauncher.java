@@ -5,14 +5,6 @@ import java.io.PrintWriter;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
@@ -36,28 +28,32 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.ChartUtils;
+import playground.dhosse.prt.NPersonsActionCreator;
 import playground.dhosse.prt.data.PrtData;
-import playground.dhosse.prt.optimizer.PrtNPersonsOptimizer;
-import playground.dhosse.prt.optimizer.PrtScheduler;
+import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
-import playground.dhosse.prt.request.PrtRequestCreator;
+import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
+import playground.dhosse.prt.scheduler.PrtScheduler;
+import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.data.TaxiData;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
 import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 public class VrpLauncher {
+	
+	private PrtParameters params;
 	
 	private Scenario scenario;
 	private TravelTimeSource ttimeSource;
@@ -67,14 +63,14 @@ public class VrpLauncher {
 	private LeastCostPathCalculator router;
 	private LeastCostPathCalculatorWithCache routerWithCache;
 	private VrpPathCalculator calculator;
-	private TaxiSchedulerParams params;
 	
 	private MatsimVrpContextImpl context;
 	
-	private static final boolean otfVis = false;
-	
-	private final static String workingDir = "C:/Users/Daniel/Desktop/dvrp/";
-	private static String eventsFile = "events.xml";
+	public VrpLauncher(PrtParameters params){
+		this.params = params;
+		this.scenario = VrpLauncherUtils.initScenario(this.params.pathToNetworkFile, this.params.pathToPlansFile);
+		this.init(this.scenario, null);
+	}
 	
 	public VrpLauncher(String netFile, String plansFile, String eventsFileName){
 		
@@ -88,23 +84,23 @@ public class VrpLauncher {
 		ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
         tdisSource = TravelDisutilitySource.TIME;
 
-        travelTime = VrpLauncherUtils.initTravelTime(scenario, ttimeSource, eventsFileName);
-        travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource, travelTime);
+        this.travelTime = VrpLauncherUtils.initTravelTime(scenario, this.params.algorithmConfig.ttimeSource, eventsFileName);
+        this.travelDisutility = VrpLauncherUtils.initTravelDisutility(this.params.algorithmConfig.tdisSource, this.travelTime);
 
-        router = new Dijkstra(scenario.getNetwork(), travelDisutility, travelTime);
+        this.router = new Dijkstra(scenario.getNetwork(), this.travelDisutility, this.travelTime);
 
-        routerWithCache = new LeastCostPathCalculatorWithCache(
-                router, new TimeDiscretizer(31*4, 15 *60,false));
+        this.routerWithCache = new LeastCostPathCalculatorWithCache(
+                this.router, new TimeDiscretizer(31*4, 15 *60,false));
         
-        calculator = new VrpPathCalculatorImpl(routerWithCache, travelTime,
-                travelDisutility);
+        this.calculator = new VrpPathCalculatorImpl(this.routerWithCache, this.travelTime,
+                this.travelDisutility);
 		
 	}
 	
 	public void run(){
 		
-		context = new MatsimVrpContextImpl();
-        context.setScenario(scenario);
+		this.context = new MatsimVrpContextImpl();
+        this.context.setScenario(this.scenario);
         Config config = scenario.getConfig();
         config.qsim().setEndTime(30*3600);
         config.controler().setOutputDirectory("C:/Users/Daniel/Desktop/dvrp/");
@@ -123,9 +119,10 @@ public class VrpLauncher {
         }
         
         TaxiOptimizerConfiguration optimConfig = initOptimizerConfiguration();
+        TaxiOptimizer optimizer = params.algorithmConfig.createTaxiOptimizer(optimConfig);
 //        APSTaxiOptimizer optimizer = new APSTaxiOptimizer(optimConfig);
 //        RESTaxiOptimizer optimizer = new RESTaxiOptimizer(optimConfig);
-        PrtNPersonsOptimizer optimizer = new PrtNPersonsOptimizer(optimConfig);
+//        PrtNPersonsOptimizer optimizer = new PrtNPersonsOptimizer(optimConfig);
 //        OTSTaxiOptimizer optimizer = new OTSTaxiOptimizer(optimizerConfig);
 //        NOSTaxiOptimizer optimizer = new NOSTaxiOptimizer(optimConfig);
         
@@ -140,18 +137,23 @@ public class VrpLauncher {
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
         
-        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new NPersonsActionCreator(
-                passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, params.pickupDuration));
+        if(this.params.nPersons){
+        	VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new NPersonsActionCreator(
+        			passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, params.pickupDuration));
+        } else{
+        	VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
+        			passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, params.pickupDuration));
+        }
 
         EventsManager events = qSim.getEventsManager();
         
-        EventWriterXML writer = new EventWriterXML("C:/Users/Daniel/Desktop/dvrp/" + eventsFile);
+        EventWriterXML writer = new EventWriterXML("C:/Users/Daniel/Desktop/dvrp/events.xml");
         events.addHandler(writer);
         
         PopulationWriter pWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
         pWriter.write("C:/Users/Daniel/Desktop/dvrp/" + "person.xml");
         
-        if (otfVis) { // OFTVis visualization
+        if (this.params.otfVis) { // OFTVis visualization
             DynAgentLauncherUtils.runOTFVis(qSim, true, ColoringScheme.taxicab);
         }
         
@@ -165,7 +167,7 @@ public class VrpLauncher {
         legHistogram.write("C:/Users/Daniel/Desktop/dvrp/hist.txt");
         LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist.png", "prt");
         
-        generateOutput();
+//        generateOutput();
         
 	}
 	
@@ -197,13 +199,21 @@ public class VrpLauncher {
 	
 	private TaxiOptimizerConfiguration initOptimizerConfiguration(){
 		
-		params = new TaxiSchedulerParams(false, 30, 30);
-		PrtScheduler scheduler = new PrtScheduler(context, calculator, params);
-		NPersonsVehicleRequestPathFinder vrpFinder = new NPersonsVehicleRequestPathFinder(calculator, scheduler);
+		if(this.params.nPersons){
+			PrtScheduler scheduler = new PrtScheduler(this.context, this.calculator, this.params.taxiParams);
+			NPersonsVehicleRequestPathFinder vrpFinder = new NPersonsVehicleRequestPathFinder(this.calculator, scheduler);
+			FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
+			
+			return new TaxiOptimizerConfiguration(this.context, this.calculator, scheduler, vrpFinder, filterFactory,
+					this.params.algorithmConfig.goal, this.params.workingDir);
+		}
+		
+		TaxiScheduler scheduler = new TaxiScheduler(this.context, this.calculator, this.params.taxiParams);
+		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(this.calculator, scheduler);
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
-		return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
-				Goal.MIN_WAIT_TIME, workingDir);
+		return new TaxiOptimizerConfiguration(this.context, this.calculator, scheduler, vrpFinder, filterFactory,
+				this.params.algorithmConfig.goal, this.params.workingDir);
 		
 	}
 	

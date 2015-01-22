@@ -1,4 +1,4 @@
-package playground.dhosse.prt.optimizer;
+package playground.dhosse.prt.scheduler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,9 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
-import playground.dhosse.prt.task.NPersonsDropoffDriveTask;
-import playground.dhosse.prt.task.NPersonsDropoffStayTask;
-import playground.dhosse.prt.task.NPersonsPickupDriveTask;
-import playground.dhosse.prt.task.NPersonsPickupStayTask;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.TaxiSchedules;
@@ -102,13 +99,13 @@ public class PrtScheduler extends TaxiScheduler {
 			
 			if(task instanceof NPersonsPickupDriveTask){
 				for(VehicleRequestPath vrp : requests){
-					if(vrp.request.getT0() < task.getBeginTime())
+					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED))
 						((NPersonsPickupDriveTask)task).appendRequest(vrp.request);
 				}
 			}
 			if(task instanceof NPersonsPickupStayTask){
 				for(VehicleRequestPath vrp : requests){
-					if(vrp.request.getT0() < task.getBeginTime())
+					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED))
 						((NPersonsPickupStayTask)task).appendRequest(vrp.request);
 				}
 			}

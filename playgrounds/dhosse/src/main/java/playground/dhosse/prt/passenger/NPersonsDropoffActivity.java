@@ -1,4 +1,4 @@
-package playground.dhosse.prt.launch;
+package playground.dhosse.prt.passenger;
 
 import java.util.ArrayList;
 import java.util.List;

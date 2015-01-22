@@ -1,4 +1,4 @@
-package playground.dhosse.prt.task;
+package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
@@ -54,7 +54,6 @@ public class NPersonsPickupDriveTask extends TaxiPickupDriveTask{
 	}
 	
 	public void appendRequest(TaxiRequest request){
-		this.requests.add(request);
 		request.setPickupDriveTask(this);
 	}
 

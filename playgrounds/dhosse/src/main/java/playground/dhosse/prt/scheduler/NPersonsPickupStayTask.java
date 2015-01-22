@@ -1,4 +1,4 @@
-package playground.dhosse.prt.task;
+package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
