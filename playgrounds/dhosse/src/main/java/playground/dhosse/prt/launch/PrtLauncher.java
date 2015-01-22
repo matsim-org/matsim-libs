@@ -13,10 +13,10 @@ public class PrtLauncher {
 		VrpLauncher launcher = new VrpLauncher(params);
 		launcher.run();
 		
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, "C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/config.xml");
-		Scenario sc = ScenarioUtils.loadScenario(config);
-		System.out.println(sc.getPopulation().getPersons().size());
+//		Config config = ConfigUtils.createConfig();
+//		ConfigUtils.loadConfig(config, "C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/config.xml");
+//		Scenario sc = ScenarioUtils.loadScenario(config);
+//		System.out.println(sc.getPopulation().getPersons().size());
 		
 //		VrpLauncher launcher = new VrpLauncher(netFile, plansFile, eventsFileName);
 //		launcher.run();
