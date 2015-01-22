@@ -33,6 +33,14 @@ import org.matsim.core.router.util.TravelTime;
  */
 public interface PTLRouter extends TravelDisutility, TravelTime {
 
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode);
+    /**
+     *
+     * @param fromNode  Node to route from...
+     * @param toNode    Node to route to...
+     * @param mode      Mode (e.g. for bus this would be bus).
+     * @param routeId   A string containing the route id...
+     * @return  Least cost path.
+     */
+    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode, String routeId);
 
 }

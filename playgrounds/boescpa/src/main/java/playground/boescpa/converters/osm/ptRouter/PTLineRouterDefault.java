@@ -395,7 +395,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
 			TransitRouteStop toStop = route.getStops().get(i+1);
-			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop);
+			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
 			for (Link link : path.links) {
 				links.add(link.getId());
 			}
@@ -405,7 +405,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 		route.setRoute(new LinkNetworkRouteImpl(links.get(0),links,links.get(links.size()-1)));
 	}
 
-	private LeastCostPathCalculator.Path getShortestPath(TransitRouteStop fromStop, TransitRouteStop toStop) {
+	private LeastCostPathCalculator.Path getShortestPath(TransitRouteStop fromStop, TransitRouteStop toStop, String routeId) {
 		LeastCostPathCalculator.Path shortestPath = null;
 
 		Map<String, Id<TransitStopFacility>[]> derivativesFromStop
@@ -421,7 +421,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					// We have to loop over both, fromStops and toStops, and have to set both as soon as found...
 					for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
 						Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
-						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 						if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
 							shortestPath = tempShortestPath;
 							fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
@@ -431,7 +431,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				} else {
 					// We have to loop over fromStops and assign it, but not over toStop. (This should actually never be the case...)
 					Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
 						shortestPath = tempShortestPath;
 						fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
@@ -444,7 +444,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				// We have to loop over toStops and assign it, but not over fromStop. (This should be the standard case...)
 				for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
 					Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
 						shortestPath = tempShortestPath;
 						toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
@@ -453,7 +453,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 			} else {
 				// We have to loop over none of the two...
 				Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
-				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode);
+				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 			}
 		}
 

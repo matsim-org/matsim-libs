@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 
+import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
+
 /**
  * What is it for?
  *
@@ -35,7 +37,15 @@ import org.matsim.vehicles.Vehicle;
  */
 public class PTLRFastAStarLandmarks implements PTLRouter {
 
+    private final static double FACTOR_SAMELINE = 1.0;
+    private final static double FACTOR_SAMEMODE = 10.0;
+    private final static double FACTOR_PTLINK = 100.0;
+    private final static double FACTOR_LINKTYPE = 1000.0;
+    private final static double FACTOR_NOMATCH = 1000000.0;
+
     private final LeastCostPathCalculator pathCalculator;
+    private String currentMode;
+    private String currentLine;
 
     public PTLRFastAStarLandmarks(Network network) {
         LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
@@ -43,7 +53,9 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     }
 
     @Override
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode) {
+    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode, String routeId) {
+        this.currentMode = mode;
+        this.currentLine = deriveLineFromRouteId(routeId);
         return pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null);
     }
 
@@ -54,12 +66,39 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
 
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-        // TODO-boescpa implement cost-calculator for each link. Cost must be non-negative.
-        return 0;
+        double travelCost = link.getLength()/link.getFreespeed();
+
+        // todo-boescpa Implement!!!
+
+        /*
+        if (currentMode.equals(BUS)) {
+            if (link.getAllowedModes().contains("street")) {
+
+            }
+        }
+
+        if (link.getAllowedModes().contains(currentMode)) {
+            if (link.getAllowedModes().contains(currentLine)) {
+                return travelCost * FACTOR_SAMELINE;
+            } else {
+                return travelCost * FACTOR_SAMEMODE;
+            }
+        } else if (currentMode.equals(BUS)) {
+            if (link.getAllowedModes().contains("street")) {
+                return travelCost * FACTOR_LINKTYPE;
+            }
+        } else {
+            return travelCost * FACTOR_NOMATCH;
+        }*/
+        return travelCost;
     }
 
     @Override
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
         return link.getLength() / link.getFreespeed(time);
+    }
+
+    private String deriveLineFromRouteId(String routeId) {
+        return null;
     }
 }
