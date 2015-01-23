@@ -94,7 +94,7 @@ public class PseudoNetworkCreator {
 
         Node fromNode = this.nodes.get(fromFacility);
         if (fromNode == null) {
-            fromNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), fromFacility.getCoord());
+            fromNode = this.network.getFactory().createNode(Id.create(this.prefix + fromFacility.getId(), Node.class), fromFacility.getCoord());
             this.network.addNode(fromNode);
             this.nodes.put(fromFacility, fromNode);
         }

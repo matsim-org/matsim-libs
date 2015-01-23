@@ -27,14 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
 import java.util.*;
@@ -49,8 +43,8 @@ import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRA
  */
 public class PTLineRouterDefault extends PTLineRouter {
 
-	private final static double SEARCH_RADIUS_BUS = 5; //[m]
-	private final static double SEARCH_RADIUS_TRAM = 10; //[m]
+	private final static double SEARCH_RADIUS_BUS = 10; //[m]
+	private final static double SEARCH_RADIUS_TRAM = 20; //[m]
 
 	private final Map<Id<TransitStopFacility>, Map<String, Id<TransitStopFacility>[]>> linkedStopFacilities = new HashMap<>();
 	private PTLRouter router = null;
@@ -92,7 +86,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 
 		log.info("Creating PT lines...");
 		linkStationsToNetwork();
-		correctStationLinks();
 		createPTRoutes();
 		cleanStationsAndNetwork();
 		log.info("Creating PT lines... done.");
@@ -189,20 +182,22 @@ public class PTLineRouterDefault extends PTLineRouter {
 	}
 
 	/**
-	 * Search for the closest link that has the current mode as allowed travel mode and return this link.
+	 * Within search radius search for the closest link that has the current mode as allowed travel mode
+	 * and return this link.
 	 *
 	 * @param stopFacility Stop facility to search a link for.
 	 * @return Null if no such link could be found.
 	 */
 	private Id<Link> findClosestLink(TransitStopFacility stopFacility) {
 		Link nearestLink = NetworkUtils.getNearestLink(this.network, stopFacility.getCoord());
-		if (nearestLink.getAllowedModes().contains(this.mode)) {
-			// If nearest link has right mode, return it.
+		if (nearestLink.getAllowedModes().contains(this.mode)
+				&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), nearestLink.getCoord()) <= this.searchRadius) {
+			// If nearest link has right mode and is within search radius, return it.
 			return nearestLink.getId();
 		} else {
 			// Search for the allowed link with the shortest distance:
 			nearestLink = null;
-			double currentRadius = Double.MAX_VALUE;
+			double currentRadius = this.searchRadius;
 			for (Link potentialLink : this.network.getLinks().values()) {
 				if (potentialLink.getAllowedModes().contains(this.mode)
 						&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), potentialLink.getCoord()) < currentRadius) {
@@ -213,8 +208,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 			if (nearestLink != null) {
 				return nearestLink.getId();
 			} else {
-				throw new RuntimeException("No link with right mode found in network! Network and schedule will not be functional. Please check configuration and retry.");
-				// If no nearest link with right mode could be found in network, error is thrown...
+				return null;
 			}
 		}
 	}
@@ -229,6 +223,10 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * @return Null if no other direction links could be found...
 	 */
 	private Id<Link>[] getOppositeDirection(Id<Link> linkId) {
+		if (linkId == null) {
+			return null;
+		}
+
 		// If we find one with "opposite" direction, we return only this.
 		Link lowerLink = this.network.getLinks().get(Id.createLinkId(Integer.parseInt(linkId.toString()) - 1));
 		Link link = this.network.getLinks().get(linkId);
@@ -297,72 +295,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 	}
 
 	/**
-	 * If euclidan distance between stop and its link is too big (bigger than stop-distance_mode),
-	 * create a new node at the stop and reconnect the stop to newly created links connecting the new node with
-	 * the existing network (using createBidirectionallyLinksBetweenStops).
-	 */
-	private void correctStationLinks() {
-		// TODO-boescpa Implement correct station links...
-
-		/*
-		TransitRouteStop formerStop = null, currentStop, nextStop;
-		for (int i = 0; i < route.getStops().size(); i++) {
-			currentStop = route.getStops().get(i);
-			nextStop = null;
-			if ((i+1) < route.getStops().size()) {
-				nextStop = route.getStops().get(i+1);
-			}
-
-			...
-
-		if (closestLink != null) {
-			oppositeDirectionLinks = getOppositeDirection(closestLink, network);
-		} else {
-			//	if no closest link found, create link linking the stop to the former stop and one to the following link. attach station to the incoming link. do this for both directions!
-			if (formerStop != null && nextStop != null) {
-				closestLink = createBidirectionallyLinksBetweenStops(network, formerStop, currentStop);
-				oppositeDirectionLinks = new Id[]{createBidirectionallyLinksBetweenStops(network, nextStop, currentStop)};
-			} else if (formerStop != null) {
-				closestLink = createBidirectionallyLinksBetweenStops(network, formerStop, currentStop);
-			} else if (nextStop != null) {
-				closestLink = createBidirectionallyLinksBetweenStops(network, nextStop, currentStop);
-			}
-		}
-		*/
-
-		/*
-		if (NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), attachedLink.getCoord()) <= this.linkRadius) {
-			...
-		}
-		 */
-	}
-
-	/**
-	 * Creates bidirectionally links between the two stops,
-	 * adds them to the network with travel mode "mode"
-	 * and returns the from-to-Link.
-	 *
-	 * @param fromStop
-	 * @param toStop
-	 * @return Created From-To-Link.
-	 */
-	private Id<Link> createBidirectionallyLinksBetweenStops(TransitRouteStop fromStop, TransitRouteStop toStop) {
-		// TODO-boescpa nodes have to be available at both stops to link them... Think about it...
-
-		/*Id<Link> fromLinkId = fromStop.getStopFacility().getLinkId();
-		Id<Link> toLinkId = toStop.getStopFacility().getLinkId();
-		Node fromNode = null;
-		if (fromLinkId != null) {
-			fromNode = network.getLinks().get(fromLinkId).getToNode();
-		} else {
-
-		}*/
-
-		// TODO-boescpa implement createBidirectionallyLinksBetweenStops
-		return null;
-	}
-
-	/**
 	 * By applying a routing algorithm (e.g. shortest path or OSM-extraction) route from station to
 	 * station for each pt-line.
 	 *
@@ -404,7 +336,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					links.add(link.getId());
 				}
 			} catch (Exception e) {
-				log.error("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. Pseudo route created");
+				//log.warn("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. Pseudo route created.");
 				Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
 				links.add(link.getId());
 				i++;
@@ -478,8 +410,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 
 		return shortestPath;
 	}
-
-
 
 	/**
 	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
