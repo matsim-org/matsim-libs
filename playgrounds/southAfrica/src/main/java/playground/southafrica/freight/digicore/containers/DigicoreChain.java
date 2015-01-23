@@ -276,7 +276,7 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	
 	public String toString(){
 		GregorianCalendar startCalendar = this.get(0).getEndTimeGregorianCalendar();
-		String startDateTime = String.format("%4d%02d%02d, %02d:%02d", 
+		String startDateTime = String.format("%4d%02d%02d, Day %d, %02d:%02d", 
 				startCalendar.get(Calendar.YEAR), 
 				startCalendar.get(Calendar.MONTH)+1,
 				startCalendar.get(Calendar.DAY_OF_MONTH),
