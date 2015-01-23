@@ -29,9 +29,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
 import java.util.*;
@@ -51,6 +54,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 
 	private final Map<Id<TransitStopFacility>, Map<String, Id<TransitStopFacility>[]>> linkedStopFacilities = new HashMap<>();
 	private PTLRouter router = null;
+	private PseudoNetworkCreator pseudoNetworkCreator = null;
 
 	public PTLineRouterDefault(TransitSchedule schedule) {
 		super(schedule);
@@ -90,7 +94,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 		linkStationsToNetwork();
 		correctStationLinks();
 		createPTRoutes();
-		createPseudoNetworkForOtherModes();
 		cleanStationsAndNetwork();
 		log.info("Creating PT lines... done.");
 	}
@@ -369,6 +372,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 		log.info("Creating pt routes...");
 
 		this.router = new PTLRFastAStarLandmarks(this.network);
+		this.pseudoNetworkCreator = new PseudoNetworkCreator(this.schedule, this.network, "PseudoNetwork_");
 
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -380,7 +384,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					routeLine(route);
 				} else {
 					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
-					// TODO-boescpa Implement other modes...
+					this.pseudoNetworkCreator.createLine(route);
 				}
 			}
 		}
@@ -391,7 +395,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private void routeLine(TransitRoute route) {
 		List<Id<Link>> links = new ArrayList<>();
 		int i = 0;
-		//links.add(this.network.getLinks().get(route.getStops().get(0).getStopFacility().getLinkId()).getId());
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
 			TransitRouteStop toStop = route.getStops().get(i+1);
@@ -401,16 +404,21 @@ public class PTLineRouterDefault extends PTLineRouter {
 					links.add(link.getId());
 				}
 			} catch (Exception e) {
-				log.error("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. No route created");
-				links.clear();
-				break;
-				// todo-boescpa Implement more sophisticated dealing with this problem like skipping the stop and continue routing and create pseudo-network for this stop later on...
+				log.error("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. Pseudo route created");
+				Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
+				links.add(link.getId());
+				i++;
+				if (i < (route.getStops().size()-1)) {
+					fromStop = route.getStops().get(i);
+					toStop = route.getStops().get(i+1);
+					link = this.pseudoNetworkCreator.getNetworkLink(fromStop,toStop);
+					links.add(link.getId());
+				}
 			}
-			//links.add(this.network.getLinks().get(route.getStops().get(i+1).getStopFacility().getLinkId()).getId());
 			i++;
 		}
 		if (links.size() > 0) {
-			route.setRoute(new LinkNetworkRouteImpl(links.get(0), links, links.get(links.size() - 1)));
+			route.setRoute(RouteUtils.createNetworkRoute(links, this.network));
 		} else {
 			log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
 		}
@@ -471,14 +479,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 		return shortestPath;
 	}
 
-	/**
-	 * All PT-modes that are not connected to the given network, get their own pseudo network integrated
-	 * in the given network. This also includes linking the stations to the new links and nodes and routing the
-	 * the pt-lines (can all be done at once...).
-	 */
-	private void createPseudoNetworkForOtherModes() {
-		// TODO-boescpa Implement this...
-	}
+
 
 	/**
 	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
