@@ -80,7 +80,7 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public static final String IGNORE = "ignore" ;
 	public static final String WARN = "warn" ;
 	public static final String ABORT = "abort" ;
-	private String vspDefaultsCheckingLevel = IGNORE ;
+	private String vspDefaultsCheckingLevel = WARN ;
 	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
 	public String getVspDefaultsCheckingLevel() {
 		return vspDefaultsCheckingLevel;
