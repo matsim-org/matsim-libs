@@ -23,13 +23,14 @@ package playground.southafrica.projects.complexNetworks.pathDependence;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
 
-public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
+public class DigicorePathDependentNetworkWriterHandlerImpl_v2 implements
 		DigicorePathDependentNetworkWriterHandler {
 
 	@Override
@@ -42,8 +43,7 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 			throws IOException {
 		out.write("\n<digicoreNetwork");
 		if(network.getDescription() != null){
-			out.write(" desc=\"" + network.getDescription());
-			out.write("\"");
+			out.write(" desc=\"" + network.getDescription() + "\"");
 		}
 		out.write(">\n\n");
 	}
@@ -58,7 +58,9 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 			throws IOException {
 		out.write("\t<node");
 		out.write(" id=\"" + node.getId().toString() + "\"");
-		out.write(String.format(" x=\"%.2f\" y=\"%.2f\">\n",node.getCoord().getX(), node.getCoord().getY() ) );
+		out.write(String.format(" x=\"%.2f\" y=\"%.2f\">\n",
+				node.getCoord().getX(), 
+				node.getCoord().getY() ) );
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startPreceding(Id id, BufferedWriter out) throws IOException {
+	public void startPreceding(Id<Node> id, BufferedWriter out) throws IOException {
 		out.write("\t\t<preceding");
 		out.write(" id=\"" + id.toString());
 		out.write("\">\n");
@@ -97,7 +99,18 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 	@Override
 	public void startStartTime(Map<String, Integer> starttime,
 			BufferedWriter out) throws IOException {
-		/* Do nothing. */
+		/* Convert the hour strings to sortable values */
+		Map<Integer, Integer> map = new TreeMap<Integer, Integer>();
+		for(String s : starttime.keySet()){
+			map.put(Integer.parseInt(s), starttime.get(s));
+		}
+		out.write("\n");
+		out.write("\t\t<!--  Source node: activity chain start times. -->\n");
+		for(int i : map.keySet()){
+			out.write("\t\t<starttime");
+			out.write(" hour=\"" + String.valueOf(i) + "\"");
+			out.write(" count=\"" + String.valueOf(map.get(i)) + "\"/>\n");
+		}
 	}
 
 	@Override
@@ -108,7 +121,19 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 	@Override
 	public void startActivities(Map<String, Integer> activities,
 			BufferedWriter out) throws IOException {
-		/* Do nothing. */
+		/* Convert the activity strings to sortable values */
+		Map<Integer, Integer> map = new TreeMap<Integer, Integer>();
+		for(String s : activities.keySet()){
+			map.put(Integer.parseInt(s), activities.get(s));
+		}
+
+		out.write("\n");
+		out.write("\t\t<!--  Source node: number of activities per chain. -->\n");
+		for(int i : map.keySet()){
+			out.write("\t\t<activities");
+			out.write(" number=\"" + String.valueOf(i) + "\"");
+			out.write(" count=\"" + String.valueOf(map.get(i)) + "\"/>\n");
+		}
 	}
 
 	@Override

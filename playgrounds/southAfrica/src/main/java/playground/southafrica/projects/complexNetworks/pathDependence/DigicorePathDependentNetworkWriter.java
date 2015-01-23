@@ -62,7 +62,7 @@ public class DigicorePathDependentNetworkWriter extends MatsimXmlWriter implemen
 	
 	@Override
 	public void write(final String filename){
-		writeV1(filename);
+		writeV2(filename);
 	}
 	
 	
@@ -101,7 +101,60 @@ public class DigicorePathDependentNetworkWriter extends MatsimXmlWriter implemen
 				throw new RuntimeException("Cannot close writer.");	
 			}
 		}
+	}
+	
+	
+	public void writeV2(final String filename){
+		String dtd = "http://matsim.org/files/dtd/digicorePathDependentNetwork_v2.dtd";
+		DigicorePathDependentNetworkWriterHandler handler = new DigicorePathDependentNetworkWriterHandlerImpl_v2();
 		
+		try {
+			openFile(filename);
+			writeXmlHead();
+			writeDoctype("digicoreNetwork", dtd);
+			
+			handler.startNetwork(network, writer);
+			for(PathDependentNode node : network.getPathDependentNodes().values()){
+				handler.startNode(node, writer);
+				for(Id<Node> id : node.getPathDependence().keySet()){
+					handler.startPreceding(id, writer);
+					
+					/* Write the following nodes. */
+					Map<Id<Node>, Double> map = node.getNextNodes(id);
+					handler.startFollowing(map, writer);
+					handler.endFollowing(writer);
+					
+					handler.endPreceding(writer);	
+					
+				}
+
+				/* Write the start hours if available. */
+				Map<String, Integer> hourMap = node.getStartTimeMap();
+				if(!hourMap.isEmpty()){
+					handler.startStartTime(hourMap, writer);
+					handler.endStartTime(writer);
+				}
+				
+				/* Write the number of activities if available. */
+				Map<String, Integer> activityMap = node.getNumberOfActivityMap();
+				if(!activityMap.isEmpty()){
+					handler.startActivities(activityMap, writer);
+					handler.endActivities(writer);
+				}
+				
+				handler.endNode(node, this.writer);
+			}
+			handler.endNetwork(this.writer);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} finally{
+			try {
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close writer.");	
+			}
+		}
 	}
 
 }

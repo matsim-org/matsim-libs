@@ -44,15 +44,13 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
+import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v2;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.utilities.Header;
 
@@ -86,7 +84,7 @@ public class FreightChainGenerator {
 		int numberOfThreads = Integer.parseInt(args[5]);
 		
 		/* Read the path-dependent complex network. */
-		DigicorePathDependentNetworkReader_v1 nr = new DigicorePathDependentNetworkReader_v1();
+		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
 		nr.parse(complexNetworkFile);
 		PathDependentNetwork pathDependentNetwork = nr.getPathDependentNetwork();
 		pathDependentNetwork.writeNetworkStatisticsToConsole();
@@ -194,56 +192,57 @@ public class FreightChainGenerator {
 			/* Generate the first activity. */
 			Id<Node> previousId = Id.create("source", Node.class);
 			Id<Node> currentId = network.sampleChainStartNode();
-			Id<Node> nextId = network.getPathDependentNode(currentId).sampleBiasedNextPathDependentNode(previousId);
+			
 			Coord coord = network.getPathDependentNode(currentId).getCoord();
 			ActivityImpl activity = new ActivityImpl("major", coord);
 			activity.setFacilityId(Id.create(currentId.toString(), ActivityFacility.class));
-			activity.setEndTime(ChainStartTime.getStartTimeInSeconds(RANDOM.nextDouble()));
+
+			int startHour = network.sampleChainStartHour(currentId);
+			double endTime = Math.round((startHour + RANDOM.nextDouble())*3600); /* in seconds after midnight */
+			activity.setEndTime(endTime);
 			plan.addActivity(activity);
-			
-			/* Generate the consecutive activities until the next vertex Id is
-			 * 'sink', indicating the activity chain ends there. */
-			boolean chainEnd = false;
-			int chainLength = 1;
-			while(!chainEnd){
-				/* Add the leg. */
-				Leg leg = pf.createLeg("commercial");
-				plan.addLeg(leg);
-				
-				/* Update the node sequence, but only if the current activity
-				 * is not the end-of-chain activity. */
+
+			/* Add the leg. */
+			Leg firstLeg = pf.createLeg("commercial");
+			plan.addLeg(firstLeg);
+
+			int numberOfActivities = network.sampleNumberOfMinorActivities(currentId);
+
+			while(numberOfActivities > 0){
+				Id<Node> nextId = network.sampleBiasedNextPathDependentNode(previousId, currentId);
+
+				/* Update the node sequence. */
 				previousId = Id.create(currentId.toString(), Node.class);
 				currentId = Id.create(nextId.toString(), Node.class);
-				chainLength++;
-				
-				/* Generate the next node, given the current node. */
-				nextId = network.getPathDependentNode(currentId).sampleBiasedNextPathDependentNode(previousId);
-				String activityType = null;
-				
-				/*Uncomment the next line if you wish to enforce a maximum chain length when generating the chains.*/
-				if(chainLength == MAX_CHAIN_LENGTH || nextId == null || nextId.toString().equalsIgnoreCase("sink")){
-//				if(nextId == null || nextId.toString().equalsIgnoreCase("sink")){ this while loop creates an infinite loop when the generator is stuck in an area with no sink node
-					activityType = "major";
-					chainEnd = true;
-				} else{
-					activityType = "minor";
-				}
 				
 				/* Create and add the activity from the identified node. */
 				Coord thisCoord = network.getPathDependentNode(currentId).getCoord();
-				ActivityImpl thisActivity = new ActivityImpl(activityType, thisCoord);
+				ActivityImpl thisActivity = new ActivityImpl("minor", thisCoord);
 				thisActivity.setFacilityId(Id.create(currentId, ActivityFacility.class));
 				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
-
-				// FIXME Is this right i.t.o. last major activity?
-				if(activityType.equalsIgnoreCase("minor")){
-					thisActivity.setMaximumDuration(duration);
-				}
-				
+				thisActivity.setMaximumDuration(duration);
 				plan.addActivity(thisActivity);
 				
+				/* Add the leg. */
+				Leg leg = pf.createLeg("commercial");
+				plan.addLeg(leg);
+
+				/* Update the chain length. If the current activity is supposed 
+				 * to be the last minor activity, then check if the 
+				 */
+				numberOfActivities--;
 			}
+			
+			/* Add the final major activity. */
+			Id<Node> finalNode = network.sampleEndOfChainNode(previousId, currentId);
+			
+			/* Create and add the activity from the identified node. */
+			Coord finalCoord = network.getPathDependentNode(finalNode).getCoord();
+			ActivityImpl finalActivity = new ActivityImpl("major", finalCoord);
+			finalActivity.setFacilityId(Id.create(finalNode, ActivityFacility.class));
+			plan.addActivity(finalActivity);
+			
 			counter.incCounter();
 			return plan;
 		}

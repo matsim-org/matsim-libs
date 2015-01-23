@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.utils.DigicoreChainCleaner;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;

@@ -21,6 +21,8 @@ package playground.southafrica.projects.complexNetworks.pathDependence;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
@@ -42,10 +46,15 @@ import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 public class PathDependentNetwork {
 	private final Logger LOG = Logger.getLogger(PathDependentNetwork.class);
 	private Map<Id<Node>, PathDependentNode> network;
+	private Double totalSourceWeight = null;
 	private Random random;
 	private String description = null;
 	private long buildStartTime;
 	private long buildEndTime;
+	
+	private static int sinkOnly = 0;
+	private static int noSink = 0;
+	private static int totalNextNodesSampled = 0;
 	
 	
 	/**
@@ -97,11 +106,18 @@ public class PathDependentNetwork {
 	
 	
 	public void processActivityChain(DigicoreChain chain){
+		/* Elements of the chain that we want to retain with the specific 
+		 * source node. This is usable when we sample an activity chain later
+		 * from the path-dependent complex network. */
+		DigicoreActivity firstMajor = chain.get(0);
+		int startHour = firstMajor.getEndTimeGregorianCalendar().get(Calendar.HOUR_OF_DAY);
+		int numberOfActivities = chain.getNumberOfMinorActivities();
+		
 		/* Process the first activity pair, but only if both activities are 
 		 * associated with a facility. */
-		Id<Node> previousNodeId = null;
-		Id<Node> currentNodeId = Id.create(chain.get(0).getFacilityId(), Node.class);
-		Id<Node> nextNodeId = Id.create(chain.get(1).getFacilityId(), Node.class);
+		Id<Node> previousNodeId = Id.createNodeId("source");
+		Id<Node> currentNodeId = Id.createNodeId(chain.get(0).getFacilityId());
+		Id<Node> nextNodeId = Id.createNodeId(chain.get(1).getFacilityId());
 		
 		if(currentNodeId != null && nextNodeId != null){
 			/* Add the current node to the network if it doesn't already exist. */
@@ -110,13 +126,13 @@ public class PathDependentNetwork {
 			} 
 			PathDependentNode currentNode = this.network.get(currentNodeId);
 			
-			/* Add the next node to the network if it doesn'talready exist. */
+			/* Add the next node to the network if it doesn't already exist. */
 			if(!this.network.containsKey(nextNodeId)){
 				this.network.put(nextNodeId, new PathDependentNode(nextNodeId, chain.get(1).getCoord()));
 			} 
 			
-			/* Add the path-dependent link to the network. */
-			currentNode.addPathDependentLink(null, nextNodeId);
+			/* Add the first path-dependent link to the network. */
+			currentNode.addSourceLink(startHour, numberOfActivities, nextNodeId);
 			
 			/* Ensure that the next node reflects the fact that it can be
 			 * reached from the currentNode. */
@@ -257,10 +273,12 @@ public class PathDependentNetwork {
 	public Id<Node> sampleChainStartNode(double randomValue){
 		Id<Node> id = null;
 		
-		/* Determine the total source weight. */
-		double totalWeight = 0.0;
-		for(PathDependentNode node : this.network.values()){
-			totalWeight += node.getSourceWeight();
+		/* Determine the total source weight, but only once for the network. */
+		if(this.totalSourceWeight == null){
+			this.totalSourceWeight = 0.0;
+			for(PathDependentNode node : this.network.values()){
+				this.totalSourceWeight += node.getSourceWeight();
+			}
 		}
 		
 		/* Given a random value, sample the next node. */
@@ -269,7 +287,7 @@ public class PathDependentNetwork {
 		while(id == null){
 			PathDependentNode node = iterator.next();
 			cumulativeWeight += node.getSourceWeight();
-			if(cumulativeWeight/totalWeight >= randomValue){
+			if(cumulativeWeight/this.totalSourceWeight >= randomValue){
 				id = node.getId();
 			}
 		}
@@ -284,6 +302,266 @@ public class PathDependentNetwork {
 	 */
 	public Id<Node> sampleChainStartNode(){
 		return sampleChainStartNode(random.nextDouble());
+	}
+	
+	/**
+	 * <b><i>Warning:</i></b> This should only be used for tests!
+	 * 
+	 * @return
+	 */
+	public int sampleChainStartHour(Id<Node> startNode, double randomValue){
+		PathDependentNode node = this.getPathDependentNode(startNode);
+		
+		Id<Node> sourceId = Id.createNodeId("source");
+		if(!node.getPathDependence().containsKey(sourceId)){
+			LOG.error("Cannot sample a chain's start hour from a node that is not considered a major activity.");
+			throw new IllegalArgumentException("Illegal start node Id: " + startNode.toString());
+		}
+
+		/* Establish the number of times this node has been a source node, but 
+		 * only once per node. */
+		if(node.sourceCount == null){
+			node.sourceCount = 0.0;
+			for(String hour : node.hourMap.keySet()){
+				node.sourceCount += (double)node.hourMap.get(hour); 
+			}
+		}
+		
+		double cumulativeWeight = 0.0;
+		Integer hour = null;
+		Iterator<String> iterator = node.hourMap.keySet().iterator();
+		while(hour == null && iterator.hasNext()){
+			String hourString = iterator.next();
+			cumulativeWeight += node.hourMap.get(hourString);
+			if( (cumulativeWeight/node.sourceCount) >= randomValue ){
+				hour = Integer.parseInt(hourString);
+			}
+		}
+		
+		return hour;
+	}
+	
+
+	/**
+	 * 
+	 * @param startNode
+	 * @return
+	 */
+	public int sampleChainStartHour(Id<Node> startNode){
+		return this.sampleChainStartHour(startNode, random.nextDouble());
+	}
+	
+	
+	public int sampleNumberOfMinorActivities(Id<Node> startNode, double randomValue){
+		PathDependentNode node = this.getPathDependentNode(startNode);
+		
+		Id<Node> sourceId = Id.createNodeId("source");
+		if(!node.getPathDependence().containsKey(sourceId)){
+			LOG.error("Cannot sample a chain's number of activities from a node that is not considered a major activity.");
+			throw new IllegalArgumentException("Illegal start node Id: " + startNode.toString());
+		}
+
+		/* Establish the number of times this node has been a source node, but 
+		 * only once per node. */
+		if(node.sourceCount == null){
+			node.sourceCount = 0.0;
+			for(String hour : node.activityCountMap.keySet()){
+				node.sourceCount += (double)node.activityCountMap.get(hour); 
+			}
+		}
+		
+		double cumulativeWeight = 0.0;
+		Integer numberOfActivities = null;
+		Iterator<String> iterator = node.activityCountMap.keySet().iterator();
+		while(numberOfActivities == null && iterator.hasNext()){
+			String activityCountString = iterator.next();
+			cumulativeWeight += node.activityCountMap.get(activityCountString);
+			if( (cumulativeWeight/node.sourceCount) >= randomValue ){
+				numberOfActivities = Integer.parseInt(activityCountString);
+			}
+		}
+		
+		return numberOfActivities;
+	}
+	
+	
+	/**
+	 * 
+	 * @param startNode
+	 * @return
+	 */
+	public int sampleNumberOfMinorActivities(Id<Node> startNode){
+		return this.sampleNumberOfMinorActivities(startNode, random.nextDouble());
+	}
+	
+	
+	public Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId, Id<Node> currentNodeId){
+		return sampleBiasedNextPathDependentNode(previousNodeId, currentNodeId, random.nextDouble());
+	}
+	
+	
+	/**
+	 * <b><i>Warning!!</i></b> This method is only meant for testing purposes. 
+	 * You should use {@link #sampleBiasedNextPathDependentNode(Id)}.
+	 * TODO Finish description.
+	 * @param previousNodeId
+	 * @param randomValue
+	 * @return
+	 */
+	protected Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId, Id<Node> currentNodeId, double randomValue){
+		PathDependentNode currentNode = this.getPathDependentNode(currentNodeId);		
+//		previousNodeId = previousNodeId == null ? Id.create("source", Node.class) : previousNodeId;
+		
+//		/* Check that the path-dependent sequence exist. */
+//		if(!pathDependence.containsKey(previousNodeId)){
+//			LOG.error("There is no next node travelling from " + previousNodeId.toString() + " via " + this.getId().toString());
+//			LOG.error("Null returned.");
+//			return null;
+//		}			
+		
+		/* Remove the 'sink' node from the choice set, and see if there are 
+		 * possible next nodes. */
+		Map<Id<Node>, Double> map = currentNode.getPathDependentNextNodes(previousNodeId);
+		Id<Node> sinkId = Id.createNodeId("sink");
+		Map<Id<Node>, Double> choiceMap = new HashMap<Id<Node>, Double>();
+		for(Id<Node> id : map.keySet()){
+			if(!id.equals(sinkId)){
+				choiceMap.put(id, map.get(id));
+			}
+		}
+		
+		if(choiceMap.isEmpty()){
+			LOG.warn("This node only terminates as a sink. Returning any next node from the current node.");
+			
+			for(Id<Node> otherPrevious : currentNode.getPathDependence().keySet()){
+				map = currentNode.getPathDependentNextNodes(otherPrevious);
+				for(Id<Node> possibleId : map.keySet()){
+					/* Ignore 'sink' as a next node. */ 
+					if(!possibleId.toString().equalsIgnoreCase(sinkId.toString())){
+						PathDependentNode possibleNode = this.getPathDependentNode(possibleId);
+						double weight = possibleNode.getTotalSinkWeight();
+						if(weight > 0){
+							choiceMap.put(possibleId, weight);
+						}
+					}
+				}
+			}
+			sinkOnly++;
+		}
+
+		/* If this too fails, see if we can terminate the chain prematurely. */
+		if(choiceMap.isEmpty()){
+			throw new RuntimeException("Ooops! Cannot sample a next node!!");
+		}
+		
+		/* Determine the total weighted out-degree. */
+		double total = 0.0;
+		for(Id<Node> id : choiceMap.keySet()){
+			total += choiceMap.get(id);
+		}
+		
+		/* Sample next node. */
+		double cumulativeTotal = 0.0;
+		Id<Node> nextId = null;
+		Iterator<Id<Node>> iterator = choiceMap.keySet().iterator();
+		
+		while(nextId == null){
+			Id<Node> id = iterator.next();
+			cumulativeTotal += choiceMap.get(id);
+			if( (cumulativeTotal / total) >= randomValue){
+				nextId = id;
+			}
+		}
+		
+		if(nextId.toString().equalsIgnoreCase("sink")){
+			return null;
+		}
+		
+		totalNextNodesSampled++;
+		return nextId;
+	}
+
+	
+	/**
+	 * Should only be used directly for tests.
+	 * 
+	 * @param previousId
+	 * @param currentId
+	 * @param randomValue
+	 * @return
+	 */
+	protected Id<Node> sampleEndOfChainNode(Id<Node> previousId, Id<Node> currentId, double randomValue){
+		PathDependentNode currentNode = this.getPathDependentNode(currentId);
+		
+		/* Only consider those nodes who have a 'sink' in their choice set. */
+
+		/* Given the path dependence, check if there is a next node that,
+		 * in turn, will have a 'sink', i.e. end the chain. */
+		Map<Id<Node>, Double> choiceMap = new HashMap<Id<Node>, Double>();	
+		Map<Id<Node>, Double> map = currentNode.getPathDependentNextNodes(previousId);
+		Id<Node> sinkId = Id.createNodeId("sink");
+		for(Id<Node> possibleId : map.keySet()){
+			/* Ignore 'sink' as a next node. */ 
+			if(!possibleId.toString().equalsIgnoreCase(sinkId.toString())){
+				PathDependentNode possibleNode = this.getPathDependentNode(possibleId);
+				Map<Id<Node>, Double> possibleMap = possibleNode.getNextNodes(currentId);
+				if(possibleMap.containsKey(sinkId)){
+					/* Yes, this can be a possible node to choose as it can end a chain. */
+					choiceMap.put(possibleId, possibleMap.get(sinkId));
+				}
+			}
+		}
+		
+		/* If the first step was unsuccessful, ignore the path dependence, and
+		 * check if any next node can be a 'sink', irrespective of the previous
+		 * node in the path-dependence. */
+		if(choiceMap.isEmpty()){
+			LOG.debug("Check if this is calculated correctly.");
+			/* Find another approach to get a next node that can end a chain. */
+			for(Id<Node> otherPrevious : currentNode.getPathDependence().keySet()){
+				map = currentNode.getPathDependentNextNodes(otherPrevious);
+				for(Id<Node> possibleId : map.keySet()){
+					/* Ignore 'sink' as a next node. */ 
+					if(!possibleId.toString().equalsIgnoreCase(sinkId.toString())){
+						PathDependentNode possibleNode = this.getPathDependentNode(possibleId);
+						double weight = possibleNode.getTotalSinkWeight();
+						if(weight > 0){
+							choiceMap.put(possibleId, weight);
+						}
+					}
+				}
+			}
+			noSink++;
+		}
+
+		/* If this too fails, see if we can terminate the chain prematurely. */
+		if(choiceMap.isEmpty()){
+			throw new RuntimeException("Ooops! Cannot sample the end of an activity chain!!");
+		}
+		
+		
+		double total = 0.0;
+		for(Id<Node> id : choiceMap.keySet()){
+			total += choiceMap.get(id);
+		}
+		
+		double cumulativeWeight = 0.0;
+		Id<Node> nextNode = null;
+		Iterator<Id<Node>> iterator = choiceMap.keySet().iterator();
+		while(nextNode == null && iterator.hasNext()){
+			Id<Node> thisNode = iterator.next();
+			cumulativeWeight += choiceMap.get(thisNode);
+			if( (cumulativeWeight/total) >= randomValue ){
+				nextNode = thisNode;
+			}
+		}
+
+		totalNextNodesSampled++;
+		return nextNode;
+	}
+	
+	public Id<Node> sampleEndOfChainNode(Id<Node> previousId, Id<Node> currentId){
+		return this.sampleEndOfChainNode(previousId, currentId, random.nextDouble());
 	}
 	
 	
@@ -305,18 +583,43 @@ public class PathDependentNetwork {
 		LOG.info("------------------------------------------------------------");
 	}
 	
+	
+	/**
+	 * TODO Fix
+	 * @return
+	 */
+	public List<Tuple<Id<Node>, Id<Node>>> getEdges(){
+		Map<Id<Node>, PathDependentNode> nodes = this.getPathDependentNodes();
+		for(PathDependentNode node : nodes.values()){
+			Id<Node> oId = node.getId();
+		}
+		
+		return null;
+	}
+	
+	public void reportSamplingStatus(){
+		LOG.info("Sampling status:");
+		LOG.info("  |_ next nodes sampled: " + totalNextNodesSampled);
+		LOG.info("  |_ revised next nodes: " + sinkOnly);
+		LOG.info("  |_ revised sink nodes: " + noSink);
+	}
+
 
 	public class PathDependentNode implements Identifiable<Node> {
 		private final Id<Node> id;
 		private final Coord coord;
-		private double source = 0.0;
-		private double sink = 0.0;
+		private Double sourceCount = null;
+		private Double sinkCount = null;
 		private Map<Id<Node>, Map<Id<Node>, Double>> pathDependence;
+		private Map<String,Integer> hourMap;
+		private Map<String, Integer> activityCountMap;
 		
 		public PathDependentNode(Id<Node> id, Coord coord) {
 			this.id = id;
 			this.coord = coord;
 			this.pathDependence = new TreeMap<>();
+			this.hourMap = new TreeMap<String, Integer>();
+			this.activityCountMap = new TreeMap<String, Integer>();
 		}
 
 		@Override
@@ -328,9 +631,27 @@ public class PathDependentNetwork {
 			return this.coord;
 		}
 		
-		public void setAsSource(){
-			source += 1.0;
+
+		public void setAsSource(int startHour, int numberOfActivities){
+			/* Set start hour. */
+			String h = String.valueOf(startHour);
+			if(!this.hourMap.containsKey(h)){
+				this.hourMap.put(h, 1);
+			} else{
+				int oldValue = this.hourMap.get(h);
+				this.hourMap.put(String.valueOf(startHour), oldValue + 1);
+			}
+			
+			/* Set number of activities. */
+			String n = String.valueOf(numberOfActivities);
+			if(!this.activityCountMap.containsKey(n)){
+				this.activityCountMap.put(n, 1);
+			} else{
+				int oldValue = this.activityCountMap.get(n);
+				this.activityCountMap.put(n, oldValue + 1);
+			}
 		}
+		
 		
 		public void setPathDependentEdgeWeight(Id<Node> previousId, Id<Node> nextId, double weight){
 			if(!pathDependence.containsKey(previousId)){
@@ -341,7 +662,6 @@ public class PathDependentNetwork {
 		
 		
 		public void setAsSink(Id<Node> previousId){
-			sink += 1.0;
 			Map<Id<Node>, Double> map = null;
 			if(!pathDependence.containsKey(previousId)){
 				map = new TreeMap<Id<Node>, Double>();
@@ -359,59 +679,14 @@ public class PathDependentNetwork {
 		}
 		
 		
-		public Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId){
-			return sampleBiasedNextPathDependentNode(previousNodeId, random.nextDouble());
+		
+		
+		public void addSourceLink(int startHour, int numberOfActivities, Id<Node> nextNodeId){
+			this.setAsSource(startHour, numberOfActivities);
+			Id<Node> previousNodeId = Id.create("source", Node.class);
+			
+			addPathDependentLink(previousNodeId, nextNodeId);
 		}
-		
-		
-		/**
-		 * <b><i>Warning!!</i></b> This method is only meant for testing purposes. 
-		 * You should use {@link #sampleBiasedNextPathDependentNode(Id)}.
-		 * TODO Finish description.
-		 * @param previousNodeId
-		 * @param randomValue
-		 * @return
-		 */
-		protected Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId, double randomValue){
-			
-			previousNodeId = previousNodeId == null ? Id.create("source", Node.class) : previousNodeId;
-			
-			/* Check that the path-dependent sequence exist. */
-			if(!pathDependence.containsKey(previousNodeId)){
-				LOG.error("There is no next node travelling from " + previousNodeId.toString() + " via " + this.getId().toString());
-				LOG.error("Null returned.");
-				return null;
-			}			
-			
-			/* Determine the total weighted out-degree. */
-			Map<Id<Node>, Double> map = pathDependence.get(previousNodeId);
-			double total = 0.0;
-			for(Id<Node> id : map.keySet()){
-				total += map.get(id);
-			}
-			
-			/* Sample next node. */
-			double cumulativeTotal = 0.0;
-			Id<Node> nextId = null;
-			Iterator<Id<Node>> iterator = map.keySet().iterator();
-			
-			while(nextId == null){
-				Id<Node> id = iterator.next();
-				cumulativeTotal += map.get(id);
-				if( (cumulativeTotal / total) >= randomValue){
-					nextId = id;
-				}
-			}
-			
-			if(nextId.toString().equalsIgnoreCase("sink")){
-				return null;
-			}
-			
-			return nextId;
-			
-		}
-		
-		
 		
 		public void addPathDependentLink(Id<Node> previousNodeId, Id<Node> nextNodeId){
 			/* DEBUG Remove after problem sorted... why are there links from
@@ -420,18 +695,13 @@ public class PathDependentNetwork {
 				LOG.debug("Link from node to itself.");
 			}		
 			
-			Id<Node> id = previousNodeId == null ? Id.create("source", Node.class) : previousNodeId;
-			if(previousNodeId == null){
-				this.setAsSource();
-			}
-			
 			/* Add the path-dependency if it doesn't exist yet. */
 			Map<Id<Node>, Double> map = null;
-			if(!pathDependence.containsKey(id)){
+			if(!pathDependence.containsKey(previousNodeId)){
 				map = new TreeMap<>();
-				pathDependence.put(id, map);
+				pathDependence.put(previousNodeId, map);
 			} else{
-				map = pathDependence.get(id);
+				map = pathDependence.get(previousNodeId);
 			}
 			
 			/* Increment the link weight. */
@@ -574,5 +844,28 @@ public class PathDependentNetwork {
 			return weight;
 		}
 		
+		public Map<String, Integer> getStartTimeMap(){
+			return this.hourMap;
+		}
+		
+		
+		public Map<String, Integer> getNumberOfActivityMap(){
+			return this.activityCountMap;
+		}
+		
+		
+		public double getTotalSinkWeight(){
+			double sinkWeight = 0.0;
+			Id<Node> sink = Id.createNodeId("sink");
+			Iterator<Id<Node>> iterator = this.pathDependence.keySet().iterator();
+			while(iterator.hasNext()){
+				Map<Id<Node>, Double> map = this.pathDependence.get(iterator.next());
+				if(map.containsKey(sink)){
+					sinkWeight += map.get(sink);
+				}
+			}
+			
+			return sinkWeight;
+		}
 	}
 }
