@@ -391,18 +391,29 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private void routeLine(TransitRoute route) {
 		List<Id<Link>> links = new ArrayList<>();
 		int i = 0;
-		links.add(this.network.getLinks().get(route.getStops().get(0).getStopFacility().getLinkId()).getId());
+		//links.add(this.network.getLinks().get(route.getStops().get(0).getStopFacility().getLinkId()).getId());
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
 			TransitRouteStop toStop = route.getStops().get(i+1);
-			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
-			for (Link link : path.links) {
-				links.add(link.getId());
+			try {
+				LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
+				for (Link link : path.links) {
+					links.add(link.getId());
+				}
+			} catch (Exception e) {
+				log.error("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. No route created");
+				links.clear();
+				break;
+				// todo-boescpa Implement more sophisticated dealing with this problem like skipping the stop and continue routing and create pseudo-network for this stop later on...
 			}
-			links.add(this.network.getLinks().get(route.getStops().get(i+1).getStopFacility().getLinkId()).getId());
+			//links.add(this.network.getLinks().get(route.getStops().get(i+1).getStopFacility().getLinkId()).getId());
 			i++;
 		}
-		route.setRoute(new LinkNetworkRouteImpl(links.get(0),links,links.get(links.size()-1)));
+		if (links.size() > 0) {
+			route.setRoute(new LinkNetworkRouteImpl(links.get(0), links, links.get(links.size() - 1)));
+		} else {
+			log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
+		}
 	}
 
 	private LeastCostPathCalculator.Path getShortestPath(TransitRouteStop fromStop, TransitRouteStop toStop, String routeId) {
@@ -472,6 +483,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	/**
 	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
 	 * and all nodes which are non-linked to any link after the above cleaning...
+	 * Clean also the allowed modes for only the modes, no line-number any more...
 	 */
 	private void cleanStationsAndNetwork() {
 		// TODO-boescpa Implement this...

@@ -29,9 +29,11 @@ import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 
 import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
+import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
 
 /**
- * What is it for?
+ * Based on the line, mode, and link type, the traveling on links is assigned different costs.
+ * The better the match, the lower the costs.
  *
  * @author boescpa
  */
@@ -39,9 +41,9 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
 
     private final static double FACTOR_SAMELINE = 1.0;
     private final static double FACTOR_SAMEMODE = 10.0;
-    private final static double FACTOR_PTLINK = 100.0;
-    private final static double FACTOR_LINKTYPE = 1000.0;
-    private final static double FACTOR_NOMATCH = 1000000.0;
+    private final static double FACTOR_PTLINK = 10.0;
+    private final static double FACTOR_LINKTYPE = 100.0;
+    private final static double FACTOR_NOMATCH = 100000.0;
 
     private final LeastCostPathCalculator pathCalculator;
     private String currentMode;
@@ -68,29 +70,30 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     public double getLinkMinimumTravelDisutility(Link link) {
         double travelCost = link.getLength()/link.getFreespeed();
 
-        // todo-boescpa Implement!!!
-
-        /*
-        if (currentMode.equals(BUS)) {
-            if (link.getAllowedModes().contains("street")) {
-
-            }
-        }
-
-        if (link.getAllowedModes().contains(currentMode)) {
-            if (link.getAllowedModes().contains(currentLine)) {
+        // Trams: They drive on tram-railways, preferably on those with their line number.
+        if (this.currentMode != null && this.currentMode.equals(TRAM)
+                && link.getAllowedModes().contains(TRAM)) {
+            if (this.currentLine != null && link.getAllowedModes().contains(this.currentLine)) {
                 return travelCost * FACTOR_SAMELINE;
             } else {
                 return travelCost * FACTOR_SAMEMODE;
             }
-        } else if (currentMode.equals(BUS)) {
-            if (link.getAllowedModes().contains("street")) {
-                return travelCost * FACTOR_LINKTYPE;
+        }
+
+        // Busses: They drive on streets ("car"), preferably on those for "pt", preferably on those with their line number.
+        if (this.currentMode != null && this.currentMode.equals(BUS)
+                && link.getAllowedModes().contains("car")) {
+            if (link.getAllowedModes().contains("pt")) {
+                if (this.currentLine != null && link.getAllowedModes().contains(this.currentLine)) {
+                    return travelCost * FACTOR_SAMELINE;
+                }
+                return travelCost * FACTOR_PTLINK;
             }
-        } else {
-            return travelCost * FACTOR_NOMATCH;
-        }*/
-        return travelCost;
+            return travelCost * FACTOR_LINKTYPE;
+        }
+
+        // If the link has no match, it is incredibly expensive to travel on it...
+        return travelCost * FACTOR_NOMATCH;
     }
 
     @Override
@@ -99,6 +102,6 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     }
 
     private String deriveLineFromRouteId(String routeId) {
-        return null;
+        return routeId.substring(0,4);
     }
 }
