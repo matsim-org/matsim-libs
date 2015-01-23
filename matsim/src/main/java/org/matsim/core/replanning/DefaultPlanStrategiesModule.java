@@ -38,11 +38,11 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     @Override
     public void install() {
-        addPlanSelectorBinding("WorstPlanSelector").to(WorstPlanForRemovalSelector.class);
-        addPlanSelectorBinding("SelectRandom").to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
-        addPlanSelectorBinding("SelectExpBeta").toProvider(ExpBetaPlanSelectorForRemoval.class);
-        addPlanSelectorBinding("ChangeExpBeta").toProvider(ExpBetaPlanChangerForRemoval.class);
-        addPlanSelectorBinding("PathSizeLogitSelector").toProvider(PathSizeLogitSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding("WorstPlanSelector").to(WorstPlanForRemovalSelector.class);
+        addPlanSelectorForRemovalBinding("SelectRandom").to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
+        addPlanSelectorForRemovalBinding("SelectExpBeta").toProvider(ExpBetaPlanSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding("ChangeExpBeta").toProvider(ExpBetaPlanChangerForRemoval.class);
+        addPlanSelectorForRemovalBinding("PathSizeLogitSelector").toProvider(PathSizeLogitSelectorForRemoval.class);
 
         // strategy packages that only select:
 		addPlanStrategyBindingToFactory(Selector.KeepLastSelected.toString(), new KeepLastSelectedPlanStrategyFactory());
@@ -68,7 +68,10 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     public static enum Selector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
 
     public static enum Names { ReRoute, TimeAllocationMutator, ChangeLegMode }
-
+    
+    // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
+    // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15
+    
     private static class ExpBetaPlanSelectorForRemoval implements Provider<ExpBetaPlanSelector<Plan, Person>> {
 
         private Config config;

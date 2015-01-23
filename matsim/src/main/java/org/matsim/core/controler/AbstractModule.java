@@ -54,7 +54,7 @@ public abstract class AbstractModule {
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
     private Multibinder<ControlerListener> controlerListenerMultibinder;
-    private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorMultibinder;
+    private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
     @Inject
@@ -77,7 +77,7 @@ public abstract class AbstractModule {
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
-        this.planSelectorMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
+        this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
         this.install();
     }
 
@@ -166,8 +166,8 @@ public abstract class AbstractModule {
         });
     }
 
-    protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorBinding(String selectorName) {
-        return planSelectorMultibinder.addBinding(selectorName);
+    protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {
+        return planSelectorForRemovalMultibinder.addBinding(selectorName);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {

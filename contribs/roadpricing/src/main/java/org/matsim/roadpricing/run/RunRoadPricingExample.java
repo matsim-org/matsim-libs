@@ -32,7 +32,7 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
  * @author nagel
  *
  */
-final class RunRoadPricingExample {
+public final class RunRoadPricingExample {
 	// to not change class name: referenced from book.  kai, dec'14
 
 	public static void main(String[] args) {
