@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 
 <!-- ============================================================ -->
-<!-- Date: 2013-11-21 -->
+<!-- Date: 2015-01-23 -->
 <!-- A concise format to write the path-dependent complex network
 	 created from parsing Digicore vehicle activity chains. In 
 	 this second version we allow for nodes that act as first 
@@ -21,7 +21,7 @@
 		  desc			CDATA		#IMPLIED
 >
 
-<!ELEMENT node						(preceding+,starttime,activities)>
+<!ELEMENT node						(preceding+,starttime*,activities*)>
 <!ATTLIST node
 		  id			CDATA		#REQUIRED
 		  x				CDATA		#REQUIRED
