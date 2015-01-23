@@ -131,12 +131,14 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 					roundingErrors+=delay;
 					log.error("Agent "+event.getPersonId()+" is leaving link "+event.getLinkId()+" at time "+event.getTime()+". Delay is 1 sec and no one left link before (no causing agent). \n"
 							+ "Thus, possible reason is throwing of wait2Link and departure event at different time steps.");
+					return;
 				} else {
 					nonInternalizedDelay+=delay;
 					log.error("Agent "+event.getPersonId()+" is leaving link "+event.getLinkId()+" at time "+event.getTime()+". Delay is "+delay+ "sec but no causing agents. \n "
 							+ "Possibly due to spill back delays.");
 					//				throw new RuntimeException("Delays are more than 0. and there is no causing agent."
 					//					+ "this should not happen.");
+					return;
 				}
 			}
 			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
@@ -167,7 +169,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	public double getTotalDelay() {
 		return totalDelay;
 	}
-	
+
 	public double getNonInternalizedDelay() {
 		return nonInternalizedDelay;
 	}
@@ -175,5 +177,5 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 	public double getRoundingErrors() {
 		return roundingErrors;
 	}
-	
+
 }

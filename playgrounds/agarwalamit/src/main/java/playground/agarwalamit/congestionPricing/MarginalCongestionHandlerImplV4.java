@@ -377,7 +377,7 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-//								System.out.println(congestionEvent.toString());
+								System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);
 				this.congestionEventsList.add(congestionEvent);
 			}
@@ -392,7 +392,7 @@ PersonStuckEventHandler
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-//								System.out.println(congestionEvent.toString());
+								System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
 				this.congestionEventsList.add(congestionEvent);
 			}
