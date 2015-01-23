@@ -387,20 +387,29 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if ( MyQueueWithBuffer.HOLES ) {
 			leftHolesStorageCapacity = this.storageCapacity;
 			// the number of holes really just needs to be the storage capacity!
-			for ( int ii=0 ; ii< this.storageCapacity; ii++ ) {
-				MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
-				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
-				hole.setSizeInEquivalents(1.);
-				holes.add( hole ) ;
-			}
+//			for ( int ii=0 ; ii< this.storageCapacity; ii++ ) {
+//				MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
+//				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
+//				hole.setSizeInEquivalents(1.);
+//				holes.add( hole ) ;
+//			}
 		}
 	}
 
 	@Override
 	public boolean doSimStep(final double now ) {
+		this.processArrivalOfHoles( now ) ;
 		this.moveQueueToBuffer(now);
 		return true ;
 	}
+
+	private void processArrivalOfHoles(double now) {
+		while ( this.holes.peek().getEarliestLinkExitTime() < now ) {
+			Hole hole = this.holes.removeFirst() ; // ???
+			this.leftHolesStorageCapacity += hole.getSizeInEquivalents() ;
+		}
+	}
+	
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
@@ -680,32 +689,32 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.add(veh);
 
 		if ( MyQueueWithBuffer.HOLES ) {
-			MyQueueWithBuffer.Hole removedHole = holes.poll();
+//			MyQueueWithBuffer.Hole removedHole = holes.poll();
 			leftHolesStorageCapacity = leftHolesStorageCapacity - veh.getSizeInEquivalents();
-			if(removedHole!=null){
-				double removedHolePCU = removedHole.getSizeInEquivalents();
-				double earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
-
-				if(removedHolePCU > veh.getSizeInEquivalents()){
-					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-					hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
-					hole2.setSizeInEquivalents(removedHolePCU-veh.getSizeInEquivalents());
-					holes.addFirst(hole2);
-				} else if(removedHolePCU < veh.getSizeInEquivalents()){
-					double totalRemovedPCU = removedHolePCU;
-					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
-						removedHole = holes.poll();
-						earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
-						totalRemovedPCU += removedHole.getSizeInEquivalents();
-					};
-					if(totalRemovedPCU > veh.getSizeInEquivalents()){
-						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
-						hole2.setSizeInEquivalents(totalRemovedPCU-veh.getSizeInEquivalents());
-						holes.addFirst(hole2);
-					}
-				}
-			}
+////			if(removedHole!=null){
+//////				double removedHolePCU = removedHole.getSizeInEquivalents();
+//////				double earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
+////
+////				if(removedHolePCU > veh.getSizeInEquivalents()){
+////					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+////					hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
+////					hole2.setSizeInEquivalents(removedHolePCU-veh.getSizeInEquivalents());
+////					holes.addFirst(hole2);
+////				} else if(removedHolePCU < veh.getSizeInEquivalents()){
+////					double totalRemovedPCU = removedHolePCU;
+////					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
+////						removedHole = holes.poll();
+////						earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
+////						totalRemovedPCU += removedHole.getSizeInEquivalents();
+////					};
+////					if(totalRemovedPCU > veh.getSizeInEquivalents()){
+////						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
+////						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
+////						hole2.setSizeInEquivalents(totalRemovedPCU-veh.getSizeInEquivalents());
+////						holes.addFirst(hole2);
+////					}
+////				}
+//			}
 		}
 	}
 
