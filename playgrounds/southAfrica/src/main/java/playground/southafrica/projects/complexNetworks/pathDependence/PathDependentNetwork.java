@@ -431,8 +431,6 @@ public class PathDependentNetwork {
 		}
 		
 		if(choiceMap.isEmpty()){
-			LOG.warn("This node only terminates as a sink. Returning any next node from the current node.");
-			
 			for(Id<Node> otherPrevious : currentNode.getPathDependence().keySet()){
 				map = currentNode.getPathDependentNextNodes(otherPrevious);
 				for(Id<Node> possibleId : map.keySet()){
@@ -451,7 +449,8 @@ public class PathDependentNetwork {
 
 		/* If this too fails, see if we can terminate the chain prematurely. */
 		if(choiceMap.isEmpty()){
-			throw new RuntimeException("Ooops! Cannot sample a next node!!");
+//			throw new RuntimeException("Ooops! Cannot sample a next node!!");
+			return null;
 		}
 		
 		/* Determine the total weighted out-degree. */
@@ -473,15 +472,16 @@ public class PathDependentNetwork {
 			}
 		}
 		
-		if(nextId.toString().equalsIgnoreCase("sink")){
-			return null;
-		}
-		
 		totalNextNodesSampled++;
 		return nextId;
 	}
 
 	
+	public Id<Node> sampleEndOfChainNode(Id<Node> previousId, Id<Node> currentId){
+		return this.sampleEndOfChainNode(previousId, currentId, random.nextDouble());
+	}
+
+
 	/**
 	 * Should only be used directly for tests.
 	 * 
@@ -516,7 +516,7 @@ public class PathDependentNetwork {
 		 * check if any next node can be a 'sink', irrespective of the previous
 		 * node in the path-dependence. */
 		if(choiceMap.isEmpty()){
-			LOG.debug("Check if this is calculated correctly.");
+			LOG.warn("Check if this is calculated correctly.");
 			/* Find another approach to get a next node that can end a chain. */
 			for(Id<Node> otherPrevious : currentNode.getPathDependence().keySet()){
 				map = currentNode.getPathDependentNextNodes(otherPrevious);
@@ -536,7 +536,8 @@ public class PathDependentNetwork {
 
 		/* If this too fails, see if we can terminate the chain prematurely. */
 		if(choiceMap.isEmpty()){
-			throw new RuntimeException("Ooops! Cannot sample the end of an activity chain!!");
+//			throw new RuntimeException("Ooops! Cannot sample the end of an activity chain!!");
+			return null;
 		}
 		
 		
@@ -559,11 +560,6 @@ public class PathDependentNetwork {
 		totalNextNodesSampled++;
 		return nextNode;
 	}
-	
-	public Id<Node> sampleEndOfChainNode(Id<Node> previousId, Id<Node> currentId){
-		return this.sampleEndOfChainNode(previousId, currentId, random.nextDouble());
-	}
-	
 	
 	public double getSourceWeight(Id<Node> nodeId){
 		if(this.network.containsKey(nodeId)){
