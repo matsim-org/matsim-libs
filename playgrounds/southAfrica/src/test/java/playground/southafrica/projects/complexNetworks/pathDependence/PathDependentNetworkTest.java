@@ -137,20 +137,20 @@ public class PathDependentNetworkTest {
 		}
 
 		PathDependentNode C = pdn.getPathDependentNode(Id.create("C", Node.class));
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), 0.25));
-		Assert.assertEquals("Wrong next Id.", Id.create("E", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), 0.75));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), C.getId(), 0.25));
+		Assert.assertEquals("Wrong next Id.", Id.create("E", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), C.getId(), 0.75));
 
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.1));
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.25));
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.5));
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.75));
-		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.9));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), C.getId(), 0.1));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), C.getId(), 0.25));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), C.getId(), 0.5));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), C.getId(), 0.75));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), pdn.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), C.getId(), 0.9));
 		
 		PathDependentNode D = pdn.getPathDependentNode(Id.create("D", Node.class));
-		Assert.assertNull("Wrong next Id.", D.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), 0.5));
+		Assert.assertNull("Wrong next Id.", pdn.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), D.getId(), 0.5));
 		
 		PathDependentNode E = pdn.getPathDependentNode(Id.create("E", Node.class));
-		Assert.assertNull("Wrong next Id.", E.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), 0.5));
+		Assert.assertNull("Wrong next Id.", pdn.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), E.getId(), 0.5));
 	}
 	
 	@Test
