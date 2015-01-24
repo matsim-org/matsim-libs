@@ -287,7 +287,7 @@ public class CheckPopulationPlans {
 			int hour = (int) Math.round(Math.floor(endTime / 3600));
 			
 			/* Get number of minor activities. */
-			int numberOfActivities = (plan.getPlanElements().size() + 1) / 2;
+			int numberOfActivities = ((plan.getPlanElements().size() + 1) / 2) - 2;
 			
 			/* Evaluate the chain's geographic extent. */
 			String extent = evaluateExtent(plan);
