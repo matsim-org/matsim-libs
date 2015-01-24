@@ -280,28 +280,32 @@ public class PathDependentNetwork {
 				this.totalSourceWeight += node.getSourceWeight();
 			}
 		}
-		
+
 		/* Given a random value, sample the next node. */
 		double cumulativeWeight = 0.0;
 		Iterator<PathDependentNode> iterator = this.network.values().iterator();
-		while(id == null){
+		while(id == null && iterator.hasNext()){
 			PathDependentNode node = iterator.next();
 			cumulativeWeight += node.getSourceWeight();
 			if(cumulativeWeight/this.totalSourceWeight >= randomValue){
 				id = node.getId();
 			}
 		}
-		
+
 		return id;
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @return
 	 */
 	public Id<Node> sampleChainStartNode(){
-		return sampleChainStartNode(random.nextDouble());
+		Id<Node> node = null;
+		while(node == null){
+			node = sampleChainStartNode(random.nextDouble());
+		}
+		return node;
 	}
 	
 	/**
