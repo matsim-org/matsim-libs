@@ -305,7 +305,7 @@ public class PathDependentNetwork {
 		while(node == null){
 			node = sampleChainStartNode(random.nextDouble());
 			if(node == null){
-				LOG.warn("Redrawing a random value to find a start node.")
+				LOG.warn("Redrawing a random value to find a start node.");
 			}
 		}
 		return node;
