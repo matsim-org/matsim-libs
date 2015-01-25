@@ -42,12 +42,14 @@ import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 public class WithindayListener implements StartupListener, IterationStartsListener {
 	
 	protected Scenario scenario;
+	private Controler controler;
 	protected WithinDayControlerListener withinDayControlerListener;
 	private static final Logger log = Logger.getLogger(WithindayListener.class);
 
 	public WithindayListener(Controler controler) {		
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
+		this.controler = controler;
 		
 		// Use a Scoring Function, that only scores the travel times!
 		//controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
@@ -79,7 +81,7 @@ public class WithindayListener implements StartupListener, IterationStartsListen
 		duringLegIdentifierFactory.addAgentFilterFactory(stuckAgentsFilterFactory);
 						
 		CurrentLegMicroReplannerFactory duringLegReplannerFactory = new CurrentLegMicroReplannerFactory(scenario, withinDayControlerListener.getWithinDayEngine(),
-				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext, this.controler);
 		duringLegReplannerFactory.addIdentifier(duringLegIdentifierFactory.createIdentifier());
 		
 		withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);

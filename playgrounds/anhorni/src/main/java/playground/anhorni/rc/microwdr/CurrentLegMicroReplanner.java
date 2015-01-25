@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -51,17 +52,20 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 
 	private final TripRouter tripRouter;
 	private static final Logger logger = Logger.getLogger(CurrentLegMicroReplanner.class);
-	Random random = new Random();
+	private Random random = new Random();
+	private Controler controler;
 	
-	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
+	
+	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter, Controler controler) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.controler = controler;
 	}
 
 	@Override
 	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
-		random.setSeed(Integer.parseInt(withinDayAgent.getId().toString()));
+		random.setSeed(Integer.parseInt(withinDayAgent.getId().toString()) * this.controler.getIterationNumber());
 
 		Plan executedPlan = WithinDayAgentUtils.getModifiablePlan(withinDayAgent);
 
