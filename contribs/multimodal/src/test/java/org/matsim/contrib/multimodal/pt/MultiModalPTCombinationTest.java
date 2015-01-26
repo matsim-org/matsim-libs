@@ -57,11 +57,21 @@ public class MultiModalPTCombinationTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	
+	/**
+	 * Two things are tested here:
+	 * - Multi-modal simulation can handle TransitAgents (previously, the TransitAgent class did not implement
+	 *   the HasPerson interface. As a result, the multi-modal simulation crashed since it could not access
+	 *   the person).
+	 * - Multi-modal simulaition can handle transit_walk legs (not yet ready...).
+	 */
 	@Test
 	public void testMultiModalPtCombination() {
 		
 		Fixture f = new Fixture();
 		f.init();
+		
+		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
+		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk);
 		
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
@@ -107,12 +117,15 @@ public class MultiModalPTCombinationTest {
 		 * Assume that the agent's plan was changed from "home-pt-home" to
 		 * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
 		 */
-		Plan plan = f.persons[0].getSelectedPlan();
-		Assert.assertEquals(7, plan.getPlanElements().size());
+		Plan ptPlan = ptPerson.getSelectedPlan();
+		Assert.assertEquals(7, ptPlan.getPlanElements().size());
 
+		Plan walkPlan = walkPerson.getSelectedPlan();
+		Assert.assertEquals(3, walkPlan.getPlanElements().size());
+		
 		/*
 		 * These tests fail since the TransitRouter (?) does not create NetworkRoutes.
-		 * As a result, the multi-modal simulation crashes.
+		 * As a result, the multi-modal simulation removes the pt agent from the simulation.
 		 */
 		// assume that the transit_walk legs have network routes
 //		Assert.assertEquals(true, ((Leg) plan.getPlanElements().get(1)).getRoute() instanceof NetworkRoute);

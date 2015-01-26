@@ -59,7 +59,9 @@ import java.util.List;
  *           A        B        C
  *      0   [0]  1   [1]  2   [2]   3
  * (0)------(1)======(2)======(3)------(4)
- *
+ *           |                 |
+ *           -------------------
+ *                    4
  * </pre>
  * Coordinates: 4km between two stops along x-axis.
  *
@@ -79,9 +81,8 @@ import java.util.List;
 	/*package*/ private final TransitSchedule schedule;
 	/*package*/ private TransitLine blueLine = null;
 	private final Node[] nodes = new Node[5];
-	private final Link[] links = new Link[4];
+	private final Link[] links = new Link[5];
 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[3];
-	/*package*/ final Person[] persons = new Person[1]; 
 
 	public Fixture() {
 		Config config = ConfigUtils.createConfig();	
@@ -99,7 +100,7 @@ import java.util.List;
 		buildStops();
 		buildVehicles();
 		buildBlueLine();
-		buildPopulation();
+//		buildPopulation();
 	}
 	
 	void buildNetwork() {
@@ -115,13 +116,15 @@ import java.util.List;
 		this.links[1] = this.network.getFactory().createLink(Id.create("1", Link.class), this.nodes[1], this.nodes[2]);
 		this.links[2] = this.network.getFactory().createLink(Id.create("2", Link.class), this.nodes[2], this.nodes[3]);
 		this.links[3] = this.network.getFactory().createLink(Id.create("3", Link.class), this.nodes[3], this.nodes[4]);
+		this.links[4] = this.network.getFactory().createLink(Id.create("4", Link.class), this.nodes[1], this.nodes[3]);
 		
 		this.links[0].setAllowedModes(CollectionUtils.stringToSet(TransportMode.walk + "," + TransportMode.transit_walk + "," + TransportMode.car));
 		this.links[1].setAllowedModes(CollectionUtils.stringToSet(TransportMode.car));
 		this.links[2].setAllowedModes(CollectionUtils.stringToSet(TransportMode.walk + "," + TransportMode.transit_walk + "," + TransportMode.car));
 		this.links[3].setAllowedModes(CollectionUtils.stringToSet(TransportMode.walk + "," + TransportMode.transit_walk));
+		this.links[4].setAllowedModes(CollectionUtils.stringToSet(TransportMode.walk + "," + TransportMode.transit_walk + "," + TransportMode.car));
 		
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			this.links[i].setLength(5000.0);
 			this.links[i].setFreespeed(20.0);
 			this.links[i].setCapacity(2000.0);
@@ -207,12 +210,7 @@ import java.util.List;
 		}
 	}
 	
-	void buildPopulation() {
-		persons[0] = createPerson(scenario, "0", "pt");
-		scenario.getPopulation().addPerson(persons[0]);
-	}
-	
-	private Person createPerson(Scenario scenario, String id, String mode) {
+	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String mode) {
 		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
@@ -231,7 +229,7 @@ import java.util.List;
 		
 		person.addPlan(plan);
 		
+		this.scenario.getPopulation().addPerson(person);
 		return person;
 	}
-
 }
