@@ -25,12 +25,12 @@ import org.matsim.contrib.networkEditor.visualizing.NetVisualizerPanel;
 /**
  * @author danielmaxx
  */
-public class NetworkEditor extends javax.swing.JFrame {
+public class RunNetworkEditor extends javax.swing.JFrame {
 
 	public NetVisualizerPanel netVisFrame;
 
 	/** Initializes and starts the NetworkEditor */
-	public NetworkEditor() {
+	public RunNetworkEditor() {
 		initComponents();
 		initVis();
 	}
@@ -277,7 +277,7 @@ public class NetworkEditor extends javax.swing.JFrame {
 		java.awt.EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				NetworkEditor vis = new NetworkEditor();
+				RunNetworkEditor vis = new RunNetworkEditor();
 				vis.setVisible(true);
 			}
 		});
