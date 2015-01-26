@@ -21,7 +21,7 @@
 		  desc			CDATA		#IMPLIED
 >
 
-<!ELEMENT node						(preceding+,starttime*,activities*)>
+<!ELEMENT node						(preceding+,startNode*)>
 <!ATTLIST node
 		  id			CDATA		#REQUIRED
 		  x				CDATA		#REQUIRED
@@ -39,14 +39,9 @@
 		  weight		CDATA		#REQUIRED
 >
 
-<!ELEMENT starttime					EMPTY>
+<!ELEMENT startNode					EMPTY>
 <!ATTLIST starttime
 		  hour			CDATA		#REQUIRED
-		  count			CDATA		#REQUIRED
->
-
-<!ELEMENT activities				EMPTY>
-<!ATTLIST activities
 		  number		CDATA		#REQUIRED
 		  count			CDATA		#REQUIRED
 >
