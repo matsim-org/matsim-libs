@@ -60,29 +60,30 @@ public class SAString_v1 {
 	private List<String> demandPoints;
 	private List<String> fixedSites;
 	private int numberOfThreads;
-	Map<String,Matrix> matrixCache = new TreeMap<String, Matrix>();
+	Map<String,Double> solutionCache = new TreeMap<String, Double>();
 
 	private Map<String, Double> demandPointWeights;
 	private final static int[] SAMPLE_SIZE = {
-		2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 16, 18, 19, 21, 
-		26, 28, 30, 31, 33, 34, 36, 37, 38, 39, 40, 41, 42, 
-		43, 44, 48, 50, 52, 53, 57, 58, 59, 63, 64, 65, 66, 
-		67, 68, 73, 75, 77, 78, 79, 80, 82, 83, 84, 87, 88, 
-		89, 92, 93, 94, 95, 96, 98, 99, 101, 103, 104, 112, 
-		113, 114, 120, 123, 124, 125, 126, 135, 136, 138, 143, 
-		144, 145, 146, 149, 150, 151, 154, 155, 157, 160, 162, 
-		163, 165, 167, 172, 174, 175, 176, 177, 180, 181, 183, 
-		184, 190, 193, 195, 200, 201, 202, 203, 205, 206, 207, 
-		210, 211, 213, 214, 215, 216, 217, 219, 222, 224, 226, 
-		227, 229, 232, 235, 236, 239, 242, 243, 245, 246, 248, 
-		249, 251, 254, 258, 259, 272, 273, 274, 284, 287, 288, 
-		289, 290, 292, 296, 299, 300, 301, 306, 307, 309, 314, 
-		318, 321, 322, 324, 333, 336, 341, 342, 346, 359, 369, 
-		373, 376, 378, 385, 388, 392, 400, 411, 418, 421, 423, 
-		424, 425, 430, 433, 447, 457, 470, 472, 481, 483, 485, 
-		488, 490, 491, 501, 509, 512, 513, 523, 533, 534, 536, 
-		539, 547, 556, 600};
-//	private final static int[] SAMPLE_SIZE = {10};
+//		2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 16, 18, 19, 21, 
+//		26, 28, 30, 31, 33, 34, 36, 37, 38, 39, 40, 41, 42, 
+//		43, 44, 48, 50, 52, 53, 57, 58, 59, 63, 64, 65, 66, 
+//		67, 68, 73, 75, 77, 78, 79, 80, 82, 83, 84, 87, 88, 
+//		89, 92, 93, 94, 95, 96, 98, 99, 101, 103, 104, 112, 
+//		113, 114, 120, 123, 124, 125, 126, 135, 136, 138, 143, 
+//		144, 145, 146, 149, 150, 151, 154, 155, 157, 160, 162, 
+//		163, 165, 167, 172, 174, 175, 176, 177, 180, 181, 183, 
+//		184, 190, 193, 195, 200, 201, 202, 203, 205, 206, 207, 
+//		210, 211, 213, 214, 215, 216, 217, 219, 222, 224, 226, 
+//		227, 229, 232, 235, 236, 239, 242, 243, 245, 246, 248, 
+//		249, 251, 254, 258, 259, 272, 273, 274, 284, 287, 288, 
+//		289, 290, 292, 296, 299, 300, 301, 306, 307, 309, 314, 
+//		318, 321, 322, 324, 333, 336, 341, 342, 346, 359, 369, 
+//		373, 376, 378, 385, 388, 392, 400, 411, 418, 421, 423, 
+//		424, 425, 430, 433, 447, 457, 470, 472, 481, 483, 485, 
+//		488, 490, 491, 501, 509, 512, 513, 523, 533, 534, 536, 
+		539, 547, 556, 600
+	};
+//	private final static int[] SAMPLE_SIZE = {50};
 
 	/**
 	 * @param args
@@ -98,21 +99,36 @@ public class SAString_v1 {
 //		int numberOfSites = Integer.parseInt(args[4]);
 //		int numberOfRuns = Integer.parseInt(args[5]);
 		
-		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[6]);
-		INITIAL_SOLUTION_STRATEGY = Integer.parseInt(args[7]);
-		NEIGHBOURHOOD_STRATEGY = Integer.parseInt(args[8]);
-		OBJECTIVE_FUNCTION_STRATEGY = Integer.parseInt(args[9]);
+		FRACTION_OF_SOLUTIONS_CHECKED = Double.parseDouble(args[4]);
+		INITIAL_SOLUTION_STRATEGY = Integer.parseInt(args[5]);
+		NEIGHBOURHOOD_STRATEGY = Integer.parseInt(args[6]);
+		OBJECTIVE_FUNCTION_STRATEGY = Integer.parseInt(args[7]);
 
-		/*
-		 * Optional arguments. If used, BOTH MUST be given, even if it is an
-		 * empty string.
-		 */
-		String weightsFilename = null;
-		String fixedSitesFilename = null;
-		if (args.length > 10) {
-			weightsFilename = args[10];
-			fixedSitesFilename = args[11];
+		List<Integer> sites = new ArrayList<Integer>();
+		if(args.length > 8){
+			int index = 8;
+			while(index < args.length){
+				sites.add(Integer.parseInt(args[index++]));
+			}
 		}
+		String siteString = "The following number of sites will be solved: [";
+		siteString += sites.get(0);
+		for(int i = 1; i < sites.size(); i++){
+			siteString += ", " + sites.get(i);
+		}
+		siteString += "]";
+		LOG.info(siteString);
+		
+//		/*
+//		 * Optional arguments. If used, BOTH MUST be given, even if it is an
+//		 * empty string.
+//		 */
+//		String weightsFilename = null;
+//		String fixedSitesFilename = null;
+//		if (args.length > 10) {
+//			weightsFilename = args[10];
+//			fixedSitesFilename = args[11];
+//		}
 
 		/*
 		 * Implementing the Simulated Annealing algorithm using a single string
@@ -120,15 +136,16 @@ public class SAString_v1 {
 		 */
 		SAString_v1 sas = new SAString_v1(numberOfThreads, false);
 		sas.readDistanceMatrix(distanceFilename);
-		sas.readDemandWeights(weightsFilename);
-		sas.readFixedSites(fixedSitesFilename);
+//		sas.readDemandWeights(weightsFilename);
+//		sas.readFixedSites(fixedSitesFilename);
 		
 		/* Initialise the output list. */
 		List<String> outputList = new ArrayList<String>();
 		
 		String prefix;
 		int numberOfRuns = 1;
-		for(int numberOfSites : SAMPLE_SIZE){
+//		for(int numberOfSites : SAMPLE_SIZE){
+		for(int numberOfSites : sites){
 			int run = numberOfRuns; /* This stays fixed in this version. */
 			LOG.info("====> Number of sites: " + numberOfSites + "; Run " + run + " <====");
 
@@ -390,9 +407,9 @@ public class SAString_v1 {
 		/* Initialise the algorithm. 
 		 * 
 		 * TODO Perform parameter analysis/tweaking */
-		int iterationMax = 100;
+		int iterationMax = 50;
 		double temp = 10;
-		int tempChangeFrequency = 20;
+		int tempChangeFrequency = 10;
 		double tempChangeFraction = 0.25;
 		int nonImprovingIterations = 0;
 		int returnToIncumbent = 0;
@@ -592,7 +609,7 @@ public class SAString_v1 {
 		Map<Tuple<String, String>, Double> map = new HashMap<Tuple<String, String>, Double>(); 
 		
 		/* Select, randomly, the sites to consider for a move. */
-		int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*(current.getRepresentation().size())) );
+		int numberOfSitesToConsiderForNeighborhood = Math.min(5, Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*(current.getRepresentation().size())) ) );
 		List<String> sitesToConsiderForMoves = new ArrayList<String>(numberOfSitesToConsiderForNeighborhood);
 
 		List<String> currentRepresentation = current.getRepresentation();
@@ -884,26 +901,17 @@ public class SAString_v1 {
 			List<Future<Tuple<Tuple<String, String>, Double>>> listOfJobs = new ArrayList<Future<Tuple<Tuple<String, String>, Double>>>();
 			
 			
-//			String s = this.toString();
-			Matrix matrix;
-//			if(matrixCache.containsKey(s)){
-//				matrix = matrixCache.get(s);
-//			} else{
-				/* Calculate the local matrix. */
-				matrix = new Matrix("tmp", "tmp");
-				for(String rep : this.representation){
-					List<Entry> entries = distanceMatrix.getToLocEntries(rep);
-					for(Entry e : entries){
-						matrix.createEntry(e.getFromLocation(), e.getToLocation(), e.getValue());
-					}
+			Matrix matrix = new Matrix("tmp", "tmp");
+			for(String rep : this.representation){
+				List<Entry> entries = distanceMatrix.getToLocEntries(rep);
+				for(Entry e : entries){
+					matrix.createEntry(e.getFromLocation(), e.getToLocation(), e.getValue());
 				}
-//				matrixCache.put(s, matrix);
-//			}
-			
+			}
 
 			/* Assign to each demand point its closest site. */
 			for(String demandPointId : demandPoints){
-				Callable<Tuple<Tuple<String, String>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, this.representation, matrix);
+				Callable<Tuple<Tuple<String, String>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, matrix);
 				Future<Tuple<Tuple<String, String>, Double>> result = threadExecutor.submit(job);
 				listOfJobs.add(result);
 			}
@@ -1010,7 +1018,13 @@ public class SAString_v1 {
 
 			/* Re-calculate the objective function. The allocation will also be 
 			 * updated. */
-			this.objective = calculateObjective();
+			String str = this.toString();
+			if(solutionCache.containsKey((str))){
+				this.objective = solutionCache.get(str);
+			} else{
+				this.objective = calculateObjective();
+				solutionCache.put(str, this.objective);
+			}
 		}
 		
 		
@@ -1086,33 +1100,29 @@ public class SAString_v1 {
 	
 	class EvaluateClosestSiteCallable implements Callable<Tuple<Tuple<String,String>, Double>> {
 		private String id;
-		private List<String> currentSites;
 		private final Matrix matrix;
 		
-		public EvaluateClosestSiteCallable(String id, List<String> currentSites, final Matrix matrix) {
+		public EvaluateClosestSiteCallable(String id, final Matrix matrix) {
 			this.id = id;
-			this.currentSites = currentSites;
 			this.matrix = matrix;
 		}
 
 		@Override
 		public Tuple<Tuple<String, String>, Double> call() throws Exception {
 			String closest = getClosestSite();
-			
 			Tuple<String, String> idPair = new Tuple<String, String>(this.id, closest);
-			
-			/*TODO Old way */
-//			Double distance = distanceMatrix.getEntry(id, closest).getValue();
-			/*TODO New way way */
 			Double distance = matrix.getEntry(id, closest).getValue();
 			return new Tuple<Tuple<String, String>, Double>(idPair, distance);
 		}
 		
+		/**
+		 * Gets the closest site to the demand point. In this implementation,
+		 * the distance matrix used <i>only</i> has those sites that are
+		 * included in the current solution being evaluated.
+		 * 
+		 * @return
+		 */
 		public String getClosestSite(){
-			String closest = null;
-			/*TODO Old way */
-//			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
-			/*TODO New way */
 			List<Entry> thisDemandPointSites =  matrix.getFromLocEntries(id);
 			Comparator<Entry> entryComparator = new Comparator<Entry>() {
 				@Override
@@ -1121,39 +1131,18 @@ public class SAString_v1 {
 				}
 			};
 			Collections.sort(thisDemandPointSites, entryComparator);
-			boolean foundClosest = false;
-			Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
-			while(!foundClosest && siteIterator.hasNext()){
-				String thisSite = siteIterator.next().getToLocation();
-				if(currentSites.contains(thisSite)){
-					foundClosest = true;
-					closest = thisSite;
-				}
-			}
-			return closest;
+			return thisDemandPointSites.iterator().next().getToLocation();
+//			boolean foundClosest = false;
+//			Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
+//			while(!foundClosest && siteIterator.hasNext()){
+//				String thisSite = siteIterator.next().getToLocation();
+//				if(currentSites.contains(thisSite)){
+//					foundClosest = true;
+//					closest = thisSite;
+//				}
+//			}
+//			return closest;
 		}
-		
-		public String getClosestSite2(){
-			String closest = null;
-			double min = Double.MAX_VALUE;
-
-			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
-			
-			Iterator<Entry> iterator = thisDemandPointSites.iterator();
-			while(iterator.hasNext()){
-				Entry e = iterator.next();
-				String s = e.getToLocation();
-				if(currentSites.contains(s)){
-					if(e.getValue() < min){
-						min = e.getValue();
-						closest = s;
-					}
-				}
-			}
-			
-			return closest;
-		}
-		
 	}
 
 	
