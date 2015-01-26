@@ -341,12 +341,11 @@ public class PathDependentNetwork {
 			String s = iterator.next();
 			cumulativeWeight += node.startNodeMap.get(s);
 			if( (cumulativeWeight/node.sourceCount) >= randomValue ){
-				List<Integer> list = new ArrayList<Integer>(2);
 				int hour = Integer.parseInt(s.split(",")[0]);
 				int activities = Integer.parseInt(s.split(",")[1]);
-				list.add(hour);
-				list.add(activities);
-				list.toArray(result);
+				result= new Integer[2];
+				result[0] = hour;
+				result[1] = activities;
 			}
 		}
 		

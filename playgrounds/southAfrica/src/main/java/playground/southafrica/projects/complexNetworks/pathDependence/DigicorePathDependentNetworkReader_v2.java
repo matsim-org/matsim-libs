@@ -44,7 +44,7 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 	private final static String ATTR_FOLLOWING_ID = "id";
 	private final static String ATTR_WEIGHT = "weight";
 	private final static String ATTR_STARTHOUR = "hour";
-	private final static String ATTR_STARTACTIVITIES = "number";
+	private final static String ATTR_STARTACTIVITIES = "activities";
 	private final static String ATTR_STARTCOUNT = "count";
 	
 	private PathDependentNetwork network = null;
