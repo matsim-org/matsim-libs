@@ -16,6 +16,9 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -288,6 +291,7 @@ public class CheckTestSetActivityChains {
 	
 	private class ProcessorCallable implements Callable<List<String>>{
 		private List<String> outputList = new ArrayList<String>();
+		private final double distanceMultiplier = 1.3;
 		private File vehicle;
 		private Counter counter;
 		
@@ -310,19 +314,37 @@ public class CheckTestSetActivityChains {
 				if(isValid){
 					/* Get start hour. */
 					int hour = chainStart.get(Calendar.HOUR_OF_DAY);
+					
 					/* Get number of minor activities. */
 					int numberOfActivities = chain.getNumberOfMinorActivities();
+					
 					/* Evaluate the chain's geographic extent. */
 					String extent = evaluateExtent(chain);
-					
-					this.outputList.add(String.format("%s,%s,%d,%d,%s\n", 
-							dv.getId().toString(), DigicoreUtils.getShortDate(chainStart), hour, numberOfActivities, extent));
+
+					/* Get the estimated vehicle kilometers travelled. */
+					double vkt = estimateVkt(chain)/1000.0;
+
+					this.outputList.add(String.format("%s,%s,%d,%d,%s,%.2f\n", 
+							dv.getId().toString(), DigicoreUtils.getShortDate(chainStart), hour, numberOfActivities, extent, vkt));
 				}
 			}
 			
 			counter.incCounter();
 			return outputList;
 		}
+
+		private double estimateVkt(DigicoreChain chain){
+			double distance = 0.0;
+			Coord c1 = chain.get(0).getCoord();
+			for(int i = 1; i < chain.size(); i++){
+				Coord c2 =chain.get(i).getCoord();
+				distance += CoordUtils.calcDistance(c1, c2)*distanceMultiplier;
+				c1 = c2;
+			}
+			
+			return distance;
+		}
+
 	}
 
 }

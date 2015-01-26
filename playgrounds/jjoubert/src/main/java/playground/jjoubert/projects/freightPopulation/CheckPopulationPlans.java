@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -60,7 +61,7 @@ public class CheckPopulationPlans {
 		FileUtils.delete(new File(outputFile));
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write("Id,hour,activities,extent");
+			bw.write("Id,hour,activities,extent,vkt");
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -264,9 +265,11 @@ public class CheckPopulationPlans {
 		}
 		return found;
 	}
+	
 
 	
 	private class ProcessorCallable implements Callable<List<String>>{
+		private final double distanceMultiplier = 1.3;
 		private List<String> outputList = new ArrayList<String>();
 		private Person person;
 		private Counter counter;
@@ -291,12 +294,27 @@ public class CheckPopulationPlans {
 			
 			/* Evaluate the chain's geographic extent. */
 			String extent = evaluateExtent(plan);
+			
+			/* Get the estimated vehicle kilometers travelled. */
+			double vkt = estimateVkt(plan)/1000.0;
 
-			this.outputList.add(String.format("%s,%d,%d,%s\n", 
-					person.getId().toString(), hour, numberOfActivities, extent));
+			this.outputList.add(String.format("%s,%d,%d,%s,%.2f\n", 
+					person.getId().toString(), hour, numberOfActivities, extent, vkt));
 			
 			counter.incCounter();
 			return outputList;
+		}
+
+		private double estimateVkt(Plan plan){
+			double distance = 0.0;
+			Coord c1 = ((Activity)plan.getPlanElements().get(0)).getCoord();
+			for(int i = 2; i < plan.getPlanElements().size(); i+= 2){
+				Coord c2 = ((Activity)plan.getPlanElements().get(i)).getCoord();
+				distance += CoordUtils.calcDistance(c1, c2)*distanceMultiplier;
+				c1 = c2;
+			}
+			
+			return distance;
 		}
 	}
 
