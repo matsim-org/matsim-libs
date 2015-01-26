@@ -105,31 +105,33 @@ public class GenerateFundamentalDiagramData {
 	 * Overall density to vehicular flow and speed.
 	 */
 	private Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
-	public static String HOLE_SPEED;
+	public static String HOLE_SPEED = "15";
 
 	public static void main(String[] args) {
 
-		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/";
-		String OUTPUT_FOLDER ="/run305/";
-		args = new String [] {"true", RUN_DIR+OUTPUT_FOLDER, "true", "true","27.","false"};
+//		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
+
+//		String OUTPUT_FOLDER ="/carBike_Holes/";
+		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
+//		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
 
 		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {0.5,0.5};
+		Double [] modalSplit = {1./2.,1./2.};
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
-		generateFDData.setSeepageAllowed(Boolean.valueOf(args[0]));
+		//		generateFDData.setSeepageAllowed(false);
 		generateFDData.setIsWritingFinalFdData(true);
 		generateFDData.setWriteInputFiles(true);
-		generateFDData.setRunDirectory(args[1]);
-		generateFDData.setUseHoles(Boolean.valueOf(args[2]));
-		generateFDData.setReduceDataPointsByFactor(1);
-		generateFDData.setUsingSeepNetworkFactory(Boolean.valueOf(args[3]));
-		HOLE_SPEED = args[4];
-		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[5]));
+		generateFDData.setRunDirectory(args[0]);
+		//		generateFDData.setUseHoles(false);
+		generateFDData.setReduceDataPointsByFactor(10);
+		//		generateFDData.setUsingSeepNetworkFactory(true);
+		//		HOLE_SPEED = args[4];
+		generateFDData.setIsPlottingDistribution(true);
 		generateFDData.run();
 	}
 
@@ -298,31 +300,41 @@ public class GenerateFundamentalDiagramData {
 
 		this.STARTING_POINT = new Integer [TRAVELMODES.length];
 		this.Step_Size = new Integer [TRAVELMODES.length];
-		
+
 		for(int ii=0;ii<TRAVELMODES.length;ii++){
 			this.STARTING_POINT [ii] =0;
 			this.Step_Size [ii] = this.reduceDataPointsByFactor*1;
 		}
-		this.STARTING_POINT = new Integer[] {370,1100};
-		
+		this.STARTING_POINT = new Integer[] {0,0};
+
 		MAX_AGENT_DISTRIBUTION = new Integer [TRAVELMODES.length];
+		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
+		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+
 		for(int ii=0;ii<MAX_AGENT_DISTRIBUTION.length;ii++){
 			double pcu = this.mode2FlowData.get(Id.create(TRAVELMODES[ii],VehicleType.class)).getVehicleType().getPcuEquivalents();
-			double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
-			double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
 			int maxNumberOfVehicle = (int) Math.floor(networkDensity/pcu)+1;
 			MAX_AGENT_DISTRIBUTION[ii] = maxNumberOfVehicle;
 		}
 
 		List<List<Integer>> pointsToRun = this.createPointsToRun();
 
+
 		for ( int i=0; i<pointsToRun.size(); i++){
 			List<Integer> pointToRun = pointsToRun.get(i);
-			System.out.println("Going into run "+pointToRun);
-			this.singleRun(pointToRun);
+			double density =0;
+			for(int jj = 0; jj < TRAVELMODES.length;jj++ ){
+				double pcu = this.mode2FlowData.get(Id.create(TRAVELMODES[jj],VehicleType.class)).getVehicleType().getPcuEquivalents();
+				density += pcu *pointToRun.get(jj) ;
+			}
+
+			if(density <= networkDensity+5){
+				System.out.println("Going into run "+pointToRun);
+				this.singleRun(pointToRun);
+			} 
 		}
 	}
-	
+
 	private List<List<Integer>> createPointsToRun() {
 
 		int numberOfPoints = 1; 
@@ -330,7 +342,7 @@ public class GenerateFundamentalDiagramData {
 		for(int jj=0;jj<TRAVELMODES.length;jj++){
 			numberOfPoints *= (int) Math.floor((MAX_AGENT_DISTRIBUTION[jj]-STARTING_POINT[jj])/Step_Size[jj])+1;
 		}
-		
+
 		if(numberOfPoints > 1000) log.warn("Total number of points to run is "+numberOfPoints+". This may take long time. "
 				+ "For lesser time to get the data reduce data points by some factor.");
 
@@ -432,7 +444,7 @@ public class GenerateFundamentalDiagramData {
 			mode2FlowSpeed.put(TRAVELMODES[i], flowSpeed);
 			outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 		}
-		
+
 		if(writeInputFiles) eventWriter.closeFile();
 	}
 
