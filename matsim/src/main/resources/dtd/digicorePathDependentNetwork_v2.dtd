@@ -39,8 +39,8 @@
 		  weight		CDATA		#REQUIRED
 >
 
-<!ELEMENT startNode					EMPTY>
-<!ATTLIST starttime
+<!ELEMENT startnode					EMPTY>
+<!ATTLIST startnode
 		  hour			CDATA		#REQUIRED
 		  number		CDATA		#REQUIRED
 		  count			CDATA		#REQUIRED
