@@ -20,6 +20,14 @@
 
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -55,10 +63,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
 
 /**
  * @author amit after ssix
@@ -305,7 +309,7 @@ public class GenerateFundamentalDiagramData {
 			this.STARTING_POINT [ii] =0;
 			this.Step_Size [ii] = this.reduceDataPointsByFactor*1;
 		}
-		this.STARTING_POINT = new Integer[] {0,0};
+		this.STARTING_POINT = new Integer[] {1,1};
 
 		MAX_AGENT_DISTRIBUTION = new Integer [TRAVELMODES.length];
 		double cellSizePerPCU = ((NetworkImpl) this.scenario.getNetwork()).getEffectiveCellSize();
