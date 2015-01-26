@@ -121,16 +121,6 @@
 			<version>0.43-RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>org.opentripplanner</groupId>
-			<artifactId>opentripplanner-routing</artifactId>
-			<version>0.9.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.opentripplanner</groupId>
-			<artifactId>opentripplanner-graph-builder</artifactId>
-			<version>0.9.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>
 			<version>0.7.0-SNAPSHOT</version>

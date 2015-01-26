@@ -22,7 +22,6 @@
 
 package playground.mzilske.clones;
 
-import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -55,49 +54,46 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
 
     @Override
     public ControlerListener get() {
-        return new IterationSummaryFileControlerListener(controlerIO,
-                ImmutableMap.<String, IterationSummaryFileControlerListener.Writer>of(
-                        "clonestats.txt",
-                        new IterationSummaryFileControlerListener.Writer() {
-                            @Override
-                            public StreamingOutput notifyStartup(StartupEvent event) {
-                                return new StreamingOutput() {
-                                    @Override
-                                    public void write(PrintWriter pw) throws IOException {
-                                        pw.printf("%s\t%s\t%s\n", "personid", "expnumber", "iteration");
-                                    }
-                                };
-                            }
+        Map<String, IterationSummaryFileControlerListener.Writer> things = new HashMap<>();
+        things.put("clonestats.txt", new IterationSummaryFileControlerListener.Writer() {
+            @Override
+            public StreamingOutput notifyStartup(StartupEvent event) {
+                return new StreamingOutput() {
+                    @Override
+                    public void write(PrintWriter pw) throws IOException {
+                        pw.printf("%s\t%s\t%s\n", "personid", "expnumber", "iteration");
+                    }
+                };
+            }
 
-                            @Override
-                            public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                                final Map<Id<Person>, Double> expectedNumberOfClones = new HashMap<>();
-                                for (Person person : scenario.getPopulation().getPersons().values()) {
-                                    Id<Person> originalId = cloneService.resolveParentId(person.getId());
-                                    for (Plan plan : person.getPlans()) {
-                                        if (plan.getPlanElements().size() > 1) {
-                                            double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, plan);
-                                            Double previous = expectedNumberOfClones.get(originalId);
-                                            if (previous == null)
-                                                expectedNumberOfClones.put(originalId, selectionProbability);
-                                            else
-                                                expectedNumberOfClones.put(originalId, previous + selectionProbability);
+            @Override
+            public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
+                final Map<Id<Person>, Double> expectedNumberOfClones = new HashMap<>();
+                for (Person person : scenario.getPopulation().getPersons().values()) {
+                    Id<Person> originalId = cloneService.resolveParentId(person.getId());
+                    for (Plan plan : person.getPlans()) {
+                        if (plan.getPlanElements().size() > 1) {
+                            double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, plan);
+                            Double previous = expectedNumberOfClones.get(originalId);
+                            if (previous == null)
+                                expectedNumberOfClones.put(originalId, selectionProbability);
+                            else
+                                expectedNumberOfClones.put(originalId, previous + selectionProbability);
 
-                                        }
-                                    }
-                                }
-                                return new StreamingOutput() {
-                                    @Override
-                                    public void write(PrintWriter pw) throws IOException {
-                                        for (Map.Entry<Id<Person>, Double> entry : expectedNumberOfClones.entrySet()) {
-                                            pw.printf("%s\t%s\t%d\n", entry.getKey(), entry.getValue(), event.getIteration());
-                                        }
-                                    }
-                                };
-                            }
                         }
-                )
-        );
+                    }
+                }
+                return new StreamingOutput() {
+                    @Override
+                    public void write(PrintWriter pw) throws IOException {
+                        for (Map.Entry<Id<Person>, Double> entry : expectedNumberOfClones.entrySet()) {
+                            pw.printf("%s\t%s\t%d\n", entry.getKey(), entry.getValue(), event.getIteration());
+                        }
+                    }
+                };
+            }
+        });
+        return new IterationSummaryFileControlerListener(controlerIO, things);
     }
 
 

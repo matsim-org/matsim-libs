@@ -23,7 +23,6 @@
 package playground.mzilske.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
@@ -49,7 +48,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class CadytsModule extends AbstractModule {
@@ -92,46 +93,44 @@ public class CadytsModule extends AbstractModule {
         @Inject VolumesAnalyzer volumesAnalyzer;
         @Override
         public ControlerListener get() {
-            return new IterationSummaryFileControlerListener(controlerIO,
-                    ImmutableMap.<String, IterationSummaryFileControlerListener.Writer>of(
-                    "linkstats.txt",
-                    new IterationSummaryFileControlerListener.Writer() {
+            Map<String, IterationSummaryFileControlerListener.Writer> things = new HashMap<>();
+            things.put("linkstats.txt", new IterationSummaryFileControlerListener.Writer() {
+                @Override
+                public StreamingOutput notifyStartup(StartupEvent event) {
+                    return new StreamingOutput() {
                         @Override
-                        public StreamingOutput notifyStartup(StartupEvent event) {
-                            return new StreamingOutput() {
-                                @Override
-                                public void write(PrintWriter pw) throws IOException {
-                                    pw.printf("%s\t%s\t%s\t%s\t%s\n",
-                                            "iteration",
-                                            "link",
-                                            "hour",
-                                            "sim.volume",
-                                            "count.volume");
-                                }
-                            };
+                        public void write(PrintWriter pw) throws IOException {
+                            pw.printf("%s\t%s\t%s\t%s\t%s\n",
+                                    "iteration",
+                                    "link",
+                                    "hour",
+                                    "sim.volume",
+                                    "count.volume");
                         }
+                    };
+                }
 
+                @Override
+                public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
+                    CountsComparisonAlgorithm countsComparisonAlgorithm = new CountsComparisonAlgorithm(volumesAnalyzer, (Counts) scenario.getScenarioElement("counts"), scenario.getNetwork(), 1.0);
+                    countsComparisonAlgorithm.run();
+                    final List<CountSimComparison> comparison = countsComparisonAlgorithm.getComparison();
+                    return new StreamingOutput() {
                         @Override
-                        public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                            CountsComparisonAlgorithm countsComparisonAlgorithm = new CountsComparisonAlgorithm(volumesAnalyzer, (Counts) scenario.getScenarioElement("counts"), scenario.getNetwork(), 1.0);
-                            countsComparisonAlgorithm.run();
-                            final List<CountSimComparison> comparison = countsComparisonAlgorithm.getComparison();
-                            return new StreamingOutput() {
-                                @Override
-                                public void write(PrintWriter pw) throws IOException {
-                                    for (CountSimComparison countLink : comparison) {
-                                        pw.printf("%d\t%s\t%d\t%f\t%f\n",
-                                                event.getIteration(),
-                                                countLink.getId().toString(),
-                                                countLink.getHour(),
-                                                countLink.getSimulationValue(),
-                                                countLink.getCountValue());
-                                    }
-                                }
-                            };
+                        public void write(PrintWriter pw) throws IOException {
+                            for (CountSimComparison countLink : comparison) {
+                                pw.printf("%d\t%s\t%d\t%f\t%f\n",
+                                        event.getIteration(),
+                                        countLink.getId().toString(),
+                                        countLink.getHour(),
+                                        countLink.getSimulationValue(),
+                                        countLink.getCountValue());
+                            }
                         }
-                    }
-            ));
+                    };
+                }
+            });
+            return new IterationSummaryFileControlerListener(controlerIO, things);
         }
     }
 
