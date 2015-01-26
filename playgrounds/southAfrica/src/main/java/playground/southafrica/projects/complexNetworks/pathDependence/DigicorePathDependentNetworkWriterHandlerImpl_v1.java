@@ -95,26 +95,16 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startStartTime(Map<String, Integer> starttime,
+	public void startStartNode(Map<String, Integer> startNode,
 			BufferedWriter out) throws IOException {
 		/* Do nothing. */
 	}
 
 	@Override
-	public void endStartTime(BufferedWriter out) throws IOException {
+	public void endStartNode(BufferedWriter out) throws IOException {
 		/* Do nothing. */
 	}
 
-	@Override
-	public void startActivities(Map<String, Integer> activities,
-			BufferedWriter out) throws IOException {
-		/* Do nothing. */
-	}
-
-	@Override
-	public void endActivities(BufferedWriter out) throws IOException {
-		/* Do nothing. */
-	}
 
 }
 

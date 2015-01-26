@@ -33,8 +33,7 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 	private final static String NODE = "node";
 	private final static String PRECEDING = "preceding";
 	private final static String FOLLOWING = "following";
-	private final static String STARTTIME = "starttime";
-	private final static String ACTIVITIES = "activities";
+	private final static String STARTNODE = "startnode";
 	
 	/* Attributes. */
 	private final static String ATTR_DESCR = "desc";
@@ -45,9 +44,8 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 	private final static String ATTR_FOLLOWING_ID = "id";
 	private final static String ATTR_WEIGHT = "weight";
 	private final static String ATTR_STARTHOUR = "hour";
+	private final static String ATTR_STARTACTIVITIES = "number";
 	private final static String ATTR_STARTCOUNT = "count";
-	private final static String ATTR_ACTIVITIES = "number";
-	private final static String ATTR_ACTIVITYCOUNT = "count";
 	
 	private PathDependentNetwork network = null;
 	
@@ -97,14 +95,11 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 			Id<Node> nextId = Id.create(atts.getValue(ATTR_FOLLOWING_ID), Node.class);
 			double weight = Double.parseDouble(atts.getValue(ATTR_WEIGHT));
 			this.network.setPathDependentEdgeWeight(currentPrecedingId, currentNodeId, nextId, weight);
-		} else if (STARTTIME.equals(name)){
+		} else if (STARTNODE.equals(name)){
 			String hour = atts.getValue(ATTR_STARTHOUR);
+			String activities = atts.getValue(ATTR_STARTACTIVITIES);
 			int count = Integer.parseInt(atts.getValue(ATTR_STARTCOUNT));
-			this.network.getPathDependentNode(currentNodeId).getStartTimeMap().put(hour, count);
-		} else if (ACTIVITIES.equals(name)){
-			String act = atts.getValue(ATTR_ACTIVITIES);
-			int count = Integer.parseInt(atts.getValue(ATTR_ACTIVITYCOUNT));
-			this.network.getPathDependentNode(currentNodeId).getNumberOfActivityMap().put(act, count);
+			this.network.getPathDependentNode(currentNodeId).getStartNodeMap().put(hour + "," + activities, count);
 		} else{
 			throw new RuntimeException(this + "[tag=" + name + " not known or supported]");
 		}
@@ -122,9 +117,7 @@ public class DigicorePathDependentNetworkReader_v2 extends MatsimXmlParser {
 			currentPrecedingId = null;
 		} else if (FOLLOWING.equals(name)){
 			/* Do nothing. */
-		} else if (STARTTIME.equals(name)){
-			/* Do nothing. */
-		} else if (ACTIVITIES.equals(name)){
+		} else if (STARTNODE.equals(name)){
 			/* Do nothing. */
 		} else{
 			throw new RuntimeException(this + "[tag=" + name + " not known or supported]");

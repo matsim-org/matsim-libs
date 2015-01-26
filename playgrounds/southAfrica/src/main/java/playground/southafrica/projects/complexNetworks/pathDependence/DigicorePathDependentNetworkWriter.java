@@ -129,17 +129,10 @@ public class DigicorePathDependentNetworkWriter extends MatsimXmlWriter implemen
 				}
 
 				/* Write the start hours if available. */
-				Map<String, Integer> hourMap = node.getStartTimeMap();
-				if(!hourMap.isEmpty()){
-					handler.startStartTime(hourMap, writer);
-					handler.endStartTime(writer);
-				}
-				
-				/* Write the number of activities if available. */
-				Map<String, Integer> activityMap = node.getNumberOfActivityMap();
-				if(!activityMap.isEmpty()){
-					handler.startActivities(activityMap, writer);
-					handler.endActivities(writer);
+				Map<String, Integer> sourceNodeMap = node.getStartNodeMap();
+				if(!sourceNodeMap.isEmpty()){
+					handler.startStartNode(sourceNodeMap, writer);
+					handler.endStartNode(writer);
 				}
 				
 				handler.endNode(node, this.writer);

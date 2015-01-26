@@ -61,10 +61,10 @@ import playground.southafrica.utilities.Header;
  */
 public class FreightChainGenerator {
 	private final static Logger LOG = Logger.getLogger(FreightChainGenerator.class);
-	private final static int MAX_CHAIN_LENGTH = 71;
 	private final static Random RANDOM = MatsimRandom.getRandom();
 	private final static Double AVERAGE_SPEED = 50.0/3.6;
 	private final static int MAX_CHAIN_ATTEMPTS = 10;
+	private static int TOTAL_CHAIN_RESTARTS = 0;
 	
 	private PathDependentNetwork complexNetwork;
 	
@@ -99,6 +99,8 @@ public class FreightChainGenerator {
 		
 		/* Write the person attributes to file. */
 		new ObjectAttributesXmlWriter(fcg.getScenario().getPopulation().getPersonAttributes()).writeFile(attributeFile);
+		
+		LOG.info("Total number of chain restarts: " + TOTAL_CHAIN_RESTARTS);
 		
 		Header.printFooter();
 	}
@@ -192,18 +194,29 @@ public class FreightChainGenerator {
 			/* Build a list of consecutive activities. */
 			boolean validChain = false;
 			int chainRestarts = 0;
+			
+			Integer[] chainAttributes = null;
 			List<String> chainList = null;
 			while(!validChain){
 				/* Generate the first activity. */
 				Id<Node> source = Id.create("source", Node.class);
 				Id<Node> firstNode = network.sampleChainStartNode();
 				
-				int numberOfActivities = network.sampleNumberOfMinorActivities(firstNode);
+				chainAttributes = network.sampleChainStartHour(firstNode);
+				int numberOfActivities = chainAttributes[1];
 				
 				chainList = new ArrayList<String>(numberOfActivities+2);
 				chainList.add( source + "," + firstNode );
 				while(chainList.size() < (numberOfActivities+1) && chainAttempts < MAX_CHAIN_ATTEMPTS){
 					chainList = buildChainList(chainList, network);
+					
+					/* It is (unfortunately) possible that the entire activity 
+					 * chain could have been removed. If that happens, the 
+					 * chain process should be restarted completely. This can
+					 * be achieved by immediately setting the number of chain 
+					 * attempts to its maximum, forcing the chain to be started
+					 * from scratch. */
+					chainAttempts = MAX_CHAIN_ATTEMPTS;
 				}
 				if(chainAttempts < MAX_CHAIN_ATTEMPTS){
 					/* Add the final major activity. */
@@ -218,6 +231,7 @@ public class FreightChainGenerator {
 				}
 				if(!validChain){
 					chainRestarts++;
+					TOTAL_CHAIN_RESTARTS++;
 					LOG.info("  ===> Chain restarts: " + chainRestarts);
 					chainAttempts = 0;
 				}
@@ -233,7 +247,7 @@ public class FreightChainGenerator {
 			ActivityImpl firstActivity = new ActivityImpl("major", coord);
 			firstActivity.setFacilityId(Id.create(firstId.toString(), ActivityFacility.class));
 
-			int startHour = network.sampleChainStartHour(firstId);
+			int startHour = chainAttributes[0];
 			double endTime = Math.round((startHour + RANDOM.nextDouble())*3600); /* in seconds after midnight */
 			firstActivity.setEndTime(endTime);
 			plan.addActivity(firstActivity);

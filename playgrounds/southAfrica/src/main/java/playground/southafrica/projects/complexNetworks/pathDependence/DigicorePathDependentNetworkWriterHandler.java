@@ -47,14 +47,9 @@ public interface DigicorePathDependentNetworkWriterHandler {
 	public void startFollowing(final Map<Id<Node>, Double> following, final BufferedWriter out) throws IOException;
 	public void endFollowing(final BufferedWriter out) throws IOException;
 	
-	/* <starttime> ... </starttime> */
-	public void startStartTime(final Map<String, Integer> starttime, final BufferedWriter out) throws IOException;
-	public void endStartTime(BufferedWriter out) throws IOException;
-	
-	/* <activities> ... </activities> */
-	public void startActivities(final Map<String, Integer> activities, final BufferedWriter out) throws IOException;
-	public void endActivities(BufferedWriter out) throws IOException;
-	
+	/* <startNode> ... </startNode> */
+	public void startStartNode(final Map<String, Integer> startNode, final BufferedWriter out) throws IOException;
+	public void endStartNode(BufferedWriter out) throws IOException;
 	
 	public void writeSeparator(final BufferedWriter out) throws IOException;
 	

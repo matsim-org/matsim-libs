@@ -152,7 +152,7 @@ public class PathDependentNetwork {
 				} 
 				PathDependentNode currentNode = this.network.get(currentNodeId);
 				
-				/* Add the next node to the network if it doesn'talready exist. */
+				/* Add the next node to the network if it doesn't already exist. */
 				if(!this.network.containsKey(nextNodeId)){
 					this.network.put(nextNodeId, new PathDependentNode(nextNodeId, chain.get(i+1).getCoord() ) );
 				} 
@@ -316,7 +316,7 @@ public class PathDependentNetwork {
 	 * 
 	 * @return
 	 */
-	public int sampleChainStartHour(Id<Node> startNode, double randomValue){
+	public Integer[] sampleChainAttributes(Id<Node> startNode, double randomValue){
 		PathDependentNode node = this.getPathDependentNode(startNode);
 		
 		Id<Node> sourceId = Id.createNodeId("source");
@@ -329,23 +329,28 @@ public class PathDependentNetwork {
 		 * only once per node. */
 		if(node.sourceCount == null){
 			node.sourceCount = 0.0;
-			for(String hour : node.hourMap.keySet()){
-				node.sourceCount += (double)node.hourMap.get(hour); 
+			for(String s : node.startNodeMap.keySet()){
+				node.sourceCount += (double)node.startNodeMap.get(s); 
 			}
 		}
 		
 		double cumulativeWeight = 0.0;
-		Integer hour = null;
-		Iterator<String> iterator = node.hourMap.keySet().iterator();
-		while(hour == null && iterator.hasNext()){
-			String hourString = iterator.next();
-			cumulativeWeight += node.hourMap.get(hourString);
+		Integer[] result = null;
+		Iterator<String> iterator = node.startNodeMap.keySet().iterator();
+		while(result == null && iterator.hasNext()){
+			String s = iterator.next();
+			cumulativeWeight += node.startNodeMap.get(s);
 			if( (cumulativeWeight/node.sourceCount) >= randomValue ){
-				hour = Integer.parseInt(hourString);
+				List<Integer> list = new ArrayList<Integer>(2);
+				int hour = Integer.parseInt(s.split(",")[0]);
+				int activities = Integer.parseInt(s.split(",")[1]);
+				list.add(hour);
+				list.add(activities);
+				list.toArray(result);
 			}
 		}
 		
-		return hour;
+		return result;
 	}
 	
 
@@ -354,54 +359,11 @@ public class PathDependentNetwork {
 	 * @param startNode
 	 * @return
 	 */
-	public int sampleChainStartHour(Id<Node> startNode){
-		return this.sampleChainStartHour(startNode, random.nextDouble());
+	public Integer[] sampleChainStartHour(Id<Node> startNode){
+		return this.sampleChainAttributes(startNode, random.nextDouble());
 	}
 	
-	
-	public int sampleNumberOfMinorActivities(Id<Node> startNode, double randomValue){
-		PathDependentNode node = this.getPathDependentNode(startNode);
 		
-		Id<Node> sourceId = Id.createNodeId("source");
-		if(!node.getPathDependence().containsKey(sourceId)){
-			LOG.error("Cannot sample a chain's number of activities from a node that is not considered a major activity.");
-			throw new IllegalArgumentException("Illegal start node Id: " + startNode.toString());
-		}
-
-		/* Establish the number of times this node has been a source node, but 
-		 * only once per node. */
-		if(node.sourceCount == null){
-			node.sourceCount = 0.0;
-			for(String hour : node.activityCountMap.keySet()){
-				node.sourceCount += (double)node.activityCountMap.get(hour); 
-			}
-		}
-		
-		double cumulativeWeight = 0.0;
-		Integer numberOfActivities = null;
-		Iterator<String> iterator = node.activityCountMap.keySet().iterator();
-		while(numberOfActivities == null && iterator.hasNext()){
-			String activityCountString = iterator.next();
-			cumulativeWeight += node.activityCountMap.get(activityCountString);
-			if( (cumulativeWeight/node.sourceCount) >= randomValue ){
-				numberOfActivities = Integer.parseInt(activityCountString);
-			}
-		}
-		
-		return numberOfActivities;
-	}
-	
-	
-	/**
-	 * 
-	 * @param startNode
-	 * @return
-	 */
-	public int sampleNumberOfMinorActivities(Id<Node> startNode){
-		return this.sampleNumberOfMinorActivities(startNode, random.nextDouble());
-	}
-	
-	
 	public Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId, Id<Node> currentNodeId){
 		return sampleBiasedNextPathDependentNode(previousNodeId, currentNodeId, random.nextDouble());
 	}
@@ -614,15 +576,15 @@ public class PathDependentNetwork {
 		private Double sourceCount = null;
 		private Double sinkCount = null;
 		private Map<Id<Node>, Map<Id<Node>, Double>> pathDependence;
-		private Map<String,Integer> hourMap;
-		private Map<String, Integer> activityCountMap;
+//		private Map<String,Integer> hourMap;
+//		private Map<String, Integer> activityCountMap;
+		private Map<String, Integer> startNodeMap;
 		
 		public PathDependentNode(Id<Node> id, Coord coord) {
 			this.id = id;
 			this.coord = coord;
 			this.pathDependence = new TreeMap<>();
-			this.hourMap = new TreeMap<String, Integer>();
-			this.activityCountMap = new TreeMap<String, Integer>();
+			this.startNodeMap = new TreeMap<String, Integer>();
 		}
 
 		@Override
@@ -636,22 +598,12 @@ public class PathDependentNetwork {
 		
 
 		public void setAsSource(int startHour, int numberOfActivities){
-			/* Set start hour. */
-			String h = String.valueOf(startHour);
-			if(!this.hourMap.containsKey(h)){
-				this.hourMap.put(h, 1);
+			String node = String.valueOf(startHour) + "," + String.valueOf(numberOfActivities);
+			if(!this.startNodeMap.containsKey(node)){
+				this.startNodeMap.put(node, 1);
 			} else{
-				int oldValue = this.hourMap.get(h);
-				this.hourMap.put(String.valueOf(startHour), oldValue + 1);
-			}
-			
-			/* Set number of activities. */
-			String n = String.valueOf(numberOfActivities);
-			if(!this.activityCountMap.containsKey(n)){
-				this.activityCountMap.put(n, 1);
-			} else{
-				int oldValue = this.activityCountMap.get(n);
-				this.activityCountMap.put(n, oldValue + 1);
+				int oldValue = this.startNodeMap.get(node);
+				this.startNodeMap.put(node, oldValue + 1);
 			}
 		}
 		
@@ -680,8 +632,6 @@ public class PathDependentNetwork {
 				map.put(sinkId, map.get(sinkId) + 1.0);
 			}
 		}
-		
-		
 		
 		
 		public void addSourceLink(int startHour, int numberOfActivities, Id<Node> nextNodeId){
@@ -847,13 +797,8 @@ public class PathDependentNetwork {
 			return weight;
 		}
 		
-		public Map<String, Integer> getStartTimeMap(){
-			return this.hourMap;
-		}
-		
-		
-		public Map<String, Integer> getNumberOfActivityMap(){
-			return this.activityCountMap;
+		public Map<String, Integer> getStartNodeMap(){
+			return this.startNodeMap;
 		}
 		
 		

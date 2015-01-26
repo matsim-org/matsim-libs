@@ -97,49 +97,38 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v2 implements
 	}
 
 	@Override
-	public void startStartTime(Map<String, Integer> starttime,
+	public void startStartNode(Map<String, Integer> startNode,
 			BufferedWriter out) throws IOException {
-		/* Convert the hour strings to sortable values */
-		Map<Integer, Integer> map = new TreeMap<Integer, Integer>();
-		for(String s : starttime.keySet()){
-			map.put(Integer.parseInt(s), starttime.get(s));
+		/* Convert the strings to sortable values */
+		Map<Integer, Map<Integer, Integer>> map = new TreeMap<Integer, Map<Integer,Integer>>();
+		for(String s : startNode.keySet()){
+			String[] sa = s.split(",");
+			Integer hour = Integer.parseInt(sa[0]);
+			Integer activities = Integer.parseInt(sa[1]);
+			Integer count = startNode.get(s);
+			if(!map.containsKey(hour)){
+				map.put(hour, new TreeMap<Integer, Integer>());
+			}
+			Map<Integer, Integer> hourMap = map.get(hour);
+			hourMap.put(activities, count);
 		}
 		out.write("\n");
-		out.write("\t\t<!--  Source node: activity chain start times. -->\n");
-		for(int i : map.keySet()){
-			out.write("\t\t<starttime");
-			out.write(" hour=\"" + String.valueOf(i) + "\"");
-			out.write(" count=\"" + String.valueOf(map.get(i)) + "\"/>\n");
+		out.write("\t\t<!--  Source node: activity chain start times and number of activities. -->\n");
+		for(Integer hour : map.keySet()){
+			for(Integer activities : map.get(hour).keySet()){
+				out.write("\t\t<startnode");
+				out.write(" hour=\"" + String.valueOf(hour) + "\"");
+				out.write(" activities=\"" + String.valueOf(activities) + "\"");
+				out.write(" count=\"" + String.valueOf(map.get(hour).get(activities)) + "\"/>\n");
+			}
 		}
 	}
 
 	@Override
-	public void endStartTime(BufferedWriter out) throws IOException {
+	public void endStartNode(BufferedWriter out) throws IOException {
 		/* Do nothing. */
 	}
 
-	@Override
-	public void startActivities(Map<String, Integer> activities,
-			BufferedWriter out) throws IOException {
-		/* Convert the activity strings to sortable values */
-		Map<Integer, Integer> map = new TreeMap<Integer, Integer>();
-		for(String s : activities.keySet()){
-			map.put(Integer.parseInt(s), activities.get(s));
-		}
-
-		out.write("\n");
-		out.write("\t\t<!--  Source node: number of activities per chain. -->\n");
-		for(int i : map.keySet()){
-			out.write("\t\t<activities");
-			out.write(" number=\"" + String.valueOf(i) + "\"");
-			out.write(" count=\"" + String.valueOf(map.get(i)) + "\"/>\n");
-		}
-	}
-
-	@Override
-	public void endActivities(BufferedWriter out) throws IOException {
-		/* Do nothing. */
-	}
 
 }
 
