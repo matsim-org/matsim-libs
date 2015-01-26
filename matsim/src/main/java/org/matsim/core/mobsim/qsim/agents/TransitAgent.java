@@ -20,12 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -37,12 +40,10 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.List;
-
 /**
  * @author mrieser
  */
-public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent {
+public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TransitAgent.class);
 	
@@ -127,6 +128,7 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		return basicAgentDelegate.getId();
 	}
 
+	@Override
 	public final Person getPerson() {
 		return basicAgentDelegate.getPerson();
 	}
