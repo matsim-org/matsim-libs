@@ -1,4 +1,4 @@
-package usecases.chessboard.replanning;
+package org.matsim.contrib.freight.usecases.chessboard.replanning;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,4 +1,4 @@
-package usecases.chessboard;
+package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;

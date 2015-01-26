@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package usecases.analysis;
+package org.matsim.contrib.freight.usecases.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

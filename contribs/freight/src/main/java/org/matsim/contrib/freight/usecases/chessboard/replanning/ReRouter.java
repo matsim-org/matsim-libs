@@ -1,4 +1,4 @@
-package usecases.chessboard.replanning;
+package org.matsim.contrib.freight.usecases.chessboard.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;

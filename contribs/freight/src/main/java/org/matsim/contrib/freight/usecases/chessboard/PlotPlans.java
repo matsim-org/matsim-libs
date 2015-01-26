@@ -1,4 +1,4 @@
-package usecases.chessboard;
+package org.matsim.contrib.freight.usecases.chessboard;
 
 import jsprit.analysis.toolbox.Plotter;
 import jsprit.core.problem.VehicleRoutingProblem;

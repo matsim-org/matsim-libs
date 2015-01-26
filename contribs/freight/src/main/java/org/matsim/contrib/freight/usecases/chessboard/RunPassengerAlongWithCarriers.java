@@ -1,10 +1,14 @@
-package usecases.chessboard;
+package org.matsim.contrib.freight.usecases.chessboard;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
+import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
+import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -16,10 +20,6 @@ import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import usecases.analysis.CarrierScoreStats;
-import usecases.analysis.LegHistogram;
-import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
-import usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 
 import java.io.File;
 

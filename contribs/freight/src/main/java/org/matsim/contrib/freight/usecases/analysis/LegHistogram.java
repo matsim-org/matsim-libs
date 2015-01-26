@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package usecases.analysis;
+package org.matsim.contrib.freight.usecases.analysis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
