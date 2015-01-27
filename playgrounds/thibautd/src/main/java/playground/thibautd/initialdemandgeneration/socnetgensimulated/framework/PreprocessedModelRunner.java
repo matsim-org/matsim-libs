@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
@@ -82,6 +83,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		this.nThreads = nThreads;
 
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );
+		Gbl.printMemoryUsage();
 
 		preprocess.addEgosIdentifiable( population.getAgents() );
 
@@ -131,6 +133,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		counter.printCounter();
 
 		log.info( "preprocessing done" );
+		Gbl.printMemoryUsage();
 	}
 
 	@Override
@@ -144,6 +147,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 			final Thresholds thresholds ) {
 		final Map<Id<Person>, Set<Id<Person>>> sn = new ConcurrentHashMap< >();
 		log.info( "create primary ties using preprocessed data" );
+		Gbl.printMemoryUsage();
 
 		for ( T agent : population.getAgents() ) sn.put( agent.getId() , new HashSet<Id<Person>>() );
 
@@ -172,6 +176,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		threads.run();
 		counter.printCounter();
 
+		Gbl.printMemoryUsage();
 		log.info( "fill in network with primary ties" );
 		final SocialNetwork net = new SocialNetworkImpl( true );
 		for ( T agent : population.getAgents() ) net.addEgo( agent.getId() );
@@ -188,12 +193,14 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
 		}
 
+		Gbl.printMemoryUsage();
 		return net;
 	}
 
 	private void updateSecondaryPreprocess(
 			final SocialNetwork sn ) {
 		log.info( "update secondary preprocess" );
+		Gbl.printMemoryUsage();
 		final List<T> agents = new ArrayList< >( population.getAgents() );
 
 		preprocessFriendsOfFriends.clear();
@@ -289,12 +296,14 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		threads.run();
 
 		counter.printCounter();
+		Gbl.printMemoryUsage();
 	}
 
 	private void runSecondary(
 			final Thresholds thresholds,
 			final SocialNetwork sn ) {
 		log.info( "create secondary ties" );
+		Gbl.printMemoryUsage();
 		final List<T> agents = new ArrayList< >( population.getAgents() );
 
 		final Map<Id<Person>, Set<Id<Person>>> newTies = new ConcurrentHashMap< >();
@@ -345,6 +354,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		threads.run();
 
 		counter.printCounter();
+		Gbl.printMemoryUsage();
 
 		log.info( "fill in social network with secondary ties" );
 		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : newTies.entrySet() ) {
@@ -352,6 +362,7 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 				sn.addBidirectionalTie( e.getKey() , alter );
 			}
 		}
+		Gbl.printMemoryUsage();
 	}
 }
 
