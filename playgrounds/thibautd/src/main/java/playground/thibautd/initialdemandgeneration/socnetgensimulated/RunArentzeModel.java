@@ -44,7 +44,6 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPop
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SimpleModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.Thresholds;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;
@@ -120,9 +119,7 @@ public class RunArentzeModel {
 		final SocialNetwork network =
 			modelIterator.iterateModelToTarget(
 					runner,
-					new Thresholds(
-						config.getInitialPrimaryThreshold(),
-						config.getInitialPrimaryThreshold() - config.getInitialSecondaryReduction() ) );
+					config.getInitialPoints() );
 
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 

@@ -20,8 +20,10 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
@@ -51,14 +53,12 @@ public class ModelIterator {
 
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
-			final Thresholds initialThresholds ) {
-		final ThresholdMemory memory = new ThresholdMemory();
+			final Collection<Thresholds> initialThresholds ) {
+		final ThresholdMemory memory = new ThresholdMemory( initialThresholds );
 
 		for ( int iter=1; true; iter++ ) {
 			log.info( "Iteration # "+iter );
 			final Thresholds thresholds =
-				iter == 1 ?
-					initialThresholds :
 					memory.createNewThresholds( iter );
 
 			log.info( "generate network for "+thresholds );
@@ -90,10 +90,16 @@ public class ModelIterator {
 	}
 
 	private class ThresholdMemory {
+		private final Iterator<Thresholds> initialThresholds;
+
 		private final ThresholdsReference bestSouthWest = new ThresholdsReference( "southWest" );
 		private final ThresholdsReference bestSouthEast = new ThresholdsReference( "southEast" );
 		private final ThresholdsReference bestNorthEast = new ThresholdsReference( "northEast" );
 		private final ThresholdsReference bestNorthWest = new ThresholdsReference( "northWest" );
+
+		public ThresholdMemory( final Iterable<Thresholds> initial ) {
+			this.initialThresholds = initial.iterator();
+		}
 
 		public void add( final Thresholds t ) {
 			final ThresholdsReference ref = getQuadrant( t );
@@ -142,6 +148,8 @@ public class ModelIterator {
 		}
 
 		public Thresholds createNewThresholds( final int iteration ) {
+			if ( initialThresholds.hasNext() ) return initialThresholds.next();
+
 			final boolean accordingToDegree = iteration % 2 == 0;
 
 			final ThresholdsReference best = getBestQuadrant( accordingToDegree );

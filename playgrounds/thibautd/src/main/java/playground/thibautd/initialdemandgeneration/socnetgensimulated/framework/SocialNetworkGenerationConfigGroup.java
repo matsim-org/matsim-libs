@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
@@ -36,9 +41,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
-
-	private double initialPrimaryThreshold = -8.8;
-	private double initialSecondaryReduction = 230;
 
 	private int nThreads = 1;
 
@@ -107,26 +109,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.targetClustering = targetClustering;
 	}
 
-	@StringGetter( "initialPrimaryThreshold" )
-	public double getInitialPrimaryThreshold() {
-		return initialPrimaryThreshold;
-	}
-
-	@StringSetter( "initialPrimaryThreshold" )
-	public void setInitialPrimaryThreshold( double initialPrimaryThreshold ) {
-		this.initialPrimaryThreshold = initialPrimaryThreshold;
-	}
-
-	@StringGetter( "initialSecondaryReduction" )
-	public double getInitialSecondaryReduction() {
-		return initialSecondaryReduction;
-	}
-
-	@StringSetter( "initialSecondaryReduction" )
-	public void setInitialSecondaryReduction( double initialSecondaryThreshold ) {
-		this.initialSecondaryReduction = initialSecondaryThreshold;
-	}
-
 	@StringGetter( "nThreads" )
 	public int getNThreads() {
 		return nThreads;
@@ -135,6 +117,53 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "nThreads" )
 	public void setNThreads( int nThreads ) {
 		this.nThreads = nThreads;
+	}
+
+	@Override
+	public ConfigGroup createParameterSet( final String type ) {
+		if ( !type.equals( InitialPointParameterSet.SET_TYPE ) ) throw new IllegalArgumentException( type );
+		return new InitialPointParameterSet();
+	}
+
+	public Collection<Thresholds> getInitialPoints() {
+		final List<Thresholds> ts = new ArrayList< >();
+		for ( InitialPointParameterSet set : (Collection<InitialPointParameterSet>) getParameterSets( InitialPointParameterSet.SET_TYPE ) ) {
+			ts.add( new Thresholds( set.getInitialPrimaryThreshold() , set.getInitialSecondaryReduction() ) );
+		}
+		return ts;
+	}
+
+	public static class InitialPointParameterSet extends ReflectiveConfigGroup {
+		public static final String SET_TYPE = "initialPoint";
+
+		public InitialPointParameterSet( ) {
+			super( SET_TYPE );
+		}
+
+		private double initialPrimaryThreshold = -8.8;
+		private double initialSecondaryReduction = 230;
+
+		@StringGetter( "initialPrimaryThreshold" )
+		public double getInitialPrimaryThreshold() {
+			return initialPrimaryThreshold;
+		}
+
+		@StringSetter( "initialPrimaryThreshold" )
+		public void setInitialPrimaryThreshold( double initialPrimaryThreshold ) {
+			this.initialPrimaryThreshold = initialPrimaryThreshold;
+		}
+
+		@StringGetter( "initialSecondaryReduction" )
+		public double getInitialSecondaryReduction() {
+			return initialSecondaryReduction;
+		}
+
+		@StringSetter( "initialSecondaryReduction" )
+		public void setInitialSecondaryReduction( double initialSecondaryReduction ) {
+			if ( initialSecondaryReduction < 0 ) throw new IllegalArgumentException( "secondary reduction must be positive, got "+initialSecondaryReduction );
+			this.initialSecondaryReduction = initialSecondaryReduction;
+		}
+
 	}
 }
 
