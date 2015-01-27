@@ -107,7 +107,7 @@ public class RunArentzeModel {
 					false ); // cache
 		final ModelRunner runner =
 			new PreprocessedModelRunner<ArentzeAgent>(
-					-500,
+					config.getLowestCachedUtility(),
 					population,
 					utility,
 					config.getPrimarySamplingRate(),

@@ -42,6 +42,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
 
+	private double lowestCachedUtility = -300;
+
 	private int nThreads = 1;
 
 
@@ -107,6 +109,16 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "targetClustering" )
 	public void setTargetClustering( double targetClustering ) {
 		this.targetClustering = targetClustering;
+	}
+
+	@StringGetter( "lowestCachedUtility" )
+	public double getLowestCachedUtility() {
+		return lowestCachedUtility;
+	}
+
+	@StringSetter( "lowestCachedUtility" )
+	public void setLowestCachedUtility( double lowestCachedUtility ) {
+		this.lowestCachedUtility = lowestCachedUtility;
 	}
 
 	@StringGetter( "nThreads" )
