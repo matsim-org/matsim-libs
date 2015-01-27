@@ -113,40 +113,52 @@ public class DoublyWeightedSocialNetwork {
 	// should be ok, as agents are got in random order
 	private static final class DoublyWeightedFriends {
 		private Id[] friends;
-		private double[] weights1;
-		private double[] weights2;
 
-		private int[] childSE;
-		private int[] childSW;
-		private int[] childNE;
-		private int[] childNW;
+		// use float and short for memory saving
+		private float[] weights1;
+		private float[] weights2;
 
-		private int size = 0;
+		private short[] childSE;
+		private short[] childSW;
+		private short[] childNE;
+		private short[] childNW;
+
+		// cannot exceed the maximum value of the "children" arrays:
+		// set to short, even if it might have only limited impact on
+		// memory
+		private short size = 0;
 
 		public DoublyWeightedFriends(final int initialSize) {
 			this.friends = new Id[ initialSize ];
 
-			this.weights1 = new double[ initialSize ];
-			this.weights2 = new double[ initialSize ];
+			this.weights1 = new float[ initialSize ];
+			this.weights2 = new float[ initialSize ];
 
-			Arrays.fill( weights1 , Double.POSITIVE_INFINITY );
-			Arrays.fill( weights2 , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights1 , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , Float.POSITIVE_INFINITY );
 
-			this.childSE = new int[ initialSize ];
-			this.childSW = new int[ initialSize ];
-			this.childNE = new int[ initialSize ];
-			this.childNW = new int[ initialSize ];
+			this.childSE = new short[ initialSize ];
+			this.childSW = new short[ initialSize ];
+			this.childNE = new short[ initialSize ];
+			this.childNW = new short[ initialSize ];
 
-			Arrays.fill( childSE , -1 );
-			Arrays.fill( childSW , -1 );
-			Arrays.fill( childNE , -1 );
-			Arrays.fill( childNW , -1 );
+			Arrays.fill( childSE , (short) -1 );
+			Arrays.fill( childSW , (short) -1 );
+			Arrays.fill( childNE , (short) -1 );
+			Arrays.fill( childNW , (short) -1 );
 		}
 
 		public synchronized void add(
 				final Id<Person> friend,
 				final double firstWeight,
 				final double secondWeight ) {
+			add( friend , (float) firstWeight , (float) secondWeight );
+		}
+
+		public synchronized void add(
+				final Id<Person> friend,
+				final float firstWeight,
+				final float secondWeight ) {
 			if ( size == 0 ) {
 				// first element is the head: special case...
 				friends[ 0 ] = friend;
@@ -159,7 +171,7 @@ public class DoublyWeightedSocialNetwork {
 
 				if ( size == friends.length ) expand();
 
-				final int[] quadrant = getQuadrant( parent , firstWeight, secondWeight );
+				final short[] quadrant = getQuadrant( parent , firstWeight, secondWeight );
 				friends[ size ] = friend;
 
 				weights1[ size ] = firstWeight;
@@ -177,33 +189,33 @@ public class DoublyWeightedSocialNetwork {
 			weights1 = Arrays.copyOf( weights1 , newLength );
 			weights2 = Arrays.copyOf( weights2 , newLength );
 
-			Arrays.fill( weights1 , size , newLength , Double.POSITIVE_INFINITY );
-			Arrays.fill( weights2 , size , newLength , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights1 , size , newLength , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , size , newLength , Float.POSITIVE_INFINITY );
 
 			childSE = Arrays.copyOf( childSE , newLength );
 			childSW = Arrays.copyOf( childSW , newLength );
 			childNE = Arrays.copyOf( childNE , newLength );
 			childNW = Arrays.copyOf( childNW , newLength );
 
-			Arrays.fill( childSE , size , newLength , -1 );
-			Arrays.fill( childSW , size , newLength , -1 );
-			Arrays.fill( childNE , size , newLength , -1 );
-			Arrays.fill( childNW , size , newLength , -1 );
+			Arrays.fill( childSE , size , newLength , (short) -1 );
+			Arrays.fill( childSW , size , newLength , (short) -1 );
+			Arrays.fill( childNE , size , newLength , (short) -1 );
+			Arrays.fill( childNW , size , newLength , (short) -1 );
 		}
 
 		private int searchParentLeaf(
 				final int head,
-				final double firstWeight,
-				final double secondWeight ) {
-			int[] quadrant = getQuadrant( head, firstWeight, secondWeight );
+				final float firstWeight,
+				final float secondWeight ) {
+			short[] quadrant = getQuadrant( head, firstWeight, secondWeight );
 
 			return quadrant[ head ] == -1 ? head : searchParentLeaf( quadrant[head], firstWeight, secondWeight );
 		}
 
-		private int[] getQuadrant(
+		private short[] getQuadrant(
 				final int head,
-				final double firstWeight,
-				final double secondWeight ) {
+				final float firstWeight,
+				final float secondWeight ) {
 			if ( firstWeight > weights1[ head ] ) {
 				return secondWeight > weights2[ head ] ? childNE : childSE;
 			}

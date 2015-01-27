@@ -123,19 +123,24 @@ public class WeightedSocialNetwork {
 
 	private static final class WeightedFriends {
 		private Id[] friends = new Id[ 20 ];
-		private double weights[] = new double[ 20 ];
-		private int size = 0;
+		// use float instead of double for saving memory.
+		// TODO: check robustness of the results facing this...
+		private float weights[] = new float[ 20 ];
+		// as such, using short here might look as overdoing...
+		// but we have one such structure per agent: this might make sense.
+		private short size = 0;
 
 		public WeightedFriends( final int initialSize ) {
 			this.friends = new Id[ initialSize ];
-			this.weights = new double[ initialSize ];
-			Arrays.fill( weights , Double.POSITIVE_INFINITY  );
+			this.weights = new float[ initialSize ];
+			Arrays.fill( weights , Float.POSITIVE_INFINITY  );
 		}
 
 		public synchronized void add( final Id<Person> friend , final double weight ) {
-			final int insertionPoint = getInsertionPoint( weight );
+			final float fweight = (float) weight; // TODO check overflow?
+			final int insertionPoint = getInsertionPoint( fweight );
 			insert( friend, insertionPoint );
-			insert( weight, insertionPoint );
+			insert( fweight, insertionPoint );
 			size++;
 			assert size <= friends.length;
 			assert weights.length == friends.length;
@@ -165,11 +170,11 @@ public class WeightedSocialNetwork {
 		}
 		*/
 
-		private int getInsertionPoint( final double weight ) {
+		private int getInsertionPoint( final float weight ) {
 			return getInsertionPoint( weight , 0 );
 		}
 
-		private int getInsertionPoint( final double weight , final int from ) {
+		private int getInsertionPoint( final float weight , final int from ) {
 			// only search the range actually filled with values.
 			// lower index can be specified, if known
 			final int index = Arrays.binarySearch( weights , from , size , weight );
@@ -192,14 +197,14 @@ public class WeightedSocialNetwork {
 			friends[ insertionPoint ] = friend;
 		}
 
-		private void insert( double weight , int insertionPoint ) {
+		private void insert( float weight , int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+weight+" at "+insertionPoint+" in array of size "+weights.length+" with data size "+size );
 			}
 
 			if ( size == weights.length ) {
 				weights = Arrays.copyOf( weights , size * 2 );
-				for ( int i = size; i < weights.length; i++ ) weights[ i ] = Double.POSITIVE_INFINITY;
+				for ( int i = size; i < weights.length; i++ ) weights[ i ] = Float.POSITIVE_INFINITY;
 			}
 
 			for ( int i = size; i > insertionPoint; i-- ) {
