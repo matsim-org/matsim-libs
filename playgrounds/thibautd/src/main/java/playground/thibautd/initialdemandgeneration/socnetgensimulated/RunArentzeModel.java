@@ -42,7 +42,7 @@ import org.xml.sax.Attributes;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelRunner;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SimpleModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.Thresholds;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility;
@@ -104,8 +104,8 @@ public class RunArentzeModel {
 						}
 					},
 					new GumbelErrorTerm() );
-		final ModelRunner<ArentzeAgent> runner =
-			new ModelRunner< >(
+		final SimpleModelRunner<ArentzeAgent> runner =
+			new SimpleModelRunner< >(
 					population,
 					utility,
 					config.getPrimarySamplingRate(),
