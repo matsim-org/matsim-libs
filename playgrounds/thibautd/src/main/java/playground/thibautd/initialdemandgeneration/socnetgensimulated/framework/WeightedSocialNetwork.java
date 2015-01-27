@@ -83,6 +83,7 @@ public class WeightedSocialNetwork {
 		altersMap.get( alter ).add( ego , weight );
 	}
 
+	/*
 	public void addMonodirectionalTie(
 			final Id<Person> ego,
 			final Id<Person> alter,
@@ -90,6 +91,7 @@ public class WeightedSocialNetwork {
 		if ( weight < lowestAllowedWeight ) return;
 		altersMap.get( ego ).add( alter , weight );
 	}
+	*/
 
 
 	public Set<Id<Person>> getAltersOverWeight(
@@ -99,6 +101,7 @@ public class WeightedSocialNetwork {
 		return altersMap.get( ego ).getAltersOverWeight( weight );
 	}
 
+	/* unused
 	public Set<Id<Person>> getAltersInWeightInterval(
 			final Id<Person> ego,
 			final double low,
@@ -107,6 +110,7 @@ public class WeightedSocialNetwork {
 		if ( low > high ) throw new IllegalArgumentException( "lower bound "+low+" is higher than higher bound "+high );
 		return altersMap.get( ego ).getAltersIn( low , high );
 	}
+	*/
 
 	private static final class WeightedFriends {
 		private Id[] friends = new Id[ 20 ];
@@ -135,6 +139,7 @@ public class WeightedSocialNetwork {
 			return alters;
 		}
 
+		/*
 		public Set<Id<Person>> getAltersIn( final double low , final double high ) {
 			final int lowInsertionPoint = getInsertionPoint( low );
 			final int highInsertionPoint = getInsertionPoint( high , lowInsertionPoint );
@@ -146,6 +151,7 @@ public class WeightedSocialNetwork {
 			}
 			return alters;
 		}
+		*/
 
 		private int getInsertionPoint( final double weight ) {
 			return getInsertionPoint( weight , 0 );
