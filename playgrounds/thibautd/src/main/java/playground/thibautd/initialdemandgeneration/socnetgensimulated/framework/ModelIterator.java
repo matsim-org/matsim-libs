@@ -154,7 +154,7 @@ public class ModelIterator {
 				// it is the best
 				new Thresholds(
 					(best.thresholds.getPrimaryThreshold() + opposite.thresholds.getPrimaryThreshold()) / 2d,
-					(best.thresholds.getSecondaryThreshold() + opposite.thresholds.getSecondaryThreshold()) / 2d );
+					(best.thresholds.getSecondaryReduction() + opposite.thresholds.getSecondaryReduction()) / 2d );
 		}
 
 		private Thresholds moveByStep(
@@ -170,7 +170,7 @@ public class ModelIterator {
 
 			return new Thresholds(
 					best.thresholds.getPrimaryThreshold() + primarySign * step,
-					best.thresholds.getSecondaryThreshold() + secondarySign * step );
+					Math.max( 0 , best.thresholds.getSecondaryReduction() + secondarySign * step ) );
 		}
 
 		private ThresholdsReference getBestQuadrant( final boolean accordingToDegree ) {

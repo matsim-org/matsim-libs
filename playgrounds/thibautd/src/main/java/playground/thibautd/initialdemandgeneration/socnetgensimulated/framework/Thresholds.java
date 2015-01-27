@@ -24,17 +24,17 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
  */
 public class Thresholds {
 	private final double primaryThreshold;
-	private final double secondaryThreshold;
-
+	private final double secondaryReduction;
 
 	private double resultingAverageDegree = Double.NaN;
 	private double resultingClustering = Double.NaN;
 	
 	public Thresholds(
 			final double primaryThreshold,
-			final double secondaryThreshold ) {
+			final double secondaryReduction ) {
 		this.primaryThreshold = primaryThreshold;
-		this.secondaryThreshold = secondaryThreshold;
+		if ( secondaryReduction < 0 ) throw new IllegalArgumentException( "secondary reduction must be positive, got "+secondaryReduction );
+		this.secondaryReduction = secondaryReduction;
 	}
 	
 	public double getResultingAverageDegree() {
@@ -62,12 +62,16 @@ public class Thresholds {
 	}
 
 	public double getSecondaryThreshold() {
-		return secondaryThreshold;
+		return primaryThreshold - secondaryReduction;
+	}
+
+	public double getSecondaryReduction() {
+		return secondaryReduction;
 	}
 
 	@Override
 	public String toString() {
-		return "[Thresholds: primary="+primaryThreshold+" secondary="+secondaryThreshold+"; clustering="+resultingClustering+"; avgDegree="+resultingAverageDegree+"]";
+		return "[Thresholds: primary="+primaryThreshold+" secondary="+getSecondaryThreshold()+"; clustering="+resultingClustering+"; avgDegree="+resultingAverageDegree+"]";
 	}
 }
 
