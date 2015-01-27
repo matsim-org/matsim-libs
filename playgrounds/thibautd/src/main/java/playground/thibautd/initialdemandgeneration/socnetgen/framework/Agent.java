@@ -20,6 +20,7 @@
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Represents an agent with id and (socio-demographic) caracteristics.
@@ -27,6 +28,6 @@ import org.matsim.api.core.v01.Identifiable;
  * marker interface)
  * @author thibautd
  */
-public interface Agent extends Identifiable {
+public interface Agent extends Identifiable<Person> {
 }
 
