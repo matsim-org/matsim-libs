@@ -216,7 +216,9 @@ public class FreightChainGenerator {
 					 * be achieved by immediately setting the number of chain 
 					 * attempts to its maximum, forcing the chain to be started
 					 * from scratch. */
-					chainAttempts = MAX_CHAIN_ATTEMPTS;
+					if(chainList.isEmpty()){
+						chainAttempts = MAX_CHAIN_ATTEMPTS;
+					}
 				}
 				if(chainAttempts < MAX_CHAIN_ATTEMPTS){
 					/* Add the final major activity. */
