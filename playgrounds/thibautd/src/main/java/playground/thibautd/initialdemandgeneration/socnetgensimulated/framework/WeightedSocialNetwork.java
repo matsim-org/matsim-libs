@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
@@ -38,6 +39,9 @@ import org.matsim.api.core.v01.population.Person;
  * @author thibautd
  */
 public class WeightedSocialNetwork {
+	private static final Logger log =
+		Logger.getLogger(WeightedSocialNetwork.class);
+
 	private final Map<Id<Person>, WeightedFriends> altersMap = new ConcurrentHashMap< >();
 	private final double lowestAllowedWeight;
 
@@ -112,6 +116,11 @@ public class WeightedSocialNetwork {
 	}
 	*/
 
+	// for tests
+	/*package*/ int getSize( final Id<Person> ego ) {
+		return altersMap.get( ego ).size;
+	}
+
 	private static final class WeightedFriends {
 		private Id[] friends = new Id[ 20 ];
 		private double weights[] = new double[ 20 ];
@@ -120,6 +129,7 @@ public class WeightedSocialNetwork {
 		public WeightedFriends( final int initialSize ) {
 			this.friends = new Id[ initialSize ];
 			this.weights = new double[ initialSize ];
+			Arrays.fill( weights , Double.POSITIVE_INFINITY  );
 		}
 
 		public synchronized void add( final Id<Person> friend , final double weight ) {
@@ -127,11 +137,13 @@ public class WeightedSocialNetwork {
 			insert( friend, insertionPoint );
 			insert( weight, insertionPoint );
 			size++;
+			assert size <= friends.length;
+			assert weights.length == friends.length;
 		}
 
 		public Set<Id<Person>> getAltersOverWeight( final double weight ) {
 			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
-			for ( int i = size;
+			for ( int i = size - 1;
 					i >= 0 && weights[ i ] >= weight;
 					i-- ) {
 				alters.add( friends[ i ] );
@@ -161,10 +173,14 @@ public class WeightedSocialNetwork {
 			// only search the range actually filled with values.
 			// lower index can be specified, if known
 			final int index = Arrays.binarySearch( weights , from , size , weight );
-			return index >= 0 ? index : 1 - index;
+			return index >= 0 ? index : - 1 - index;
 		}
 
 		private void insert( Id<Person> friend , int insertionPoint ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
+			}
+
 			if ( size == friends.length ) {
 				friends = Arrays.copyOf( friends , size * 2 );
 			}
@@ -177,8 +193,13 @@ public class WeightedSocialNetwork {
 		}
 
 		private void insert( double weight , int insertionPoint ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "insert "+weight+" at "+insertionPoint+" in array of size "+weights.length+" with data size "+size );
+			}
+
 			if ( size == weights.length ) {
 				weights = Arrays.copyOf( weights , size * 2 );
+				for ( int i = size; i < weights.length; i++ ) weights[ i ] = Double.POSITIVE_INFINITY;
 			}
 
 			for ( int i = size; i > insertionPoint; i-- ) {
