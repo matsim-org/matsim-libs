@@ -41,23 +41,32 @@ public class WeightedSocialNetwork {
 	private final Map<Id<Person>, WeightedFriends> altersMap = new ConcurrentHashMap< >();
 	private final double lowestAllowedWeight;
 
-	public WeightedSocialNetwork( final double lowestWeight ) {
+	private final int initialSize;
+
+	public WeightedSocialNetwork(
+			final int initialSize,
+			final double lowestWeight ) {
+		this.initialSize = initialSize;
 		this.lowestAllowedWeight = lowestWeight;
 	}
 
+	public WeightedSocialNetwork( final double lowestWeight ) {
+		this( 20 , lowestWeight );
+	}
+
 	public void addEgo( final Id<Person> ego ) {
-		altersMap.put( ego , new WeightedFriends() );
+		altersMap.put( ego , new WeightedFriends( initialSize ) );
 	}
 
 	public void addEgosIds( final Collection<Id<Person>> egos ) {
 		for ( Id<Person> ego : egos ) {
-			altersMap.put( ego , new WeightedFriends() );
+			altersMap.put( ego , new WeightedFriends( initialSize ) );
 		}
 	}
 
 	public void addEgosIdentifiable( final Collection<? extends Identifiable<Person>> egos ) {
 		for ( Identifiable<Person> ego : egos ) {
-			altersMap.put( ego.getId() , new WeightedFriends() );
+			altersMap.put( ego.getId() , new WeightedFriends( initialSize ) );
 		}
 	}
 
@@ -103,6 +112,11 @@ public class WeightedSocialNetwork {
 		private Id[] friends = new Id[ 20 ];
 		private double weights[] = new double[ 20 ];
 		private int size = 0;
+
+		public WeightedFriends( final int initialSize ) {
+			this.friends = new Id[ initialSize ];
+			this.weights = new double[ initialSize ];
+		}
 
 		public synchronized void add( final Id<Person> friend , final double weight ) {
 			final int insertionPoint = getInsertionPoint( weight );
