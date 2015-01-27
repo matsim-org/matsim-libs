@@ -148,9 +148,10 @@ public class BikeSharingRoute implements GenericRoute, NetworkRoute {
 		this.destinationStation = Id.create( stations[ 1 ], BikeSharingFacility.class );
 
 		final List<Id<Link>> links = new ArrayList<Id<Link>>( stations.length - 2 );
-		for ( int i=3; i < stations.length; i++ ) {
+		for ( int i=2; i < stations.length; i++ ) {
 			links.add( Id.createLinkId( stations[ i ] ) );
 		}
+		setLinkIds( startLinkId , links , endLinkId );
 	}
 
 	@Override

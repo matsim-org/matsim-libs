@@ -59,8 +59,8 @@ public class BikeSharingRouteIOTest {
 
 		final BikeSharingRoute outRoute =
 			new BikeSharingRoute(
-					Id.createLinkId( "start link" ),
-					Id.createLinkId( "end link" ) );
+					Id.createLinkId( "start_link" ),
+					Id.createLinkId( "end_link" ) );
 
 		outRoute.setOriginStation(
 				Id.create(
@@ -75,13 +75,13 @@ public class BikeSharingRouteIOTest {
 		outRoute.setLinkIds(
 				outRoute.getStartLinkId(),
 				Arrays.asList(
-					Id.createLinkId( "some link" ),
-					Id.createLinkId( "some other link" ),
-					Id.createLinkId( "yet another link" ),
-					Id.createLinkId( "so many?" ),
+					Id.createLinkId( "some_link" ),
+					Id.createLinkId( "some_other_link" ),
+					Id.createLinkId( "yet_another_link" ),
+					Id.createLinkId( "so_many?" ),
 					Id.createLinkId( "really?" ),
 					Id.createLinkId( "enough!" ),
-					Id.createLinkId( "ok, but this is the last one" ) ),
+					Id.createLinkId( "ok,_but_this_is_the_last_one" ) ),
 				outRoute.getEndLinkId() );
 		outRoute.setDistance( 1953 );
 		outRoute.setTravelTime( 9785 );
