@@ -301,7 +301,7 @@ public class GfipQueuePassingControler extends Controler{
 		
 		/* Create the population. */
 		PopulationFactory pf = sc.getPopulation().getFactory();
-		for(int i = 0; i < 3000; i++){
+		for(int i = 0; i < 2500; i++){
 			Person person = pf.createPerson(Id.createPersonId(i));
 			Plan plan = pf.createPlan();
 			
