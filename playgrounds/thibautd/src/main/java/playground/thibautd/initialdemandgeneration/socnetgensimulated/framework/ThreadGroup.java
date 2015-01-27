@@ -22,7 +22,11 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 class ThreadGroup {
+	private final static Logger log = Logger.getLogger( ThreadGroup.class );
+
 	final List<Thread> threads = new ArrayList< >();
 	final List<Throwable> exceptions = new ArrayList< >();
 	final Thread.UncaughtExceptionHandler exceptionHandler =
@@ -31,6 +35,7 @@ class ThreadGroup {
 			public void uncaughtException(
 					final Thread t ,
 					final Throwable e ) {
+				log.error( "exception in thread "+t.getName() , e );
 				exceptions.add( e );
 			}
 		};
