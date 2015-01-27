@@ -172,77 +172,123 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		threads.run();
 		counter.printCounter();
 
-		if ( thresholds.getPrimaryThreshold() < this.lowestPrimaryThreshold ) {
-			// store new friends of friends
-			updateSecondaryPreprocess( sn );
-			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
-		}
-
 		log.info( "fill in network with primary ties" );
 		final SocialNetwork net = new SocialNetworkImpl( true );
-		for ( T agent : population.getAgents() )
-			net.addEgo( agent.getId() );
+		for ( T agent : population.getAgents() ) net.addEgo( agent.getId() );
+
 		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : sn.entrySet() ) {
 			for ( Id<Person> alter : e.getValue() ) {
 				net.addBidirectionalTie( e.getKey(), alter );
 			}
 		}
+
+		if ( thresholds.getPrimaryThreshold() < this.lowestPrimaryThreshold ) {
+			// store new friends of friends
+			updateSecondaryPreprocess( net );
+			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
+		}
+
 		return net;
 	}
 
 	private void updateSecondaryPreprocess(
-			final Map<Id<Person>, Set<Id<Person>>> sn ) {
+			final SocialNetwork sn ) {
+		log.info( "update secondary preprocess" );
+		final List<T> agents = new ArrayList< >( population.getAgents() );
+
 		preprocessFriendsOfFriends.clear();
-		preprocessFriendsOfFriends.addEgosIds( sn.keySet() );
+		preprocessFriendsOfFriends.addEgosIds( sn.getEgos() );
 
-		final Map< Id<Person> , Double > highestPrimary = new ConcurrentHashMap< >();
-		// TODO threads
-		for ( Map.Entry<Id<Person>, Set<Id<Person>>> entry : sn.entrySet() ) {
-			final Id<Person> ego = entry.getKey();
-			final Set<Id<Person>> alters = entry.getValue();
+		final Counter counter = new Counter( "add secondary pair # " );
+		final ThreadGroup threads = new ThreadGroup();
 
-			final T egoAgent = population.getAgentsMap().get( ego );
+		for ( int i=0; i < nThreads; i++ ) {
+			final int startThreadAgents = i * agents.size() / nThreads;
+			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
 
-			// for each friend of friend, search for the highest common
-			// friend utility.
-			highestPrimary.clear();
-			for ( Id<Person> alter : alters ) {
-				final double alterWeight =
-					utility.getTieUtility(
-							egoAgent,
-							population.getAgentsMap().get( alter ) );
-				final Set<Id<Person>> altersOfAlter = sn.get( alter );
-
-				for ( Id<Person> alterOfAlter : altersOfAlter ) {
-					// "utility" of an alter of alter is the min of the
-					// two linked ties, as below this utility it is not an
-					// alter of alter.
-					final double aoaWeight =
-						Math.min(
-								alterWeight,
-								utility.getTieUtility(
-									population.getAgentsMap().get( alter ),
-									population.getAgentsMap().get( alterOfAlter ) ) );
-
-					if ( highestPrimary.get( alterOfAlter ) == null ||
-							highestPrimary.get( alterOfAlter ) < aoaWeight ) {
-						highestPrimary.put( alterOfAlter , aoaWeight );
-					}
-				}
+			// always consider only "upper-right" half of contingency matrix
+			// (because symetric)
+			final Set<Id<Person>> allowedAlters = new HashSet< >();
+			for ( int ai = startThreadAgents; ai < agents.size(); ai++ ) {
+				allowedAlters.add( agents.get( ai ).getId() );
 			}
 
-			for ( Map.Entry<Id<Person>, Double> weight : highestPrimary.entrySet() ) {
-				final Id<Person> alterOfAlter = weight.getKey();
-				final double lowestUtilityOfAlter = weight.getValue();
-				preprocessFriendsOfFriends.addMonodirectionalTie(
-						ego,
-						alterOfAlter,
-						lowestUtilityOfAlter,
-						utility.getTieUtility(
-							egoAgent,
-							population.getAgentsMap().get( alterOfAlter ) ) );
-			}
+			final Random random = new Random( randomSeed + 20140107 + i );
+			threads.add(
+					new Runnable() {
+						@Override
+						public void run() {
+							final List<Id<Person>> potentialAlters = new ArrayList< >();
+							final Map< Id<Person> , Double > highestPrimary = new ConcurrentHashMap< >();
+
+							for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
+								final T egoAgent = agents.get( agentIndex );
+								final Id<Person> ego = egoAgent.getId();
+
+								allowedAlters.remove( ego );
+
+								final Set<Id<Person>> alters = sn.getAlters( ego );
+
+								// for each friend of friend, search for the highest common
+								// friend utility.
+								highestPrimary.clear();
+								for ( Id<Person> alter : alters ) {
+									final double alterWeight =
+										utility.getTieUtility(
+												egoAgent,
+												population.getAgentsMap().get( alter ) );
+									final Set<Id<Person>> altersOfAlter = sn.getAlters( alter );
+
+									potentialAlters.clear();
+									for ( Id<Person> fof : altersOfAlter ) {
+										if ( !allowedAlters.contains( fof ) ) continue;
+										if ( alters.contains( fof ) ) continue;
+										potentialAlters.add( fof );
+									}
+
+									final T alterAgent = population.getAgentsMap().get( alter );
+									for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
+											remainingChecks > 0 && !potentialAlters.isEmpty();
+											remainingChecks--) {
+										counter.incCounter();
+										final Id<Person> alterOfAlter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+
+										// "utility" of an alter of alter is the min of the
+										// two linked ties, as below this utility it is not an
+										// alter of alter.
+										final double aoaWeight =
+											Math.min(
+													alterWeight,
+													utility.getTieUtility(
+														alterAgent,
+														population.getAgentsMap().get( alterOfAlter ) ) );
+
+										if ( highestPrimary.get( alterOfAlter ) == null ||
+												highestPrimary.get( alterOfAlter ) < aoaWeight ) {
+											highestPrimary.put( alterOfAlter , aoaWeight );
+										}
+									}
+								}
+
+								for ( Map.Entry<Id<Person>, Double> weight : highestPrimary.entrySet() ) {
+									final Id<Person> alterOfAlter = weight.getKey();
+									final double lowestUtilityOfAlter = weight.getValue();
+									preprocessFriendsOfFriends.addMonodirectionalTie(
+											ego,
+											alterOfAlter,
+											lowestUtilityOfAlter,
+											utility.getTieUtility(
+												egoAgent,
+												population.getAgentsMap().get( alterOfAlter ) ) );
+								}
+							}
+						}
+					} );
 		}
+
+		threads.run();
+
+		counter.printCounter();
 	}
 
 	private void runSecondary(
@@ -268,34 +314,24 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 				allowedAlters.add( agents.get( ai ).getId() );
 			}
 
-			final Random random = new Random( randomSeed + 20140107 + i );
 			threads.add(
 					new Runnable() {
 						@Override
 						public void run() {
-							final List<T> potentialAlters = new ArrayList<T>();
-
 							for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
 								final T ego = agents.get( agentIndex );
 								allowedAlters.remove( ego.getId() );
 
 								final Set<Id<Person>> friendsOfFriends =
-									preprocessFriendsOfFriends.getAltersOverWeight(
+									preprocessFriendsOfFriends.getAltersOverWeights(
 										ego.getId(),
-										thresholds.getPrimaryThreshold() );
+										thresholds.getPrimaryThreshold(),
+										thresholds.getSecondaryThreshold() );
 
-								potentialAlters.clear();
+								// sampling already done
 								for ( Id<Person> fof : friendsOfFriends ) {
-									if ( !allowedAlters.contains( fof ) ) continue;
-									if ( sn.getAlters( ego.getId() ).contains( fof ) ) continue;
-									potentialAlters.add( population.getAgentsMap().get( fof ) );
-								}
-
-								for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
-										remainingChecks > 0 && !potentialAlters.isEmpty();
-										remainingChecks--) {
 									counter.incCounter();
-									final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+									final T alter = population.getAgentsMap().get( fof );
 
 									if ( utility.getTieUtility( ego , alter ) > thresholds.getSecondaryThreshold() ) {
 										newTies.get( ego.getId() ).add( alter.getId() );
