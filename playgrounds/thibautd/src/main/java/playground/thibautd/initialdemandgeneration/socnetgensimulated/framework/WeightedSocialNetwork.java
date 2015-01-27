@@ -99,10 +99,10 @@ public class WeightedSocialNetwork {
 		}
 
 		public Set<Id<Person>> getAltersOverWeight( final double weight ) {
-			final int insertionPoint = getInsertionPoint( weight );
-
 			final Set<Id<Person>> alters = new HashSet<Id<Person>>();
-			for ( int i = insertionPoint; i < size; i++ ) {
+			for ( int i = size;
+					i >= 0 && weights[ i ] >= weight;
+					i-- ) {
 				alters.add( friends[ i ] );
 			}
 			return alters;
