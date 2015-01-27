@@ -61,6 +61,10 @@ public class WeightedSocialNetwork {
 		}
 	}
 
+	public void clear() {
+		altersMap.clear();
+	}
+
 	public void addBidirectionalTie(
 			final Id<Person> ego,
 			final Id<Person> alter,
@@ -69,6 +73,15 @@ public class WeightedSocialNetwork {
 		altersMap.get( ego ).add( alter , weight );
 		altersMap.get( alter ).add( ego , weight );
 	}
+
+	public void addMonodirectionalTie(
+			final Id<Person> ego,
+			final Id<Person> alter,
+			final double weight ) {
+		if ( weight < lowestAllowedWeight ) return;
+		altersMap.get( ego ).add( alter , weight );
+	}
+
 
 	public Set<Id<Person>> getAltersOverWeight(
 			final Id<Person> ego,
