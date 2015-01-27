@@ -122,10 +122,10 @@ public class WeightedSocialNetwork {
 	}
 
 	private static final class WeightedFriends {
-		private Id[] friends = new Id[ 20 ];
+		private Id[] friends;
 		// use float instead of double for saving memory.
 		// TODO: check robustness of the results facing this...
-		private float weights[] = new float[ 20 ];
+		private float weights[];
 		// as such, using short here might look as overdoing...
 		// but we have one such structure per agent: this might make sense.
 		private short size = 0;
