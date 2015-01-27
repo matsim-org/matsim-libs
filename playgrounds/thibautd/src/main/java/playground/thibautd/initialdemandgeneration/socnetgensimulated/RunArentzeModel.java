@@ -103,7 +103,8 @@ public class RunArentzeModel {
 									+ pars.getB_ageDiff4() * dummy( ageClassDifference == 4 );
 						}
 					},
-					new GumbelErrorTerm() );
+					new GumbelErrorTerm(),
+					false ); // cache
 		final ModelRunner runner =
 			new PreprocessedModelRunner<ArentzeAgent>(
 					-500,

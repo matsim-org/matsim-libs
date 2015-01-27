@@ -38,28 +38,34 @@ public class TieUtility<T extends Agent> {
 	 * and thus the same error term, and (b) it avoids having
 	 * to create "tie" objects
 	 */
-	private final SoftCache< Integer , Double >  cache = new SoftCache< >();
+	private final SoftCache< Integer , Double >  cache;
 
 	public TieUtility(
 			final DeterministicPart<T> deterministicPart,
-			final ErrorTerm errorTerm ) {
+			final ErrorTerm errorTerm,
+			final boolean doCache) {
 		this.deterministicPart = deterministicPart;
 		this.errorTerm = errorTerm;
+		this.cache = doCache ? new SoftCache< Integer , Double >() : null;
 	}
 
 	public double getTieUtility(
 			final T ego,
 			final T alter ) {
+		return deterministicPart.calcDeterministicPart( ego , alter ) +
+			error( ego , alter );
+	}
+
+	private double error( final T ego , final T alter ) {
 		final int seed = ego.getId().hashCode() + alter.getId().hashCode();
-
-		final Double cached = cache.get( seed );
-
-		if ( cached != null ) return deterministicPart.calcDeterministicPart( ego , alter ) + cached;
+		if ( cache != null ) {
+			final Double cached = cache.get( seed );
+			if ( cached != null ) return cached.doubleValue();
+		}
 
 		final double sampledError = errorTerm.calcError( seed );
-		cache.put( seed , sampledError );
-
-		return deterministicPart.calcDeterministicPart( ego , alter ) + sampledError;
+		if ( cache != null ) cache.put( seed , sampledError );
+		return sampledError;
 	}
 
 	public static interface DeterministicPart< T extends Agent> {
