@@ -21,7 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -161,7 +161,7 @@ public class DoublyWeightedSocialNetwork {
 		public Set<Id<Person>> getAltersOverWeights(
 				final double firstWeight,
 				final double secondWeight ) {
-			final Set<Id<Person>> alters = new HashSet<Id<Person>>();
+			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
 
 			addGreaterPoints( 0, alters, firstWeight, secondWeight );
 

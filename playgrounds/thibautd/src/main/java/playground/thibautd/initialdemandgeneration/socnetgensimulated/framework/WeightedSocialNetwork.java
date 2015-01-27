@@ -21,7 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,7 +112,7 @@ public class WeightedSocialNetwork {
 		}
 
 		public Set<Id<Person>> getAltersOverWeight( final double weight ) {
-			final Set<Id<Person>> alters = new HashSet<Id<Person>>();
+			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
 			for ( int i = size;
 					i >= 0 && weights[ i ] >= weight;
 					i-- ) {
@@ -126,7 +126,7 @@ public class WeightedSocialNetwork {
 			final int highInsertionPoint = getInsertionPoint( high , lowInsertionPoint );
 			assert highInsertionPoint >= lowInsertionPoint;
 
-			final Set<Id<Person>> alters = new HashSet<Id<Person>>();
+			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
 			for ( int i = lowInsertionPoint; i < highInsertionPoint; i++ ) {
 				alters.add( friends[ i ] );
 			}
