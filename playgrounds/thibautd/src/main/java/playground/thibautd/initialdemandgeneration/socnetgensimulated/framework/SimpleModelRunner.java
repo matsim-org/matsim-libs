@@ -237,37 +237,5 @@ public class SimpleModelRunner<T extends Agent> implements ModelRunner {
 
 		return list;
 	}
-
-	private static class ThreadGroup {
-		final List<Thread> threads = new ArrayList< >();
-		final List<Throwable> exceptions = new ArrayList< >();
-		final Thread.UncaughtExceptionHandler exceptionHandler =
-			 new Thread.UncaughtExceptionHandler() {
-				@Override
-				public void uncaughtException(
-						final Thread t ,
-						final Throwable e ) {
-					exceptions.add( e );
-				}
-			};
-
-		public void add( final Runnable r ) {
-			final Thread t = new Thread( r );
-			t.setUncaughtExceptionHandler( exceptionHandler );
-			threads.add( t );
-		}
-
-		public void run() {
-			for ( Thread t : threads ) t.start();
-			try {
-				for ( Thread t : threads ) t.join();
-			}
-			catch ( InterruptedException e ) {
-				throw new RuntimeException( e );
-			}
-
-			if ( !exceptions.isEmpty() ) throw new RuntimeException( "got "+exceptions.size()+" exceptions while running threads" );
-		}
-	}
 }
 
