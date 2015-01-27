@@ -37,6 +37,15 @@ public class DoublyWeightedSocialNetwork {
 	private final Map<Id<Person>, DoublyWeightedFriends> altersMap = new ConcurrentHashMap< >();
 	private final double lowestAllowedFirstWeight;
 	private final double lowestAllowedSecondWeight;
+	private int initialSize;
+
+	public DoublyWeightedSocialNetwork(
+			final int initialSize,
+			final double lowestWeight ) {
+		this.initialSize  = initialSize;
+		this.lowestAllowedFirstWeight = lowestWeight;
+		this.lowestAllowedSecondWeight = lowestWeight;
+	}
 
 	public DoublyWeightedSocialNetwork( final double lowestWeight ) {
 		this.lowestAllowedFirstWeight = lowestWeight;
@@ -44,18 +53,18 @@ public class DoublyWeightedSocialNetwork {
 	}
 
 	public void addEgo( final Id<Person> ego ) {
-		altersMap.put( ego , new DoublyWeightedFriends() );
+		altersMap.put( ego , new DoublyWeightedFriends( initialSize ) );
 	}
 
 	public void addEgosIds( final Collection<Id<Person>> egos ) {
 		for ( Id<Person> ego : egos ) {
-			altersMap.put( ego , new DoublyWeightedFriends() );
+			altersMap.put( ego , new DoublyWeightedFriends( initialSize ) );
 		}
 	}
 
 	public void addEgosIdentifiable( final Collection<? extends Identifiable<Person>> egos ) {
 		for ( Identifiable<Person> ego : egos ) {
-			altersMap.put( ego.getId() , new DoublyWeightedFriends() );
+			altersMap.put( ego.getId() , new DoublyWeightedFriends( initialSize ) );
 		}
 	}
 
@@ -94,35 +103,70 @@ public class DoublyWeightedSocialNetwork {
 		return altersMap.get( ego ).getAltersOverWeights( weight1 , weight2 );
 	}
 
+	// for tests
+	/*package*/ int getSize( final Id<Person> ego ) {
+		return altersMap.get( ego ).size;
+	}
+
 	// point quad-tree
 	// No check is done that is is balanced!
+	// should be ok, as agents are got in random order
 	private static final class DoublyWeightedFriends {
-		private Id[] friends = new Id[ 20 ];
-		private double weights1[] = new double[ 20 ];
-		private double weights2[] = new double[ 20 ];
+		private Id[] friends;
+		private double[] weights1;
+		private double[] weights2;
 
-		private int childSE[] = new int[ 20 ];
-		private int childSW[] = new int[ 20 ];
-		private int childNE[] = new int[ 20 ];
-		private int childNW[] = new int[ 20 ];
+		private int[] childSE;
+		private int[] childSW;
+		private int[] childNE;
+		private int[] childNW;
 
 		private int size = 0;
+
+		public DoublyWeightedFriends(final int initialSize) {
+			this.friends = new Id[ initialSize ];
+
+			this.weights1 = new double[ initialSize ];
+			this.weights2 = new double[ initialSize ];
+
+			Arrays.fill( weights1 , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , Double.POSITIVE_INFINITY );
+
+			this.childSE = new int[ initialSize ];
+			this.childSW = new int[ initialSize ];
+			this.childNE = new int[ initialSize ];
+			this.childNW = new int[ initialSize ];
+
+			Arrays.fill( childSE , -1 );
+			Arrays.fill( childSW , -1 );
+			Arrays.fill( childNE , -1 );
+			Arrays.fill( childNW , -1 );
+		}
 
 		public synchronized void add(
 				final Id<Person> friend,
 				final double firstWeight,
 				final double secondWeight ) {
-			final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
+			if ( size == 0 ) {
+				// first element is the head: special case...
+				friends[ 0 ] = friend;
 
-			if ( size == friends.length ) expand();
+				weights1[ 0 ] = firstWeight;
+				weights2[ 0 ] = secondWeight;
+			}
+			else {
+				final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
 
-			final int[] quadrant = getQuadrant( parent , firstWeight, secondWeight );
-			friends[ size ] = friend;
+				if ( size == friends.length ) expand();
 
-			weights1[ size ] = firstWeight;
-			weights2[ size ] = secondWeight;
+				final int[] quadrant = getQuadrant( parent , firstWeight, secondWeight );
+				friends[ size ] = friend;
 
-			quadrant[ parent ] = size;
+				weights1[ size ] = firstWeight;
+				weights2[ size ] = secondWeight;
+
+				quadrant[ parent ] = size;
+			}
 			size++;
 		}
 
@@ -133,10 +177,18 @@ public class DoublyWeightedSocialNetwork {
 			weights1 = Arrays.copyOf( weights1 , newLength );
 			weights2 = Arrays.copyOf( weights2 , newLength );
 
+			Arrays.fill( weights1 , size , newLength , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , size , newLength , Double.POSITIVE_INFINITY );
+
 			childSE = Arrays.copyOf( childSE , newLength );
 			childSW = Arrays.copyOf( childSW , newLength );
 			childNE = Arrays.copyOf( childNE , newLength );
 			childNW = Arrays.copyOf( childNW , newLength );
+
+			Arrays.fill( childSE , size , newLength , -1 );
+			Arrays.fill( childSW , size , newLength , -1 );
+			Arrays.fill( childNE , size , newLength , -1 );
+			Arrays.fill( childNW , size , newLength , -1 );
 		}
 
 		private int searchParentLeaf(
@@ -145,7 +197,7 @@ public class DoublyWeightedSocialNetwork {
 				final double secondWeight ) {
 			int[] quadrant = getQuadrant( head, firstWeight, secondWeight );
 
-			return quadrant[ head ] == 0 ? head : searchParentLeaf( quadrant[head], firstWeight, secondWeight );
+			return quadrant[ head ] == -1 ? head : searchParentLeaf( quadrant[head], firstWeight, secondWeight );
 		}
 
 		private int[] getQuadrant(
@@ -173,6 +225,8 @@ public class DoublyWeightedSocialNetwork {
 				final Set<Id<Person>> alters,
 				final double firstWeight,
 				final double secondWeight ) {
+			if ( head == -1 ) return; // we fell of the tree!
+
 			if ( weights1[ head ] > firstWeight && weights2[ head ] > secondWeight ) {
 				alters.add( friends[ head ] );
 				addGreaterPoints( childSW[ head ] , alters , firstWeight , secondWeight );
