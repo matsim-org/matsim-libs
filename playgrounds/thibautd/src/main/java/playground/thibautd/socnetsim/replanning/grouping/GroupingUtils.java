@@ -59,7 +59,7 @@ public class GroupingUtils {
 		}
 
 		final Map<Id, Set<Id>> jpTies = getJointPlanLinks( groupPlans );
-		final Map<Id, Set<Id<Person>>> subnet =
+		final Map<Id<Person>, Set<Id<Person>>> subnet =
 			SocialNetworkUtils.getSubnetwork(
 					socialNetwork,
 					planPerPerson.keySet() );
@@ -105,7 +105,7 @@ public class GroupingUtils {
 			final SocialNetwork socialNetwork) {
 
 		final Map<Id, Set<Id>> jpTies = getJointPlanNetwork( population , jointPlans );
-		final Map<Id, Set<Id<Person>>> netmap = new LinkedHashMap<>( socialNetwork.getMapRepresentation() );
+		final Map<Id<Person>, Set<Id<Person>>> netmap = new LinkedHashMap<>( socialNetwork.getMapRepresentation() );
 
 		final Collection<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
 		while ( !netmap.isEmpty() ) {
@@ -149,17 +149,17 @@ public class GroupingUtils {
 	private static Set<Id> getRandomGroup(
 			final Random random,
 			final double probActivationTie,
-			final Map<Id, Set<Id<Person>>> subnet,
+			final Map<Id<Person>, Set<Id<Person>>> netmap,
 			final double probBreakingJointPlan,
 			final Map<Id, Set<Id>> jpTies) {
 		final Set<Id> group = new LinkedHashSet<Id>();
 
-		final Queue<Id> egoStack = Collections.asLifoQueue( new ArrayDeque<Id>( subnet.size() ) );
-		egoStack.add( CollectionUtils.getElement( 0 , subnet.keySet() ) );
+		final Queue<Id> egoStack = Collections.asLifoQueue( new ArrayDeque<Id>( netmap.size() ) );
+		egoStack.add( CollectionUtils.getElement( 0 , netmap.keySet() ) );
 
 		while ( !egoStack.isEmpty() ) {
 			final Id ego = egoStack.remove();
-			final Set<Id<Person>> alters = subnet.remove( ego );
+			final Set<Id<Person>> alters = netmap.remove( ego );
 			if ( alters == null ) continue;
 			group.add( ego );
 

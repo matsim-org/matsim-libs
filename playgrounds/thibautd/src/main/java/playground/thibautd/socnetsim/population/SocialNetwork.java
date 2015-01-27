@@ -37,19 +37,19 @@ public interface SocialNetwork {
 	 * for more safety in simulation (fail if the social network does not cover the
 	 * whole population).
 	 */
-	public void addEgo(Id id);
+	public void addEgo(Id<Person> id);
 
-	public void addEgos(Iterable<? extends Id> ids);
+	public void addEgos(Iterable<? extends Id<Person>> ids);
 
-	public void addBidirectionalTie(Id id1, Id id2);
+	public void addBidirectionalTie(Id<Person> id1, Id<Person> id2);
 
-	public void addMonodirectionalTie(Id ego, Id alter);
+	public void addMonodirectionalTie(Id<Person> ego, Id<Person> alter);
 
-	public Set<Id<Person>> getAlters(Id ego);
+	public Set<Id<Person>> getAlters(Id<Person> ego);
 
-	public Set<Id> getEgos();
+	public Set<Id<Person>> getEgos();
 
-	public Map<Id, Set<Id<Person>>> getMapRepresentation();
+	public Map<Id<Person>, Set<Id<Person>>> getMapRepresentation();
 
 	public boolean isReflective();
 

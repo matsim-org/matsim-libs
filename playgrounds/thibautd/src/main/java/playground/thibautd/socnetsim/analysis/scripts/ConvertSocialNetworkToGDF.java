@@ -75,7 +75,7 @@ public class ConvertSocialNetworkToGDF {
 			final BufferedWriter writer) throws IOException {
 		writer.newLine();
 		writer.write( "edgedef>node1 VARCHAR,node2 VARCHAR" );
-		for ( Map.Entry<Id, Set<Id<Person>>> e : sn.getMapRepresentation().entrySet() ) {
+		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : sn.getMapRepresentation().entrySet() ) {
 			for ( Id alter : e.getValue() ) {
 				writer.newLine();
 				writer.write( e.getKey()+","+alter );

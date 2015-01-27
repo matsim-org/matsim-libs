@@ -61,10 +61,10 @@ public final class SocialNetworkUtils {
 		return secondaryNetwork;
 	}
 
-	public static Map<Id, Set<Id<Person>>> getSubnetwork(
+	public static Map<Id<Person>, Set<Id<Person>>> getSubnetwork(
 			final SocialNetwork network,
 			final Set<Id> egos ) {
-		final Map<Id, Set<Id<Person>>> subnet = new LinkedHashMap<>();
+		final Map<Id<Person>, Set<Id<Person>>> subnet = new LinkedHashMap<>();
 
 		for ( Id ego : egos ) {
 			final Set<Id<Person>> alters = network.getAlters( ego );

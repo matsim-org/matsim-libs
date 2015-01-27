@@ -39,7 +39,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 		Logger.getLogger(SocialNetworkImpl.class);
 
 	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
-	private final Map<Id, Set<Id<Person>>> map = new HashMap<Id, Set<Id<Person>>>();
+	private final Map<Id<Person>, Set<Id<Person>>> map = new HashMap< >();
 
 	private final boolean isReflective;
 
@@ -78,7 +78,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	}
 
 	@Override
-	public void addEgos( final Iterable<? extends Id> ids ) {
+	public void addEgos( final Iterable<? extends Id<Person>> ids ) {
 		for ( Id id : ids ) addEgo( id );
 	}
 
@@ -138,12 +138,12 @@ public class SocialNetworkImpl implements SocialNetwork {
 	}
 
 	@Override
-	public Set<Id> getEgos() {
+	public Set<Id<Person>> getEgos() {
 		return Collections.unmodifiableSet( map.keySet() );
 	}
 
 	@Override
-	public Map<Id, Set<Id<Person>>> getMapRepresentation() {
+	public Map<Id<Person>, Set<Id<Person>>> getMapRepresentation() {
 		return Collections.unmodifiableMap( map );
 	}
 

@@ -41,7 +41,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	private static final Logger log =
 		Logger.getLogger(LockedSocialNetwork.class);
 
-	private final Map<Id, Set<Id<Person>>> alterEgoMap;
+	private final Map<Id<Person>, Set<Id<Person>>> alterEgoMap;
 	private final boolean failOnUnknownEgo;
 	private boolean locked = false;
 	
@@ -51,10 +51,10 @@ public class LockedSocialNetwork implements SocialNetwork {
 	// mainly to simplify writing tests
 	public LockedSocialNetwork( final boolean failOnUnknownEgo ) {
 		this( failOnUnknownEgo,
-				new LinkedHashMap<Id, Set<Id<Person>>>() );
+				new LinkedHashMap<Id<Person>, Set<Id<Person>>>() );
 	}
 
-	private LockedSocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id<Person>>> map ) {
+	private LockedSocialNetwork( final boolean failOnUnknownEgo , final Map<Id<Person>, Set<Id<Person>>> map ) {
 		this.failOnUnknownEgo = failOnUnknownEgo;
 		this.alterEgoMap = map;
 	}
@@ -62,7 +62,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	private LockedSocialNetwork(
 			final int initialCap,
 			final float loadFactor) {
-		this( true , new LinkedHashMap<Id, Set<Id<Person>>>( initialCap , loadFactor ) );
+		this( true , new LinkedHashMap<Id<Person>, Set<Id<Person>>>( initialCap , loadFactor ) );
 	}
 
 	public LockedSocialNetwork() {
@@ -75,7 +75,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 
 	public LockedSocialNetwork(final LockedSocialNetwork toCopy) {
 		this( toCopy.failOnUnknownEgo,
-			new LinkedHashMap<Id, Set<Id<Person>>>( toCopy.alterEgoMap ) );
+			new LinkedHashMap<Id<Person>, Set<Id<Person>>>( toCopy.alterEgoMap ) );
 	}
 
 	public LockedSocialNetwork(final Collection<? extends Identifiable> egos) {
@@ -104,7 +104,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public void addEgos(final Iterable<? extends Id> ids) {
+	public void addEgos(final Iterable<? extends Id<Person>> ids) {
 		if ( locked ) throw new IllegalStateException();
 		for ( Id id : ids ) addEgo( id );
 	}
@@ -144,8 +144,8 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public Set<Id> getEgos() {
-		return Collections.unmodifiableSet( alterEgoMap.keySet() );
+	public Set<Id<Person>> getEgos() {
+		return Collections.<Id<Person>>unmodifiableSet( alterEgoMap.keySet() );
 	}
 
 	private LockedSocialNetwork secondaryNetwork = null;
@@ -197,7 +197,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public Map<Id, Set<Id<Person>>> getMapRepresentation() {
+	public Map<Id<Person>, Set<Id<Person>>> getMapRepresentation() {
 		throw new UnsupportedOperationException();
 	}
 

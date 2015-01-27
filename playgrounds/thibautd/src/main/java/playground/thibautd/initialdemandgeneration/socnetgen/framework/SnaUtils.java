@@ -85,7 +85,7 @@ public class SnaUtils {
 		if ( !sn.isReflective() ) {
 			throw new IllegalArgumentException( "the algorithm is valid only with reflective networks" );
 		}
-		final Map<Id, Set<Id<Person>>> altersMap = new LinkedHashMap<>( sn.getMapRepresentation() );
+		final Map<Id<Person>, Set<Id<Person>>> altersMap = new LinkedHashMap<>( sn.getMapRepresentation() );
 		final Collection< Set<Id> > components = new ArrayList< Set<Id> >();
 	
 		while ( !altersMap.isEmpty() ) {
