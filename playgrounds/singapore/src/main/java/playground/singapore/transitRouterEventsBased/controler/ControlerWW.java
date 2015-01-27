@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWWImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterEventsWLFactory;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 
@@ -44,7 +44,7 @@ public class ControlerWW {
 		controler.setOverwriteFiles(true);
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
 		controler.getEvents().addHandler(waitTimeCalculator);
-		controler.setTransitRouterFactory(new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes()));
+		controler.setTransitRouterFactory(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.getWaitTimes()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}

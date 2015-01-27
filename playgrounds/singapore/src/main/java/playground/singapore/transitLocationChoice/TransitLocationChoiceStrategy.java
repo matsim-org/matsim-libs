@@ -22,10 +22,13 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import com.google.inject.Inject;
+
 public class TransitLocationChoiceStrategy implements PlanStrategy {
 	
 	private PlanStrategyImpl delegate;
 	
+	@Inject
 	public TransitLocationChoiceStrategy(final Scenario scenario) {
 		String planSelector = ((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getPlanSelector();
 		if (planSelector.equals("BestScore")) {

@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.calibration.CalibrationStatsListener;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
@@ -69,7 +69,7 @@ public class ControlerWS {
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
+		TransitRouterEventsWSFactory factory = new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		controler.setTransitRouterFactory(factory);
 		controler.run();
 	}

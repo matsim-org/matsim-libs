@@ -26,6 +26,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
+import playground.singapore.transitRouterEventsBased.vehicleOccupancy.VehicleOccupancy;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 
 /**
@@ -33,24 +34,16 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
  * 
  * @author sergioo
  */
-public class TransitRouterWSImplFactory implements TransitRouterFactory {
+public class TransitRouterEventsWSVFactory implements TransitRouterFactory {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Scenario scenario;
-	private WaitTime waitTime;
-
-    public void setStopStopTime(StopStopTime stopStopTime) {
-        this.stopStopTime = stopStopTime;
-    }
-
-    public void setWaitTime(WaitTime waitTime) {
-        this.waitTime = waitTime;
-    }
-
-    private StopStopTime stopStopTime;
+	private final WaitTime waitTime;
+	private final StopStopTime stopStopTime;
+	private final VehicleOccupancy vehicleOccupancy;
 	
-	public TransitRouterWSImplFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
+	public TransitRouterEventsWSVFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime, final VehicleOccupancy vehicleOccupancy) {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
@@ -58,10 +51,11 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 		this.scenario = scenario;
 		this.waitTime = waitTime;
 		this.stopStopTime = stopStopTime;
+		this.vehicleOccupancy = vehicleOccupancy;
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWSV(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 
 }

@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
@@ -47,7 +47,7 @@ public class ControlerWS {
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+		controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}

@@ -26,7 +26,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWSVImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSVFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.vehicleOccupancy.VehicleOccupancyCalculator;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
@@ -51,7 +51,7 @@ public class ControlerWSV {
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(controler.getScenario().getTransitSchedule(), ((ScenarioImpl)controler.getScenario()).getVehicles(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(vehicleOccupancyCalculator);
-		controler.setTransitRouterFactory(new TransitRouterWSVImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
+		controler.setTransitRouterFactory(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}
