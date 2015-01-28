@@ -14,6 +14,11 @@ import java.util.Map;
 
 public class TransitPerformance implements Serializable {
     private Map<String, DwellEventsForLine> linesToStopDwellEvents = new HashMap<>();
+
+    public BoardingModel getBoardingModel() {
+        return boardingModel;
+    }
+
     private BoardingModel boardingModel;
 
     public TransitPerformance(BoardingModel boardingModel) {
@@ -21,7 +26,7 @@ public class TransitPerformance implements Serializable {
     }
 
     public TransitPerformance() {
-        this.boardingModel = new BoardingModelIgnoringOccupancy();
+        this.boardingModel = new BoardingModelStochasticLinear();
     }
 
     public void setBoardingModel(BoardingModel boardingModel) {

@@ -42,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
+import playground.pieter.distributed.listeners.events.transit.BoardingModel;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
@@ -52,6 +53,7 @@ import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -207,8 +209,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
         config.controler().setCreateGraphs(false);
-//        config.controler().setWriteEventsInterval(0);
-//        config.controler().setWritePlansInterval(0);
+        config.controler().setWriteEventsInterval(0);
+        config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
         scenario = ScenarioUtils.createScenario(config);
         //assume basic scenario for now, can create a loadScenario later
@@ -275,8 +277,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
             //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
-            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
+//            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
         }
+        matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);

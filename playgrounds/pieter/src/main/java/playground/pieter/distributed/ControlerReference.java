@@ -26,6 +26,8 @@ import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterFactory;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,16 +66,17 @@ public class ControlerReference {
         for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
             ((ActivityFacilityImpl) facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
 
-        StopStopTimeCalculatorSerializable stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                .qsim().getEndTime() - config.qsim().getStartTime()));
-
-        WaitTimeCalculatorSerializable waitTimes = new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                .qsim().getEndTime() - config.qsim().getStartTime()));
-        delegate.getEvents().addHandler(waitTimes);
-        delegate.getEvents().addHandler(stopStopTimes);
-        delegate.setTransitRouterFactory(new TransitRouterWSImplFactory(delegate.getScenario(), waitTimes.getWaitTimes(), stopStopTimes.getStopStopTimes()));
+//        StopStopTimeCalculatorSerializable stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
+//                config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+//                .qsim().getEndTime() - config.qsim().getStartTime()));
+//
+//        WaitTimeCalculatorSerializable waitTimes = new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
+//                config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+//                .qsim().getEndTime() - config.qsim().getStartTime()));
+//        delegate.getEvents().addHandler(waitTimes);
+//        delegate.getEvents().addHandler(stopStopTimes);
+//        delegate.setTransitRouterFactory(new TransitRouterWSImplFactory(delegate.getScenario(), waitTimes.getWaitTimes(), stopStopTimes.getStopStopTimes()));
+        delegate.addOverridingModule(new RandomizedTransitRouterModule());
         delegate.setMobsimFactory(new PTQSimFactory());
 	}
 

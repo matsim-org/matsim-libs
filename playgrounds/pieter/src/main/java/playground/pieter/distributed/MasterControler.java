@@ -274,7 +274,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             PlanSerializable.isUseTransit = true;
             if(FullTransitPerformanceTransmission) {
                 transitPerformanceRecorder = new TransitPerformanceRecorder(scenario, matsimControler.getEvents());
-                transitPerformanceRecorder.getTransitPerformance().setBoardingModel(new BoardingModelStochasticLinear());
             }
         }
 
@@ -686,6 +685,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
             for (int i : valid) {
                 allocation[i] += optimalNumberPerSlave.get(i);
+                if(allocation[i]<=0){
+                    masterLogger.error("Something went wrong during loadBalancing (allocation <=0). Continuing as-is for now...");
+                    return personsPerSlave;
+                }
             }
             if (validSlaveIndices.size() == 0 && remainder > 0) {
                 masterLogger.error("All slaves are nearing their maximum memory capacity!! Probably not a sustainable situation...");
