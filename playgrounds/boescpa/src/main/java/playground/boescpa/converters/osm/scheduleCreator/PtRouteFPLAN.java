@@ -44,6 +44,7 @@ public class PtRouteFPLAN {
 	private final int initialDelay = 60; // [s] In MATSim a pt route starts with the arrival at the first station. In HAFAS with the departure at the first station. Ergo we have to set a delay which gives some waiting time at the first station while still keeping the schedule.
 
 	private static TransitScheduleFactory scheduleBuilder = new TransitScheduleFactoryImpl();
+	private static Set<Id<TransitStopFacility>> facilitiesNotFound = new HashSet<>();
 
 	public static final String BUS = "bus";
 	private static enum allBusses {
@@ -60,7 +61,6 @@ public class PtRouteFPLAN {
 	private final int numberOfDepartures;
 	private final int cycleTime; // [sec]
 	private final List<TransitRouteStop> stops = new ArrayList<>();
-	private final Set<String> facilitiesNotFound = new HashSet<>();
 
 	public Id<TransitRoute> getRouteId() {
 		return Id.create(routeId.toString(), TransitRoute.class);
@@ -123,8 +123,8 @@ public class PtRouteFPLAN {
 	 */
 	public void addStop(Id<TransitStopFacility> stopId, TransitStopFacility stopFacility, double arrivalTime, double departureTime) {
 		if (stopFacility == null) {
-			if (!facilitiesNotFound.contains(stopId.toString())) {
-				facilitiesNotFound.add(stopId.toString());
+			if (!facilitiesNotFound.contains(stopId)) {
+				facilitiesNotFound.add(stopId);
 				log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stops connected to this facility will not be added to routes. Please check.");
 			}
 			return;
