@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.listeners.events.transit.BoardingModel;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
@@ -48,7 +49,7 @@ import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslati
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
@@ -363,9 +364,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
-            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterWSImplFactory) {
-                ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-                ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
+            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
+                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
+                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
             }
         }
         plancatcher.init();
