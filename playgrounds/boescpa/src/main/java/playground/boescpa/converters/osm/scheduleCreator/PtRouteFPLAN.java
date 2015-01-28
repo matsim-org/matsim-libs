@@ -29,7 +29,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A public transport route as read out from HAFAS FPLAN.
@@ -58,6 +60,7 @@ public class PtRouteFPLAN {
 	private final int numberOfDepartures;
 	private final int cycleTime; // [sec]
 	private final List<TransitRouteStop> stops = new ArrayList<>();
+	private final Set<Id<TransitStopFacility>> facilitiesNotFound = new HashSet<>();
 
 	public Id<TransitRoute> getRouteId() {
 		return Id.create(routeId.toString(), TransitRoute.class);
@@ -120,7 +123,10 @@ public class PtRouteFPLAN {
 	 */
 	public void addStop(Id<TransitStopFacility> stopId, TransitStopFacility stopFacility, double arrivalTime, double departureTime) {
 		if (stopFacility == null) {
-			log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stop will not be added to route. Please check.");
+			if (!facilitiesNotFound.contains(stopId)) {
+				facilitiesNotFound.add(stopId);
+				log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stops connected to this facility will not be added to routes. Please check.");
+			}
 			return;
 		}
 		double arrivalDelay = 0.0;
