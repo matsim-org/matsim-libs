@@ -60,7 +60,7 @@ public class PtRouteFPLAN {
 	private final int numberOfDepartures;
 	private final int cycleTime; // [sec]
 	private final List<TransitRouteStop> stops = new ArrayList<>();
-	private final Set<Id<TransitStopFacility>> facilitiesNotFound = new HashSet<>();
+	private final Set<String> facilitiesNotFound = new HashSet<>();
 
 	public Id<TransitRoute> getRouteId() {
 		return Id.create(routeId.toString(), TransitRoute.class);
@@ -123,8 +123,8 @@ public class PtRouteFPLAN {
 	 */
 	public void addStop(Id<TransitStopFacility> stopId, TransitStopFacility stopFacility, double arrivalTime, double departureTime) {
 		if (stopFacility == null) {
-			if (!facilitiesNotFound.contains(stopId)) {
-				facilitiesNotFound.add(stopId);
+			if (!facilitiesNotFound.contains(stopId.toString())) {
+				facilitiesNotFound.add(stopId.toString());
 				log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stops connected to this facility will not be added to routes. Please check.");
 			}
 			return;
