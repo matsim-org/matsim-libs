@@ -26,15 +26,15 @@ public class Test {
 	 */
 	public static void main(String[] args) throws IOException {
 		String configFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/config_default.xml";
-		String populationInput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSorted.xml";
+		String populationInput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/output_plans.xml";
 		String vehiclesInput = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
 		String transitScheduleInput = "E:/MA/workspace/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
-		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo.xml";
+		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo_.xml";
 		String populationOutput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestSorted.xml"; //if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
 		
-		Map<Id<Person>, Person> persons = new HashMap<Id<Person>, Person>();
-		Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
-		Map<Id<VehicleType>, VehicleType> vehicleTypes = new HashMap<Id<VehicleType>, VehicleType>();
+		List<Person> persons = new ArrayList<>();
+		Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<>();
+		List<VehicleType> vehicleTypes = new ArrayList<>();
 		
 		
 		TqMatsimVehiclesReader vr = new TqMatsimVehiclesReader(vehiclesInput);
@@ -48,7 +48,7 @@ public class Test {
 		persons = pr.getPlans();
 		System.out.println("getPlans completed");
 
-        List<Person> personsSorted = new ArrayList<Person>(persons.values()); //id's sorted by end_times of first activity of selectedPlans
+        List<Person> personsSorted = new ArrayList<Person>(persons); //id's sorted by end_times of first activity of selectedPlans
         Collections.sort(personsSorted, new Comparator<Person>() {
             @Override
             public int compare(Person o1, Person o2) {

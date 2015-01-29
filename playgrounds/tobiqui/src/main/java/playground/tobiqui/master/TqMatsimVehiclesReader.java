@@ -1,6 +1,8 @@
 package playground.tobiqui.master;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -11,8 +13,8 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 public class TqMatsimVehiclesReader {
-	protected Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
-	protected Map<Id<VehicleType>, VehicleType> vehicleTypes = new HashMap<Id<VehicleType>, VehicleType>();
+	protected List<Vehicle> vehicles = new ArrayList<>();
+	protected List<VehicleType> vehicleTypes = new ArrayList<>();
 	protected Vehicles v;
 
 	public TqMatsimVehiclesReader(String fileName) {
@@ -21,14 +23,12 @@ public class TqMatsimVehiclesReader {
 	}
 	
 	public Map<Id<Vehicle>, Vehicle> getVehicles() {
-		vehicles = v.getVehicles();
 		
-		return vehicles;
+		return v.getVehicles();
 	}
 	
-	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {
-		vehicleTypes = v.getVehicleTypes();
+	public List<VehicleType> getVehicleTypes() {
 		
-		return vehicleTypes;
+		return new ArrayList<VehicleType>(v.getVehicleTypes().values());
 	}
 }

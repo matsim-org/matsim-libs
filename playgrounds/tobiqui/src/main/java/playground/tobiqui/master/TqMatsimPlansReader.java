@@ -56,10 +56,10 @@ public class TqMatsimPlansReader{
 			this.popSorted = this.scenarioSorted.getPopulation();
 		}
 
-		public Map<Id<Person>, Person> getPlans() {
+		public List<Person> getPlans() {
 			this.persons = this.scenario.getPopulation().getPersons();
 			
-			return (Map<Id<Person>, Person>) this.persons;
+			return new ArrayList<Person>(this.persons.values());
 		}
 		
 		public Map<Id<Person>, Person> sortPlans(Map<Id<Person>, Person> map){
