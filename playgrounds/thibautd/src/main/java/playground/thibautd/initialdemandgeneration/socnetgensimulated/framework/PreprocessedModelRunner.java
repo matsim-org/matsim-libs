@@ -123,6 +123,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 										alter,
 										utility.getTieUtility( ego , alter ) );
 							}
+
+							// no tie added to this ego anymore (always look only "to the right"):
+							// trim storing array to avoid waste of space
+							preprocess.trim( ego );
 						}
 					}
 				} );
@@ -302,6 +306,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 										return true;
 									}
 								} );
+
+								// no tie added to this ego anymore (only monodirectional ties added)
+								// trim storing array to avoid waste of space
+								preprocessFriendsOfFriends.trim( ego );
 							}
 						}
 					} );

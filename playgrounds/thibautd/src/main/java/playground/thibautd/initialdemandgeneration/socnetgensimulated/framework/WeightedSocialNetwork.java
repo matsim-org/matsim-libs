@@ -79,6 +79,19 @@ public class WeightedSocialNetwork {
 		alters[ alter ].add( ego , weight );
 	}
 
+	/**
+	 * Memory optimisation: shrinks storing arrays so that they do not contain
+	 * unused slots.
+	 */
+	public void trim( final int ego ) {
+		this.alters[ ego ].trim();
+	}
+
+	public void trimAll() {
+		for ( int i = 0; i < alters.length; i++ ) {
+			trim( i );
+		}
+	}
 
 	public Set<Id<Person>> getAltersOverWeight(
 			final int ego,
@@ -184,7 +197,7 @@ public class WeightedSocialNetwork {
 			return index >= 0 ? index : - 1 - index;
 		}
 
-		private void insert( int friend , int insertionPoint ) {
+		private synchronized void insert( int friend , int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
 			}
@@ -200,7 +213,7 @@ public class WeightedSocialNetwork {
 			friends[ insertionPoint ] = friend;
 		}
 
-		private void insert( float weight , int insertionPoint ) {
+		private synchronized void insert( float weight , int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+weight+" at "+insertionPoint+" in array of size "+weights.length+" with data size "+size );
 			}
@@ -215,6 +228,11 @@ public class WeightedSocialNetwork {
 			}
 
 			weights[ insertionPoint ] = weight;
+		}
+
+		public synchronized void trim() {
+			friends = Arrays.copyOf( friends , size );
+			weights = Arrays.copyOf( weights , size );
 		}
 	}
 }

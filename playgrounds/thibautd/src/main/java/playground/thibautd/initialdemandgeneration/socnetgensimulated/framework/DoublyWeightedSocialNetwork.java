@@ -58,6 +58,20 @@ public class DoublyWeightedSocialNetwork {
 		}
 	}
 
+	/**
+	 * Memory optimisation: shrinks storing arrays so that they do not contain
+	 * unused slots.
+	 */
+	public void trim( final int ego ) {
+		this.alters[ ego ].trim();
+	}
+
+	public void trimAll() {
+		for ( int i = 0; i < alters.length; i++ ) {
+			trim( i );
+		}
+	}
+
 	public void addBidirectionalTie(
 			final int ego,
 			final int alter,
@@ -179,7 +193,7 @@ public class DoublyWeightedSocialNetwork {
 			size++;
 		}
 
-		private void expand() {
+		private synchronized void expand() {
 			final int newLength = 2 * friends.length;
 			friends = Arrays.copyOf( friends , newLength );
 
@@ -255,6 +269,18 @@ public class DoublyWeightedSocialNetwork {
 			}
 			// always look to the NW
 			addGreaterPoints( childNE[ head ] , alters , firstWeight , secondWeight );
+		}
+
+		public synchronized void trim() {
+			friends = Arrays.copyOf( friends , size );
+
+			weights1 = Arrays.copyOf( weights1 , size );
+			weights2 = Arrays.copyOf( weights2 , size );
+
+			childSE = Arrays.copyOf( childSE , size );
+			childSW = Arrays.copyOf( childSW , size );
+			childNE = Arrays.copyOf( childNE , size );
+			childNW = Arrays.copyOf( childNW , size );
 		}
 	}
 }
