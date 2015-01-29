@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import gnu.trove.set.TIntSet;
+
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -93,6 +95,14 @@ public class WeightedSocialNetwork {
 		return alters[ ego ].getAltersOverWeight( weight );
 	}
 
+	public void addAltersOverWeight(
+			final TIntSet set,
+			final int ego,
+			final double weight ) {
+		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
+		alters[ ego ].addAltersOverWeight( set , weight );
+	}
+
 	/* unused
 	public Set<Id<Person>> getAltersInWeightInterval(
 			final Id<Person> ego,
@@ -145,6 +155,17 @@ public class WeightedSocialNetwork {
 			}
 			return alters;
 		}
+
+		public void addAltersOverWeight(
+				final TIntSet set,
+				final double weight ) {
+			for ( int i = size - 1;
+					i >= 0 && weights[ i ] >= weight;
+					i-- ) {
+				set.add( friends[ i ] );
+			}
+		}
+
 
 		public int[] getAltersOverWeight(
 				final double weight ) {

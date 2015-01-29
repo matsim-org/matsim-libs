@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.procedure.TIntDoubleProcedure;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -98,7 +104,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 					public void run() {
 						final Random random = new Random( randomSeed + threadNumber );
 						// initialize out loop to reduce stress on GC
-						final List<Integer> potentialAlters = new ArrayList< >();
+						final TIntList potentialAlters = new TIntArrayList();
 
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
 							potentialAlters.clear();
@@ -110,7 +116,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
 								counter.incCounter();
-								final int alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+								final int alter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
 
 								preprocess.addBidirectionalTie(
 										ego,
@@ -153,6 +159,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 				new Runnable() {
 					@Override
 					public void run() {
+						final TIntSet friendsOfFriends = new TIntHashSet();
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
 							sn.put(
 								population.getId( ego ),
@@ -161,15 +168,16 @@ public class PreprocessedModelRunner implements ModelRunner {
 									thresholds.getPrimaryThreshold(),
 									population ) );
 
-							final Set<Integer> friendsOfFriends =
-								preprocessFriendsOfFriends.getAltersOverWeights(
+								friendsOfFriends.clear();
+								preprocessFriendsOfFriends.addAltersOverWeights(
+									friendsOfFriends,
 									ego,
 									thresholds.getPrimaryThreshold(),
 									thresholds.getSecondaryThreshold() );
 
 							// sampling already done
 							final Set<Id<Person>> newAlters = sn.get( population.getId( ego ) );
-							for ( int fof : friendsOfFriends ) {
+							for ( int fof : friendsOfFriends.toArray() ) {
 								counter2.incCounter();
 								if ( utility.getTieUtility( ego , fof ) > thresholds.getSecondaryThreshold() ) {
 									newAlters.add( population.getId( fof ) );
@@ -218,66 +226,82 @@ public class PreprocessedModelRunner implements ModelRunner {
 					new Runnable() {
 						@Override
 						public void run() {
-							final List<Integer> potentialAlters = new ArrayList< >();
+							final TIntList potentialAlters = new TIntArrayList();
 							// TODO: modify doublyweighted preprocess to avoid having to do that externally
-							final Map< Integer , Double > highestPrimary = new ConcurrentHashMap< >();
+							final TIntDoubleMap highestPrimary = new TIntDoubleHashMap();
 
-							for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
-								final int[] alters = preprocess.getAltersOverWeight( ego , primaryThreshold );
-								// TODO: find better way...
-								final Set<Integer> altersSet = new HashSet<Integer>();
+							final TIntSet altersSet = new TIntHashSet();
+							final TIntSet altersOfAltersSet = new TIntHashSet();
+							for ( int egoi = startThreadAgents; egoi < endThreadAgents; egoi++ ) {
+								final int ego = egoi;
+								altersSet.clear();
+								preprocess.addAltersOverWeight( altersSet , ego , primaryThreshold );
 
 								// for each friend of friend, search for the highest common
 								// friend utility.
 								highestPrimary.clear();
-								for ( int alter : alters ) {
-									final double alterWeight =
-										utility.getTieUtility(
-												ego,
-												alter );
-									final int[] altersOfAlter = preprocess.getAltersOverWeight( alter , primaryThreshold );
-
-									potentialAlters.clear();
-									for ( int fof : altersOfAlter ) {
-										if ( fof <= ego ) continue; // only consider upper half of matrix
-										if ( altersSet.contains( fof ) ) continue;
-										potentialAlters.add( fof );
-									}
-
-									for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
-											remainingChecks > 0 && !potentialAlters.isEmpty();
-											remainingChecks--) {
-										counter.incCounter();
-										final int alterOfAlter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
-
-										// "utility" of an alter of alter is the min of the
-										// two linked ties, as below this utility it is not an
-										// alter of alter.
-										final double aoaWeight =
-											Math.min(
-													alterWeight,
-													utility.getTieUtility(
-														alter,
-														alterOfAlter ) );
-
-										if ( highestPrimary.get( alterOfAlter ) == null ||
-												highestPrimary.get( alterOfAlter ) < aoaWeight ) {
-											highestPrimary.put( alterOfAlter , aoaWeight );
-										}
-									}
-								}
-
-								for ( Map.Entry<Integer, Double> weight : highestPrimary.entrySet() ) {
-									final int alterOfAlter = weight.getKey();
-									final double lowestUtilityOfAlter = weight.getValue();
-									preprocessFriendsOfFriends.addMonodirectionalTie(
-											ego,
-											alterOfAlter,
-											lowestUtilityOfAlter,
+								altersSet.forEach( new TIntProcedure() {
+									@Override
+									public boolean execute( final int alter ) {
+										final double alterWeight =
 											utility.getTieUtility(
+													ego,
+													alter );
+										altersOfAltersSet.clear();
+										preprocess.addAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
+
+										potentialAlters.clear();
+										altersOfAltersSet.forEach( new TIntProcedure() {
+											@Override
+											public boolean execute( final int fof ) {
+												if ( fof <= ego ) return true; // only consider upper half of matrix
+												if ( altersSet.contains( fof ) ) return true;
+												potentialAlters.add( fof );
+												return true;
+											}
+										} );
+
+										for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
+												remainingChecks > 0 && !potentialAlters.isEmpty();
+												remainingChecks--) {
+											counter.incCounter();
+											final int alterOfAlter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
+
+											// "utility" of an alter of alter is the min of the
+											// two linked ties, as below this utility it is not an
+											// alter of alter.
+											final double aoaWeight =
+												Math.min(
+														alterWeight,
+														utility.getTieUtility(
+															alter,
+															alterOfAlter ) );
+
+											if ( !highestPrimary.containsKey( alterOfAlter ) ||
+													highestPrimary.get( alterOfAlter ) < aoaWeight ) {
+												highestPrimary.put( alterOfAlter , aoaWeight );
+											}
+										}
+										
+										return true;
+									}
+								} );
+
+								highestPrimary.forEachEntry( new TIntDoubleProcedure() {
+									@Override
+									public boolean execute(
+											final int alterOfAlter,
+											final double lowestUtilityOfAlter ) {
+										preprocessFriendsOfFriends.addMonodirectionalTie(
 												ego,
-												alterOfAlter ) );
-								}
+												alterOfAlter,
+												lowestUtilityOfAlter,
+												utility.getTieUtility(
+													ego,
+													alterOfAlter ) );
+										return true;
+									}
+								} );
 							}
 						}
 					} );

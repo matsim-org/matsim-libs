@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import gnu.trove.set.TIntSet;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -72,7 +73,7 @@ public class DoublyWeightedSocialNetworkTest {
 				9 * 9,
 				testee.getSize( ego ) );
 
-		final Set<Integer> result = testee.getAltersOverWeights( ego , 10 , 50 );
+		final TIntSet result = testee.getAltersOverWeights( ego , 10 , 50 );
 		Assert.assertEquals(
 				"unexpected nuber of returned elements: "+result,
 				result.size(),

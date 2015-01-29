@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * @author thibautd
@@ -79,7 +80,7 @@ public class DoublyWeightedSocialNetwork {
 	}
 
 
-	public Set<Integer> getAltersOverWeights(
+	public TIntSet getAltersOverWeights(
 			final int ego,
 			final double weight1,
 			final double weight2 ) {
@@ -87,6 +88,17 @@ public class DoublyWeightedSocialNetwork {
 		if ( weight2 < lowestAllowedSecondWeight ) throw new IllegalArgumentException( "second weight "+weight2+" is lower than lowest stored weight "+lowestAllowedSecondWeight );
 		return alters[ ego ].getAltersOverWeights( weight1 , weight2 );
 	}
+
+	public void addAltersOverWeights(
+			final TIntSet set,
+			final int ego,
+			final double weight1,
+			final double weight2 ) {
+		if ( weight1 < lowestAllowedFirstWeight ) throw new IllegalArgumentException( "first weight "+weight1+" is lower than lowest stored weight "+lowestAllowedFirstWeight );
+		if ( weight2 < lowestAllowedSecondWeight ) throw new IllegalArgumentException( "second weight "+weight2+" is lower than lowest stored weight "+lowestAllowedSecondWeight );
+		alters[ ego ].addAltersOverWeights( set , weight1 , weight2 );
+	}
+
 
 	// for tests
 	/*package*/ int getSize( final int ego ) {
@@ -207,19 +219,26 @@ public class DoublyWeightedSocialNetwork {
 			return secondWeight > weights2[ head ] ? childNW : childSW;
 		}
 
-		public Set<Integer> getAltersOverWeights(
+		public TIntSet getAltersOverWeights(
 				final double firstWeight,
 				final double secondWeight) {
-			final Set<Integer> alters = new LinkedHashSet< >();
+			final TIntSet alters = new TIntHashSet();
 
 			addGreaterPoints( 0, alters, firstWeight, secondWeight );
 
 			return alters;
 		}
 
+		public void addAltersOverWeights(
+				final TIntSet alters,
+				final double firstWeight,
+				final double secondWeight) {
+			addGreaterPoints( 0, alters, firstWeight, secondWeight );
+		}
+
 		private void addGreaterPoints(
 				final int head,
-				final Set<Integer> alters,
+				final TIntSet alters,
 				final double firstWeight,
 				final double secondWeight ) {
 			if ( head == -1 ) return; // we fell of the tree!
