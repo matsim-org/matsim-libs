@@ -28,8 +28,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
@@ -38,7 +36,6 @@ public class DoublyWeightedSocialNetworkTest {
 	@Test
 	public void testSizeAndGetOverWeight() {
 		if ( false ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
-		final DoublyWeightedSocialNetwork testee = new DoublyWeightedSocialNetwork( 2 , 0 );
 
 		final List<Double> weights1 =
 			Arrays.asList(
@@ -60,14 +57,13 @@ public class DoublyWeightedSocialNetworkTest {
 					100d, 200d, 300d, 400d, 500d );
 		Collections.shuffle( weights2 );
 
+		final DoublyWeightedSocialNetwork testee = new DoublyWeightedSocialNetwork( 2 , 0 , 1 + weights1.size() * weights2.size() );
 
-		final Id<Person> ego = Id.createPersonId( "ego" );
-		testee.addEgo( ego );
+		final int ego = 0;
+		int alter = 1;
 		for ( Double w1 : weights1 ) {
 			for ( Double w2 : weights2 ) {
-				final Id<Person> alter = Id.createPersonId( w1+"~"+w2 );
-				testee.addEgo( alter );
-				testee.addBidirectionalTie( ego , alter , w1 , w2 );
+				testee.addBidirectionalTie( ego , alter++ , w1 , w2 );
 			}
 		}
 
@@ -76,7 +72,7 @@ public class DoublyWeightedSocialNetworkTest {
 				9 * 9,
 				testee.getSize( ego ) );
 
-		final Set<Id<Person>> result = testee.getAltersOverWeights( ego , 10 , 50 );
+		final Set<Integer> result = testee.getAltersOverWeights( ego , 10 , 50 );
 		Assert.assertEquals(
 				"unexpected nuber of returned elements: "+result,
 				result.size(),

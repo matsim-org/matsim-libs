@@ -20,15 +20,11 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 
 /**
@@ -42,67 +38,59 @@ public class WeightedSocialNetwork {
 	private static final Logger log =
 		Logger.getLogger(WeightedSocialNetwork.class);
 
-	private final Map<Id<Person>, WeightedFriends> altersMap = new ConcurrentHashMap< >();
+	private final WeightedFriends[] alters;
 	private final double lowestAllowedWeight;
 
 	private final int initialSize;
 
 	public WeightedSocialNetwork(
 			final int initialSize,
-			final double lowestWeight ) {
-		this.initialSize = initialSize;
+			final double lowestWeight,
+			final int populationSize ) {
 		this.lowestAllowedWeight = lowestWeight;
-	}
+		this.alters = new WeightedFriends[ populationSize ];
+		this.initialSize = initialSize;
 
-	public WeightedSocialNetwork( final double lowestWeight ) {
-		this( 20 , lowestWeight );
-	}
-
-	public void addEgo( final Id<Person> ego ) {
-		altersMap.put( ego , new WeightedFriends( initialSize ) );
-	}
-
-	public void addEgosIds( final Collection<Id<Person>> egos ) {
-		for ( Id<Person> ego : egos ) {
-			altersMap.put( ego , new WeightedFriends( initialSize ) );
+		for ( int i=0; i < this.alters.length; i++ ) {
+			this.alters[ i ] = new WeightedFriends( initialSize );
 		}
 	}
 
-	public void addEgosIdentifiable( final Collection<? extends Identifiable<Person>> egos ) {
-		for ( Identifiable<Person> ego : egos ) {
-			altersMap.put( ego.getId() , new WeightedFriends( initialSize ) );
-		}
+	public WeightedSocialNetwork(
+			final double lowestWeight,
+			final int populationSize ) {
+		this( 20 , lowestWeight , populationSize );
 	}
 
 	public void clear() {
-		altersMap.clear();
+		for ( int i=0; i < this.alters.length; i++ ) {
+			this.alters[ i ] = new WeightedFriends( initialSize );
+		}
 	}
 
 	public void addBidirectionalTie(
-			final Id<Person> ego,
-			final Id<Person> alter,
+			final int ego,
+			final int alter,
 			final double weight ) {
 		if ( weight < lowestAllowedWeight ) return;
-		altersMap.get( ego ).add( alter , weight );
-		altersMap.get( alter ).add( ego , weight );
+		alters[ ego ].add( alter , weight );
+		alters[ alter ].add( ego , weight );
 	}
-
-	/*
-	public void addMonodirectionalTie(
-			final Id<Person> ego,
-			final Id<Person> alter,
-			final double weight ) {
-		if ( weight < lowestAllowedWeight ) return;
-		altersMap.get( ego ).add( alter , weight );
-	}
-	*/
 
 
 	public Set<Id<Person>> getAltersOverWeight(
-			final Id<Person> ego,
+			final int ego,
+			final double weight,
+			final IndexedPopulation population) {
+		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
+		return alters[ ego ].getAltersOverWeight( weight , population );
+	}
+
+	public int[] getAltersOverWeight(
+			final int ego,
 			final double weight ) {
 		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
-		return altersMap.get( ego ).getAltersOverWeight( weight );
+		return alters[ ego ].getAltersOverWeight( weight );
 	}
 
 	/* unused
@@ -117,12 +105,12 @@ public class WeightedSocialNetwork {
 	*/
 
 	// for tests
-	/*package*/ int getSize( final Id<Person> ego ) {
-		return altersMap.get( ego ).size;
+	/*package*/ int getSize( final int ego ) {
+		return alters[ ego ].size;
 	}
 
 	private static final class WeightedFriends {
-		private Id[] friends;
+		private int[] friends;
 		// use float instead of double for saving memory.
 		// TODO: check robustness of the results facing this...
 		private float weights[];
@@ -131,12 +119,12 @@ public class WeightedSocialNetwork {
 		private short size = 0;
 
 		public WeightedFriends( final int initialSize ) {
-			this.friends = new Id[ initialSize ];
+			this.friends = new int[ initialSize ];
 			this.weights = new float[ initialSize ];
 			Arrays.fill( weights , Float.POSITIVE_INFINITY  );
 		}
 
-		public synchronized void add( final Id<Person> friend , final double weight ) {
+		public synchronized void add( final int friend , final double weight ) {
 			final float fweight = (float) weight; // TODO check overflow?
 			final int insertionPoint = getInsertionPoint( fweight );
 			insert( friend, insertionPoint );
@@ -146,29 +134,23 @@ public class WeightedSocialNetwork {
 			assert weights.length == friends.length;
 		}
 
-		public Set<Id<Person>> getAltersOverWeight( final double weight ) {
-			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
+		public Set<Id<Person>> getAltersOverWeight(
+				final double weight,
+				final IndexedPopulation population ) {
+			final Set<Id<Person>> alters = new LinkedHashSet< >();
 			for ( int i = size - 1;
 					i >= 0 && weights[ i ] >= weight;
 					i-- ) {
-				alters.add( friends[ i ] );
+				alters.add( population.getId( friends[ i ] ) );
 			}
 			return alters;
 		}
 
-		/*
-		public Set<Id<Person>> getAltersIn( final double low , final double high ) {
-			final int lowInsertionPoint = getInsertionPoint( low );
-			final int highInsertionPoint = getInsertionPoint( high , lowInsertionPoint );
-			assert highInsertionPoint >= lowInsertionPoint;
-
-			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
-			for ( int i = lowInsertionPoint; i < highInsertionPoint; i++ ) {
-				alters.add( friends[ i ] );
-			}
-			return alters;
+		public int[] getAltersOverWeight(
+				final double weight ) {
+			final int insertionPoint = getInsertionPoint( (float) weight );
+			return Arrays.copyOfRange( friends , insertionPoint , size );
 		}
-		*/
 
 		private int getInsertionPoint( final float weight ) {
 			return getInsertionPoint( weight , 0 );
@@ -181,7 +163,7 @@ public class WeightedSocialNetwork {
 			return index >= 0 ? index : - 1 - index;
 		}
 
-		private void insert( Id<Person> friend , int insertionPoint ) {
+		private void insert( int friend , int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
 			}

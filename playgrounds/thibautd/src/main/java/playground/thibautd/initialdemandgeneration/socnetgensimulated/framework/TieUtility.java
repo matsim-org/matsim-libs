@@ -21,14 +21,13 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import java.util.Random;
 
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.utils.SoftCache;
 
 /**
  * @author thibautd
  */
-public class TieUtility<T extends Agent> {
-	private final DeterministicPart<T> deterministicPart;
+public class TieUtility {
+	private final DeterministicPart deterministicPart;
 	private final ErrorTerm errorTerm;
 
 	/**
@@ -41,7 +40,7 @@ public class TieUtility<T extends Agent> {
 	private final SoftCache< Integer , Double >  cache;
 
 	public TieUtility(
-			final DeterministicPart<T> deterministicPart,
+			final DeterministicPart deterministicPart,
 			final ErrorTerm errorTerm,
 			final boolean doCache) {
 		this.deterministicPart = deterministicPart;
@@ -50,14 +49,14 @@ public class TieUtility<T extends Agent> {
 	}
 
 	public double getTieUtility(
-			final T ego,
-			final T alter ) {
+			final int ego,
+			final int alter ) {
 		return deterministicPart.calcDeterministicPart( ego , alter ) +
 			error( ego , alter );
 	}
 
-	private double error( final T ego , final T alter ) {
-		final int seed = ego.getId().hashCode() + alter.getId().hashCode();
+	private double error( final int ego , final int alter ) {
+		final int seed = ego + alter;
 		if ( cache != null ) {
 			final Double cached = cache.get( seed );
 			if ( cached != null ) return cached.doubleValue();
@@ -68,8 +67,8 @@ public class TieUtility<T extends Agent> {
 		return sampledError;
 	}
 
-	public static interface DeterministicPart< T extends Agent> {
-		public double calcDeterministicPart( T ego , T alter );
+	public static interface DeterministicPart {
+		public double calcDeterministicPart( int ego , int alter );
 	}
 
 	public static interface ErrorTerm {

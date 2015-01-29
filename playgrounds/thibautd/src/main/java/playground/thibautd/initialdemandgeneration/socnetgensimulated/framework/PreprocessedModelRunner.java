@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 
@@ -49,7 +47,7 @@ import playground.thibautd.socnetsim.population.SocialNetworkImpl;
  * to be selected.
  * @author thibautd
  */
-public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
+public class PreprocessedModelRunner implements ModelRunner {
 	private static final Logger log =
 		Logger.getLogger(PreprocessedModelRunner.class);
 
@@ -60,8 +58,8 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 
 	private final int randomSeed = 20150116;
 
-	private final SocialPopulation<T> population;
-	private final TieUtility<T> utility;
+	private final IndexedPopulation population;
+	private final TieUtility utility;
 
 	private final double secondarySampleRate;
 
@@ -70,13 +68,13 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 	public PreprocessedModelRunner(
 			final double minUtilityPrimary,
 			final double minUtilitySecondary,
-			final SocialPopulation<T> population ,
-			final TieUtility<T> utility ,
+			final IndexedPopulation population ,
+			final TieUtility utility ,
 			final double primarySampleRate ,
 			final double secondarySampleRate ,
 			final int nThreads ) {
-		this.preprocess = new WeightedSocialNetwork( minUtilityPrimary );
-		this.preprocessFriendsOfFriends = new DoublyWeightedSocialNetwork( minUtilitySecondary );
+		this.preprocess = new WeightedSocialNetwork( minUtilityPrimary , population.size() );
+		this.preprocessFriendsOfFriends = new DoublyWeightedSocialNetwork( minUtilitySecondary , population.size() );
 
 		this.secondarySampleRate = secondarySampleRate;
 		this.population = population;
@@ -86,17 +84,13 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );
 		Gbl.printMemoryUsage();
 
-		preprocess.addEgosIdentifiable( population.getAgents() );
-
 		final Counter counter = new Counter( "consider (primary) pair # " );
 		final ThreadGroup threads = new ThreadGroup();
 
-		final List<T> agents = new ArrayList< >( population.getAgents() );
-
 		for ( int i=0; i < nThreads; i++ ) {
 			final int threadNumber = i;
-			final int startThreadAgents = i * agents.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
+			final int startThreadAgents = i * population.size() / nThreads;
+			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
 
 			threads.add(
 				new Runnable() {
@@ -104,25 +98,23 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 					public void run() {
 						final Random random = new Random( randomSeed + threadNumber );
 						// initialize out loop to reduce stress on GC
-						final List<T> potentialAlters = new ArrayList< >();
+						final List<Integer> potentialAlters = new ArrayList< >();
 
-						for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-							final T ego = agents.get( agentIndex );
-
+						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
 							potentialAlters.clear();
-							for ( int pa=agentIndex + 1; pa < agents.size(); pa++ ) {
-								potentialAlters.add( agents.get( pa ) );
+							for ( int pa=ego + 1; pa < population.size(); pa++ ) {
+								potentialAlters.add( pa );
 							}
 
 							int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
 
 							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
 								counter.incCounter();
-								final T alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+								final int alter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 
 								preprocess.addBidirectionalTie(
-										ego.getId(),
-										alter.getId(),
+										ego,
+										alter,
 										utility.getTieUtility( ego , alter ) );
 							}
 						}
@@ -139,36 +131,51 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 
 	@Override
 	public SocialNetwork runModel( final Thresholds thresholds ) {
-		final SocialNetwork sn = runPrimary( thresholds );
-		runSecondary( thresholds , sn );
-		return sn;
-	}
+		if ( thresholds.getPrimaryThreshold() < this.lowestPrimaryThreshold ) {
+			// store new friends of friends
+			updateSecondaryPreprocess( thresholds.getPrimaryThreshold() );
+			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
+		}
 
-	private SocialNetwork runPrimary(
-			final Thresholds thresholds ) {
 		final Map<Id<Person>, Set<Id<Person>>> sn = new ConcurrentHashMap< >();
-		log.info( "create primary ties using preprocessed data" );
+		log.info( "create ties using preprocessed data" );
 		Gbl.printMemoryUsage();
 
-		for ( T agent : population.getAgents() ) sn.put( agent.getId() , new HashSet<Id<Person>>() );
-
 		final Counter counter = new Counter( "consider primary pair # " );
+		final Counter counter2 = new Counter( "consider secondary pair # " );
 		final ThreadGroup threads = new ThreadGroup();
 
-		final List<T> agents = new ArrayList< >( population.getAgents() );
-
 		for ( int i=0; i < nThreads; i++ ) {
-			final int startThreadAgents = i * agents.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
+			final int startThreadAgents = i * population.size() / nThreads;
+			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
 
 			threads.add(
 				new Runnable() {
 					@Override
 					public void run() {
-						for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-							final Id<Person> ego = agents.get( agentIndex ).getId();
+						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
+							sn.put(
+								population.getId( ego ),
+								preprocess.getAltersOverWeight(
+									ego,
+									thresholds.getPrimaryThreshold(),
+									population ) );
 
-							sn.put( ego , preprocess.getAltersOverWeight( ego , thresholds.getPrimaryThreshold() ) );
+							final Set<Integer> friendsOfFriends =
+								preprocessFriendsOfFriends.getAltersOverWeights(
+									ego,
+									thresholds.getPrimaryThreshold(),
+									thresholds.getSecondaryThreshold() );
+
+							// sampling already done
+							final Set<Id<Person>> newAlters = sn.get( population.getId( ego ) );
+							for ( int fof : friendsOfFriends ) {
+								counter2.incCounter();
+								if ( utility.getTieUtility( ego , fof ) > thresholds.getSecondaryThreshold() ) {
+									newAlters.add( population.getId( fof ) );
+								}
+							}
+
 						}
 					}
 				} );
@@ -176,90 +183,72 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 
 		threads.run();
 		counter.printCounter();
+		counter2.printCounter();
 
 		Gbl.printMemoryUsage();
-		log.info( "fill in network with primary ties" );
+		// TODO: check if not possible in loop
+		log.info( "fill in network with identified ties" );
 		final SocialNetwork net = new SocialNetworkImpl( true );
-		for ( T agent : population.getAgents() ) net.addEgo( agent.getId() );
+		for ( int i = 0; i < population.size(); i++ ) net.addEgo( population.getId( i ) );
 
 		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : sn.entrySet() ) {
 			for ( Id<Person> alter : e.getValue() ) {
 				net.addBidirectionalTie( e.getKey(), alter );
 			}
 		}
-
-		if ( thresholds.getPrimaryThreshold() < this.lowestPrimaryThreshold ) {
-			// store new friends of friends
-			updateSecondaryPreprocess( net );
-			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
-		}
-
-		Gbl.printMemoryUsage();
 		return net;
 	}
 
 	private void updateSecondaryPreprocess(
-			final SocialNetwork sn ) {
-		log.info( "update secondary preprocess" );
+			final double primaryThreshold ) {
+		log.info( "update secondary preprocess for use with primary threshold > "+primaryThreshold );
 		Gbl.printMemoryUsage();
-		final List<T> agents = new ArrayList< >( population.getAgents() );
 
 		preprocessFriendsOfFriends.clear();
-		preprocessFriendsOfFriends.addEgosIds( sn.getEgos() );
 
 		final Counter counter = new Counter( "add secondary pair # " );
 		final ThreadGroup threads = new ThreadGroup();
 
 		for ( int i=0; i < nThreads; i++ ) {
-			final int startThreadAgents = i * agents.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
-
-			// always consider only "upper-right" half of contingency matrix
-			// (because symetric)
-			final Set<Id<Person>> allowedAlters = new HashSet< >();
-			for ( int ai = startThreadAgents; ai < agents.size(); ai++ ) {
-				allowedAlters.add( agents.get( ai ).getId() );
-			}
+			final int startThreadAgents = i * population.size() / nThreads;
+			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
 
 			final Random random = new Random( randomSeed + 20140107 + i );
 			threads.add(
 					new Runnable() {
 						@Override
 						public void run() {
-							final List<Id<Person>> potentialAlters = new ArrayList< >();
-							final Map< Id<Person> , Double > highestPrimary = new ConcurrentHashMap< >();
+							final List<Integer> potentialAlters = new ArrayList< >();
+							// TODO: modify doublyweighted preprocess to avoid having to do that externally
+							final Map< Integer , Double > highestPrimary = new ConcurrentHashMap< >();
 
-							for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-								final T egoAgent = agents.get( agentIndex );
-								final Id<Person> ego = egoAgent.getId();
-
-								allowedAlters.remove( ego );
-
-								final Set<Id<Person>> alters = sn.getAlters( ego );
+							for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
+								final int[] alters = preprocess.getAltersOverWeight( ego , primaryThreshold );
+								// TODO: find better way...
+								final Set<Integer> altersSet = new HashSet<Integer>();
 
 								// for each friend of friend, search for the highest common
 								// friend utility.
 								highestPrimary.clear();
-								for ( Id<Person> alter : alters ) {
+								for ( int alter : alters ) {
 									final double alterWeight =
 										utility.getTieUtility(
-												egoAgent,
-												population.getAgentsMap().get( alter ) );
-									final Set<Id<Person>> altersOfAlter = sn.getAlters( alter );
+												ego,
+												alter );
+									final int[] altersOfAlter = preprocess.getAltersOverWeight( alter , primaryThreshold );
 
 									potentialAlters.clear();
-									for ( Id<Person> fof : altersOfAlter ) {
-										if ( !allowedAlters.contains( fof ) ) continue;
-										if ( alters.contains( fof ) ) continue;
+									for ( int fof : altersOfAlter ) {
+										if ( fof <= ego ) continue; // only consider upper half of matrix
+										if ( altersSet.contains( fof ) ) continue;
 										potentialAlters.add( fof );
 									}
 
-									final T alterAgent = population.getAgentsMap().get( alter );
 									for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
 											remainingChecks > 0 && !potentialAlters.isEmpty();
 											remainingChecks--) {
 										counter.incCounter();
-										final Id<Person> alterOfAlter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
+										final int alterOfAlter = potentialAlters.remove( random.nextInt( potentialAlters.size() ) );
 
 										// "utility" of an alter of alter is the min of the
 										// two linked ties, as below this utility it is not an
@@ -268,8 +257,8 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 											Math.min(
 													alterWeight,
 													utility.getTieUtility(
-														alterAgent,
-														population.getAgentsMap().get( alterOfAlter ) ) );
+														alter,
+														alterOfAlter ) );
 
 										if ( highestPrimary.get( alterOfAlter ) == null ||
 												highestPrimary.get( alterOfAlter ) < aoaWeight ) {
@@ -278,16 +267,16 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 									}
 								}
 
-								for ( Map.Entry<Id<Person>, Double> weight : highestPrimary.entrySet() ) {
-									final Id<Person> alterOfAlter = weight.getKey();
+								for ( Map.Entry<Integer, Double> weight : highestPrimary.entrySet() ) {
+									final int alterOfAlter = weight.getKey();
 									final double lowestUtilityOfAlter = weight.getValue();
 									preprocessFriendsOfFriends.addMonodirectionalTie(
 											ego,
 											alterOfAlter,
 											lowestUtilityOfAlter,
 											utility.getTieUtility(
-												egoAgent,
-												population.getAgentsMap().get( alterOfAlter ) ) );
+												ego,
+												alterOfAlter ) );
 								}
 							}
 						}
@@ -297,72 +286,6 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 		threads.run();
 
 		counter.printCounter();
-		Gbl.printMemoryUsage();
-	}
-
-	private void runSecondary(
-			final Thresholds thresholds,
-			final SocialNetwork sn ) {
-		log.info( "create secondary ties" );
-		Gbl.printMemoryUsage();
-		final List<T> agents = new ArrayList< >( population.getAgents() );
-
-		final Map<Id<Person>, Set<Id<Person>>> newTies = new ConcurrentHashMap< >();
-		for ( T agent : population.getAgents() ) newTies.put( agent.getId() , new HashSet<Id<Person>>() );
-
-		final Counter counter = new Counter( "consider secondary pair # " );
-		final ThreadGroup threads = new ThreadGroup();
-
-		for ( int i=0; i < nThreads; i++ ) {
-			final int startThreadAgents = i * agents.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? agents.size() : (i + 1) * agents.size() / nThreads;
-
-			// always consider only "upper-right" half of contingency matrix
-			// (because symetric)
-			final Set<Id<Person>> allowedAlters = new HashSet< >();
-			for ( int ai = startThreadAgents; ai < agents.size(); ai++ ) {
-				allowedAlters.add( agents.get( ai ).getId() );
-			}
-
-			threads.add(
-					new Runnable() {
-						@Override
-						public void run() {
-							for ( int agentIndex = startThreadAgents; agentIndex < endThreadAgents; agentIndex++ ) {
-								final T ego = agents.get( agentIndex );
-								allowedAlters.remove( ego.getId() );
-
-								final Set<Id<Person>> friendsOfFriends =
-									preprocessFriendsOfFriends.getAltersOverWeights(
-										ego.getId(),
-										thresholds.getPrimaryThreshold(),
-										thresholds.getSecondaryThreshold() );
-
-								// sampling already done
-								for ( Id<Person> fof : friendsOfFriends ) {
-									counter.incCounter();
-									final T alter = population.getAgentsMap().get( fof );
-
-									if ( utility.getTieUtility( ego , alter ) > thresholds.getSecondaryThreshold() ) {
-										newTies.get( ego.getId() ).add( alter.getId() );
-									}
-								}
-							}
-						}
-					} );
-		}
-
-		threads.run();
-
-		counter.printCounter();
-		Gbl.printMemoryUsage();
-
-		log.info( "fill in social network with secondary ties" );
-		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : newTies.entrySet() ) {
-			for ( Id<Person> alter : e.getValue() ) {
-				sn.addBidirectionalTie( e.getKey() , alter );
-			}
-		}
 		Gbl.printMemoryUsage();
 	}
 }

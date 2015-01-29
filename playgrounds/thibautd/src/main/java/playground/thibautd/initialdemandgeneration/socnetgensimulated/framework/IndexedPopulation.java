@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedSocialNetworkTest.java
+ * IndexedPopulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,52 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
-public class WeightedSocialNetworkTest {
+public abstract class IndexedPopulation {
+	private final Id[] ids;
 
-	@Test
-	public void testSizeAndGetOverWeight() {
-		if ( false ) Logger.getLogger(WeightedSocialNetwork.class).setLevel( Level.TRACE );
+	protected IndexedPopulation(final Id[] ids) {
+		this.ids = ids;
+	}
 
-		final List<Double> weights =
-			Arrays.asList(
-					// some lowest than lower bound: should not be added at all
-					-1d, -2d, -3d,
-					// some between lower bound and desired weight
-					1d, 2d, 3d, 4d,
-					// over desired weight
-					100d, 200d, 300d, 400d, 500d );
-		Collections.shuffle( weights );
+	public Id<Person> getId( final int index ) {
+		return ids[ index ];
+	}
 
-		final WeightedSocialNetwork testee = new WeightedSocialNetwork( 2 , 0 , 1 + weights.size() );
-
-		final int ego = 0;
-		int alter = 1;
-		for ( Double w : weights ) {
-			testee.addBidirectionalTie( ego , alter++ , w );
-		}
-
-		Assert.assertEquals(
-				"unexpected size of stored elements",
-				9,
-				testee.getSize( ego ) );
-
-		final int[] result = testee.getAltersOverWeight( ego , 10 );
-		Assert.assertEquals(
-				"unexpected nuber of returned elements: "+result,
-				result.length,
-				5 );
+	public int size() {
+		return ids.length;
 	}
 }
 

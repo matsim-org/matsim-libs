@@ -20,99 +20,84 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
 public class DoublyWeightedSocialNetwork {
-	private final Map<Id<Person>, DoublyWeightedFriends> altersMap = new ConcurrentHashMap< >();
+	private final DoublyWeightedFriends[] alters;
 	private final double lowestAllowedFirstWeight;
 	private final double lowestAllowedSecondWeight;
 	private int initialSize;
 
 	public DoublyWeightedSocialNetwork(
 			final int initialSize,
-			final double lowestWeight ) {
+			final double lowestWeight,
+			final int populationSize ) {
 		this.initialSize  = initialSize;
 		this.lowestAllowedFirstWeight = lowestWeight;
 		this.lowestAllowedSecondWeight = lowestWeight;
-	}
-
-	public DoublyWeightedSocialNetwork( final double lowestWeight ) {
-		this.lowestAllowedFirstWeight = lowestWeight;
-		this.lowestAllowedSecondWeight = lowestWeight;
-	}
-
-	public void addEgo( final Id<Person> ego ) {
-		altersMap.put( ego , new DoublyWeightedFriends( initialSize ) );
-	}
-
-	public void addEgosIds( final Collection<Id<Person>> egos ) {
-		for ( Id<Person> ego : egos ) {
-			altersMap.put( ego , new DoublyWeightedFriends( initialSize ) );
+		this.alters = new DoublyWeightedFriends[ populationSize ];
+		for ( int i = 0; i < populationSize; i++ ) {
+			this.alters[ i ] = new DoublyWeightedFriends( initialSize );
 		}
 	}
 
-	public void addEgosIdentifiable( final Collection<? extends Identifiable<Person>> egos ) {
-		for ( Identifiable<Person> ego : egos ) {
-			altersMap.put( ego.getId() , new DoublyWeightedFriends( initialSize ) );
-		}
+	public DoublyWeightedSocialNetwork(
+			final double lowestWeight,
+			final int populationSize ) {
+		this( 20 , lowestWeight , populationSize );
 	}
 
 	public void clear() {
-		altersMap.clear();
+		for ( int i = 0; i < alters.length; i++ ) {
+			this.alters[ i ] = new DoublyWeightedFriends( initialSize );
+		}
 	}
 
 	public void addBidirectionalTie(
-			final Id<Person> ego,
-			final Id<Person> alter,
+			final int ego,
+			final int alter,
 			final double weight1,
 			final double weight2 ) {
 		if ( weight1 < lowestAllowedFirstWeight ) return;
 		if ( weight2 < lowestAllowedSecondWeight ) return;
-		altersMap.get( ego ).add( alter , weight1 , weight2 );
-		altersMap.get( alter ).add( ego , weight1 , weight2 );
+		alters[ ego ].add( alter , weight1 , weight2 );
+		alters[ alter ].add( ego , weight1 , weight2 );
 	}
 
 	public void addMonodirectionalTie(
-			final Id<Person> ego,
-			final Id<Person> alter,
+			final int ego,
+			final int alter,
 			final double weight1,
 			final double weight2 ) {
 		if ( weight1 < lowestAllowedFirstWeight ) return;
 		if ( weight2 < lowestAllowedSecondWeight ) return;
-		altersMap.get( ego ).add( alter , weight1 , weight2 );
+		alters[ ego ].add( alter , weight1 , weight2 );
 	}
 
 
-	public Set<Id<Person>> getAltersOverWeights(
-			final Id<Person> ego,
+	public Set<Integer> getAltersOverWeights(
+			final int ego,
 			final double weight1,
-			final double weight2) {
+			final double weight2 ) {
 		if ( weight1 < lowestAllowedFirstWeight ) throw new IllegalArgumentException( "first weight "+weight1+" is lower than lowest stored weight "+lowestAllowedFirstWeight );
 		if ( weight2 < lowestAllowedSecondWeight ) throw new IllegalArgumentException( "second weight "+weight2+" is lower than lowest stored weight "+lowestAllowedSecondWeight );
-		return altersMap.get( ego ).getAltersOverWeights( weight1 , weight2 );
+		return alters[ ego ].getAltersOverWeights( weight1 , weight2 );
 	}
 
 	// for tests
-	/*package*/ int getSize( final Id<Person> ego ) {
-		return altersMap.get( ego ).size;
+	/*package*/ int getSize( final int ego ) {
+		return alters[ ego ].size;
 	}
 
 	// point quad-tree
 	// No check is done that is is balanced!
 	// should be ok, as agents are got in random order
 	private static final class DoublyWeightedFriends {
-		private Id[] friends;
+		private int[] friends;
 
 		// use float and short for memory saving
 		private float[] weights1;
@@ -129,7 +114,7 @@ public class DoublyWeightedSocialNetwork {
 		private short size = 0;
 
 		public DoublyWeightedFriends(final int initialSize) {
-			this.friends = new Id[ initialSize ];
+			this.friends = new int[ initialSize ];
 
 			this.weights1 = new float[ initialSize ];
 			this.weights2 = new float[ initialSize ];
@@ -149,14 +134,14 @@ public class DoublyWeightedSocialNetwork {
 		}
 
 		public synchronized void add(
-				final Id<Person> friend,
+				final int friend,
 				final double firstWeight,
 				final double secondWeight ) {
 			add( friend , (float) firstWeight , (float) secondWeight );
 		}
 
 		public synchronized void add(
-				final Id<Person> friend,
+				final int friend,
 				final float firstWeight,
 				final float secondWeight ) {
 			if ( size == 0 ) {
@@ -222,10 +207,10 @@ public class DoublyWeightedSocialNetwork {
 			return secondWeight > weights2[ head ] ? childNW : childSW;
 		}
 
-		public Set<Id<Person>> getAltersOverWeights(
+		public Set<Integer> getAltersOverWeights(
 				final double firstWeight,
-				final double secondWeight ) {
-			final Set<Id<Person>> alters = new LinkedHashSet<Id<Person>>();
+				final double secondWeight) {
+			final Set<Integer> alters = new LinkedHashSet< >();
 
 			addGreaterPoints( 0, alters, firstWeight, secondWeight );
 
@@ -234,7 +219,7 @@ public class DoublyWeightedSocialNetwork {
 
 		private void addGreaterPoints(
 				final int head,
-				final Set<Id<Person>> alters,
+				final Set<Integer> alters,
 				final double firstWeight,
 				final double secondWeight ) {
 			if ( head == -1 ) return; // we fell of the tree!
