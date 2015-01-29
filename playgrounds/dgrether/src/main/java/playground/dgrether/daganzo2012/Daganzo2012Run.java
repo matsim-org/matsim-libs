@@ -73,8 +73,8 @@ public class Daganzo2012Run {
         //FIXME: Take care that the normal SignalsControllerListener is NOT added.
         controler.addControlerListener(new DgSylviaControlerListenerFactory(sylviaConfig).createSignalsControllerListener());
         controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		addControlerListener(controler);
+        controler.getConfig().controler().setCreateGraphs(false);
+        addControlerListener(controler);
 		controler.run();
 	}
 

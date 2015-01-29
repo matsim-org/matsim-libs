@@ -20,7 +20,6 @@
 package org.matsim.signalsystems;
 
 import junit.framework.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -75,8 +74,8 @@ public class DefaultPlanbasedSignalControlTest {
 		config.signalSystems().setSignalControlFile(signalControlFile);
 	
 		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		PlanSwitchingTestListener testListener = new PlanSwitchingTestListener();
 		controler.addControlerListener(testListener);
 		controler.run();

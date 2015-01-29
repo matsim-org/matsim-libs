@@ -24,12 +24,6 @@
 package playground.yu.newPlans;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-
-import playground.yu.replanning.selectors.RandomPlanSelectorWithPlanType;
 
 /**
  * generate a populationfile, in which each agent has a plan choice set with
@@ -90,8 +84,8 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 		controler.setStrategyChangerIteration(Integer
 				.parseInt(args[1]/* strategyChangerIteration */));
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(100);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(100);
 		controler.run();
 	}
 

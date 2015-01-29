@@ -125,8 +125,8 @@ public class BetaTravelTest extends MatsimTestCase {
 		PopulationUtils.sortPersons(scenario.getPopulation());
 		TestControler controler = new TestControler(scenario);
 		controler.addControlerListener(new TestControlerListener());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -148,8 +148,8 @@ public class BetaTravelTest extends MatsimTestCase {
 		PopulationUtils.sortPersons(scenario.getPopulation());
 		TestControler controler = new TestControler(scenario);
 		controler.addControlerListener(new TestControlerListener());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}

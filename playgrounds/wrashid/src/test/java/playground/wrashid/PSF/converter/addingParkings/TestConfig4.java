@@ -47,8 +47,8 @@ public class TestConfig4 extends MatsimTestCase {
 
 		// start simulation run
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		new OptimizedChargerTestGeneral(controler).optimizedChargerTest();
+        controler.getConfig().controler().setCreateGraphs(false);
+        new OptimizedChargerTestGeneral(controler).optimizedChargerTest();
 	}
 
 }

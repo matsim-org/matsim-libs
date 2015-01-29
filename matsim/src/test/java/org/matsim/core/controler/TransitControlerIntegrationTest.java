@@ -20,21 +20,13 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -43,15 +35,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TransitControlerIntegrationTest extends MatsimTestCase {
 
@@ -146,8 +135,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		// run
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 
 		// checks
 		assertEquals(1, population.getPersons().size());

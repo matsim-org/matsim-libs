@@ -228,8 +228,8 @@ public class CompareMain {
 				planSelector.setCadytsWeight(10000000);
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		double sum=0.0;
 		for (Person person : scenario2.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();

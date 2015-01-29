@@ -32,7 +32,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
 
 /**
@@ -154,9 +153,9 @@ public class InternalControler {
 				STUCK_SCORE);
 		
 		controler.setScoringFunctionFactory(scoringfactory);
-		
-		controler.setCreateGraphs(false);
-		controler.run();		
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 	}
 
 	public double getMarginalUtlOfMoney() {

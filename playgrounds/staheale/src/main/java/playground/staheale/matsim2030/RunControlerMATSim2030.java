@@ -49,8 +49,8 @@ public class RunControlerMATSim2030 extends Controler {
 								ConfigUtils.loadConfig(
 										args[ 0 ] ) ) );
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.init();
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.init();
 		controler.run();
 	}
 	

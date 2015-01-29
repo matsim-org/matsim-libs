@@ -23,16 +23,12 @@
  */
 package org.matsim.contrib.otfvis;
 
-import java.io.File;
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.SnapshotWriterFactoryRegister;
 import org.matsim.core.controler.SnapshotWriterRegistrar;
@@ -41,6 +37,9 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -79,8 +78,8 @@ public class OTFVisTest extends MatsimTestCase {
 		final Controler controler = new Controler(config);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());

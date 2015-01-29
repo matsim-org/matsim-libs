@@ -196,9 +196,9 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void specifyControler() {
 		// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		// controlerConfigGroup
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setFirstIteration(0);
 		//set to one iteration, use "ccg.setLastIteration(9)" for ten iterations

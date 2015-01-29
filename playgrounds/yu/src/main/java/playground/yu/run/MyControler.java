@@ -202,8 +202,8 @@ public final class MyControler extends Controler {
 
 	public static void main(String[] args) {
 		Controler controler = new MyControler(args[0]);
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setOverwriteFiles(true);
 
         controler.setScoringFunctionFactory( new MyCharyparNagelScoringFunctionFactory( controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()) ) ;
 		

@@ -10,8 +10,8 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		PSimControler c = new PSimControler(args);
-		c.getMATSimControler().setCreateGraphs(false);
-		c.getMATSimControler().run();
+        c.getMATSimControler().getConfig().controler().setCreateGraphs(false);
+        c.getMATSimControler().run();
 		
 	}
 

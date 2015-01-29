@@ -95,8 +95,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(final StartupEvent event) {

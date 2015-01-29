@@ -22,12 +22,7 @@
  */
 package org.matsim.contrib.accessibility.run;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +50,10 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author nagel
@@ -170,8 +169,8 @@ public class AccessibilityIntegrationTest {
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 		
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		
 		// compare some results -> done in EvaluateTestResults
 	}
@@ -232,8 +231,8 @@ public class AccessibilityIntegrationTest {
 		gacl.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		
 		// compare some results -> done in EvaluateTestResults 
 		
@@ -306,8 +305,8 @@ public class AccessibilityIntegrationTest {
 		gacl.generateGridsAndMeasuringPointsByShapeFile(acm.getShapeFileCellBasedAccessibility(), cellSize);
 
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		
 		// compare some results -> done in EvaluateTestResults 
 	}

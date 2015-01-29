@@ -27,13 +27,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
@@ -162,12 +157,12 @@ public class CARunner implements IterationStartsListener {
 		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
 			// this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(true);
-		} else {
+            this.controller.getConfig().controler().setCreateGraphs(true);
+        } else {
 			// this.factory.debug(null);
 			this.controller.getEvents().removeHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(false);
-		}
+            this.controller.getConfig().controler().setCreateGraphs(false);
+        }
 		// this.visDebugger.setIteration(event.getIteration());
 	}
 }

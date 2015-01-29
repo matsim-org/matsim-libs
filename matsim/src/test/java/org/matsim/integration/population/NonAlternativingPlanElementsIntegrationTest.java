@@ -73,8 +73,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Controler controler = new Controler(scenario);
 		controler.setDumpDataAtEnd(false);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}
@@ -99,8 +99,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Controler controler = new Controler(scenario);
 		controler.setDumpDataAtEnd(false);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
 	}

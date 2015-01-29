@@ -19,32 +19,21 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -55,6 +44,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -119,9 +111,9 @@ public class RunInternalizationTest {
 	private void specifyControler() {
 	// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-	// controlerConfigGroup
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);

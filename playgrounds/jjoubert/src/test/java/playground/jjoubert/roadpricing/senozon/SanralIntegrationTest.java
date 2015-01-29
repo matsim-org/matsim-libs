@@ -19,22 +19,22 @@
 
 package playground.jjoubert.roadpricing.senozon;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SanralIntegrationTest {
 
@@ -49,8 +49,8 @@ public class SanralIntegrationTest {
 	@Ignore
 	public void testVehicleIdBasedTollCosts_distance() {
 		SanralControler c = new SanralControler(utils.loadConfig(utils.getInputDirectory() + "config.xml"));
-		c.setCreateGraphs(false);
-		c.run();
+        c.getConfig().controler().setCreateGraphs(false);
+        c.run();
 
 		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector ec = new EventsCollector();

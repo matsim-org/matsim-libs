@@ -68,8 +68,8 @@ public class SignalSystemsIntegrationTest {
 		config.controler().setWritePlansInterval(10);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.run();
 		
 		String inputDirectory = testUtils.getInputDirectory();
@@ -138,8 +138,8 @@ public class SignalSystemsIntegrationTest {
 
 		Controler c = new Controler(configFile);
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.run();
 
 		

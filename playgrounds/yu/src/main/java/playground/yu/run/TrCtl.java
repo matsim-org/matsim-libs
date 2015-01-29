@@ -29,7 +29,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-
 import playground.mrieser.pt.controler.TransitControler;
 
 /**
@@ -87,8 +86,8 @@ public class TrCtl extends TransitControler {
 		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
 
 		ctl.setOverwriteFiles(true);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 }

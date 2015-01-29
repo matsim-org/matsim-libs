@@ -35,8 +35,8 @@ public class Controller {
 	public static void run(Config config){
 		Controler c = new Controler(config);
 		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		addListener(c);
+        c.getConfig().controler().setCreateGraphs(false);
+        addListener(c);
 		c.run();
 	}
 

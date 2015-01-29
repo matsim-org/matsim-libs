@@ -284,10 +284,10 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			// this is now no longer a hack but something that should be reasonably stable.  NOTE: You have to switch on/off roadpricing now in a 
 			// (newly constructed) matsim4Urbansim config section.  kai & michael z, sep'14
 		}
-		controler.setOverwriteFiles(true);	
-		controler.setCreateGraphs(true);	
-		
-		PtMatrix ptMatrix = null ;
+		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(true);
+
+        PtMatrix ptMatrix = null ;
 		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(scenario.getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");

@@ -1,13 +1,10 @@
 package playground.wrashid.PSF.singleAgent;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.V2G.BatteryStatistics;
@@ -18,6 +15,8 @@ import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF.energy.charging.optimizedCharging.OptimizedCharger;
 import playground.wrashid.PSF.energy.consumption.LogEnergyConsumption;
 import playground.wrashid.PSF.parking.LogParkingTimes;
+
+import java.util.HashMap;
 
 /**
  * Note: Cannot simply inherit from class TestCase, but must inherit from
@@ -39,9 +38,9 @@ public class AdvancedTest extends MatsimTestCase {
 		controler = new Controler(config);
 
 		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		logEnergyConsumption = new LogEnergyConsumption(controler);
+        logEnergyConsumption = new LogEnergyConsumption(controler);
 		logParkingTimes = new LogParkingTimes(controler);
 		simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);

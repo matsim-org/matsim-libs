@@ -126,8 +126,8 @@ public class PtTest extends MatsimTestCase {
 		Config config = super.loadConfig(getInputDirectory() + "config.xml");
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setOverwriteFiles(true);
 		controler.run();
 	}
 
@@ -138,8 +138,8 @@ public class PtTest extends MatsimTestCase {
 		Config config = super.loadConfig(getInputDirectory() + "config.xml");
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setOverwriteFiles(true);
 		controler.run();
 	}
 }

@@ -20,7 +20,6 @@
 package org.matsim.integration.lanes;
 
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,8 +70,8 @@ public class LanesIntegrationTest {
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		TestListener listener = new TestListener();
+        controler.getConfig().controler().setCreateGraphs(false);
+        TestListener listener = new TestListener();
 		controler.addControlerListener(listener);
 		controler.run();
 		

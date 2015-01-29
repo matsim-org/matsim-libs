@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.daganzo2012;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,8 +36,10 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 
 /**
@@ -60,8 +59,8 @@ public class Daganzo2012SimpleAdaptiveRun {
 	private void run(String config) {
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
+        controler.getConfig().controler().setCreateGraphs(false);
+        final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
 		addControlerListener(controler, adaptiveControl);
 		final MobsimFactory mf = new QSimFactory();
 		

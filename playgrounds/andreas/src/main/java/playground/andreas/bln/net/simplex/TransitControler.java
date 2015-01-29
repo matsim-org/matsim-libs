@@ -120,8 +120,8 @@ public final class TransitControler extends Controler {
 		addControlerListener(new PtCountControlerListener(config) );
 		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
 
-		setCreateGraphs(false);
-	}
+        this.getConfig().controler().setCreateGraphs(false);
+    }
 
 	private void addTransitControlerListener() {
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);

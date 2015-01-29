@@ -33,8 +33,8 @@ public class ConfigParameterTest extends MatsimTestCase {
 		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		/* make sure, all simulation parameters are set properly from
 		 * config xml file */
 

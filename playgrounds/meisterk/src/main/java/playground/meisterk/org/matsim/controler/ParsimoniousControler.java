@@ -27,8 +27,8 @@ public class ParsimoniousControler {
 	public static void main(String[] args) {
 
 		Controler controler = new Controler(args);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 
 	}
 

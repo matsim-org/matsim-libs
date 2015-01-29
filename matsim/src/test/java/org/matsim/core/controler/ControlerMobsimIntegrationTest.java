@@ -26,11 +26,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -50,8 +47,8 @@ public class ControlerMobsimIntegrationTest {
 		Controler c = new Controler(cfg);
 		CountingMobsimFactory mf = new CountingMobsimFactory();
 		c.addMobsimFactory("counting", mf);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertEquals(1, mf.callCount);
@@ -64,8 +61,8 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);
 		Controler c = new Controler(cfg);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
         Assert.assertNotNull("expected exception, but there was none.", c.uncaughtException);

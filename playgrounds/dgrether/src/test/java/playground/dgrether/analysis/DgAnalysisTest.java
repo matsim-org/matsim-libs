@@ -19,19 +19,18 @@
  * *********************************************************************** */
 package playground.dgrether.analysis;
 
-import java.io.File;
-
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.dgrether.analysis.io.DgAnalysisPopulationReader;
+
+import java.io.File;
 
 
 /**
@@ -60,8 +59,8 @@ public class DgAnalysisTest extends MatsimTestCase {
 		config.controler().setRunId(runId);
 		
 		Controler controler = new Controler(sc);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 		
 		String outputNetworkFilename = this.getOutputDirectory() + "testRun23.output_network.xml.gz";
 		String outputPlansFilename = this.getOutputDirectory() + "testRun23.output_plans.xml.gz";

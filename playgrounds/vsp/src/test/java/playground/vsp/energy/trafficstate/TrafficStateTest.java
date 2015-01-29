@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.vsp.energy.trafficstate;
 
-import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
+import java.io.File;
 
 
 /**
@@ -49,8 +47,8 @@ public class TrafficStateTest {
 //		System.out.println(config.exists());
 		
 		Controler controler = new Controler(configfile);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		controler.setOverwriteFiles(true);
 		controler.addControlerListener(new TrafficStateControlerListener());

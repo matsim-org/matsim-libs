@@ -73,9 +73,9 @@ public class PControlerTest implements TabularFileHandler{
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-		// manipulate config
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        // manipulate config
 		PModule builder = new PModule() ;
 		builder.configureControler(controler);
 		//		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));

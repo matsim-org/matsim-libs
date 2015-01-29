@@ -74,8 +74,8 @@ public class TimeTollTest extends MatsimTestCase {
 		Config config = super.loadConfig(getInputDirectory() + "config.xml");
 		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
-		ctl.setCreateGraphs(false);
-		ctl.setOverwriteFiles(true);
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.setOverwriteFiles(true);
 		ctl.run();
 	}
 
@@ -83,8 +83,8 @@ public class TimeTollTest extends MatsimTestCase {
 		Config config = super.loadConfig(getInputDirectory() + "config.xml");
 		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
-		ctl.setCreateGraphs(false);
-		ctl.setOverwriteFiles(true);
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.setOverwriteFiles(true);
 		ctl.run();
 	}
 }

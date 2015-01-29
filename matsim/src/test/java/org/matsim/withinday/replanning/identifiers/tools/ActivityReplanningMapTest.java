@@ -20,9 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -46,6 +43,9 @@ import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
@@ -105,8 +105,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
 		ControlerListenerForTests listener = new ControlerListenerForTests(withinDayEngine);
 		controler.addControlerListener(listener);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		controler.run();

@@ -24,23 +24,11 @@
 package playground.ikaddoura.economics;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -52,13 +40,20 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.internalizationCar.MarginalCostPricing;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 
 /**
@@ -123,8 +118,8 @@ public class EconomicsControler {
 		controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 		
 	}
@@ -159,8 +154,8 @@ public class EconomicsControler {
 		controler.addControlerListener(flatPricing);
 		
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 		
 	}
@@ -189,8 +184,8 @@ public class EconomicsControler {
 		controler.addControlerListener(analysis);
 		
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 	}
 
@@ -220,8 +215,8 @@ public class EconomicsControler {
 			DemandFunctionControlerListener demandFunctionControlerListener = new DemandFunctionControlerListener();
 
 			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			controler.addControlerListener(demandFunctionControlerListener);
+            controler.getConfig().controler().setCreateGraphs(false);
+            controler.addControlerListener(demandFunctionControlerListener);
 			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 			controler.run();
 			
@@ -282,8 +277,8 @@ public class EconomicsControler {
 			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
 
 			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
-			controler.addControlerListener(economicsControlerListener);
+            controler.getConfig().controler().setCreateGraphs(false);
+            controler.addControlerListener(economicsControlerListener);
 			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 			controler.run();
 			

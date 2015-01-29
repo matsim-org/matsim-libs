@@ -20,14 +20,6 @@
 
 package playground.mmoyo.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -38,8 +30,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
-
 import playground.mmoyo.ptRouterAdapted.AdaptedLauncher;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * routes a plan applying many different travel parameter values. Includes method to simulate all routed plans in a directory
@@ -103,8 +102,8 @@ class AllrouteTest {
 					//simulate
 					log.info(STR_READING + strCombination);
 					Controler controler = new Controler( this.scn ) ;
-					controler.setCreateGraphs(false);
-					controler.setOverwriteFiles(true);
+                    controler.getConfig().controler().setCreateGraphs(false);
+                    controler.setOverwriteFiles(true);
 					controler.run();
 					
 					//get error graph
@@ -206,8 +205,8 @@ class AllrouteTest {
 					
 					//simulate
 					Controler controler = new Controler( tmpconfigFile ) ;
-					controler.setCreateGraphs(false);
-					controler.setOverwriteFiles(true);
+                    controler.getConfig().controler().setCreateGraphs(false);
+                    controler.setOverwriteFiles(true);
 					controler.run();
 					
 					/*
@@ -254,8 +253,8 @@ class AllrouteTest {
 				
 				//simulate
 				Controler controler = new Controler( this.outDir +  configFileName ) ;
-				controler.setCreateGraphs(false);
-				controler.setOverwriteFiles(true);
+                controler.getConfig().controler().setCreateGraphs(false);
+                controler.setOverwriteFiles(true);
 				controler.run();
 			}		
 		}
@@ -314,8 +313,8 @@ class AllrouteTest {
 			if (i>=ini && i<=end ){
 				String configFile = configDirPath + s + STR_CONF;
 				Controler controler = new Controler( configFile) ;
-				controler.setCreateGraphs(false);
-				controler.setOverwriteFiles(true);
+                controler.getConfig().controler().setCreateGraphs(false);
+                controler.setOverwriteFiles(true);
 				controler.run();
 			}
 			i++;

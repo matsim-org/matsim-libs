@@ -148,8 +148,8 @@ public class ControlerTest {
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -166,8 +166,8 @@ public class ControlerTest {
 		strategyParams.addParam("Module_1", "ReRoute");
 		// Run the simulation again
 		controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setOverwriteFiles(true);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 
@@ -201,8 +201,8 @@ public class ControlerTest {
 		link.setNumberOfLanes(1);
 
 		final Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
@@ -269,8 +269,8 @@ public class ControlerTest {
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -351,8 +351,8 @@ public class ControlerTest {
 
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -394,8 +394,8 @@ public class ControlerTest {
 				3 == controler.getConfig().controler().getWriteEventsInterval());
 		controler.getConfig().controler().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -424,8 +424,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
@@ -457,8 +457,8 @@ public class ControlerTest {
 				0 == controler.getConfig().controler().getWriteEventsInterval());
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		assertEquals(0, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -480,8 +480,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -502,8 +502,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -524,8 +524,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -546,8 +546,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -566,8 +566,8 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 
 		controler.setDumpDataAtEnd(true);
 		controler.run();
@@ -586,8 +586,8 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setMobsimFactory(new FakeMobsimFactory());
 
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -608,8 +608,8 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		FakeMobsimFactory testFactory = new FakeMobsimFactory();
 		controler.setMobsimFactory(testFactory);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(2, testFactory.counter);
 	}
@@ -643,8 +643,8 @@ public class ControlerTest {
 			controler = new Controler(config);
 			CrashingMobsimFactory testFactory = new CrashingMobsimFactory();
 			controler.setMobsimFactory(testFactory);
-			controler.setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
+            controler.getConfig().controler().setCreateGraphs(false);
+            controler.setDumpDataAtEnd(false);
 			controler.run();
 		}
 	}
@@ -659,8 +659,8 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -679,8 +679,8 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -699,8 +699,8 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
 		controler.setMobsimFactory(new FakeMobsimFactory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -721,8 +721,8 @@ public class ControlerTest {
 		config.qsim().setSnapshotStyle("equiDist");
 
 		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
@@ -740,8 +740,8 @@ public class ControlerTest {
 		config.qsim().setSnapshotStyle("equiDist");
 
 		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
@@ -759,8 +759,8 @@ public class ControlerTest {
 		config.qsim().setSnapshotStyle("equiDist");
 
 		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());

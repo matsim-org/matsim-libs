@@ -52,9 +52,9 @@ public final class PMain {
         Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		
-		PModule builder = new PModule() ;
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        PModule builder = new PModule() ;
 		builder.configureControler(controler);
 
 		controler.run();

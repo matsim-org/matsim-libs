@@ -53,9 +53,9 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		Controler controler = new Controler(config);
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
-		
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		

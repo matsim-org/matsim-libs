@@ -23,7 +23,6 @@ package org.matsim.contrib.cadyts.car;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -110,9 +108,9 @@ public class CadytsCarIntegrationTest {
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
 			}} ) ;
-		
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.setMobsimFactory(new DummyMobsimFactory());
 		controler.run();
@@ -154,8 +152,8 @@ public class CadytsCarIntegrationTest {
 		// ===
 
 		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true);
 		
 		final CadytsContext cContext = new CadytsContext(config);

@@ -37,8 +37,8 @@ public class BenchmarkTest {
 	public static void main(String[] args) {
 		Controler ctl = new Controler("input/config.xml");
 		ctl.getConfig().controler().setWriteEventsInterval(5);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 }

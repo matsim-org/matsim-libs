@@ -41,8 +41,8 @@ public class RunPassengerPlansFromScratch {
 //		
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.setCreateGraphs(false);
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setOverwriteFiles(true);
 		
 		controler.run();
 

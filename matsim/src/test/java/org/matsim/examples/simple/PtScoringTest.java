@@ -22,10 +22,7 @@
  */
 package org.matsim.examples.simple;
 
-import java.util.List;
-
 import junit.framework.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -36,9 +33,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+
+import java.util.List;
 
 /**
  * @author nagel
@@ -56,9 +54,9 @@ public class PtScoringTest {
 
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		EventsCollector collector = new EventsCollector();
+        EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 
 		controler.run();
@@ -192,9 +190,9 @@ public class PtScoringTest {
 
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		EventsCollector collector = new EventsCollector();
+        EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 
 		controler.run();
@@ -331,9 +329,9 @@ public class PtScoringTest {
 
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		EventsCollector collector = new EventsCollector();
+        EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 
 		controler.run();
@@ -400,9 +398,9 @@ public class PtScoringTest {
 
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		EventsCollector collector = new EventsCollector();
+        EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
 
 		controler.run();

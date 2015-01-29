@@ -1,13 +1,10 @@
 package playground.wrashid.PSF.singleAgent;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
 import playground.wrashid.PSF.energy.SimulationStartupListener;
@@ -21,6 +18,8 @@ import playground.wrashid.PSF.parking.LogParkingTimes;
 import playground.wrashid.PSF.parking.ParkLog;
 import playground.wrashid.PSF.parking.ParkingTimes;
 
+import java.util.HashMap;
+
 public class BasicTest extends MatsimTestCase {
 
 	Controler controler;
@@ -31,9 +30,9 @@ public class BasicTest extends MatsimTestCase {
 		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/config.xml");
 
 		controler = new Controler(config);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		controler.addControlerListener(new AddEnergyScoreListener());
+        controler.addControlerListener(new AddEnergyScoreListener());
 	}
 
 	/*

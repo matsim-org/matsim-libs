@@ -23,12 +23,10 @@
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.run;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.matsim.core.controler.Controler;
-
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.BseUCControler;
+
+import java.io.IOException;
 
 /**
  * @author yu
@@ -50,8 +48,8 @@ public class Run {
 		}
 
 		ctl.setOverwriteFiles(true);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 	public static void runOld(String[] args) throws IOException {
@@ -64,8 +62,8 @@ public class Run {
 		}
 
 		ctl.setOverwriteFiles(true);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 	public static void runTest(String[] args) throws IOException {
@@ -83,8 +81,8 @@ public class Run {
 		}
 
 		ctl.setOverwriteFiles(true);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 	public static void main(String[] args) throws IOException {

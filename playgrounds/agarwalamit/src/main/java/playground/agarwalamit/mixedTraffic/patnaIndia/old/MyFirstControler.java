@@ -1,8 +1,5 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -17,9 +14,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyFirstControler {
 
@@ -83,8 +82,8 @@ public class MyFirstControler {
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
-		controler.setCreateGraphs(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 
 		if(seepage){
 			controler.setMobsimFactory(new SeepageMobsimfactory());

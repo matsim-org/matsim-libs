@@ -91,8 +91,8 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 		Controler controler = new ControlerWithRemoveOldestPlan(args[0]);
 		controler.addControlerListener(new ReRouteWithDiffTimeDistWeight(
 				Integer.parseInt(args[1])));
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 	}
 
 }

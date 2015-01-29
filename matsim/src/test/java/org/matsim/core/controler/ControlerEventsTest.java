@@ -20,10 +20,6 @@
 
 package org.matsim.core.controler;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -31,6 +27,10 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author dgrether
@@ -59,8 +59,8 @@ public class ControlerEventsTest extends MatsimTestCase {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 
 		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
@@ -78,8 +78,8 @@ public class ControlerEventsTest extends MatsimTestCase {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 
 		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
 		controler.run();
@@ -103,8 +103,8 @@ public class ControlerEventsTest extends MatsimTestCase {
 
 		// prepare remove test
 		controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		listener = new ControlerEventsTestListener(1, this);
 		// we know from the code above, that "add" works
 		controler.addControlerListener(listener);

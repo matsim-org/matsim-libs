@@ -58,8 +58,8 @@ public class TransitLoadIntegrationTest {
 		});
 
 		cfg.controler().setWritePlansInterval(0);
-		c.setCreateGraphs(false);
-		c.getConfig().controler().setWriteEventsInterval(0);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.getConfig().controler().setWriteEventsInterval(0);
 		c.setDumpDataAtEnd(false);
 		c.run();
 

@@ -56,8 +56,8 @@ public class Controller {
 	public Controller(String[] args){
 		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		addListener(c);
+        c.getConfig().controler().setCreateGraphs(false);
+        addListener(c);
 		c.run();
 	}
 	

@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.juliakern.internalizationExposure;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,12 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
@@ -52,12 +43,11 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import playground.benjamin.scenarios.munich.exposure.*;
 
-import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
-import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
-import playground.benjamin.scenarios.munich.exposure.GridTools;
-import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
-import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -121,9 +111,9 @@ public class TestExposurePricing {
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-	// controlerConfigGroup
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);

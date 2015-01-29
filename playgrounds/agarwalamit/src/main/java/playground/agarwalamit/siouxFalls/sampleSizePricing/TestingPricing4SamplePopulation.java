@@ -18,13 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls.sampleSizePricing;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,10 +34,16 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * @author amit
@@ -106,8 +105,8 @@ public class TestingPricing4SamplePopulation {
 			//			emissionModule.createEmissionHandler();
 
 			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(true);				
-			controler.setDumpDataAtEnd(false);
+            controler.getConfig().controler().setCreateGraphs(true);
+            controler.setDumpDataAtEnd(false);
 
 //			controler.addControlerListener(new EmissionControlerListner());
 			Scenario scenario = ScenarioUtils.loadScenario(config);

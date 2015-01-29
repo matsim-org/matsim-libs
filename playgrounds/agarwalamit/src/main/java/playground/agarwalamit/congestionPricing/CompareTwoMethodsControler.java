@@ -23,7 +23,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.internalizationCar.MarginalCostPricing;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
@@ -83,8 +82,8 @@ public class CompareTwoMethodsControler {
 		}
 
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		

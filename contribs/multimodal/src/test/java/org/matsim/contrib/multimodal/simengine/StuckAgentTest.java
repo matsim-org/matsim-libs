@@ -139,8 +139,8 @@ public class StuckAgentTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p4", "walk", null, 24.5*3600));	// departs after simulation has ended
 		
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		
 		// controler listener that initializes the multi-modal simulation

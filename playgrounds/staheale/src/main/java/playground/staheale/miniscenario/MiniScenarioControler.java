@@ -32,7 +32,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.staheale.occupancy.FacilitiesOccupancyCalculator;
 import playground.staheale.occupancy.FacilityOccupancy;
 import playground.staheale.scoring.AgentInteractionScoringFunctionFactory;
@@ -55,8 +54,8 @@ public class MiniScenarioControler extends Controler {
 
 	protected void setUp() {
 
-		this.setCreateGraphs(true);
-		this.setDumpDataAtEnd(false);
+        this.getConfig().controler().setCreateGraphs(true);
+        this.setDumpDataAtEnd(false);
 		this.getConfig().controler().setWriteEventsInterval(0);
 
 		ObjectAttributes attributes = new ObjectAttributes();

@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,6 +40,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author amit
@@ -141,9 +141,9 @@ public class SubPopControler {
 //		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
-		controler.setCreateGraphs(true);
-		
-		controler.addPlanStrategyFactory("ChangeLegMode_slum", new PlanStrategyFactory() {
+        controler.getConfig().controler().setCreateGraphs(true);
+
+        controler.addPlanStrategyFactory("ChangeLegMode_slum", new PlanStrategyFactory() {
 			String [] availableModes_slum = {"slum_bike","slum_motorbike","slum_pt","slum_walk"};
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario,

@@ -27,7 +27,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.benjamin.internalization.EmissionCostModule;
@@ -145,8 +144,8 @@ public class MunichControler {
 		}
 
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 

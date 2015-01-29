@@ -37,8 +37,8 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -93,8 +93,8 @@ public class CadytsIntegrationTest {
 				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario2, context));
 			}} ) ;
 
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.setMobsimFactory(new DummyMobsimFactory());
 		controler.run();
@@ -134,8 +134,8 @@ public class CadytsIntegrationTest {
 		// ===
 
 		final Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(true);
 
 		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
@@ -297,8 +297,8 @@ public class CadytsIntegrationTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		final Controler controler = new Controler( scenario );
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(true);
 
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
@@ -458,8 +458,8 @@ public class CadytsIntegrationTest {
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
 
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
 

@@ -122,9 +122,9 @@ public class InternalControler {
 		TransitConfigGroup transit = controler.getConfig().transit();
 		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
-		
-		controler.setCreateGraphs(false);
-		controler.run();		
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 	}
 
 	public double getMarginalUtlOfMoney() {

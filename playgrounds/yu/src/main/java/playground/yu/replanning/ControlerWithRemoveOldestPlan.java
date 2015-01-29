@@ -24,8 +24,6 @@
 package playground.yu.replanning;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
  * test the effect with "removeOldestPlan"
@@ -61,7 +59,7 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 		Controler controler = new ControlerWithRemoveOldestPlan(args);
 		// controler.addControlerListener(new OnePersonPlanScoreMonitor());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 	}
 }

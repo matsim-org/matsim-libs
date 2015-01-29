@@ -20,13 +20,6 @@
 
 package org.matsim.withinday.controller;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -39,11 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -67,6 +56,9 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * @author cdobler
@@ -102,8 +94,8 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		population.addPerson(createPerson(scenario, "p02"));
 		
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 		

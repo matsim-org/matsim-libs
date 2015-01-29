@@ -24,16 +24,12 @@
 package playground.ikaddoura;
 
 
-import java.io.IOException;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.selectors.AbstractPlanSelector;
-
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
+
+import java.io.IOException;
 
 /**
  * @author ikaddoura
@@ -74,9 +70,9 @@ public class PathSizeLogitControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-		if (pathSizeLogit){
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        if (pathSizeLogit){
 			
 			Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
 			builder.setActTypeWeight(0.);

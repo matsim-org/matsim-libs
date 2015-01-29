@@ -147,8 +147,8 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "unknown"));
 
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 
@@ -225,8 +225,8 @@ public class MultiModalControlerListenerTest {
 		PrepareMultiModalScenario.run(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setOverwriteFiles(true);
 

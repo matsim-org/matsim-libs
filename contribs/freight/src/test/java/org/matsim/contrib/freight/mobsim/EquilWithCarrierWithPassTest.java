@@ -69,8 +69,8 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 //		
 		controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.setCreateGraphs(false);
-//		CarrierConfig carrierConfig = new CarrierConfig();
+        controler.getConfig().controler().setCreateGraphs(false);
+        //		CarrierConfig carrierConfig = new CarrierConfig();
 //		carrierConfig.addCoreModules();
 		planFile = getClassInputDirectory() + "carrierPlansEquils.xml";
 //		carrierConfig.plans().setInputFile(planFile);

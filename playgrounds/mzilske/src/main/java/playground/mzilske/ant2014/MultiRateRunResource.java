@@ -198,7 +198,7 @@ class MultiRateRunResource {
         PopulationFromSightings.preparePopulation(scenario, linkIsZone, sightings);
 
         Controler controler = new Controler(scenario);
-        controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
     }
 
@@ -259,7 +259,7 @@ class MultiRateRunResource {
             });
         }
 
-        controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
     }
@@ -294,7 +294,7 @@ class MultiRateRunResource {
         }
 
         Controler controler = new Controler(scenario);
-        controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
     }
 

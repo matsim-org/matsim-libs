@@ -25,7 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
@@ -59,8 +58,8 @@ public class PricingControler {
 		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(true);
-		controler.setDumpDataAtEnd(true);
+        controler.getConfig().controler().setCreateGraphs(true);
+        controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		TollHandler tollHandler = new TollHandler(sc);

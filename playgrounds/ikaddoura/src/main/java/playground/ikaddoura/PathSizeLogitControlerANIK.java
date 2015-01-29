@@ -74,7 +74,7 @@ public class PathSizeLogitControlerANIK {
 		
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
         final Network network = controler.getScenario().getNetwork();
 		
 		if (pathSizeLogit){

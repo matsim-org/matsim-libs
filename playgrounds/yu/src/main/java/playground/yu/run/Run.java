@@ -21,7 +21,6 @@
 package playground.yu.run;
 
 import org.matsim.core.controler.Controler;
-
 import playground.yu.analysis.QVProfilControlerListener;
 import playground.yu.analysis.RouteTravelTimeSummary;
 import playground.yu.counts.CntSimCap4Chart;
@@ -43,8 +42,8 @@ public class Run {
 			controler.addControlerListener(new RouteTravelTimeSummary());
 			controler.addControlerListener(new QVProfilControlerListener());
 		}
-		controler.setCreateGraphs(Boolean.parseBoolean(args[1]));
-		controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setCreateGraphs(Boolean.parseBoolean(args[1]));
+        controler.setOverwriteFiles(true);
 		controler.run();
 	}
 

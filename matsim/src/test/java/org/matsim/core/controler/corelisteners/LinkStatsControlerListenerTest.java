@@ -275,9 +275,9 @@ public class LinkStatsControlerListenerTest {
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
-		
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -313,9 +313,9 @@ public class LinkStatsControlerListenerTest {
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
-		
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();

@@ -253,9 +253,9 @@ public class CountsControlerListenerTest {
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
-		
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -287,9 +287,9 @@ public class CountsControlerListenerTest {
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
-		
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -326,8 +326,8 @@ public class CountsControlerListenerTest {
 		// create and run controler
 		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -339,8 +339,8 @@ public class CountsControlerListenerTest {
 		controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -352,8 +352,8 @@ public class CountsControlerListenerTest {
 		controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -365,8 +365,8 @@ public class CountsControlerListenerTest {
 		controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();

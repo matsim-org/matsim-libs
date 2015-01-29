@@ -20,12 +20,11 @@
 
 package playground.meisterk.kti.controler;
 
-import java.io.File;
-
 import org.junit.Ignore;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.meisterk.kti.router.KtiTravelCostCalculatorFactory;
+
+import java.io.File;
 
 @Ignore("test requires real-world input data which cannot be uploaded to test server")
 public class KtiControlerTest extends MatsimTestCase {
@@ -38,8 +37,8 @@ public class KtiControlerTest extends MatsimTestCase {
 		testee.getConfig().plans().setInputFile(this.getClassInputDirectory() + "plans.xml.gz");
 		testee.getConfig().controler().setOutputDirectory(this.getOutputDirectory());
 
-		testee.setCreateGraphs(false);
-		testee.run();
+        testee.getConfig().controler().setCreateGraphs(false);
+        testee.run();
 
 //		PlansCalcRoute router = (PlansCalcRoute) testee.createRoutingAlgorithm();
 //		assertEquals(

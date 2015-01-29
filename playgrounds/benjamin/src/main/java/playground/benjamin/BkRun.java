@@ -60,9 +60,9 @@ public class BkRun {
 		
 	// controler settings	
 		kontrolle.setOverwriteFiles(true);
-		kontrolle.setCreateGraphs(false);
-		
-	// controlerConfigGroup
+        kontrolle.getConfig().controler().setCreateGraphs(false);
+
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = kontrolle.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(1500);

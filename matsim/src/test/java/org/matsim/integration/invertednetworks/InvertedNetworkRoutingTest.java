@@ -70,8 +70,8 @@ public class InvertedNetworkRoutingTest {
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
-		c.setCreateGraphs(false);
-		final TestEventHandler testHandler = new TestEventHandler();
+        c.getConfig().controler().setCreateGraphs(false);
+        final TestEventHandler testHandler = new TestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
@@ -88,8 +88,8 @@ public class InvertedNetworkRoutingTest {
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
-		c.setCreateGraphs(false);
-		final TestEventHandler testHandler = new TestEventHandler();
+        c.getConfig().controler().setCreateGraphs(false);
+        final TestEventHandler testHandler = new TestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
@@ -114,8 +114,8 @@ public class InvertedNetworkRoutingTest {
 		sd.addTurningMoveRestriction(Id.create(23, Link.class));
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
-		c.setCreateGraphs(false);
-		final TestEventHandler testHandler = new TestEventHandler();
+        c.getConfig().controler().setCreateGraphs(false);
+        final TestEventHandler testHandler = new TestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
@@ -133,8 +133,8 @@ public class InvertedNetworkRoutingTest {
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
-		c.setCreateGraphs(false);
-		final TestEventHandler testHandler = new TestEventHandler();
+        c.getConfig().controler().setCreateGraphs(false);
+        final TestEventHandler testHandler = new TestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
@@ -154,8 +154,8 @@ public class InvertedNetworkRoutingTest {
 		f.scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(false);
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
-		c.setCreateGraphs(false);
-		final TestEventHandler testHandler = new TestEventHandler();
+        c.getConfig().controler().setCreateGraphs(false);
+        final TestEventHandler testHandler = new TestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {

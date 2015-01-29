@@ -50,8 +50,8 @@ public class VControler{
 		Controler controler = new Controler(scenario);
 		
 //		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		controler.run();
+        controler.run();
 	}		
 }

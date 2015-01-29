@@ -74,9 +74,9 @@ public class RunTestRoad {
 
 			// controler settings	
 			controler.setOverwriteFiles(true);
-			controler.setCreateGraphs(false);
+            controler.getConfig().controler().setCreateGraphs(false);
 
-			// config settings
+            // config settings
 			config.controler().setOutputDirectory(outputPath + day + "/");
 			config.controler().setFirstIteration(0);
 			config.controler().setLastIteration(0);

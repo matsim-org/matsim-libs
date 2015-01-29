@@ -2,7 +2,6 @@ package playground.jjoubert.CommercialModel;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-
 import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityListener;
 
 public class MyCommercialControlerV01 {
@@ -16,8 +15,8 @@ public class MyCommercialControlerV01 {
 		long t = System.currentTimeMillis();
 		
 		// Set some Controler characteristics
-		c.setCreateGraphs(true);
-		c.getConfig().controler().setWriteEventsInterval(20);
+        c.getConfig().controler().setCreateGraphs(true);
+        c.getConfig().controler().setWriteEventsInterval(20);
 		
 		/*
 		 * Add all the listeners

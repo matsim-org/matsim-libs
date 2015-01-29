@@ -61,8 +61,8 @@ public class Controler_eThekwini_Census {
 		config.qsim().setNumberOfThreads(numberOfThreadsQSim);
 
 		Controler c = new Controler(config);
-		c.setCreateGraphs(true);
-		c.getConfig().controler().setWriteEventsInterval(20);
+        c.getConfig().controler().setCreateGraphs(true);
+        c.getConfig().controler().setWriteEventsInterval(20);
 		c.setOverwriteFiles(overwrite);
 		
 		c.run();

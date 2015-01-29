@@ -106,8 +106,8 @@ public class InnovationSwitchOffTest {
 		}
 		
 		Controler ctrl = new Controler(config);
-		ctrl.setCreateGraphs(false);
-		ctrl.addControlerListener(new BeforeMobsimListener(){
+        ctrl.getConfig().controler().setCreateGraphs(false);
+        ctrl.addControlerListener(new BeforeMobsimListener(){
 			@Override
 			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 				System.out.flush() ;

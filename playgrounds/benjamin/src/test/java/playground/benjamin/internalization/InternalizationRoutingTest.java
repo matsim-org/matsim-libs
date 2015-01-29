@@ -19,20 +19,13 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -55,6 +48,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author benjamin
@@ -228,9 +224,9 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private void specifyControler() {
 		// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
 
-		// controlerConfigGroup
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setFirstIteration(0);
 		ccg.setLastIteration(0);

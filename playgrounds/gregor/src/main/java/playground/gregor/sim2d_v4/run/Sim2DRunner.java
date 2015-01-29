@@ -28,7 +28,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -238,12 +237,12 @@ public class Sim2DRunner implements IterationStartsListener{
 		if ((event.getIteration()) % 1 == 0 || event.getIteration() > 50) {
 //			this.factory.debug(this.visDebugger);
 			this.controller.getEvents().addHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(true);
-		} else {
+            this.controller.getConfig().controler().setCreateGraphs(true);
+        } else {
 //			this.factory.debug(null);
 			this.controller.getEvents().removeHandler(this.qSimDrawer);
-			this.controller.setCreateGraphs(false);
-		}
+            this.controller.getConfig().controler().setCreateGraphs(false);
+        }
 //		this.visDebugger.setIteration(event.getIteration());
 	}
 }

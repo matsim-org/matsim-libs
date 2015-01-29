@@ -338,6 +338,16 @@ public class ControlerConfigGroup extends ConfigGroup {
 		return createGraphs;
 	}
 
+    /**
+     * Sets whether graphs showing some analyses should automatically be
+     * generated during the simulation. The generation of graphs usually takes a
+     * small amount of time that does not have any weight in big simulations,
+     * but add a significant overhead in smaller runs or in test cases where the
+     * graphical output is not even requested.
+     *
+     * @param createGraphs
+     *            true if graphs showing analyses' output should be generated.
+     */
 	public void setCreateGraphs(boolean createGraphs) {
 		this.createGraphs = createGraphs;
 	}

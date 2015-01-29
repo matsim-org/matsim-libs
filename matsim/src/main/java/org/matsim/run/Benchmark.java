@@ -19,19 +19,19 @@
 
 package org.matsim.run;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+
+import java.io.IOException;
 
 public class Benchmark {
 
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.loadConfig("test/scenarios/benchmark/config.xml");
 		Controler ctl = new Controler(config);
-		ctl.setCreateGraphs(false);
-		ctl.run();
+        ctl.getConfig().controler().setCreateGraphs(false);
+        ctl.run();
 	}
 
 }

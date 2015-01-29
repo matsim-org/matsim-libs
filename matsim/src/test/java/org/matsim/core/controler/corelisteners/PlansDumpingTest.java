@@ -19,16 +19,16 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author mrieser
@@ -44,9 +44,9 @@ public class PlansDumpingTest {
 		config.controler().setWritePlansInterval(3);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
-		c.setCreateGraphs(false);
+        c.getConfig().controler().setCreateGraphs(false);
 
-		c.run();
+        c.run();
 
 		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written
@@ -68,9 +68,9 @@ public class PlansDumpingTest {
 		config.controler().setWritePlansInterval(0);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
-		c.setCreateGraphs(false);
+        c.getConfig().controler().setCreateGraphs(false);
 
-		c.run();
+        c.run();
 
 		assertFalse(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertFalse(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is deactivated when interval = 0
@@ -92,9 +92,9 @@ public class PlansDumpingTest {
 		config.controler().setWritePlansInterval(1);
 		Controler c = new Controler(config);
 		c.getConfig().controler().setWriteEventsInterval(0);
-		c.setCreateGraphs(false);
+        c.getConfig().controler().setCreateGraphs(false);
 
-		c.run();
+        c.run();
 
 		assertTrue(new File(c.getControlerIO().getIterationFilename(0, "plans.xml.gz")).exists());
 		assertTrue(new File(c.getControlerIO().getIterationFilename(1, "plans.xml.gz")).exists()); // it.1 is always written

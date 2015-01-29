@@ -89,10 +89,10 @@ public class SpaceTimeProbability {
 
 				Controler controler = new Controler(scenario);
 				controler.setOverwriteFiles(true);
-				controler.setCreateGraphs(false);
+                controler.getConfig().controler().setCreateGraphs(false);
 
 
-				final LinkLeaveCountHandler handler = new LinkLeaveCountHandler();
+                final LinkLeaveCountHandler handler = new LinkLeaveCountHandler();
 				StartupListener startupListener = new StartupListener() {
 					@Override
 					public void notifyStartup(StartupEvent event) {

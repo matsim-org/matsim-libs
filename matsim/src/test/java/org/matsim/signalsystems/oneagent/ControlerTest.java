@@ -20,7 +20,6 @@
 package org.matsim.signalsystems.oneagent;
 
 import junit.framework.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -67,8 +66,8 @@ public class ControlerTest {
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.addControlerListener(new AfterMobsimListener() {
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.addControlerListener(new AfterMobsimListener() {
 
 			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {

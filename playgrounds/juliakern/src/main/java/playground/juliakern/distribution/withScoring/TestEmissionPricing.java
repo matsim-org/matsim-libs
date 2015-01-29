@@ -86,9 +86,9 @@ public class TestEmissionPricing {
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-	// controlerConfigGroup
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);

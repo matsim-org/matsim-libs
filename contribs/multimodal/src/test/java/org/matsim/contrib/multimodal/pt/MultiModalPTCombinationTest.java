@@ -101,8 +101,8 @@ public class MultiModalPTCombinationTest {
         config.travelTimeCalculator().setFilterModes(true);
 
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 		

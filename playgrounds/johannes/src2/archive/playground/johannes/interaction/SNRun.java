@@ -57,8 +57,8 @@ public class SNRun {
 	public static void main(String[] args) throws IOException {
 		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		c.setWriteEventsInterval(0);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setWriteEventsInterval(0);
 		c.addControlerListener(new SNSetup());
 		c.run();
 		

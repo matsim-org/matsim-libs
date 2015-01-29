@@ -60,8 +60,8 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 //		 test the default
 		config.controler().setOutputDirectory(getOutputDirectory() + "/default");
 		Controler controler = new Controler(config);
-		controler.setCreateGraphs(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 
         Population population = controler.getScenario().getPopulation();
@@ -85,8 +85,8 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 		loader.loadScenario();
 
 		Controler controler2 = new Controler(scenario);
-		controler2.setCreateGraphs(false);
-		controler2.getConfig().controler().setWriteEventsInterval(0);
+        controler2.getConfig().controler().setCreateGraphs(false);
+        controler2.getConfig().controler().setWriteEventsInterval(0);
 		controler2.run();
 
         Population population2 = controler2.getScenario().getPopulation();

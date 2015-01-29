@@ -645,21 +645,8 @@ public class Controler extends AbstractController {
 		this.overwriteFiles = overwrite;
 	}
 
-	/**
-	 * Sets whether graphs showing some analyses should automatically be
-	 * generated during the simulation. The generation of graphs usually takes a
-	 * small amount of time that does not have any weight in big simulations,
-	 * but add a significant overhead in smaller runs or in test cases where the
-	 * graphical output is not even requested.
-	 *
-	 * @param createGraphs
-	 *            true if graphs showing analyses' output should be generated.
-	 */
-	public final void setCreateGraphs(final boolean createGraphs) {
-		this.config.controler().setCreateGraphs(createGraphs);
-	}
 
-	/**
+    /**
 	 * @param dumpData
 	 *            <code>true</code> if at the end of a run, plans, network,
 	 *            config etc should be dumped to a file.

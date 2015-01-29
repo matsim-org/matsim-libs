@@ -19,23 +19,17 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.emissions;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author benjamin
@@ -69,9 +63,9 @@ public class RunEmissionToolOnline {
 		
 	// controler settings	
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		
-	// controlerConfigGroup
+        controler.getConfig().controler().setCreateGraphs(false);
+
+        // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);

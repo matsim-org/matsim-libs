@@ -11,8 +11,8 @@ public class NoPseudoSim {
 	public static void main(String[] args) {
 		Controler c = new Controler(args);
 		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		c.run();
+        c.getConfig().controler().setCreateGraphs(false);
+        c.run();
 		
 	}
 

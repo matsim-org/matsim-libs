@@ -39,8 +39,8 @@ public class TransitIntegrationTest {
 		config.plans().setInputFile("test/scenarios/pt-tutorial/population2.xml");
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.run();
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.run();
 
 		ScenarioImpl s = (ScenarioImpl) controler.getScenario();
 		Assert.assertNotNull(s.getTransitSchedule());

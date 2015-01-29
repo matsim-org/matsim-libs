@@ -29,8 +29,8 @@ public class RunEquil {
 	 */
 	public static void main(String[] args) {
 		Controler c = new Controler(args[0]	);
-		c.setCreateGraphs(false);
-		c.setOverwriteFiles(true);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setOverwriteFiles(true);
 		c.run();
 	}
 

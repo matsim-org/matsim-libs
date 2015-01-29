@@ -1,20 +1,9 @@
 package playground.jjoubert.roadpricing.analysis;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import nl.knaw.dans.common.dbflib.CorruptedTableException;
 import nl.knaw.dans.common.dbflib.IfNonExistent;
 import nl.knaw.dans.common.dbflib.Record;
 import nl.knaw.dans.common.dbflib.Table;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -22,6 +11,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 public class MyGantryComparatorTest extends MatsimTestCase{
 	private final static Logger log = Logger.getLogger(MyGantryComparatorTest.class);
@@ -243,16 +238,16 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		config.controler().setWritePlansInterval(0);
 		
 		Controler c = new Controler(config);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.run();
 		
 		config.plans().setInputFile(getClassInputDirectory() + "50.plans110.xml.gz");
 		config.controler().setOutputDirectory(getOutputDirectory() + "Output2/");
 		
 		c = new Controler(config);
-		c.setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setCreateGraphs(false);
+        c.setDumpDataAtEnd(false);
 		c.run();		
 	}
 

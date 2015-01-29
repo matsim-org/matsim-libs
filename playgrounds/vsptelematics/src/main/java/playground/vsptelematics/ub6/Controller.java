@@ -24,11 +24,9 @@
 package playground.vsptelematics.ub6;
 
 
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-
 import playground.vsptelematics.common.IncidentGenerator;
 
 /**
@@ -48,8 +46,8 @@ public class Controller extends Controler {
 	public static void main(String[] args) {
 		Controller c = new Controller(args);
 		c.setOverwriteFiles(true);
-		c.setCreateGraphs(false);
-		addListener(c);
+        c.getConfig().controler().setCreateGraphs(false);
+        addListener(c);
 		c.setScoringFunctionFactory(new NoScoringFunctionFactory());
 //		throw new RuntimeException("I removed the overriding of loadCoreListeners() below since that method should become " +
 //				"final in Controler.  I am not sure why this was needed; it looks like it was supposed to be a less heavyweight version of the" +

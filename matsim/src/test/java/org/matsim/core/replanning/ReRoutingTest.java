@@ -62,8 +62,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -72,8 +72,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -85,8 +85,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
@@ -95,8 +95,8 @@ public class ReRoutingTest extends MatsimTestCase {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
 		Controler controler = new Controler(scenario);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
 		controler.run();
 		this.evaluate();
 	}
