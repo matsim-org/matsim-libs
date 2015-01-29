@@ -76,6 +76,8 @@ public class TieUtility {
 	}
 
 	public static class GumbelErrorTerm implements ErrorTerm {
+		private static final int N_THROWN_DRAWS = 2;
+
 		// avoid re-instanciating random over and over,
 		// while remaining thread-safe
 		private final ThreadLocal<Random> random =
@@ -101,8 +103,8 @@ public class TieUtility {
 			rnd.setSeed( seed );
 
 			// take a few draws to come to the "chaotic region"
-			for (int i = 0; i < 5; i++) {
-				rnd.nextDouble();
+			for (int i = 0; i < N_THROWN_DRAWS; i++) {
+				rnd.nextInt();
 			}
 
 			double uniform = rnd.nextDouble();
