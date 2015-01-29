@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated;
 
+import gnu.trove.list.TCharList;
+import gnu.trove.list.array.TCharArrayList;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Level;
@@ -39,9 +44,8 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.FileWriterEvolutionListener;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunner;
@@ -82,22 +86,25 @@ public class RunArentzeModel {
 		log.info( "###### secondary sampling rate: " + config.getSecondarySamplingRate() );
 		log.info( "################################################################################" );
 
-		final SocialPopulation<ArentzeAgent> population = parsePopulation( config.getInputPopulationFile() );
+		final ArentzePopulation population = parsePopulation( config.getInputPopulationFile() );
 
-		final TieUtility<ArentzeAgent> utility = 
-			new TieUtility< >(
-				new DeterministicPart<ArentzeAgent>() {
+		final TieUtility utility = 
+			new TieUtility(
+				new DeterministicPart() {
 						@Override
 						public double calcDeterministicPart(
-								final ArentzeAgent ego,
-								final ArentzeAgent alter ) {
-							final int ageClassDifference = Math.abs( ego.getAgeCategory() - alter.getAgeCategory() );
+								final int ego,
+								final int alter ) {
+							final int ageClassDifference =
+							Math.abs(
+								population.getAgeCategory( ego ) -
+								population.getAgeCategory( alter ) );
 
 							// increase distance by 1 (normally meter) to avoid linking with all agents
 							// living in the same place.
 							// TODO: test sensitivity of the results to this
-							return pars.getB_logDist() * Math.log( CoordUtils.calcDistance( ego.getCoord(), alter.getCoord() ) + 1 )
-									+ pars.getB_sameGender() * dummy( ego.isMale() == alter.isMale() )
+							return pars.getB_logDist() * Math.log( CoordUtils.calcDistance( population.getCoord( ego ), population.getCoord( alter ) ) + 1 )
+									+ pars.getB_sameGender() * dummy( population.isMale( ego ) == population.isMale( alter ) )
 									+ pars.getB_ageDiff0() * dummy( ageClassDifference == 0 )
 									+ pars.getB_ageDiff2() * dummy( ageClassDifference == 2 )
 									+ pars.getB_ageDiff3() * dummy( ageClassDifference == 3 )
@@ -107,7 +114,7 @@ public class RunArentzeModel {
 					new GumbelErrorTerm(),
 					false ); // cache
 		final ModelRunner runner =
-			new PreprocessedModelRunner<ArentzeAgent>(
+			new PreprocessedModelRunner(
 					config.getLowestCachedUtilityPrimary(),
 					config.getLowestCachedUtilitySecondary(),
 					population,
@@ -153,14 +160,17 @@ public class RunArentzeModel {
 		return b ? 1 : 0;
 	}
 
-	public static SocialPopulation<ArentzeAgent> parsePopulation(final String populationFile) {
-		final SocialPopulation<ArentzeAgent> population = new SocialPopulation<ArentzeAgent>();
-
+	public static ArentzePopulation parsePopulation(final String populationFile) {
 		final Counter counter = new Counter( "convert person to agent # " );
 		final ObjectPool<Coord> coordPool = new ObjectPool<Coord>();
 
+		final List<Id> ids = new ArrayList<Id>();
+		final TCharList ageCategories = new TCharArrayList();
+		final List<Boolean> isMales = new ArrayList<Boolean>();
+		final List<Coord> coords = new ArrayList<Coord>();
+
 		new MatsimXmlParser() {
-			private ArentzeAgent agentWithoutCoord = null;
+			private boolean missCoord = false;
 
 			@Override
 			public void startTag(
@@ -179,28 +189,25 @@ public class RunArentzeModel {
 					try {
 						final int age = Integer.parseInt( atts.getValue( "age" ) );
 						if ( age < 0 ) throw new IllegalArgumentException( ""+age );
-						final int ageCategory = age <= 23 ? 1 : age <= 37 ? 2 : age <= 50 ? 3 : age <= 65 ? 4 : 5;
+						final char ageCategory = age <= 23 ? (char) 1 : age <= 37 ? (char) 2 : age <= 50 ? (char) 3 : age <= 65 ? (char) 4 : (char) 5;
 						final boolean male = atts.getValue( "sex" ).equals( "m" );
 
-						agentWithoutCoord =
-								new ArentzeAgent(
-									Id.create( atts.getValue( "id" ) , Person.class ),
-									ageCategory,
-									male );
+						ids.add( Id.create( atts.getValue( "id" ) , Person.class ) );
+						ageCategories.add( ageCategory );
+						isMales.add( male );
 
-						population.addAgent(
-								agentWithoutCoord );
+						missCoord = true;
 					}
 					catch (Exception e) {
 						throw new RuntimeException( "exception when processing person "+atts , e );
 					}
 				}
 
-				if ( name.equals( "act" ) && agentWithoutCoord != null ) {
+				if ( name.equals( "act" ) && missCoord ) {
 					final double x = Double.parseDouble( atts.getValue( "x" ) );
 					final double y = Double.parseDouble( atts.getValue( "y" ) );
-					agentWithoutCoord.setCoord( coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
-					agentWithoutCoord = null;
+					coords.add( coordPool.getPooledInstance( new CoordImpl( x , y ) ) );
+					missCoord = false;
 				}
 
 			}
@@ -213,44 +220,44 @@ public class RunArentzeModel {
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );
 
-		return population;
+		final boolean[] malesArray = new boolean[ isMales.size() ];
+		for ( int i = 0; i < malesArray.length; i++ )  {
+			malesArray[ i ] = isMales.get( i ).booleanValue();
+		}
+
+		return new ArentzePopulation(
+				ids.toArray( new Id[ ids.size() ] ),
+				ageCategories.toArray(),
+				malesArray,
+				coords.toArray( new Coord[ ids.size() ] ) );
 	}
 
-	public static class ArentzeAgent implements Agent {
-		private final Id<Person> id;
-		private final int ageCategory;
-		private final boolean isMale;
-		private Coord coord = null;
+	private static class ArentzePopulation extends IndexedPopulation {
+		private final char[] ageCategory;
+		private final boolean[] isMale;
+		private final Coord[] coord;
 
-		public ArentzeAgent(
-				final Id<Person> id,
-				final int ageCategory,
-				final boolean male) {
-			this.id = id;
+		protected ArentzePopulation(
+				final Id[] ids,
+				final char[] ageCategory,
+				final boolean[] isMale,
+				final Coord[] coord ) {
+			super( ids );
 			this.ageCategory = ageCategory;
-			this.isMale = male;
-		}
-
-		@Override
-		public Id<Person> getId() {
-			return id;
-		}
-
-		public int getAgeCategory() {
-			return this.ageCategory;
-		}
-
-		public boolean isMale() {
-			return this.isMale;
-		}
-
-		public Coord getCoord() {
-			return this.coord;
-		}
-
-		public void setCoord(final Coord coord) {
-			if ( this.coord != null ) throw new IllegalStateException();
+			this.isMale = isMale;
 			this.coord = coord;
+		}
+
+		public char getAgeCategory( final int agent ) {
+			return ageCategory[ agent ];
+		}
+
+		public boolean isMale( final int agent ) {
+			return isMale[ agent ];
+		}
+
+		public Coord getCoord( final int agent ) {
+			return coord[ agent ];
 		}
 	}
 
