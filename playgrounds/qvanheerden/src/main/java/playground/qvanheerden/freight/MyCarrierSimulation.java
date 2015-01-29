@@ -19,6 +19,8 @@ import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
+import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -45,9 +47,8 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
 import playground.southafrica.utilities.Header;
-import usecases.analysis.CarrierScoreStats;
-import usecases.analysis.LegHistogram;
 
 import java.util.ArrayList;
 import java.util.Collection;
