@@ -68,14 +68,15 @@ public class PreprocessedModelRunner<T extends Agent> implements ModelRunner {
 	private final int nThreads;
 
 	public PreprocessedModelRunner(
-			final double minUtility,
+			final double minUtilityPrimary,
+			final double minUtilitySecondary,
 			final SocialPopulation<T> population ,
 			final TieUtility<T> utility ,
 			final double primarySampleRate ,
 			final double secondarySampleRate ,
 			final int nThreads ) {
-		this.preprocess = new WeightedSocialNetwork( minUtility );
-		this.preprocessFriendsOfFriends = new DoublyWeightedSocialNetwork( minUtility );
+		this.preprocess = new WeightedSocialNetwork( minUtilityPrimary );
+		this.preprocessFriendsOfFriends = new DoublyWeightedSocialNetwork( minUtilitySecondary );
 
 		this.secondarySampleRate = secondarySampleRate;
 		this.population = population;

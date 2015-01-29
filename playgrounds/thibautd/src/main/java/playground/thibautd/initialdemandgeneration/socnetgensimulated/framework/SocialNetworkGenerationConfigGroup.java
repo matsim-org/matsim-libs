@@ -42,7 +42,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
 
-	private double lowestCachedUtility = -300;
+	private double lowestCachedUtilityPrimary = -50;
+	private double lowestCachedUtilitySecondary = -400;
 
 	private int nThreads = 1;
 
@@ -111,15 +112,26 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.targetClustering = targetClustering;
 	}
 
-	@StringGetter( "lowestCachedUtility" )
-	public double getLowestCachedUtility() {
-		return lowestCachedUtility;
+	@StringGetter( "lowestCachedUtilityPrimary" )
+	public double getLowestCachedUtilityPrimary() {
+		return lowestCachedUtilityPrimary;
 	}
 
-	@StringSetter( "lowestCachedUtility" )
-	public void setLowestCachedUtility( double lowestCachedUtility ) {
-		this.lowestCachedUtility = lowestCachedUtility;
+	@StringSetter( "lowestCachedUtilityPrimary" )
+	public void setLowestCachedUtilityPrimary( double lowestCachedUtility ) {
+		this.lowestCachedUtilityPrimary = lowestCachedUtility;
 	}
+
+	@StringGetter( "lowestCachedUtilitySecondary" )
+	public double getLowestCachedUtilitySecondary() {
+		return lowestCachedUtilitySecondary;
+	}
+
+	@StringSetter( "lowestCachedUtilitySecondary" )
+	public void setLowestCachedUtilitySecondary( double lowestCachedUtility ) {
+		this.lowestCachedUtilitySecondary = lowestCachedUtility;
+	}
+
 
 	@StringGetter( "nThreads" )
 	public int getNThreads() {
