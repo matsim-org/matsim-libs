@@ -182,7 +182,7 @@ public abstract class AbstractModule {
         return binder.getProvider(Key.get(typeLiteral));
     }
 
-    public static AbstractModule override(final Iterable<AbstractModule> modules, final AbstractModule abstractModule) {
+    public static AbstractModule override(final Iterable<? extends AbstractModule> modules, final AbstractModule abstractModule) {
         return new AbstractModule() {
             @Override
             public void install() {

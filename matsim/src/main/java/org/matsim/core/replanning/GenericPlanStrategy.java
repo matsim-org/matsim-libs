@@ -22,7 +22,12 @@ import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 
 /**
- * @author nagel
+ * Notes:<ul>
+ * <li> If an implementation of this interface is "innovative", i.e. modifies plans, then it should first copy that plan, add the new plan to the choice set,
+ * and then modify that new copy.  Otherwise, the evolutionary functionality of MATSim will probably be destroyed. kai, jan'15
+ * </ul>
+ * 
+ * @author (of "Generic"PlanStrategy) Kai Nagel
  *
  */
 public interface GenericPlanStrategy<T extends BasicPlan, I> {

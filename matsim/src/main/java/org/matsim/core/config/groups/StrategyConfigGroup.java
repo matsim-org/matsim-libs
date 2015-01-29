@@ -326,7 +326,16 @@ public class StrategyConfigGroup extends ConfigGroup {
 	}
 
 	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
-		delegate.setPlanSelectorForRemoval(planSelectorForRemoval);
+		switch ( planSelectorForRemoval ) {
+		case "SelectExpBeta" :
+			throw new RuntimeException("'SelectExpBeta' was replaced by 'SelectExpBetaForRemoval' in the plans removal setting" ) ;
+		case "ChangeExpBeta" :
+			throw new RuntimeException("'ChangeExpBeta' was replaced by 'ChangeExpBetaForRemoval' in the plans removal setting" ) ;
+		case "PathSizeLogitSelector" :
+			throw new RuntimeException("'PathSizeLogitSelector' was replaced by 'PathSizeLogitSelectorForRemoval' in the plans removal setting" ) ;
+		default: 
+			delegate.setPlanSelectorForRemoval(planSelectorForRemoval) ;
+		}
 	}
 
 	public double getFractionOfIterationsToDisableInnovation() {

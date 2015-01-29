@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,20 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.kai.usecases.ownTravelDisutility;
 
-package org.matsim.core.replanning;
-
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**
- *  * Notes:<ul>
- * <li> If an implementation of this interface is "innovative", i.e. modifies plans, then it should first copy that plan, add the new plan to the choice set,
- * and then modify that new copy.  Otherwise, the evolutionary functionality of MATSim will probably be destroyed. kai, jan'15
- * </ul>
- * 
+ * @author nagel
+ *
  */
-public interface PlanStrategy extends GenericPlanStrategy<Plan, Person> {
+public class MyTravelDisutility implements TravelDisutility {
 
+	@Override
+	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
 
 }

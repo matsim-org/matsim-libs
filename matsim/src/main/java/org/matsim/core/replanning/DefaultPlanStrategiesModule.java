@@ -40,9 +40,9 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     public void install() {
         addPlanSelectorForRemovalBinding("WorstPlanSelector").to(WorstPlanForRemovalSelector.class);
         addPlanSelectorForRemovalBinding("SelectRandom").to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
-        addPlanSelectorForRemovalBinding("SelectExpBeta").toProvider(ExpBetaPlanSelectorForRemoval.class);
-        addPlanSelectorForRemovalBinding("ChangeExpBeta").toProvider(ExpBetaPlanChangerForRemoval.class);
-        addPlanSelectorForRemovalBinding("PathSizeLogitSelector").toProvider(PathSizeLogitSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding("SelectExpBetaForRemoval").toProvider(ExpBetaPlanSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding("ChangeExpBetaForRemoval").toProvider(ExpBetaPlanChangerForRemoval.class);
+        addPlanSelectorForRemovalBinding("PathSizeLogitSelectorForRemoval").toProvider(PathSizeLogitSelectorForRemoval.class);
 
         // strategy packages that only select:
 		addPlanStrategyBindingToFactory(Selector.KeepLastSelected.toString(), new KeepLastSelectedPlanStrategyFactory());

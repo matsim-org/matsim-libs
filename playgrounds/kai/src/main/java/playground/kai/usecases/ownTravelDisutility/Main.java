@@ -20,7 +20,9 @@
 /**
  * 
  */
-package playground.kai.usecases.plansremoval;
+package playground.kai.usecases.ownTravelDisutility;
+
+import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -28,9 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-
 
 /**
  * @author nagel
@@ -42,32 +43,30 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final String selectorName = "MySelectorForRemoval" ;
-
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		
-		config.strategy().setPlanSelectorForRemoval( selectorName );
+		config.strategy().setPlanSelectorForRemoval( "MySelectorForRemoval" );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		Controler ctrl = new Controler( scenario ) ;
-		
-		// create a controler defaults "module":
-		AbstractModule modules = new ControlerDefaultsModule() ;
 
-		// create the module that adds the new functionality:
-		AbstractModule modules2 = new AbstractModule(){
+		// create my own disutlity:
+		final TravelDisutility travelDisutility = new MyTravelDisutility() ;
+		
+		// wrap it into a "Module" for the TravelDisutility class:
+		final AbstractModule abstractModule = new AbstractModule() {
 			@Override
 			public void install() {
-				PlanSelector selector = new MySelectorForRemoval() ;
-				this.addPlanSelectorForRemovalBinding(selectorName).toInstance( selector ) ;
-				// (as with the other registers, this will only be used when referred to by the config) 
-				
+				this.bindToInstance(TravelDisutility.class, travelDisutility);
 			}
-		} ; 
+		};
+		
+		// override the default TravelDisutility entry:
+		AbstractModule modules = AbstractModule.override(Arrays.asList(new ControlerDefaultsModule()), abstractModule) ;
 
-		// set both of them simultaneously ; 
-		ctrl.setModules(modules,modules2);
+		// set the result in the controler:
+		ctrl.setModules( modules );
 		
 		ctrl.run();
 
