@@ -41,6 +41,7 @@ import org.xml.sax.Attributes;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.Agent;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.FileWriterEvolutionListener;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunner;
@@ -119,11 +120,15 @@ public class RunArentzeModel {
 					config.getTargetClustering(),
 					config.getTargetDegree() );
 
+		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory()+"/threshold-evolution.dat" );
+		modelIterator.addListener( fileListener );
+
 		final SocialNetwork network =
 			modelIterator.iterateModelToTarget(
 					runner,
 					config.getInitialPoints() );
 
+		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();

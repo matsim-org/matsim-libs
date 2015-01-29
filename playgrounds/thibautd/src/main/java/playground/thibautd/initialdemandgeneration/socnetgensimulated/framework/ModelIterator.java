@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -46,9 +48,12 @@ public class ModelIterator {
 
 	private static final double SEARCH_STEP = 10;
 
+	private final List<EvolutionListener> listeners = new ArrayList< >();
+
 	public ModelIterator( double targetClustering , double targetDegree ) {
 		this.targetClustering = targetClustering;
 		this.targetDegree = targetDegree;
+		listeners.add( new EvolutionLogger() );
 	}
 
 	public SocialNetwork iterateModelToTarget(
@@ -67,12 +72,16 @@ public class ModelIterator {
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
 			thresholds.setResultingClustering( SnaUtils.calcClusteringCoefficient( sn ) );
 
-			log.info( "generated network for "+thresholds );
+			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds );
 
 			memory.add( thresholds );
 
 			if ( isAcceptable( thresholds ) ) return sn;
 		}
+	}
+
+	public void addListener( final EvolutionListener l ) {
+		listeners.add( l );
 	}
 
 	private boolean isAcceptable(
@@ -219,6 +228,17 @@ public class ModelIterator {
 		public ThresholdsReference(
 				final String name ) {
 			this.name = name;
+		}
+	}
+
+	public static interface EvolutionListener {
+		public void handleNewResult( Thresholds t );
+	}
+
+	private static class EvolutionLogger implements EvolutionListener {
+		@Override
+		public void handleNewResult( final Thresholds t ) {
+			log.info( "generated network for "+t );
 		}
 	}
 }
