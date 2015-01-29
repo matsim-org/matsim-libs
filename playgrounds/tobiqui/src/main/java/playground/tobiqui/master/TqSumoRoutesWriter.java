@@ -180,7 +180,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		for (Id<Vehicle> vehicleId : getVehiclesSortedByDeparture()){
 			if (vehicleId.toString().startsWith("car")){
 				String vehId = vehicleId.toString();
-				for (Person p : persons.stream().filter(pers -> vehId.contains(pers.getId().toString())).toArray(Person[]::new)) {
+				for (Person p : persons) {
 					Id<Person> id = p.getId();
 					PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 					Boolean next = false;
@@ -238,7 +238,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			if (vehicleId.toString().startsWith("bus")){
 				Boolean next = false;
 				String vehId = vehicleId.toString();
-				for (TransitLine transitLine : transitSchedule.getTransitLines().values().stream().filter(transLn -> vehId.contains(transLn.getId().toString())).toArray(TransitLine[]::new)) {
+				for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
 					
 					for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 						
