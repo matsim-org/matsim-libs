@@ -22,6 +22,7 @@ package playground.anhorni.locationchoice.run.scoring;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -79,8 +80,11 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		Controler c = event.getControler();
 
         for (Person p : c.getScenario().getPopulation().getPersons().values()) {
-			
-			ScoringFunction sf = c.getPlansScoring().getScoringFunctionForAgent(p.getId());
+
+            PlansScoring result;
+
+//            ScoringFunction sf = result.getScoringFunctionForAgent(p.getId());
+            ScoringFunction sf = null;
 			if (sf instanceof ScoringFunctionAccumulator) {
 				if (((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0) instanceof ActivityScoringFunction) {
 					asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0);

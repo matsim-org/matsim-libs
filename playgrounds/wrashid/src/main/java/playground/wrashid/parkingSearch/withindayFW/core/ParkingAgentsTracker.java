@@ -37,6 +37,7 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -742,8 +743,13 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		for (Id personId : this.parkingIterationScoreSum.keySet()) {
 			processScoreOfLastParking(personId);
 
-			ScoringFunction scoringFunction = event.getControler().getPlansScoring().getScoringFunctionForAgent(personId);
-			
+            PlansScoring result;
+//            throw new RuntimeException("To modify scoring for your Agents, please either:" +
+//"(1) throw a PersonMoneyEvent for an appropriate amount or" +
+//"(2) set a custom ScoringFunctionFactory which calculates what you need or" +
+//"(3) talk to developers list.");
+//            ScoringFunction scoringFunction = result.getScoringFunctionForAgent(personId);
+			ScoringFunction scoringFunction = null;
 			double amount = GlobalParkingSearchParams.getParkingScoreWeight() *  parkingIterationScoreSum.get(personId);
 			scoringFunction.addMoney(amount);
 		}

@@ -22,6 +22,7 @@ package playground.meisterk.kti.controler.listeners;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -79,8 +80,14 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		Controler c = event.getControler();
 
         for (Person p : c.getScenario().getPopulation().getPersons().values()) {
-			
-			ScoringFunction sf = c.getPlansScoring().getScoringFunctionForAgent(p.getId());
+
+            PlansScoring result;
+//            throw new RuntimeException("To modify scoring for your Agents, please either:" +
+//"(1) throw a PersonMoneyEvent for an appropriate amount or" +
+//"(2) set a custom ScoringFunctionFactory which calculates what you need or" +
+//"(3) talk to developers list.");
+//            ScoringFunction sf = result.getScoringFunctionForAgent(p.getId());
+            ScoringFunction sf = null;
 			if (sf instanceof ScoringFunctionAccumulator) {
 				if (((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0) instanceof playground.meisterk.kti.scoring.ActivityScoringFunction) {
 					asf = (playground.meisterk.kti.scoring.ActivityScoringFunction) ((ScoringFunctionAccumulator) sf).getActivityScoringFunctions().get(0);

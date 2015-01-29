@@ -526,16 +526,7 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(ScoreStats.class);
 	}
 
-	@SuppressWarnings("static-method")
-	@Deprecated
-	public final PlansScoring getPlansScoring() {
-		throw new RuntimeException("To modify scoring for your Agents, please either:" +
-                "(1) throw a PersonMoneyEvent for an appropriate amount or" +
-                "(2) set a custom ScoringFunctionFactory which calculates what you need or" +
-                "(3) talk to developers list.");
-	}
-
-	public final TravelDisutilityFactory getTravelDisutilityFactory() {
+    public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.injector.getInstance(TravelDisutilityFactory.class);
 	}
 
