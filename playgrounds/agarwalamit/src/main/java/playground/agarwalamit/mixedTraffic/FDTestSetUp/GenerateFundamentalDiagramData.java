@@ -99,6 +99,7 @@ public class GenerateFundamentalDiagramData {
 	private Scenario scenario;
 
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	static PassingEventsUpdator passingEventsUpdator;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 
 	private Integer[] STARTING_POINT;
@@ -113,14 +114,14 @@ public class GenerateFundamentalDiagramData {
 
 	public static void main(String[] args) {
 
-//		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
+		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
 
-//		String OUTPUT_FOLDER ="/carBike_Holes/";
+		String OUTPUT_FOLDER ="/carBikePassingRate/4c1b";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
-//		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
+		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
 
 		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1./2.,1./2.};
+		Double [] modalSplit = {4.,0.25};
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -135,8 +136,10 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setReduceDataPointsByFactor(10);
 		//		generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
-		generateFDData.setIsPlottingDistribution(true);
+		//		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.run();
+
+
 	}
 
 	private void consistencyCheckAndInitialize(){
@@ -379,8 +382,10 @@ public class GenerateFundamentalDiagramData {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(this.scenario, this.mode2FlowData);
+		passingEventsUpdator  = new PassingEventsUpdator();
 
 		events.addHandler(globalFlowDynamicsUpdator);
+		events.addHandler(passingEventsUpdator);
 
 		EventWriterXML eventWriter = new EventWriterXML(RUN_DIR+"/events.xml");
 		if(writeInputFiles){
@@ -416,6 +421,15 @@ public class GenerateFundamentalDiagramData {
 		}
 		if(!globalFlowDynamicsUpdator.isPermanent()) stableState=false;
 
+		// sometimes higher density points are also executed (stuck time), to exclude them density check.
+		double cellSizePerPCU = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize();
+		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU) * 3 * InputsForFDTestSetUp.NO_OF_LANES;
+
+		if(stableState){
+			double globalLinkDensity = globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity();
+			if(globalLinkDensity > networkDensity/3+10) stableState =false; //+10; since we still need some points at max density to show zero speed.
+		}
+
 		if(WRITE_FD_DATA && stableState) {
 			writer.format("%d\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
 			for (int i=0; i < TRAVELMODES.length; i++){
@@ -436,6 +450,11 @@ public class GenerateFundamentalDiagramData {
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
 			}
+			writer.print("\t");
+			writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassed());
+
+			writer.print("\t");
+			writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			writer.print("\n");
 		}
 		//storing data in map
@@ -537,6 +556,12 @@ public class GenerateFundamentalDiagramData {
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
+		writer.print("\t");
+		writer.print("numberOfBikesPassed \t");
+
+		writer.print("\t");
+		writer.print("avgBikePassingRate");
+
 		writer.print("\n");
 	}
 
