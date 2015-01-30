@@ -26,10 +26,10 @@ public class Test {
 	 */
 	public static void main(String[] args) throws IOException {
 		String configFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/config_default.xml";
-		String populationInput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/Test.xml";
+		String populationInput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/output_plans.xml";
 		String vehiclesInput = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
 		String transitScheduleInput = "E:/MA/workspace/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
-		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestSumo_.xml";
+		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo_.xml";
 		String populationOutput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestSorted.xml"; //if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
 		
 		List<Person> persons = new ArrayList<>();
