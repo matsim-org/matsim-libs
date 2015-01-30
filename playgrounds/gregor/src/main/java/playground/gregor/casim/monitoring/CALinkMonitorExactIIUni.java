@@ -298,6 +298,7 @@ public class CALinkMonitorExactIIUni extends CALinkMonitorExact {
 				}
 				vDs = new Variance();
 				cnt = 0;
+				from = to;
 			}
 
 			to++;

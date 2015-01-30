@@ -32,10 +32,12 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 
 	private static final Logger log = Logger
 			.getLogger(CAMultiLaneNetwork.class);
+	private CADensityEstimatorKernel k;
 
 	public CAMultiLaneNetwork(Network net, EventsManager em,
-			CANetsimEngine engine) {
-		super(net, em, engine, null);
+			CANetsimEngine engine, CASimDensityEstimatorFactory fac) {
+		super(net, em, engine, fac);
+		this.k = fac.createCASimDensityEstimator(this);
 		init();
 		if (STATIC_VIS_HANDLER != null) {
 			((CASimVisRequestHandler) STATIC_VIS_HANDLER).intitialize(this);
@@ -43,7 +45,7 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 	}
 
 	private void init() {
-
+		CAMultiLaneLink.k = (MultiLaneDensityEstimator) k;
 		super.tFreeMin = Double.POSITIVE_INFINITY;
 		for (Node n : this.net.getNodes().values()) {
 
@@ -66,6 +68,7 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 				}
 			}
 			if (rev != null) {
+
 				CALink revCA = this.caLinks.get(rev.getId());
 				if (revCA != null) {
 					this.caLinks.put(l.getId(), revCA);

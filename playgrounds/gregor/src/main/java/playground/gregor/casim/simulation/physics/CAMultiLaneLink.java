@@ -51,11 +51,17 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private static final Logger log = Logger.getLogger(CAMultiLaneLink.class);
 
+	static final double LANESWITCH_TS_TTA = 1.8;
+	private static final double LANESWITCH_TS_SWAP = 0;
+	// private static final double LANESWITCH_TS_TTA = 1111.8;
+	// private static final double LANESWITCH_TS_SWAP = 1111;
+
 	private final Link dsl;
 	private final Link usl;
 
 	private final CAMoveableEntity[][] particles;
-	private final double[][] lastLeftTimes;
+	private final double[][] lastLeftDsTimes;
+	private final double[][] lastLeftUsTimes;
 
 	private final int size;
 
@@ -94,6 +100,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private final LinkedHashSet<CAMoveableEntity> dsWaitQ = new LinkedHashSet<>();
 	private final LinkedHashSet<CAMoveableEntity> usWaitQ = new LinkedHashSet<>();
 
+	static MultiLaneDensityEstimator k; // TODO clean this up
+
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
 			CAMultiLaneNode us, AbstractCANetwork net) {
 
@@ -113,7 +121,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		this.dsl = dsl;
 		this.usl = usl;
 		this.particles = new CAMoveableEntity[lanes][this.size];
-		this.lastLeftTimes = new double[lanes][this.size];
+		this.lastLeftDsTimes = new double[lanes][this.size];
+		this.lastLeftUsTimes = new double[lanes][this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.laneCellLength / AbstractCANetwork.V_HAT;
@@ -156,6 +165,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			// log.warn("Agent: " + a + " not on expected position!!");
 			return;
 		}
+		a.setRho(k.estRho(a));
 		double time = e.getEventExcexutionTime();
 		if (e.getCAEventType() == CAEventType.SWAP) {
 			handelSwap(a, time);
@@ -265,36 +275,83 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAOnLinkDownStream(CAMoveableEntity a, double time) {
 		int idx = a.getPos();
 		int lane = a.getLane();
+		int dir = a.getDir();
 
 		// check pre-condition
-		if (this.particles[lane][idx + 1] == null) {
-			double z = getZ(a);
-			z *= this.ratio;
-			if (this.lastLeftTimes[lane][idx + 1] <= (time - z + epsilon)) {
-				handleTTAOnLinkDownStreamOnPreCondition1(a, time, idx, lane);
-			} else {
-				handleTTAOnLinkDownStreamOnPreCondition2(a, time, idx, lane);
+		int newLane = this.particles[lane][idx + dir] == null ? lane : -1;
+		double z = getZ(a);
+		z *= this.ratio;
+		z -= epsilon;
+
+		if (a.getRho() >= LANESWITCH_TS_TTA) {
+			newLane = -1;
+			int from = lane > 0 ? lane - 1 : lane;
+			int to = lane < (this.lanes - 1) ? lane + 1 : lane;
+			// 1. collect candidates
+			List<Integer> cands = new ArrayList<>();// maybe gnu trove
+													// collections
+													// would helpful here to
+													// speed
+													// things up a bit
+			for (int i = from; i <= to; i++) {
+				if (this.particles[i][idx + dir] == null) {
+					double timeGap = time - this.lastLeftDsTimes[i][idx + dir];
+					if (timeGap >= z) {// candidate
+						cands.add(i);
+					}
+				}
 			}
+
+			// 2. choose the one with the largest free space
+			int bestTr = 0;
+			for (int cand : cands) {
+				int tr = dir;
+				;
+				while (tr < 10) { // figure this out, something like 1/rhoHat
+									// [GL,
+									// Jan '15]
+					if (this.particles[cand][idx + tr] == null) {
+						tr += dir;
+					} else {
+						break;
+					}
+					if (idx + tr >= this.size - 1) {
+						break;
+					}
+				}
+
+				if (tr > bestTr) {
+					bestTr = tr;
+					newLane = cand;
+				}
+			}
+		}
+		if (newLane > -1) {
+			handleTTAOnLinkDownStreamOnPreCondition1(a, time, idx, lane,
+					newLane);
+		} else if (this.particles[lane][idx + 1] == null) {
+			handleTTAOnLinkDownStreamOnPreCondition2(a, time, idx, lane);
 		} else {
 			handleTTAOnLinkDownStreamOnPreCondition3(a, time);
 		}
-
 	}
 
 	private void handleTTAOnLinkDownStreamOnPreCondition1(CAMoveableEntity a,
-			double time, int idx, int lane) {
+			double time, int idx, int currLane, int newLane) {
 
-		this.lastLeftTimes[lane][idx] = time;
-		this.particles[lane][idx] = null;
-		this.particles[lane][idx + 1] = a;
+		this.lastLeftDsTimes[currLane][idx] = time;
+		this.particles[currLane][idx] = null;
+		this.particles[newLane][idx + 1] = a;
+		a.setLane(newLane);
 		a.proceed();
 
 		// check post-condition and generate events
 		// first for persons behind
-		checkPostConditionForPersonBehindOnDownStreamAdvance(idx, time, lane);
+		checkPostConditionForPersonBehindOnDownStreamAdvance(idx, time,
+				currLane);
 
 		// second for oneself
-		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, lane);
+		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, newLane);
 
 	}
 
@@ -312,6 +369,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx - 1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == 1) {
+					toBeTriggered.setRho(k.estRho(toBeTriggered));
 					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered, this, time + z);
@@ -389,7 +447,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		double z = getZ(a);
 		z *= this.ratio;
-		double zStar = z - (time - this.lastLeftTimes[lane][idx + 1]);
+		double zStar = z - (time - this.lastLeftDsTimes[lane][idx + 1]);
 		double nextTime = time + zStar;
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -403,16 +461,61 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAOnLinkUpStream(CAMoveableEntity a, double time) {
 		int idx = a.getPos();
 		int lane = a.getLane();
+		int dir = a.getDir();
 
 		// check pre-condition
-		if (this.particles[lane][idx - 1] == null) {
-			double z = getZ(a);
-			z *= this.ratio;
-			if (this.lastLeftTimes[lane][idx - 1] <= (time - z + epsilon)) {
-				handleTTAOnLinkUpStreamOnPreCondition1(a, time, idx, lane);
-			} else {
-				handleTTAOnLinkUpStreamOnPreCondition2(a, time, idx, lane);
+		int newLane = this.particles[lane][idx + dir] == null ? lane : -1;
+		double z = getZ(a);
+		z *= this.ratio;
+		z -= epsilon;
+
+		if (a.getRho() >= LANESWITCH_TS_TTA) {
+			newLane = -1;
+			int from = lane > 0 ? lane - 1 : lane;
+			int to = lane < (this.lanes - 1) ? lane + 1 : lane;
+			// 1. collect candidates
+			List<Integer> cands = new ArrayList<>();// maybe gnu trove
+													// collections
+													// would helpful here to
+													// speed
+													// things up a bit
+			for (int i = from; i <= to; i++) {
+				if (this.particles[i][idx - 1] == null) {
+					double timeGap = time - this.lastLeftUsTimes[i][idx - 1];
+					if (timeGap >= z) {// candidate
+						cands.add(i);
+					}
+				}
 			}
+
+			// 2. choose the one with the largest free space
+			int bestTr = 0;
+			for (int cand : cands) {
+				int tr = dir;
+				;
+				while (tr > -10) { // figure this out, something like 1/rhoHat
+									// [GL,
+									// Jan '15]
+					if (this.particles[cand][idx + tr] == null) {
+						tr += dir;
+					} else {
+						break;
+					}
+					if (idx + tr <= 0) {
+						break;
+					}
+				}
+
+				if (tr < bestTr) {
+					bestTr = tr;
+					newLane = cand;
+				}
+			}
+		}
+		if (newLane > -1) {
+			handleTTAOnLinkUpStreamOnPreCondition1(a, time, idx, lane, newLane);
+		} else if (this.particles[lane][idx - 1] == null) {
+			handleTTAOnLinkUpStreamOnPreCondition2(a, time, idx, lane);
 		} else {
 			handleTTAOnLinkUpStreamOnPreCondition3(a, time);
 		}
@@ -420,19 +523,20 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTAOnLinkUpStreamOnPreCondition1(CAMoveableEntity a,
-			double time, int idx, int lane) {
+			double time, int idx, int currLane, int newLane) {
 
-		this.lastLeftTimes[lane][idx] = time;
-		this.particles[lane][idx] = null;
-		this.particles[lane][idx - 1] = a;
+		this.lastLeftUsTimes[currLane][idx] = time;
+		this.particles[currLane][idx] = null;
+		this.particles[newLane][idx - 1] = a;
+		a.setLane(newLane);
 		a.proceed();
 
 		// check post-condition and generate events
 		// first for persons behind
-		checkPostConditionForPersonBehindOnUpStreamAdvance(idx, time, lane);
+		checkPostConditionForPersonBehindOnUpStreamAdvance(idx, time, currLane);
 
 		// second for oneself
-		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, lane);
+		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, newLane);
 
 	}
 
@@ -451,6 +555,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx + 1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == -1) {
+					toBeTriggered.setRho(k.estRho(toBeTriggered));
 					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered, this, time + z);
@@ -524,7 +629,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			double time, int idx, int lane) {
 		double z = getZ(a);
 		z *= this.ratio;
-		double zStar = z - (time - this.lastLeftTimes[lane][idx - 1]);
+		double zStar = z - (time - this.lastLeftUsTimes[lane][idx - 1]);
 		double nextTime = time + zStar;
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -601,7 +706,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			double time, int nodeLane) {
 
 		int lane = a.getLane();
-		this.lastLeftTimes[lane][this.size - 1] = time;
+		this.lastLeftDsTimes[lane][this.size - 1] = time;
 		this.particles[lane][this.size - 1] = null;
 		this.ds.putAgentInSlot(nodeLane, a);
 		a.materialize(Integer.MAX_VALUE, Integer.MAX_VALUE, nodeLane);
@@ -710,7 +815,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			double time, int nodeSlot) {
 
 		int lane = a.getLane();
-		this.lastLeftTimes[lane][0] = time;
+		this.lastLeftUsTimes[lane][0] = time;
 		this.particles[lane][0] = null;
 		this.us.putAgentInSlot(nodeSlot, a);
 
@@ -775,9 +880,10 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		swapA.moveOverNode(this, time);
 
 		this.particles[lane][this.size - 1] = swapA;
-		this.lastLeftTimes[lane][this.size - 1] = time;
+		this.lastLeftDsTimes[lane][this.size - 1] = time;
 		this.ds.putAgentInSlot(nodeSlot, a);
 		a.materialize(Integer.MIN_VALUE, Integer.MIN_VALUE, nodeSlot);
+		swapA.setRho(k.estRho(swapA));
 
 		fireDownstreamLeft(a, time);
 		fireDownstreamEntered(swapA, time);
@@ -812,12 +918,14 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		CAMoveableEntity swapA = this.us.pollAgentFromSlot(nodeLane);
 
 		this.particles[lane][0] = swapA;
-		this.lastLeftTimes[lane][0] = time;
+		this.lastLeftUsTimes[lane][0] = time;
 		this.us.putAgentInSlot(nodeLane, a);
 		a.materialize(Integer.MIN_VALUE, Integer.MIN_VALUE, nodeLane);
 		swapA.materialize(0, 1, lane);
 		swapA.moveOverNode(this, time);
 		swapA.invalidate();
+
+		swapA.setRho(k.estRho(swapA));
 
 		fireUpstreamLeft(a, time);
 		fireUpstreamEntered(swapA, time);
@@ -888,18 +996,120 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		int nbIdx = idx + 1;
 		CAMoveableEntity nb = this.particles[lane][nbIdx];
-		this.particles[lane][nbIdx] = a;
-		this.particles[lane][idx] = nb;
 
-		this.lastLeftTimes[lane][nbIdx] = time;
-		this.lastLeftTimes[lane][idx] = time;
+		// check if nb is null; if so trigger a new TTA event
+		if (nb == null || nb.getDir() == 1) {
+			triggerTTA(a, this, time);
+			return;
+		}
+
+		nb.setRho(k.estRho(nb));
+
+		int bestLaneA = lane;
+		// check for lane switch
+		if (a.getRho() >= LANESWITCH_TS_SWAP) {
+
+			int bestTr = 1;
+			for (; bestTr < 10; bestTr++) {
+				int pos = nbIdx + bestTr * a.getDir();
+				if (pos >= this.size || this.particles[lane][pos] != null) {
+					break;
+				}
+			}
+			if (lane > 0) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = nbIdx + tr * a.getDir();
+					if (pos >= this.size
+							|| this.particles[lane - 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneA = lane - 1;
+				}
+			}
+			if (lane < this.lanes - 1) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = nbIdx + tr * a.getDir();
+					if (pos >= this.size
+							|| this.particles[lane + 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneA = lane + 1;
+				}
+			}
+
+		}
+		this.particles[bestLaneA][nbIdx] = a;
+		a.setLane(bestLaneA);
+
+		int bestLaneNb = lane;
+		// check for lane switch
+		if (nb.getRho() >= LANESWITCH_TS_SWAP) {
+
+			int bestTr = 1;
+			for (; bestTr < 10; bestTr++) {
+				int pos = idx + bestTr * nb.getDir();
+				if (pos < 0 || this.particles[lane][pos] != null) {
+					break;
+				}
+			}
+			if (lane > 0) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = idx + tr * nb.getDir();
+					if (pos < 0 || this.particles[lane - 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneNb = lane - 1;
+				}
+			}
+			if (lane < this.lanes - 1) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = idx + tr * nb.getDir();
+					if (pos < 0 || this.particles[lane + 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneNb = lane + 1;
+				}
+			}
+
+		}
+		this.particles[bestLaneNb][idx] = nb;
+		nb.setLane(bestLaneNb);
+
+		this.lastLeftUsTimes[lane][nbIdx] = time;
+		this.lastLeftDsTimes[lane][idx] = time;
 
 		nb.invalidate();
 		nb.proceed();
 		a.proceed();
 
-		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, lane);
-		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time, lane);
+		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time, bestLaneA);
+		if (bestLaneNb != lane) {
+			this.particles[lane][idx] = null;
+			checkPostConditionForPersonBehindOnDownStreamAdvance(idx, time,
+					lane);
+		}
+		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time, bestLaneNb);
+		if (bestLaneA != lane) {
+			this.particles[lane][nbIdx] = null;
+			checkPostConditionForPersonBehindOnUpStreamAdvance(nbIdx, time,
+					lane);
+		}
 
 	}
 
@@ -908,18 +1118,118 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		int nbIdx = idx - 1;
 		CAMoveableEntity nb = this.particles[lane][nbIdx];
-		this.particles[lane][nbIdx] = a;
-		this.particles[lane][idx] = nb;
+		// check if nb is null; if so trigger a new TTA event
+		if (nb == null || nb.getDir() == -1) {
+			triggerTTA(a, this, time);
+			return;
+		}
+		nb.setRho(k.estRho(nb));
+		int bestLaneA = lane;
+		// check for lane switch
+		if (a.getRho() >= LANESWITCH_TS_SWAP) {
 
-		this.lastLeftTimes[lane][nbIdx] = time;
-		this.lastLeftTimes[lane][idx] = time;
+			int bestTr = 1;
+			for (; bestTr < 10; bestTr++) {
+				int pos = nbIdx + bestTr * a.getDir();
+				if (pos < 0 || this.particles[lane][pos] != null) {
+					break;
+				}
+			}
+			if (lane > 0) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = nbIdx + tr * a.getDir();
+					if (pos < 0 || this.particles[lane - 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneA = lane - 1;
+				}
+			}
+			if (lane < this.lanes - 1) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = nbIdx + tr * a.getDir();
+					if (pos < 0 || this.particles[lane + 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneA = lane + 1;
+				}
+			}
+
+		}
+		this.particles[bestLaneA][nbIdx] = a;
+		a.setLane(bestLaneA);
+
+		int bestLaneNb = lane;
+		// check for lane switch
+		if (nb.getRho() >= LANESWITCH_TS_SWAP) {
+
+			int bestTr = 1;
+			for (; bestTr < 10; bestTr++) {
+				int pos = idx + bestTr * nb.getDir();
+				if (pos >= this.size || this.particles[lane][pos] != null) {
+					break;
+				}
+			}
+			if (lane > 0) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = idx + tr * nb.getDir();
+					if (pos >= this.size
+							|| this.particles[lane - 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneNb = lane - 1;
+				}
+			}
+			if (lane < this.lanes - 1) {
+				int tr = 0;
+				for (; tr < 10; tr++) {
+					int pos = idx + tr * nb.getDir();
+					if (pos >= this.size
+							|| this.particles[lane + 1][pos] != null) {
+						break;
+					}
+				}
+				if (tr > bestTr) {
+					bestTr = tr;
+					bestLaneNb = lane + 1;
+				}
+			}
+
+		}
+		this.particles[bestLaneNb][idx] = nb;
+		nb.setLane(bestLaneNb);
+
+		this.lastLeftDsTimes[lane][nbIdx] = time;
+		this.lastLeftUsTimes[lane][idx] = time;
 
 		nb.invalidate();
 		nb.proceed();
 		a.proceed();
 
-		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, lane);
-		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time, lane);
+		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time, bestLaneA);
+		if (bestLaneNb != lane) {
+			this.particles[lane][idx] = null;
+			checkPostConditionForPersonBehindOnUpStreamAdvance(idx, time, lane);
+		}
+
+		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time,
+				bestLaneNb);
+		if (bestLaneA != lane) {
+			this.particles[lane][nbIdx] = null;
+			checkPostConditionForPersonBehindOnDownStreamAdvance(nbIdx, time,
+					lane);
+		}
 
 	}
 
@@ -942,8 +1252,12 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		return this.size;
 	}
 
-	public double[] getLastLeftTimes(int lane) {
-		return this.lastLeftTimes[lane];
+	public double[] getLastLeftDsTimes(int lane) {
+		return this.lastLeftDsTimes[lane];
+	}
+
+	public double[] getLastLeftUsTimes(int lane) {
+		return this.lastLeftUsTimes[lane];
 	}
 
 	@Override
@@ -1012,7 +1326,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx,
 			int lane) {
-		this.lastLeftTimes[lane][idx] = time;
+		if (a.getDir() == 1) {
+			this.lastLeftDsTimes[lane][idx] = time;
+		} else {
+			this.lastLeftUsTimes[lane][idx] = time;
+		}
 		this.particles[lane][idx] = null;
 		CANetsimEngine engine = this.net.getEngine();
 		if (engine != null) {
@@ -1031,7 +1349,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	public void reset() {
 		for (int i = 0; i < this.lanes; i++) {
 			for (int j = 0; j < this.size; j++) {
-				lastLeftTimes[i][j] = 0;
+				lastLeftDsTimes[i][j] = 0;
+				lastLeftUsTimes[i][j] = 0;
 				if (particles[i][j] != null) {
 					CAMoveableEntity part = particles[i][j];
 					this.net.unregisterAgent(part);

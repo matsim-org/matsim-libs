@@ -19,34 +19,13 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-
-import playground.gregor.casim.simulation.CANetsimEngine;
-
-public class CAMultiLaneNetworkFactory implements CANetworkFactory {
-
-	private static final Logger log = Logger
-			.getLogger(CAMultiLaneNetworkFactory.class);
-	private CASimDensityEstimatorFactory fac;
+public class CAMultiLaneDensityEstimatorSPHFactory implements
+		CASimDensityEstimatorFactory {
 
 	@Override
-	public CANetwork createCANetwork(Network net, EventsManager em,
-			CANetsimEngine engine) {
-		return new CAMultiLaneNetwork(net, em, engine, fac);
-	}
-
-	@Override
-	public void setDensityEstimatorFactory(CASimDensityEstimatorFactory fac) {
-		if (!(fac instanceof CAMultiLaneDensityEstimatorSPHFactory)) {
-			log.warn(CASimDensityEstimatorFactory.class.toString()
-					+ " of type:" + fac.getClass().toString()
-					+ " is not allowd here! Ignored!");
-			return;
-		}
-		this.fac = fac;
-
+	public CADensityEstimatorKernel createCASimDensityEstimator(
+			AbstractCANetwork net) {
+		return new CAMultiLaneDensityEstimatorSPH(net);
 	}
 
 }

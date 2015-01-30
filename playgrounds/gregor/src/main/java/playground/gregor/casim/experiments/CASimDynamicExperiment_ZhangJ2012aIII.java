@@ -102,9 +102,9 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 				continue;
 			}
 			i++;
-			r0 = 1;
+			r0 = 3.6;
 
-			settings.add(new Setting(r0, r0, r0));
+			settings.add(new Setting(r0, 2.4, r0));
 		}
 
 	}
@@ -123,7 +123,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 
 	public static void main(String[] args) throws IOException {
 		USE_SPH = true;
-		VIS = false;
+		VIS = true;
 		AbstractCANetwork.EMIT_VIS_EVENTS = VIS;
 		for (int R = 12; R <= 12; R++) {
 			CASingleLaneDensityEstimatorSPH.H = R;
@@ -159,10 +159,10 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 				double bBuff = bR;
 
 				double rCL = 1 / (AbstractCANetwork.RHO_HAT * bR);
-				double rL = rCL * 30000 + 1;
+				double rL = rCL * 5000 + 1;
 
 				double lCL = 1 / (AbstractCANetwork.RHO_HAT * bL);
-				double lL = lCL * 30000 + 1;
+				double lL = lCL * 5000 + 1;
 
 				double xCl = 1 / (AbstractCANetwork.RHO_HAT * bEx);
 				double xL = xCl * 100 + 1;
@@ -525,7 +525,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 			int skip = 20;
 			int cnt = 0;
 			for (int i = particles.length - 1; i >= 0; i -= skip) {
-				if (cnt > 150 && skip > 12 || cnt > 300) {
+				if (cnt > 50) {
 					System.out.println(skip + " " + cnt);
 					cnt = 0;
 					skip--;
@@ -562,7 +562,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 			int cnt = 0;
 			for (int i = 0; i < particles.length; i += skip) {
 
-				if (cnt > 150 && skip > 12 || cnt > 300) {
+				if (cnt > 50) {
 					skip--;
 					cnt = 0;
 					if (skip == 10) {
@@ -596,7 +596,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 						.getLink().getCapacity());
 		caNet.addMonitor(monitor);
 		monitor.init();
-		caNet.run(3600);
+		caNet.run(300);
 		try {
 			monitor.report(bw2);
 		} catch (IOException e) {

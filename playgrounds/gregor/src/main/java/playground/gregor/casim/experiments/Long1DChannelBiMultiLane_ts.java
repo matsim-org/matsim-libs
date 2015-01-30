@@ -43,12 +43,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
-import playground.gregor.casim.monitoring.CALinkMonitorExactII;
+import playground.gregor.casim.monitoring.CALinkMultiLaneMonitor;
 import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CAEvent;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
+import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPH;
+import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHFactory;
+import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHII;
+import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetwork;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
@@ -59,7 +63,6 @@ import playground.gregor.casim.simulation.physics.CASingleLaneDensityEstimatorSP
 import playground.gregor.casim.simulation.physics.CASingleLaneDensityEstimatorSPH;
 import playground.gregor.casim.simulation.physics.CASingleLaneDensityEstimatorSPHFactory;
 import playground.gregor.casim.simulation.physics.CASingleLaneDensityEstimatorSPHII;
-import playground.gregor.casim.simulation.physics.CASingleLaneLink;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -69,53 +72,69 @@ import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
-public class Long1DChannelBi {
+public class Long1DChannelBiMultiLane_ts {
 
-	public final static boolean USE_MULTI_LANE_MODEL = false;
+	public final static boolean USE_MULTI_LANE_MODEL = true;
 	private static BufferedWriter bw;
 	private static boolean USE_SPH;
 
 	public static final class Setting {
-		public Setting(double bl, double bCor, double bEx) {
+		private int pR;
+		private int pL;
+		private double bexR;
+		private double bexL;
+
+		public Setting(double bl, double bCor, double br, int pL, int pR,
+				double bexR, double bexL) {
 			this.bL = bl;
 			this.bCor = bCor;
-			this.bEx = bEx;
+			this.bR = br;
+			this.pL = pL;
+			this.pR = pR;
+			this.bexR = bexR;
+			this.bexL = bexL;
+
 		}
 
 		public double bL;
 		public double bCor;
-		public double bEx;
+		public double bR;
+
+		@Override
+		public String toString() {
+
+			return "bl: " + bL + " cor:" + bCor + " br:" + bR + " bexL:" + bexL
+					+ " bexR:" + bexR;
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
+		List<Setting> settings = new ArrayList<>();
+		settings.add(new Setting(2, 3.6, 2, 143, 166, 3.6, 3.6));
+
 		AbstractCANetwork.EMIT_VIS_EVENTS = true;
 		USE_SPH = true;
-
 		for (int R = 12; R <= 12; R++) {
 			CASingleLaneDensityEstimatorSPH.H = R;
-			CASingleLaneDensityEstimatorSPHII.H = R;
+			CAMultiLaneDensityEstimatorSPH.H = R;
+			CAMultiLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPA.RANGE = R;
+			CASingleLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPAII.RANGE = R;
 			try {
-				bw = new BufferedWriter(
-						new FileWriter(new File(
-								"/Users/laemmel/devel/bipedca/ant/rho_new_bi_spl_"
-										+ R)));
+				bw = new BufferedWriter(new FileWriter(new File(
+						"/Users/laemmel/devel/bipedca/ant/multi-spl-bi_200_200_ts_"
+								+ R)));
+				// bw = new BufferedWriter(
+				// new FileWriter(new File(
+				// "/home/laemmel/scenarios/bipedca/rho_new_uni_spl_"
+				// + R)));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
-			for (int ii = 0; ii < 20; ii++) {
-				System.out
-						.println("+++++++++++++++++++++++++++++++++++++++++++++++++++");
-				System.out.println("it:" + ii);
-				System.out
-						.println("+++++++++++++++++++++++++++++++++++++++++++++++++++");
-				double w = 0;
-				while (w < 1 || w > 3) {
-					w = 2 + MatsimRandom.getRandom().nextGaussian();
-				}
-				w = AbstractCANetwork.PED_WIDTH;
+			for (Setting s : settings) {
+				System.out.println(s);
 				Config c = ConfigUtils.createConfig();
 				c.global().setCoordinateSystem("EPSG:3395");
 				Scenario sc = ScenarioUtils.createScenario(c);
@@ -130,16 +149,29 @@ public class Long1DChannelBi {
 				((NetworkImpl) net).setCapacityPeriod(1);
 				NetworkFactory fac = net.getFactory();
 
-				Node n3 = fac.createNode(Id.createNodeId("3"), new CoordImpl(
-						-10, 0));
-
-				Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(0,
-						0));
+				int l = 8;
+				int res = 100;
+				Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(
+						20 - res, 0));
 				Node n1 = fac.createNode(Id.createNodeId("1"), new CoordImpl(
-						100, 0));
+						20, 0));
 				Node n2 = fac.createNode(Id.createNodeId("2"), new CoordImpl(
-						100, 0));
+						24, 0));
+				Node n2ex = fac.createNode(Id.createNodeId("2ex"),
+						new CoordImpl(24, 20));
+				Node n3 = fac.createNode(Id.createNodeId("3"), new CoordImpl(
+						24 + l, 0));
+				Node n3ex = fac.createNode(Id.createNodeId("3ex"),
+						new CoordImpl(24 + l, -20));
+				Node n4 = fac.createNode(Id.createNodeId("4"), new CoordImpl(
+						24 + 4 + l, 0));
+				Node n5 = fac.createNode(Id.createNodeId("5"), new CoordImpl(24
+						+ 4 + res + l, 0));
+				net.addNode(n5);
+				net.addNode(n4);
+				net.addNode(n3ex);
 				net.addNode(n3);
+				net.addNode(n2ex);
 				net.addNode(n2);
 				net.addNode(n1);
 				net.addNode(n0);
@@ -148,68 +180,95 @@ public class Long1DChannelBi {
 				Link l0rev = fac.createLink(Id.createLinkId("0rev"), n1, n0);
 				Link l1 = fac.createLink(Id.createLinkId("1"), n1, n2);
 				Link l1rev = fac.createLink(Id.createLinkId("1rev"), n2, n1);
-				Link l2 = fac.createLink(Id.createLinkId("2"), n0, n3);
-				Link l2rev = fac.createLink(Id.createLinkId("2rev"), n3, n0);
+				Link l2 = fac.createLink(Id.createLinkId("2"), n2, n3);
+				Link l2rev = fac.createLink(Id.createLinkId("2rev"), n3, n2);
+				Link l2ex = fac.createLink(Id.createLinkId("2ex"), n2, n2ex);
+				Link l3 = fac.createLink(Id.createLinkId("3"), n3, n4);
+				Link l3ex = fac.createLink(Id.createLinkId("3ex"), n3, n3ex);
+				Link l3rev = fac.createLink(Id.createLinkId("3rev"), n4, n3);
+				Link l4 = fac.createLink(Id.createLinkId("4"), n4, n5);
+				Link l4rev = fac.createLink(Id.createLinkId("4rev"), n5, n4);
 
-				l0.setLength(100);
-				l1.setLength(10);
-				l2.setLength(10);
+				l0.setLength(res);
+				l1.setLength(4);
 
-				l0rev.setLength(100);
-				l1rev.setLength(10);
-				l2rev.setLength(10);
+				l0rev.setLength(res);
+				l1rev.setLength(4);
+
+				l2rev.setLength(l);
+				l2.setLength(l);
+
+				l3rev.setLength(4);
+				l3.setLength(4);
+				l4rev.setLength(res);
+				l4.setLength(res);
+				l3ex.setLength(20);
+				l2ex.setLength(20);
+
+				net.addLink(l4);
+				net.addLink(l4rev);
 				net.addLink(l1);
 				net.addLink(l0);
-				net.addLink(l1rev);
-				net.addLink(l0rev);
 				net.addLink(l2);
 				net.addLink(l2rev);
-				l0.setCapacity(w);
-				l1.setCapacity(w);
-				l0rev.setCapacity(w);
-				l1rev.setCapacity(w);
-				l2.setCapacity(w);
-				l2rev.setCapacity(w);
+				net.addLink(l1rev);
+				net.addLink(l0rev);
+				net.addLink(l3rev);
+				net.addLink(l3);
+				net.addLink(l3ex);
+				net.addLink(l2ex);
+
+				double bl = s.bL;
+				double bc = s.bCor;
+				double br = s.bR;
+				double bexR = s.bexR;
+				double bexL = s.bexL;
+
+				l0.setCapacity(2 * bc);
+				l0rev.setCapacity(2 * bc);
+				l1.setCapacity(bl);
+				l1rev.setCapacity(bl);
+				l2.setCapacity(bc);
+				l2rev.setCapacity(bc);
+				l3.setCapacity(br);
+				l3rev.setCapacity(br);
+				l4.setCapacity(2 * bc);
+				l4rev.setCapacity(2 * bc);
+				l3ex.setCapacity(bexR);
+				l2ex.setCapacity(bexL);
 
 				List<Link> linksLR = new ArrayList<Link>();
 				linksLR.add(l0);
 				linksLR.add(l1);
+				linksLR.add(l2);
+				linksLR.add(l3ex);
 				List<Link> linksRL = new ArrayList<Link>();
-				linksRL.add(l0);
-				linksRL.add(l2);
+				linksRL.add(l4rev);
+				linksRL.add(l3rev);
+				linksRL.add(l2rev);
+				linksRL.add(l2ex);
 
-				c.qsim().setEndTime(3600);
-				for (double skip = 2; skip >= 1; skip--) {
-
-					// if (skip == 2) {
-					// c.qsim().setEndTime(240);
-					// } else if (skip == 1) {
-					// c.qsim().setEndTime(480);
-					// }
-					for (double mskip = 5; mskip <= 5; mskip++) {
-						System.out
-								.println("---------------------------------------");
-						System.out.println("skip" + skip + " mskip:" + mskip);
-						System.out
-								.println("---------------------------------------");
-						// skip = 3;
-						// mskip = 9;
-						for (double rho = 0.2; rho < 0.25; rho += 0.1)
-							runIt(net, linksLR, linksRL, sc, skip, mskip, rho);
-						// skip = -1;
-						// break;
+				for (int i = 0; i < 1; i++) {
+					for (double th = 1; th <= 1; th += 0.15) {
+						runIt(net, linksLR, linksRL, sc, th, s);
 					}
+					// for (double th = .26; th <= .4; th += 0.01) {
+					// runIt(net, linksLR, sc, th);
+					// }
+					// for (double th = .45; th < .5; th += 0.05) {
+					// runIt(net, linksLR, sc, th);
+					// }
+					// for (double th = .5; th <= 1.; th += 0.1) {
+					// runIt(net, linksLR, sc, th);
+					// }
 				}
-				// break;
 			}
 			bw.close();
 		}
 	}
 
 	private static void runIt(Network net, List<Link> linksLR,
-			List<Link> linksRL, Scenario sc, double skip, double mskip,
-			double rho) {
-
+			List<Link> linksRL, Scenario sc, double th, Setting s) {
 		// visualization stuff
 		EventsManager em = new EventsManagerImpl();
 		// // // if (iter == 9)
@@ -226,7 +285,7 @@ public class Long1DChannelBi {
 		CANetworkFactory fac;
 		if (USE_MULTI_LANE_MODEL) {
 			fac = new CAMultiLaneNetworkFactory();
-			fac.setDensityEstimatorFactory(null);
+			fac.setDensityEstimatorFactory(new CAMultiLaneDensityEstimatorSPHFactory());
 
 		} else {
 			fac = new CASingleLaneNetworkFactory();
@@ -241,102 +300,94 @@ public class Long1DChannelBi {
 		CANetwork caNet = fac.createCANetwork(net, em, null);
 
 		int agents = 0;
+		{
+			CAMultiLaneLink caLink = (CAMultiLaneLink) caNet.getCALink(linksLR
+					.get(0).getId());
+			int lanes = caLink.getNrLanes();
+			CAMoveableEntity[] particles = caLink.getParticles(0);
+			System.out.println("part left:" + particles.length);
+			double oldR = 1;
+			int tenth = particles.length / 10;
+			int cnt = 0;
+			for (int i = particles.length - 1; i >= 0; i--) {
+				for (int lane = 0; lane < lanes; lane++) {
+					double r = MatsimRandom.getRandom().nextDouble();
+					if (r > th) {
+						continue;
+					}
+					cnt++;
+					if (cnt > s.pL) {
+						break;
+					}
+					// agents++;
+					CAMoveableEntity a = new CASimpleDynamicAgent(linksLR, 1,
+							Id.create("g" + agents++,
+									CASimpleDynamicAgent.class), caLink);
+					a.materialize(i, 1, lane);
+					caLink.getParticles(lane)[i] = a;
+					CASimAgentConstructEvent ee = new CASimAgentConstructEvent(
+							0, a);
+					em.processEvent(ee);
 
-		CASingleLaneLink caLink = (CASingleLaneLink) caNet.getCALink(linksLR
-				.get(0).getId());
-		CAMoveableEntity[] particles = caLink.getParticles();
-		System.out.println("part left:" + particles.length);
-
-		CAMoveableEntity a1 = null;
-		CAMoveableEntity a2 = null;
-		double rho1 = Double.NaN; // rho * AbstractCANetwork.RHO_HAT / 2;
-		double rho2 = Double.NaN; // rho * AbstractCANetwork.RHO_HAT / 2;
-		// double rho = MatsimRandom.getRandom().nextDouble() / 10;
-		for (int i = 0; i < particles.length; i += skip) {
-
-			// if (mskip < 5 && i % mskip == 0) {
-			// i++;
-			// if (i >= particles.length) {
-			// break;
-			// }
-			// }
-			// if (MatsimRandom.getRandom().nextDouble() > rho) {
-			// continue;
-			// }
-
-			boolean side = agents % 2 == 0;
-			int shift = -1;
-			if (skip == 1) {
-				shift = 0;
-			} else {
-				while (shift < skip / 4. || shift > 3. * skip / 4.) {
-					shift = (int) (MatsimRandom.getRandom().nextGaussian()
-							* skip / 4. + skip / 2);
-				}
-			}
-			int pos = i + shift;
-
-			if (pos >= particles.length) {
-				continue;
-			}
-			if (side) {
-
-				// agents++;
-				CAMoveableEntity a = new CASimpleDynamicAgent(linksLR, 1,
-						Id.create(agents++, CASimpleDynamicAgent.class), caLink);
-				a.materialize(pos, 1);
-				particles[pos] = a;
-				if (a1 == null && pos > particles.length / 3) {
-					a1 = a;
-				}
-				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
-				em.processEvent(ee);
-
-				CAEvent e = new CAEvent(
-						1 / (AbstractCANetwork.V_HAT * AbstractCANetwork.RHO_HAT),
-						a, caLink, CAEventType.TTA);
-				caNet.pushEvent(e);
-				caNet.registerAgent(a);
-			} else {
-				// agents++;
-				CAMoveableEntity a = new CASimpleDynamicAgent(linksRL, 1,
-						Id.create(agents++, CASimpleDynamicAgent.class), caLink);
-				a.materialize(pos, -1);
-				particles[pos] = a;
-				if (pos < 2 * particles.length / 3) {
-					a2 = a;
-				}
-				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
-				em.processEvent(ee);
-
-				if (i > 0 && particles[pos - 1] != null
-						&& particles[pos - 1].getDir() == 1) {
-					CAEvent e = new CAEvent(0, a, caLink, CAEventType.SWAP);
-					caNet.pushEvent(e);
-				} else {
 					CAEvent e = new CAEvent(
 							1 / (AbstractCANetwork.V_HAT * AbstractCANetwork.RHO_HAT),
 							a, caLink, CAEventType.TTA);
 					caNet.pushEvent(e);
+					caNet.registerAgent(a);
 				}
-				caNet.registerAgent(a);
 			}
 		}
 
-		// CALinkMonitorExact monitor = new
-		// CALinkMonitorRange(caNet.getCALink(Id
-		// .createLinkId("0")), 10.,
-		// ((CASingleLaneLink) caNet.getCALink(Id.createLinkId("0")))
-		// .getParticles(), caNet.getCALink(Id.createLinkId("0"))
-		// .getLink().getCapacity(), rho1, rho2, a1, a2);
-		Monitor monitor = new CALinkMonitorExactII(caNet.getCALink(Id
-				.createLinkId("0")), 10.,
-				((CASingleLaneLink) caNet.getCALink(Id.createLinkId("0")))
-						.getParticles(), caNet.getCALink(Id.createLinkId("0"))
-						.getLink().getCapacity());
+		{
+			CAMultiLaneLink caLink = (CAMultiLaneLink) caNet.getCALink(linksRL
+					.get(0).getId());
+			int lanes = caLink.getNrLanes();
+			CAMoveableEntity[] particles = caLink.getParticles(0);
+			System.out.println("part left:" + particles.length);
+			double oldR = 1;
+			int tenth = particles.length / 10;
+			int cnt = 0;
+			for (int i = 0; i < particles.length - 1; i++) {
+				// for (int i = 0; i < 0; i++) {
+				for (int lane = 0; lane < lanes; lane++) {
+					double r = MatsimRandom.getRandom().nextDouble();
+					if (r > th) {
+						continue;
+					}
+					cnt++;
+					if (cnt > s.pR) {
+						break;
+					}
+					// agents++;
+					CAMoveableEntity a = new CASimpleDynamicAgent(linksRL, 1,
+							Id.create("b" + agents++,
+									CASimpleDynamicAgent.class), caLink);
+					a.materialize(i, -1, lane);
+					caLink.getParticles(lane)[i] = a;
+					CASimAgentConstructEvent ee = new CASimAgentConstructEvent(
+							0, a);
+					em.processEvent(ee);
+
+					CAEvent e = new CAEvent(
+							1 / (AbstractCANetwork.V_HAT * AbstractCANetwork.RHO_HAT),
+							a, caLink, CAEventType.TTA);
+					caNet.pushEvent(e);
+					caNet.registerAgent(a);
+				}
+			}
+		}
+
+		Monitor monitor = new CALinkMultiLaneMonitor(
+				(CAMultiLaneLink) caNet.getCALink(Id.createLinkId("2")), 2.);
+
+		// CALinkMonitorExact monitor = new CALinkMonitorExactIIUni(
+		// caNet.getCALink(Id.createLinkId("0")), 10.,
+		// ((CAMultiLaneLink) caNet.getCALink(Id.createLinkId("0")))
+		// .getParticles(0), caNet.getCALink(Id.createLinkId("0"))
+		// .getLink().getCapacity());
 		caNet.addMonitor(monitor);
 		monitor.init();
-		caNet.run(sc.getConfig().qsim().getEndTime());
+		caNet.run(3600);
 		try {
 			monitor.report(bw);
 			bw.flush();

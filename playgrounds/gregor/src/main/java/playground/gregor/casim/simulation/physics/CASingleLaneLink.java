@@ -64,7 +64,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	// we put lastLeftTimes directly in a queue exclusive for the succeeding
 	// agent (as long as one exist) ... need to think about this [GL Oct '14]
 	private final CAMoveableEntity[] particles;
-	private final double[] lastLeftTimes;
+	private final double[] lastLeftDsTimes;
+	private final double[] lastLeftUsTimes;
 
 	private final int size;
 
@@ -113,7 +114,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		this.usl = usl;
 		this.size = (int) (0.5 + dsl.getLength() / this.cellLength);
 		this.particles = new CAMoveableEntity[this.size];
-		this.lastLeftTimes = new double[this.size];
+		this.lastLeftDsTimes = new double[this.size];
+		this.lastLeftUsTimes = new double[this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.cellLength / AbstractCANetwork.V_HAT;
@@ -131,15 +133,16 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	}
 
 	/* package */double getD(CAMoveableEntity a) {
-		final double rho = a.getRho();
-		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
-				AbstractCANetwork.GAMMA);
-		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
+		double d = a.getTimeGap() - 1
+				/ (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT);
 		return d;
 	}
 
 	/* package */double getZ(CAMoveableEntity a) {
-		double d = getD(a);
+		final double rho = a.getRho();
+		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
+				AbstractCANetwork.GAMMA);
+		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
 		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
 				+ d;
 		// double z = this.tFree + d;
@@ -242,7 +245,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		if (this.particles[idx + 1] == null) {
 			double z = getZ(a);
 			z *= this.ratio;
-			if (this.lastLeftTimes[idx + 1] <= (time - z + epsilon)) {
+			if (this.lastLeftDsTimes[idx + 1] <= (time - z + epsilon)) {
 				handleTTAOnLinkDownStreamOnPreCondition1(a, time, idx);
 			} else {
 				handleTTAOnLinkDownStreamOnPreCondition2(a, time, idx);
@@ -256,7 +259,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAOnLinkDownStreamOnPreCondition1(CAMoveableEntity a,
 			double time, int idx) {
 
-		this.lastLeftTimes[idx] = time;
+		a.setTimeGap(time - this.lastLeftDsTimes[idx]);
+
+		this.lastLeftDsTimes[idx] = time;
 		this.particles[idx] = null;
 		this.particles[idx + 1] = a;
 		a.proceed();
@@ -331,7 +336,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 		double z = getZ(a);
 		z *= this.ratio;
-		double zStar = z - (time - this.lastLeftTimes[idx + 1]);
+		double zStar = z - (time - this.lastLeftDsTimes[idx + 1]);
 		double nextTime = time + zStar;
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -349,7 +354,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		if (this.particles[idx - 1] == null) {
 			double z = getZ(a);
 			z *= this.ratio;
-			if (this.lastLeftTimes[idx - 1] <= (time - z + epsilon)) {
+			if (this.lastLeftUsTimes[idx - 1] <= (time - z + epsilon)) {
 				handleTTAOnLinkUpStreamOnPreCondition1(a, time, idx);
 			} else {
 				handleTTAOnLinkUpStreamOnPreCondition2(a, time, idx);
@@ -363,7 +368,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAOnLinkUpStreamOnPreCondition1(CAMoveableEntity a,
 			double time, int idx) {
 
-		this.lastLeftTimes[idx] = time;
+		a.setTimeGap(time - this.lastLeftUsTimes[idx]);
+
+		this.lastLeftUsTimes[idx] = time;
 		this.particles[idx] = null;
 		this.particles[idx - 1] = a;
 		a.proceed();
@@ -438,7 +445,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 			double time, int idx) {
 		double z = getZ(a);
 		z *= this.ratio;
-		double zStar = z - (time - this.lastLeftTimes[idx - 1]);
+		double zStar = z - (time - this.lastLeftDsTimes[idx - 1]);
 		double nextTime = time + zStar;
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -495,7 +502,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void handleTTADownStreamNodeOnPreCondition1(CAMoveableEntity a,
 			double time) {
 
-		this.lastLeftTimes[this.size - 1] = time;
+		a.setTimeGap(this.lastLeftDsTimes[this.size - 1] - time);
+
+		this.lastLeftDsTimes[this.size - 1] = time;
 		this.particles[this.size - 1] = null;
 		this.ds.putAgent(a);
 
@@ -540,7 +549,7 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		CAMoveableEntity inFrontOfMe = nextCALink.getParticles()[nextNextA];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == nextRevDir) { // oncoming
-			// double d = Math.min(getD(a), getD(inFrontOfMe));
+				// double d = Math.min(getD(a), getD(inFrontOfMe));
 				double d = getD(a);
 				d *= this.ratio;
 				triggerSWAP(a, n, time + d + this.tFree);
@@ -571,7 +580,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
 		if (a.getNextLinkId() == null && this.us.peekForAgent() == null) {
-			this.lastLeftTimes[0] = time;
+
+			this.lastLeftUsTimes[0] = time;
 			this.particles[0] = null;
 			letAgentArrive(a, time, 0);
 			// check post-condition and generate events
@@ -597,7 +607,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private void handleTTAUpStreamNodeOnPreCondition1(CAMoveableEntity a,
 			double time) {
 
-		this.lastLeftTimes[0] = time;
+		a.setTimeGap(time - this.lastLeftUsTimes[0]);
+		this.lastLeftUsTimes[0] = time;
 		this.particles[0] = null;
 		this.us.putAgent(a);
 
@@ -642,7 +653,9 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		swapA.moveOverNode(this, time);
 
 		this.particles[this.size - 1] = swapA;
-		this.lastLeftTimes[this.size - 1] = time;
+
+		a.setTimeGap(time - this.lastLeftDsTimes[this.size - 1]);
+		this.lastLeftDsTimes[this.size - 1] = time;
 		this.ds.putAgent(a);
 
 		fireDownstreamLeft(a, time);
@@ -663,7 +676,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		swapA.moveOverNode(this, time);
 
 		this.particles[0] = swapA;
-		this.lastLeftTimes[0] = time;
+		a.setTimeGap(time - this.lastLeftUsTimes[0]);
+		this.lastLeftUsTimes[0] = time;
 		this.us.putAgent(a);
 
 		fireUpstreamLeft(a, time);
@@ -732,8 +746,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		this.particles[nbIdx] = a;
 		this.particles[idx] = nb;
 
-		this.lastLeftTimes[nbIdx] = time;
-		this.lastLeftTimes[idx] = time;
+		nb.setTimeGap(time - this.lastLeftUsTimes[nbIdx]);
+		this.lastLeftUsTimes[nbIdx] = time;
+		a.setTimeGap(time - this.lastLeftDsTimes[idx]);
+		this.lastLeftDsTimes[idx] = time;
 
 		nb.proceed();
 		a.proceed();
@@ -750,8 +766,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		this.particles[nbIdx] = a;
 		this.particles[idx] = nb;
 
-		this.lastLeftTimes[nbIdx] = time;
-		this.lastLeftTimes[idx] = time;
+		nb.setTimeGap(time - this.lastLeftDsTimes[nbIdx]);
+		this.lastLeftDsTimes[nbIdx] = time;
+		a.setTimeGap(time - this.lastLeftUsTimes[idx]);
+		this.lastLeftUsTimes[idx] = time;
 
 		nb.proceed();
 		a.proceed();
@@ -780,8 +798,12 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		return this.size;
 	}
 
-	public double[] getLastLeftTimes() {
-		return this.lastLeftTimes;
+	public double[] getLastLeftDsTimes() {
+		return this.lastLeftDsTimes;
+	}
+
+	public double[] getLastLeftUsTimes() {
+		return this.lastLeftUsTimes;
 	}
 
 	@Override
@@ -848,7 +870,11 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx) {
-		this.lastLeftTimes[idx] = time;
+		if (a.getDir() == 1) {
+			this.lastLeftDsTimes[idx] = time;
+		} else {
+			this.lastLeftUsTimes[idx] = time;
+		}
 		this.particles[idx] = null;
 		CANetsimEngine engine = this.net.getEngine();
 		if (engine != null) {
@@ -860,7 +886,8 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	@Override
 	public void reset() {
 		for (int i = 0; i < particles.length; i++) {
-			lastLeftTimes[i] = 0;
+			lastLeftDsTimes[i] = 0;
+			lastLeftUsTimes[i] = 0;
 			if (particles[i] != null) {
 				CAMoveableEntity part = particles[i];
 				this.net.unregisterAgent(part);

@@ -86,10 +86,7 @@ public class CASingleLaneNode implements CANode {
 				width = l.getCapacity();
 			}
 		}
-		if (node.getId().toString().equals("2")
-				|| node.getId().toString().equals("3")) {
-			width = 10;
-		}
+
 		this.width = width;
 		this.node = node;
 		this.net = net;
@@ -172,7 +169,7 @@ public class CASingleLaneNode implements CANode {
 		if (nextLink.getParticles()[0] == null) {
 			double z = nextLink.getZ(a);
 			z *= this.ratio;
-			if (nextLink.getLastLeftTimes()[0] <= (time - z + epsilon)) {
+			if (nextLink.getLastLeftDsTimes()[0] <= (time - z + epsilon)) {
 				handleTTAEnterNextLinkFromUpstreamEndOnPrecondition1(nextLink,
 						a, time);
 			} else {
@@ -229,7 +226,7 @@ public class CASingleLaneNode implements CANode {
 			CASingleLaneLink nextLink, CAMoveableEntity a, double time) {
 		double z = nextLink.getZ(a);
 		z *= this.ratio;
-		double zStar = z - (time - nextLink.getLastLeftTimes()[0]);
+		double zStar = z - (time - nextLink.getLastLeftDsTimes()[0]);
 		double nextTime = time + zStar;
 
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
@@ -250,7 +247,7 @@ public class CASingleLaneNode implements CANode {
 		if (nextLink.getParticles()[nextLink.getNumOfCells() - 1] == null) {
 			double z = nextLink.getZ(a);
 			z *= this.ratio;
-			if (nextLink.getLastLeftTimes()[nextLink.getNumOfCells() - 1] <= (time
+			if (nextLink.getLastLeftUsTimes()[nextLink.getNumOfCells() - 1] <= (time
 					- z + epsilon)) {
 				handleTTAEnterNextLinkFromDownstreamEndOnPrecondition1(
 						nextLink, a, time);
@@ -309,7 +306,8 @@ public class CASingleLaneNode implements CANode {
 		double z = nextLink.getZ(a);
 		z *= this.ratio;
 		double zStar = z
-				- (time - nextLink.getLastLeftTimes()[nextLink.getNumOfCells() - 1]);
+				- (time - nextLink.getLastLeftUsTimes()[nextLink
+						.getNumOfCells() - 1]);
 		double nextTime = time + zStar;
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -402,7 +400,7 @@ public class CASingleLaneNode implements CANode {
 		nextLink.fireUpstreamEntered(a, time);
 		a.moveOverNode(nextLink, time);
 
-		nextLink.getLastLeftTimes()[0] = time;
+		nextLink.getLastLeftUsTimes()[0] = time;
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 
 		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
@@ -487,7 +485,7 @@ public class CASingleLaneNode implements CANode {
 		nextLink.fireDownstreamEntered(a, time);
 		a.moveOverNode(nextLink, time);
 
-		nextLink.getLastLeftTimes()[nextLink.getNumOfCells() - 1] = time;
+		nextLink.getLastLeftDsTimes()[nextLink.getNumOfCells() - 1] = time;
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 
 		// check post-conditions & new events

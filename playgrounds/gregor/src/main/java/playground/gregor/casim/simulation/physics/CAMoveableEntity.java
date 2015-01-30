@@ -31,6 +31,7 @@ public abstract class CAMoveableEntity {
 
 	private double rho;
 	private int lane;
+	private double timeGap = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT);
 
 	public void proceed() {
 		this.pos += this.dir;
@@ -104,6 +105,19 @@ public abstract class CAMoveableEntity {
 
 	public void setRho(double rho) {
 		this.rho = rho;
+	}
+
+	public void setTimeGap(double gap) {
+		this.timeGap = gap;
+
+	}
+
+	public double getTimeGap() {
+		return this.timeGap;
+	}
+
+	public void setLane(int newLane) {
+		this.lane = newLane;
 	}
 
 }
