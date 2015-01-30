@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.synPop.analysis;
 
-import playground.johannes.gsv.synPop.ActivityType;
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+
+import java.util.Collection;
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ActivityTypePredicate implements Predicate {
+public class TripDayVolumeTask extends AnalyzerTask {
 
-	private final String type;
-
-	public ActivityTypePredicate(String type) {
-		this.type = type;
+	private final String mode;
+	
+	public TripDayVolumeTask(String mode) {
+		this.mode = mode;
 	}
-
+	
 	@Override
-	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-//		String prevType = prev.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
-//		String nextType = next.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
-		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
-			return true;
-		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
-			return true;
-		} else {
-			return false;
+	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+		TObjectIntHashMap<String> values = new TObjectIntHashMap<>();
+		
+		for(ProxyPerson person : persons) {
+			String day = person.getAttribute(CommonKeys.DAY);
+			for(ProxyPlan plan : person.getPlans()) {
+				
+				int cnt = 0;
+				for(ProxyObject leg : plan.getLegs()) {
+					if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
+						cnt++;
+					}
+				}
+				values.adjustOrPutValue(day, cnt, cnt);
+			}
 		}
+		
+		TObjectIntIterator<String> it = values.iterator();
+		for(int i = 0; i < values.size(); i++) {
+			it.advance();
+			DescriptiveStatistics tmp = new DescriptiveStatistics();
+			tmp.addValue(it.value());
+			results.put(it.key(), tmp);
+		}
+
 	}
 
 }

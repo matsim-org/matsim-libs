@@ -68,8 +68,8 @@ public class MergeFacilities {
 //					newOpt = all.getFactory().createActivityOption("pickdrop");
 //					newFac.addActivityOption(newOpt);
 			
-					newOpt = all.getFactory().createActivityOption("misc");
-					newFac.addActivityOption(newOpt);
+//					newOpt = all.getFactory().createActivityOption("misc");
+//					newFac.addActivityOption(newOpt);
 					
 //					newOpt = all.getFactory().createActivityOption("outoftown");
 //					newFac.addActivityOption(newOpt);

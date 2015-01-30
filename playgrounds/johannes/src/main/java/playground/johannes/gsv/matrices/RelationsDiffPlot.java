@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.math.linear.MatrixIndexException;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSON;
@@ -62,32 +63,34 @@ public class RelationsDiffPlot {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "593";
-//		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
-		String simFile = "/home/johannes/gsv/matrices/refmatrices/bmbv2010.xml";
-		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
+		String runId = "629";
+		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String refFile2 = "/home/johannes/gsv/matrices/refmatrices/bmbv2010.xml";
+		String refFile1 = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
 		 * load ref matrix
 		 */
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(refFile);
-		KeyMatrix reference = reader.getMatrix();
+		reader.parse(refFile1);
+		KeyMatrix reference1 = reader.getMatrix();
 
-//		MatrixOpertaions.applyFactor(reference, 1 / 365.0);
+		MatrixOpertaions.applyFactor(reference1, 1 / 365.0);
 
+		reader.parse(refFile2);
+		KeyMatrix reference2 = reader.getMatrix();
+
+		MatrixOpertaions.applyFactor(reference2, 1 / 365.0);
+		
 		/*
 		 * load simulated matrix
 		 */
-//		ODMatrixXMLReader reader2 = new ODMatrixXMLReader();
-//		reader2.setValidating(false);
-//		reader2.parse(simFile);
 		reader.parse(simFile);
 		KeyMatrix simulation = reader.getMatrix();
-//		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
 
-//		MatrixOpertaions.applyFactor(simulation, 22.0);
-//		MatrixOpertaions.applyDiagonalFactor(simulation, 1.3);
+		MatrixOpertaions.sysmetrize(simulation);
+		MatrixOpertaions.applyFactor(simulation, 11.0);
+		MatrixOpertaions.applyDiagonalFactor(simulation, 1.3);
 		/*
 		 * load zones
 		 */
@@ -98,11 +101,11 @@ public class RelationsDiffPlot {
 		/*
 		 * compare
 		 */
-		data = writeGeoJSON(zones, urbanZones(zones.zoneSet()), simulation, reference);
-		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/matrixdiff.json"), data.getBytes(), StandardOpenOption.CREATE);
+		data = writeGeoJSON(zones, urbanZones(zones.zoneSet()), simulation, reference1, reference2);
+		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/matrixdiff."+runId+".json"), data.getBytes(), StandardOpenOption.CREATE);
 	}
 
-	private static String writeGeoJSON(ZoneCollection zones, Collection<Zone> relationZones, KeyMatrix m1, KeyMatrix m2) {
+	private static String writeGeoJSON(ZoneCollection zones, Collection<Zone> relationZones, KeyMatrix m1, KeyMatrix m2, KeyMatrix m3) {
 		StringBuilder builder = new StringBuilder();
 		/*
 		 * write zone polygons
@@ -125,7 +128,12 @@ public class RelationsDiffPlot {
 					if (val2 == null)
 						val2 = 0.0;
 
-					double err = (val1 - val2) / val2;
+					Double val3 = m3.get(i.getAttribute("gsvId"), j.getAttribute("gsvId"));
+					if (val3 == null)
+						val3 = 0.0;
+					
+					double err1 = (val1 - val2) / val2;
+					double err2 = (val1 - val3) / val3;
 
 					Point start = i.getGeometry().getCentroid();
 					Point end = j.getGeometry().getCentroid();
@@ -139,11 +147,14 @@ public class RelationsDiffPlot {
 					
 					double rotation = Math.atan(deltaY/deltaX) * 180/Math.PI;
 					
-					coords[1].x = coords[0].x + deltaX/2.0;
-					coords[1].y = coords[0].y + deltaY/2.0;
+//					coords[1].x = coords[0].x + deltaX/2.0;
+//					coords[1].y = coords[0].y + deltaY/2.0;
 					
-					double labelX = coords[1].x + deltaX/4.0;
-					double labelY = coords[1].y + deltaY/4.0;
+//					double labelX = coords[0].x + deltaX/4.0;
+//					double labelY = coords[0].y + deltaY/4.0;
+					
+					double labelX = coords[0].x + deltaX/2.0;
+					double labelY = coords[0].y + deltaY/2.0;
 					
 					LineString line = factory.createLineString(coords);
 
@@ -151,7 +162,9 @@ public class RelationsDiffPlot {
 					Geometry geom = (Geometry) GeoJSONFactory.create(json.toString());
 
 					Map<String, Object> atts = new HashMap<>();
-					atts.put("error", err);
+					atts.put("volume", val1);
+					atts.put("error1", err1);
+					atts.put("error2", err2);
 					atts.put("labelX", labelX);
 					atts.put("labelY", labelY);
 					atts.put("rotation", rotation);

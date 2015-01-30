@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.johannes.gsv.synPop.CopyAttributes;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -123,7 +124,13 @@ public class XMLParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(Constants.PERSON_TAG)) {
-			persons.add(person);
+//			if(CopyAttributes.subsample) {
+//				if(Math.random() > 0.7) {
+					persons.add(person);
+//				}
+//			} else {
+//				persons.add(person);
+//			}
 			person = null;
 			
 			if(persons.size() % 50000 == 0)

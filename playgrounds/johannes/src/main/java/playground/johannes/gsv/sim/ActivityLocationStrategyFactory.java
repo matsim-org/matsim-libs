@@ -94,11 +94,13 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 				ObjectAttributes oatts = pop.getPersonAttributes();
 				
 				List<Double> atts = (List<Double>) oatts.getAttribute(person.getId().toString(), CommonKeys.LEG_GEO_DISTANCE);
+				if(atts != null) {
 				for(Double d : atts) {
 					if(d != null && d > threshold) {
 						candidates.add(person);
 						break;
 					}
+				}
 				}
 			}
 			

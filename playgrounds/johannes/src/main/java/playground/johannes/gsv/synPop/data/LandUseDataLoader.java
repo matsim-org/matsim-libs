@@ -53,11 +53,12 @@ public class LandUseDataLoader implements DataLoader {
 		data.setNuts1Layer(loadLayer("nuts1"));
 		data.setNuts3Layer(loadLayer("nuts3"));
 		data.setLau2Layer(loadLayer("lau2"));
+		data.setModenaLayer(loadLayer("modena"));
 		logger.info("Done.");
 		return data;
 	}
 
-	private ZoneLayer<Map<String, Object>> loadLayer(String type) {
+	public ZoneLayer<Map<String, Object>> loadLayer(String type) {
 		Collection<? extends ConfigGroup> modules = module.getParameterSets(type);
 		if (!modules.isEmpty()) {
 			ConfigGroup m = modules.iterator().next();

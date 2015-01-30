@@ -175,31 +175,31 @@ public class MatrixOpertaions {
 			for(int j = (i+1); j < keys.size(); j++) {
 				String key2 = keys.get(j);
 				Double val1 = m.get(key1, key2);
-				if(val1 == null) val1 = 1.0;
+				if(val1 == null) val1 = 0.0;
 				
 				Double val2 = m.get(key2, key1);
-				if(val2 == null) val2 = 1.0;
+				if(val2 == null) val2 = 0.0;
 				
 				double sum = val1 + val2;
-				double p = Math.random() - 0.5;
+//				double p = Math.random() - 0.5;
+//				
+//				double f = 0.5 + (p * 0.1);
+//						
+//				double maxf = Math.max(f, 1-f);				
+//				
+//				double v1;
+//				double v2;
+//				
+//				if(val1 < val2) {
+//					v1 = sum * maxf;
+//					v2 = sum * (1 - maxf);
+//				} else {
+//					v1 = sum * (1 - maxf);
+//					v2 = sum * maxf;
+//				}
 				
-				double f = 0.5 + (p * 0.1);
-						
-				double maxf = Math.max(f, 1-f);				
-				
-				double v1;
-				double v2;
-				
-				if(val1 < val2) {
-					v1 = sum * maxf;
-					v2 = sum * (1 - maxf);
-				} else {
-					v1 = sum * (1 - maxf);
-					v2 = sum * maxf;
-				}
-				
-				m.set(key1, key2, v1);
-				m.set(key2, key1, v2);
+				m.set(key1, key2, sum/2.0);
+				m.set(key2, key1, sum/2.0);
 			}
 		}
 	}

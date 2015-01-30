@@ -30,16 +30,16 @@ import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class ReplaceActTypes implements ProxyPlanTask {
 
 	public static final String ORIGINAL_TYPE = "origType";
-	
+
 	private static Map<String, String> typeMapping;
-	
+
 	public Map<String, String> getTypeMapping() {
-		if(typeMapping == null) {
+		if (typeMapping == null) {
 			typeMapping = new HashMap<String, String>();
 			typeMapping.put("vacations_short", ActivityType.LEISURE);
 			typeMapping.put("vacations_long", ActivityType.LEISURE);
@@ -52,21 +52,24 @@ public class ReplaceActTypes implements ProxyPlanTask {
 			typeMapping.put("sport", ActivityType.LEISURE);
 			typeMapping.put("wecommuter", ActivityType.WORK);
 		}
-		
+
 		return typeMapping;
 	}
-	
+
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject act : plan.getActivities()) {
-			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-			act.setAttribute(ORIGINAL_TYPE, type);
-			String newType = getTypeMapping().get(type);
-			if(newType != null) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, newType);
+		for (ProxyObject act : plan.getActivities()) {
+			String origType = act.getAttribute(ORIGINAL_TYPE);
+			if (origType == null) {
+				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+				act.setAttribute(ORIGINAL_TYPE, type);
+				String newType = getTypeMapping().get(type);
+				if (newType != null) {
+					act.setAttribute(CommonKeys.ACTIVITY_TYPE, newType);
+				}
 			}
 		}
-		
+
 	}
 
 }

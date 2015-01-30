@@ -21,6 +21,7 @@ package playground.johannes.gsv.matrices;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
@@ -35,7 +36,7 @@ public class ModePredicate implements Predicate {
 	}
 	
 	@Override
-	public boolean test(ProxyObject leg, ProxyObject prev, ProxyObject next) {
+	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
 		return mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE));
 	}
 

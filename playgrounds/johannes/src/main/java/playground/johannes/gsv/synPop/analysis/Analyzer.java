@@ -43,10 +43,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		String output = args[2];
-		String output = "/home/johannes/gsv/invermo/analysis/";
-//		String personFile = args[0];
-		String personFile = "/home/johannes/gsv/invermo/pop.de.car.xml";
+		String output = args[1];
+//		String output = "/home/johannes/gsv/mid2008/analysis/car.3-100km/";
+		String personFile = args[0];
+//		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.3-1000km.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -55,11 +55,11 @@ public class Analyzer {
 
 		Set<ProxyPerson> persons = parser.getPersons();
 		
-		logger.info("Cloning persons...");
-		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones(persons, 200000, random);
-		new ApplySampleProbas(82000000).apply(persons);
-		logger.info(String.format("Generated %s persons.", persons.size()));
+//		logger.info("Cloning persons...");
+//		Random random = new XORShiftRandom();
+//		persons = PersonCloner.weightedClones(persons, 200000, random);
+//		new ApplySampleProbas(82000000).apply(persons);
+//		logger.info(String.format("Generated %s persons.", persons.size()));
 		
 //		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/pop.nuts3.shp");
 //		Set<Geometry> geometries = new HashSet<Geometry>();
@@ -83,9 +83,10 @@ public class Analyzer {
 //		task.addTask(new ActivityDistanceTask(facilities, "car"));
 //		task.addTask(new ActivityDistanceTruncatedTask(facilities, "car", 100000));
 		task.addTask(new DistanceJourneyDaysTask("car"));
+		task.addTask(new TripDayVolumeTask("car"));
 //		task.addTask(new SpeedFactorAnalyzer());
 //		task.addTask(new SeasonsTask());
-//		task.addTask(new PkmTask());
+		task.addTask(new PkmTask("car"));
 //		task.addTask(new PopulationDensityTask(geometries, facilities, output));
 		
 		task.setOutputDirectory(output);

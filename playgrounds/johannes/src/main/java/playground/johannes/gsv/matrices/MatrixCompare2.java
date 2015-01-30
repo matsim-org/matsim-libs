@@ -64,7 +64,7 @@ public class MatrixCompare2 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "593";
+		String runId = "629";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
@@ -87,7 +87,7 @@ public class MatrixCompare2 {
 		KeyMatrix m2 = reader.getMatrix();
 //		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
 
-		MatrixOpertaions.applyFactor(m2, 22.0);
+		MatrixOpertaions.applyFactor(m2, 11.0);
 		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
 		/*
 		 * load zones
@@ -105,7 +105,7 @@ public class MatrixCompare2 {
 
 		KeyMatrix itp_d = distanceMatrix(m1, zones);
 		TDoubleDoubleHashMap hist = writeDistanceHist(m1, itp_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/ivv.dist.txt");
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/itp.dist.txt");
 
 		KeyMatrix m_d = distanceMatrix(m2, zones);
 		hist = writeDistanceHist(m2, m_d);
@@ -217,15 +217,15 @@ public class MatrixCompare2 {
 		for (String i : keys) {
 			for (String j : keys) {
 				if(i.equals(j)) {
-//					Zone zone = zones.get(i);
-//					MinimumDiameter dia = new MinimumDiameter(zone.getGeometry());
-//					LineString ls = dia.getDiameter();
-//					Coordinate pi = ls.getCoordinateN(0);
-//					Coordinate pj = ls.getCoordinateN(1);
-////					double d = dia.getLength();
-//					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
-//					m_d.set(i, j, d);
-					m_d.set(i, j, -1.0);
+					Zone zone = zones.get(i);
+					MinimumDiameter dia = new MinimumDiameter(zone.getGeometry());
+					LineString ls = dia.getDiameter();
+					Coordinate pi = ls.getCoordinateN(0);
+					Coordinate pj = ls.getCoordinateN(1);
+//					double d = dia.getLength();
+					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
+					m_d.set(i, j, d/2.0);
+//					m_d.set(i, j, -1.0);
 				} else {
 				Point pi = zones.get(i).getGeometry().getCentroid();
 				Point pj = zones.get(j).getGeometry().getCentroid();
@@ -267,7 +267,7 @@ public class MatrixCompare2 {
 		for (String i : keys) {
 			for (String j : keys) {
 				double d = m_d.get(i, j);
-//				if (d > 100000) {
+//				if (d > 10000) {
 					Double val = m.get(i, j);
 					// if(val == null) val = 1.0;
 					if (val != null) {

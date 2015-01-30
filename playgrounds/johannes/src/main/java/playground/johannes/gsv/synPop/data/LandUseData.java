@@ -39,6 +39,8 @@ public class LandUseData {
 	
 	private ZoneLayer<Map<String, Object>> lau2Layer;
 	
+	private ZoneLayer<Map<String, Object>> modenaLayer;
+	
 	void setNuts1Layer(ZoneLayer<Map<String, Object>> nuts1Layer) {
 		this.nuts1Layer = nuts1Layer;
 	}
@@ -51,6 +53,10 @@ public class LandUseData {
 		this.lau2Layer = lau2Layer;
 	}
 	
+	void setModenaLayer(ZoneLayer<Map<String, Object>> modenaLayer) {
+		this.modenaLayer = modenaLayer;
+	}
+	
 	public ZoneLayer<Map<String, Object>> getNuts1Layer() {
 		return nuts1Layer;
 	}
@@ -61,5 +67,9 @@ public class LandUseData {
 	
 	public ZoneLayer<Map<String, Object>> getLau2Layer() {
 		return lau2Layer;
+	}
+	
+	public ZoneLayer<Map<String, Object>> getModenaLayer() {
+		return modenaLayer;
 	}
 }

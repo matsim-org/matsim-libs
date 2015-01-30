@@ -22,6 +22,7 @@ package playground.johannes.coopsim.pysical;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,6 +33,8 @@ import org.matsim.api.core.v01.population.PlanElement;
  *
  */
 public class Trajectory {
+	
+	private final Logger logger = Logger.getLogger(Trajectory.class);
 
 	private final List<PlanElement> elements = new ArrayList<PlanElement>(7);
 	
@@ -68,7 +71,8 @@ public class Trajectory {
 	
 	public void addElement(PlanElement element, double startTime, double endTime) {
 		if(endTime < startTime) {
-			throw new RuntimeException("Start time must not be greater than end time!");
+//			throw new RuntimeException("Start time must not be greater than end time!");
+			logger.warn("Start time must not be greater than end time!");
 		}
 		
 		if(elements.isEmpty()) {

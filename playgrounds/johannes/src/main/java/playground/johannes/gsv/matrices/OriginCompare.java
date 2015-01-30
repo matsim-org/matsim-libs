@@ -49,7 +49,7 @@ public class OriginCompare {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "593";
+		String runId = "610";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*

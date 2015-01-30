@@ -81,7 +81,12 @@ public class Zone2GeoJSON {
 				Zone zone = new Zone(reader.read(feature.getGeometry()));
 //				System.out.println(zone.getGeometry().toString());
 				for (Entry<String, Object> prop : feature.getProperties().entrySet()) {
-					zone.setAttribute(prop.getKey(), prop.getValue().toString());
+					Object value = prop.getValue();
+					if(value == null) {
+						zone.setAttribute(prop.getKey(), "");
+					} else {
+						zone.setAttribute(prop.getKey(), prop.getValue().toString());
+					}
 				}
 //				System.out.println(zone.attributes().toString());
 //				System.exit(0);

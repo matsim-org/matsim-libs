@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,33 +19,25 @@
 
 package playground.johannes.gsv.matrices;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
  * 
  */
-public class ActivityTypePredicate implements Predicate {
+public class MonthPredicate implements Predicate {
 
-	private final String type;
+	private final String month;
 
-	public ActivityTypePredicate(String type) {
-		this.type = type;
+	public MonthPredicate(String month) {
+		this.month = month;
 	}
 
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-//		String prevType = prev.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
-//		String nextType = next.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
-		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
-			return true;
-		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
+		if (month == null || month.equalsIgnoreCase(person.getAttribute(MIDKeys.PERSON_MONTH))) {
 			return true;
 		} else {
 			return false;

@@ -15,11 +15,11 @@ import playground.johannes.coopsim.analysis.TrajectoryUtils;
 import playground.johannes.coopsim.analysis.TripDistanceTotal;
 import playground.johannes.coopsim.pysical.Trajectory;
 
-public class PkmTask extends TrajectoryAnalyzerTask {
+public class PkmGeoTask extends TrajectoryAnalyzerTask {
 
 	private final ActivityFacilities facilities;
 	
-	public PkmTask(ActivityFacilities facilities) {
+	public PkmGeoTask(ActivityFacilities facilities) {
 		this.facilities = facilities;
 	}
 	
