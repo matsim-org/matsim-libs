@@ -55,6 +55,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+import java.util.Arrays;
+
 /**
  * @author mrieser
  */
@@ -93,38 +95,44 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
             public void install() {
                 bindToInstance(Scenario.class, scenario);
                 bindToInstance(EventsManager.class, EventsUtils.createEventsManager());
-                include(new StrategyManagerModule());
+                include(AbstractModule.override(Arrays.asList(new StrategyManagerModule()), new AbstractModule() {
+
+                    @Override
+                    public void install() {
+                        bindToInstance(ReplanningContext.class, new ReplanningContext() {
+
+                            @Override
+                            public TravelDisutility getTravelDisutility() {
+                                return null;
+                            }
+
+                            @Override
+                            public TravelTime getTravelTime() {
+                                return null;
+                            }
+
+                            @Override
+                            public ScoringFunctionFactory getScoringFunctionFactory() {
+                                return null;
+                            }
+
+                            @Override
+                            public int getIteration() {
+                                return 0;
+                            }
+
+                            @Override
+                            public TripRouter getTripRouter() {
+                                return new TripRouterProviderImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).get();
+                            }
+
+                        });
+                    }
+                }));
             }
         });
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);
-		manager.run(population, new ReplanningContext() {
-
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return null;
-			}
-
-			@Override
-			public TravelTime getTravelTime() {
-				return null;
-			}
-
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return null;
-			}
-
-			@Override
-			public int getIteration() {
-				return 0;
-			}
-
-			@Override
-			public TripRouter getTripRouter() {
-				return new TripRouterProviderImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).get();
-			}
-			
-		});
+		manager.run(population, injector.getInstance(ReplanningContext.class));
 
 		// test that everything worked as expected
 		assertEquals("number of plans in person.", 2, person.getPlans().size());

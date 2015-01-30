@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.name.Names;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -309,6 +310,12 @@ public class Controler extends AbstractController {
                         bindToInstance(IterationStopWatch.class, stopwatch);
                         bindToInstance(Scenario.class, scenarioData);
                         bindToInstance(EventsManager.class, events);
+                        binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toProvider(new com.google.inject.Provider<Integer>() {
+                            @Override
+                            public Integer get() {
+                                return getIterationNumber();
+                            }
+                        });
                     }
                 });
         this.injectorCreated = true;

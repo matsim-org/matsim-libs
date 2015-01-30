@@ -37,6 +37,7 @@ public class StrategyManagerModule extends AbstractModule {
     public void install() {
         include(new DefaultPlanStrategiesModule());
         bindToProviderAsSingleton(StrategyManager.class, StrategyManagerProvider.class);
+        bindTo(ReplanningContext.class, ReplanningContextImpl.class);
     }
 
     private static class StrategyManagerProvider implements Provider<StrategyManager> {
