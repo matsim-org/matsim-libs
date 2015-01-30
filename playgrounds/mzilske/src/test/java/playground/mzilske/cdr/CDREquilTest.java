@@ -14,6 +14,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
@@ -57,6 +58,7 @@ public class CDREquilTest {
         Controler controler = new Controler(new OneWorkplace().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new CharyparNagelScoringFunctionModule(),
                 new TripRouterModule(),
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
@@ -78,6 +80,7 @@ public class CDREquilTest {
         Controler controler = new Controler(new TwoWorkplaces().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new CharyparNagelScoringFunctionModule(),
                 new TripRouterModule(),
                 new TravelTimeCalculatorModule(),
                 new TravelDisutilityModule(),

@@ -36,6 +36,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -55,6 +57,8 @@ public class ScoreStatsModuleTest {
         config.controler().setLastIteration(nIterations - 1);
         Controler controler = new Controler(config);
         controler.setModules(
+                new ScenarioElementsModule(),
+                new CharyparNagelScoringFunctionModule(),
                 new TripRouterModule(),
                 new TravelTimeCalculatorModule(),
                 new TravelDisutilityModule(),

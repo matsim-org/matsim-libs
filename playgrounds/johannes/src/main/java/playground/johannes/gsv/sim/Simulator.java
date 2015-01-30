@@ -22,12 +22,6 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -66,15 +60,9 @@ import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripCountTask;
-import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
-import playground.johannes.coopsim.analysis.TripPurposeShareTask;
+import playground.johannes.coopsim.analysis.*;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
 import playground.johannes.gsv.analysis.PkmTask;
@@ -84,6 +72,12 @@ import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
 import playground.johannes.gsv.synPop.Proxy2Matsim;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -167,6 +161,7 @@ public class Simulator {
 			public void install() {
 			
 				include(new ScenarioElementsModule());
+                include(new CharyparNagelScoringFunctionModule());
 				// include(new TravelTimeCalculatorModule());
 				include(new TravelDisutilityModule());
 				include(new TripRouterModule());

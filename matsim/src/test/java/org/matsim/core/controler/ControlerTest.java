@@ -204,14 +204,12 @@ public class ControlerTest {
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
-		assertTrue("Custom ScoringFunctionFactory was not set.",
-				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 
 		controler.setMobsimFactory(new FakeMobsimFactory());
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue("Custom ScoringFunctionFactory got overwritten.",
+		assertTrue("Custom ScoringFunctionFactory was not set.",
 				controler.getScoringFunctionFactory() instanceof DummyScoringFunctionFactory);
 	}
 

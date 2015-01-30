@@ -31,6 +31,7 @@ import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
 import org.matsim.population.VspPlansCleanerModule;
@@ -43,6 +44,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         include(new ScenarioElementsModule());
         include(new TravelTimeCalculatorModule());
         include(new TravelDisutilityModule());
+        include(new CharyparNagelScoringFunctionModule());
         include(new TripRouterModule());
         include(new StrategyManagerModule());
         include(new LinkStatsModule());

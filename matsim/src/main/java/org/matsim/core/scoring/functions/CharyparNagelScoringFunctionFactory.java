@@ -51,15 +51,14 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	}
 
 	/**
-	 * puts the scoring functions together, which form the
-	 * CharyparScoringFunction
-	 * <p/>
-	 * This creational method gets the plan as an argument.  Since it is possible to get the person from the plan, it is thus
-	 * possible to make the scoring function person-specific.
-	 * <p/>  
-	 * Notes:<ul>
-	 * <li>If I understand this correctly, this creational method is 
-	 * called in every iteration. kai, apr'11
+     *
+     * In every iteration, the framework creates a new ScoringFunction for each Person.
+     * A ScoringFunction is much like an EventHandler: It reacts to scoring-relevant events
+     * by accumulating them. After the iteration, it is asked for a score value.
+     *
+     * Since the factory method gets the Person, it can create a ScoringFunction
+     * which depends on Person attributes. This implementation does not.
+     *
 	 * <li>The fact that you have a person-specific scoring function does not mean that the "creative" modules
 	 * (such as route choice) are person-specific.  This is not a bug but a deliberate design concept in order 
 	 * to reduce the consistency burden.  Instead, the creative modules should generate a diversity of possible

@@ -31,6 +31,7 @@ import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
@@ -53,6 +54,7 @@ public class Main {
                 // but leave out TravelTimeCalculator.
                 // You can just comment out these lines if you don't want them,
                 // these modules are optional.
+                include(new CharyparNagelScoringFunctionModule());
                 include(new TripRouterModule());
                 include(new StrategyManagerModule());
                 include(new LinkStatsModule());

@@ -33,17 +33,16 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
-
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
-import playground.pieter.distributed.listeners.events.transit.BoardingModel;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
@@ -232,6 +231,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             public void install() {
 //                include(new ScoreStatsModule());
                 include(new TripRouterModule());
+                include(new CharyparNagelScoringFunctionModule());
+                include(new ScenarioElementsModule());
                 include(new StrategyManagerModule());
                 include(new TravelDisutilityModule());
                 bindToInstance(TravelTime.class, travelTime);

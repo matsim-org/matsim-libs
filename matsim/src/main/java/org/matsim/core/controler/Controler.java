@@ -132,9 +132,7 @@ public class Controler extends AbstractController {
     // The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
 
-    private ScoringFunctionFactory scoringFunctionFactory = null;
-
-	private boolean scenarioLoaded = false;
+    private boolean scenarioLoaded = false;
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
@@ -297,11 +295,6 @@ public class Controler extends AbstractController {
 			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData , getControlerIO()));
 		}
 
-
-		if (this.getScoringFunctionFactory() == null) {
-			this.setScoringFunctionFactory(ControlerDefaults.createDefaultScoringFunctionFactory(this.scenarioData )) ;
-		}
-
         this.injector = Injector.createInjector(
                 config,
                 new AbstractModule() {
@@ -319,21 +312,17 @@ public class Controler extends AbstractController {
                     }
                 });
         this.injectorCreated = true;
-        this.injector.retrofitScoringFunctionFactory(this.getScoringFunctionFactory());
-        PlansScoring plansScoring = new PlansScoring(this.scenarioData , this.events, getControlerIO(), this.getScoringFunctionFactory());
-		this.addCoreControlerListener(plansScoring);
-
-        this.addCoreControlerListener(new PlansReplanning(this.injector.getInstance(StrategyManager.class), getScenario().getPopulation()));
-		this.addCoreControlerListener(new PlansDumping(this.scenarioData , this.getConfig().controler().getFirstIteration(), this.config.controler().getWritePlansInterval(),
+        this.addCoreControlerListener(new PlansScoring(this.getScenario(), this.getEvents(), this.getControlerIO(), this.getScoringFunctionFactory()));
+        this.addCoreControlerListener(new PlansReplanning(this.injector.getInstance(StrategyManager.class), this.getScenario().getPopulation()));
+		this.addCoreControlerListener(new PlansDumping(this.getScenario(), this.getConfig().controler().getFirstIteration(), this.getConfig().controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
-
-		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
+		this.addCoreControlerListener(new EventsHandling(this.getEvents(), this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
 		// must be last being added (=first being executed)
 
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
         for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-            this.events.addHandler(eventHandler);
+            this.getEvents().addHandler(eventHandler);
         }
         Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
@@ -484,13 +473,8 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
 	}
 
-	/**
-	 * @return the currently used
-	 *         {@link org.matsim.core.scoring.ScoringFunctionFactory} for
-	 *         scoring plans.
-	 */
 	public final ScoringFunctionFactory getScoringFunctionFactory() {
-		return this.scoringFunctionFactory;
+		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
 	public final Config getConfig() {
@@ -569,8 +553,13 @@ public class Controler extends AbstractController {
 	}
 
 	public final void setScoringFunctionFactory(
-			final ScoringFunctionFactory factory) {
-		this.scoringFunctionFactory = factory;
+			final ScoringFunctionFactory scoringFunctionFactory) {
+        this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindToInstance(ScoringFunctionFactory.class, scoringFunctionFactory);
+            }
+        });
 	}
 
 	public final void setTerminationCriterion(TerminationCriterion terminationCriterion) {

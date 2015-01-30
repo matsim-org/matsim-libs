@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import javax.inject.Provider;
 import java.util.ArrayList;
@@ -132,10 +131,6 @@ public class Injector {
                 new TypeLiteral<Map<String, GenericPlanSelector<Plan, Person>>>() {
                 }
         ));
-    }
-
-    void retrofitScoringFunctionFactory(ScoringFunctionFactory scoringFunctionFactory) {
-        injector.injectMembers(scoringFunctionFactory);
     }
 
     <T> Provider<T> getProvider(Class<T> type) {
