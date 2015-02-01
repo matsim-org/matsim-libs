@@ -56,7 +56,7 @@ import org.matsim.core.utils.io.IOUtils;
  * 
  * @author jwjoubert
  */
-public class Main {
+public class RunParallelisationExample {
 	final private static Logger LOG = Logger.getLogger(Math.class);
 
 	/**

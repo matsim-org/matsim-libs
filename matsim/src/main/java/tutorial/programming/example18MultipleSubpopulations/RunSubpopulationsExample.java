@@ -56,7 +56,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
  *  <code>route.txt</code> for those agents adapting their routes. 
  *  @author nagel, jwjoubert
  */
-public class SubpopulationsExample {
+public class RunSubpopulationsExample {
 	final static String EQUIL_NETWORK = "./examples/equil/network.xml";
 	final static String PLANS = "./examples/tutorial/programming/MultipleSubpopulations/plans.xml";
 	final static String OBJECT_ATTRIBUTES = "./examples/tutorial/programming/MultipleSubpopulations/personAtrributes.xml";

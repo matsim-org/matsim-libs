@@ -20,7 +20,7 @@
  * <p/>
  * Please address yourself to Christoph Dobler for support.
  */
-package tutorial.unsupported.example50WithinDayReplanningFromPlans;
+package tutorial.unsupported.withinDayReplanningFromPlans;
 
 // attaching the above comment to a class would give us WYSIWYG in eclipse.  It means, however, that it does not display any
 // more in the matsim javadoc browser.  kai, mar'11

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example30NetworkFromEmme;
+package tutorial.programming.networkFromEmme;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -56,8 +56,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author nagel
  * 
  */
-public class NetworkEmme2Matsim {
-	private static final Logger log = Logger.getLogger(NetworkEmme2Matsim.class);
+public class RunNetworkEmme2MatsimExample {
+	private static final Logger log = Logger.getLogger(RunNetworkEmme2MatsimExample.class);
 
 	private static final int PSRC = 0 ;
 	private static final int EUGENE = 1 ;

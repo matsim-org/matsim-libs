@@ -5,7 +5,7 @@ import org.matsim.core.controler.Controler;
 
 
 
-public class MyMainClass {
+public class RunControlerListenerExample {
 	/**
 	 * @param args
 	 */

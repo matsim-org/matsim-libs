@@ -41,7 +41,7 @@ import org.matsim.vehicles.VehicleUtils;
  * 
  * @author nagel
  */
-public class RunOwnMobsimAgentUsingRouter {
+public class RunOwnMobsimAgentUsingRouterExample {
 
 	public static void main(String[] args) {
 		final Controler controler = new Controler("examples/tutorial/config/example5-config.xml") ;

@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,18 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.reflectiveConfigGroup;
 
-package org.matsim.core.mobsim.framework;
-
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.ControlerUtils;
 
 /**
- * If you add an AgentSource into the QSim, the method insertAgentsIntoMobsim() will be called during the initialization phase.
- * <p/>
- * For an example see {@link tutorial.programming.ownMobsimAgent.RunAgentSourceExample}
+ * @author nagel
+ *
  */
-public interface AgentSource {
-	// keep stable: referenced from book
+public class RunReflectiveConfigGroupExample {
 
-    public void insertAgentsIntoMobsim();
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Config config = ConfigUtils.loadConfig( args[0], new MyConfigGroup() ) ;
+		
+		// with cast:
+//		MyConfigGroup myConfigGroup = (MyConfigGroup) config.getModule( MyConfigGroup.GROUP_NAME ) ;
+		
+		// or without cast:
+		MyConfigGroup myConfigGroup = ConfigUtils.addOrGetModule(config, MyConfigGroup.GROUP_NAME, MyConfigGroup.class ) ;
+		
+		myConfigGroup.setDoubleField(-99.13) ;
+		
+		config.checkConsistency(); 
+		
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "test");
+		
+	}
 
 }

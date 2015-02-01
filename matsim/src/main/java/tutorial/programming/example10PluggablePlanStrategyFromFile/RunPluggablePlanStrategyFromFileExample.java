@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
-public class Main {
+public class RunPluggablePlanStrategyFromFileExample {
 
 	public static void main(final String[] args) {
 

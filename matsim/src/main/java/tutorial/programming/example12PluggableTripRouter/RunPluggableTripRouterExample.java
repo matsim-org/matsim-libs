@@ -24,7 +24,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
 
-public class RunPluggableTripRouter {
+public class RunPluggableTripRouterExample {
 
 	public static void main(final String[] args) {
 

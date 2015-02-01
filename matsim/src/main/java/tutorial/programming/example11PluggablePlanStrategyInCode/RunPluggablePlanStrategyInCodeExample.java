@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 
-public class Main {
+public class RunPluggablePlanStrategyInCodeExample {
 
 	public static void main(final String[] args) {
 

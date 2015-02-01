@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example50WithinDayReplanningFromPlans;
+package tutorial.unsupported.withinDayReplanningFromPlans;
 
 import java.util.ArrayList;
 import java.util.Collection;

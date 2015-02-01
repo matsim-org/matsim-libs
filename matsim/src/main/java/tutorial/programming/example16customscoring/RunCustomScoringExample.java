@@ -29,7 +29,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 
-public class Main {
+public class RunCustomScoringExample {
 
 	static class RainOnPersonEvent extends Event implements HasPersonId {
 

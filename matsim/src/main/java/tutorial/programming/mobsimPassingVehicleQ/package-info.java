@@ -5,4 +5,4 @@
  * @author nagel
  *
  */
-package tutorial.unsupported.mobsimPassingVehicleQ;
+package tutorial.programming.mobsimPassingVehicleQ;

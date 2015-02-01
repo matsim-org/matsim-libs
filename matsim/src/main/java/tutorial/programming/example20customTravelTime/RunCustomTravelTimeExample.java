@@ -42,7 +42,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
  * @author michaz
  *
  */
-public class Main {
+public class RunCustomTravelTimeExample {
 
     public static void main(String[] args) {
         String configFilename = "examples/equil/config.xml";

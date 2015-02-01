@@ -127,7 +127,7 @@ public abstract class ConfigUtils {
 	}
 
 	/**
-	 * This is a refactoring device to remove former core config groups from the Config.
+	 * This is a refactoring device to remove former core config groups from the core config.
 	 * Instructions: If you want to remove e.g. Config.vspExperimental(), replace that
 	 * method with
 	 * ConfigUtils.addOrGetModule(this, VspExperimentalConfigGroup.GROUP_NAME, VspExperimentalConfigGroup.class)

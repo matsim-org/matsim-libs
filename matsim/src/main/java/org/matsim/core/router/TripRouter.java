@@ -41,9 +41,9 @@ import org.matsim.core.utils.misc.Time;
  * It provides convenience methods to route an individual trip with
  * a desired mode or to identify trips.
  * <p/>
- * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouter} for an example
+ * See {@link tutorial.programming.ownMobsimAgentUsingRouter.RunOwnMobsimAgentUsingRouterExample} for an example
  * how to use this API from your own code.
- * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouter} and {@link tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRouting} for examples
+ * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample} and {@link tutorial.programming.example13MultiStageTripRouting.RunTeleportationMobsimWithCustomRoutingExample} for examples
  * how to replace this behavior with your own.
  *
  * @author thibautd

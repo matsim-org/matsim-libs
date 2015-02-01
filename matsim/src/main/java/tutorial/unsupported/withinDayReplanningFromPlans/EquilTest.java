@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example50WithinDayReplanningFromPlans;
+package tutorial.unsupported.withinDayReplanningFromPlans;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
