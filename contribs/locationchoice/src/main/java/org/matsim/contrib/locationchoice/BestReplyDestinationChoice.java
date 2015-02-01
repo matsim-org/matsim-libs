@@ -19,11 +19,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +27,8 @@ import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutato
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -41,16 +38,19 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 

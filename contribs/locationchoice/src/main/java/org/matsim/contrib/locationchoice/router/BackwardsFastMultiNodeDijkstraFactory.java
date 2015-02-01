@@ -18,15 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.matsim.contrib.locationchoice.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
-import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.util.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Creates a MultiNodeDijkstra which is routing backwards. To do so,
@@ -41,12 +41,8 @@ public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalcu
 	private final PreProcessDijkstra preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks;
-	
-	public BackwardsFastMultiNodeDijkstraFactory() {
-		this(null, false);
-	}
-	
-	public BackwardsFastMultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
+
+    public BackwardsFastMultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
 		this(null, searchAllEndNodes);
 	}
 		
@@ -54,7 +50,7 @@ public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalcu
 		this.preProcessData = preProcessData;
 		this.searchAllEndNodes = searchAllEndNodes;
 		
-		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
+		this.routingNetworks = new HashMap<>();
 		this.routingNetworkFactory = new InverseArrayRoutingNetworkFactory(preProcessData);
 	}
 

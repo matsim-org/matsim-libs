@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 
 public abstract class AbstractRoutingNetworkFactory implements RoutingNetworkFactory {
 
-	/*package*/ final PreProcessDijkstra preProcessData;
+	protected final PreProcessDijkstra preProcessData;
 	
 	public AbstractRoutingNetworkFactory(PreProcessDijkstra preProcessData) {
 		this.preProcessData = preProcessData;

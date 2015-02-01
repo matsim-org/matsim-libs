@@ -18,21 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
-
-import java.util.ArrayList;
+package org.matsim.contrib.locationchoice.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.NodeData;
-import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.RoutingNetwork;
-import org.matsim.core.router.util.RoutingNetworkLink;
-import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.FastMultiNodeDijkstra;
+import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+
+import java.util.ArrayList;
 
 /**
  * This implementation of a backwards routing Dijkstra is based on an
@@ -59,8 +54,8 @@ public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra {
 		 */
 		// bw: travel time has to be negative while costs are still positive
 		// But we have a problem if current time is negative. Use previous day instead! 
-		double travelTime = 0.0;
-		double travelCost = 0.0;
+		double travelTime;
+		double travelCost;
 		if (currTime < 0) {
 			double timeMod = 24.0 * 3600.0 - Math.abs(currTime % (24.0 * 3600.0));
 			travelTime = -1.0 * this.timeFunction.getLinkTravelTime(l, timeMod, getPerson(), getVehicle());
@@ -93,8 +88,8 @@ public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra {
 	@Override
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
 		
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
+		ArrayList<Node> nodes = new ArrayList<>();
+		ArrayList<Link> links = new ArrayList<>();
 
 		nodes.add(((RoutingNetworkNode) toNode).getNode());
 		Link tmpLink = getData(toNode).getPrevLink();

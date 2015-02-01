@@ -27,7 +27,7 @@ public class ArrayRoutingNetworkLink extends AbstractRoutingNetworkLink implemen
 
 	final int arrayIndex;
 	
-	/*package*/ ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode, int arrayIndex) {
+	public ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode, int arrayIndex) {
 		super(link, fromNode, toNode);
 		this.arrayIndex = arrayIndex;
 	}

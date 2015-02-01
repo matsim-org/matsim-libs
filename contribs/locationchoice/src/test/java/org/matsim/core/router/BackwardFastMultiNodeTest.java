@@ -20,24 +20,25 @@
 
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.util.BackwardsFastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author cdobler

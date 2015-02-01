@@ -20,10 +20,6 @@
 
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +34,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 
 /**
@@ -92,12 +92,12 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	/**
 	 * The cost calculator. Provides the cost for each link and time step.
 	 */
-	final TravelDisutility costFunction;
+	protected final TravelDisutility costFunction;
 
 	/**
 	 * The travel time calculator. Provides the travel time for each link and time step.
 	 */
-	final TravelTime timeFunction;
+	protected final TravelTime timeFunction;
 
 	final HashMap<Id<Node>, DijkstraNodeData> nodeData;
 
@@ -203,8 +203,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *            The time at which the route should start. <i>Note:</i> Using
 	 *            {@link Time#UNDEFINED_TIME} does not imply "time is not relevant",
 	 *            rather, {@link Path#travelTime} will return {@link Double#NaN}.
-	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
-	 *      org.matsim.core.network.Node, double)
+	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.api.core.v01.network.Node, org.matsim.api.core.v01.network.Node, double, org.matsim.api.core.v01.population.Person, org.matsim.vehicles.Vehicle)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -266,7 +265,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		 * the getArrayIndex() method of the ArrayRoutingNetworkNodes which further reduces
 		 * the memory consumption and increases the performance by another ~10%.
 		 */
-		return new WrappedBinaryMinHeap<Node>(this.network.getNodes().size());
+		return new WrappedBinaryMinHeap<>(this.network.getNodes().size());
 	}
 	
 	/**
@@ -305,12 +304,10 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *            The node where the path ends.
 	 * @param startTime
 	 *            The time when the trip starts.
-	 * @param preProcessData
-	 *            The time when the trip ends.
 	 */
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		ArrayList<Link> links = new ArrayList<Link>();
+		ArrayList<Node> nodes = new ArrayList<>();
+		ArrayList<Link> links = new ArrayList<>();
 
 		nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
@@ -450,7 +447,6 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	}
 
 	/**
-	 * @param link
 	 * @return <code>true</code> if the link can be passed with respect to a possible mode restriction set
 	 *
 	 * @see #setModeRestriction(Set)
@@ -484,7 +480,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @param outLink
 	 *            The link from which we came visiting n.
 	 */
-	void revisitNode(final Node n, final DijkstraNodeData data,
+	protected void revisitNode(final Node n, final DijkstraNodeData data,
 			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
@@ -531,7 +527,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	/**
 	 * @return iterationID
 	 */
-	/*package*/ int getIterationId() {
+	protected int getIterationId() {
 		return this.iterationID;
 	}
 

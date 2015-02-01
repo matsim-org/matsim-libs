@@ -19,11 +19,6 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
@@ -44,13 +40,17 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private final ActivityFacilities facilities;
