@@ -22,13 +22,10 @@ package org.matsim.core.controler;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -128,7 +125,7 @@ public abstract class AbstractController {
         try {
             loadCoreListeners();
             this.controlerListenerManager.fireControlerStartupEvent();
-            checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
+            ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
             prepareForSim();
             doIterations(config);
         } catch (UnexpectedShutdownException e) {
@@ -336,37 +333,6 @@ public abstract class AbstractController {
         }
     }
 
-
-    /**
-     * Design decisions:
-     * <ul>
-     * <li>I extracted this method since it is now called <i>twice</i>: once
-     * directly after reading, and once before the iterations start. The second
-     * call seems more important, but I wanted to leave the first one there in
-     * case the program fails before that config dump. Might be put into the
-     * "unexpected shutdown hook" instead. kai, dec'10
-     *
-     * Removed the first call for now, because I am now also checking for
-     * consistency with loaded controler modules. If still desired, we can
-     * put it in the shutdown hook.. michaz aug'14
-     *
-     * </ul>
-     *
-     * @param config  TODO
-     * @param message the message that is written just before the config dump
-     */
-    public static final void checkConfigConsistencyAndWriteToLog(Config config,
-                                                                    final String message) {
-        log.info(message);
-        String newline = System.getProperty("line.separator");// use native line endings for logfile
-        StringWriter writer = new StringWriter();
-        new ConfigWriter(config).writeStream(new PrintWriter(writer), newline);
-        log.info(newline + newline + writer.getBuffer().toString());
-        log.info("Complete config dump done.");
-        log.info("Checking consistency of config...");
-        config.checkConsistency();
-        log.info("Checking consistency of config done.");
-    }
 
     /**
      * Design comments:<ul>

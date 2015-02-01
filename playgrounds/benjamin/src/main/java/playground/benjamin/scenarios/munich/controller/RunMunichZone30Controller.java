@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.AbstractController;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
@@ -94,7 +95,7 @@ public class RunMunichZone30Controller extends AbstractController {
 
 	public void run() {
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-		checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
 		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
 		this.network = this.scenario.getNetwork();
 		this.population = this.scenario.getPopulation();
@@ -219,7 +220,7 @@ public class RunMunichZone30Controller extends AbstractController {
 	
 	@Override
 	protected void prepareForSim() {
-		checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
 		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override

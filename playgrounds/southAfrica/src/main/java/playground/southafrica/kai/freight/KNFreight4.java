@@ -59,9 +59,9 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -135,7 +135,7 @@ public class KNFreight4 {
 
 		Config config = createConfig(args);
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
-		AbstractController.checkConfigConsistencyAndWriteToLog(config, "dump");
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "dump");
 //		System.exit(-1);
 		
 		// ### scenario stuff: ###

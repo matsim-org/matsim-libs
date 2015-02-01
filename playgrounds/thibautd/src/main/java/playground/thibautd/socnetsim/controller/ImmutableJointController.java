@@ -23,12 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.LegTimesControlerListener;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.controler.AbstractController;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+
 import playground.ivt.utils.SubpopulationFilter;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.PsimAwareEventsWriter;
@@ -58,7 +60,7 @@ public final class ImmutableJointController extends AbstractController {
 		checkOutputdir( registry );
 
 		this.replanner = replanner;
-		checkConfigConsistencyAndWriteToLog(
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(
 				registry.getScenario().getConfig(),
 				"Complete config dump after reading the config file:");
 		this.registry = registry;
@@ -184,7 +186,7 @@ public final class ImmutableJointController extends AbstractController {
 
 	@Override
 	protected void prepareForSim() {
-		checkConfigConsistencyAndWriteToLog(
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(
 				registry.getScenario().getConfig(),
 				"Config dump before doIterations:");
 
