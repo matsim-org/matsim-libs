@@ -12,7 +12,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
 
-public class PNetworkGenerator {
+/**
+ * "P" has to do with "Potsdam" and "Z" with "Zurich", but P and Z are mostly used to show which classes belong together.
+ */
+public class RunPNetworkGenerator {
 	
 	public static void main(String[] args) {
 		

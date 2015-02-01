@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example90TrafficLights;
+package tutorial.programming.trafficSignals;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,9 +38,9 @@ import org.matsim.signalsystems.model.SignalSystem;
  * @author dgrether
  *
  */
-public class CreateIntergreens {
+public class RunCreateIntergreensExample {
 
-	private static final Logger log = Logger.getLogger(CreateIntergreens.class);
+	private static final Logger log = Logger.getLogger(RunCreateIntergreensExample.class);
 	
 	private static void createIntergreens(SignalsData sd){
 		IntergreenTimesData ig = sd.getIntergreenTimesData();
@@ -60,7 +60,7 @@ public class CreateIntergreens {
 	
 	
 	public static void main(String[] args) {
-		String configFile = new CreateSimpleTrafficSignalScenario().run();
+		String configFile = new RunCreateTrafficSignalScenarioExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
 		config.signalSystems().setUseIntergreenTimes(true);
 		SignalsScenarioLoader loader = new SignalsScenarioLoader(config.signalSystems());

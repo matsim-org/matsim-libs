@@ -1,4 +1,4 @@
-package tutorial.unsupported.example80DemandGenerationFromShapefile;
+package tutorial.programming.demandGenerationFromShapefile;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -15,7 +15,9 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.xml.sax.SAXException;
 
-public class NetworkGenerator {
+class NetworkGenerator {
+	// NOT naming this RunXxx since there is already a network generation example and this one here does
+	// not add anything (or if it does, that information might be copied to the other one).  kai, feb'15
 	
 	public static final String UTM33N = "PROJCS[\"WGS_1984_UTM_Zone_33N\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137,298.257223563]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",15],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"Meter\",1]]";
 	

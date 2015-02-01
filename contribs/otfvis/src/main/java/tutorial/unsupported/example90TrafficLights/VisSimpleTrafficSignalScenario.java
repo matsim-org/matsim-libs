@@ -21,6 +21,8 @@ package tutorial.unsupported.example90TrafficLights;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
+import tutorial.programming.trafficSignals.RunCreateTrafficSignalScenarioExample;
+
 
 
 /**
@@ -37,7 +39,7 @@ public class VisSimpleTrafficSignalScenario {
 
 	
 	private void run() {
-		String configFile = new CreateSimpleTrafficSignalScenario().run();
+		String configFile = new RunCreateTrafficSignalScenarioExample().run();
 		OTFVis.playConfig(configFile);
 	}
 	

@@ -21,6 +21,8 @@ package tutorial.unsupported.example90TrafficLights;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
+import tutorial.programming.trafficSignals.RunCreateTrafficSignalScenarioWithLanesExample;
+
 /**
  * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
  * 
@@ -32,7 +34,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 public class VisTrafficSignalScenarioWithLanes {
 
 	private void run() {
-		String configFile = new CreateTrafficSignalScenarioWithLanes().run();
+		String configFile = new RunCreateTrafficSignalScenarioWithLanesExample().run();
 		OTFVis.playConfig(configFile);
 	}
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example80DemandGenerationFromShapefile;
+package tutorial.programming.demandGenerationFromShapefile;
 
 import org.matsim.run.Controler;
 
@@ -27,7 +27,9 @@ import org.matsim.run.Controler;
  * @author dgrether
  *
  */
-public class GeneratedDemandRunner {
+class GeneratedDemandRunner {
+	// NOT naming this RunXxx since there are already similar examples elsewhere.  kai, feb'15
+
 
 	/**
 	 * @param args

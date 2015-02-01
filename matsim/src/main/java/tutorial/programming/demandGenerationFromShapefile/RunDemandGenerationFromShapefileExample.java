@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example80DemandGenerationFromShapefile;
+package tutorial.programming.demandGenerationFromShapefile;
 
 import java.io.IOException;
 import java.util.Random;
@@ -58,9 +58,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author dgrether
  *
  */
-public class DemandGenerator {
+public class RunDemandGenerationFromShapefileExample {
 
-	private static final Logger log = Logger.getLogger(DemandGenerator.class);
+	private static final Logger log = Logger.getLogger(RunDemandGenerationFromShapefileExample.class);
 
 	private static int ID = 0;
 

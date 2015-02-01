@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example90TrafficLights;
+package tutorial.programming.trafficSignals;
 
 import java.io.File;
 
@@ -69,10 +69,10 @@ import org.matsim.signalsystems.model.SignalSystem;
  * @see http://matsim.org/node/384
  *
  */
-public class CreateTrafficSignalScenarioWithLanes {
+public class RunCreateTrafficSignalScenarioWithLanesExample {
 
 	
-	private static final Logger log = Logger.getLogger(CreateTrafficSignalScenarioWithLanes.class);
+	private static final Logger log = Logger.getLogger(RunCreateTrafficSignalScenarioWithLanesExample.class);
 	
 	private int onset1 = 0;
 	private int dropping1 = 55;
@@ -304,7 +304,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new CreateTrafficSignalScenarioWithLanes().run();
+		new RunCreateTrafficSignalScenarioWithLanesExample().run();
 	}
 
 

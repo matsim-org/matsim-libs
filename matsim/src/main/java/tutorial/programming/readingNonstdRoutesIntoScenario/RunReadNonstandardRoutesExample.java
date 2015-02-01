@@ -20,7 +20,7 @@
 /**
  * 
  */
-package tutorial.unsupported.readingNonstdRoutesIntoScenario;
+package tutorial.programming.readingNonstdRoutesIntoScenario;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,12 +36,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * This is is an example, taken from Thibaut, of how to set an additional route factory before the controler has started.
+ * <p/>
+ * This will generate the route, with start and end link id.  It will also set distance and travel time if they
+ * are in the file.  This is sufficient information for teleportation.
  * 
  * @author nagel
  * @author thibautd
  *
  */
-public class Main {
+public class RunReadNonstandardRoutesExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig() ;

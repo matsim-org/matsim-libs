@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.unsupported.example60WithinDayReplanningAgents;
+package tutorial.programming.withinDayReplanningAgents;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,7 +45,7 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
-public class Main {
+public class RunWithinDayReplanningAgentExample {
 
 	public static void main(String[] args) {
 		
@@ -94,6 +94,13 @@ public class Main {
 
 }
 
+/**
+ * See {@link tutorial.programming.ownMobsimAgentWithPerception} and {@link tutorial.programming.ownMobsimAgentUsingRouter} for
+ * more complete examples.
+ * 
+ * @author nagel
+ *
+ */
 class MyAgent implements MobsimDriverAgent {
 	private static Logger log = Logger.getLogger("MyAgent") ;
 

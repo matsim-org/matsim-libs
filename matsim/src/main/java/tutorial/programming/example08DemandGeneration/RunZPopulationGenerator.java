@@ -19,7 +19,10 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class ZPopulationGenerator {
+/**
+ * "P" has to do with "Potsdam" and "Z" with "Zurich", but P and Z are mostly used to show which classes belong together.
+ */
+public class RunZPopulationGenerator {
 
 	public static void main(String args[]) {
 

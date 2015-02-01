@@ -23,7 +23,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * @author michaz
  *
  */
-public class POnePersonPopulationGenerator {
+public class RunPOnePersonPopulationGenerator {
 
 	public static void main(String[] args) {
 		

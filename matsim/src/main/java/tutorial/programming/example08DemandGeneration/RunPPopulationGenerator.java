@@ -18,7 +18,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-public class PPopulationGenerator implements Runnable {
+/**
+ * "P" has to do with "Potsdam" and "Z" with "Zurich", but P and Z are mostly used to show which classes belong together.
+ */
+public class RunPPopulationGenerator implements Runnable {
 
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 
@@ -29,7 +32,7 @@ public class PPopulationGenerator implements Runnable {
 	private Population population;
 
 	public static void main(String[] args) {
-		PPopulationGenerator potsdamPop = new PPopulationGenerator();
+		RunPPopulationGenerator potsdamPop = new RunPPopulationGenerator();
 		potsdamPop.run();
 	}
 
