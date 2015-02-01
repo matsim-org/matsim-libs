@@ -32,7 +32,7 @@ import org.matsim.core.events.MatsimEventsReader;
  * 
  * @author dgrether
  */
-public class MyEventsHandling {
+public class RunEventsHandlingExample {
 
 	
 	
