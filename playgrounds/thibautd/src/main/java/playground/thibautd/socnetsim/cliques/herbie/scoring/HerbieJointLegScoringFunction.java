@@ -108,7 +108,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		else if (TransportMode.walk.equals(leg.getMode())) {
 			
 			double distance =  DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-								* this.config.plansCalcRoute().getBeelineDistanceFactor();
+								* this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 			
 			travelTime = distance / this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
@@ -119,7 +119,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 			double distance = 0.0;
 			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-					* this.config.plansCalcRoute().getBeelineDistanceFactor();
+					* this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 			}
 			
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
@@ -127,7 +127,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 		}
 		else if (TransportMode.bike.equals(leg.getMode())) {
 			double distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-				* this.config.plansCalcRoute().getBeelineDistanceFactor();
+				* this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.bike ).getBeelineDistanceFactor();
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
 		}

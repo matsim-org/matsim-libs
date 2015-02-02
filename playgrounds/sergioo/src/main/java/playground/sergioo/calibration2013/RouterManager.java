@@ -93,7 +93,8 @@ public class RouterManager {
 								distances[CAR_POSITION] = Double.POSITIVE_INFINITY;
 						}
 						path = ((TransitRouterVariableImpl)transitRouter).calcPathRoute(prev.getCoord(), next.getCoord(), prev.getEndTime(), null);
-						double walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) / scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
+						double walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) / 
+								scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 						costs[PT_POSITION] = path==null?Double.POSITIVE_INFINITY:path.travelCost;
 						if(path!=null) {
 							for(Link link:path.links)

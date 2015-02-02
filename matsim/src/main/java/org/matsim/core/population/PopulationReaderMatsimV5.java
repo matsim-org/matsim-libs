@@ -244,7 +244,9 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
                     Coord toCoord = getCoord(this.curract);
                     if (fromCoord != null && toCoord != null) {
                         double dist = CoordUtils.calcDistance(fromCoord, toCoord);
-                        double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
+                        double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
+                        		getModeRoutingParams().get( this.currleg.getMode() ).getBeelineDistanceFactor() ;
+//                        		getBeelineDistanceFactor();
                         this.currRoute.setDistance(estimatedNetworkDistance);
                     }
 				}

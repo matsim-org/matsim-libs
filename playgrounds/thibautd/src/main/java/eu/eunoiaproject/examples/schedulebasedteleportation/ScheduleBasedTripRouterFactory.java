@@ -78,7 +78,7 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 							new TeleportationLegRouter(
 									((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
 									scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ),
-									scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor())));
+									scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor())));
 
 		tripRouter.setRoutingModule(
 				TransportMode.pt,

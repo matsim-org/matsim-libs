@@ -104,7 +104,8 @@ public class PTTravelTimes {
                         new TeleportationLegRouter(
                                 ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
                                 routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                routeConfigGroup.getBeelineDistanceFactor())));
+                                routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() )));
+//                                routeConfigGroup.getBeelineDistanceFactor())));
 		
 		//final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/StatisticsPt.txt");
 		int i = 1;

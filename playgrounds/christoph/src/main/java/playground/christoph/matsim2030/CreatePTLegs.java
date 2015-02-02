@@ -113,7 +113,8 @@ public class CreatePTLegs {
                             new TeleportationLegRouter(
                                     ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
                                     routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                    routeConfigGroup.getBeelineDistanceFactor())));
+                                    routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
+//                                    routeConfigGroup.getBeelineDistanceFactor())));
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...
                 // because the setting is inconsistent by default (defaults

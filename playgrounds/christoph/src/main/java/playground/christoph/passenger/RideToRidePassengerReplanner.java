@@ -129,8 +129,9 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		ridePassengerLeg.setDepartureTime(rideLeg.getDepartureTime());
 		Route ridePassengerRoute = rideRouteFactory.createRoute(context.pickupLink.getId(), context.dropOffLink.getId());
 		ridePassengerLeg.setRoute(ridePassengerRoute);
-		double estimatedNetworkDistance = CoordUtils.calcDistance(context.pickupLink.getCoord(), context.dropOffLink.getCoord()) * 
-				scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
+		double estimatedNetworkDistance = CoordUtils.calcDistance(context.pickupLink.getCoord(), context.dropOffLink.getCoord()) *
+				scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.ride ).getBeelineDistanceFactor() ;
+//				scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
 		ridePassengerRoute.setDistance(estimatedNetworkDistance);
 		
 		// Create drop off activity.

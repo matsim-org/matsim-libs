@@ -92,7 +92,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 				new TeleportationLegRouter(
 						((PopulationFactoryImpl) populationFactory).getModeRouteFactory(),
 						routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-						routeConfigGroup.getBeelineDistanceFactor()));
+						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()));
 	}
 
 	@Override

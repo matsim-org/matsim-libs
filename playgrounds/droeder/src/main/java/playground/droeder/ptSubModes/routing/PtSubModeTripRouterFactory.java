@@ -133,7 +133,8 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 							network,
 							routeAlgoPtFreeFlow,
 							routeConfigGroup.getTeleportedModeFreespeedFactors().get( mainMode ),
-							routeConfigGroup.getBeelineDistanceFactor(),
+                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor(),
+//							routeConfigGroup.getBeelineDistanceFactor(),
 							modeRouteFactory)));
 		}
 
@@ -146,7 +147,8 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 						new TeleportationLegRouter(
 							modeRouteFactory,
 							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-							routeConfigGroup.getBeelineDistanceFactor())));
+                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+//			routeConfigGroup.getBeelineDistanceFactor())));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
@@ -176,7 +178,8 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 									new TeleportationLegRouter(
 											modeRouteFactory,
 											routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
-											routeConfigGroup.getBeelineDistanceFactor()))));
+				                            routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() )))) ;
+//					routeConfigGroup.getBeelineDistanceFactor()))));
 		}
 		// add pt as fallback-solution
 		tripRouter.setRoutingModule(
@@ -191,7 +194,8 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 								new TeleportationLegRouter(
 										modeRouteFactory,
 										routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
-										routeConfigGroup.getBeelineDistanceFactor()))));
+			                            routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() )))) ;
+//										routeConfigGroup.getBeelineDistanceFactor()))));
 		return tripRouter;
 		
 	}

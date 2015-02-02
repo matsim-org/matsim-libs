@@ -64,17 +64,17 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(SimpleTripAnalyzer.class);
-	private double distFactor;
 	private Map<Id<Person>, Traveller> traveller;
 	private Network net;
 	private Set<Id<Person>> pIds;
+	private Map<String, Double> distFactors;
 	
 	public  SimpleTripAnalyzer(Config c, Network net, Set<Id<Person>> pIds) throws RuntimeException{
 		if(c.scenario().isUseTransit() ){
 			throw new RuntimeException("This analysis is structured very simple. " +
 					"Thus, it does not allow physically simulated transit!");
 		}
-		distFactor = c.plansCalcRoute().getBeelineDistanceFactor();
+		this.distFactors = c.plansCalcRoute().getBeelineDistanceFactors() ;
 		this.net = net;
 		this.pIds = pIds;
 	}
@@ -150,7 +150,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 			trip.beeline = calcBeelineDistance(trip.from, trip.to);
 			// dist for non-car-modes is calculated with a factor
 			if(!trip.mode.equals(TransportMode.car)){
-				trip.dist = this.distFactor * trip.beeline; 
+				trip.dist = this.distFactors.get( trip.mode ) * trip.beeline; 
 			}
 			// there will be no more trips
 			if(trip.stuck) return;

@@ -119,7 +119,8 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 		} else if (TransportMode.walk.equals(leg.getMode())) {
 			
 			double distance =  DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-								* this.config.plansCalcRoute().getBeelineDistanceFactor();
+					* this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()  ;
+//								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
 			travelTime = distance / this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 			
@@ -141,14 +142,16 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			double distance = 0.0;
 			if (this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m != 0.0) {
 				distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-					* this.config.plansCalcRoute().getBeelineDistanceFactor();
+                        * this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+                        //					* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			}
 			
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		} else if (TransportMode.bike.equals(leg.getMode())) {
 			double distance = DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
-				* this.config.plansCalcRoute().getBeelineDistanceFactor();
+                    * this.config.plansCalcRoute().getModeRoutingParams().get( TransportMode.bike ).getBeelineDistanceFactor() ;
+                    //				* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			tmpScore += travelScoring.getBikeScore(distance, travelTime);
 			
 		} else {

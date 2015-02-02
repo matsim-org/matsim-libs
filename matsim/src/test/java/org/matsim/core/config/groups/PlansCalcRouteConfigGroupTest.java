@@ -126,15 +126,17 @@ public class PlansCalcRouteConfigGroupTest {
 		params.setTeleportedModeFreespeedFactor( 2.0 );
 	}
 
-	private void assertIdentical(
+	private static void assertIdentical(
 			final String msg,
 			final PlansCalcRouteConfigGroup initialGroup,
 			final PlansCalcRouteConfigGroup inputConfigGroup) {
 		Assert.assertEquals(
 				"unexpected beelineDistanceFactor",
-				initialGroup.getBeelineDistanceFactor(),
-				inputConfigGroup.getBeelineDistanceFactor(),
-				MatsimTestUtils.EPSILON );
+//				initialGroup.getBeelineDistanceFactor(),
+//				inputConfigGroup.getBeelineDistanceFactor(),
+				initialGroup.getBeelineDistanceFactors(),
+				inputConfigGroup.getBeelineDistanceFactors() ) ;
+//				MatsimTestUtils.EPSILON );
 		Assert.assertEquals(
 				"unexpected networkModes",
 				initialGroup.getNetworkModes(),

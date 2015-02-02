@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
@@ -69,7 +70,9 @@ public class EvacuationTransitRouterFactory implements TransitRouterFactory {
 		this.dijkstraFactory = new FastTransitDijkstraFactory();
 		this.departureTimeCache = new PreparedTransitSchedule(transitSchedule);
 		
-		double beelineDistanceFactor = config.plansCalcRoute().getBeelineDistanceFactor();
+		double beelineDistanceFactor =
+                config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+//				config.plansCalcRoute().getBeelineDistanceFactor();
 		this.ttCalculator = new EvacuationTransitRouterNetworkTravelTimeAndDisutility(this.routerConfig, this.departureTimeCache, walkTravelTime,
 				beelineDistanceFactor);
 		this.exitNodes = new ArrayList<TransitRouterNetworkNode>();

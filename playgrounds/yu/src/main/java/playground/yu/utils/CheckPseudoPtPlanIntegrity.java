@@ -68,7 +68,7 @@ public class CheckPseudoPtPlanIntegrity {
 
 						route.setDistance(distance);
 
-						leg.setTravelTime(pcrcg.getBeelineDistanceFactor()
+						leg.setTravelTime(pcrcg.getModeRoutingParams().get( TransportMode.pt ).getBeelineDistanceFactor()
 								* distance / pcrcg.getTeleportedModeSpeeds().get(TransportMode.pt));
 
 						// leg.setRoute(route);

@@ -96,7 +96,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                                     scenario.getNetwork(),
                                     routeAlgoPtFreeFlow,
                                     routeConfigGroup.getTeleportedModeFreespeedFactors().get( mainMode ),
-                                    routeConfigGroup.getBeelineDistanceFactor(),
+                                    routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor(),
+//                                    routeConfigGroup.getBeelineDistanceFactor(),
                                     ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory())));
         }
 
@@ -110,7 +111,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                                     new TeleportationLegRouter(
                                             ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
                                             routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-                                            routeConfigGroup.getBeelineDistanceFactor())));
+                                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+            //                                            routeConfigGroup.getBeelineDistanceFactor())));
             if ( old != null ) {
                 log.error( "inconsistent router configuration for mode "+mainMode );
                 log.error( "One situation which triggers this warning: setting both speed and speedFactor for a mode (this used to be possible)." );
@@ -148,7 +150,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                             new TeleportationLegRouter(
                                     ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
                                     routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-                                    routeConfigGroup.getBeelineDistanceFactor())));
+                                    routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
+//                                    routeConfigGroup.getBeelineDistanceFactor())));
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...
                 // because the setting is inconsistent by default (defaults

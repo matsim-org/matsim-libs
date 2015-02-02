@@ -98,7 +98,8 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 							new PseudoTransitLegRouter(
 									network, routeAlgoPtFreeFlow,
 									routeConfigGroup.getTeleportedModeFreespeedFactors().get(mainMode),
-									routeConfigGroup.getBeelineDistanceFactor(),
+	                                routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor(),
+//									routeConfigGroup.getBeelineDistanceFactor(),
 									modeRouteFactory)));
 			
 		}
@@ -112,7 +113,8 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 						new TeleportationLegRouter(
                                 modeRouteFactory,
 							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-							routeConfigGroup.getBeelineDistanceFactor())));
+                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+//							routeConfigGroup.getBeelineDistanceFactor())));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {

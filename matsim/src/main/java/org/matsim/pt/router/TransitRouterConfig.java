@@ -102,7 +102,9 @@ public class TransitRouterConfig implements MatsimParameters {
 	{
 
 		// walk:
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / pcrConfig.getBeelineDistanceFactor();
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
+				/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+//				/ pcrConfig.getBeelineDistanceFactor();
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ; 
 		
 		// pt:

@@ -151,7 +151,7 @@ public class AccessEgressMultimodalTripRouterFactory implements TripRouterFactor
 								subNetwork,
 								nonPersonnalizableDisutility,
 								travelTime) );
-			final double crowFlyDistanceFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor();
+			final double crowFlyDistanceFactor = scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( mode ).getBeelineDistanceFactor();
 			final double crowFlySpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( mode );
 			instance.setRoutingModule(
 					mode,

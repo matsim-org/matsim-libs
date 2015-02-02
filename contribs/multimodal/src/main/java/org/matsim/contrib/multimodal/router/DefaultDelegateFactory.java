@@ -127,7 +127,9 @@ public class DefaultDelegateFactory implements TripRouterFactory {
     		LeastCostPathCalculator routeAlgoPtFreeFlow = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, ptTimeCostCalc, ptTimeCostCalc);
         	
 			LegRouter pseudoTransitLegRouter = new PseudoTransitLegRouter(scenario.getNetwork(), routeAlgoPtFreeFlow, 
-					routeConfigGroup.getTeleportedModeFreespeedFactors().get(mode), routeConfigGroup.getBeelineDistanceFactor(), modeRouteFactory);
+					routeConfigGroup.getTeleportedModeFreespeedFactors().get(mode), 
+					routeConfigGroup.getModeRoutingParams().get( mode ).getBeelineDistanceFactor(), 
+					modeRouteFactory);
 			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, pseudoTransitLegRouter); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
        }
@@ -141,7 +143,9 @@ public class DefaultDelegateFactory implements TripRouterFactory {
         	if (multiModalConfigGroup.getSimulatedModes().contains(mode)) continue;
         	
 			LegRouter teleportationLegRouter = new TeleportationLegRouter(modeRouteFactory, 
-					routeConfigGroup.getTeleportedModeSpeeds().get(mode), routeConfigGroup.getBeelineDistanceFactor());
+					routeConfigGroup.getTeleportedModeSpeeds().get(mode),
+					routeConfigGroup.getModeRoutingParams().get( mode ).getBeelineDistanceFactor()
+					);
 			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, teleportationLegRouter); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	

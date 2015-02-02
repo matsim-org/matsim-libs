@@ -88,7 +88,8 @@ class PSim implements Mobsim {
 
 
         PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
-        this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / pcrConfig.getBeelineDistanceFactor();
+        this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) 
+        		/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
         this.carLinkTravelTimes = carLinkTravelTimes;
         this.plans = plans;
     }

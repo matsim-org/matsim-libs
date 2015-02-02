@@ -74,7 +74,9 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 				transitWalkRoutingModule = tripRouter.getRoutingModule(TransportMode.walk);
 			} else {
 				LegRouter teleportationLegRouter = new TeleportationLegRouter(modeRouteFactory, 
-						routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk), routeConfigGroup.getBeelineDistanceFactor());
+						routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk), 
+						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()
+						);
 				transitWalkRoutingModule = new LegRouterWrapper(TransportMode.transit_walk, populationFactory, teleportationLegRouter);
 			}
 			

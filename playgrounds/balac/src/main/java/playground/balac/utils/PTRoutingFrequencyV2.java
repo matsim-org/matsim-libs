@@ -195,7 +195,8 @@ public class PTRoutingFrequencyV2 {
                         new TeleportationLegRouter(
                                 ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
                                 routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                routeConfigGroup.getBeelineDistanceFactor())));
+                                routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
+//                                routeConfigGroup.getBeelineDistanceFactor())));
 		
 		int i =1;
 		System.out.println("starting to parse the input file");

@@ -78,8 +78,9 @@ public class CATripRouterFactory implements TripRouterFactory {
 							((PopulationFactoryImpl) scenario.getPopulation()
 									.getFactory()).getModeRouteFactory(),
 							routeConfigGroup.getTeleportedModeSpeeds().get(
-									mainMode), routeConfigGroup
-									.getBeelineDistanceFactor())));
+									mainMode), 
+		                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+//									routeConfigGroup.getBeelineDistanceFactor())));
 			if (old != null) {
 				log.error("inconsistent router configuration for mode "
 						+ mainMode);

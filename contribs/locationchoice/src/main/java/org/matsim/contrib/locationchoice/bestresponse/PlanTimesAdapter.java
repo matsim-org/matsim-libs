@@ -252,7 +252,8 @@ public class PlanTimesAdapter {
 		((PathCostsGeneric)pathCosts).createRoute(
 				this.network.getLinks().get(actPre.getLinkId()), 
 				this.network.getLinks().get(pe.getLinkId()),
-				config.plansCalcRoute().getBeelineDistanceFactor(), 
+//				config.plansCalcRoute().getBeelineDistanceFactor(), 
+				config.plansCalcRoute().getModeRoutingParams().get( PlansCalcRouteConfigGroup.UNDEFINED ).getBeelineDistanceFactor(),
 				speed);
 		return pathCosts;
 	}

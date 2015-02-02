@@ -128,7 +128,8 @@ public class FirstSimulation {
 		 */
  
 		
-		System.out.println(config.plansCalcRoute().getBeelineDistanceFactor());
+//		System.out.println(config.plansCalcRoute().getBeelineDistanceFactor());
+		// this is now mode-specific, but I don't know to which mode this refers. kai, feb'15
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

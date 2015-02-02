@@ -911,7 +911,7 @@ public class GeneralLib {
 
 	public static double getWalkingTravelDuration(double distance) {
 		return distance
-				* controler.getConfig().plansCalcRoute()
+				* controler.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk )
 						.getBeelineDistanceFactor()
 				/ controler.getConfig().plansCalcRoute()
 						.getTeleportedModeSpeeds().get(TransportMode.walk);
@@ -925,7 +925,7 @@ public class GeneralLib {
 	public static double getPtTravelDuration(double distance) {
 		return distance
 				* controler.getConfig().plansCalcRoute()
-						.getBeelineDistanceFactor()
+						.getModeRoutingParams().get( TransportMode.pt ).getBeelineDistanceFactor()
 				/ controler.getConfig().plansCalcRoute()
 						.getTeleportedModeSpeeds().get(TransportMode.pt);
 	}
@@ -933,7 +933,7 @@ public class GeneralLib {
 	public static double getBikeTravelDuration(double distance) {
 		return distance
 				* controler.getConfig().plansCalcRoute()
-						.getBeelineDistanceFactor()
+						.getModeRoutingParams().get( TransportMode.bike ).getBeelineDistanceFactor()
 				/ controler.getConfig().plansCalcRoute()
 						.getTeleportedModeSpeeds().get(TransportMode.bike);
 	}

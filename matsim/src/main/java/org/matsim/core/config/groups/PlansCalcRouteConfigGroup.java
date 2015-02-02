@@ -61,7 +61,8 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private double beelineDistanceFactor = 1.3;
+	private static Double beelineDistanceFactor = null ;
+			
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
 
 	private boolean acceptModeParamsWithoutClearing = false;
@@ -72,6 +73,8 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		private String mode = null;
 		private Double teleportedModeSpeed = null;
 		private Double teleportedModeFreespeedFactor = null;
+
+		private Double beelineDistanceFactorForMode = null ;
 
 		public ModeRoutingParams(final String mode) {
 			super( SET_TYPE );
@@ -148,6 +151,22 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 			}
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
 		}
+		
+		@StringSetter("beelineDistanceFactor")
+		public void setBeelineDistanceFactor( Double val ) {
+			this.beelineDistanceFactorForMode = val ;
+		}
+		@StringGetter("beelineDistanceFactor")
+		public Double getBeelineDistanceFactor() {
+			if ( this.beelineDistanceFactorForMode != null ) {
+				return this.beelineDistanceFactorForMode ;
+			} else  if ( beelineDistanceFactor != null ) {
+				return beelineDistanceFactor ;
+			} else {
+				return 1.3 ; // this is the old default; can be removed after about a year.  kai, feb'15
+			}
+		}
+		
 	}
 	
 	public PlansCalcRouteConfigGroup() {
@@ -282,7 +301,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
-		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
+//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[this.networkModes.size()])));
 		return map;
 	}
@@ -298,12 +317,19 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-	public double getBeelineDistanceFactor() {
-		return this.beelineDistanceFactor;
-	}
+//	@SuppressWarnings("static-method")
+//	public double getBeelineDistanceFactor() {
+//		return beelineDistanceFactor;
+//	}
 
-	public void setBeelineDistanceFactor(double beelineDistanceFactor) {
-		this.beelineDistanceFactor = beelineDistanceFactor;
+	@SuppressWarnings("static-method")
+	public void setBeelineDistanceFactor(double val) {
+		if ( beelineDistanceFactor == null ) {
+			beelineDistanceFactor = val;
+		} else {
+			throw new RuntimeException("changing beelineDistanceFactor for second time no longer allowed.  Use mode-specific "
+					+ "beelineDistanceFactor in config v2 format.  kai, feb'15") ;
+		}
 	}
 
 	public Collection<String> getNetworkModes() {
@@ -330,9 +356,17 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 			if ( speed != null ) map.put( pars.getMode() , speed );
 		}
 		return map;
-
 	}
-
+	
+	public Map<String,Double> getBeelineDistanceFactors() {
+		final Map<String,Double> map = new LinkedHashMap<>() ;
+		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+			final Double val = pars.getBeelineDistanceFactor() ;
+			if ( val != null ) map.put( pars.getMode() , val ) ;
+		}
+		return map ;
+	}
+	
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		// re-create, to trigger erasing of defaults
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );

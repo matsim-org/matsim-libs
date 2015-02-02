@@ -113,7 +113,9 @@ public final class PtMatrix {
 
 					PtStop destinationStop = ptStopIds[destination];
 					Coord destinationCoord = destinationStop.getCoord();
-					double distance = CoordUtils.calcDistance(originCoord, destinationCoord) * plansCalcRoute.getBeelineDistanceFactor();
+					double distance = CoordUtils.calcDistance(originCoord, destinationCoord)
+							* plansCalcRoute.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
+//							* plansCalcRoute.getBeelineDistanceFactor();
 
 					double travelTime = distance / plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt);
 
