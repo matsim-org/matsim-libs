@@ -33,7 +33,7 @@ import java.util.Map;
  * @author nagel
  *
  */
-class RunMobsimWithPassingVehicleQExample {
+class RunMobsimWithMultipleModeVehiclesExample {
 
 	public static void main ( String[] args ) {
 
@@ -48,7 +48,7 @@ class RunMobsimWithPassingVehicleQExample {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.setMobsimFactory(new PassingQMobsimFactory()) ;
+		controler.setMobsimFactory(new MultipleModeVehiclesQSimFactory()) ;
 
 		// run everything:
 		controler.run();
@@ -61,7 +61,7 @@ class RunMobsimWithPassingVehicleQExample {
 	 * @author nagel
 	 *
 	 */
-	static class PassingQMobsimFactory implements MobsimFactory {
+	static class MultipleModeVehiclesQSimFactory implements MobsimFactory {
 
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
