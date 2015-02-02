@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -43,12 +44,26 @@ import playground.thibautd.utils.CollectionUtils;
 public class SnaUtils {
 	private SnaUtils() {}
 
-	public static double calcClusteringCoefficient(
+	public static double estimateClusteringCoefficient(
+			final double samplingRate,
 			final SocialNetwork socialNetwork) {
+		return estimateClusteringCoefficient( new Random( 20150130 ) , samplingRate , socialNetwork );
+	}
+
+	public static double estimateClusteringCoefficient(
+			final Random random,
+			final double samplingRate,
+			final SocialNetwork socialNetwork) {
+		if ( samplingRate <= 0 ) throw new IllegalArgumentException( "sampling rate must be positive, got "+samplingRate );
+		if ( samplingRate > 1 ) throw new IllegalArgumentException( "sampling rate must lower than 1, got "+samplingRate );
+
 		final Counter tripleCounter = new Counter( "clustering calculation: look at triple # " );
 		long nTriples = 0;
 		long nTriangles = 0;
+
 		for ( Id<Person> ego : socialNetwork.getEgos() ) {
+			if ( random != null && random.nextDouble() > samplingRate ) continue;
+
 			final Set<Id<Person>> alterSet = socialNetwork.getAlters( ego );
 			final Id<Person>[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
 
@@ -72,6 +87,11 @@ public class SnaUtils {
 		assert nTriples >= 0 : nTriples;
 		assert nTriangles >= 0 : nTriangles;
 		return nTriples > 0 ? (1d * nTriangles) / nTriples : 0;
+	}
+
+	public static double calcClusteringCoefficient(
+			final SocialNetwork socialNetwork) {
+		return estimateClusteringCoefficient( null , 1 , socialNetwork );
 	}
 
 	public static double calcAveragePersonalNetworkSize(final SocialNetwork socialNetwork) {
