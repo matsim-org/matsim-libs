@@ -168,8 +168,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		log.info( "create ties using preprocessed data" );
 		Gbl.printMemoryUsage();
 
-		final Counter counter = new Counter( "consider primary pair # " );
-		final Counter counter2 = new Counter( "consider secondary pair # " );
+		final Counter counter = new Counter( "consider ego # " );
 		final ThreadGroup threads = new ThreadGroup();
 
 		for ( int i=0; i < nThreads; i++ ) {
@@ -182,6 +181,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 					public void run() {
 						final TIntSet friendsOfFriends = new TIntHashSet();
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
+							counter.incCounter();
 							sn.put(
 								population.getId( ego ),
 								preprocess.getAltersOverWeight(
@@ -199,10 +199,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 							// sampling already done
 							final Set<Id<Person>> newAlters = sn.get( population.getId( ego ) );
 							for ( int fof : friendsOfFriends.toArray() ) {
-								counter2.incCounter();
-								if ( utility.getTieUtility( ego , fof ) > thresholds.getSecondaryThreshold() ) {
-									newAlters.add( population.getId( fof ) );
-								}
+								newAlters.add( population.getId( fof ) );
 							}
 
 						}
@@ -212,7 +209,6 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 		threads.run();
 		counter.printCounter();
-		counter2.printCounter();
 
 		Gbl.printMemoryUsage();
 		// TODO: check if not possible in loop
