@@ -154,10 +154,11 @@ public class MunichControler {
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 
-		if(Boolean.valueOf(args [5])){
+		if(Boolean.valueOf(args [6])){
 			controler.addControlerListener(new MyTollAveragerControlerListner());
 		}
-		if(Boolean.valueOf(args [6])){
+		if(Boolean.valueOf(args [7])){
+			// not sure for true functionality yet
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 			controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner(emissionCostModule,emissionModule));
 		}
