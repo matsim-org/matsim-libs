@@ -123,16 +123,15 @@ public class PreprocessedModelRunner implements ModelRunner {
 										alter,
 										utility.getTieUtility( ego , alter ) );
 							}
-
-							// no tie added to this ego anymore (always look only "to the right"):
-							// trim storing array to avoid waste of space
-							preprocess.trim( ego );
 						}
 					}
 				} );
 		}
 
 		threads.run();
+		// cannot trim "on the fly", even though one always looks "on the right":
+		// other threads are also allowed to add elements
+		preprocess.trimAll();
 		counter.printCounter();
 
 		log.info( "preprocessing done" );
