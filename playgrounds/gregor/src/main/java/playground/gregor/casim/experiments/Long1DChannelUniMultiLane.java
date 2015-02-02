@@ -51,7 +51,6 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPH;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHFactory;
-import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHII;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetwork;
@@ -113,96 +112,24 @@ public class Long1DChannelUniMultiLane {
 		for (double w = 2.9; w < 3; w += 0.05) {
 			settings.add(new Setting(w, 3, 3, 500, 0, w, w));
 		}
-		// settings.add(new Setting(3, 3, .8, 270, 0, .8, .8));
 		for (double w = .4; w < 3; w += 0.2) {
 			settings.add(new Setting(3, 3, w, 500, 0, w, w));
 		}
-		// settings.add(new Setting(3, 3, 1.2, 348, 0, 1.2, 1.2));
-		// // for (double w = 1.2; w < 1.6)
-		// settings.add(new Setting(2, 3.6, 2, 143, 166, 3.6, 3.6));
-		// // settings.add(new Setting(3, 3, 2.1, 351, 0, 2, 2));
-		// settings.add(new Setting(3, 3, 2, 351, 0, 2, 2));
-		// // settings.add(new Setting(3, 3, 1.9, 351, 0, 2, 2));
-		// settings.add(new Setting(3, 3, 3, 349, 0, 3, 3));
-		// settings.add(new Setting(2.4, 3, 3, 296, 0, 3, 3));
-		// settings.add(new Setting(1.8, 3, 3, 208, 0, 3, 3));
-		// settings.add(new Setting(1.2, 3, 3, 163, 0, 3, 3));
-		// settings.add(new Setting(1, 3, 3, 100, 0, 3, 3));
 		for (double w = 0.8; w <= 3; w += 0.2) {
 			settings.add(new Setting(w, 3, 3, 500, 0, w, w));
 		}
-		// settings.add(new Setting(1.8, 3.6, 1.8));
-		// settings.add(new Setting(2, 3.6, 2));
-		// settings.add(new Setting(.5, 3.6, .5, 56, 74));
-		// settings.add(new Setting(.75, 3.6, .75, 62, 65));
-		// settings.add(new Setting(.9, 3.6, .9, 110, 102));
-		// settings.add(new Setting(1.2, 3.6, 1.2, 115, 106));
-		// settings.add(new Setting(1.6, 3.6, 1.6, 140, 166));
-		// settings.add(new Setting(2., 3.6, 2., 143, 166));
-		// settings.add(new Setting(2.5, 3.6, 2.5, 141, 163));
-		// settings.add(new Setting(2., 3.6, 2., 500, 500));
-		// for (int i = 0; i < 500; i++) {
-		// double r = 0, l = 0, c = 0;
-		// while (l < 1 || l > 5) {
-		// l = 2.5 + MatsimRandom.getRandom().nextGaussian();
-		// }
-		// while (r < 1 || r > 5) {
-		// r = 2.5 + MatsimRandom.getRandom().nextGaussian();
-		// }
-		// while (c < 1 || c > 5) {
-		// c = 2.5 + MatsimRandom.getRandom().nextGaussian();
-		// }
-		// settings.add(new Setting(l, c, r, 200, 200, r, l));
-		// }
-
-		// for (double l = 1.6; l <= 3.61; l += .1) {
-		// for (double r = .61; r <= 0.61; r += .61) {
-		// for (double cor = 3.6; cor <= 3.6; cor += 3.6) {
-		// for (double bexL = .61; bexL <= cor; bexL += .61) {
-		// for (double bexR = .6; bexR <= cor; bexR += .1) {
-		//
-		// // settings.add(new Setting(l, cor, r, 400, 400,
-		// // bexL,
-		// // bexR));
-		// if (l < bexR) {
-		// continue;
-		// }
-		// settings.add(new Setting(l, cor, r, 1600, 0, bexL,
-		// bexR));
-		// // settings.add(new Setting(l, cor, r, 0, 400, bexL,
-		// // bexR));
-		// }
-		// }
-		// }
-		// }
-		//
-		// }
-
-		// settings.add(new Setting(3.6, 3.6, 3.6, 400, 0, 1.8, 7.2));
-		// settings.add(new Setting(3.6, 3.6, 3.6, 400, 400, 1.8, 7.2));
-
-		// for (double w = 1; w < 3.61; w += 0.1) {
-		// settings.add(new Setting(w, 3.6, w, 500, 500));
-		// }
 
 		AbstractCANetwork.EMIT_VIS_EVENTS = false;
 		USE_SPH = true;
 		for (int R = 12; R <= 12; R++) {
-			// R = 12;
 			CASingleLaneDensityEstimatorSPH.H = R;
 			CAMultiLaneDensityEstimatorSPH.H = R;
-			CAMultiLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPA.RANGE = R;
 			CASingleLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPAII.RANGE = R;
-			// R = 12;
 			try {
 				bw = new BufferedWriter(new FileWriter(new File(
 						"/Users/laemmel/devel/bipedca/ant/uni" + R)));
-				// bw = new BufferedWriter(
-				// new FileWriter(new File(
-				// "/home/laemmel/scenarios/bipedca/rho_new_uni_spl_"
-				// + R)));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

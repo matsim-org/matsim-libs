@@ -51,7 +51,6 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPH;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHFactory;
-import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHII;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetwork;
@@ -163,18 +162,17 @@ public class Long1DChannelBiMultiLane {
 		// settings.add(new Setting(w, 3.6, w, 500, 500));
 		// }
 
-		AbstractCANetwork.EMIT_VIS_EVENTS = false;
+		AbstractCANetwork.EMIT_VIS_EVENTS = true;
 		USE_SPH = true;
 		for (int R = 12; R <= 12; R++) {
 			CASingleLaneDensityEstimatorSPH.H = R;
 			CAMultiLaneDensityEstimatorSPH.H = R;
-			CAMultiLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPA.RANGE = R;
 			CASingleLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPAII.RANGE = R;
 			try {
 				bw = new BufferedWriter(new FileWriter(new File(
-						"/Users/laemmel/devel/bipedca/ant/bi" + R)));
+						"/Users/laemmel/devel/bipedca/ant/trash" + R)));
 				// bw = new BufferedWriter(
 				// new FileWriter(new File(
 				// "/home/laemmel/scenarios/bipedca/rho_new_uni_spl_"

@@ -45,7 +45,6 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 	}
 
 	private void init() {
-		CAMultiLaneLink.k = (MultiLaneDensityEstimator) k;
 		super.tFreeMin = Double.POSITIVE_INFINITY;
 		for (Node n : this.net.getNodes().values()) {
 
@@ -75,7 +74,8 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 					continue;
 				}
 			}
-			CAMultiLaneLink caL = new CAMultiLaneLink(l, rev, ds, us, this);
+			CAMultiLaneLink caL = new CAMultiLaneLink(l, rev, ds, us, this,
+					(MultiLaneDensityEstimator) this.k);
 
 			if (caL.getTFree() < tFreeMin) {
 				tFreeMin = caL.getTFree();

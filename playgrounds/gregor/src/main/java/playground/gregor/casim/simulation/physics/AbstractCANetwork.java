@@ -103,8 +103,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 	private double eventChunkSizeCoefficient = 1;
 	private final int desiredChunkSizeAvgPerThread = 400;
 
-	private final CASimDensityEstimator dens;
-
 	protected double tFreeMin;
 
 	private final CANetsimEngine engine;
@@ -117,7 +115,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 		this.em = em;
 		this.engine = engine;
 		init();
-		this.dens = new CASimDensityEstimator(this, fac);
 
 	}
 
@@ -152,18 +149,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 		}
 	}
 
-	/* package */void updateRho() {
-
-		for (CAMoveableEntity a : this.agents) {
-			this.dens.handle(a);
-		}
-		this.dens.await();
-	}
-
 	@Override
 	public void doSimStep(double time) {
-		updateRho();
-		// draw2();
 		while (this.events.peek() != null
 				&& this.events.peek().getEventExcexutionTime() < time + 1) {
 
@@ -241,8 +228,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 	@Deprecated
 	public void run(double endTime) {
 		this.workerMap.clear();
-		// draw2();
-		updateRho();
 		double time = 0;
 		this.time2 = 0.;
 		for (Monitor monitor : this.monitors) {
@@ -255,11 +240,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 				time = this.events.peek().getEventExcexutionTime();
 
 				if (EMIT_VIS_EVENTS) {
-					// updateDensity();
 					draw2(time);
-					// draw3(time);
 				}
-				// updateRho();
 
 			}
 
@@ -268,11 +250,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 			}
 
 			CAEvent e = this.events.poll();
-
-			// if (e.getCAAgent().getId().toString().equals("55") && time > 61)
-			// {
-			// log.info("==> " + e);
-			// }
 
 			if (e.getEventExcexutionTime() > time2) {
 				time2 = e.getEventExcexutionTime();
@@ -292,22 +269,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 				continue;
 			}
 
-			// this.dens.handle(e.getCAAgent());
-			// CANetworkEntity ent = e.getCANetworkEntity();
-			// if (ent instanceof CAMultiLaneLink) {
-			// CAMoveableEntity[] parts = ((CAMultiLaneLink) ent)
-			// .getParticles(e.getCAAgent().getLane());
-			// int pp = e.getCAAgent().getPos() - 1;
-			// if (pp >= 0 && parts[pp] != null) {
-			// this.dens.handle(parts[pp]);
-			// }
-			// pp += 2;
-			// if (pp < parts.length && parts[pp] != null) {
-			// this.dens.handle(parts[pp]);
-			// }
-			// }
-			// this.dens.await();
-			// this.workers[e.getCANetworkEntity().threadNR()].add(e);
 			e.getCANetworkEntity().handleEvent(e);
 
 		}
@@ -686,7 +647,6 @@ abstract public class AbstractCANetwork implements CANetwork {
 		for (CALink caLink : this.getLinks().values()) {
 			caLink.reset();
 		}
-		this.dens.shutdown();
 		for (int i = 0; i < NR_THREADS; i++) {
 			this.workers[i].add(new CAEvent(Double.NaN, null, null,
 					CAEventType.END_OF_SIM));

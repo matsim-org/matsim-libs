@@ -533,7 +533,7 @@ public class CAMultiLaneNode implements CANode {
 			}
 			for (int i = 0; i < empt && i < cands.size(); i++) {
 				CandInfo cand = cands.get(i);
-				cand.e.setRho(CAMultiLaneLink.k.estRho(cand.e));
+				cand.e.setRho(cand.l.getDensityEstimator().estRho(cand.e));
 				double z = CAMultiLaneLink.getZ(cand.e);
 				z = 0;
 				CAEvent e = new CAEvent(time + z, cand.e, cand.l,

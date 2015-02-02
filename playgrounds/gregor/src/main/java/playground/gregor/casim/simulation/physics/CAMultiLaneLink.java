@@ -79,7 +79,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private double ratio;
 	private final double epsilon; // TODO check if this is still needed [GL Nov.
-									// '14]
+									// '14] // Yes, it is needed - w/o epsilon
+									// agents get stuck [GL Jan. 14]
 
 	final ReentrantLock lock = new ReentrantLock();
 
@@ -100,10 +101,11 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private final LinkedHashSet<CAMoveableEntity> dsWaitQ = new LinkedHashSet<>();
 	private final LinkedHashSet<CAMoveableEntity> usWaitQ = new LinkedHashSet<>();
 
-	static MultiLaneDensityEstimator k; // TODO clean this up
+	private final MultiLaneDensityEstimator k;
 
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
-			CAMultiLaneNode us, AbstractCANetwork net) {
+			CAMultiLaneNode us, AbstractCANetwork net,
+			MultiLaneDensityEstimator k) {
 
 		this.threadNr = MatsimRandom.getRandom().nextInt(
 				AbstractCANetwork.NR_THREADS);
@@ -131,6 +133,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		x = this.getLink().getToNode().getCoord().getX();
 		y = this.getLink().getToNode().getCoord().getY();
+		this.k = k;
 	}
 
 	public void setThreadNr(int thread) {
@@ -160,12 +163,14 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	@Override
 	public void handleEvent(CAEvent e) {
 		CAMoveableEntity a = e.getCAAgent();
-		if (e.getCAEventType() != CAEventType.TTE
-				&& this.particles[a.getLane()][a.getPos()] != a) {
-			// log.warn("Agent: " + a + " not on expected position!!");
-			return;
+		if (e.getCAEventType() != CAEventType.TTE) {
+			if (this.particles[a.getLane()][a.getPos()] != a) {
+				// log.warn("Agent: " + a + " not on expected position!!");
+				return;
+			}
+			a.setRho(getDensityEstimator().estRho(a));
 		}
-		a.setRho(k.estRho(a));
+
 		double time = e.getEventExcexutionTime();
 		if (e.getCAEventType() == CAEventType.SWAP) {
 			handelSwap(a, time);
@@ -369,7 +374,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx - 1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == 1) {
-					toBeTriggered.setRho(k.estRho(toBeTriggered));
+					toBeTriggered.setRho(getDensityEstimator().estRho(
+							toBeTriggered));
 					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered, this, time + z);
@@ -555,7 +561,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx + 1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == -1) {
-					toBeTriggered.setRho(k.estRho(toBeTriggered));
+					toBeTriggered.setRho(getDensityEstimator().estRho(
+							toBeTriggered));
 					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered, this, time + z);
@@ -883,7 +890,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		this.lastLeftDsTimes[lane][this.size - 1] = time;
 		this.ds.putAgentInSlot(nodeSlot, a);
 		a.materialize(Integer.MIN_VALUE, Integer.MIN_VALUE, nodeSlot);
-		swapA.setRho(k.estRho(swapA));
+		swapA.setRho(getDensityEstimator().estRho(swapA));
 
 		fireDownstreamLeft(a, time);
 		fireDownstreamEntered(swapA, time);
@@ -925,7 +932,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		swapA.moveOverNode(this, time);
 		swapA.invalidate();
 
-		swapA.setRho(k.estRho(swapA));
+		swapA.setRho(getDensityEstimator().estRho(swapA));
 
 		fireUpstreamLeft(a, time);
 		fireUpstreamEntered(swapA, time);
@@ -1003,7 +1010,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			return;
 		}
 
-		nb.setRho(k.estRho(nb));
+		nb.setRho(getDensityEstimator().estRho(nb));
 
 		int bestLaneA = lane;
 		// check for lane switch
@@ -1123,7 +1130,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			triggerTTA(a, this, time);
 			return;
 		}
-		nb.setRho(k.estRho(nb));
+		nb.setRho(getDensityEstimator().estRho(nb));
 		int bestLaneA = lane;
 		// check for lane switch
 		if (a.getRho() >= LANESWITCH_TS_SWAP) {
@@ -1439,5 +1446,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	@Override
 	public double getY() {
 		return y;
+	}
+
+	public MultiLaneDensityEstimator getDensityEstimator() {
+		return k;
 	}
 }

@@ -51,7 +51,6 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPH;
 import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHFactory;
-import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHII;
 import playground.gregor.casim.simulation.physics.CAMultiLaneLink;
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetwork;
@@ -117,7 +116,6 @@ public class Long1DChannelBiMultiLane_ts {
 		for (int R = 12; R <= 12; R++) {
 			CASingleLaneDensityEstimatorSPH.H = R;
 			CAMultiLaneDensityEstimatorSPH.H = R;
-			CAMultiLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPA.RANGE = R;
 			CASingleLaneDensityEstimatorSPHII.H = R;
 			CASingleLaneDensityEstimatorSPAII.RANGE = R;

@@ -100,14 +100,6 @@ public class CAMultiLaneDensityEstimatorSPH implements
 			if (traRho[0] < 2 * H && (nextId = e.getNextLinkId()) != null) {
 				CAMultiLaneLink next = (CAMultiLaneLink) this.net
 						.getCALink(nextId);
-				// if (nextId.toString().equals("2ex")) {
-				// next = (CAMultiLaneLink) this.net.getCALink(Id
-				// .createLinkId("1"));
-				// }
-				// if (nextId.toString().equals("3ex")) {
-				// next = (CAMultiLaneLink) this.net.getCALink(Id
-				// .createLinkId("3"));
-				// }
 
 				CAMoveableEntity[] nextParts = next.getParticles(0);
 				CANode nn = next.getUpstreamCANode();

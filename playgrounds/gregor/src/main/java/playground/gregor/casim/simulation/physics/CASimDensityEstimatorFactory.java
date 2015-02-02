@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,7 +21,6 @@ package playground.gregor.casim.simulation.physics;
 
 public interface CASimDensityEstimatorFactory {
 
-	public CADensityEstimatorKernel createCASimDensityEstimator(
-			AbstractCANetwork net);
+	CADensityEstimatorKernel createCASimDensityEstimator(AbstractCANetwork net);
 
 }
