@@ -19,9 +19,10 @@
 
 package playground.gregor.casim.simulation.physics;
 
-public class CAConstantDensityEstimator implements CADensityEstimatorKernel {
+public class CAConstantDensityEstimator implements CADensityEstimatorKernel,
+		MultiLaneDensityEstimator {
 
-	private static final double RHO = 6;
+	public static double RHO = 0;
 
 	@Override
 	public double estRho(CAMoveableEntity e) {
