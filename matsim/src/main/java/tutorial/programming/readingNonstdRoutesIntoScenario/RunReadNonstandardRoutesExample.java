@@ -30,6 +30,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +40,11 @@ import org.matsim.core.scenario.ScenarioUtils;
  * This is is an example, taken from Thibaut, of how to set an additional route factory before the controler has started.
  * <p/>
  * This will generate the route, with start and end link id.  It will also set distance and travel time if they
- * are in the file.  This is sufficient information for teleportation.
+ * are in the file.  This is sufficient information for teleportation.  Additional information needs to come from elsewhere, 
+ * or the corresponding {@link PopulationReader} needs to be modified.
+ * <p/>
+ * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link ModeRouteFactory} 
+ * will already generate an instance of {@link GenericRoute} when a mode is not registered. 
  * 
  * @author nagel
  * @author thibautd
