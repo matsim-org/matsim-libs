@@ -272,15 +272,16 @@ public class DoublyWeightedSocialNetwork {
 		}
 
 		public synchronized void trim() {
-			friends = Arrays.copyOf( friends , size );
+			final int newSize = Math.max( 1 , size );
+			friends = Arrays.copyOf( friends , newSize );
 
-			weights1 = Arrays.copyOf( weights1 , size );
-			weights2 = Arrays.copyOf( weights2 , size );
+			weights1 = Arrays.copyOf( weights1 , newSize );
+			weights2 = Arrays.copyOf( weights2 , newSize );
 
-			childSE = Arrays.copyOf( childSE , size );
-			childSW = Arrays.copyOf( childSW , size );
-			childNE = Arrays.copyOf( childNE , size );
-			childNW = Arrays.copyOf( childNW , size );
+			childSE = Arrays.copyOf( childSE , newSize );
+			childSW = Arrays.copyOf( childSW , newSize );
+			childNE = Arrays.copyOf( childNE , newSize );
+			childNW = Arrays.copyOf( childNW , newSize );
 		}
 	}
 }

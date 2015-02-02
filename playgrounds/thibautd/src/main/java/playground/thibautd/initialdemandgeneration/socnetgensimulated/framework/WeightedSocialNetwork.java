@@ -231,8 +231,9 @@ public class WeightedSocialNetwork {
 		}
 
 		public synchronized void trim() {
-			friends = Arrays.copyOf( friends , size );
-			weights = Arrays.copyOf( weights , size );
+			final int newSize = Math.max( 1 , size );
+			friends = Arrays.copyOf( friends , newSize );
+			weights = Arrays.copyOf( weights , newSize );
 		}
 	}
 }
