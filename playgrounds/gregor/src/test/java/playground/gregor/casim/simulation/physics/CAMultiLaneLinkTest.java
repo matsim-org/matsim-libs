@@ -52,7 +52,7 @@ public class CAMultiLaneLinkTest extends MatsimTestCase {
 	}
 
 	@Test
-	public void testCAMultiLaneLinkLangeChangingLR() {
+	public void testCAMultiLaneLinkLaneChangingLR() {
 		CAMultiLaneLink l = createCAMultiLaneLink();
 		CAMoveableEntity[] l0 = l.getParticles(0);
 		CAMoveableEntity[] l1 = l.getParticles(1);
@@ -97,7 +97,7 @@ public class CAMultiLaneLinkTest extends MatsimTestCase {
 	}
 
 	@Test
-	public void testCAMultiLaneLinkLangeChangingRL() {
+	public void testCAMultiLaneLinkLaneChangingRL() {
 		CAMultiLaneLink l = createCAMultiLaneLink();
 		int cells = l.getSize();
 		CAMoveableEntity[] l0 = l.getParticles(0);
