@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.utils.CollectionUtils;
@@ -44,8 +45,9 @@ public class SnaUtils {
 
 	public static double calcClusteringCoefficient(
 			final SocialNetwork socialNetwork) {
-		int nTriples = 0;
-		int nTriangles = 0;
+		final Counter tripleCounter = new Counter( "clustering calculation: look at triple # " );
+		long nTriples = 0;
+		long nTriangles = 0;
 		for ( Id<Person> ego : socialNetwork.getEgos() ) {
 			final Set<Id<Person>> alterSet = socialNetwork.getAlters( ego );
 			final Id<Person>[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
@@ -54,6 +56,7 @@ public class SnaUtils {
 				final Set<Id<Person>> altersOfAlter1 = socialNetwork.getAlters( alters[ alter1index ] );
 				for ( int alter2index = alter1index + 1; alter2index < alters.length; alter2index++ ) {
 					// this is a new triple
+					tripleCounter.incCounter();
 					nTriples++;
 
 					if ( altersOfAlter1.contains( alters[ alter2index ] ) ) {
@@ -62,11 +65,12 @@ public class SnaUtils {
 				}
 			}
 		}
+		tripleCounter.printCounter();
 
 		// note: in Arentze's paper, it is 3 * triangle / triples.
 		// but here, we count every triangle three times.
-		assert nTriples >= 0;
-		assert nTriangles >= 0;
+		assert nTriples >= 0 : nTriples;
+		assert nTriangles >= 0 : nTriangles;
 		return nTriples > 0 ? (1d * nTriangles) / nTriples : 0;
 	}
 
