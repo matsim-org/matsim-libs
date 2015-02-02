@@ -50,7 +50,8 @@ public class MunichControler {
 		//		args[1] ="false";
 		//		args[2] ="false";
 		//		args[3] =clusterFolder+"/ils4/agarwal/munich/outputTest/run5/run8/baseCaseCtd/config_subActivities_baseCaseCtd_msa.xml";
-		//		args[4] ="/Users/amit/Documents/workspace/output/munich/baseCaseCtd/";
+		//		args[4] = "1.0";	
+		//		args[5] ="/Users/amit/Documents/workspace/output/munich/baseCaseCtd/";
 
 		boolean internalizeEmission = Boolean.valueOf(args [0]); 
 		boolean internalizeCongestion = Boolean.valueOf(args [1]);
@@ -59,10 +60,10 @@ public class MunichControler {
 
 		String emissionEfficiencyFactor ="1.0";
 		String considerCO2Costs = "true";
-		String emissionCostFactor = "1.0";
+		String emissionCostFactor = args[4];//"1.0";
 
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.controler().setOutputDirectory(args[4]);
+		config.controler().setOutputDirectory(args[5]);
 
 		//		config.network().setInputFile("/Users/amit/Documents/workspace/input/munich/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml");
 		//		config.plans().setInputFile(clusterFolder+"/ils4/agarwal/munich/outputTest/run5/run7/baseCaseCtd/ITERS/it.1400/1400.plans.xml.gz");
