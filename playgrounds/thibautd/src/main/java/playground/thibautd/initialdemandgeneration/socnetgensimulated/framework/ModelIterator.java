@@ -191,7 +191,7 @@ public class ModelIterator {
 		}
 
 		private ThresholdsReference getBestQuadrant( final boolean accordingToDegree ) {
-			return Collections.max(
+			return Collections.min(
 					Arrays.asList(
 						bestSouthWest,
 						bestSouthEast,
@@ -201,21 +201,21 @@ public class ModelIterator {
 							@Override
 							public int compare( ThresholdsReference o1 , ThresholdsReference o2 ) {
 								if ( o1.thresholds == null ) {
-									// null < whatever
-									return o2.thresholds == null ? 0 : -1;
+									// null > whatever
+									return o2.thresholds == null ? 0 : 1;
 								}
 								if ( o2.thresholds == null ) {
 									// o1 is not null
-									return 1;
+									return -1;
 								}
 
 								return accordingToDegree ?
 									Double.compare(
-										o1.thresholds.getResultingAverageDegree(),
-										o2.thresholds.getResultingAverageDegree() ) :
+										distDegree( o1.thresholds ),
+										distDegree( o2.thresholds ) ) :
 									Double.compare(
-										o1.thresholds.getResultingClustering(),
-										o2.thresholds.getResultingClustering() );
+										distClustering( o1.thresholds ),
+										distClustering( o2.thresholds ) );
 							}
 					} );
 		}
