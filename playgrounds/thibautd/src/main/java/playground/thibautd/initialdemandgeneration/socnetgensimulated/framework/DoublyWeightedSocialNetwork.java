@@ -103,14 +103,14 @@ public class DoublyWeightedSocialNetwork {
 		return alters[ ego ].getAltersOverWeights( weight1 , weight2 );
 	}
 
-	public void addAltersOverWeights(
+	public void fillWithAltersOverWeights(
 			final TIntSet set,
 			final int ego,
 			final double weight1,
 			final double weight2 ) {
 		if ( weight1 < lowestAllowedFirstWeight ) throw new IllegalArgumentException( "first weight "+weight1+" is lower than lowest stored weight "+lowestAllowedFirstWeight );
 		if ( weight2 < lowestAllowedSecondWeight ) throw new IllegalArgumentException( "second weight "+weight2+" is lower than lowest stored weight "+lowestAllowedSecondWeight );
-		alters[ ego ].addAltersOverWeights( set , weight1 , weight2 );
+		alters[ ego ].fillWithAltersOverWeights( set , weight1 , weight2 );
 	}
 
 
@@ -238,19 +238,19 @@ public class DoublyWeightedSocialNetwork {
 				final double secondWeight) {
 			final TIntSet alters = new TIntHashSet();
 
-			addGreaterPoints( 0, alters, firstWeight, secondWeight );
+			fillWithGreaterPoints( 0, alters, firstWeight, secondWeight );
 
 			return alters;
 		}
 
-		public void addAltersOverWeights(
+		public void fillWithAltersOverWeights(
 				final TIntSet alters,
 				final double firstWeight,
 				final double secondWeight) {
-			addGreaterPoints( 0, alters, firstWeight, secondWeight );
+			fillWithGreaterPoints( 0, alters, firstWeight, secondWeight );
 		}
 
-		private void addGreaterPoints(
+		private void fillWithGreaterPoints(
 				final int head,
 				final TIntSet alters,
 				final double firstWeight,
@@ -259,16 +259,16 @@ public class DoublyWeightedSocialNetwork {
 
 			if ( weights1[ head ] > firstWeight && weights2[ head ] > secondWeight ) {
 				alters.add( friends[ head ] );
-				addGreaterPoints( childSW[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( childSW[ head ] , alters , firstWeight , secondWeight );
 			}
 			if ( weights1[ head ] > firstWeight ) {
-				addGreaterPoints( childNW[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( childNW[ head ] , alters , firstWeight , secondWeight );
 			}
 			if ( weights2[ head ] > secondWeight ) {
-				addGreaterPoints( childSE[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( childSE[ head ] , alters , firstWeight , secondWeight );
 			}
 			// always look to the NW
-			addGreaterPoints( childNE[ head ] , alters , firstWeight , secondWeight );
+			fillWithGreaterPoints( childNE[ head ] , alters , firstWeight , secondWeight );
 		}
 
 		public synchronized void trim() {

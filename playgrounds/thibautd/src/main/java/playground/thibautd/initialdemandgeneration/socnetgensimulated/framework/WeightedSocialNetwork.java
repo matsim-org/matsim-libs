@@ -108,12 +108,12 @@ public class WeightedSocialNetwork {
 		return alters[ ego ].getAltersOverWeight( weight );
 	}
 
-	public void addAltersOverWeight(
+	public void fillWithAltersOverWeight(
 			final TIntSet set,
 			final int ego,
 			final double weight ) {
 		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
-		alters[ ego ].addAltersOverWeight( set , weight );
+		alters[ ego ].fillWithAltersOverWeight( set , weight );
 	}
 
 	/* unused
@@ -169,7 +169,7 @@ public class WeightedSocialNetwork {
 			return alters;
 		}
 
-		public void addAltersOverWeight(
+		public void fillWithAltersOverWeight(
 				final TIntSet set,
 				final double weight ) {
 			for ( int i = size - 1;

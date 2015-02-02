@@ -190,7 +190,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 									population ) );
 
 								friendsOfFriends.clear();
-								preprocessFriendsOfFriends.addAltersOverWeights(
+								preprocessFriendsOfFriends.fillWithAltersOverWeights(
 									friendsOfFriends,
 									ego,
 									thresholds.getPrimaryThreshold(),
@@ -255,7 +255,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 							for ( int egoi = startThreadAgents; egoi < endThreadAgents; egoi++ ) {
 								final int ego = egoi;
 								altersSet.clear();
-								preprocess.addAltersOverWeight( altersSet , ego , primaryThreshold );
+								preprocess.fillWithAltersOverWeight( altersSet , ego , primaryThreshold );
 
 								// for each friend of friend, search for the highest common
 								// friend utility.
@@ -268,7 +268,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 													ego,
 													alter );
 										altersOfAltersSet.clear();
-										preprocess.addAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
+										preprocess.fillWithAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
 
 										potentialAlters.clear();
 										altersOfAltersSet.forEach( new TIntProcedure() {
