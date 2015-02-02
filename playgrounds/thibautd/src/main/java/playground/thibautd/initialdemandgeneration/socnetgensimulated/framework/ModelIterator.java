@@ -115,6 +115,7 @@ public class ModelIterator {
 
 			if ( ref.thresholds == null ) {
 				log.info("not yet a value for quadrant "+ref.name+", putting "+t );
+				ref.thresholds = t;
 			}
 			else if ( distDegree( t ) <= distDegree( ref.thresholds ) &&
 					distClustering( t ) <= distClustering( ref.thresholds ) ) {
@@ -141,6 +142,7 @@ public class ModelIterator {
 		}
 
 		private final ThresholdsReference getOppositeQuadrant( final ThresholdsReference t ) {
+			if ( t == null ) throw new NullPointerException();
 			if ( t == bestSouthWest ) return bestNorthEast;
 			if ( t == bestSouthEast ) return bestNorthWest;
 			if ( t == bestNorthEast ) return bestSouthWest;
@@ -164,6 +166,8 @@ public class ModelIterator {
 			final ThresholdsReference best = getBestQuadrant( accordingToDegree );
 			final ThresholdsReference opposite = getOppositeQuadrant( best );
 
+			assert best != null;
+			assert best.thresholds != null;
 			return opposite.thresholds == null ?
 				// step-based movement
 				moveByStep( best , iteration ) :
