@@ -57,16 +57,20 @@ public class PreprocessedModelRunner implements ModelRunner {
 	private static final Logger log =
 		Logger.getLogger(PreprocessedModelRunner.class);
 
-	private final WeightedSocialNetwork preprocess;
+	private WeightedSocialNetwork preprocess = null;
+	private DoublyWeightedSocialNetwork preprocessFriendsOfFriends = null;
 
-	private final DoublyWeightedSocialNetwork preprocessFriendsOfFriends;
-	private double lowestPrimaryThreshold = Double.POSITIVE_INFINITY;
+	private double lowestStoredPrimary = 0;
+	private double lowestStoredSecondary = 0;
+
+	private double lowestKnownPrimaryThreshold = Double.POSITIVE_INFINITY;
 
 	private final int randomSeed = 20150116;
 
 	private final IndexedPopulation population;
 	private final TieUtility utility;
 
+	private final double primarySampleRate;
 	private final double secondarySampleRate;
 
 	private final int nThreads;
@@ -79,16 +83,23 @@ public class PreprocessedModelRunner implements ModelRunner {
 			final double primarySampleRate ,
 			final double secondarySampleRate ,
 			final int nThreads ) {
-		this.preprocess = new WeightedSocialNetwork( minUtilityPrimary , population.size() );
-		this.preprocessFriendsOfFriends = new DoublyWeightedSocialNetwork( minUtilitySecondary , population.size() );
+		this.lowestStoredPrimary = minUtilityPrimary;
+		this.lowestStoredSecondary = minUtilitySecondary;
 
+		this.primarySampleRate = primarySampleRate;
 		this.secondarySampleRate = secondarySampleRate;
 		this.population = population;
 		this.utility = utility;
 		this.nThreads = nThreads;
 
+		this.updatePrimaryPreprocess();
+	}
+
+	private void updatePrimaryPreprocess() {
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );
 		Gbl.printMemoryUsage();
+
+		this.preprocess = new WeightedSocialNetwork( lowestStoredPrimary , population.size() );
 
 		final Counter counter = new Counter( "consider (primary) pair # " );
 		final ThreadGroup threads = new ThreadGroup();
@@ -140,10 +151,17 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 	@Override
 	public SocialNetwork runModel( final Thresholds thresholds ) {
-		if ( thresholds.getPrimaryThreshold() < this.lowestPrimaryThreshold ) {
+		if ( thresholds.getPrimaryThreshold() < lowestStoredPrimary ) {
+			this.lowestStoredPrimary = thresholds.getPrimaryThreshold() - 1;
+			updatePrimaryPreprocess();
+		}
+
+		if ( thresholds.getPrimaryThreshold() < this.lowestKnownPrimaryThreshold ||
+				thresholds.getSecondaryThreshold() < lowestStoredSecondary ) {
 			// store new friends of friends
+			this.lowestStoredSecondary = Math.min( lowestStoredSecondary , thresholds.getSecondaryThreshold() - 1 );
 			updateSecondaryPreprocess( thresholds.getPrimaryThreshold() );
-			this.lowestPrimaryThreshold = thresholds.getPrimaryThreshold();
+			this.lowestKnownPrimaryThreshold = thresholds.getPrimaryThreshold();
 		}
 
 		final Map<Id<Person>, Set<Id<Person>>> sn = new ConcurrentHashMap< >();
@@ -215,7 +233,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 		log.info( "update secondary preprocess for use with primary threshold > "+primaryThreshold );
 		Gbl.printMemoryUsage();
 
-		preprocessFriendsOfFriends.clear();
+		preprocessFriendsOfFriends =
+			new DoublyWeightedSocialNetwork(
+					lowestStoredSecondary,
+					population.size() );
 
 		final Counter counter = new Counter( "add secondary pair # " );
 		final ThreadGroup threads = new ThreadGroup();
