@@ -78,19 +78,32 @@ public class PlansCalcRouteConfigGroupTest {
 	}
 
 	@Test
-	public void testIODifferentVersions() {
-			final PlansCalcRouteConfigGroup initialGroup = createTestConfigGroup();
+	public void testIODifferentVersions() 
+	{
+		final PlansCalcRouteConfigGroup initialGroup = createTestConfigGroup();
 
-		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
+		log.info( "constructing new config ...");
 		final Config configV1 = new Config();
+		log.info("... done constructing new config.");
+		log.info("adding undescored info ...");
 		configV1.addModule(toUnderscoredModule(initialGroup));
+		log.info("... done adding underscored info.") ;
 
+		log.info( "writing to file ...");
+		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
 		new ConfigWriter( configV1 ).writeFileV1( v1path );
+		log.info( "... done writing to file.");
 
+		log.info( "creating new config ...");
 		final Config configV1In = ConfigUtils.createConfig();
+		log.info( "... done creating new config.");
+		log.info( "read file into new config ...");
 		new MatsimConfigReader( configV1In ).readFile( v1path );
+		log.info("... done reading file into new config.") ;
 
+		log.info( "asserting ...");
 		assertIdentical("re-read v1", initialGroup, configV1In.plansCalcRoute());
+		log.info( "... done asserting.") ;
 
 		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
 
@@ -151,38 +164,57 @@ public class PlansCalcRouteConfigGroupTest {
 				inputConfigGroup.getTeleportedModeSpeeds() );
 	}
 
-	private ConfigGroup toUnderscoredModule(final PlansCalcRouteConfigGroup initialGroup) {
+	private static ConfigGroup toUnderscoredModule(final PlansCalcRouteConfigGroup initialGroup) {
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
-			log.info( "add param "+e.getKey() );
+			log.info( "add param="+e.getKey() + " with value=" + e.getValue() );
 			module.addParam( e.getKey() , e.getValue() );
 		}
-
+		
 		for ( ModeRoutingParams settings : initialGroup.getModeRoutingParams().values() ) {
 			final String mode = settings.getMode();
 			module.addParam( "teleportedModeSpeed_"+mode , ""+settings.getTeleportedModeSpeed() );
 			module.addParam( "teleportedModeFreespeedFactor_"+mode , ""+settings.getTeleportedModeFreespeedFactor() );
 		}
 
+		Double val = null ;
+		boolean first = true ;
+		for ( ModeRoutingParams settings : initialGroup.getModeRoutingParams().values() ) {
+			if ( first ) {
+				first = false ;
+				val = settings.getBeelineDistanceFactor() ;
+			} else if ( !settings.getBeelineDistanceFactor().equals( val ) ) {
+				throw new RuntimeException( "beeline distance factor varies by mode; this cannot be covered by this test" ) ;
+			}
+		}		
+		module.addParam( "beelineDistanceFactor", ""+val );
+		
 		return module;
 	}
 
-	private PlansCalcRouteConfigGroup createTestConfigGroup() {
+	private static PlansCalcRouteConfigGroup createTestConfigGroup() {
+		log.info( "creating test config group ... "); 
+		
 		final PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
 
-		group.setBeelineDistanceFactor( 10000000 );
 		group.setNetworkModes( Arrays.asList( "electricity" , "water_supply" ) );
 
 		// two modes with only one speed
 		group.setTeleportedModeFreespeedFactor( "inline skate" , 0.1 );
+//		group.getModeRoutingParams().get("inline skate").setBeelineDistanceFactor( 10000000. );
+		
 		group.setTeleportedModeSpeed( "ice skates" , 10 );
+//		group.getModeRoutingParams().get("ice skates").setBeelineDistanceFactor( 10000000. );
+
+		group.setBeelineDistanceFactor( 10000000 );
 
 		// one mode with both speeds
 		// Was made illegal: do not test
 		//group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
 		//group.setTeleportedModeSpeed( "overboard" , 999 );
 
+		log.info( "... done creating test config group."); 
 		return group;
 	}
 }

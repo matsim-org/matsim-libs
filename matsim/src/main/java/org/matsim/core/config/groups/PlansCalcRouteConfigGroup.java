@@ -24,14 +24,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -42,7 +40,7 @@ import java.util.Map.Entry;
  * @author mrieser
  */
 public class PlansCalcRouteConfigGroup extends ConfigGroup {
-
+	private static final Logger log = Logger.getLogger( PlansCalcRouteConfigGroup.class ) ;
 
 	public static final String GROUP_NAME = "planscalcroute";
 
@@ -61,11 +59,11 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
-	private static Double beelineDistanceFactor = null ;
-			
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
 
 	private boolean acceptModeParamsWithoutClearing = false;
+	
+	private Double beelineDistanceFactor = 1.3 ;
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
@@ -158,13 +156,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 		@StringGetter("beelineDistanceFactor")
 		public Double getBeelineDistanceFactor() {
-			if ( this.beelineDistanceFactorForMode != null ) {
-				return this.beelineDistanceFactorForMode ;
-			} else  if ( beelineDistanceFactor != null ) {
-				return beelineDistanceFactor ;
-			} else {
-				return 1.3 ; // this is the old default; can be removed after about a year.  kai, feb'15
-			}
+			return this.beelineDistanceFactorForMode ;
 		}
 		
 	}
@@ -176,6 +168,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		{
 			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
 			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
+			bike.setBeelineDistanceFactor(1.3); // old default; necessary for backwards compatibility.  kai, feb'15
 			addParameterSet( bike );
 		}
 
@@ -234,6 +227,13 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
+			
+		}
+		ModeRoutingParams pars = (ModeRoutingParams) set ;
+		// for the time being pushing the "global" factor into the local ones if they are not initialized by
+		// themselves.  Necessary for some tests; maybe we should eventually disable them.  kai, feb'15
+		if ( pars.getBeelineDistanceFactor()== null ) {
+			pars.setBeelineDistanceFactor( this.beelineDistanceFactor );
 		}
 		super.addParameterSet( set );
 	}
@@ -301,8 +301,19 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
-//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[this.networkModes.size()])));
+
+		//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
+
+//		for ( ModeRoutingParams param : this.getModeRoutingParams().values() ) {
+//			if ( !param.getBeelineDistanceFactor().equals( this.beelineDistanceFactor ) ) {
+//				log.error( "beeline distance factor varies by mode; this cannot be accessed by getParams()" ) ;
+//			}
+//		}
+//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString( this.beelineDistanceFactor ) ) ;
+//
+// if we uncomment the above, then this is also written into config v2 fmt, which we don't want.  kai, feb'15
+		
 		return map;
 	}
 
@@ -322,13 +333,14 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 //		return beelineDistanceFactor;
 //	}
 
-	@SuppressWarnings("static-method")
+	@Deprecated // use mode-specific beeline distance factors!
 	public void setBeelineDistanceFactor(double val) {
-		if ( beelineDistanceFactor == null ) {
-			beelineDistanceFactor = val;
-		} else {
-			throw new RuntimeException("changing beelineDistanceFactor for second time no longer allowed.  Use mode-specific "
-					+ "beelineDistanceFactor in config v2 format.  kai, feb'15") ;
+		// memorize the global factor for ModeRoutingParams that are added later:
+		this.beelineDistanceFactor = val ;
+		
+		// push the global factor to the local ones for all ModeRoutingParams that are already there:
+		for ( ModeRoutingParams params : this.getModeRoutingParams().values() ) {
+			params.setBeelineDistanceFactor( val );
 		}
 	}
 
@@ -368,14 +380,14 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 	
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
-		// re-create, to trigger erasing of defaults
+		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeFreespeedFactor( freespeedFactor );
 		addParameterSet( pars );
 	}
 
 	public void setTeleportedModeSpeed(String mode, double speed) {
-		// re-create, to trigger erasing of defaults
+		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeSpeed( speed );
 		addParameterSet( pars );
