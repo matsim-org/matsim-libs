@@ -54,6 +54,10 @@ public class NPersonsProblem {
             }
             
             requests.add(best);
+            
+            if(req.getPassenger().getId().toString().equals("pt_9868_25959_12071244_12052000")){
+				System.out.println("");
+			}
 
             ((PrtScheduler)optimConfig.scheduler).scheduleRequests(best,requests);
             unplannedRequests.poll();

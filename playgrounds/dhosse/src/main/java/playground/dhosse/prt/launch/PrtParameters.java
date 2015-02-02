@@ -42,6 +42,7 @@ public class PrtParameters {
 	private final String dropoffDurationString = "dropoffDuration";
 	private final String otfVisString = "otfVis";
 	private final String separator = " ";
+	private final String vehCap = "capacity";
 	
 	String workingDir;
 	String pathToNetworkFile;
@@ -52,6 +53,7 @@ public class PrtParameters {
 	boolean destinationKnown = false;
 	double pickupDuration;
 	double dropoffDuration;
+	int capacity;
 	boolean otfVis = false;
 	boolean nPersons = false;
 	TaxiSchedulerParams taxiParams;
@@ -112,6 +114,9 @@ public class PrtParameters {
 				}
 				else if(lineParts[0].equals(this.otfVisString)){
 					this.otfVis = true;
+				}
+				else if(lineParts[0].equals(this.vehCap)){
+					this.capacity = Integer.valueOf(lineParts[1]);
 				}
 				
 			}

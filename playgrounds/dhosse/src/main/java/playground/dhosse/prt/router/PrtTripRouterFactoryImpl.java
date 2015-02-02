@@ -4,12 +4,15 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -124,9 +127,24 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
                                 modeRouteFactory)));
 		}
 		
+		Network prtNetwork = NetworkUtils.createNetwork();
+		for(Link link : network.getLinks().values()){
+			if(link.getAllowedModes().contains(TransportMode.car)){
+				Node fromNode = link.getFromNode();
+				Node toNode = link.getToNode();
+				if(!prtNetwork.getNodes().containsKey(fromNode.getId())){
+					((NetworkImpl)prtNetwork).createAndAddNode(fromNode.getId(), fromNode.getCoord());
+				}
+				if(!prtNetwork.getNodes().containsKey(toNode.getId())){
+					((NetworkImpl)prtNetwork).createAndAddNode(toNode.getId(), toNode.getCoord());
+				}
+				prtNetwork.addLink(link);
+			}
+		}
+		
 		tripRouter.setRoutingModule(PrtRequestCreator.MODE,
 				new PrtRouterWrapper(PrtRequestCreator.MODE, populationFactory,
-						new PrtNetworkLegRouter(network, routeAlgoPtFreeFlow, modeRouteFactory)));
+						new PrtNetworkLegRouter(prtNetwork, routeAlgo, modeRouteFactory)));
 		
 		return tripRouter;
 		

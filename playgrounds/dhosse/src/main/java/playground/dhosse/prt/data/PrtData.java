@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.michalm.taxi.data.TaxiData;
@@ -17,15 +18,10 @@ public class PrtData extends TaxiData {
 	
 	public PrtData(Network network, TaxiData data){
 		this.vehicleRanks = data.getTaxiRanks();
-		this.initRankQuadTree(0, 0, 5000, 5000);
+		double[] bb = NetworkUtils.getBoundingBox(network.getNodes().values());
+		this.initRankQuadTree(bb[0], bb[1], bb[2], bb[3]);
 	}
 
-//    private final List<TaxiRank> unmodifiableVehicleRanks = Collections.unmodifiableList(vehicleRanks);
-    
-//    public List<TaxiRank> getTaxiRanks(){
-//        return unmodifiableVehicleRanks;
-//    }
-    
     public void addVehicleRank(TaxiRank rank){
     	this.vehicleRanks.add(rank);
     }

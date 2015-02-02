@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
-import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
@@ -36,7 +34,6 @@ public class NPersonsPickupActivity implements PassengerPickupActivity {
 		maxT0 = 0;
 		
 		for(TaxiRequest request : requests){
-//			System.out.println(request.getPassenger().getId().toString() + "\t" + request.getPassenger().getActivityEndTime());
 			passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 			if (passengerAboard) n++;
 			if(request.getT0() > maxT0) maxT0 = request.getT0();
@@ -58,21 +55,15 @@ public class NPersonsPickupActivity implements PassengerPickupActivity {
     public void doSimStep(double now)
     {
 		double end = maxT0;
-//		for(TaxiRequest request : this.requests){
 		if(!passengerAboard){
 			end = Math.max(now, maxT0 + this.requests.size()*pickupDuration);
 			endTime = end;
 		}
-//		}
     }
 	
 	@Override
     public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now)
     {
-		
-		if(passenger.getId().toString().equals("13669")){
-			System.out.println("");
-		}
 		
 		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
 		

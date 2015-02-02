@@ -4,6 +4,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
@@ -19,12 +20,14 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
 
 	private final VrpPathCalculator calculator;
 	private final TaxiScheduler scheduler;
+	private int vehicleCapacity = 4;
 	
 	public NPersonsVehicleRequestPathFinder(VrpPathCalculator calculator,
-			TaxiScheduler scheduler) {
+			TaxiScheduler scheduler, int vehicleCapacity) {
 		super(calculator, scheduler);
 		this.calculator = calculator;
 		this.scheduler = scheduler;
+		this.vehicleCapacity = vehicleCapacity;
 	}
 	
 	@Override
@@ -95,13 +98,14 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
     		
     		NPersonsPickupStayTask task = (NPersonsPickupStayTask)lastTask;
 
-    		if(task.getLink().equals(req.getFromLink()) && task.getRequest().getToLink().equals(req.getToLink()) && task.getRequests().size() < 4){
+    		if(task.getLink().equals(req.getFromLink()) && task.getRequest().getToLink().equals(req.getToLink()) &&
+    				task.getRequests().size() < this.vehicleCapacity){
     			
     			double begin = task.getBeginTime();
         		
         		double t0 = req.getT0();
         		
-        		if(t0 < begin){
+        		if(t0 < begin && task.getStatus()!=TaskStatus.PERFORMED && task.getStatus() != TaskStatus.STARTED){
         			
         			departure = t0 >= veh.getT1() ? null : new LinkTimePair(req.getFromLink(), t0);
         			
@@ -110,7 +114,9 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
     		
     	} else if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.WAIT_STAY)){
     		
+    		if(lastTask.getStatus().equals(TaskStatus.STARTED)){
     			departure = scheduler.getEarliestIdleness(veh);
+    		}
     			
     	}
     	
