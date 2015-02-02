@@ -104,7 +104,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 					public void run() {
 						final Random random = new Random( randomSeed + threadNumber );
 						// initialize out loop to reduce stress on GC
-						final TIntList potentialAlters = new TIntArrayList();
+						final TIntList potentialAlters = new TIntArrayList( population.size() - startThreadAgents );
 
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
 							potentialAlters.clear();
