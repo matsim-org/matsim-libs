@@ -39,7 +39,308 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 public class CAMultiLaneLinkTest extends MatsimTestCase {
 
 	@Test
-	public void testDynamics() {
+	public void testDynamicsRL() {
+		CAMultiLaneLink l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+		CAConstantDensityEstimator.RHO = 2;
+		double d = AbstractCANetwork.ALPHA
+				+ AbstractCANetwork.BETA
+				* Math.pow(CAConstantDensityEstimator.RHO
+						* AbstractCANetwork.PED_WIDTH, AbstractCANetwork.GAMMA);
+		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
+				+ d;
+		double tFree = l.getTFree();
+		{
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,0,<,>,");
+			CAMoveableEntity a = agents.get(0);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<,0,>");
+			assertEquals(CAEventType.TTA, agents.get(0).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(0).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "<,0,<,>");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "<,<,0,>");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,0,<,<");
+			CAMoveableEntity a = agents.get(0);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<,0,<");
+			assertEquals(CAEventType.TTA, agents.get(0).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(0).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + z, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "<,0,<,<");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "<,<,0,<");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+			assertEquals(CAEventType.TTA, agents.get(2).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + z, agents.get(2).getCurrentEvent()
+					.getEventExcexutionTime());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,0,<,>");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<,0,>");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(t + d + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.SWAP, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,0,<,<");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<,0,<");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(CAEventType.TTA, agents.get(2).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + z, agents.get(2).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(t + d + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.SWAP, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z / 2;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,<");
+			CAMoveableEntity a = agents.get(0);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<");
+			assertEquals(CAEventType.TTA, agents.get(0).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(z, agents.get(0).getCurrentEvent()
+					.getEventExcexutionTime());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = 0;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,<");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.TTA);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+		}
+
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,>,<,0");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<,>,0");
+			assertEquals(CAEventType.TTA, agents.get(0).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(0).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,>,<,>");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<,>,>");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "<,>,<,0");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "<,<,>,0");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+
+			assertEquals(null, agents.get(2).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "<,>,<,>");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "<,<,>,>");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+			assertEquals(null, agents.get(3).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,>,<,0");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<,>,0");
+			assertEquals(CAEventType.SWAP, agents.get(2).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(2).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(0).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,>,<,<");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<,>,<");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(CAEventType.SWAP, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.SWAP, agents.get(2).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(2).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(3).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "0,>,<,<");
+			CAMoveableEntity a = agents.get(1);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "0,<,>,<");
+			assertEquals(CAEventType.SWAP, agents.get(0).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(0).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(CAEventType.TTA, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, "<,>,<,<");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, "<,<,>,<");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(2).getCurrentEvent());
+			assertEquals(CAEventType.SWAP, agents.get(1).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(1).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(3).getCurrentEvent());
+		}
+		{
+			l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
+			double t = z;
+			List<CAMoveableEntity> agents = setConfiguration(l, ">,>,<,>");
+			CAMoveableEntity a = agents.get(2);
+			CAEvent e = new CAEvent(t, a, l, CAEventType.SWAP);
+			l.handleEvent(e);
+
+			checkPostConfiguration(l, ">,<,>,>");
+			assertEquals(null, agents.get(0).getCurrentEvent());
+			assertEquals(null, agents.get(1).getCurrentEvent());
+			assertEquals(CAEventType.SWAP, agents.get(2).getCurrentEvent()
+					.getCAEventType());
+			assertEquals(t + d + tFree, agents.get(2).getCurrentEvent()
+					.getEventExcexutionTime());
+			assertEquals(null, agents.get(3).getCurrentEvent());
+		}
+	}
+
+	@Test
+	public void testDynamicsLR() {
 		CAMultiLaneLink l = createCAMultiLaneLink(AbstractCANetwork.PED_WIDTH);
 		CAConstantDensityEstimator.RHO = 2;
 		double d = AbstractCANetwork.ALPHA
