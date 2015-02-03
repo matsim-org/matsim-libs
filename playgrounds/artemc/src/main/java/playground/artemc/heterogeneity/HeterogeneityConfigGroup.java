@@ -20,7 +20,7 @@ public class HeterogeneityConfigGroup extends ReflectiveConfigGroup {
 	private static final String INCOME_ON_TRAVELCOST_TYPE = "incomeOnTravelCostType";
 	private String IncomeOnTravelCostType = null;
 
-	private static final String DISTANCE_ON_TRAVELTIME_LAMBDA = "DistanceOnTravelTimeLambda";
+	private static final String DISTANCE_ON_TRAVELTIME_LAMBDA = "distanceOnTravelTimeLambda";
 	private String distanceOnTravelTimeLambda = null;
 
 	public HeterogeneityConfigGroup() {

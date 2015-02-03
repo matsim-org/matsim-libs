@@ -52,10 +52,10 @@ import javax.inject.Inject;
  * 
  * @author rashid_waraich
  */
-public class DisaggregatedCharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
+public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory implements ScoringFunctionFactory, PersonalScoringFaunctionFactory {
 	
 
-	private static final Logger log = Logger.getLogger(DisaggregatedCharyparNagelScoringFunctionFactory.class);
+	private static final Logger log = Logger.getLogger(HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory.class);
 
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;
@@ -66,13 +66,13 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	private IncomeHeterogeneity incomeHeterogeneity;
 
 
-	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
+	public HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(final PlanCalcScoreConfigGroup config, Network network) {
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
-	}
+}
 
-	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, HeterogeneityConfig heterogeneityConfig) {
+	public HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(final PlanCalcScoreConfigGroup config, Network network, HeterogeneityConfig heterogeneityConfig) {
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
@@ -212,6 +212,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		return params;
 	}
 
+	@Override
 	public HashMap<Id, ScoringFunction> getPersonScoringFunctions() {
 		return personScoringFunctions;
 	}

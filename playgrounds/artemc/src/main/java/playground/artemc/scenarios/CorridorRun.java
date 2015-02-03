@@ -16,8 +16,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.dwellTimeModel.QSimFactory;
-import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
+import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
@@ -75,13 +75,13 @@ public class CorridorRun {
 
 		// Additional analysis
 		ScenarioImpl scenarioImpl = (ScenarioImpl) controler.getScenario();
-        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
+        controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 		controler.addControlerListener(new SimpleAnnealer());
 		
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
 		
 		controler.setMobsimFactory(new QSimFactory());

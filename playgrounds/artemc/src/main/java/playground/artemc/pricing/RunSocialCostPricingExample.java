@@ -30,6 +30,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
+import playground.artemc.scoring.CharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
@@ -70,13 +71,12 @@ public final class RunSocialCostPricingExample {
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
 
-//		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
-//		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
+		controler.setScoringFunctionFactory(new CharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 //		controler.addControlerListener(new SimpleAnnealer());
 		// Additional analysis
-//		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
-//		controler.addControlerListener(analysisControlerListener);
-//		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		controler.addControlerListener(analysisControlerListener);
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 
 		controler.setOverwriteFiles(true);
         // run the controler:

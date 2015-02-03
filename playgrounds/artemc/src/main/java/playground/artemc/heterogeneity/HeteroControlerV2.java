@@ -2,31 +2,21 @@ package playground.artemc.heterogeneity;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.corelisteners.LegHistogramModule;
-import org.matsim.core.controler.corelisteners.LinkStatsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
+import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import playground.artemc.transitRouterEventsBased.TransitRouterHeteroWSImplFactory;
 import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
@@ -67,9 +57,11 @@ public class HeteroControlerV2 {
 	private void run() {
 
 		Scenario scenario = initScenario();
-		System.setProperty("matsim.preferLocalDtds", "true");
+		//System.setProperty("matsim.preferLocalDtds", "true");
+
 		System.out.println(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getName());
 		System.out.println(ConfigUtils.addOrGetModule(scenario.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class).getLambdaIncomeTravelcost());
+
 		//Adjust the heterogeneity parameter
 		Double newIncomeLambda = heterogeneityFactor * Double.parseDouble(ConfigUtils.addOrGetModule(scenario.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class).getLambdaIncomeTravelcost());
 
@@ -144,13 +136,13 @@ public class HeteroControlerV2 {
 		//controler.setTransitRouterFactory(new TransitRouterHeteroWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), heterogeneityConfig));
 
 		//Scoring
-        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
+        controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 		controler.setOverwriteFiles(true);
 		
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
 
 		//Logger root = Logger.getRootLogger();

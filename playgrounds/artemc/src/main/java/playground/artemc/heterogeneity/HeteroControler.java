@@ -15,8 +15,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
+import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouterEventsBased.TransitRouterHeteroWSImplFactory;
@@ -110,13 +110,13 @@ public class HeteroControler {
 		controler.setTransitRouterFactory(new TransitRouterHeteroWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), heterogeneityConfig));
 
 		//Scoring
-        controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), heterogeneityConfig));
+        controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork(), heterogeneityConfig));
 		controler.setOverwriteFiles(true);
 		
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
 
 		//Logger root = Logger.getRootLogger();

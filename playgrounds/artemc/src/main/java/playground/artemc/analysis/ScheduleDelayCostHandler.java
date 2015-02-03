@@ -17,8 +17,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.scoring.DisaggregatedSumScoringFunction;
+import playground.artemc.scoring.PersonalScoringFaunctionFactory;
 import playground.artemc.scoring.functions.ActivityUtilityParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
@@ -47,7 +48,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 	private HashMap<Id<Person>, PersonalScoringParameters>  scoringParameters;
 	private Controler controler;
 	private HashSet<String> usedModes;
-	private DisaggregatedCharyparNagelScoringFunctionFactory disScoringFactory = null;
+	private PersonalScoringFaunctionFactory disScoringFactory = null;
 	private Journey currentJourney;
 	private ArrayList<Id<Person>> stuckedAgents;
 
@@ -223,7 +224,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 
 		//Save personal scoring parameters, if the person appears for the first time
 		if(disScoringFactory==null){
-			disScoringFactory = (DisaggregatedCharyparNagelScoringFunctionFactory) controler.getScoringFunctionFactory();
+			disScoringFactory = (PersonalScoringFaunctionFactory) controler.getScoringFunctionFactory();
 		}
 
 		if(!scoringParameters.containsKey(perosnId)){
