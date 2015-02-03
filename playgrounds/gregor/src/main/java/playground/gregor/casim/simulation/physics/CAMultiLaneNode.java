@@ -226,7 +226,7 @@ public class CAMultiLaneNode implements CANode {
 		Id<Link> nextLinkId = a.getNextLinkId();
 		CAMultiLaneLink nextLink = (CAMultiLaneLink) this.net
 				.getCALink(nextLinkId);
-
+		a.setRho(nextLink.getDensityEstimator().estRho(a));
 		if (nextLink.getDownstreamCANode() == this) {
 			handleTTAEnterNextLinkFromDownstreamEnd(nextLink, a, time);
 		} else if (nextLink.getUpstreamCANode() == this) {
@@ -535,7 +535,7 @@ public class CAMultiLaneNode implements CANode {
 				CandInfo cand = cands.get(i);
 				cand.e.setRho(cand.l.getDensityEstimator().estRho(cand.e));
 				double z = CAMultiLaneLink.getZ(cand.e);
-				z = 0;
+				// z = 0;
 				CAEvent e = new CAEvent(time + z, cand.e, cand.l,
 						CAEventType.TTA);
 				this.net.pushEvent(e);
@@ -585,7 +585,7 @@ public class CAMultiLaneNode implements CANode {
 		Id<Link> nextLinkId = a.getNextLinkId();
 		CAMultiLaneLink nextLink = (CAMultiLaneLink) this.net
 				.getCALink(nextLinkId);
-
+		a.setRho(nextLink.getDensityEstimator().estRho(a));
 		if (nextLink.getDownstreamCANode() == this) {
 			handleSwapWithDownStreamEnd(a, time, nextLink);
 		} else if (nextLink.getUpstreamCANode() == this) {
@@ -615,6 +615,8 @@ public class CAMultiLaneNode implements CANode {
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
 		swapA = nextLink.getParticles(lane)[0];
 		swapA.invalidate();
+
+		swapA.setRho(nextLink.getDensityEstimator().estRho(swapA));
 
 		this.pollAgentFromSlot(a.getLane());
 		this.putAgentInSlot(a.getLane(), swapA);
@@ -756,7 +758,7 @@ public class CAMultiLaneNode implements CANode {
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
 		CAMoveableEntity swapA = nextLink.getParticles(lane)[cellIdx];
 		swapA.invalidate();
-
+		swapA.setRho(nextLink.getDensityEstimator().estRho(swapA));
 		this.pollAgentFromSlot(a.getLane());
 		this.putAgentInSlot(a.getLane(), swapA);
 
