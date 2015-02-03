@@ -64,6 +64,7 @@ public class NetworkLanesSignalsSimplifier {
 
 	private Set<Id<Node>> nodeIdsToRemove = new HashSet<>();
 	private boolean simplifySignalizedNodes;
+	private double maximalLinkLength;
 
 	private Id<Link> createId(Id<Link> inLink, Id<Link> outLink) {
 		Id<Link> id = Id.create(inLink + "-" + outLink, Link.class);
@@ -133,6 +134,8 @@ public class NetworkLanesSignalsSimplifier {
 									if (stop) break;//continue;
 								}
 								
+								// The new link should not exceed the maximum link length
+								if (linkLengthAccepted(inLink,outLink)){									
 								// Only merge links with same attributes
 								if (bothLinksHaveSameLinkStats(inLink, outLink)) {
 									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
@@ -198,6 +201,7 @@ public class NetworkLanesSignalsSimplifier {
 										}
 									}
 								}
+								}
 							}
 						}
 					}
@@ -215,6 +219,13 @@ public class NetworkLanesSignalsSimplifier {
 		log.info("  resulting network contains " + network.getNodes().size() + " nodes and "
 				+ network.getLinks().size() + " links.");
 		log.info("done.");
+	}
+
+	private boolean linkLengthAccepted(Link inLink, Link outLink) {
+		if (inLink.getLength() + outLink.getLength() > maximalLinkLength)
+			return false;
+		else
+			return true;
 	}
 
 	public Set<Id<Node>> getRemovedNodeIds() {
@@ -289,6 +300,10 @@ public class NetworkLanesSignalsSimplifier {
 
 	public void setSimplifySignalizedNodes(boolean b) {
 		this.simplifySignalizedNodes = b;
+	}
+
+	public void setMaximalLinkLength(double maximalLinkLength) {
+		this.maximalLinkLength = maximalLinkLength;
 	}
 
 	

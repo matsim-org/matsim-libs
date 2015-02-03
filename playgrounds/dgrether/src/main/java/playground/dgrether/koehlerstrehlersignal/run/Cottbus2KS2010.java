@@ -80,6 +80,7 @@ public class Cottbus2KS2010 {
 		/* parameters for the interior link filter */
 		double freeSpeedFilter = 15.0; // the minimal free speed value for the interior link filter in m/s
 		boolean useFreeSpeedTravelTime = true; // a flag for dijkstras cost function: if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
+		double maximalLinkLength = Double.MAX_VALUE; // restricts the NetworkSimplifier. Double.MAX_VALUE is no restriction.
 		/* parameters for the demand filter */
 		double matsimPopSampleSize = 1.0; // 100% sample
 		double ksModelCommoditySampleSize = 1.0; // 1 vehicle is equivalent to 1 unit of flow
@@ -91,7 +92,7 @@ public class Cottbus2KS2010 {
 		// String name = "run run1728 output plans between 13:30 and 18:30";
 		String spCost = "tt";
 		if (!useFreeSpeedTravelTime) spCost = "dist";
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2014-08-12" 
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2015-02-02_test_" 
 				+ "_minflow_" + minCommodityFlow + "_morning_peak_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
 				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset + "_doubleLightTest/";
 		String ksModelOutputFilename = "ks2010_model_";
@@ -109,7 +110,7 @@ public class Cottbus2KS2010 {
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(
 				fullScenario, CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory,
-				cuttingBoundingBoxOffset, freeSpeedFilter, useFreeSpeedTravelTime);
+				cuttingBoundingBoxOffset, freeSpeedFilter, useFreeSpeedTravelTime, maximalLinkLength);
 
 		// create the geometry for zones. The geometry itsself is not used, but
 		// the object serves as container for the link -> link OD pairs

@@ -92,7 +92,7 @@ public class NetLanesSignalsShrinker {
 	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function 
 	 * @throws IOException
 	 */
-	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, boolean useFreeSpeedTravelTime) throws IOException{
+	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, boolean useFreeSpeedTravelTime, double maximalLinkLength) throws IOException{
 		//Some initialization
 		Set<Id<Node>> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
@@ -130,6 +130,7 @@ public class NetLanesSignalsShrinker {
 		NetworkLanesSignalsSimplifier nsimply = new NetworkLanesSignalsSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.setSimplifySignalizedNodes(false);
+		nsimply.setMaximalLinkLength(maximalLinkLength);
 		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, (LaneDefinitions20) this.fullScenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), (SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		
