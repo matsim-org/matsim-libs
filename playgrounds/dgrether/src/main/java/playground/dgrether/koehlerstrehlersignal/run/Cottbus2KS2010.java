@@ -112,7 +112,7 @@ public class Cottbus2KS2010 {
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory,
 				cuttingBoundingBoxOffset, freeSpeedFilter, useFreeSpeedTravelTime, maximalLinkLength);
 
-		// create the geometry for zones. The geometry itsself is not used, but
+		// create the geometry for zones. The geometry itself is not used, but
 		// the object serves as container for the link -> link OD pairs
 		ZoneBuilder zoneBuilder = new ZoneBuilder(CRS);
 		DgZones zones = zoneBuilder.createAndWriteZones(
