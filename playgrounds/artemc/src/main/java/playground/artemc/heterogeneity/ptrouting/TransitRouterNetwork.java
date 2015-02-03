@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.heterogeneity.routing;
+package playground.artemc.heterogeneity.ptrouting;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;

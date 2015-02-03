@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.heterogeneity.routing;
+package playground.artemc.heterogeneity.ptrouting;
 
 
 import org.matsim.api.core.v01.Coord;
@@ -35,7 +35,7 @@ import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
 
-import playground.artemc.heterogeneity.routing.TransitRouterNetwork.TransitRouterNetworkLink;
+import playground.artemc.heterogeneity.ptrouting.TransitRouterNetwork.TransitRouterNetworkLink;
 
 /**
  * TravelTime and TravelCost calculator to be used with the transit network used for transit routing.

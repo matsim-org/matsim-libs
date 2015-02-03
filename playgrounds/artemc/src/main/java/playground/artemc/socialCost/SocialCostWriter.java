@@ -43,7 +43,7 @@ public class SocialCostWriter {
 	
 	protected int iteration;
 	
-	SocialCostWriter(int iteration) {
+	public SocialCostWriter(int iteration) {
 		this.iteration = iteration;
 	}
 

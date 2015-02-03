@@ -53,8 +53,6 @@ public class BaseControler {
 		controler.addControlerListener(analysisControlerListener);
 		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
-		controler.setOverwriteFiles(true);
-		controler.run();
 	}
 
 	private static class Initializer implements StartupListener {

@@ -31,12 +31,16 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.artemc.heterogeneity.HeterogeneityConfig;
+import playground.artemc.heterogeneity.IncomeHeterogeneity;
 import playground.artemc.scoring.functions.CharyparNagelActivityScoring;
 import playground.artemc.scoring.functions.CharyparNagelAgentStuckScoring;
 import playground.artemc.scoring.functions.CharyparNagelLegScoring;
 import playground.artemc.scoring.functions.CharyparNagelMoneyScoring;
 import playground.artemc.scoring.functions.PersonalScoringParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
+
+import javax.inject.Inject;
+
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
  * 
@@ -59,6 +63,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	private HashMap<Id<Person>, Double> incomeFactors = null;
 	private HashMap<Id<Person>, Double> betaFactors = null;
 	private String simulationType;
+	private IncomeHeterogeneity incomeHeterogeneity;
 
 
 	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
@@ -71,33 +76,29 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
-		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
-		this.betaFactors = heterogeneityConfig.getBetaFactors();
-		this.simulationType = heterogeneityConfig.getSimulationType();
+
+
+//		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
+//		this.betaFactors = heterogeneityConfig.getBetaFactors();
+//		this.simulationType = heterogeneityConfig.getSimulationType();
 	}
 
-	/**
-	 * puts the scoring functions together, which form the
-	 * CharyparScoringFunction
-	 * <p/>
-	 * This creational method gets the plan as an argument.  Since it is possible to get the person from the plan, it is thus
-	 * possible to make the scoring function person-specific.
-	 * <p/>  
-	 * Notes:<ul>
-	 * <li>If I understand this correctly, this creational method is 
-	 * called in every iteration. kai, apr'11
-	 * <li>The fact that you have a person-specific scoring function does not mean that the "creative" modules
-	 * (such as route choice) are person-specific.  This is not a bug but a deliberate design concept in order 
-	 * to reduce the consistency burden.  Instead, the creative modules should generate a diversity of possible
-	 * solutions.  In order to do a better job, they may (or may not) use person-specific info.  kai, apr'11
-	 * </ul>
-	 * 
-	 * @param plan
-	 * @return new ScoringFunction
-	 */
+	//setter method injector
+	@Inject
+	public void setIncomeHeterogeneity(IncomeHeterogeneity incomeHeterogeneity){
+		this.incomeHeterogeneity = incomeHeterogeneity;
+	}
+
+	private void init(){
+		this.incomeFactors = incomeHeterogeneity.getIncomeFactors();
+		this.betaFactors = incomeHeterogeneity.getBetaFactors();
+		this.simulationType = incomeHeterogeneity.getType();
+	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
+
+		this.init();
 		PersonalScoringParameters params = new PersonalScoringParameters(this.config);
 		
 		//Adjust individuals scoring parameters for heterogeneity simulation. If simulationType is set to "homo" (default setting) no adjustment takes place.

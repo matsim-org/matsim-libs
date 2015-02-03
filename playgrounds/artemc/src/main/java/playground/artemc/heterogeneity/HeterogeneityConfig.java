@@ -28,17 +28,15 @@ ControlerListener {
 
 	private static final Logger log = Logger.getLogger(HeterogeneityConfig.class);
 
-	public static final String LAMBDA_INCOME = "lambda_income";
-	public static final String LAMBDA_DISTANCE = "lambda_dist";
-	final static String modName = "Heterogeneity";
+	public static final String LAMBDA_INCOME = "incomeOnTravelCostLambda";
+	public static final String LAMBDA_DISTANCE = "lambdaDistanceTravelTime";
+	final static String modName = "heterogeneity";
 	static double lambda_income = 1.0;
 	static double lambda_dist = 1.0;
 	static boolean heterogeneitySwitch = false;
 	static boolean homogeneousIncomeFactorSwitch = false;
 	static double heterogeneityFactor = 1.0;
 	
-	
-
 
 	private Controler controler;
 	private Config config;
