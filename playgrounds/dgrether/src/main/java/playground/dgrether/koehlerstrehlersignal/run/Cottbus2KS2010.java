@@ -75,8 +75,9 @@ public class Cottbus2KS2010 {
 		// double startTime = 13.5 * 3600.0;
 		// double endTime = 18.5 * 3600.0;
 		/* parameters for the network area */
-		double signalsBoundingBoxOffset = 500.0;
-		double cuttingBoundingBoxOffset = 5000.0; // an offset >= 31000.0 results in a bounding box that contains the hole network
+		double signalsBoundingBoxOffset = 500.0; // outside this envelope all crossings stay unexpanded
+		// Okt'14: sBB 500 instead of 50 to avoid effect that travelers drive from the ring around cottbus outside and inside again to jump in time
+		double cuttingBoundingBoxOffset = 50.0; // an offset >= 31000.0 results in a bounding box that contains the hole network
 		/* parameters for the interior link filter */
 		double freeSpeedFilter = 15.0; // the minimal free speed value for the interior link filter in m/s
 		boolean useFreeSpeedTravelTime = true; // a flag for dijkstras cost function: if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
@@ -94,7 +95,7 @@ public class Cottbus2KS2010 {
 		if (!useFreeSpeedTravelTime) spCost = "dist";
 		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2015-02-02_test_" 
 				+ "_minflow_" + minCommodityFlow + "_morning_peak_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
-				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset + "_doubleLightTest/";
+				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset;
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + "_" + Double.toString(cuttingBoundingBoxOffset) + ".xml";

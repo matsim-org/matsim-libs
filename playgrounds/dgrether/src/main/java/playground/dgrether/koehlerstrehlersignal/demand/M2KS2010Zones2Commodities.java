@@ -94,7 +94,7 @@ public class M2KS2010Zones2Commodities  {
 					fromCrossingNodeId = this.idConverter.convertNodeId2NotExpandedCrossingNodeId(fromNodeId);
 				}
 				else{
-					fromCrossingNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(fromLink.getLink().getId());
+					fromCrossingNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(fromLink.getLink().getId()); //TODO methoden to from umbenenen
 				}
 				
 				for (Entry<Link, Double> toLinkEntry : fromLink.getDestinationLinkTrips().entrySet()){
