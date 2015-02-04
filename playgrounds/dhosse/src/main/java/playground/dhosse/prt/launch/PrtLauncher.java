@@ -26,8 +26,6 @@ public class PrtLauncher {
 		VrpLauncher launcher = new VrpLauncher(params);
 		launcher.run();
 		
-//		OTFVis.playNetwork("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/network_pt.xml");
-		
 	}
 
 	private static void createVehicles() {

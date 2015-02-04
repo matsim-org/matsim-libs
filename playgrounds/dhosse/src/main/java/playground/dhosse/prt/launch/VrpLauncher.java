@@ -6,6 +6,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -20,12 +21,17 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.run.XY2Links;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import pl.poznan.put.util.ChartUtils;
@@ -33,6 +39,7 @@ import playground.dhosse.prt.NPersonsActionCreator;
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
+import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
 import playground.dhosse.prt.scheduler.PrtScheduler;
 import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.data.TaxiData;
@@ -104,60 +111,20 @@ public class VrpLauncher {
         config.controler().setOutputDirectory("C:/Users/Daniel/Desktop/dvrp/");
         config.controler().setCreateGraphs(true);
         
-//        ActivityParams home = new ActivityParams("home");
-//        home.setPriority(1.);
-//        home.setTypicalDuration(16*3600);
-//        config.planCalcScore().addActivityParams(home);
-//        ActivityParams work = new ActivityParams("work");
-//        work.setPriority(1.);
-//        work.setTypicalDuration(8*3600);
-//        config.planCalcScore().addActivityParams(work);
-//        
-//        config.planCalcScore().setBrainExpBeta(1);
-//        config.planCalcScore().setLearningRate(2);
-//        config.planCalcScore().setLateArrival_utils_hr(-18);
-//        config.planCalcScore().setEarlyDeparture_utils_hr(0);
-//        config.planCalcScore().setPerforming_utils_hr(6);
-//        config.planCalcScore().setTraveling_utils_hr(-6);
-//        config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
-//
-//        config.strategy().setMaxAgentPlanMemorySize(4);
-//        StrategySettings stratSets = new StrategySettings();
-//        stratSets.setStrategyName("ChangeExpBeta");
-//        stratSets.setWeight(0.8);
-//        config.strategy().addStrategySettings(stratSets);
-//        stratSets = new StrategySettings();
-//        stratSets.setStrategyName("ReRoute");
-//        stratSets.setWeight(0.1);
-//        config.strategy().addStrategySettings(stratSets);
-//        stratSets = new StrategySettings();
-//        stratSets.setStrategyName("ChangeLegMode");
-//        stratSets.setWeight(0.1);
-//        config.strategy().addStrategySettings(stratSets);
-        
         TaxiData taxiData = TaxiLauncherUtils.initTaxiData(scenario, params.pathToTaxisFile,
         		params.pathToRanksFile);
         
         context.setVrpData(taxiData);
         PrtData prtData = new PrtData(scenario.getNetwork(), taxiData);
         
-//        PrtTripRouterFactoryImpl tripRouterFactory = new PrtTripRouterFactoryImpl(this.context);
-//        final PersonAlgorithm router = new PlanRouter(tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(this.travelDisutility, this.travelTime)));
+        PrtTripRouterFactoryImpl tripRouterFactory = new PrtTripRouterFactoryImpl(this.context, this.travelTime, this.travelDisutility);
+        final PersonAlgorithm router = new PlanRouter(tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(this.travelDisutility, this.travelTime)));
 
-//        for(Person p : scenario.getPopulation().getPersons().values()){
-//        	
-//        	for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
-//        		if(pe instanceof Activity){
-//        			ActivityImpl act = (ActivityImpl)pe;
-//        			if(act.getLinkId() == null){
-//        				act.setLinkId(networkImpl.getNearestLinkExactly(act.getCoord()).getId());
-//        			}
-//        		}
-//        	}
+        for(Person p : scenario.getPopulation().getPersons().values()){
         	
-//        	if(p.getId().toString().contains("pt"))
-//        		router.run(p);
-//        }
+        	if(p.getId().toString().contains("prt"))
+        		router.run(p);
+        }
         
         TaxiOptimizerConfiguration optimConfig = initOptimizerConfiguration();
         TaxiOptimizer optimizer = params.algorithmConfig.createTaxiOptimizer(optimConfig);
@@ -209,8 +176,9 @@ public class VrpLauncher {
         LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist_all.png");
         LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist_prt.png", "prt");
         LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist_car.png", TransportMode.car);
+        LegHistogramChart.writeGraphic(legHistogram, "C:/Users/Daniel/Desktop/dvrp/hist_transitWalk.png", TransportMode.transit_walk);
         
-//        generateOutput();
+        generateOutput();
         
 	}
 	

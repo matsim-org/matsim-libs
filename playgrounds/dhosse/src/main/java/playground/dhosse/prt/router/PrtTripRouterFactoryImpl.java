@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -19,7 +20,6 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -40,10 +40,14 @@ import playground.dhosse.prt.passenger.PrtRequestCreator;
 public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 	
 	private final MatsimVrpContext context;
+	private final TravelTime travelTime;
+	private final TravelDisutility travelDisutility;
 	
-	public PrtTripRouterFactoryImpl(final MatsimVrpContext context){
+	public PrtTripRouterFactoryImpl(final MatsimVrpContext context, final TravelTime ttime, final TravelDisutility tdis){
 
 		this.context = context;
+		this.travelTime = ttime;
+		this.travelDisutility = tdis;
 		
 	}
 
@@ -144,9 +148,10 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 			}
 		}
 		
-		tripRouter.setRoutingModule(PrtRequestCreator.MODE,
-				new PrtRouterWrapper(PrtRequestCreator.MODE, populationFactory,
-						new PrtNetworkLegRouter(prtNetwork, routeAlgo, modeRouteFactory)));
+		tripRouter.setRoutingModule(PrtRequestCreator.MODE, new PrtRouterWrapper(PrtRequestCreator.MODE, network,
+				populationFactory, new VrpPathCalculatorImpl(routeAlgo, this.travelTime, this.travelDisutility),
+				new LegRouterWrapper(TransportMode.transit_walk, populationFactory,
+						new NetworkLegRouter(network, routeAlgoPtFreeFlow, modeRouteFactory))));
 		
 		return tripRouter;
 		
