@@ -26,7 +26,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.*;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
 import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
@@ -46,6 +50,7 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     private final static double FACTOR_NOMATCH = 100000.0;
 
     private final LeastCostPathCalculator pathCalculator;
+    private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
     private String currentMode;
     private String currentLine;
 
@@ -58,7 +63,15 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode, String routeId) {
         this.currentMode = mode;
         this.currentLine = deriveLineFromRouteId(routeId);
-        return pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null);
+        if (fromNode != null && toNode != null) {
+            Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
+            if (!paths.containsKey(nodes)) {
+                paths.put(nodes, pathCalculator.calcLeastCostPath(fromNode, toNode, 0.0, null, null));
+            }
+            return paths.get(nodes);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -102,6 +115,10 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     }
 
     private String deriveLineFromRouteId(String routeId) {
-        return routeId.substring(0,4);
+        if (routeId != null && routeId.length() > 3) {
+            return routeId.substring(0, 4);
+        } else {
+            return null;
+        }
     }
 }

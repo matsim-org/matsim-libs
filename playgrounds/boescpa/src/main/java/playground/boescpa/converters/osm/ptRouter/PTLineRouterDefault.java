@@ -43,8 +43,8 @@ import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRA
  */
 public class PTLineRouterDefault extends PTLineRouter {
 
-	private final static double SEARCH_RADIUS_BUS = 10; //[m]
-	private final static double SEARCH_RADIUS_TRAM = 20; //[m]
+	private final static double SEARCH_RADIUS_BUS = 50; //[m]
+	private final static double SEARCH_RADIUS_TRAM = 50; //[m]
 
 	private final Map<Id<TransitStopFacility>, Map<String, Id<TransitStopFacility>[]>> linkedStopFacilities = new HashMap<>();
 	private PTLRouter router = null;
@@ -59,22 +59,26 @@ public class PTLineRouterDefault extends PTLineRouter {
 	}
 
 	private String mode;
+	private String networkMode;
 	private double searchRadius;
 	private void setMode(String mode) {
 		switch (mode) {
 			case BUS: {
 				this.mode = BUS;
+				this.networkMode = "car";
 				this.searchRadius = SEARCH_RADIUS_BUS;
 				break;
 			}
 			case TRAM: {
 				this.mode = TRAM;
+				this.networkMode = "tram";
 				this.searchRadius = SEARCH_RADIUS_TRAM;
 				break;
 			}
 			default: {
 				log.warn("Mode " + mode + " not available for network assignment.");
 				this.mode = null;
+				this.networkMode = null;
 				this.searchRadius = 0;
 			}
 		}
@@ -95,7 +99,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * Link the pt-stations in the schedule to the closest network links.
 	 * Writes the resulting schedule into this.schedule.
 	 */
-	private void linkStationsToNetwork() {
+	protected void linkStationsToNetwork() {
 		log.info("Linking pt stations to network...");
 
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
@@ -190,7 +194,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 */
 	private Id<Link> findClosestLink(TransitStopFacility stopFacility) {
 		Link nearestLink = NetworkUtils.getNearestLink(this.network, stopFacility.getCoord());
-		if (nearestLink.getAllowedModes().contains(this.mode)
+		if (nearestLink.getAllowedModes().contains(this.networkMode)
 				&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), nearestLink.getCoord()) <= this.searchRadius) {
 			// If nearest link has right mode and is within search radius, return it.
 			return nearestLink.getId();
@@ -199,7 +203,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 			nearestLink = null;
 			double currentRadius = this.searchRadius;
 			for (Link potentialLink : this.network.getLinks().values()) {
-				if (potentialLink.getAllowedModes().contains(this.mode)
+				if (potentialLink.getAllowedModes().contains(this.networkMode)
 						&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), potentialLink.getCoord()) < currentRadius) {
 					currentRadius = NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), potentialLink.getCoord());
 					nearestLink = potentialLink;
@@ -234,13 +238,13 @@ public class PTLineRouterDefault extends PTLineRouter {
 		if (lowerLink != null
 				&& lowerLink.getFromNode().getId().toString().equals(link.getToNode().getId().toString())
 				&& lowerLink.getToNode().getId().toString().equals(link.getFromNode().getId().toString())
-				&& lowerLink.getAllowedModes().contains(this.mode)) {
+				&& lowerLink.getAllowedModes().contains(this.networkMode)) {
 			return new Id[]{lowerLink.getId()};
 		}
 		if (upperLink != null
 				&& upperLink.getFromNode().getId().toString().equals(link.getToNode().getId().toString())
 				&& upperLink.getToNode().getId().toString().equals(link.getFromNode().getId().toString())
-				&& upperLink.getAllowedModes().contains(this.mode)) {
+				&& upperLink.getAllowedModes().contains(this.networkMode)) {
 			return new Id[]{upperLink.getId()};
 		}
 
@@ -265,7 +269,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	private Set<Link> getLinksWithinSearchRadius(Coord centralCoords) {
 		Set<Link> linksWithinRadius = new HashSet<>();
 		for (Link link : this.network.getLinks().values()) {
-			if (link.getAllowedModes().contains(this.mode)
+			if (link.getAllowedModes().contains(this.networkMode)
 					&& NetworkUtils.getEuclidianDistance(centralCoords, link.getCoord()) < this.searchRadius) {
 				linksWithinRadius.add(link);
 			}
@@ -300,7 +304,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 *
 	 * Writes the resulting schedule into this.schedule.
 	 */
-	private void createPTRoutes() {
+	protected void createPTRoutes() {
 		log.info("Creating pt routes...");
 
 		this.router = new PTLRFastAStarLandmarks(this.network);
@@ -330,14 +334,14 @@ public class PTLineRouterDefault extends PTLineRouter {
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
 			TransitRouteStop toStop = route.getStops().get(i+1);
-			try {
-				LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
+			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
+			if (path != null) {
+				links.add(fromStop.getStopFacility().getLinkId());
 				for (Link link : path.links) {
 					links.add(link.getId());
 				}
-			} catch (Exception e) {
-				//log.warn("Routing from " + fromStop.toString() + " to " + toStop.toString() + "caused error. Pseudo route created.");
-				Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
+			} else {
+				/*Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
 				links.add(link.getId());
 				i++;
 				if (i < (route.getStops().size()-1)) {
@@ -345,11 +349,12 @@ public class PTLineRouterDefault extends PTLineRouter {
 					toStop = route.getStops().get(i+1);
 					link = this.pseudoNetworkCreator.getNetworkLink(fromStop,toStop);
 					links.add(link.getId());
-				}
+				}*/
 			}
 			i++;
 		}
 		if (links.size() > 0) {
+			links.add(route.getStops().get(route.getStops().size()-1).getStopFacility().getLinkId());
 			route.setRoute(RouteUtils.createNetworkRoute(links, this.network));
 		} else {
 			log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
@@ -367,13 +372,13 @@ public class PTLineRouterDefault extends PTLineRouter {
 
 		if (derivativesFromStop != null) {
 			for (Id<TransitStopFacility> fromStopFacilityId : derivativesFromStop.get(this.mode)) {
-				Node fromNode = this.network.getLinks().get(this.schedule.getFacilities().get(fromStopFacilityId).getLinkId()).getToNode();
+				Node fromNode = getNodeForStopFacility(fromStopFacilityId, true);
 				if (derivativesToStop != null) {
 					// We have to loop over both, fromStops and toStops, and have to set both as soon as found...
 					for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
-						Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
-						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
-						if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+						Node toNode = getNodeForStopFacility(toStopFacilityId, false);
+						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+						if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 							shortestPath = tempShortestPath;
 							fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
 							toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
@@ -381,30 +386,30 @@ public class PTLineRouterDefault extends PTLineRouter {
 					}
 				} else {
 					// We have to loop over fromStops and assign it, but not over toStop. (This should actually never be the case...)
-					Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
-					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+					Node toNode = getNodeForStopFacility(toStop.getStopFacility().getId(), false);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+					if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 						shortestPath = tempShortestPath;
 						fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
 					}
 				}
 			}
 		} else {
-			Node fromNode = this.network.getLinks().get(fromStop.getStopFacility().getLinkId()).getToNode();
+			Node fromNode = getNodeForStopFacility(fromStop.getStopFacility().getId(), true);
 			if (derivativesToStop != null) {
 				// We have to loop over toStops and assign it, but not over fromStop. (This should be the standard case...)
 				for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
-					Node toNode = this.network.getLinks().get(this.schedule.getFacilities().get(toStopFacilityId).getLinkId()).getFromNode();
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
-					if (shortestPath == null || tempShortestPath.travelCost < shortestPath.travelCost) {
+					Node toNode = getNodeForStopFacility(toStopFacilityId, false);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+					if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 						shortestPath = tempShortestPath;
 						toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
 					}
 				}
 			} else {
 				// We have to loop over none of the two...
-				Node toNode = this.network.getLinks().get(toStop.getStopFacility().getLinkId()).getFromNode();
-				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
+				Node toNode = getNodeForStopFacility(toStop.getStopFacility().getId(), false);
+				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
 			}
 		}
 
@@ -412,11 +417,27 @@ public class PTLineRouterDefault extends PTLineRouter {
 	}
 
 	/**
+	 * @param stopFacilityId for which the attached node is returned
+	 * @param toNode True returns toNode, False returns fromNode
+	 * @return Node if a link is attached to facility, null else.
+	 */
+	private Node getNodeForStopFacility(Id<TransitStopFacility> stopFacilityId, boolean toNode) {
+		if (this.schedule.getFacilities().get(stopFacilityId).getLinkId() != null) {
+			if (toNode) {
+				return this.network.getLinks().get(this.schedule.getFacilities().get(stopFacilityId).getLinkId()).getToNode();
+			} else {
+				return this.network.getLinks().get(this.schedule.getFacilities().get(stopFacilityId).getLinkId()).getFromNode();
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
 	 * and all nodes which are non-linked to any link after the above cleaning...
 	 * Clean also the allowed modes for only the modes, no line-number any more...
 	 */
-	private void cleanStationsAndNetwork() {
+	protected void cleanStationsAndNetwork() {
 		// TODO-boescpa Implement this...
 	}
 }
