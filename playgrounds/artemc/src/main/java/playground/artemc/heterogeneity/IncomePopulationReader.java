@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import playground.artemc.utils.MapWriter;
 
 /**
  * Created by artemc on 29/1/15.

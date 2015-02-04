@@ -20,7 +20,7 @@ public class MapWriter {
 		this.path = path;
 	}
 
-	public void writeBetaFactors(HashMap<Id<Person>, Double> map, String row1, String row2){
+	public void write(HashMap<Id<Person>, Double> map, String row1, String row2){
 		File file = new File(this.path);
 
 		try {

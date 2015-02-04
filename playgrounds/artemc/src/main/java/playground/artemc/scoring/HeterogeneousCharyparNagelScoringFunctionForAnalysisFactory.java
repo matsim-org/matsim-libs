@@ -115,7 +115,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	}
 	
 	public PersonalScoringParameters adjustParametersForHeterogeneity(String simulationType, Person person, PersonalScoringParameters params){
-		if(incomeFactors!=null){
+		if(incomeFactors!=null && !simulationType.equals("homo")){
 			
 			/*Calculate the mean in order to adjust the utility parameters*/
 			Double factorSum=0.0;
@@ -131,7 +131,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 			
 
 		if(simulationType.equals("hetero")){
-			
+
 				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
 				
 				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;

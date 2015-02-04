@@ -19,6 +19,7 @@ import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
+import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
 import playground.artemc.pricing.ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
@@ -29,19 +30,28 @@ import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
 import playground.artemc.transitRouter.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ControlerWithHeteroAndToll {
+public class ControlerWithHeteroAndTollLoop {
 
-	private static final Logger log = Logger.getLogger(ControlerWithHeteroAndToll.class);
+	private static final Logger log = Logger.getLogger(ControlerWithHeteroAndTollLoop.class);
 
 	private static String input;
 	private static String output;
 	private static String simulationType = "homo";
 	private static Double heterogeneityFactor = 1.0;
+	private static boolean roadpricing = false;
 
 	public static void main(String[] args){
+
+		ArrayList<String> simulationTypes = new ArrayList<String>();
+
+		simulationTypes.add("hetero");
+		simulationTypes.add("heteroAlpha");
+		simulationTypes.add("heteroGamma");
+		simulationTypes.add("heteroAlphaProp");
 
 		input = args[0];
 		if(args.length>1){
@@ -50,16 +60,19 @@ public class ControlerWithHeteroAndToll {
 		if(args.length>2){
 			simulationType = args[2];
 		}
-		if(args.length>3){
-			heterogeneityFactor = Double.valueOf(args[3]);			
+		if(args.length>3 && args[3].equals("toll")){
+			roadpricing = true;
 		}
+		for(String type:simulationTypes){
+			simulationType = type;
+			if(args.length>1){
+				output = args[1] + "_"+simulationType;
+			}
 
-
-		ControlerWithHeteroAndToll runner = new ControlerWithHeteroAndToll();
-		runner.run();
+			ControlerWithHeteroAndTollLoop runner = new ControlerWithHeteroAndTollLoop();
+			runner.run();
+		}
 	}
-
-
 
 	private void run() {
 
@@ -78,13 +91,24 @@ public class ControlerWithHeteroAndToll {
 
 //		controler.setModules(new IncomeHeterogeneityModule(input));
 
-		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+		if(roadpricing==true) {
+			log.info("First-best roadpricing enabled!");
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+				}});
+		}else{
+			log.info("No roadpricing!");
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+				}});
+		}
 
-		controler.addOverridingModule( new AbstractModule() {
-			@Override
-			public void install() {
-				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
-			}});
 
 		log.info("Simulation type: "+simulationType);
 		if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma") || simulationType.equals("heteroGammaProp") || simulationType.equals("heteroAlphaProp")) {
