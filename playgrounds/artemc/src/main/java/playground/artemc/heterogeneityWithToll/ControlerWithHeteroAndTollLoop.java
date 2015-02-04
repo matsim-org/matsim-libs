@@ -60,7 +60,11 @@ public class ControlerWithHeteroAndTollLoop {
 		if(args.length>2){
 			simulationType = args[2];
 		}
-		if(args.length>3 && args[3].equals("toll")){
+		if(args.length>3){
+			heterogeneityFactor = Double.valueOf(args[3]);
+		}
+
+		if(args.length>4 && args[4].equals("toll")){
 			roadpricing = true;
 		}
 		for(String type:simulationTypes){
