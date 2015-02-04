@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
+ * WaitTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.artemc.scoring;
 
-import java.util.HashMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import playground.artemc.heterogeneity.old.HeterogeneityConfig;
-
+package playground.artemc.transitRouter.waitTimes;
 
 /**
- * @author dgrether
- *
+ * Array implementation of the structure for saving wait times
+ * 
+ * @author sergioo
  */
-public class TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	HeterogeneityConfig heterogeneityConfig;
-	
-	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HeterogeneityConfig heterogeneityConfig){
-		this.heterogeneityConfig = heterogeneityConfig;
+public class WaitTimeDataArray implements WaitTimeData {
+
+	//Attributes
+	private double[] waitTimes;
+	private int[] numTimes;
+
+	//Constructors
+	public WaitTimeDataArray(int numSlots) {
+		waitTimes = new double[numSlots];
+		numTimes = new int[numSlots];
+		resetWaitTimes();
 	}
-	
+
+	//Methods
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new TravelTimeAndDistanceBasedIncomeTravelDisutility(timeCalculator, cnScoringGroup, heterogeneityConfig);
+	public void resetWaitTimes() {
+		for(int i=0; i<waitTimes.length; i++) {
+			waitTimes[i] = 0;
+			numTimes[i] = 0;
+		}
+	}
+	@Override
+	public synchronized void addWaitTime(int timeSlot, double waitTime) {
+		waitTimes[timeSlot] = (waitTimes[timeSlot]*numTimes[timeSlot]+waitTime)/++numTimes[timeSlot];
+	}
+	@Override
+	public double getWaitTime(int timeSlot) {
+		return waitTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
+	}
+	@Override
+	public int getNumData(int timeSlot) {
+		return numTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
 	}
 
 }

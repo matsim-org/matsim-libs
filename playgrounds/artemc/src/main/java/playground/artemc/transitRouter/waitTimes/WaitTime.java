@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
+ * WaitTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.artemc.scoring;
 
-import java.util.HashMap;
+package playground.artemc.transitRouter.waitTimes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import playground.artemc.heterogeneity.old.HeterogeneityConfig;
 
+import java.io.Serializable;
 
 /**
- * @author dgrether
- *
+ * Gives an average of the wait time of people for a line, route, stop and in a time of the day 
+ * 
+ * @author sergioo
  */
-public class TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	HeterogeneityConfig heterogeneityConfig;
-	
-	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HeterogeneityConfig heterogeneityConfig){
-		this.heterogeneityConfig = heterogeneityConfig;
-	}
-	
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new TravelTimeAndDistanceBasedIncomeTravelDisutility(timeCalculator, cnScoringGroup, heterogeneityConfig);
-	}
+public interface WaitTime extends Serializable {
+
+	//Methods
+	public double getRouteStopWaitTime(Id line, Id route, Id stopId, double time);
 
 }

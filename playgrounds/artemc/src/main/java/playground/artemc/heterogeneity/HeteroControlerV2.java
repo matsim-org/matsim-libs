@@ -6,19 +6,27 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
+import playground.artemc.pricing.ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
-import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
+import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
+import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
+import playground.artemc.transitRouter.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.File;
 import java.util.HashSet;
@@ -76,31 +84,15 @@ public class HeteroControlerV2 {
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
 
-		controler.setModules(new IncomeHeterogeneityModule(input));
-//		controler.setModules(new AbstractModule() {
-//			                     @Override
-//			                     public void install() {
-//				                     // Include some things from ControlerDefaultsModule.java,
-//				                     // but leave out TravelTimeCalculator.
-//				                     // You can just comment out these lines if you don't want them,
-//				                     // these modules are optional.
-//				                     include(new TripRouterModule());
-//				                     include(new StrategyManagerModule());
-//				                     include(new LinkStatsModule());
-//				                     include(new VolumesAnalyzerModule());
-//				                     include(new LegHistogramModule());
-//				                     include(new TravelDisutilityModule());
-//				                     include(new IncomeHeterogeneityModule(input));
-//
-//				                     // Because TravelTimeCalculatorModule is left out,
-//				                     // we have to provide a TravelTime.
-//				                     // This line says: Use this thing here as the TravelTime implementation.
-//				                     // Try removing this line: You will get an error because there is no
-//				                     // TravelTime and someone needs it.
-//				                     bindToInstance(TravelTime.class, new FreeSpeedTravelTime());
-//			                     }
-//		                     });
+//		controler.setModules(new IncomeHeterogeneityModule(input));
 
+		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+
+		controler.addOverridingModule( new AbstractModule() {
+			@Override
+			public void install() {
+				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+			}});
 
 		log.info("Simulation type: "+simulationType);
 		//HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType, heterogeneityFactor);
@@ -122,18 +114,16 @@ public class HeteroControlerV2 {
 		}
 
 
+
 		//Routing PT
-        WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
+		log.warn("About to init StopStopTimeCalculator...");
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		
-		//VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(controler.getScenario().getTransitSchedule(), controler.getScenario().getVehicles(), controler.getConfig());
-		//controler.getEvents().addHandler(vehicleOccupancyCalculator);
-		//controler.setTransitRouterFactory(new TransitRouterWSVImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 
-		//controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-		//controler.setTransitRouterFactory(new TransitRouterHeteroWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), heterogeneityConfig));
+		log.warn("About to init TransitRouterEventsHeteroWSFactory...");
+		controler.addOverridingModule(new TransitRouterEventsHeteroWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 
 		//Scoring
         controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
@@ -151,7 +141,9 @@ public class HeteroControlerV2 {
 
 	private static Scenario initScenario() {
 
-		Config config = ConfigUtils.loadConfig(input+"config.xml", new HeterogeneityConfigGroup());
+		Config config = ConfigUtils.loadConfig(input+"configRP.xml", new HeterogeneityConfigGroup());
+		ConfigUtils.addOrGetModule(config,
+		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
 
 		config.network().setInputFile(input+"network.xml");
 		

@@ -34,6 +34,7 @@ import playground.artemc.scoring.CharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -103,13 +104,26 @@ public final class RunSocialCostPricingExample {
 	private static Scenario initSampleScenario() {
 
 		Config config = ConfigUtils.loadConfig(input+"configRP.xml", new RoadPricingConfigGroup());
+
+		config.network().setInputFile(input + "network.xml");
+		boolean isPopulationZipped = new File(input+"population.xml.gz").isFile();
+		if(isPopulationZipped){
+			config.plans().setInputFile(input+"population.xml.gz");
+		}else{
+			config.plans().setInputFile(input+"population.xml");
+		}
+
+		config.transit().setTransitScheduleFile(input + "transitSchedule.xml");
+		config.transit().setVehiclesFile(input + "vehicles.xml");
+
+		if(output!=null){
+			config.controler().setOutputDirectory(output);
+		}
+
+		//Roadpricing module config
 		ConfigUtils.addOrGetModule(config,
-				RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
-		config.controler().setOutputDirectory(output);
-		config.network().setInputFile(input+"network.xml");
-		config.plans().setInputFile(input+"population.xml");
-		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
-		config.transit().setVehiclesFile(input+"vehicles.xml");
+		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
+
 
 		//config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

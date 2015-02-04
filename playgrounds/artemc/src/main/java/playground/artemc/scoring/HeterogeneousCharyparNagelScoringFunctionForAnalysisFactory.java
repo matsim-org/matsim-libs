@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import playground.artemc.heterogeneity.HeterogeneityConfig;
 import playground.artemc.heterogeneity.IncomeHeterogeneity;
 import playground.artemc.scoring.functions.CharyparNagelActivityScoring;
 import playground.artemc.scoring.functions.CharyparNagelAgentStuckScoring;
@@ -52,7 +51,7 @@ import javax.inject.Inject;
  * 
  * @author rashid_waraich
  */
-public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory implements ScoringFunctionFactory, PersonalScoringFaunctionFactory {
+public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory implements ScoringFunctionFactory, PersonalScoringFunctionFactory {
 	
 
 	private static final Logger log = Logger.getLogger(HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory.class);
@@ -70,17 +69,6 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
-}
-
-	public HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(final PlanCalcScoreConfigGroup config, Network network, HeterogeneityConfig heterogeneityConfig) {
-		this.config = config;
-		this.network = network;
-		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
-
-
-//		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
-//		this.betaFactors = heterogeneityConfig.getBetaFactors();
-//		this.simulationType = heterogeneityConfig.getSimulationType();
 	}
 
 	//setter method injector

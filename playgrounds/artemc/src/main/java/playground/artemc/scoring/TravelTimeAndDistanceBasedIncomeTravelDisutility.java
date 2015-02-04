@@ -30,8 +30,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
-import playground.artemc.heterogeneity.HeterogeneityConfig;
+import playground.artemc.heterogeneity.old.HeterogeneityConfig;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
