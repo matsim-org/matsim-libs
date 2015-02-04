@@ -328,22 +328,6 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-//	@SuppressWarnings("static-method")
-//	public double getBeelineDistanceFactor() {
-//		return beelineDistanceFactor;
-//	}
-
-	@Deprecated // use mode-specific beeline distance factors!
-	public void setBeelineDistanceFactor(double val) {
-		// memorize the global factor for ModeRoutingParams that are added later:
-		this.beelineDistanceFactor = val ;
-		
-		// push the global factor to the local ones for all ModeRoutingParams that are already there:
-		for ( ModeRoutingParams params : this.getModeRoutingParams().values() ) {
-			params.setBeelineDistanceFactor( val );
-		}
-	}
-
 	public Collection<String> getNetworkModes() {
 		return this.networkModes;
 	}
@@ -379,6 +363,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map ;
 	}
 	
+	@Deprecated // use mode-specific factors
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
@@ -386,11 +371,33 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 
+	@Deprecated // use mode-specific factors
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeSpeed( speed );
 		addParameterSet( pars );
 	}
+	
+//	@SuppressWarnings("static-method")
+//	public double getBeelineDistanceFactor() {
+//		return beelineDistanceFactor;
+//	}
+
+	@Deprecated // use mode-specific beeline distance factors!
+	public void setBeelineDistanceFactor(double val) {
+		// yyyy thinking about this: this should in design maybe not be different from the other teleportation factors (reset everything
+		// if one is set; or possibly disallow setting it at all). kai, feb'15
+		
+		// memorize the global factor for ModeRoutingParams that are added later:
+		this.beelineDistanceFactor = val ;
+		
+		// push the global factor to the local ones for all ModeRoutingParams that are already there:
+		for ( ModeRoutingParams params : this.getModeRoutingParams().values() ) {
+			params.setBeelineDistanceFactor( val );
+		}
+	}
+
+
 
 }

@@ -224,22 +224,31 @@ public class NetworkUtils {
 				String m2 = modes.iterator().next();
 				if (mode == null) {
 					if (hasEmptyModes) {
+						// i.e. we have a mode restriction on the current link but not mode restriction on some other link. => multi-modal
 						return true;
 					}
 					mode = m2;
+					// (memorize that we have seen a link with a mode restriction)
 				} else {
 					if (!m2.equals(mode)) {
+						// i.e. we have a mode restriction on the current link, and some other mode restriction on some other link. => multi-modal
 						return true;
 					}
+					// position here can be reached with "mode!=null" and "hasEmptyModes==true".  Should return "true" here but does not.
+					// Works anyways, since (it seems to me) that that state (mode!=null, hasEmptyModes==true) can never be reached.
+					// ???  kai, feb'15
 				}
 			} else if (modes.size() == 0) {
 				if (mode != null) {
+					// i.e. we have no mode restriction on the current link, but a mode restriction on some other link. => multi-modal:
 					return true;
 				}
 				hasEmptyModes = true;
+				// (memorize that we have seen a link without mode restrictions)
 			}
 		}
 		return false;
+		
 	}
 
 	public static Link getConnectingLink(final Node fromNode, final Node toNode) {

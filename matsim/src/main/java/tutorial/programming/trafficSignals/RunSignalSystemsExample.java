@@ -17,55 +17,58 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether;
+package tutorial.programming.trafficSignals;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
+import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
+import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgController {
+public class RunSignalSystemsExample {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig( args[0]) ;
+		// ---
 		
+		Config config = ConfigUtils.loadConfig("examples/equil-extended/config.xml") ;
+		
+		config.controler().setLastIteration(0); // use higher values if you want to iterate
+		
+		config.network().setInputFile("examples/equil-extended/network.xml");
+		
+		config.plans().setInputFile("examples/equil-extended/plans100.xml");
+		
+		// the following makes matsim _load_ the signalSystems files, but not to do anything with them:
+		// (this switch will eventually go away)
+		config.scenario().setUseSignalSystems(true);
+		
+		// these are the paths to the signal systems definition files:
+		config.signalSystems().setSignalSystemFile("examples/equil-extended/signalSystems_v2.0.xml");
+		config.signalSystems().setSignalGroupsFile("examples/equil-extended/signalGroups_v2.0.xml");
+		config.signalSystems().setSignalControlFile("examples/equil-extended/signalControl_v2.0.xml");
+		
+		
+		// ---
+
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
+		// ---
+
 		Controler c = new Controler( scenario );
-		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 
-		final DgSylviaControlerListenerFactory signalsFactory = new DgSylviaControlerListenerFactory(sylviaConfig);
-		// note: This will check (in DefaultSignalModelFactory) if the controllerIdentifier equals sylvia..., otherwise the default
-		// (fixed time) signal controller will be used.  kai & theresa, oct'14
-		
-		signalsFactory.setAlwaysSameMobsimSeed(false);
-
-		//FIXME: Take care that the normal SignalsControllerListener is NOT added.
-		// yyyy ????
+		// add the signals controller to the simulation:
+		final SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory() ;
         c.addControlerListener(signalsFactory.createSignalsControllerListener());
 
         c.setOverwriteFiles(true);
