@@ -19,22 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.GenericPlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
@@ -64,8 +55,6 @@ public class DgController {
 		
 		signalsFactory.setAlwaysSameMobsimSeed(false);
 
-		//FIXME: Take care that the normal SignalsControllerListener is NOT added.
-		// yyyy ????
         c.addControlerListener(signalsFactory.createSignalsControllerListener());
 
         c.setOverwriteFiles(true);

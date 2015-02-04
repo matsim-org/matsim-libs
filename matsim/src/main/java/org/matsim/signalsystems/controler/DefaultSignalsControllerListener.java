@@ -38,12 +38,12 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public class DefaultSignalsControllerListener implements SignalsControllerListener, ShutdownListener, IterationStartsListener {
+public final class DefaultSignalsControllerListener implements SignalsControllerListener, ShutdownListener, IterationStartsListener {
 
 	private QSimSignalEngine signalEngine;
 
 	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	public final void notifyIterationStarts(IterationStartsEvent event) {
 		event.getControler().getMobsimListeners().remove(this.signalEngine);
 		//build model
 		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
@@ -55,11 +55,11 @@ public class DefaultSignalsControllerListener implements SignalsControllerListen
 	}
 	
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
+	public final void notifyShutdown(ShutdownEvent event) {
+		writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
 	}
 	
-	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
+	private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
 		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
 	}

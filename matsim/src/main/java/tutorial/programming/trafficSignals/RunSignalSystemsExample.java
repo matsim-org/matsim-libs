@@ -58,6 +58,9 @@ public class RunSignalSystemsExample {
 		config.signalSystems().setSignalGroupsFile("examples/equil-extended/signalGroups_v2.0.xml");
 		config.signalSystems().setSignalControlFile("examples/equil-extended/signalControl_v2.0.xml");
 		
+//		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
+//		config.controler().setLinkToLinkRoutingEnabled(true);
+		
 		
 		// ---
 

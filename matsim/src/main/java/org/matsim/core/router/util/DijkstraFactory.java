@@ -41,6 +41,10 @@ public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 			return new Dijkstra(network, travelCosts, travelTimes);
 		}
 		return new Dijkstra(network, travelCosts, travelTimes, preProcessData);
+
+		// yy there is no guarantee that "createPathCalculator" is called with the same network as the one that was used for "preProcessData".
+		// This can happen for example when LinkToLink routing is switched on.  kai & theresa, feb'15,
+		
 	}
 
 }

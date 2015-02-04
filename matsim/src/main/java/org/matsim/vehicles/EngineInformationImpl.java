@@ -20,8 +20,6 @@
 package org.matsim.vehicles;
 
 /**
- * deliberately non-public since there is an interface.  kai, nov'11
- * 
  * @author dgrether
  */
 public class EngineInformationImpl implements EngineInformation {
