@@ -20,10 +20,6 @@
 
 package org.matsim.vis.otfvis;
 
-import java.awt.BorderLayout;
-
-import javax.swing.SwingUtilities;
-
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -37,6 +33,9 @@ import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * This file starts OTFVis using a .mvi file.
@@ -84,7 +83,8 @@ public class OTFClientFile implements Runnable {
 		OTFClientQuadTree clientQuadTree = clientQ;
 		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));
-		otfClient.show();
+		otfClient.pack();
+        otfClient.setVisible(true);
 	}
 
 }

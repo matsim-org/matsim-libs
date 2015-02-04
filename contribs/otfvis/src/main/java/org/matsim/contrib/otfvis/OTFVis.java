@@ -99,8 +99,7 @@ public class OTFVis {
 	public static void main(final String[] args) {
 		String [] args2 = args;
 		if (args2.length == 0) {
-			String filename = chooseFile();
-			play(filename);
+			OTFVisGUI.runDialog();
 		} else if ( args2[0].equalsIgnoreCase("-convert") || args2[0].equalsIgnoreCase("--convert") ) {
 			convert(args2);
 		} else if (args2[0].equalsIgnoreCase("-help") || args2[0].equalsIgnoreCase("--help") || args2[0].equalsIgnoreCase("-?") ) {
@@ -114,7 +113,7 @@ public class OTFVis {
 
 	}
 
-	private static final void play(String filename) {
+	private static void play(String filename) {
 		String lowerCaseFilename = filename.toLowerCase(Locale.ROOT);
 		if (lowerCaseFilename.endsWith(".mvi")) {
 			playMVI(filename);
@@ -131,7 +130,7 @@ public class OTFVis {
 		}
 	}
 
-	private static final String chooseFile() {
+	private static String chooseFile() {
 		JFileChooser fc = new JFileChooser();
 		fc.setFileFilter( new FileFilter() {
 			@Override public boolean accept( File f ) {
@@ -156,19 +155,19 @@ public class OTFVis {
 		return null;
 	}
 
-	public static final void playMVI(final String[] args) {
+	public static void playMVI(final String[] args) {
 		playMVI(args[0]);
 	}
 
-	public static final void playMVI(String file) {
+	public static void playMVI(String file) {
 		new OTFClientFile(file).run();
 	}
 
-	public static final void playConfig(final String configFilename){
+	public static void playConfig(final String configFilename){
 		playConfig(new String[]{configFilename});
 	}
 
-	public static final void playConfig(final String[] args) {
+	public static void playConfig(final String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		log.info("Complete config dump:");
@@ -230,7 +229,7 @@ public class OTFVis {
 		return server;
 	}
 
-	public static final void playNetwork(final String filename) {
+	public static void playNetwork(final String filename) {
 		Config config = ConfigUtils.createConfig();
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);
@@ -239,7 +238,7 @@ public class OTFVis {
 		OTFClientLive.run(config, server);
 	}
 
-	public static final void convert(final String[] args) {
+	public static void convert(final String[] args) {
 		if ((args.length < 4) || (args.length > 5)) {
 			printUsage();
 			return;
