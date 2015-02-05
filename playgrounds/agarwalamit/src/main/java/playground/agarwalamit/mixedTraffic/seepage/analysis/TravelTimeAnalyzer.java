@@ -50,23 +50,25 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  */
 public class TravelTimeAnalyzer extends AbstractAnalyisModule {
 
-	public TravelTimeAnalyzer(String outputDir) {
+	public TravelTimeAnalyzer(String eventsFile, String outputDir) {
 		super(TravelTimeAnalyzer.class.getSimpleName());
 		this.outputDir = outputDir;
+		this.eventsFile = eventsFile;
 		this.travelTimeHandler = new LinkTravelTimeHandler();
 		this.mode2AvgTravelTime = new TreeMap<String, Double>();
-		this.mode2TotalLinkTravelTime = new TreeMap<String, Double>();
+		this.mode2TotalTravelTime = new TreeMap<String, Double>();
 	}
 
 	private LinkTravelTimeHandler travelTimeHandler;
 	private String outputDir;
+	private String eventsFile;
 	private SortedMap<String, Double> mode2AvgTravelTime;
-	private SortedMap<String, Double> mode2TotalLinkTravelTime;
+	private SortedMap<String, Double> mode2TotalTravelTime;
 
 
 	public static void main(String[] args) {
 		String outputDir = SeepageControler.outputDir;
-		new TravelTimeAnalyzer(outputDir).run();
+		new TravelTimeAnalyzer(outputDir+"/events.xml",outputDir).run();
 	}
 
 	public void run(){
@@ -85,13 +87,13 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule {
 		EventsManager manager = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(manager);
 		manager.addHandler(travelTimeHandler);
-		reader.readFile(outputDir+"/events.xml");
+		reader.readFile(this.eventsFile);
 	}
 
 	@Override
 	public void postProcessData() {
 			mode2AvgTravelTime = travelTimeHandler.getAvgModeTravelTime();
-			mode2TotalLinkTravelTime = travelTimeHandler.getMode2TotalLinkTravelTime();
+			mode2TotalTravelTime = travelTimeHandler.getMode2TotalTravelTime();
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule {
 			writer.write("travelMode \t"+"avgTravelTimeInSecOnLink"+travelTimeHandler.travelTimeOnLink.toString()+" \t"+
 					"totalTravelTimeInSecOnLink"+travelTimeHandler.travelTimeOnLink.toString()+"\n");
 			for(String mode : mode2AvgTravelTime.keySet()){
-				writer.write(mode+"\t"+mode2AvgTravelTime.get(mode)+"\t"+mode2TotalLinkTravelTime.get(mode)+"\n");
+				writer.write(mode+"\t"+mode2AvgTravelTime.get(mode)+"\t"+mode2TotalTravelTime.get(mode)+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -149,7 +151,7 @@ public class TravelTimeAnalyzer extends AbstractAnalyisModule {
 			person2Leg.put(event.getPersonId(), event.getLegMode());
 		}
 		
-		public SortedMap<String,Double> getMode2TotalLinkTravelTime () {
+		public SortedMap<String,Double> getMode2TotalTravelTime () {
 			return mode2TotalTime;
 		}
 		
