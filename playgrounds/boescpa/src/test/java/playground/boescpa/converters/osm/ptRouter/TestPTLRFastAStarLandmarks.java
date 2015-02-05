@@ -67,7 +67,7 @@ public class TestPTLRFastAStarLandmarks {
 		PTLRouter router = new PTLRFastAStarLandmarks(this.network);
 		Node fromNode = this.network.getNodes().get(Id.create(390486263l, Node.class));
 		Node toNode = this.network.getNodes().get(Id.create(1630517605l, Node.class));
-		LeastCostPathCalculator.Path path = router.calcLeastCostPath(fromNode, toNode, "car", null);
+		LeastCostPathCalculator.Path path = router.calcLeastCostPath(fromNode, toNode, BUS, null);
 		assertEquals("Base Route not 4 links.", 4, path.links.size());
 		assertEquals("Base Route not passing link 263.", Id.createLinkId(263), path.links.get(0).getId());
 	}

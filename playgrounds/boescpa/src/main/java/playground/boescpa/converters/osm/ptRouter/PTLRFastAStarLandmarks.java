@@ -25,10 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,19 +51,38 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     private final static double FACTOR_LINKTYPE = 100.0;
     private final static double FACTOR_NOMATCH = 100000.0;
 
-    private final LeastCostPathCalculator pathCalculator;
+    private final IntermodalLeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
-    private String currentMode;
     private String currentLine;
+
+	private String currentMode;
+	private void setMode(String mode) {
+		switch (mode) {
+			case BUS: {
+				this.currentMode = BUS;
+				this.pathCalculator.setModeRestriction(Collections.singleton("car"));
+				break;
+			}
+			case TRAM: {
+				this.currentMode = TRAM;
+				this.pathCalculator.setModeRestriction(Collections.singleton("tram"));
+				break;
+			}
+			default: {
+				this.currentMode = null;
+				this.pathCalculator.setModeRestriction(null);
+			}
+		}
+	}
 
     public PTLRFastAStarLandmarks(Network network) {
         LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
-        this.pathCalculator = factory.createPathCalculator(network, this, this);
+        this.pathCalculator = (IntermodalLeastCostPathCalculator) factory.createPathCalculator(network, this, this);
     }
 
     @Override
     public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode, String routeId) {
-        this.currentMode = mode;
+        this.setMode(mode);
         this.currentLine = deriveLineFromRouteId(routeId);
         if (fromNode != null && toNode != null) {
             Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
@@ -84,8 +105,7 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
         double travelCost = link.getLength()/link.getFreespeed();
 
         // Trams: They drive on tram-railways, preferably on those with their line number.
-        if (this.currentMode != null && this.currentMode.equals(TRAM)
-                && link.getAllowedModes().contains(TRAM)) {
+        if (this.currentMode != null && this.currentMode.equals(TRAM)) {
             if (this.currentLine != null && link.getAllowedModes().contains(this.currentLine)) {
                 return travelCost * FACTOR_SAMELINE;
             } else {
@@ -94,8 +114,7 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
         }
 
         // Busses: They drive on streets ("car"), preferably on those for "pt", preferably on those with their line number.
-        if (this.currentMode != null && this.currentMode.equals(BUS)
-                && link.getAllowedModes().contains("car")) {
+        if (this.currentMode != null && this.currentMode.equals(BUS)) {
             if (link.getAllowedModes().contains("pt")) {
                 if (this.currentLine != null && link.getAllowedModes().contains(this.currentLine)) {
                     return travelCost * FACTOR_SAMELINE;
@@ -105,7 +124,7 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
             return travelCost * FACTOR_LINKTYPE;
         }
 
-        // If the link has no match, it is incredibly expensive to travel on it...
+        // If the link has no match, it is terribly expensive to travel on it...
         return travelCost * FACTOR_NOMATCH;
     }
 

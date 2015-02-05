@@ -377,7 +377,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					// We have to loop over both, fromStops and toStops, and have to set both as soon as found...
 					for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
 						Node toNode = getNodeForStopFacility(toStopFacilityId, false);
-						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+						LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 						if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 							shortestPath = tempShortestPath;
 							fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
@@ -387,7 +387,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				} else {
 					// We have to loop over fromStops and assign it, but not over toStop. (This should actually never be the case...)
 					Node toNode = getNodeForStopFacility(toStop.getStopFacility().getId(), false);
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 					if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 						shortestPath = tempShortestPath;
 						fromStop.setStopFacility(this.schedule.getFacilities().get(fromStopFacilityId));
@@ -400,7 +400,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				// We have to loop over toStops and assign it, but not over fromStop. (This should be the standard case...)
 				for (Id<TransitStopFacility> toStopFacilityId : derivativesToStop.get(this.mode)) {
 					Node toNode = getNodeForStopFacility(toStopFacilityId, false);
-					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+					LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 					if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
 						shortestPath = tempShortestPath;
 						toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
@@ -409,7 +409,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 			} else {
 				// We have to loop over none of the two...
 				Node toNode = getNodeForStopFacility(toStop.getStopFacility().getId(), false);
-				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.networkMode, routeId);
+				shortestPath = this.router.calcLeastCostPath(fromNode, toNode, this.mode, routeId);
 			}
 		}
 
