@@ -61,7 +61,7 @@ public class GroupXGroupExposureCosts {
 			Double averageDurationPerCell, Map<Id<Link>, ? extends Link> links) { 
 		
 			if(averageDurationPerCell<=0.0)averageDurationPerCell=1.0;
-			Double normalizationFactor = linkweightUtil.getNormalizationFactor()*scalingFactor;
+			Double normalizationFactor = linkweightUtil.getNormalizationFactor();
 			// for every causing group
 			for(int causing=0; causing<noGroups; causing++){
 				logger.info("Causing group:" + userGroups[causing].toString());
