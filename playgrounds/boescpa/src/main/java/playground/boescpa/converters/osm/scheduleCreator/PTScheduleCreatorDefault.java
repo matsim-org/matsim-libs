@@ -145,7 +145,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	}
 
 	private void createStop(Id<TransitStopFacility> stopId, Coord coord, String stopName) {
-		TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(stopId, coord, false);
+		TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(stopId, coord, true);
 		stopFacility.setName(stopName);
 		this.schedule.addStopFacility(stopFacility);
 		//log.info("Added " + schedule.getFacilities().get(stopId).toString());

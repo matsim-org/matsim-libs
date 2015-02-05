@@ -24,10 +24,10 @@
 
 <transitSchedule>
 	<transitStops>
-		<stopFacility id="1234567" x="683315.2753" y="246780.86068" name="Mixed Start-Bahnhof" isBlocking="false"/>
-		<stopFacility id="1234568" x="683576.65447" y="246828.46583" name="Tram End-Bahnhof" isBlocking="false"/>
-		<stopFacility id="1234569" x="683551.50459" y="246787.14815" name="Bus Middle-Bahnhof" isBlocking="false"/>
-		<stopFacility id="1234570" x="683604.10668" y="246879.50697" name="Bus End-Bahnhof" isBlocking="false"/>
+		<stopFacility id="1234567" x="683315.2753" y="246780.86068" name="Mixed Start-Bahnhof" isBlocking="true"/>
+		<stopFacility id="1234568" x="683576.65447" y="246828.46583" name="Tram End-Bahnhof" isBlocking="true"/>
+		<stopFacility id="1234569" x="683551.50459" y="246787.14815" name="Bus Middle-Bahnhof" isBlocking="true"/>
+		<stopFacility id="1234570" x="683604.10668" y="246879.50697" name="Bus End-Bahnhof" isBlocking="true"/>
 	</transitStops>
 	<transitLine id="000001">
 		<transitRoute id="00001_000">
