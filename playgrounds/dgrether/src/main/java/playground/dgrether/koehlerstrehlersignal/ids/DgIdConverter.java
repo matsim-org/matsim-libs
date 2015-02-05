@@ -51,11 +51,11 @@ public class DgIdConverter {
 	
 	/**
 	 * creates an id for the crossing node of the extended crossing corresponding to
-	 * the from node of the link. in the extended ks-model network the street 
+	 * the FromNode of the link. in the extended ks-model network the street 
 	 * corresponding to the matsim link will start at this crossing node.
 	 * 
 	 * @param linkId the id of the link in the matsim network
-	 * @return the id for the crossing node of the links from crossing
+	 * @return the id of the corresponding FromNode in the ks-model
 	 */
 	public  Id<Node> convertLinkId2FromCrossingNodeId(Id<Link> linkId){
 		String idString = linkId.toString() + "11";
@@ -64,11 +64,11 @@ public class DgIdConverter {
 	
 	/**
 	 * creates an id for the crossing node of the extended crossing corresponding to
-	 * the to node of the link. in the extended ks-model network the street 
+	 * the ToNode of the link. in the extended ks-model network the street 
 	 * corresponding to the matsim link will end at this crossing node.
 	 * 
 	 * @param linkId the id of the link in the matsim network
-	 * @return the id for the crossing node of the links to crossing
+	 * @return the id of the corresponding ToNode in the ks-model
 	 */
 	public Id<Node> convertLinkId2ToCrossingNodeId(Id<Link> linkId){
 		String idString = linkId.toString() + "99";
@@ -78,7 +78,7 @@ public class DgIdConverter {
 	/**
 	 * converts back. see convertLinkId2ToCrossingNodeId(...)
 	 * 
-	 * @param toCrossingNodeId the id of the crossing node in the ks-model network
+	 * @param toCrossingNodeId the id of a crossing node in the ks-model network
 	 * @return the id of the matsim link corresponding to the street ending in this crossing node
 	 */
 	public Id<Link> convertToCrossingNodeId2LinkId(Id<DgCrossingNode> toCrossingNodeId){
@@ -93,13 +93,13 @@ public class DgIdConverter {
 	/**
 	 * converts back. see convertLinkId2FromCrossingNodeId(...)
 	 * 
-	 * @param fromCrossingNodeId the id of the crossing node in the ks-model network
+	 * @param fromCrossingNodeId the id of a crossing node in the ks-model network
 	 * @return the id of the matsim link corresponding to the street starting in this crossing node
 	 */
-//	public Id convertFromCrossingNodeId2LinkId(Id fromCrossingNodeId){
+//	public Id<Link> convertFromCrossingNodeId2LinkId(Id<DgCrossingNode> fromCrossingNodeId){
 //		String sid = fromCrossingNodeId.toString();
 //		if (sid.endsWith("11")){
-//			Id id = Id.create(sid.substring(0, sid.length() - 2));
+//			Id<Link> id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
 //			return id;
 //		}
 //		throw new IllegalStateException("Can not convert " + sid + " to link id");
