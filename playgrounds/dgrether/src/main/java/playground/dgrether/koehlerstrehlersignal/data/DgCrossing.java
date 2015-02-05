@@ -37,10 +37,9 @@ public class DgCrossing {
 	private static final Logger log = Logger.getLogger(DgCrossing.class);
 	
 	private Id<DgCrossing> id;
-	private boolean signalized;
-	private Map<Id<Node>, DgCrossingNode> nodes = new HashMap<>();
-	private Map<Id, DgStreet> lights = new HashMap<>();
-	private Map<String, DgProgram> programs = new HashMap<>();
+	private Map<Id<DgCrossingNode>, DgCrossingNode> nodes = new HashMap<>();
+	private Map<Id<DgStreet>, DgStreet> lights = new HashMap<>();
+	private Map<Id<DgProgram>, DgProgram> programs = new HashMap<>();
 	private String type;
 
 	public DgCrossing(Id<DgCrossing> id) {
@@ -58,20 +57,16 @@ public class DgCrossing {
 		this.nodes.put(crossingNode.getId(), crossingNode);
 	}
 	
-	public Map<Id<Node>, DgCrossingNode> getNodes(){
+	public Map<Id<DgCrossingNode>, DgCrossingNode> getNodes(){
 		return this.nodes;
 	}
 	
-	public Map<Id, DgStreet> getLights(){
+	public Map<Id<DgStreet>, DgStreet> getLights(){
 		return this.lights;
 	}
 
 	public void addLight(DgStreet light) {
 		this.lights.put(light.getId(), light);
-	}
-
-	public void setSignalized(boolean signalized) {
-		this.signalized = signalized;
 	}
 	
 	public void addProgram(DgProgram p){
@@ -81,7 +76,7 @@ public class DgCrossing {
 		this.programs.put(p.getId(), p);
 	}
 	
-	public Map<String, DgProgram> getPrograms(){
+	public Map<Id<DgProgram>, DgProgram> getPrograms(){
 		return this.programs;
 	}
 	

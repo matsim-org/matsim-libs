@@ -29,6 +29,7 @@ import playground.dgrether.koehlerstrehlersignal.conversion.TtCrossingType;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.utils.zones.DgZone;
@@ -51,7 +52,7 @@ public class M2KS2010Zones2Commodities  {
 		this.idConverter = idConverter;
 	}
 
-	private void addCommodity(DgCommodities coms, Id<DgCommodity> id, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Double flow, DgKSNetwork net){
+	private void addCommodity(DgCommodities coms, Id<DgCommodity> id, Id<DgCrossingNode> fromNodeId, Id<DgCrossingNode> toNodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Double flow, DgKSNetwork net){
 		this.validateFromAndToNode(fromNodeId, toNodeId, net);
 		DgCommodity com = new DgCommodity(id);
 		coms.addCommodity(com);
@@ -59,7 +60,7 @@ public class M2KS2010Zones2Commodities  {
 		com.setDrainNode(toNodeId, toLinkId);
 	}
 	
-	private void validateFromAndToNode(Id<Node> fromNode, Id<Node> toNode, DgKSNetwork net){
+	private void validateFromAndToNode(Id<DgCrossingNode> fromNode, Id<DgCrossingNode> toNode, DgKSNetwork net){
 		boolean foundFrom = false;
 		boolean foundTo = false;
 		for (DgCrossing crossing : net.getCrossings().values()){
@@ -88,7 +89,7 @@ public class M2KS2010Zones2Commodities  {
 				// Note: until nov'14 we used the up-stream node here. problem: cplex considers the travel time of the first link while matsim don't do so.
 				Id<Node> fromNodeId = fromLink.getLink().getToNode().getId(); // the matsim from node id
 				Id<DgCrossing> fromCrossingId = this.idConverter.convertNodeId2CrossingId(fromNodeId); // the ks-model crossing id
-				Id<Node> fromCrossingNodeId; // the ks-model crossing node id
+				Id<DgCrossingNode> fromCrossingNodeId; // the ks-model crossing node id
 				// check whether the from crossing is expanded or not to determine the from crossing node id
 				if (network.getCrossings().get(fromCrossingId).getType().equals(TtCrossingType.NOTEXPAND)){
 					fromCrossingNodeId = this.idConverter.convertNodeId2NotExpandedCrossingNodeId(fromNodeId);
@@ -102,7 +103,7 @@ public class M2KS2010Zones2Commodities  {
 					// uses the down-stream node of the toLink as toNode for the commodity
 					Id<Node> toNodeId = toLinkEntry.getKey().getToNode().getId(); // the matsim to node id
 					Id<DgCrossing> toCrossingId = this.idConverter.convertNodeId2CrossingId(toNodeId); // the ks-model crossing id
-					Id<Node> toCrossingNodeId; // the ks-model crossing node id
+					Id<DgCrossingNode> toCrossingNodeId; // the ks-model crossing node id
 					// check whether the to crossing is expanded or not to determine the to crossing node id
 					if (network.getCrossings().get(toCrossingId).getType().equals(TtCrossingType.NOTEXPAND)){
 						toCrossingNodeId = this.idConverter.convertNodeId2NotExpandedCrossingNodeId(toNodeId);

@@ -25,7 +25,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
@@ -64,10 +64,10 @@ public class M2KS2010SimpleDemandConverter {
 					Leg leg = (Leg)pe;
 					Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
 					DgStreet startStreet = net.getStreets().get(fromLinkId);
-					Id<Node> fromNodeId = Id.create(startStreet.getToNode().getId(), Node.class);
+					Id<DgCrossingNode> fromNodeId = startStreet.getToNode().getId();
 					Id<Link> toLinkId = leg.getRoute().getEndLinkId();
 					DgStreet endStreet = net.getStreets().get(toLinkId);
-					Id<Node> toNodeId = Id.create(endStreet.getFromNode().getId(), Node.class);
+					Id<DgCrossingNode> toNodeId = endStreet.getFromNode().getId();
 					Id<?>[] index = new Id[]{fromNodeId, toNodeId, fromLinkId, toLinkId};
 					if (!fromNodeToNodeCountMap.containsKey(index)){
 						fromNodeToNodeCountMap.put(index, 0.0);
@@ -85,8 +85,8 @@ public class M2KS2010SimpleDemandConverter {
 			Id<DgCommodity> coId = Id.create(comId, DgCommodity.class);
 			DgCommodity co = new DgCommodity(coId);
 			coms.addCommodity(co);
-			co.setSourceNode((Id<Node>) index[0], (Id<Link>) index[2], fromNodeToNodeCountMap.get(index));
-			co.setDrainNode((Id<Node>) index[1], (Id<Link>) index[3]);
+			co.setSourceNode((Id<DgCrossingNode>) index[0], (Id<Link>) index[2], fromNodeToNodeCountMap.get(index));
+			co.setDrainNode((Id<DgCrossingNode>) index[1], (Id<Link>) index[3]);
 		}
 		
 		return coms;

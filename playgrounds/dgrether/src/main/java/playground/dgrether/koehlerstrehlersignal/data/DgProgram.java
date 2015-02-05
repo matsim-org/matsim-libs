@@ -30,12 +30,12 @@ public class DgProgram {
 	
 	private static final Logger log = Logger.getLogger(DgProgram.class);
 	
-	private String id;
+	private Id<DgProgram> id;
 	private int cycle = 0;
-	private Map<Id, DgGreen> green = new HashMap<Id, DgGreen>();
+	private Map<Id<DgGreen>, DgGreen> green = new HashMap<>();
 	
 	
-	public DgProgram(String id){
+	public DgProgram(Id<DgProgram> id){
 		this.id = id;
 	}
 	
@@ -46,7 +46,7 @@ public class DgProgram {
 		this.green.put(g.getLightId(), g);
 	}
 	
-	public Map<Id, DgGreen> getGreensByLightId(){
+	public Map<Id<DgGreen>, DgGreen> getGreensByLightId(){
 		return this.green;
 	}
 
@@ -61,7 +61,7 @@ public class DgProgram {
 	}
 
 	
-	public String getId() {
+	public Id<DgProgram> getId() {
 		return id;
 	}
 	

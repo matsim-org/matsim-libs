@@ -40,6 +40,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
@@ -77,7 +78,7 @@ public class KS2010VsMatimVolumes {
 			Integer ksIntStreetId = Integer.parseInt(streetId.toString());
 			String matsimStringStreetId = idPool.getStringId(ksIntStreetId);
 			Id<Link> linkId = dgIdConverter.convertStreetId2LinkId(Id.create(
-					matsimStringStreetId, Link.class));
+					matsimStringStreetId, DgStreet.class));
 			// assign the flow to all links that belongs to the simplified link
 			String[] unsimplifiedLinks = linkId.toString().split("-");
 			for (int i = 0; i < unsimplifiedLinks.length; i++)

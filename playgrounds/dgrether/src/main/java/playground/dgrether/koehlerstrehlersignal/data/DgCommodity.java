@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.network.Node;
 public class DgCommodity {
 
 	private Id<DgCommodity> id;
-	private Id<Node> sourceNode; 
-	private Id<Node> drainNode;
+	private Id<DgCrossingNode> sourceNode; 
+	private Id<DgCrossingNode> drainNode;
 	private Id<Link> sourceLink;
 	private Id<Link> drainLink;
 	private Double flow;
@@ -46,13 +46,13 @@ public class DgCommodity {
 	}
 
 
-	public void setSourceNode(Id<Node> fromNodeId, Id<Link> fromLinkId, Double flow) {
+	public void setSourceNode(Id<DgCrossingNode> fromNodeId, Id<Link> fromLinkId, Double flow) {
 		this.sourceNode = fromNodeId;
 		this.sourceLink = fromLinkId;
 		this.flow = flow;
 	}
 	
-	public void setDrainNode(Id<Node> toNodeId, Id<Link> toLinkId){
+	public void setDrainNode(Id<DgCrossingNode> toNodeId, Id<Link> toLinkId){
 		this.drainNode = toNodeId;
 		this.drainLink = toLinkId;
 	}
@@ -62,11 +62,11 @@ public class DgCommodity {
 	}
 	
 	
-	public Id<Node> getDrainNodeId(){
+	public Id<DgCrossingNode> getDrainNodeId(){
 		return this.drainNode;
 	}
 	
-	public Id<Node> getSourceNodeId(){
+	public Id<DgCrossingNode> getSourceNodeId(){
 		return this.sourceNode;
 	}
 	

@@ -32,6 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 
 /**
  * 
@@ -57,8 +58,8 @@ public class TtSignalizedNodeShortestPath {
 			for (Id<Node> toSignalId : signalizedNodes){
 				if (!fromSignalId.equals(toSignalId)){
 					DgCommodity signalCom = new DgCommodity(Id.create("signalCommodity_" + fromSignalId + "-" + toSignalId, DgCommodity.class));
-					signalCom.setSourceNode(fromSignalId, null, 1.0);
-					signalCom.setDrainNode(toSignalId, null);
+					signalCom.setSourceNode(Id.create(fromSignalId, DgCrossingNode.class), null, 1.0);
+					signalCom.setDrainNode(Id.create(toSignalId, DgCrossingNode.class), null);
 					signalCommodities.addCommodity(signalCom);
 					/*
 					 * remark: a DgCommodity needs node to node representation together with link to link representation 

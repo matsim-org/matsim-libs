@@ -30,12 +30,12 @@ public class DgStreet {
 
 	private DgCrossingNode toNode;
 	private DgCrossingNode fromNode;
-	private Id id;
+	private Id<DgStreet> id;
 	private long cost;
 	private double capacity;
 	
 
-	public DgStreet(Id id, DgCrossingNode fromNode, DgCrossingNode toNode) {
+	public DgStreet(Id<DgStreet> id, DgCrossingNode fromNode, DgCrossingNode toNode) {
 		if (id == null){
 			throw new IllegalStateException("Id null not permitted!");
 		}
@@ -58,7 +58,7 @@ public class DgStreet {
 		return fromNode;
 	}
 
-	public Id getId() {
+	public Id<DgStreet> getId() {
 		return this.id;
 	}
 

@@ -30,15 +30,15 @@ import org.matsim.api.core.v01.network.Node;
  */
 public class DgCrossingNode {
 
-	private Id<Node> id;
+	private Id<DgCrossingNode> id;
 	
 	private Coord coordinate;
 
-	public DgCrossingNode(Id<Node> id) {
+	public DgCrossingNode(Id<DgCrossingNode> id) {
 		this.id = id;
 	}
 
-	public Id<Node> getId() {
+	public Id<DgCrossingNode> getId() {
 		return this.id;
 	}
 
