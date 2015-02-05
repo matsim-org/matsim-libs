@@ -116,12 +116,12 @@ public class GenerateFundamentalDiagramData {
 
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
 
-		String OUTPUT_FOLDER ="/carBikePassingRate/4c1b";
+		String OUTPUT_FOLDER ="/carBikePassingRate/1c8b";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
 		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
 
 		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {4.,0.25};
+		Double [] modalSplit = {1.,2.};
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -133,7 +133,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(args[0]);
 		//		generateFDData.setUseHoles(false);
-		generateFDData.setReduceDataPointsByFactor(10);
+//		generateFDData.setReduceDataPointsByFactor(10);
 		//		generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
 		//		generateFDData.setIsPlottingDistribution(false);
@@ -435,25 +435,22 @@ public class GenerateFundamentalDiagramData {
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
 			}
-			writer.print("\t");
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity());
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentDensity());
 			}
-			writer.print("\t");
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentFlow());
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentFlow());
 			}
-			writer.print("\t");
 			writer.format("%.2f\t", globalFlowDynamicsUpdator.getGlobalData().getPermanentAverageVelocity());
 			for (int i=0; i < TRAVELMODES.length; i++){
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
 			}
-			writer.print("\t");
-			writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassed());
+			writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
+			
+			writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
-			writer.print("\t");
 			writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
 			writer.print("\n");
 		}
@@ -532,35 +529,35 @@ public class GenerateFundamentalDiagramData {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.print("n\t");
+		writer.print("n \t");
 		for (int i=0; i < TRAVELMODES.length; i++){
 			String str = this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getModeId().toString();
 			String strn = "n_"+str;
 			writer.print(strn+"\t");
 		}
-		writer.print("\tk\t");
+		writer.print("k \t");
 		for (int i=0; i < TRAVELMODES.length; i++){
 			String str = this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getModeId().toString();
 			String strk = "k_"+str;
 			writer.print(strk+"\t");
 		}
-		writer.print("\tq\t");
+		writer.print("q \t");
 		for (int i=0; i < TRAVELMODES.length; i++){
 			String str = this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getModeId().toString();
 			String strq = "q_"+str;
 			writer.print(strq+"\t");
 		}
-		writer.print("\tv\t");
+		writer.print("v \t");
 		for (int i=0; i < TRAVELMODES.length; i++){
 			String str = this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getModeId().toString();
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
-		writer.print("\t");
-		writer.print("numberOfBikesPassed \t");
+		writer.print("noOfCarsPerkm \t");
+		
+		writer.print("totalBikesPassedByAllCarsPerKm \t");
 
-		writer.print("\t");
-		writer.print("avgBikePassingRate");
+		writer.print("avgBikePassingRatePerkm \t");
 
 		writer.print("\n");
 	}
