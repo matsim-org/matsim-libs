@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -68,6 +69,16 @@ public class TestPTLineRouterDefault {
 		PTLineRouterDefault router = new PTLineRouterDefault(this.schedule, this.network);
 		router.linkStationsToNetwork();
 		router.createPTRoutes();
-		new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "ScheduleTest.xml");
+		new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "Schedule_RouterTest.xml");
+	}
+
+	@Test
+	public void testCleanStationsAndNetwork() {
+		PTLineRouterDefault router = new PTLineRouterDefault(this.schedule, this.network);
+		router.linkStationsToNetwork();
+		router.createPTRoutes();
+		router.cleanStationsAndNetwork();
+		new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "Schedule_CleanerTest.xml");
+		new NetworkWriter(network).write(utils.getOutputDirectory() + "Network_CleanerTest.xml");
 	}
 }

@@ -438,6 +438,65 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * Clean also the allowed modes for only the modes, no line-number any more...
 	 */
 	protected void cleanStationsAndNetwork() {
-		// TODO-boescpa Implement this...
+		removeNonUsedStopFacilities();
+		removeNonUsedPTexclusiveLinks();
+	}
+
+	private void removeNonUsedPTexclusiveLinks() {
+		// Collect all used pt-exclusive links:
+		Set<Id<Link>> usedPTLinks = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					Link link = this.network.getLinks().get(linkId);
+					if (!link.getAllowedModes().contains("car")) {
+						usedPTLinks.add(linkId);
+					}
+				}
+			}
+		}
+		// Collect all non-used pt-exclusive links:
+		Set<Link> unusedPTLinks = new HashSet<>();
+		for (Link link : this.network.getLinks().values()) {
+			if (!link.getAllowedModes().contains("car") && !usedPTLinks.contains(link.getId())) {
+				unusedPTLinks.add(link);
+			}
+		}
+		// Remove non-used pt-exclusive links and any nodes not used anymore because of removal:
+		for (Link link : unusedPTLinks) {
+			this.network.removeLink(link.getId());
+			removeUnusedNode(link.getFromNode().getId());
+			removeUnusedNode(link.getToNode().getId());
+		}
+	}
+
+	private void removeUnusedNode(Id<Node> nodeId) {
+		if (this.network.getNodes().get(nodeId).getInLinks().isEmpty() &&
+				this.network.getNodes().get(nodeId).getOutLinks().isEmpty()) {
+			this.network.removeNode(nodeId);
+		}
+	}
+
+	private void removeNonUsedStopFacilities() {
+		// Collect all used stop facilities:
+		Set<Id<TransitStopFacility>> usedStopFacilities = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (TransitRouteStop stop : route.getStops()) {
+					usedStopFacilities.add(stop.getStopFacility().getId());
+				}
+			}
+		}
+		// Check all stop facilities if not used:
+		Set<TransitStopFacility> unusedStopFacilites = new HashSet<>();
+		for (Id<TransitStopFacility> facilityId : this.schedule.getFacilities().keySet()) {
+			if (!usedStopFacilities.contains(facilityId)) {
+				unusedStopFacilites.add(this.schedule.getFacilities().get(facilityId));
+			}
+		}
+		// Remove all stop facilities not used:
+		for (TransitStopFacility facility : unusedStopFacilites) {
+			this.schedule.removeStopFacility(facility);
+		}
 	}
 }
