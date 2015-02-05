@@ -1,4 +1,4 @@
-package org.matsim.integration.daily;
+package org.matsim.integration.daily.accessibility;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -20,6 +20,7 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
+import org.matsim.integration.daily.QGisProjectFileWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedWriter;
