@@ -32,7 +32,6 @@ public class TravelDisutilityIncludingIncome implements TravelDisutility{
 	private HashMap<Id<Person>, Double> incomeFactors;
 	private Double factorMean;
 
-
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory{
 
@@ -54,7 +53,6 @@ public class TravelDisutilityIncludingIncome implements TravelDisutility{
 				return previousTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
 			}
 		}
-
 	}
 	// === end Builder ===
 

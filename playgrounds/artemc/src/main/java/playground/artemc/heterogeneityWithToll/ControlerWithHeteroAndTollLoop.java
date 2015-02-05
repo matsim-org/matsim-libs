@@ -58,19 +58,17 @@ public class ControlerWithHeteroAndTollLoop {
 			output = args[1];
 		}
 		if(args.length>2){
-			simulationType = args[2];
-		}
-		if(args.length>3){
-			heterogeneityFactor = Double.valueOf(args[3]);
+			heterogeneityFactor = Double.valueOf(args[2]);
 		}
 
-		if(args.length>4 && args[4].equals("toll")){
+		if(args.length>3 && args[3].equals("toll")){
 			roadpricing = true;
 		}
+
 		for(String type:simulationTypes){
 			simulationType = type;
 			if(args.length>1){
-				output = args[1] + "_"+simulationType;
+				output = args[1] + "_"+simulationType+"_"+heterogeneityFactor+"x";
 			}
 
 			ControlerWithHeteroAndTollLoop runner = new ControlerWithHeteroAndTollLoop();
@@ -148,7 +146,7 @@ public class ControlerWithHeteroAndTollLoop {
 
 	private static Scenario initScenario() {
 
-		Config config = ConfigUtils.loadConfig(input+"configRP.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup());
+		Config config = ConfigUtils.loadConfig(input+"config.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup());
 
 		config.network().setInputFile(input+"network.xml");
 		boolean isPopulationZipped = new File(input+"population.xml.gz").isFile();

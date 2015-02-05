@@ -19,6 +19,7 @@ import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
+import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
 import playground.artemc.pricing.ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
@@ -40,6 +41,7 @@ public class ControlerWithHeteroAndToll {
 	private static String output;
 	private static String simulationType = "homo";
 	private static Double heterogeneityFactor = 1.0;
+	private static boolean roadpricing = false;
 
 	public static void main(String[] args){
 
@@ -54,6 +56,9 @@ public class ControlerWithHeteroAndToll {
 			heterogeneityFactor = Double.valueOf(args[3]);			
 		}
 
+		if(args.length>4 && args[4].equals("toll")){
+			roadpricing = true;
+		}
 
 		ControlerWithHeteroAndToll runner = new ControlerWithHeteroAndToll();
 		runner.run();
@@ -78,13 +83,23 @@ public class ControlerWithHeteroAndToll {
 
 //		controler.setModules(new IncomeHeterogeneityModule(input));
 
-		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
-
-		controler.addOverridingModule( new AbstractModule() {
-			@Override
-			public void install() {
-				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
-			}});
+		if(roadpricing==true) {
+			log.info("First-best roadpricing enabled!");
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+				}});
+		}else{
+			log.info("No roadpricing!");
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+				}});
+		}
 
 		log.info("Simulation type: "+simulationType);
 		if(simulationType.equals("hetero")|| simulationType.equals("heteroAlpha") || simulationType.equals("heteroGamma") || simulationType.equals("heteroGammaProp") || simulationType.equals("heteroAlphaProp")) {
@@ -120,7 +135,7 @@ public class ControlerWithHeteroAndToll {
 
 	private static Scenario initScenario() {
 
-		Config config = ConfigUtils.loadConfig(input+"configRP.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup());
+		Config config = ConfigUtils.loadConfig(input+"config.xml", new HeterogeneityConfigGroup(), new RoadPricingConfigGroup());
 
 		config.network().setInputFile(input+"network.xml");
 		boolean isPopulationZipped = new File(input+"population.xml.gz").isFile();
