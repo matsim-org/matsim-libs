@@ -53,7 +53,7 @@ public class EmissionCostsBySubgroupAnalysis {
 	private static final Logger logger = Logger.getLogger(EmissionCostsBySubgroupAnalysis.class);
 
 	private String scenarioName = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String analysisCase = "exposurePricing"; // base, zone30, pricing, exposurePricing, 983
+	private String analysisCase = "zone30"; // base, zone30, pricing, exposurePricing, 983
 	final static int numberOfTimeBins = 1;
 	
 	private SpatialAveragingParameters sap;

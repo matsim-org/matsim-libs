@@ -62,7 +62,7 @@ public class SpatialAveragingDemandEmissions {
 	 * is to use the "pointMethod", i.e. mapping emissions to the center
 	 * of each link.
 	 */
-	final boolean useLineMethod = true;
+	final boolean useLineMethod = false;
 	private boolean useCellMethod = false;
 
 	private SpatialAveragingParameters parameter;

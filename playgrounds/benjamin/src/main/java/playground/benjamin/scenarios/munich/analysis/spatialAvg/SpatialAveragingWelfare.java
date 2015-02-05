@@ -81,6 +81,7 @@ public class SpatialAveragingWelfare {
 		String outputPathForR = inputData.getAnalysisOutPathForBaseCase() + ".Routput." ;
 		sar.writeRoutput(baseCaseGrid.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits.txt");
 		sar.writeRoutput(baseCaseGrid.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage.txt");
+		sar.writeRoutput(currentCaseGridNoRefund.getWeightsOfGrid(), outputPathForR + "UserBenefitsWeights.txt");
 
 		// policy case
 		if(compareToBaseCase){
@@ -93,10 +94,10 @@ public class SpatialAveragingWelfare {
 			// write R output for policy case
 			sar.writeRoutput(currentCaseGridNoRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits_NoRefund.txt");
 			sar.writeRoutput(currentCaseGridPersonalRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits_PersonalRefund.txt");
-			sar.writeRoutput(currentCaseGridAvgRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits_AverageRefundRefund.txt");
+			sar.writeRoutput(currentCaseGridAvgRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefits_AverageRefund.txt");
 			sar.writeRoutput(currentCaseGridNoRefund.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage_NoRefund.txt");
 			sar.writeRoutput(currentCaseGridPersonalRefund.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage_PersonalRefund.txt");
-			sar.writeRoutput(currentCaseGridAvgRefund.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage_AverageRefundRefund.txt");
+			sar.writeRoutput(currentCaseGridAvgRefund.getAverageValuesOfGrid(), outputPathForR + "UserBenefitsAverage_AverageRefund.txt");
 			
 			// write differences policy <-> base case
 			logger.info("Writing R output for differences to " + inputData.getAnalysisOutPathForBaseCase());
@@ -105,9 +106,9 @@ public class SpatialAveragingWelfare {
 			sar.writeRoutput(differencesNoRefund.getAverageValuesOfGrid(), outputPathForR + "AvgUserBenefitsDifferencesNoRefund.txt");
 			SpatialGrid differencesPersonalRefund = currentCaseGridPersonalRefund.getDifferencesAAverages(baseCaseGrid);
 			sar.writeRoutput(differencesPersonalRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefitsDifferencesPersonalRefund.txt");
-			sar.writeRoutput(differencesPersonalRefund.getAverageValuesOfGrid(), outputPathForR + "AvgUserBenefitsDifferencesAvgerareRefund.txt");
+			sar.writeRoutput(differencesPersonalRefund.getAverageValuesOfGrid(), outputPathForR + "AvgUserBenefitsDifferencesAverageRefund.txt");
 			SpatialGrid differencesAvgRefund = currentCaseGridAvgRefund.getDifferencesAAverages(baseCaseGrid);
-			sar.writeRoutput(differencesAvgRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefitsDifferencesAverageRefundRefund.txt");
+			sar.writeRoutput(differencesAvgRefund.getWeightedValuesOfGrid(), outputPathForR + "UserBenefitsDifferencesAverageRefund.txt");
 			sar.writeRoutput(differencesAvgRefund.getAverageValuesOfGrid(), outputPathForR + "AvgUserBenefitsDifferencesAvgerageRefund.txt");
 		}
 	}

@@ -57,11 +57,13 @@ public class SpatialAveragingDemandEmissions {
 
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-//	private final static String runNumber2 = "zone30";
+	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd//";
+//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_zone30/";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-	private final static String runNumber2 = "pricing";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+//	private final static String runNumber2 = "pricing";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
@@ -99,9 +101,9 @@ public class SpatialAveragingDemandEmissions {
 	
 	final double smoothingRadius_m = 500.;
 	
-	final String pollutant2analyze = WarmPollutant.NO2.toString();
-//	final boolean compareToBaseCase = true;
-	final boolean compareToBaseCase = false;
+	final String pollutant2analyze = WarmPollutant.NOX.toString();
+	final boolean compareToBaseCase = true;
+//	final boolean compareToBaseCase = false;
 	
 	SpatialAveragingUtils sau;
 	SpatialAveragingUtilsExtended saue;
@@ -150,7 +152,7 @@ public class SpatialAveragingDemandEmissions {
 //		Map<Double, double[][]> time2SpecificEmissions1 = calculateSpecificEmissionsPerBin(time2NormalizedWeightedEmissions1, time2NormalizedWeightedDemand1);
 		
 
-		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
+		outPathStub = runDirectory1 + "analysis/spatialAveraging/data/" + runNumber1 + "." + lastIteration1;
 		for(double endOfTimeInterval: time2WeightedEmissions1.keySet()){
 			this.sau.writeRoutput(time2NormalizedWeightedEmissions1.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 			this.sau.writeRoutput(time2NormalizedWeightedDemand1.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
@@ -190,7 +192,7 @@ public class SpatialAveragingDemandEmissions {
 			Map<Double, double[][]> time2AbsoluteDemandDifferences = calculateAbsoluteDifferencesPerBin(time2NormalizedWeightedDemand1, time2NormalizedWeightedDemand2);
 			Map<Double, double[][]> time2SpecificEmissionDifferences = calculateAbsoluteDifferencesPerBin(time2SpecificEmissions1, time2SpecificEmissions2);
 
-			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
+			outPathStub = runDirectory1 + "analysis/spatialAveraging/data/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			for(double endOfTimeInterval : time2AbsoluteDemandDifferences.keySet()){
 				this.sau.writeRoutput(time2AbsoluteEmissionDifferences.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze + ".g." + endOfTimeInterval + ".txt");
 				this.sau.writeRoutput(time2AbsoluteDemandDifferences.get(endOfTimeInterval),	outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
