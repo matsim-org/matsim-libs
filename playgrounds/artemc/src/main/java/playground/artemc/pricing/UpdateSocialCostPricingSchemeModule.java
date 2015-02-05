@@ -66,6 +66,9 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 
 		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
+
+			Controler controler = event.getControler();
+
 			log.info("Updating tolls according to social cost imposed...");
 
 			// initialize the social costs calculator
@@ -76,7 +79,11 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 				roadPricingScheme.getTypicalCostsForLink().get(link).clear();
 
 					for (int i = 0; i < scc.getSocialCostsMap().get(link).socialCosts.length; i++) {
-						RoadPricingSchemeImpl.Cost cost = new RoadPricingSchemeImpl.Cost(i * timeslice, (i + 1) * timeslice - 1, scc.getSocialCostsMap().get(link).socialCosts[i]);
+						double socialCost = scc.getSocialCostsMap().get(link).socialCosts[i];
+						double opportunityCostOfCarTravel = - controler.getConfig().planCalcScore().getTraveling_utils_hr() + controler.getConfig().planCalcScore().getPerforming_utils_hr();
+						double toll = (opportunityCostOfCarTravel * socialCost / 3600) / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+
+						RoadPricingSchemeImpl.Cost cost = new RoadPricingSchemeImpl.Cost(i * timeslice, (i + 1) * timeslice - 1, toll);
 
 						if(!roadPricingScheme.getTypicalCostsForLink().containsKey(link)){
 							roadPricingScheme.getTypicalCostsForLink().put(link, new ArrayList<RoadPricingSchemeImpl.Cost>());
