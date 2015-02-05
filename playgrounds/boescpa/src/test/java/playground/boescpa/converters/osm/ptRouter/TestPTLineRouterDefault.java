@@ -78,7 +78,20 @@ public class TestPTLineRouterDefault {
 		router.linkStationsToNetwork();
 		router.createPTRoutes();
 		router.cleanStationsAndNetwork();
-		new TransitScheduleWriter(schedule).writeFile(utils.getOutputDirectory() + "Schedule_CleanerTest.xml");
+		new TransitScheduleWriter(this.schedule).writeFile(utils.getOutputDirectory() + "Schedule_CleanerTest.xml");
 		new NetworkWriter(network).write(utils.getOutputDirectory() + "Network_CleanerTest.xml");
+	}
+
+	@Test
+	public void testCreateAdditionalLinks() {
+		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(transitSchedule, new ModeRouteFactory());
+		reader.readFile(utils.getClassInputDirectory() + "ScheduleTest_AdditionalLinks.xml");
+		PTLineRouterDefault router = new PTLineRouterDefault(transitSchedule, this.network);
+		router.linkStationsToNetwork();
+		router.createPTRoutes();
+		router.cleanStationsAndNetwork();
+		new TransitScheduleWriter(transitSchedule).writeFile(utils.getOutputDirectory() + "Schedule_AdditionalTest.xml");
+		new NetworkWriter(network).write(utils.getOutputDirectory() + "Network_AdditionalTest.xml");
 	}
 }

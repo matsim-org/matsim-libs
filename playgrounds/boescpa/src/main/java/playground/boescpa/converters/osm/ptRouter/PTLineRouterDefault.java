@@ -25,10 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 
 import java.util.*;
@@ -102,7 +105,9 @@ public class PTLineRouterDefault extends PTLineRouter {
 	protected void linkStationsToNetwork() {
 		log.info("Linking pt stations to network...");
 
+		Counter counter = new Counter("line # ");
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			counter.incCounter();
 			for (TransitRoute route : line.getRoutes().values()) {
 				if (route.getTransportMode().equals(BUS)) {
 					setMode(BUS);
@@ -115,6 +120,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				}
 			}
 		}
+		counter.printCounter();
 
 		log.info("Linking pt stations to network... done.");
 	}
@@ -307,9 +313,24 @@ public class PTLineRouterDefault extends PTLineRouter {
 	protected void createPTRoutes() {
 		log.info("Creating pt routes...");
 
-		this.router = new PTLRFastAStarLandmarks(this.network);
+		this.router = new PTLRFastAStarLandmarks(this.network);//copyNetwork(this.network));
 		this.pseudoNetworkCreator = new PseudoNetworkCreator(this.schedule, this.network, "PseudoNetwork_");
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				if (route.getTransportMode().equals(BUS)) {
+					setMode(BUS);
+					prepareRouteLine(route);
+				} else if (route.getTransportMode().equals(TRAM)) {
+					setMode(TRAM);
+					prepareRouteLine(route);
+				} else {
+					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
+					this.pseudoNetworkCreator.createLine(route);
+				}
+			}
+		}
 
+		this.router = new PTLRFastAStarLandmarks(this.network);
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				if (route.getTransportMode().equals(BUS)) {
@@ -318,9 +339,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 				} else if (route.getTransportMode().equals(TRAM)) {
 					setMode(TRAM);
 					routeLine(route);
-				} else {
-					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
-					this.pseudoNetworkCreator.createLine(route);
 				}
 			}
 		}
@@ -328,33 +346,82 @@ public class PTLineRouterDefault extends PTLineRouter {
 		log.info("Creating pt routes... done.");
 	}
 
+	private Network copyNetwork(Network network) {
+		Network networkCopy = NetworkUtils.createNetwork();
+		NetworkFactory factory = networkCopy.getFactory();
+		for (Node node : network.getNodes().values()) {
+			networkCopy.addNode(factory.createNode(node.getId(), node.getCoord()));
+		}
+		for (Link link : network.getLinks().values()) {
+			Link newLink = factory.createLink(link.getId(), link.getFromNode(), link.getToNode());
+			newLink.setAllowedModes(link.getAllowedModes());
+			newLink.setCapacity(link.getCapacity());
+			newLink.setFreespeed(link.getFreespeed());
+			newLink.setLength(link.getLength());
+			newLink.setNumberOfLanes(link.getNumberOfLanes());
+			networkCopy.addLink(newLink);
+		}
+		return networkCopy;
+	}
+
+	private void prepareRouteLine(TransitRoute route) {
+		/*Set<Tuple<TransitRouteStop, TransitRouteStop>> stationsToLinkExtra = new HashSet<>();
+		int i = 0;
+		while (i < (route.getStops().size()-1)) {
+			TransitRouteStop fromStop = route.getStops().get(i);
+			TransitRouteStop toStop = route.getStops().get(i+1);
+			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
+			if (path == null) {
+				stationsToLinkExtra.add(new Tuple<>(fromStop, toStop));
+				i++;
+				if (i < (route.getStops().size()-1)) {
+					fromStop = route.getStops().get(i);
+					toStop = route.getStops().get(i+1);
+					stationsToLinkExtra.add(new Tuple<>(fromStop, toStop));
+				}
+			}
+			i++;
+		}
+		for (Tuple<TransitRouteStop, TransitRouteStop> pair : stationsToLinkExtra) {
+			this.pseudoNetworkCreator.getNetworkLink(pair.getFirst(), pair.getSecond());
+		}*/
+	}
+
 	private void routeLine(TransitRoute route) {
+		Tuple<TransitRouteStop, TransitRouteStop> linkToAdd = null;
 		List<Id<Link>> links = new ArrayList<>();
 		int i = 0;
 		while (i < (route.getStops().size()-1)) {
 			TransitRouteStop fromStop = route.getStops().get(i);
 			TransitRouteStop toStop = route.getStops().get(i+1);
 			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
+			if (linkToAdd != null) {
+				Id<Link> replacedLink = fromStop.getStopFacility().getLinkId();
+				Link link = this.pseudoNetworkCreator.getNetworkLink(linkToAdd.getFirst(), linkToAdd.getSecond());
+				links.add(link.getId());
+				links.add(replacedLink);
+				linkToAdd = null;
+			}
 			if (path != null) {
 				links.add(fromStop.getStopFacility().getLinkId());
 				for (Link link : path.links) {
 					links.add(link.getId());
 				}
 			} else {
+				links.add(fromStop.getStopFacility().getLinkId());
 				Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
 				links.add(link.getId());
 				i++;
 				if (i < (route.getStops().size()-1)) {
 					fromStop = route.getStops().get(i);
 					toStop = route.getStops().get(i+1);
-					link = this.pseudoNetworkCreator.getNetworkLink(fromStop,toStop);
-					links.add(link.getId());
+					linkToAdd = new Tuple<>(fromStop, toStop);
 				}
 			}
 			i++;
 		}
 		if (links.size() > 0) {
-			links.add(route.getStops().get(route.getStops().size()-1).getStopFacility().getLinkId());
+			links.add(route.getStops().get(route.getStops().size() - 1).getStopFacility().getLinkId());
 			route.setRoute(RouteUtils.createNetworkRoute(links, this.network));
 		} else {
 			log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
@@ -458,7 +525,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 		// Set new modes:
 		for (Link link : this.network.getLinks().values()) {
 			Set<String> modes = new HashSet<>();
-			if (link.getAllowedModes().contains("car")) {
+			if (link.getAllowedModes().contains("car") && !link.getId().toString().contains("Pseudo")) {
 				modes.add("car");
 			}
 			if (usedPTLinks.contains(link.getId())) {

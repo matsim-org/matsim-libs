@@ -57,12 +57,13 @@ public class PseudoNetworkCreator {
 
     private long linkIdCounter = 0;
 
-    private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
+    private final Set<String> modes = new HashSet<>();
 
     protected PseudoNetworkCreator(final TransitSchedule schedule, final Network network, final String networkIdPrefix) {
         this.schedule = schedule;
         this.network = network;
         this.prefix = networkIdPrefix;
+		modes.add("tram"); modes.add("car");
     }
 
     /**
@@ -94,15 +95,23 @@ public class PseudoNetworkCreator {
 
         Node fromNode = this.nodes.get(fromFacility);
         if (fromNode == null) {
-            fromNode = this.network.getFactory().createNode(Id.create(this.prefix + fromFacility.getId(), Node.class), fromFacility.getCoord());
-            this.network.addNode(fromNode);
+			if (fromFacility.getLinkId() != null) {
+				fromNode = this.network.getLinks().get(fromFacility.getLinkId()).getToNode();
+			} else {
+				fromNode = this.network.getFactory().createNode(Id.create(this.prefix + fromFacility.getId(), Node.class), fromFacility.getCoord());
+				this.network.addNode(fromNode);
+			}
             this.nodes.put(fromFacility, fromNode);
         }
 
         Node toNode = this.nodes.get(toFacility);
         if (toNode == null) {
-            toNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), toFacility.getCoord());
-            this.network.addNode(toNode);
+			if (toFacility.getLinkId() != null) {
+				toNode = this.network.getLinks().get(toFacility.getLinkId()).getFromNode();
+			} else {
+				toNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), toFacility.getCoord());
+				this.network.addNode(toNode);
+			}
             this.nodes.put(toFacility, toNode);
         }
 
@@ -149,7 +158,7 @@ public class PseudoNetworkCreator {
         link.setCapacity(500);
         link.setNumberOfLanes(1);
         this.network.addLink(link);
-        link.setAllowedModes(this.transitModes);
+        link.setAllowedModes(this.modes);
         this.links.put(connection, link);
         return link;
     }
