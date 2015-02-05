@@ -81,7 +81,6 @@ public class PseudoNetworkCreator {
             routeLinks.add(link.getId());
             fromStop = toStop;
         }
-
         if (routeLinks.size() > 0) {
             route.setRoute(RouteUtils.createNetworkRoute(routeLinks, this.network));
         } else {

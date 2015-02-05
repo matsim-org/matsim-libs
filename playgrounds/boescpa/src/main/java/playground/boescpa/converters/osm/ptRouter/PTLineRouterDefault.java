@@ -314,25 +314,9 @@ public class PTLineRouterDefault extends PTLineRouter {
 	protected void createPTRoutes() {
 		log.info("Creating pt routes...");
 
-		this.router = new PTLRFastAStarLandmarks(this.network);//copyNetwork(this.network));
-		this.pseudoNetworkCreator = new PseudoNetworkCreator(this.schedule, this.network, "PseudoNetwork_");
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				if (route.getTransportMode().equals(BUS)) {
-					setMode(BUS);
-					prepareRouteLine(route);
-				} else if (route.getTransportMode().equals(TRAM)) {
-					setMode(TRAM);
-					prepareRouteLine(route);
-				} else {
-					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
-					this.pseudoNetworkCreator.createLine(route);
-				}
-			}
-		}
-
 		Counter counter = new Counter("route # ");
 		this.router = new PTLRFastAStarLandmarks(this.network);
+		this.pseudoNetworkCreator = new PseudoNetworkCreator(this.schedule, this.network, "PseudoNetwork_");
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				counter.incCounter();
@@ -342,53 +326,15 @@ public class PTLineRouterDefault extends PTLineRouter {
 				} else if (route.getTransportMode().equals(TRAM)) {
 					setMode(TRAM);
 					routeLine(route);
+				} else {
+					// Other modes (e.g. train or ship) are not linked to the network. An own network is created for them.
+					this.pseudoNetworkCreator.createLine(route);
 				}
 			}
 		}
 		counter.printCounter();
 
 		log.info("Creating pt routes... done.");
-	}
-
-	private Network copyNetwork(Network network) {
-		Network networkCopy = NetworkUtils.createNetwork();
-		NetworkFactory factory = networkCopy.getFactory();
-		for (Node node : network.getNodes().values()) {
-			networkCopy.addNode(factory.createNode(node.getId(), node.getCoord()));
-		}
-		for (Link link : network.getLinks().values()) {
-			Link newLink = factory.createLink(link.getId(), link.getFromNode(), link.getToNode());
-			newLink.setAllowedModes(link.getAllowedModes());
-			newLink.setCapacity(link.getCapacity());
-			newLink.setFreespeed(link.getFreespeed());
-			newLink.setLength(link.getLength());
-			newLink.setNumberOfLanes(link.getNumberOfLanes());
-			networkCopy.addLink(newLink);
-		}
-		return networkCopy;
-	}
-
-	private void prepareRouteLine(TransitRoute route) {
-		/*Set<Tuple<TransitRouteStop, TransitRouteStop>> stationsToLinkExtra = new HashSet<>();
-		int i = 0;
-		while (i < (route.getStops().size()-1)) {
-			TransitRouteStop fromStop = route.getStops().get(i);
-			TransitRouteStop toStop = route.getStops().get(i+1);
-			LeastCostPathCalculator.Path path = getShortestPath(fromStop, toStop, route.getId().toString());
-			if (path == null) {
-				stationsToLinkExtra.add(new Tuple<>(fromStop, toStop));
-				i++;
-				if (i < (route.getStops().size()-1)) {
-					fromStop = route.getStops().get(i);
-					toStop = route.getStops().get(i+1);
-					stationsToLinkExtra.add(new Tuple<>(fromStop, toStop));
-				}
-			}
-			i++;
-		}
-		for (Tuple<TransitRouteStop, TransitRouteStop> pair : stationsToLinkExtra) {
-			this.pseudoNetworkCreator.getNetworkLink(pair.getFirst(), pair.getSecond());
-		}*/
 	}
 
 	private void routeLine(TransitRoute route) {
@@ -514,21 +460,33 @@ public class PTLineRouterDefault extends PTLineRouter {
 		removeNonUsedStopFacilities();
 		cleanModes();
 		removeNonUsedLinks();
-		//removeNonUsedPTexclusiveLinks();
 		log.info("Clean Stations and Network... done.");
 	}
 
 	private void cleanSchedule() {
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			Set<TransitRoute> toRemove = new HashSet<>();
 			for (TransitRoute transitRoute : line.getRoutes().values()) {
-				NetworkRoute route = transitRoute.getRoute();
-				for (int i = 0; i < transitRoute.getRoute().getLinkIds().size(); i++) {
+				boolean removeRoute = false;
+				NetworkRoute networkRoute = transitRoute.getRoute();
 
+				// todo-boescpa: This check here should not be necessary. Find reason!!!
+				if (networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
+					removeRoute = true;
 				}
 				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
 					if (linkId == null) {
-
+						removeRoute = true;
 					}
+				}
+				if (removeRoute) {
+					log.error("NetworkRoute for " + transitRoute.getId().toString() + " incomplete. Remove route.");
+					toRemove.add(transitRoute);
+				}
+			}
+			if (!toRemove.isEmpty()) {
+				for (TransitRoute transitRoute : toRemove) {
+					line.removeRoute(transitRoute);
 				}
 			}
 		}
@@ -561,34 +519,6 @@ public class PTLineRouterDefault extends PTLineRouter {
 			link.setAllowedModes(modes);
 		}
 	}
-
-	/*private void removeNonUsedPTexclusiveLinks() {
-		// Collect all used pt-exclusive links:
-		Set<Id<Link>> usedPTLinks = new HashSet<>();
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute transitRoute : line.getRoutes().values()) {
-				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
-					Link link = this.network.getLinks().get(linkId);
-					if (!link.getAllowedModes().contains("car")) {
-						usedPTLinks.add(linkId);
-					}
-				}
-			}
-		}
-		// Collect all non-used pt-exclusive links:
-		Set<Link> unusedPTLinks = new HashSet<>();
-		for (Link link : this.network.getLinks().values()) {
-			if (!link.getAllowedModes().contains("car") && !usedPTLinks.contains(link.getId())) {
-				unusedPTLinks.add(link);
-			}
-		}
-		// Remove non-used pt-exclusive links and any nodes not used anymore because of removal:
-		for (Link link : unusedPTLinks) {
-			this.network.removeLink(link.getId());
-			removeUnusedNode(link.getFromNode().getId());
-			removeUnusedNode(link.getToNode().getId());
-		}
-	}*/
 
 	private void removeNonUsedLinks() {
 		// Collect all non-used links:
