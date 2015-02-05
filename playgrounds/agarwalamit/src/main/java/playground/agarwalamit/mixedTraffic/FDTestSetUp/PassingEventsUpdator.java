@@ -43,15 +43,13 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	public PassingEventsUpdator() {
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
-		this.totalBikesPassed = new ArrayList<Double>();
-		this.avgBikePassingRate = new ArrayList<Double>();
+		this.bikesPassedByEachCar = new ArrayList<Double>();
 	}
 
 	private Map<Id<Person>, Double> personId2LinkEnterTime;
 	private Map<Id<Person>, String> personId2LegMode;
 
-	private List<Double> totalBikesPassed;
-	private List<Double> avgBikePassingRate;
+	private List<Double> bikesPassedByEachCar;
 
 	private final static Id<Link> trackStartLink = Id.createLinkId(0);
 	private final static Id<Link> trackEndLink = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
@@ -62,54 +60,51 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	public void reset(int iteration) {
 		this.personId2LinkEnterTime.clear();
 		this.personId2LegMode.clear();
-		this.totalBikesPassed.clear();
-		this.avgBikePassingRate.clear();
+		this.bikesPassedByEachCar.clear();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 		if(event.getLinkId().equals(trackStartLink)){
-			this.personId2LinkEnterTime.put(event.getPersonId(), event.getTime());
+			this.personId2LinkEnterTime.put(personId, event.getTime());
 		}
 	}
 
 	@Override 
 	public void handleEvent(LinkLeaveEvent event){
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 
-		if (event.getLinkId().equals(trackEndLink)){
+		if (event.getLinkId().equals(trackStartLink)){
 
-			if(this.personId2LegMode.get(event.getPersonId()).equals(TransportMode.bike) && !firstBikeLeavingTrack) firstBikeLeavingTrack = true;
+			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !firstBikeLeavingTrack) firstBikeLeavingTrack = true;
 
-			if(firstBikeLeavingTrack) {
-				double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(event);
-				this.totalBikesPassed.add(numberOfBicyclesOvertaken);
-
-				double noOfCarsOnTrack = getCars();
-				double avgBikePassingRate = numberOfBicyclesOvertaken / noOfCarsOnTrack;
-				this.avgBikePassingRate.add(avgBikePassingRate);
+			if(firstBikeLeavingTrack && !this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
+				double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(personId);
+				this.bikesPassedByEachCar.add(numberOfBicyclesOvertaken);
 			}
-			this.personId2LinkEnterTime.remove(event.getPersonId());
+			
+			this.personId2LinkEnterTime.remove(personId);
 		}
 	}
 
 	private double getCars(){
 		double cars =0;
-		for (Id<Person> personId : this.personId2LinkEnterTime.keySet()){
+		for (Id<Person> personId : this.personId2LegMode.keySet()){
 			if(this.personId2LegMode.get(personId).equals(TransportMode.car)) cars++;
 		}
 		return cars;
 	}
 
 
-	private double getNumberOfBicycleOvertaken(LinkLeaveEvent event) {
+	private double getNumberOfBicycleOvertaken(Id<Person> leavingPersonId) {
 		double overtakenBicycles =0;
 		/* Simply, on a race track, enter time at start of track and leave time at end of track are recoreded, 
 		 * Thus, if an agent is leaving, and leaving agent's enter time is more than 5 (for e.g.) vehicles, then
 		 * total number of overtaken bikes are 5 
 		 */
 		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
-			if(this.personId2LinkEnterTime.get(event.getPersonId()) > this.personId2LinkEnterTime.get(personId)){
+			if(this.personId2LinkEnterTime.get(leavingPersonId) > this.personId2LinkEnterTime.get(personId)){
 				overtakenBicycles++;
 			}
 		}
@@ -121,20 +116,17 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
 	}
 
-	public double getTotalBikesPassed(){
-		double avg=0;
-		for(double d:this.totalBikesPassed){
-			avg += d;
-		}
-		return avg/this.totalBikesPassed.size();
-	}
-
 	public double getAvgBikesPassingRate(){
 		double avg=0;
-		for(double d:this.avgBikePassingRate){
+		for(double d:this.bikesPassedByEachCar){
 			avg += d;
 		}
-		return avg/this.avgBikePassingRate.size();
+		return avg/this.bikesPassedByEachCar.size();
+	}
+
+	public double getTotalBikesPassed(){
+		double noOfCarsOnTrack = getCars();
+		return noOfCarsOnTrack*getAvgBikesPassingRate();
 	}
 
 }
