@@ -21,10 +21,13 @@
 
 package playground.boescpa.converters.osm.ptRouter;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
@@ -45,7 +48,7 @@ import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRA
  */
 public class PTLRFastAStarLandmarks implements PTLRouter {
 
-    private final static double FACTOR_SAMELINE = 1.0;
+	private final static double FACTOR_SAMELINE = 1.0;
     private final static double FACTOR_SAMEMODE = 10.0;
     private final static double FACTOR_PTLINK = 10.0;
     private final static double FACTOR_LINKTYPE = 100.0;
@@ -78,6 +81,8 @@ public class PTLRFastAStarLandmarks implements PTLRouter {
     public PTLRFastAStarLandmarks(Network network) {
         LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
         this.pathCalculator = (IntermodalLeastCostPathCalculator) factory.createPathCalculator(network, this, this);
+		// Suppress "no route found" statements...
+		Logger.getLogger( org.matsim.core.router.Dijkstra.class ).setLevel( Level.ERROR );
     }
 
     @Override

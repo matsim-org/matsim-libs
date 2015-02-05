@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
@@ -105,10 +106,10 @@ public class PTLineRouterDefault extends PTLineRouter {
 	protected void linkStationsToNetwork() {
 		log.info("Linking pt stations to network...");
 
-		Counter counter = new Counter("line # ");
+		Counter counter = new Counter("route # ");
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			counter.incCounter();
 			for (TransitRoute route : line.getRoutes().values()) {
+				counter.incCounter();
 				if (route.getTransportMode().equals(BUS)) {
 					setMode(BUS);
 					linkRouteToNetwork(route);
@@ -330,9 +331,11 @@ public class PTLineRouterDefault extends PTLineRouter {
 			}
 		}
 
+		Counter counter = new Counter("route # ");
 		this.router = new PTLRFastAStarLandmarks(this.network);
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
+				counter.incCounter();
 				if (route.getTransportMode().equals(BUS)) {
 					setMode(BUS);
 					routeLine(route);
@@ -342,6 +345,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 				}
 			}
 		}
+		counter.printCounter();
 
 		log.info("Creating pt routes... done.");
 	}
@@ -506,10 +510,28 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 */
 	protected void cleanStationsAndNetwork() {
 		log.info("Clean Stations and Network...");
+		cleanSchedule();
 		removeNonUsedStopFacilities();
-		removeNonUsedPTexclusiveLinks();
 		cleanModes();
+		removeNonUsedLinks();
+		//removeNonUsedPTexclusiveLinks();
 		log.info("Clean Stations and Network... done.");
+	}
+
+	private void cleanSchedule() {
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				NetworkRoute route = transitRoute.getRoute();
+				for (int i = 0; i < transitRoute.getRoute().getLinkIds().size(); i++) {
+
+				}
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					if (linkId == null) {
+
+					}
+				}
+			}
+		}
 	}
 
 	private void cleanModes() {
@@ -517,9 +539,11 @@ public class PTLineRouterDefault extends PTLineRouter {
 		Set<Id<Link>> usedPTLinks = new HashSet<>();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				usedPTLinks.add(transitRoute.getRoute().getStartLinkId());
 				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
 					usedPTLinks.add(linkId);
 				}
+				usedPTLinks.add(transitRoute.getRoute().getEndLinkId());
 			}
 		}
 		// Set new modes:
@@ -531,11 +555,14 @@ public class PTLineRouterDefault extends PTLineRouter {
 			if (usedPTLinks.contains(link.getId())) {
 				modes.add("pt");
 			}
+			if (modes.isEmpty()) {
+				modes.add("remove");
+			}
 			link.setAllowedModes(modes);
 		}
 	}
 
-	private void removeNonUsedPTexclusiveLinks() {
+	/*private void removeNonUsedPTexclusiveLinks() {
 		// Collect all used pt-exclusive links:
 		Set<Id<Link>> usedPTLinks = new HashSet<>();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
@@ -561,12 +588,32 @@ public class PTLineRouterDefault extends PTLineRouter {
 			removeUnusedNode(link.getFromNode().getId());
 			removeUnusedNode(link.getToNode().getId());
 		}
+	}*/
+
+	private void removeNonUsedLinks() {
+		// Collect all non-used links:
+		Set<Link> unusedLinks = new HashSet<>();
+		for (Link link : this.network.getLinks().values()) {
+			if (link.getAllowedModes().contains("remove")) {
+				unusedLinks.add(link);
+			}
+		}
+		// Remove non-used pt-exclusive links and any nodes not used anymore because of removal:
+		for (Link link : unusedLinks) {
+			if (this.network.getLinks().containsKey(link.getId())) {
+				this.network.removeLink(link.getId());
+				removeUnusedNode(link.getFromNode().getId());
+				removeUnusedNode(link.getToNode().getId());
+			}
+		}
 	}
 
 	private void removeUnusedNode(Id<Node> nodeId) {
-		if (this.network.getNodes().get(nodeId).getInLinks().isEmpty() &&
-				this.network.getNodes().get(nodeId).getOutLinks().isEmpty()) {
-			this.network.removeNode(nodeId);
+		if (nodeId != null && this.network.getNodes().containsKey(nodeId)) {
+			if (this.network.getNodes().get(nodeId).getInLinks().isEmpty() &&
+					this.network.getNodes().get(nodeId).getOutLinks().isEmpty()) {
+				this.network.removeNode(nodeId);
+			}
 		}
 	}
 
