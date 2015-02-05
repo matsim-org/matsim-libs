@@ -341,7 +341,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					links.add(link.getId());
 				}
 			} else {
-				/*Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
+				Link link = this.pseudoNetworkCreator.getNetworkLink(fromStop, toStop);
 				links.add(link.getId());
 				i++;
 				if (i < (route.getStops().size()-1)) {
@@ -349,7 +349,7 @@ public class PTLineRouterDefault extends PTLineRouter {
 					toStop = route.getStops().get(i+1);
 					link = this.pseudoNetworkCreator.getNetworkLink(fromStop,toStop);
 					links.add(link.getId());
-				}*/
+				}
 			}
 			i++;
 		}
@@ -438,8 +438,34 @@ public class PTLineRouterDefault extends PTLineRouter {
 	 * Clean also the allowed modes for only the modes, no line-number any more...
 	 */
 	protected void cleanStationsAndNetwork() {
+		log.info("Clean Stations and Network...");
 		removeNonUsedStopFacilities();
 		removeNonUsedPTexclusiveLinks();
+		cleanModes();
+		log.info("Clean Stations and Network... done.");
+	}
+
+	private void cleanModes() {
+		// Collect all pt-links:
+		Set<Id<Link>> usedPTLinks = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					usedPTLinks.add(linkId);
+				}
+			}
+		}
+		// Set new modes:
+		for (Link link : this.network.getLinks().values()) {
+			Set<String> modes = new HashSet<>();
+			if (link.getAllowedModes().contains("car")) {
+				modes.add("car");
+			}
+			if (usedPTLinks.contains(link.getId())) {
+				modes.add("pt");
+			}
+			link.setAllowedModes(modes);
+		}
 	}
 
 	private void removeNonUsedPTexclusiveLinks() {
