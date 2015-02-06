@@ -1,23 +1,23 @@
-package org.matsim.integration.daily;
+package org.matsim.integration.daily.accessibility;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class QGisProjectFileWriter {
+final class QGisProjectFileWriter {
 	private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 	private Date now = new Date();
 	
-	public void endDocument(BufferedWriter out) throws IOException{
+	static void endDocument(BufferedWriter out) throws IOException{
 		out.write("</qgis>");
 	}
 	
-	public void startLegend(final BufferedWriter out) throws IOException{
+	static void startLegend(final BufferedWriter out) throws IOException{
 		out.write("\t<legend>\n");
 	}
 	
-	public void writeLegendLayer(BufferedWriter out, String key) throws IOException {
+	void writeLegendLayer(BufferedWriter out, String key) throws IOException {
 		String id = key+this.df.format(this.now);
 		out.write("\t\t<legendlayer open=\"true\" checked=\"Qt::Checked\" name=\""+key+"\" showFeatureCount=\"0\">\n");
 		out.write("\t\t\t<filegroup open=\"true\" hidden=\"false\">\n");
@@ -26,15 +26,15 @@ public class QGisProjectFileWriter {
 		out.write("\t\t</legendlayer>\n");
 	}
 
-	public void endLegend(final BufferedWriter out) throws IOException{
+	static void endLegend(final BufferedWriter out) throws IOException{
 		out.write("\t</legend>\n");
 	}
 	
-	public void startProjectLayers(final BufferedWriter out, int size) throws IOException{
+	static void startProjectLayers(final BufferedWriter out, int size) throws IOException{
 		out.write("\t<projectlayers layercount=\""+size+"\">\n");
 	}
 	
-	public void writeProjectLayer(final BufferedWriter out, String key, String geometry, String clazz, String type) throws IOException{
+	void writeProjectLayer(final BufferedWriter out, String key, String geometry, String clazz, String type) throws IOException{
 		
 		String id = key+this.df.format(this.now);
 		
@@ -80,7 +80,7 @@ public class QGisProjectFileWriter {
 		}
 	}
 	
-	private void writeNodeTypesLayer(BufferedWriter out, String key, String geometry, String clazz, String type, String id) throws IOException {
+	private static void writeNodeTypesLayer(BufferedWriter out, String key, String geometry, String clazz, String type, String id) throws IOException {
 		
 		out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" geometry=\""+geometry+"\" type =\"vector\"" +
 				" hasScaleBasedVisibilityFlag=\"0\">\n");
@@ -159,11 +159,11 @@ public class QGisProjectFileWriter {
 //        </maplayer>
 	}
 
-	public void endProjectLayers(BufferedWriter out) throws IOException{
+	static void endProjectLayers(BufferedWriter out) throws IOException{
 		out.write("\t</projectlayers>\n");
 	}
 	
-	public void writeProperties(BufferedWriter out) throws IOException{
+	static void writeProperties(BufferedWriter out) throws IOException{
 		out.write("\t<properties>\n");
 		out.write("\t\t<Paths>\n");
 		out.write("\t\t\t<Absolute type=\"bool\">false</Absolute>\n");
@@ -171,12 +171,12 @@ public class QGisProjectFileWriter {
 		out.write("\t</properties>\n");
 	}
 	
-	public void writeQGisHead(BufferedWriter out) throws IOException{
+	static void writeQGisHead(BufferedWriter out) throws IOException{
 		out.write("<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>\n");
 //		out.write(NL);
 	}
 
-	public void writeEverything(BufferedWriter out, String osmMapnikFile) throws IOException{
+	static void writeEverything(BufferedWriter out, String osmMapnikFile) throws IOException{
 		out.write("\t<title></title>\n");
 		
 		out.write("\t<layer-tree-group expanded=\"1\" checked=\"Qt::Checked\" name=\"\">\n");
