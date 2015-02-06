@@ -597,7 +597,7 @@ public class Controler extends AbstractController {
         });
 	}
 
-    public void addOverridingModule(AbstractModule abstractModule) {
+    public final void addOverridingModule(AbstractModule abstractModule) {
         if (this.injectorCreated) {
             throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
         }
@@ -711,11 +711,11 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(StrategyManager.class);
 	}
 
-	protected boolean isScenarioLoaded() {
+	protected final boolean isScenarioLoaded() {
 		return scenarioLoaded;
 	}
 
-	protected void setScenarioLoaded(boolean scenarioLoaded) {
+	protected final void setScenarioLoaded(boolean scenarioLoaded) {
 		this.scenarioLoaded = scenarioLoaded;
 	}
 
