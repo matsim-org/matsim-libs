@@ -100,7 +100,7 @@ public class M2KS2010Zones2Commodities  {
 				}
 				
 				for (Entry<Link, Double> toLinkEntry : fromLink.getDestinationLinkTrips().entrySet()){
-					Id<DgCommodity> id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId(), toLinkEntry.getKey().getId());
+					Id<DgCommodity> id = this.idConverter.createCommodityId4LinkToLinkPair(fromLink.getLink().getId(), toLinkEntry.getKey().getId());
 					// uses the down-stream node of the toLink as toNode for the commodity
 					Id<Node> toNodeId = toLinkEntry.getKey().getToNode().getId(); // the matsim to node id
 					Id<DgCrossing> toCrossingId = this.idConverter.convertNodeId2CrossingId(toNodeId); // the ks-model crossing id
