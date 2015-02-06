@@ -132,10 +132,6 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
-				// MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
-				// As an alternative, one could add the context to Scenario as scenario element.  I find the present version easier to read, and
-				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
-				// We do not see this as a problem any more.  kai/mz, oct'14
 			}
 		});
 
