@@ -33,9 +33,7 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -77,8 +75,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 	 */
 	protected void readVehicles(String vehicleFile) {
 		try {
-			FileReader reader = new FileReader(vehicleFile);
-			BufferedReader readsLines = new BufferedReader(reader);
+			BufferedReader readsLines = new BufferedReader(new FileReader(vehicleFile));
 			// read header 1 and 2
 			readsLines.readLine();
 			readsLines.readLine();
@@ -120,8 +117,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 
 	protected void readStops(String BFKOORD_GEOFile) {
 		try {
-			FileReader reader = new FileReader(BFKOORD_GEOFile);
-			BufferedReader readsLines = new BufferedReader(reader);
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BFKOORD_GEOFile), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
 				/*Spalte Typ Bedeutung
@@ -156,8 +152,7 @@ public class PTScheduleCreatorDefault extends PTScheduleCreator {
 			Map<Id<TransitLine>,PtLineFPLAN> linesFPLAN = new HashMap<>();
 			PtRouteFPLAN currentRouteFPLAN = null;
 
-			FileReader reader = new FileReader(FPLAN);
-			BufferedReader readsLines = new BufferedReader(reader);
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(FPLAN), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
 				if (newLine.charAt(0) == '*') {
