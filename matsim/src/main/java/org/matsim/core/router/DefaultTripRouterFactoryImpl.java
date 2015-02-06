@@ -67,7 +67,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-        if ( NetworkUtils.isMultimodal(scenario.getNetwork()) ) {
+        final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
+		if ( networkIsMultimodal ) {
             // note: LinkImpl has a default allowed mode of "car" so that all links
             // of a monomodal network are actually restricted to car, making the check
             // of multimodality unecessary from a behavioral point of view.
@@ -132,10 +133,27 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                                             scenario.getNetwork(),
                                             routeAlgo,
                                             ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory())));
+
             if ( old != null ) {
                 log.error( "inconsistent router configuration for mode "+mainMode );
                 throw new RuntimeException( "there was already a module set when trying to set network routing module for mode "+mainMode+
                         ": "+old );
+            }
+            
+            // The default router will always route on the car network.  A user may, however, have prepared a network with dedicated bicycle
+            // links and then expect the router to route on that.  The following test tries to catch that.  If someone improves on this,
+            // the test can be removed.  kai, feb'15
+            if ( networkIsMultimodal ) {
+            	switch ( mainMode ) {
+            	case TransportMode.car :
+            	case TransportMode.ride :
+            		break ;
+            	default:
+            		throw new RuntimeException("you have a multi-modal network and configured " + mainMode + " to be routed as a network mode.  "
+            				+ "The present configuration will route this "
+            				+ "mode on the car network.  This may be ok (e.g. with ``truck'' or ``motorbike''), or not (e.g. with ``bicycle''). "
+            				+ "Throwing an exception anyways; please use a uni-modal network if you want to keep this configuration.") ;
+            	}
             }
         }
 
