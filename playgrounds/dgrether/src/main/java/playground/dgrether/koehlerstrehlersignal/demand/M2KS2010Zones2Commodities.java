@@ -32,6 +32,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
+import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.utils.zones.DgZone;
 import playground.dgrether.utils.zones.DgZoneFromLink;
 import playground.dgrether.utils.zones.DgZones;
@@ -86,7 +87,7 @@ public class M2KS2010Zones2Commodities  {
 		for (DgZone fromZone : this.zones.values()){
 			for (DgZoneFromLink fromLink : fromZone.getFromLinks().values()){
 				// use the down-stream node of the fromLink as fromNode for the commodity
-				// Note: until nov'14 we used the up-stream node here. problem: cplex considers the travel time of the first link while matsim don't do so.
+				// Note: until nov'14 we used the up-stream node here. problem: cplex considers the travel time of the first link while matsim doesn't do so.
 				Id<Node> fromNodeId = fromLink.getLink().getToNode().getId(); // the matsim from node id
 				Id<DgCrossing> fromCrossingId = this.idConverter.convertNodeId2CrossingId(fromNodeId); // the ks-model crossing id
 				Id<DgCrossingNode> fromCrossingNodeId; // the ks-model crossing node id
@@ -99,7 +100,7 @@ public class M2KS2010Zones2Commodities  {
 				}
 				
 				for (Entry<Link, Double> toLinkEntry : fromLink.getDestinationLinkTrips().entrySet()){
-					Id id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId(), toLinkEntry.getKey().getId());
+					Id<DgCommodity> id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId(), toLinkEntry.getKey().getId());
 					// uses the down-stream node of the toLink as toNode for the commodity
 					Id<Node> toNodeId = toLinkEntry.getKey().getToNode().getId(); // the matsim to node id
 					Id<DgCrossing> toCrossingId = this.idConverter.convertNodeId2CrossingId(toNodeId); // the ks-model crossing id
@@ -112,7 +113,8 @@ public class M2KS2010Zones2Commodities  {
 						toCrossingNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(toLinkEntry.getKey().getId());
 					}
 					
-					this.addCommodity(coms, id, fromCrossingNodeId, toCrossingNodeId, fromLink.getLink().getId(), toLinkEntry.getKey().getId(), 
+					if (! fromCrossingNodeId.equals(toCrossingNodeId))
+						this.addCommodity(coms, id, fromCrossingNodeId, toCrossingNodeId, fromLink.getLink().getId(), toLinkEntry.getKey().getId(), 
 							toLinkEntry.getValue(), network);
 				}
 			}			

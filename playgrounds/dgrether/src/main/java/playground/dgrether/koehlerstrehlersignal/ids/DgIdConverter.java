@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.data.v20.Lane;
 
+import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
@@ -210,9 +211,16 @@ public class DgIdConverter {
 //		return idPool.createId(idString);
 //	}
 
-	public Id<Link> createFromLink2ToLinkId(Id<Link> from, Id<Link> to){
+	/**
+	 * create a commodity id for the FromLink - ToLink pair
+	 * 
+	 * @param from the FromLink id
+	 * @param to the ToLink id
+	 * @return commodity id
+	 */
+	public Id<DgCommodity> createFromLink2ToLinkId(Id<Link> from, Id<Link> to){
 		String idString = from + "33" + to;
-		return idPool.createId(idString, Link.class);
+		return idPool.createId(idString, DgCommodity.class);
 	}
 //	
 //	public Id createFrom2ToId(Id from, Id to){
