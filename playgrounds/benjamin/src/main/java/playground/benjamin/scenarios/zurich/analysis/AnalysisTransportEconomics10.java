@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -142,7 +143,7 @@ if ( true ) {
 	eventsReader.readFile(eventsfile);
 		System.out.println("Events file read!");
 			
-	Map<Id, Double> id2Toll = tollCollectHandler.getPersonId2TollMap();
+	Map<Id<Person>, Double> id2Toll = tollCollectHandler.getPersonId2TollMap();
 //	for (DgPersonData data : ana.getPersonData().values()){
 //		if (id2Toll.containsKey(data.getPersonId())){
 //			data.setToll(id2Toll.get(data.getPersonId()));

@@ -124,7 +124,7 @@ public class SpatialAveragingWelfare {
 		Population pop = scenario.getPopulation();
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		ubc.calculateUtility_money(pop);
-		Map<Id, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
+		Map<Id<Person>, Double> personId2Utility = ubc.getPersonId2MonetizedUtility();
 		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 		
 		double [][] weightsBaseCase = calculateWeights(personId2Utility, pop);
@@ -148,7 +148,7 @@ public class SpatialAveragingWelfare {
 			Population pop2 = scenario2.getPopulation();
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM, false);
 			ubc2.calculateUtility_money(pop2);
-			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
+			Map<Id<Person>, Double> personId2Utility2 = ubc2.getPersonId2MonetizedUtility();
 			logger.info("There were " + ubc2.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
 			
 			double [][] weightsPolicyCase = calculateWeights(personId2Utility2, pop2);
@@ -194,10 +194,10 @@ public class SpatialAveragingWelfare {
 		return average;
 	}
 
-	private double [][] calculateWeights(Map<Id, Double> personId2Utility, Population pop){
+	private double [][] calculateWeights(Map<Id<Person>, Double> personId2Utility, Population pop){
 		double[][] weights = new double[noOfXbins][noOfYbins];
 
-		for(Id personId : personId2Utility.keySet()){ 
+		for(Id<Person> personId : personId2Utility.keySet()){ 
 			Person person = pop.getPersons().get(personId);
 			Coord homeCoord = this.lf.getHomeActivityCoord(person);
 			if (this.sau.isInResearchArea(homeCoord)){
@@ -216,10 +216,10 @@ public class SpatialAveragingWelfare {
 		return weights;
 	}
 	
-	private double [][] fillUserBenefits(Map<Id, Double> personId2Utility, Population pop){
+	private double [][] fillUserBenefits(Map<Id<Person>, Double> personId2Utility, Population pop){
 		double[][] scaledWeightedBenefits = new double [noOfXbins][noOfYbins];
 
-		for(Id personId : personId2Utility.keySet()){ 
+		for(Id<Person> personId : personId2Utility.keySet()){ 
 			Person person = pop.getPersons().get(personId);
 			Coord homeCoord = this.lf.getHomeActivityCoord(person);
 			if (this.sau.isInResearchArea(homeCoord)){

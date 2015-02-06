@@ -87,7 +87,7 @@ public class IKGISAnalyzer {
 		log.info("Reading zone shapefile... Done.");
 	}
 
-	public void analyzeZones_congestionCost(Scenario scenario, String runDirectory, Map<Id, Double> causingAgentId2amountSum, Map<Id, Double> affectedAgentId2amountSum) {
+	public void analyzeZones_congestionCost(Scenario scenario, String runDirectory, Map<Id<Person>, Double> causingAgentId2amountSum, Map<Id<Person>, Double> affectedAgentId2amountSum) {
 		
 		log.info("Number of causing agent IDs: " + causingAgentId2amountSum.size());
 		log.info("Number of affected agent IDs: " + affectedAgentId2amountSum.size());
@@ -134,7 +134,7 @@ public class IKGISAnalyzer {
 		log.info("Writing shape file... Done.");
 	}
 	
-	public void analyzeZones_welfare(String runId, Scenario scenario, String runDirectory, Map<Id, Double> personId2userBenefits, Map<Id, Double> personId2tollPayments, Map<Id, Double> personId2welfareContribution) {
+	public void analyzeZones_welfare(String runId, Scenario scenario, String runDirectory, Map<Id<Person>, Double> personId2userBenefits, Map<Id<Person>, Double> personId2tollPayments, Map<Id<Person>, Double> personId2welfareContribution) {
 		String outputPath = runDirectory + "spatial_analysis/welfare_zones/";
 		
 		File file = new File(outputPath);
@@ -189,12 +189,12 @@ public class IKGISAnalyzer {
 		return zoneId2avgToll;
 	}
 
-	private Map<Integer, Double> getZoneNr2totalAmount(Population population, Map<Id, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry, int scalingFactor) {
+	private Map<Integer, Double> getZoneNr2totalAmount(Population population, Map<Id<Person>, Double> personId2amountSum, Map<Integer, Geometry> zoneId2geometry, int scalingFactor) {
 		Map<Integer, Double> zoneNr2totalAmount = new HashMap<Integer, Double>();	
 		
-		SortedMap<Id,Coord> personId2homeCoord = getPersonId2Coordinates(population, homeActivity);
+		SortedMap<Id<Person>,Coord> personId2homeCoord = getPersonId2Coordinates(population, homeActivity);
 		
-		for (Id personId : personId2amountSum.keySet()) {
+		for (Id<Person> personId : personId2amountSum.keySet()) {
 			if (personId2homeCoord.containsKey(personId)){
 				for (Integer zoneId : zoneId2geometry.keySet()) {
 					Geometry geometry = zoneId2geometry.get(zoneId);
@@ -220,7 +220,7 @@ public class IKGISAnalyzer {
 	private Map<Integer, Integer> getZoneNr2activityLocations(String activity, Population population, Map<Integer, Geometry> zoneNr2zoneGeometry, int scalingFactor) {
 		Map<Integer, Integer> zoneNr2activity = new HashMap<Integer, Integer>();	
 
-		SortedMap<Id,Coord> personId2activityCoord = getPersonId2Coordinates(population, activity);
+		SortedMap<Id<Person>,Coord> personId2activityCoord = getPersonId2Coordinates(population, activity);
 		
 		for (Coord coord : personId2activityCoord.values()) {
 			for (Integer nr : zoneNr2zoneGeometry.keySet()) {
@@ -240,8 +240,8 @@ public class IKGISAnalyzer {
 		return zoneNr2activity;
 	}
 	
-	private SortedMap<Id, Coord> getPersonId2Coordinates(Population population, String activity) {
-		SortedMap<Id,Coord> personId2coord = new TreeMap<Id,Coord>();
+	private SortedMap<Id<Person>, Coord> getPersonId2Coordinates(Population population, String activity) {
+		SortedMap<Id<Person>,Coord> personId2coord = new TreeMap<Id<Person>,Coord>();
 		
 		for(Person person : population.getPersons().values()){
 			

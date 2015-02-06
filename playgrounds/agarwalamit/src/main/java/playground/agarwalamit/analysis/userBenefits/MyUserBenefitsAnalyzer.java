@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -52,8 +53,8 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalyisModule{
 	
 	private double allUsersLogSum;
 	private int personWithNoValidPlanCnt;
-	private Map<Id, Double> personId2UserWelfare;
-	private Map<Id, Double> personId2MonetarizedUserWelfare;
+	private Map<Id<Person>, Double> personId2UserWelfare;
+	private Map<Id<Person>, Double> personId2MonetarizedUserWelfare;
 	private WelfareMeasure welfareMeasure;
 	
 	public MyUserBenefitsAnalyzer() {
@@ -109,7 +110,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalyisModule{
 			bw.write("userID \t userWelfare_utils \t monetary user logsum");
 			bw.newLine();
 			
-			for (Id id : this.personId2UserWelfare.keySet()){
+			for (Id<Person> id : this.personId2UserWelfare.keySet()){
 				String row = id + "\t" + this.personId2UserWelfare.get(id)+"\t"+this.personId2MonetarizedUserWelfare.get(id);
 				bw.write(row);
 				bw.newLine();
@@ -127,11 +128,11 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalyisModule{
 		return this.allUsersLogSum;
 	}
 
-	public Map<Id, Double> getPersonId2UserWelfare_utils() {
+	public Map<Id<Person>, Double> getPersonId2UserWelfare_utils() {
 		return personId2UserWelfare;
 	}
 	
-	public Map<Id, Double> getPersonId2MonetarizedUserWelfare(){
+	public Map<Id<Person>, Double> getPersonId2MonetarizedUserWelfare(){
 		return personId2MonetarizedUserWelfare;
 	}
 }

@@ -25,6 +25,7 @@
 package playground.vsp.congestion.controler;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -82,7 +83,7 @@ public class AverageCostPricing implements StartupListener, AfterMobsimListener 
 		
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
 			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());
-			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), enterEvent.getPersonId(), amount);
+			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(enterEvent.getTime(), Id.createPersonId(enterEvent.getVehicleId()), amount);
 			events.processEvent(moneyEvent);
 		}
 	}

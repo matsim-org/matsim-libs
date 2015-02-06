@@ -130,10 +130,10 @@ public class UserBenefitsAndTotalWelfare {
 		paymentsAnalyzer.postProcessData();
 		paymentsAnalyzer.writeResults(outputDir+runCase+"/analysis/");
 
-		Map<Id, Double> personId2amount = paymentsAnalyzer.getPersonId2amount();
+		Map<Id<Person>, Double> personId2amount = paymentsAnalyzer.getPersonId2amount();
 
 		if(! considerAllPersonsInSumOfTolls){
-			for (Id personId : personId2amount.keySet()){
+			for (Id<Person> personId : personId2amount.keySet()){
 				if(isPersonIncluded(personId)) totalToll += personId2amount.get(personId);
 				else {
 					excludedToll += personId2amount.get(personId);
@@ -147,7 +147,7 @@ public class UserBenefitsAndTotalWelfare {
 		return tollInfo;
 	}
 
-	private boolean isPersonIncluded(Id personId){
+	private boolean isPersonIncluded(Id<Person> personId){
 		Id<Person> id = Id.createPersonId(personId.toString());
 		double score = sc.getPopulation().getPersons().get(id).getSelectedPlan().getScore();
 		if (score < 0 ) return false;

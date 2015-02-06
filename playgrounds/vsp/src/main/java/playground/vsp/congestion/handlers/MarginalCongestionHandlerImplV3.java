@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.congestion.LinkCongestionInfo;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
 
 /** 
  * In this implementation the causing agent for a delay resulting from the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.
@@ -45,7 +45,7 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  */
 public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler implements ActivityEndEventHandler {
 	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV3.class);
-	private final Map<Id, Double> agentId2storageDelay = new HashMap<Id, Double>();
+	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	
 	public MarginalCongestionHandlerImplV3(EventsManager events, ScenarioImpl scenario) {
 		super(events, scenario);
@@ -62,7 +62,7 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink;
 		} else {
 			totalDelayWithDelaysOnPreviousLinks = delayOnThisLink + this.agentId2storageDelay.get(event.getVehicleId());
-			this.agentId2storageDelay.put(event.getVehicleId(), 0.);
+			this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), 0.);
 		}
 		
 		if (totalDelayWithDelaysOnPreviousLinks < 0.) {
@@ -86,7 +86,7 @@ public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler i
 				if (this.allowForStorageCapacityConstraint) {
 					if (this.calculateStorageCapacityConstraints) {
 						// Saving the delay resulting from the storage capacity constraint for later when reaching the bottleneck link.
-						this.agentId2storageDelay.put(event.getVehicleId(), storageDelay);
+						this.agentId2storageDelay.put(Id.createPersonId(event.getVehicleId()), storageDelay);
 					} else {
 						this.delayNotInternalized_storageCapacity += storageDelay;
 						log.warn("Delay which is not internalized: " + this.delayNotInternalized_storageCapacity);

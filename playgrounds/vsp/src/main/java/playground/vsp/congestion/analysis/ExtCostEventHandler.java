@@ -46,6 +46,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
 import playground.vsp.congestion.handlers.CongestionHandler;
@@ -62,22 +63,22 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	// This analysis uses either money events or congestion events.
 	private final boolean useMoneyEvents;
 	
-	private Map<Id,Integer> personId2actualTripNumber = new HashMap<Id, Integer>();
-	private Map<Id,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<Id,Map<Integer,String>>();
+	private Map<Id<Person>,Integer> personId2actualTripNumber = new HashMap<Id<Person>, Integer>();
+	private Map<Id<Person>,Map<Integer,String>> personId2tripNumber2legMode = new HashMap<Id<Person>,Map<Integer,String>>();
 	
-	private Map<Id,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<Id, Map<Integer,Double>>();
-	private Map<Id,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id, Map<Integer,Double>>();
-	private Map<Id,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id, Map<Integer,Double>>();
-	private Map<Id,Double> driverId2totalDistance = new HashMap<Id,Double>();
+	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2departureTime = new HashMap<Id<Person>, Map<Integer,Double>>();
+	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<Id<Person>, Map<Integer,Double>>();
+	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<Id<Person>, Map<Integer,Double>>();
+	private Map<Id<Person>,Double> driverId2totalDistance = new HashMap<Id<Person>,Double>();
 	
-	private Map<Id, Double> causingAgentId2amountSum = new HashMap <Id, Double>();
-	private Map<Id, Double> affectedAgentId2amountSum = new HashMap <Id, Double>();
-	private List<Id> persons = new ArrayList<Id>();
+	private Map<Id<Person>, Double> causingAgentId2amountSum = new HashMap <Id<Person>, Double>();
+	private Map<Id<Person>, Double> affectedAgentId2amountSum = new HashMap <Id<Person>, Double>();
+	private List<Id<Person>> persons = new ArrayList<Id<Person>>();
 	
 	// for pt-distance calculation
-	private Map<Id,Double> personId2distanceEnterValue = new HashMap<Id,Double>();
+	private Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<Id<Person>,Double>();
 	
-	private List<Id> ptDrivers = new ArrayList<Id>();
+	private List<Id<Person>> ptDrivers = new ArrayList<Id<Person>>();
 	private Scenario scenario;
 	
 	private double distance = 500.; // TODO: set dynamically!
@@ -196,9 +197,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		double linkLength = this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 		if(ptDrivers.contains(event.getVehicleId())){
 			if(driverId2totalDistance.containsKey(event.getVehicleId())){
-				driverId2totalDistance.put(event.getVehicleId(),driverId2totalDistance.get(event.getVehicleId()) + linkLength);
+				driverId2totalDistance.put(Id.createPersonId(event.getVehicleId()),driverId2totalDistance.get(Id.createPersonId(event.getVehicleId())) + linkLength);
 			} else {
-				driverId2totalDistance.put(event.getVehicleId(),linkLength);
+				driverId2totalDistance.put(Id.createPersonId(event.getVehicleId()),linkLength);
 			}
 		}else{
 			// updating the trip Length
@@ -207,15 +208,15 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			double updatedDistance = distanceBefore + linkLength;
 			Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getVehicleId());
 			tripNumber2tripDistance.put(tripNumber, updatedDistance);
-			personId2tripNumber2tripDistance.put(event.getVehicleId(), tripNumber2tripDistance);
+			personId2tripNumber2tripDistance.put(Id.createPersonId(event.getVehicleId()), tripNumber2tripDistance);
 		}
 	}
 	
 //	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-	public Map<Id,List<Double>> getPersonId2listOfDepartureTimes(String mode) {
-		Map<Id,List<Double>> personId2listOfDepartureTimes = new HashMap<Id, List<Double>>();
-		for(Id personId: personId2tripNumber2departureTime.keySet()){
+	public Map<Id<Person>,List<Double>> getPersonId2listOfDepartureTimes(String mode) {
+		Map<Id<Person>,List<Double>> personId2listOfDepartureTimes = new HashMap<Id<Person>, List<Double>>();
+		for(Id<Person> personId: personId2tripNumber2departureTime.keySet()){
 			List<Double> times = new ArrayList<Double>();
 			for(int i : personId2tripNumber2departureTime.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(i).toString().equals(mode)){
@@ -229,9 +230,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		return personId2listOfDepartureTimes;
 	}
 	
-	public Map<Id,List<Double>> getPersonId2listOfDistances(String mode) {
-		Map<Id,List<Double>> personId2listOfDistances = new HashMap<Id, List<Double>>();
-		for(Id personId: personId2tripNumber2tripDistance.keySet()){
+	public Map<Id<Person>,List<Double>> getPersonId2listOfDistances(String mode) {
+		Map<Id<Person>,List<Double>> personId2listOfDistances = new HashMap<Id<Person>, List<Double>>();
+		for(Id<Person> personId: personId2tripNumber2tripDistance.keySet()){
 			List<Double> distances = new ArrayList<Double>();
 			for(int i : personId2tripNumber2tripDistance.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(i).toString().equals(mode)){
@@ -245,9 +246,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		return personId2listOfDistances;
 	}
 	
-	public Map<Id,List<Double>> getPersonId2listOfAmounts(String mode) {
-		Map<Id,List<Double>> personId2listOfAmounts = new HashMap<Id, List<Double>>();
-		for(Id personId: personId2tripNumber2amount.keySet()){
+	public Map<Id<Person>,List<Double>> getPersonId2listOfAmounts(String mode) {
+		Map<Id<Person>,List<Double>> personId2listOfAmounts = new HashMap<Id<Person>, List<Double>>();
+		for(Id<Person> personId: personId2tripNumber2amount.keySet()){
 			List<Double> amounts = new ArrayList<Double>();
 			for(int i : personId2tripNumber2amount.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(i).toString().equals(mode)){
@@ -277,7 +278,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		Map<Integer, double[]> counter2allDepartureTimesAndAmounts = new HashMap<Integer, double[]>();
 		int i = 0;
 		
-		for(Id personId : personId2tripNumber2departureTime.keySet()){
+		for(Id<Person> personId : personId2tripNumber2departureTime.keySet()){
 			for(int tripNumber : personId2tripNumber2departureTime.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(tripNumber).toString().equals(mode)){
 					double departureTime = personId2tripNumber2departureTime.get(personId).get(tripNumber);
@@ -339,7 +340,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		Map<Integer, double[]> counter2allDistancesAndAmounts = new HashMap<Integer, double[]>();
 		int i = 0;
 		
-		for(Id personId : personId2tripNumber2tripDistance.keySet()){
+		for(Id<Person> personId : personId2tripNumber2tripDistance.keySet()){
 			for(int tripNumber : personId2tripNumber2tripDistance.get(personId).keySet()){
 				if(personId2tripNumber2legMode.get(personId).get(tripNumber).toString().equals(mode)){
 					double tripDistance = personId2tripNumber2tripDistance.get(personId).get(tripNumber);
@@ -479,7 +480,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			// already listed
 		} else {
 			ptDrivers.add(event.getDriverId());
-			driverId2totalDistance.put(event.getVehicleId(),0.0);
+			driverId2totalDistance.put(Id.createPersonId(event.getVehicleId()),0.0);
 		}
 	}
 	
@@ -518,18 +519,18 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		}
 	}
 
-	public Map<Id, Double> getCausingAgentId2amountSum() {
+	public Map<Id<Person>, Double> getCausingAgentId2amountSum() {
 		return causingAgentId2amountSum;
 	}
 	
-	public Map<Id, Double> getAffectedAgentId2amountSum() {
+	public Map<Id<Person>, Double> getAffectedAgentId2amountSum() {
 		return affectedAgentId2amountSum;
 	}
 
-	public Map<Id, Double> getCausingAgentId2amountSumAllAgents() {
-		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
+	public Map<Id<Person>, Double> getCausingAgentId2amountSumAllAgents() {
+		Map<Id<Person>, Double> personId2amountSumAllAgents = new HashMap<Id<Person>, Double>();
 		
-		List<Id> personIds = new ArrayList<Id>();
+		List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 		if (this.scenario.getPopulation().getPersons().isEmpty()) {
 			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
 			personIds.addAll(this.persons);
@@ -538,7 +539,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
 		}
 		
-		for (Id id : personIds) {
+		for (Id<Person> id : personIds) {
 			double amountSum = 0.;
 			if (this.causingAgentId2amountSum.get(id) == null) {
 				// no monetary payments
@@ -550,14 +551,14 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 		return personId2amountSumAllAgents;
 	}
 	
-	public Map<Id, Double> getAffectedAgentId2amountSumAllAgents() {
-		Map<Id, Double> personId2amountSumAllAgents = new HashMap<Id, Double>();
+	public Map<Id<Person>, Double> getAffectedAgentId2amountSumAllAgents() {
+		Map<Id<Person>, Double> personId2amountSumAllAgents = new HashMap<Id<Person>, Double>();
 		
 		if (this.affectedAgentId2amountSum.isEmpty()) {
 			log.warn("There is no info re the affected agents. This info is only avalable when analyzing congestion events and not the money events.");		
 		
 		} else {
-			List<Id> personIds = new ArrayList<Id>();
+			List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 			if (this.scenario.getPopulation().getPersons().isEmpty()) {
 				log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
 				personIds.addAll(this.persons);
@@ -566,7 +567,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 				personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
 			}
 			
-			for (Id id : personIds) {
+			for (Id<Person> id : personIds) {
 				double amountSum = 0.;
 				if (this.affectedAgentId2amountSum.get(id) == null) {
 					// no monetary payments

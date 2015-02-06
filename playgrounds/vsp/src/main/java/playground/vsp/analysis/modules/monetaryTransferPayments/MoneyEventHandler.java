@@ -27,18 +27,19 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author ikaddoura, benjamin
  *
  */
 public class MoneyEventHandler implements PersonMoneyEventHandler{
-	private SortedMap<Id, Double> id2amount = new TreeMap<Id, Double>();
+	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 
-		Id id = event.getPersonId();
+		Id<Person> id = event.getPersonId();
 		Double amountByEvent = event.getAmount();
 		Double amountSoFar = id2amount.get(id);
 		
@@ -51,7 +52,7 @@ public class MoneyEventHandler implements PersonMoneyEventHandler{
 		}	
 	}
 
-	public Map<Id, Double> getPersonId2amount() {
+	public Map<Id<Person>, Double> getPersonId2amount() {
 		return Collections.unmodifiableMap(id2amount);
 	}
 	

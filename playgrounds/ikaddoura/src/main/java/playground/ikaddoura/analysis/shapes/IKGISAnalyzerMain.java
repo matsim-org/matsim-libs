@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -85,8 +86,8 @@ public class IKGISAnalyzerMain {
 		log.info("Reading events file... Done.");
 		
 		// Spatial analysis
-		Map<Id, Double> causingAgentId2amountSum = extCostHandler.getCausingAgentId2amountSumAllAgents();
-		Map<Id, Double> affectedAgentId2amountSum = extCostHandler.getAffectedAgentId2amountSumAllAgents();
+		Map<Id<Person>, Double> causingAgentId2amountSum = extCostHandler.getCausingAgentId2amountSumAllAgents();
+		Map<Id<Person>, Double> affectedAgentId2amountSum = extCostHandler.getAffectedAgentId2amountSumAllAgents();
 
 		log.info("Analyzing zones...");
 		IKGISAnalyzer gisAnalysis = new IKGISAnalyzer(shapeFileZones, scalingFactor, homeActivity, workActivity);

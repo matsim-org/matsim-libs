@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author ikaddoura , lkroeger
@@ -68,11 +68,11 @@ public class TripInfoWriter {
 			bw.write("amount per trip;departure time [sec];person Id;distance [m]");
 			bw.newLine();
 			
-			Map<Id,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(mode);
-			Map<Id,List<Double>> personId2listOfDepartureTimes = this.handler.getPersonId2listOfDepartureTimes(mode);
-			Map<Id,List<Double>> personId2listOfDistances = this.handler.getPersonId2listOfDistances(mode);
+			Map<Id<Person>,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(mode);
+			Map<Id<Person>,List<Double>> personId2listOfDepartureTimes = this.handler.getPersonId2listOfDepartureTimes(mode);
+			Map<Id<Person>,List<Double>> personId2listOfDistances = this.handler.getPersonId2listOfDistances(mode);
 			
-			for (Id id : personId2listOfAmounts.keySet()) {
+			for (Id<Person> id : personId2listOfAmounts.keySet()) {
 				List<Double> fares = personId2listOfAmounts.get(id);
 				List<Double> departureTimes = personId2listOfDepartureTimes.get(id);
 				List<Double> distances = personId2listOfDistances.get(id);
@@ -166,9 +166,9 @@ public class TripInfoWriter {
 			bw.write("person Id;total amount [monetary units]");
 			bw.newLine();
 			
-			Map<Id,Double> personId2totalAmount = this.handler.getCausingAgentId2amountSumAllAgents();
+			Map<Id<Person>,Double> personId2totalAmount = this.handler.getCausingAgentId2amountSumAllAgents();
 
-			for (Id id : personId2totalAmount.keySet()) {
+			for (Id<Person> id : personId2totalAmount.keySet()) {
 				double totalAmount = personId2totalAmount.get(id);
 				
 				bw.write(id + ";" + totalAmount);
@@ -198,9 +198,9 @@ public class TripInfoWriter {
 				bw.write("person Id;total amount [monetary units]");
 				bw.newLine();
 				
-				Map<Id,Double> personId2totalAmount = this.handler.getAffectedAgentId2amountSumAllAgents();
+				Map<Id<Person>,Double> personId2totalAmount = this.handler.getAffectedAgentId2amountSumAllAgents();
 	
-				for (Id id : personId2totalAmount.keySet()) {
+				for (Id<Person> id : personId2totalAmount.keySet()) {
 					double totalAmount = personId2totalAmount.get(id);
 					
 					bw.write(id + ";" + totalAmount);

@@ -85,7 +85,7 @@ public class SpatialAveragingTollPayments {
 		MatsimEventsReader mer = new MatsimEventsReader(eventsManager);
 		mer.readFile(inputData.getEventsFileCompareCase());
 		
-		Map<Id, Double> personId2paidToll = moneyEventHandler.getPersonId2TollMap();
+		Map<Id<Person>, Double> personId2paidToll = moneyEventHandler.getPersonId2TollMap();
 		
 		LocationFilter lf = new LocationFilter();
 		

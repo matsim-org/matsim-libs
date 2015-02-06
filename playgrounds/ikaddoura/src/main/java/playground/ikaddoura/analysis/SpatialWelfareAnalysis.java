@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -106,9 +107,9 @@ public class SpatialWelfareAnalysis {
 		config1.plans().setInputFile(runDirectory1 + "output_plans.xml.gz");
 		ScenarioImpl scenario1 = (ScenarioImpl) ScenarioUtils.loadScenario(config1);
 		
-		Map<Id, Double> personId2userBenefit_baseCase = getPersonId2UserBenefit(scenario1, runDirectory1);
-		Map<Id, Double> personId2tollPayments_baseCase = getPersonId2TollPayments(scenario1, runDirectory1);
-		Map<Id, Double> personId2welfareContribution_baseCase = calculateSum(personId2userBenefit_baseCase, personId2tollPayments_baseCase);
+		Map<Id<Person>, Double> personId2userBenefit_baseCase = getPersonId2UserBenefit(scenario1, runDirectory1);
+		Map<Id<Person>, Double> personId2tollPayments_baseCase = getPersonId2TollPayments(scenario1, runDirectory1);
+		Map<Id<Person>, Double> personId2welfareContribution_baseCase = calculateSum(personId2userBenefit_baseCase, personId2tollPayments_baseCase);
 		
 		gisAnalysis.analyzeZones_welfare("baseCase", scenario1, runDirectory1, personId2userBenefit_baseCase, personId2tollPayments_baseCase, personId2welfareContribution_baseCase);
 		
@@ -119,26 +120,26 @@ public class SpatialWelfareAnalysis {
 		config2.plans().setInputFile(runDirectory2 + "output_plans.xml.gz");
 		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.loadScenario(config2);
 		
-		Map<Id, Double> personId2userBenefit_policyCase = getPersonId2UserBenefit(scenario2, runDirectory2);
-		Map<Id, Double> personId2tollPayments_policyCase = getPersonId2TollPayments(scenario2, runDirectory2);
-		Map<Id, Double> personId2welfareContribution_policyCase = calculateSum(personId2userBenefit_policyCase, personId2tollPayments_policyCase);
+		Map<Id<Person>, Double> personId2userBenefit_policyCase = getPersonId2UserBenefit(scenario2, runDirectory2);
+		Map<Id<Person>, Double> personId2tollPayments_policyCase = getPersonId2TollPayments(scenario2, runDirectory2);
+		Map<Id<Person>, Double> personId2welfareContribution_policyCase = calculateSum(personId2userBenefit_policyCase, personId2tollPayments_policyCase);
 
 		gisAnalysis.analyzeZones_welfare("policyCase", scenario2, runDirectory2, personId2userBenefit_policyCase, personId2tollPayments_policyCase, personId2welfareContribution_policyCase);
 
 		// Comparison
 		
-		Map<Id, Double> personId2userBenefit_difference = calculateDifference(scenario1, personId2userBenefit_policyCase, personId2userBenefit_baseCase);
-		Map<Id, Double> personId2tollPayments_difference = calculateDifference(scenario1, personId2tollPayments_policyCase, personId2tollPayments_baseCase);
-		Map<Id, Double> personId2welfareContribution_difference = calculateDifference(scenario1, personId2welfareContribution_policyCase, personId2welfareContribution_baseCase);
+		Map<Id<Person>, Double> personId2userBenefit_difference = calculateDifference(scenario1, personId2userBenefit_policyCase, personId2userBenefit_baseCase);
+		Map<Id<Person>, Double> personId2tollPayments_difference = calculateDifference(scenario1, personId2tollPayments_policyCase, personId2tollPayments_baseCase);
+		Map<Id<Person>, Double> personId2welfareContribution_difference = calculateDifference(scenario1, personId2welfareContribution_policyCase, personId2welfareContribution_baseCase);
 	
 		gisAnalysis.analyzeZones_welfare("policyCase_baseCase_comparison", scenario2, runDirectory2, personId2userBenefit_difference, personId2tollPayments_difference, personId2welfareContribution_difference);
 		
 	}
 
-	private Map<Id, Double> calculateSum(Map<Id, Double> personId2userBenefit, Map<Id, Double> personId2tollPayments) {
-		Map<Id, Double> personId2Sum = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> calculateSum(Map<Id<Person>, Double> personId2userBenefit, Map<Id<Person>, Double> personId2tollPayments) {
+		Map<Id<Person>, Double> personId2Sum = new HashMap<Id<Person>, Double>();
 		
-		for (Id id : personId2userBenefit.keySet()) {
+		for (Id<Person> id : personId2userBenefit.keySet()) {
 			if (personId2tollPayments.containsKey(id)) {
 				personId2Sum.put(id, personId2userBenefit.get(id) + Math.abs(personId2tollPayments.get(id)));
 			} else {
@@ -148,10 +149,10 @@ public class SpatialWelfareAnalysis {
 		return personId2Sum;
 	}
 
-	private Map<Id, Double> calculateDifference(ScenarioImpl scenario, Map<Id, Double> personId2value1, Map<Id, Double> personId2value2) {
-		Map<Id, Double> personId2difference = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> calculateDifference(ScenarioImpl scenario, Map<Id<Person>, Double> personId2value1, Map<Id<Person>, Double> personId2value2) {
+		Map<Id<Person>, Double> personId2difference = new HashMap<Id<Person>, Double>();
 		
-		for (Id id : scenario.getPopulation().getPersons().keySet()) {
+		for (Id<Person> id : scenario.getPopulation().getPersons().keySet()) {
 			double value1 = 0.;
 			double value2 = 0.;
 			if (personId2value1.containsKey(id)){
@@ -165,7 +166,7 @@ public class SpatialWelfareAnalysis {
 		return personId2difference;
 	}
 
-	private Map<Id, Double> getPersonId2TollPayments(ScenarioImpl scenario, String runDirectory) {
+	private Map<Id<Person>, Double> getPersonId2TollPayments(ScenarioImpl scenario, String runDirectory) {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
@@ -180,11 +181,11 @@ public class SpatialWelfareAnalysis {
 		return moneyHandler.getPersonId2amount();
 	}
 
-	private Map<Id, Double> getPersonId2UserBenefit(Scenario scenario, String runDirectory) {
+	private Map<Id<Person>, Double> getPersonId2UserBenefit(Scenario scenario, String runDirectory) {
 			
 		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, true);
 		userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation());
-		Map<Id, Double> personId2userBenefit = userBenefitsCalculator_selected.getPersonId2MonetizedUtility();
+		Map<Id<Person>, Double> personId2userBenefit = userBenefitsCalculator_selected.getPersonId2MonetizedUtility();
 		return personId2userBenefit;
 	}
 			 

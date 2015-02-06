@@ -191,7 +191,7 @@ public class MultiAnalyzer {
 		eventsManager.addHandler(moneyEventHandler);
 		eventsReader.parse(eventsFile);
 
-		Map<Id, Double> personId2Toll = moneyEventHandler.getPersonId2TollMap();
+		Map<Id<Person>, Double> personId2Toll = moneyEventHandler.getPersonId2TollMap();
 		
 		// TODO: this could be probably done outside of the writer as follows:
 //		Map<UserGroup, Double> userGroup2Size = userGroupUtils.getSizePerGroup(pop);

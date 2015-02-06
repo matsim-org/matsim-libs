@@ -46,8 +46,8 @@ public class UserBenefitsCalculator {
 	private int personsWithoutValidPlanScore = 0;
 	private final int maxWarnCnt = 3;
 	private final boolean considerAllPlans;
-	private final Map<Id, Double> personId2Utility = new HashMap<Id, Double>();
-	private final Map<Id, Double> personId2MonetizedUtility = new HashMap<Id, Double>();
+	private final Map<Id<Person>, Double> personId2Utility = new HashMap<Id<Person>, Double>();
+	private final Map<Id<Person>, Double> personId2MonetizedUtility = new HashMap<Id<Person>, Double>();
 
 
 	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
@@ -159,7 +159,7 @@ public class UserBenefitsCalculator {
 		return utilityOfPerson_utils;
 	}
 
-	private boolean testScore(Plan plan, Id personId) {
+	private boolean testScore(Plan plan, Id<Person> personId) {
 		if(plan.getScore() == null){
 			nullScore++;
 			if(nullScore <= maxWarnCnt) {
@@ -202,11 +202,11 @@ public class UserBenefitsCalculator {
 		return invalidPlans;
 	}
 	
-	public Map<Id, Double> getPersonId2Utility() {
+	public Map<Id<Person>, Double> getPersonId2Utility() {
 		return personId2Utility;
 	}
 	
-	public Map<Id, Double> getPersonId2MonetizedUtility() {
+	public Map<Id<Person>, Double> getPersonId2MonetizedUtility() {
 		return personId2MonetizedUtility;
 	}
 }

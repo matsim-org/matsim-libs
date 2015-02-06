@@ -188,8 +188,8 @@ PersonStuckEventHandler
 		} else { // car
 			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getEnteringAgents().add(enteredPerson);
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getVehicleId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
-			linkInfo.getPersonId2linkEnterTime().put(event.getVehicleId(), event.getTime());
+			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
 		}	
 	}
 
@@ -213,9 +213,9 @@ PersonStuckEventHandler
 			startDelayProcessing(event);
 
 			linkInfo.getEnteringAgents().remove(event.getVehicleId());
-			linkInfo.getLeavingAgents().add(event.getVehicleId());
-			linkInfo.getPersonId2linkLeaveTime().put(event.getVehicleId(), event.getTime());
-			linkInfo.setLastLeavingAgent(event.getVehicleId());
+			linkInfo.getLeavingAgents().add(Id.createPersonId(event.getVehicleId()));
+			linkInfo.getPersonId2linkLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
+			linkInfo.setLastLeavingAgent(Id.createPersonId(event.getVehicleId()));
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getVehicleId());
 		}
 	}
@@ -236,12 +236,12 @@ PersonStuckEventHandler
 			linkInfo.getPersonId2DelaysToPayFor().put(delayedPerson, delayOnThisLink);
 			this.totalDelay = this.totalDelay + delayOnThisLink;
 
-			List<Id> leavingAgentsList = new ArrayList<Id>(linkInfo.getLeavingAgents());
+			List<Id<Person>> leavingAgentsList = new ArrayList<Id<Person>>(linkInfo.getLeavingAgents());
 			Collections.reverse(leavingAgentsList);
 
 			if(!leavingAgentsList.isEmpty()){ // flow cap delays
 				double delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
-				Iterator< Id> personIdListIterator = leavingAgentsList.iterator();
+				Iterator< Id<Person>> personIdListIterator = leavingAgentsList.iterator();
 
 				while (personIdListIterator.hasNext() && delayToPayFor>0){
 					Id<Person> personToBeChargedId = personIdListIterator.next();
@@ -311,9 +311,9 @@ PersonStuckEventHandler
 		}
 
 		if(delayToPayFor>0){
-			List<Id> personsLeftSpillBackCausingLink = new ArrayList<Id>(spillBackCausingLinkInfo.getLeavingAgents());
+			List<Id<Person>> personsLeftSpillBackCausingLink = new ArrayList<Id<Person>>(spillBackCausingLinkInfo.getLeavingAgents());
 			Collections.reverse(personsLeftSpillBackCausingLink);
-			Iterator<Id> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
+			Iterator<Id<Person>> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
 
 			while(prsnLftSpillBakCauinLinkItrtr.hasNext()&&delayToPayFor>0.){ // again charged for flow cap of link
 				Id<Person> chargedPersonId = prsnLftSpillBakCauinLinkItrtr.next();
@@ -344,7 +344,7 @@ PersonStuckEventHandler
 		if(linkInfo.getPersonId2CausingLinkId().containsKey(thisPerson)){//leaving agents list was empty
 			spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(thisPerson);
 		} else {
-			List<Id> personLeavingList = new ArrayList<Id>(linkInfo.getLeavingAgents());
+			List<Id<Person>> personLeavingList = new ArrayList<Id<Person>>(linkInfo.getLeavingAgents());
 			Collections.reverse(personLeavingList);
 			for(Id<Person> id:personLeavingList){
 				if(linkInfo.getPersonId2CausingLinkId().containsKey(id)){
@@ -454,7 +454,7 @@ PersonStuckEventHandler
 		return nextLinkInRoute;
 	}
 
-	double getLastLeavingTime(Map<Id, Double> personId2LinkLeaveTime) {
+	double getLastLeavingTime(Map<Id<Person>, Double> personId2LinkLeaveTime) {
 		double lastLeavingFromThatLink = Double.NEGATIVE_INFINITY;
 		for (Id<Person> id : personId2LinkLeaveTime.keySet()){
 			if (personId2LinkLeaveTime.get(id) > lastLeavingFromThatLink) {

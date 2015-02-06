@@ -29,6 +29,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.config.Config;
@@ -59,7 +60,7 @@ public class MultiAnalyzerWriter {
 		personFilter = new PersonFilter();
 	}
 
-	public void writeWelfareTollInformation(String configFile, Population pop, Map<Id,Double> personId2Toll) {
+	public void writeWelfareTollInformation(String configFile, Population pop, Map<Id<Person>,Double> personId2Toll) {
 		String fileName = this.outputDir + "/welfareTollInformation_" + runName + ".txt";
 		File file = new File(fileName);
 		

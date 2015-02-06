@@ -56,7 +56,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private Map<Id<Person>, Double> pId2ColdEmissionsCosts = new HashMap<>();
 	private Map<Id<Person>, Double> pId2WarmEmissionsCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2CongestionCosts= new HashMap<>();
-	private Map<Id, Double> pId2Tolls= new HashMap<>();
+	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private ScenarioImpl scenario;
 	private EmissionCostModule emissionCostModule;
 	private BufferedWriter writer;

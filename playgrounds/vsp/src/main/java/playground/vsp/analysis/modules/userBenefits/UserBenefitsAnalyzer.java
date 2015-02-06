@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -53,7 +54,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 	
 	private double allUsersLogSum;
 	private int personWithNoValidPlanCnt;
-	private Map<Id, Double> personId2Logsum;
+	private Map<Id<Person>, Double> personId2Logsum;
 
 	public UserBenefitsAnalyzer() {
 		super(UserBenefitsAnalyzer.class.getSimpleName());
@@ -101,7 +102,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 			bw.write("userID \t monetary user logsum");
 			bw.newLine();
 			
-			for (Id id : this.personId2Logsum.keySet()){
+			for (Id<Person> id : this.personId2Logsum.keySet()){
 				String row = id + "\t" + this.personId2Logsum.get(id);
 				bw.write(row);
 				bw.newLine();
@@ -119,7 +120,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 		return allUsersLogSum;
 	}
 
-	public Map<Id, Double> getPersonId2Logsum() {
+	public Map<Id<Person>, Double> getPersonId2Logsum() {
 		return personId2Logsum;
 	}
 

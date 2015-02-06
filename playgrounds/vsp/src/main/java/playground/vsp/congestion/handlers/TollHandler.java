@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
 
@@ -50,15 +51,15 @@ public class TollHandler implements CongestionHandler, LinkEnterEventHandler, Pe
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
-	private Map<Id, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id, Map<Double, Double>>();
-	private Map<Id, Map<Double, Integer>> linkId2timeBin2enteringAndDepartingAgents = new HashMap<Id, Map<Double, Integer>>();
+	private Map<Id<Link>, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id<Link>, Map<Double, Double>>();
+	private Map<Id<Link>, Map<Double, Integer>> linkId2timeBin2enteringAndDepartingAgents = new HashMap<Id<Link>, Map<Double, Integer>>();
 	
 	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 	private List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
 	private List<PersonDepartureEvent> personDepartureEvents = new ArrayList<PersonDepartureEvent>();
 
-	private Map<Id, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id, Map<Double, Double>>();
-	private Map<Id, Map<Double, Double>> linkId2timeBin2avgTollOldValue = new HashMap<Id, Map<Double, Double>>();
+	private Map<Id<Link>, Map<Double, Double>> linkId2timeBin2avgToll = new HashMap<Id<Link>, Map<Double,Double>>();
+	private Map<Id<Link>, Map<Double, Double>> linkId2timeBin2avgTollOldValue = new HashMap<Id<Link>, Map<Double, Double>>();
 	
 	private boolean setMethodsExecuted = false;
 	
@@ -128,7 +129,7 @@ public class TollHandler implements CongestionHandler, LinkEnterEventHandler, Pe
 		} else {
 			// calculate average toll for each link and time bin
 			
-			for (Id linkId : this.linkId2timeBin2tollSum.keySet()) {
+			for (Id<Link> linkId : this.linkId2timeBin2tollSum.keySet()) {
 //				log.info("Calculating average toll for link " + linkId);
 				Map<Double, Double> timeBin2tollSum = this.linkId2timeBin2tollSum.get(linkId);
 				Map<Double, Double> timeBin2avgToll = new HashMap<Double, Double>();
@@ -321,7 +322,7 @@ public class TollHandler implements CongestionHandler, LinkEnterEventHandler, Pe
 	/**
 	 * Returns the avg toll (negative monetary amount) paid on that link during that time bin.
 	 */
-	public double getAvgToll(Id linkId, double time) {
+	public double getAvgToll(Id<Link> linkId, double time) {
 		double avgToll = 0.;
 		
 		if (this.linkId2timeBin2avgToll.containsKey(linkId)){
@@ -339,7 +340,7 @@ public class TollHandler implements CongestionHandler, LinkEnterEventHandler, Pe
 	/**
 	 * Returns the avg toll (old value) (negative monetary amount) paid on that link during that time bin.
 	 */
-	public double getAvgTollOldValue(Id linkId, double time) {
+	public double getAvgTollOldValue(Id<Link> linkId, double time) {
 		double avgTollOldValue = 0.;
 		
 		if (this.linkId2timeBin2avgTollOldValue.containsKey(linkId)){
@@ -368,7 +369,7 @@ public class TollHandler implements CongestionHandler, LinkEnterEventHandler, Pe
 			bw.write("link;total toll (per day);entering (and departing) agents (per day)");
 			bw.newLine();
 			
-			for (Id linkId : this.linkId2timeBin2enteringAndDepartingAgents.keySet()){
+			for (Id<Link> linkId : this.linkId2timeBin2enteringAndDepartingAgents.keySet()){
 				double totalToll = 0.;
 				int enteringAgents = 0;
 								

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -48,7 +49,7 @@ public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
 	private ScenarioImpl scenario;
 
 	private MoneyEventHandler moneyEventHandler;
-	private Map<Id, Double> personId2amount;
+	private Map<Id<Person>, Double> personId2amount;
 	private double allUsersAmount;
 	
 	public MonetaryPaymentsAnalyzer() {
@@ -59,7 +60,7 @@ public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
 		this.scenario = scenario;
 		
 		this.moneyEventHandler = new MoneyEventHandler();
-		this.personId2amount = new TreeMap<Id, Double>();
+		this.personId2amount = new TreeMap<Id<Person>, Double>();
 		this.allUsersAmount = 0.;
 	}
 	
@@ -115,7 +116,7 @@ public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
 		
 	}
 
-	public Map<Id, Double> getPersonId2amount() {
+	public Map<Id<Person>, Double> getPersonId2amount() {
 		return personId2amount;
 	}
 

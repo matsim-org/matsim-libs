@@ -62,9 +62,9 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private String outputDir;
-	private Map<Id, Double> personId2UserWelfare_utils;
-	private Map<Id, Double> personId2MonetarizedUserWelfare;
-	private Map<Id, Double> personId2MonetaryPayments;
+	private Map<Id<Person>, Double> personId2UserWelfare_utils;
+	private Map<Id<Person>, Double> personId2MonetarizedUserWelfare;
+	private Map<Id<Person>, Double> personId2MonetaryPayments;
 	private SortedMap<UserGroup, Double>  userGrp2ExcludedToll;
 	private Scenario scenario;
 	private int lastIteration;
@@ -132,7 +132,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 	}
 
-	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap) { 
+	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id<Person>, Double> inputMap) { 
 		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
 		for(UserGroup ug : UserGroup.values()){
 			outMap.put(ug, 0.0);
@@ -148,7 +148,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		return outMap;
 	}
 
-	private SortedMap<UserGroup, Double> getTollsPerUserGroup(Map<Id, Double> inputMap) { 
+	private SortedMap<UserGroup, Double> getTollsPerUserGroup(Map<Id<Person>, Double> inputMap) { 
 		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
 		for(UserGroup ug : UserGroup.values()){
 			outMap.put(ug, 0.0);

@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author benjamin
@@ -34,7 +35,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
  */
 public class MoneyEventHandler implements PersonMoneyEventHandler{
 
-	SortedMap<Id, Double> id2Toll = new TreeMap<Id, Double>();
+	SortedMap<Id<Person>, Double> id2Toll = new TreeMap<Id<Person>, Double>();
 	
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
@@ -60,7 +61,7 @@ public class MoneyEventHandler implements PersonMoneyEventHandler{
 		return sumOfTollPayments;
 	}
 	
-	public Map<Id, Double> getPersonId2TollMap() {
+	public Map<Id<Person>, Double> getPersonId2TollMap() {
 		return Collections.unmodifiableMap(id2Toll);
 	}
 	

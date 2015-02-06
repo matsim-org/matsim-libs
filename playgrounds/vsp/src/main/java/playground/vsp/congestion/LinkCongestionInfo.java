@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -38,20 +40,20 @@ import org.matsim.api.core.v01.Id;
  */
 public class LinkCongestionInfo {
 	
-	private Id linkId;
+	private Id<Link> linkId;
 	private double freeTravelTime;
 	private double marginalDelayPerLeavingVehicle_sec;
 	private int storageCapacity_cars;
-	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
-	private List<Id> leavingAgents = new ArrayList<Id>();
-	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2linkEnterTime = new HashMap<Id, Double>();
-	private Id lastLeavingAgent;
+	private Map<Id<Person>, Double> personId2linkLeaveTime = new HashMap<Id<Person>, Double>();
+	private List<Id<Person>> leavingAgents = new ArrayList<Id<Person>>();
+	private Map<Id<Person>, Double> personId2freeSpeedLeaveTime = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2linkEnterTime = new HashMap<Id<Person>, Double>();
+	private Id<Person> lastLeavingAgent;
 	
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
-	public void setLinkId(Id linkId) {
+	public void setLinkId(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 	public void setMarginalDelayPerLeavingVehicle(double marginalDelay_sec) {
@@ -72,29 +74,29 @@ public class LinkCongestionInfo {
 	public void setFreeTravelTime(double freeTravelTime) {
 		this.freeTravelTime = freeTravelTime;
 	}
-	public Map<Id, Double> getPersonId2linkLeaveTime() {
+	public Map<Id<Person>, Double> getPersonId2linkLeaveTime() {
 		return personId2linkLeaveTime;
 	}
-	public List<Id> getLeavingAgents() {
+	public List<Id<Person>> getLeavingAgents() {
 		return leavingAgents;
 	}
-	public Map<Id, Double> getPersonId2freeSpeedLeaveTime() {
+	public Map<Id<Person>, Double> getPersonId2freeSpeedLeaveTime() {
 		return personId2freeSpeedLeaveTime;
 	}
 	public void setPersonId2freeSpeedLeaveTime(
-			Map<Id, Double> personId2freeSpeedLeaveTime) {
+			Map<Id<Person>, Double> personId2freeSpeedLeaveTime) {
 		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
 	}
-	public Id getLastLeavingAgent() {
+	public Id<Person> getLastLeavingAgent() {
 		return lastLeavingAgent;
 	}
-	public void setLastLeavingAgent(Id lastLeavingAgent) {
+	public void setLastLeavingAgent(Id<Person> lastLeavingAgent) {
 		this.lastLeavingAgent = lastLeavingAgent;
 	}
-	public Map<Id, Double> getPersonId2linkEnterTime() {
+	public Map<Id<Person>, Double> getPersonId2linkEnterTime() {
 		return personId2linkEnterTime;
 	}
-	public void setPersonId2linkEnterTime(Map<Id, Double> personId2linkEnterTime) {
+	public void setPersonId2linkEnterTime(Map<Id<Person>, Double> personId2linkEnterTime) {
 		this.personId2linkEnterTime = personId2linkEnterTime;
 	}
 		

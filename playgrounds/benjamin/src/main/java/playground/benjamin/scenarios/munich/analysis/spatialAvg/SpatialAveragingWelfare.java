@@ -122,7 +122,7 @@ public class SpatialAveragingWelfare {
 		Population pop = scenario.getPopulation();
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM, false);
 		ubc.calculateUtility_money(pop);
-		Map<Id, Double> personId2UtilityWithoutRefund = ubc.getPersonId2MonetizedUtility();
+		Map<Id<Person>, Double> personId2UtilityWithoutRefund = ubc.getPersonId2MonetizedUtility();
 		
 		
 		// calculate personal / average refund
@@ -133,12 +133,12 @@ public class SpatialAveragingWelfare {
 		eventsReader.readFile(eventsFile);
 		// sign correct?
 		// personal refund
-		Map<Id, Double> personId2PersonalRefund = moneyEventHandler.getPersonId2TollMap();
-		Map<Id, Double> personId2UtilityWithPersonalRefund = sumUpUtilities(personId2UtilityWithoutRefund, personId2PersonalRefund);
+		Map<Id<Person>, Double> personId2PersonalRefund = moneyEventHandler.getPersonId2TollMap();
+		Map<Id<Person>, Double> personId2UtilityWithPersonalRefund = sumUpUtilities(personId2UtilityWithoutRefund, personId2PersonalRefund);
 		// avg refund
 		Double avgRefund = moneyEventHandler.getSumOfTollPayments()/pop.getPersons().size();
 		
-		Map<Id, Double> personId2UtilityWithAverageRefund = addAvgRefundToUtilities(personId2UtilityWithoutRefund, avgRefund);
+		Map<Id<Person>, Double> personId2UtilityWithAverageRefund = addAvgRefundToUtilities(personId2UtilityWithoutRefund, avgRefund);
 		
 		LocationFilter lf = new LocationFilter();
 		logger.info("There were " + ubc.getPersonsWithoutValidPlanCnt() + " persons without any valid plan.");
@@ -149,17 +149,17 @@ public class SpatialAveragingWelfare {
 		currentCaseGridPersonalRefund = getGridFromUtilities(pop, personId2UtilityWithPersonalRefund, lf);
 	}
 
-	private Map<Id, Double> addAvgRefundToUtilities(
-			Map<Id, Double> personId2UtilityWithoutRefund, Double avgRefund) {
-		Map<Id, Double> personId2UtilityWithAvgRefund = new HashMap<Id, Double>();
-		for(Id personId : personId2UtilityWithoutRefund.keySet()){
+	private Map<Id<Person>, Double> addAvgRefundToUtilities(
+			Map<Id<Person>, Double> personId2UtilityWithoutRefund, Double avgRefund) {
+		Map<Id<Person>, Double> personId2UtilityWithAvgRefund = new HashMap<Id<Person>, Double>();
+		for(Id<Person> personId : personId2UtilityWithoutRefund.keySet()){
 			personId2UtilityWithAvgRefund.put(personId, personId2UtilityWithoutRefund.get(personId)+avgRefund);
 		}
 		return personId2UtilityWithAvgRefund;
 	}
 
 	private SpatialGrid getGridFromUtilities(Population pop,
-			Map<Id, Double> personId2Utility, LocationFilter lf) {
+			Map<Id<Person>, Double> personId2Utility, LocationFilter lf) {
 		SpatialGrid spatialGrid = new SpatialGrid(inputData, parameters.getNoOfXbins(), parameters.getNoOfYbins());
 		for(Id<Person> personId: personId2Utility.keySet()){
 			Person person = pop.getPersons().get(personId);
@@ -173,9 +173,9 @@ public class SpatialAveragingWelfare {
 		return spatialGrid;
 	}
 
-	private Map<Id, Double> sumUpUtilities(Map<Id, Double> personId2Utility, Map<Id, Double> personId2Refund) {
-		Map<Id, Double> sumOfUtilities = new HashMap<Id, Double>();
-		for(Id personId : personId2Utility.keySet()){
+	private Map<Id<Person>, Double> sumUpUtilities(Map<Id<Person>, Double> personId2Utility, Map<Id<Person>, Double> personId2Refund) {
+		Map<Id<Person>, Double> sumOfUtilities = new HashMap<Id<Person>, Double>();
+		for(Id<Person> personId : personId2Utility.keySet()){
 			double sumOfUtility = personId2Utility.get(personId);;
 			if(personId2Refund.get(personId) != null){
 				sumOfUtility += personId2Refund.get(personId);
