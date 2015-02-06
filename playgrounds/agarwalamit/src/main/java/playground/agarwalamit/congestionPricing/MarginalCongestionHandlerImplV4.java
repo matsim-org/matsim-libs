@@ -23,8 +23,6 @@
 package playground.agarwalamit.congestionPricing;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +57,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
@@ -77,13 +76,14 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  *
  */
 
-public class MarginalCongestionHandlerImplV4 implements
+public class MarginalCongestionHandlerImplV4  implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler,
 PersonArrivalEventHandler,
-PersonStuckEventHandler
+PersonStuckEventHandler,
+CongestionPricingHandler
 {
 
 	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
@@ -274,7 +274,6 @@ PersonStuckEventHandler
 				Id<Link> personOnThisLink = event.getLinkId();
 
 				processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
-
 			}
 		}
 	}
@@ -334,7 +333,6 @@ PersonStuckEventHandler
 			personOnThisLink = spillBackCausingLink;;
 		};
 	}
-
 
 	/**
 	 * @param personOnThisLink
@@ -467,10 +465,8 @@ PersonStuckEventHandler
 	}
 
 	public void writeCongestionStats(String fileName) {
-		File file = new File(fileName);
-
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			bw.write("Total delay [hours];" + this.totalDelay / 3600.);
 			bw.newLine();
 			bw.write("Total internalized delay [hours];" + this.totalInternalizedDelay / 3600.);
@@ -479,7 +475,7 @@ PersonStuckEventHandler
 			bw.newLine();
 			bw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Data is not written to file. Reason "+e);
 		}
 		log.info("Congestion statistics written to " + fileName);		
 	}

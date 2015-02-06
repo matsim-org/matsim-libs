@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing;
 
+import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
@@ -51,11 +53,12 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 /**
  * @author amit
  * Another version of congestion handler, if a person is delayed, it will charge everything to the person who just left before if link is constrained by flow capacity else 
- * it will idenstiy the bottelneck link (spill back causing link) and charge the person who just entered on that link.
+ * it will identify the bottleneck link (spill back causing link) and charge the person who just entered on that link.
  */
 
 public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-PersonStuckEventHandler{
+PersonStuckEventHandler, CongestionPricingHandler
+{
 
 	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV6.class);
 
@@ -266,5 +269,22 @@ PersonStuckEventHandler{
 	 */
 	public double getRoundingDelays(){
 		return this.roundingErrors;
+	}
+
+	@Override
+	public void writeCongestionStats(String fileName) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+		
+		try {
+			bw.write("Total delay [hours];"+this.totalDelay / 3600);
+			bw.newLine();
+			bw.write("Total internalied delay [hours];"+ (this.totalDelay - this.roundingErrors) / 3600);
+			bw.newLine();
+			bw.write("Not internalied delay (rounding errors) [hours];"+this.roundingErrors / 3600);
+			bw.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
+		}
+		log.info("Congestion statistics written to " + fileName);	
 	}
 }

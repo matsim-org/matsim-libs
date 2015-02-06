@@ -69,7 +69,7 @@ public class PricingControler {
 		case "implV3":
 		{
 			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
+//			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;

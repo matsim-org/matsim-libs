@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
@@ -45,7 +48,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * Simplest version of congestion handler, if a person is delayed, it will charge everything to the person who just left before.
  */
 
-public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, CongestionPricingHandler {
 
 	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV5.class);
 
@@ -176,6 +179,24 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 
 	public double getRoundingErrors() {
 		return roundingErrors;
+	}
+
+	@Override
+	public void writeCongestionStats(String fileName) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+		try {
+			bw.write("Total delay [hours];" + this.totalDelay / 3600.);
+			bw.newLine();
+			bw.write("Total internalized delay [hours];" + (this.totalDelay - this.roundingErrors - this.nonInternalizedDelay) / 3600.);
+			bw.newLine();
+			bw.write("Not internalized delay (rounding errors) [hours];" + this.roundingErrors / 3600.);
+			bw.newLine();
+			bw.write("Not internalied delay (No causing agent(s)) [hours];"+this.nonInternalizedDelay / 3600);
+			bw.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written to file. Reason "+e);
+		}
+		log.info("Congestion statistics written to " + fileName);	
 	}
 
 }

@@ -32,7 +32,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
@@ -50,7 +49,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
-	private EventHandler congestionHandler;
+	private CongestionPricingHandler congestionHandler;
 	private MarginalCostPricingCarHandler pricingHandler;
 	private ExtCostEventHandler extCostHandler;
 	
@@ -59,7 +58,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 	 * @param tollHandler
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
-	public CongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, EventHandler handler){
+	public CongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, CongestionPricingHandler handler){
 		this.scenario = (ScenarioImpl) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = handler;
@@ -88,7 +87,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-//		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
 		writerCar.writeDetailedResults(TransportMode.car);
 		writerCar.writeAvgTollPerDistance(TransportMode.car);
