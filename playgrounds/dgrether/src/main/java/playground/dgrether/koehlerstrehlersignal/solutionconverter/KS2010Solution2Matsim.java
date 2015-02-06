@@ -59,7 +59,6 @@ public class KS2010Solution2Matsim {
 		for (KS2010CrossingSolution sol : solutionCrossings){
 			Id<DgCrossing> mId = idConverter.getSymbolicId(Integer.valueOf(sol.getCrossingId().toString()));
 			Id<Node> nodeId = idConverter.convertCrossingId2NodeId(mId);
-			// TODO it would be better to create a new object, wouldn't it?
 			sol.setCrossingId(Id.create(nodeId, DgCrossing.class));
 			newMap.put(nodeId, sol);
 		}
