@@ -12,6 +12,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
+
 /**
  * 
  * class to read in the optimized btu coordinations
@@ -50,9 +53,9 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	public void startTag(String elementName, Attributes atts, Stack<String> context) {
 		// read the crossings program offset
 		if (elementName.equals(FIXEDCROSSING)){
-			String crossingId = atts.getValue(ID);
+			Id<DgCrossing> crossingId = Id.create(atts.getValue(ID), DgCrossing.class);
 			int offsetSeconds = Integer.parseInt(atts.getValue(OFFSET));
-			String programId = atts.getValue(PROG);
+			Id<DgProgram> programId = Id.create(atts.getValue(PROG), DgProgram.class);
 			KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
 			crossing.addOffset4Program(programId, offsetSeconds);
 			this.crossingSolutions.add(crossing);

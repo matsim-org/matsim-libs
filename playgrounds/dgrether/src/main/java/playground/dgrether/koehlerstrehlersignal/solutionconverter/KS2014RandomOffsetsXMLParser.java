@@ -10,8 +10,12 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 
 /**
  * class to read in randomized offsets as btu coordinations
@@ -64,9 +68,9 @@ public class KS2014RandomOffsetsXMLParser extends MatsimXmlParser {
 			this.randomOffsets.put(currentList, new ArrayList<KS2010CrossingSolution>());
 		}
 		else if (elementName.equals(CROSSING)){
-			String crossingId = atts.getValue(ID);
+			Id<DgCrossing> crossingId = Id.create(atts.getValue(ID), DgCrossing.class);
 			int offsetSeconds = Integer.parseInt(atts.getValue(OFFSET));
-			String programId = atts.getValue(PROG); 
+			Id<DgProgram> programId = Id.create(atts.getValue(PROG), DgProgram.class); 
 			KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
 			crossing.addOffset4Program(programId, offsetSeconds);
 			this.randomOffsets.get(currentList).add(crossing);

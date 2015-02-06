@@ -31,6 +31,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
+
 
 /**
  * Deprecated since BTU changed their solution format in spring 2014. The new parser is KS2014SolutionXMLParser.java
@@ -65,8 +68,8 @@ public class KS2010SolutionTXTParser10 {
 	
 	private void parseKreuzungLine(String line) {
 		String[] s = line.split(" ");
-		String crossingId = s[1];
-		String programId = s[4];
+		Id<DgCrossing> crossingId = Id.create(s[1], DgCrossing.class);
+		Id<DgProgram> programId = Id.create(s[4], DgProgram.class);
 		int offset = Integer.valueOf(s[7]);
 		log.debug("Crossing " + crossingId + " program " + programId + " offset " + offset);
 		KS2010CrossingSolution c = new KS2010CrossingSolution(crossingId);

@@ -24,8 +24,12 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 
 
 /**
@@ -70,8 +74,8 @@ public class KS2010SolutionXMLParser10 extends MatsimXmlParser {
 				double value = Double.parseDouble(atts.getValue(VALUE));
 				if (this.compareDouble(1.0, value, EPSILON)){
 					String[] nameParts = name.split("#");
-					String crossingString = nameParts[1];
-					String programString = nameParts[2];
+					Id<DgCrossing> crossingString = Id.create(nameParts[1], DgCrossing.class);
+					Id<DgProgram> programString = Id.create(nameParts[2], DgProgram.class);
 					int offsetSeconds = Integer.parseInt(nameParts[3]);
 					KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingString);
 					crossing.addOffset4Program(programString, offsetSeconds);

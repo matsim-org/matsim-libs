@@ -25,11 +25,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 
 import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010NetworkConverter;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 
@@ -50,13 +53,14 @@ public class KS2010Solution2Matsim {
 	}
 	
 	
-	private Map<Id, KS2010CrossingSolution> convertIds(DgIdPool idPool, List<KS2010CrossingSolution> solutionCrossings){
+	private Map<Id<Node>, KS2010CrossingSolution> convertIds(DgIdPool idPool, List<KS2010CrossingSolution> solutionCrossings){
 		DgIdConverter idConverter = new DgIdConverter(idPool);
-		Map<Id, KS2010CrossingSolution> newMap = new HashMap<Id, KS2010CrossingSolution>();
+		Map<Id<Node>, KS2010CrossingSolution> newMap = new HashMap<>();
 		for (KS2010CrossingSolution sol : solutionCrossings){
-			Id mId = idConverter.getSymbolicId(Integer.valueOf(sol.getCrossingId().toString()));
-			Id nodeId = idConverter.convertCrossingId2NodeId(mId);
-			sol.setCrossingId(nodeId.toString());
+			Id<DgCrossing> mId = idConverter.getSymbolicId(Integer.valueOf(sol.getCrossingId().toString()));
+			Id<Node> nodeId = idConverter.convertCrossingId2NodeId(mId);
+			// TODO it would be better to create a new object, wouldn't it?
+			sol.setCrossingId(Id.create(nodeId, DgCrossing.class));
 			newMap.put(nodeId, sol);
 		}
 		return newMap;
@@ -80,7 +84,7 @@ public class KS2010Solution2Matsim {
 		// overwrite zero offsets with the ones from solutionCrossings
 		for (KS2010CrossingSolution solution : solutionCrossings) {
 			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
-				String programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
+				Id<DgProgram> programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
 				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(programId)) {
 					throw new IllegalStateException(" something's wrong");
 				}
