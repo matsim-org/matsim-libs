@@ -31,8 +31,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
 /**
  * (1) Computes marginal congestion events based on a standard events file.
@@ -77,8 +77,8 @@ public class MarginalCongestionEventsWriter {
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
-		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, scenario);
-		MarginalCostPricingCarHandler marginalCostTollHandler = new MarginalCostPricingCarHandler(events, scenario);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, scenario);
+		MarginalCongestionPricingHandler marginalCostTollHandler = new MarginalCongestionPricingHandler(events, scenario);
 		
 		events.addHandler(eventWriter);
 		events.addHandler(congestionHandler);

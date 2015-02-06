@@ -35,7 +35,7 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  * @author ihab
  */
 
-public interface CongestionHandler extends EventHandler {
+public interface CongestionEventHandler extends EventHandler {
 	
 	public void handleEvent (MarginalCongestionEvent event);
 	

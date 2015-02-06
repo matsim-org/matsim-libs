@@ -35,7 +35,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.vsp.congestion.events.MarginalCongestionEvent;
 import playground.vsp.congestion.events.MarginalCongestionEventsReader;
-import playground.vsp.congestion.handlers.CongestionHandler;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 
 /**
@@ -54,7 +54,7 @@ public class CompareCongestionEvents  {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MarginalCongestionEventsReader reader = new MarginalCongestionEventsReader(eventsManager);
 
-		eventsManager.addHandler(new CongestionHandler () {
+		eventsManager.addHandler(new CongestionEventHandler () {
 			@Override
 			public void reset(int iteration) {
 				congestionevents.clear();

@@ -49,14 +49,14 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.CongestionHandler;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 /**
  * 
  * @author ikaddoura , lkroeger
  *
  */
-public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionHandler {
+public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionEventHandler {
 	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
 	private final double vtts_car;
 	

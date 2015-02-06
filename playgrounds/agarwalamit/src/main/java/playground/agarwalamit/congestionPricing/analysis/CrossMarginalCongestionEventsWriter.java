@@ -29,8 +29,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
 /**
  * Basically the idea is to read the events file from implementation A and then write congestion events of implementation B.
@@ -49,7 +49,7 @@ public class CrossMarginalCongestionEventsWriter {
 	private String inputEventsFile = "";
 	private Scenario sc;
 	private int lastIt;
-	private MarginalCongestionHandlerImplV4 eh = null;
+	private CongestionHandlerImplV4 eh = null;
 
 	/**
 	 * @param congestionImpl One for which marginal congestion events need to be evaluated.
@@ -64,7 +64,7 @@ public class CrossMarginalCongestionEventsWriter {
 
 		switch (congestionImpl){
 //		case "implV3" : eh = new MarginalCongestionHandlerImplV3(manager, (ScenarioImpl)this.sc); break;
-		case "implV4" : eh = new MarginalCongestionHandlerImplV4(manager, sc); break;
+		case "implV4" : eh = new CongestionHandlerImplV4(manager, sc); break;
 //		case "implV5" : eh = new MarginalCongestionHandlerImplV5(manager, sc); break;
 //		case "implV6" : eh = new MarginalCongestionHandlerImplV6(manager, sc); break;
 		default : throw new RuntimeException(congestionImpl+ "is not supported. Available implementations are implV3, implV4, implV5, implV6. Aborting ...");
@@ -73,7 +73,7 @@ public class CrossMarginalCongestionEventsWriter {
 		EventWriterXML writer = new EventWriterXML(outputEventsFile);
 		manager.addHandler(writer);
 
-		MarginalCostPricingCarHandler moneyEventHandler = new MarginalCostPricingCarHandler(manager,  (ScenarioImpl)this.sc);
+		MarginalCongestionPricingHandler moneyEventHandler = new MarginalCongestionPricingHandler(manager,  (ScenarioImpl)this.sc);
 		manager.addHandler(moneyEventHandler);
 
 		reader.readFile(this.inputEventsFile);

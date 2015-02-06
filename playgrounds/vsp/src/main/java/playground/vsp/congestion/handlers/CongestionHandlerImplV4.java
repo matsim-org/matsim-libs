@@ -77,7 +77,7 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  *
  */
 
-public class MarginalCongestionHandlerImplV4  implements
+public class CongestionHandlerImplV4  implements
 LinkEnterEventHandler,
 LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
@@ -86,7 +86,7 @@ PersonArrivalEventHandler,
 PersonStuckEventHandler
 {
 
-	final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV4.class);
+	final static Logger log = Logger.getLogger(CongestionHandlerImplV4.class);
 	final Scenario scenario;
 	final EventsManager events;
 	final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
@@ -100,7 +100,7 @@ PersonStuckEventHandler
 	
 	private List<MarginalCongestionEvent> congestionEventsList = new ArrayList<MarginalCongestionEvent>();
 
-	public MarginalCongestionHandlerImplV4(EventsManager events, Scenario scenario) {
+	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 

@@ -58,11 +58,11 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  * it will identify the bottleneck link (spill back causing link) and charge the person who just entered on that link.
  */
 
-public class MarginalCongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+public class CongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
 PersonStuckEventHandler
 {
 
-	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV6.class);
+	public static final Logger  log = Logger.getLogger(CongestionHandlerImplV6.class);
 
 	private final EventsManager events;
 	private final Scenario scenario;
@@ -77,7 +77,7 @@ PersonStuckEventHandler
 	 * @param events
 	 * @param scenario must contain network and config
 	 */
-	public MarginalCongestionHandlerImplV6(EventsManager events, Scenario scenario) {
+	public CongestionHandlerImplV6(EventsManager events, Scenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 

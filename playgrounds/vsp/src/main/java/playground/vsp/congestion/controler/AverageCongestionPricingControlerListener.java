@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -43,14 +43,14 @@ import playground.vsp.congestion.handlers.TollHandler;
  *
  */
 
-public class AverageCostPricing implements StartupListener, AfterMobsimListener {
-	private static final Logger log = Logger.getLogger(AverageCostPricing.class);
+public class AverageCongestionPricingControlerListener implements StartupListener, AfterMobsimListener {
+	private static final Logger log = Logger.getLogger(AverageCongestionPricingControlerListener.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
-	private MarginalCongestionHandlerImplV3 congestionHandler;
+	private CongestionHandlerImplV3 congestionHandler;
 	
-	public AverageCostPricing(ScenarioImpl scenario, TollHandler tollHandler){
+	public AverageCongestionPricingControlerListener(ScenarioImpl scenario, TollHandler tollHandler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
 	}
@@ -59,7 +59,7 @@ public class AverageCostPricing implements StartupListener, AfterMobsimListener 
 	public void notifyStartup(StartupEvent event) {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
-		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
+		congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
 		
 		event.getControler().getEvents().addHandler(congestionHandler);		
 		event.getControler().getEvents().addHandler(tollHandler);

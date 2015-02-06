@@ -60,9 +60,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.CongestionHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV6;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -85,7 +85,7 @@ public class MarginalCongestionPricingTest {
 
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-		events.addHandler( new CongestionHandler() {
+		events.addHandler( new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				
@@ -98,7 +98,7 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		events.addHandler(new MarginalCongestionHandlerImplV6(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV6(events, (ScenarioImpl) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -188,7 +188,7 @@ public class MarginalCongestionPricingTest {
 
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-		events.addHandler( new CongestionHandler() {
+		events.addHandler( new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				
@@ -201,7 +201,7 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		events.addHandler(new MarginalCongestionHandlerImplV4(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV4(events, (ScenarioImpl) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -325,7 +325,7 @@ public class MarginalCongestionPricingTest {
 
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-		events.addHandler( new CongestionHandler() {
+		events.addHandler( new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				
@@ -338,8 +338,8 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();

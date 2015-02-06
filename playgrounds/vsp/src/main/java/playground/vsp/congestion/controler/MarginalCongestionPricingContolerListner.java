@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.congestion.analysis.ExtCostEventHandler;
 import playground.vsp.congestion.analysis.TripInfoWriter;
-import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -45,13 +45,13 @@ import playground.vsp.congestion.handlers.TollHandler;
  *
  */
 
-public class CongestionPricingContolerListner implements StartupListener, IterationEndsListener {
-	private final Logger log = Logger.getLogger(CongestionPricingContolerListner.class);
+public class MarginalCongestionPricingContolerListner implements StartupListener, IterationEndsListener {
+	private final Logger log = Logger.getLogger(MarginalCongestionPricingContolerListner.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
-	private MarginalCostPricingCarHandler pricingHandler;
+	private MarginalCongestionPricingHandler pricingHandler;
 	private ExtCostEventHandler extCostHandler;
 	
 	/**
@@ -59,7 +59,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 	 * @param tollHandler
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
-	public CongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
+	public MarginalCongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
 		this.scenario = (ScenarioImpl) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = congestionHandler;
@@ -70,7 +70,7 @@ public class CongestionPricingContolerListner implements StartupListener, Iterat
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		this.pricingHandler = new MarginalCostPricingCarHandler(eventsManager, this.scenario);
+		this.pricingHandler = new MarginalCongestionPricingHandler(eventsManager, this.scenario);
 		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
 		eventsManager.addHandler(this.congestionHandler);

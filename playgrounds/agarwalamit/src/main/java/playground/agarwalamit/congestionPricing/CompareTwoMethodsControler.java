@@ -25,9 +25,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
-import playground.vsp.congestion.controler.CongestionPricingContolerListner;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -73,7 +73,7 @@ public class CompareTwoMethodsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new CongestionPricingContolerListner((ScenarioImpl) controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListner((ScenarioImpl) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 		}
 		
 		if(newMethod) {
@@ -81,7 +81,7 @@ public class CompareTwoMethodsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new CongestionPricingContolerListner(controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListner(controler.getScenario(), tollHandler, new CongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
 		}
 
 		controler.setOverwriteFiles(true);

@@ -38,16 +38,16 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  * @author ikaddoura
  *
  */
-public class MarginalCostPricingCarHandler implements CongestionHandler {
+public class MarginalCongestionPricingHandler implements CongestionEventHandler {
 
-	private final static Logger log = Logger.getLogger(MarginalCostPricingCarHandler.class);
+	private final static Logger log = Logger.getLogger(MarginalCongestionPricingHandler.class);
 
 	private final EventsManager events;
 	private final ScenarioImpl scenario;
 	private final double vtts_car;
 	private double amountSum = 0.;
 
-	public MarginalCostPricingCarHandler(EventsManager eventsManager, ScenarioImpl scenario) {
+	public MarginalCongestionPricingHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();

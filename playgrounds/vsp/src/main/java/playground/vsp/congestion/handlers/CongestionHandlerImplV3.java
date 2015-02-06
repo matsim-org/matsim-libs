@@ -43,11 +43,11 @@ import playground.vsp.congestion.LinkCongestionInfo;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionHandlerImplV3 extends MarginalCongestionHandler implements ActivityEndEventHandler {
-	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerImplV3.class);
+public class CongestionHandlerImplV3 extends MarginalCongestionHandler implements ActivityEndEventHandler {
+	private final static Logger log = Logger.getLogger(CongestionHandlerImplV3.class);
 	private final Map<Id<Person>, Double> agentId2storageDelay = new HashMap<Id<Person>, Double>();
 	
-	public MarginalCongestionHandlerImplV3(EventsManager events, ScenarioImpl scenario) {
+	public CongestionHandlerImplV3(EventsManager events, ScenarioImpl scenario) {
 		super(events, scenario);
 	}
 	

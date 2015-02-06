@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.congestion.analysis.ExtCostEventHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
  * 
@@ -72,7 +72,7 @@ public class IKGISAnalyzerMain {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		// Compute marginal congestion events based on normal events file.
-		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) scenario1);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, (ScenarioImpl) scenario1);
 		events.addHandler(congestionHandler);
 		
 		// Analyze external cost per person based on marginal congestion events.

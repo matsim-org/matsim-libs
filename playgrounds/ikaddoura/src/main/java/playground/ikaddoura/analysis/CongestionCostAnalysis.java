@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
 import playground.vsp.congestion.analysis.ExtCostEventHandler;
 import playground.vsp.congestion.analysis.TripInfoWriter;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -109,7 +109,7 @@ public class CongestionCostAnalysis {
 //		EventWriterXML eventWriter = new EventWriterXML(outputDirectory + config.controler().getLastIteration() + ".events_ExternalCongestionCost_Offline.xml.gz");
 //		events.addHandler(eventWriter);
 		
-		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(events, scenario);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, scenario);
 		events.addHandler(congestionHandler);
 
 		TollHandler tollHandler = new TollHandler(scenario);

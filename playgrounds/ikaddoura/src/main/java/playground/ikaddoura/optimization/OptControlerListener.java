@@ -34,8 +34,8 @@ import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
 import playground.ikaddoura.optimization.users.ConstantFareHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
 /**
  * @author Ihab
@@ -94,10 +94,10 @@ public class OptControlerListener implements StartupListener {
 		
 		// car mode
 		if (this.calculate_carCongestionEffects) {
-			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV3(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new CongestionHandlerImplV3(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingCar) {
-			event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
 		}
 				
 		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));

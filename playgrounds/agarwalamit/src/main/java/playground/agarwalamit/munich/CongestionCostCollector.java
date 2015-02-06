@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.CongestionHandler;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 /**
  * @author amit
  */
 
-public class CongestionCostCollector implements CongestionHandler {
+public class CongestionCostCollector implements CongestionEventHandler {
 	private final static Logger log = Logger.getLogger(CongestionCostCollector.class);
 
 	private final ScenarioImpl scenario;

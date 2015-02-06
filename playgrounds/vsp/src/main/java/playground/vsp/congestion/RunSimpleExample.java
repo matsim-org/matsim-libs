@@ -31,8 +31,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.vsp.congestion.controler.CongestionPricingContolerListner;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -71,7 +71,7 @@ public class RunSimpleExample {
 
 		// Define the pricing approach and the congestion implementation.
 		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
-		controler.addControlerListener(new CongestionPricingContolerListner(controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListner(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);

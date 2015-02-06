@@ -27,10 +27,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
-import playground.vsp.congestion.controler.CongestionPricingContolerListner;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV6;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -80,7 +80,7 @@ public class PricingControler {
 		case "implV4":
 			{
 				controler.setTravelDisutilityFactory(fact);
-				controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV4(controler.getEvents(), sc)));
+				controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
 				Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 4.");
 			}
 			break;
@@ -88,7 +88,7 @@ public class PricingControler {
 		case "implV5":
 		{
 			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 5.");
 		}
 		break;
@@ -96,7 +96,7 @@ public class PricingControler {
 		case "implV6":
 		{
 			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV6(controler.getEvents(), sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 		}
 		break;

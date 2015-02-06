@@ -65,10 +65,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.CongestionHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV6;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -95,7 +95,7 @@ public class TestNetworkExperiment {
 		sc.getConfig().controler().setWriteEventsInterval(1);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		events.addHandler(new CongestionHandlerImplV4(events, sc));
 		EventWriterXML writer = new EventWriterXML(outputDir+"/events.xml.gz");
 		events.addHandler(writer);
 
@@ -160,7 +160,7 @@ public class TestNetworkExperiment {
 
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-		events.addHandler( new CongestionHandler() {
+		events.addHandler( new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				
@@ -171,10 +171,10 @@ public class TestNetworkExperiment {
 				congestionEvents.add(event);
 			}
 		});
-		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl)sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new MarginalCongestionHandlerImplV4(events, sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v5")) events.addHandler(new MarginalCongestionHandlerImplV5(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new MarginalCongestionHandlerImplV6(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events, false);
 		sim.run();

@@ -29,7 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
  * @author ikaddoura
@@ -39,7 +39,7 @@ import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
 public class CostFunctionsControlerListener implements StartupListener {
 
 	private final ScenarioImpl scenario;
-	private MarginalCongestionHandlerImplV3 congestionHandler;
+	private CongestionHandlerImplV3 congestionHandler;
 
 	public CostFunctionsControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
@@ -50,11 +50,11 @@ public class CostFunctionsControlerListener implements StartupListener {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		this.congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
+		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
 		event.getControler().getEvents().addHandler(congestionHandler);		
 	}
 
-	public MarginalCongestionHandlerImplV3 getCongestionHandler() {
+	public CongestionHandlerImplV3 getCongestionHandler() {
 		return congestionHandler;
 	}
 }

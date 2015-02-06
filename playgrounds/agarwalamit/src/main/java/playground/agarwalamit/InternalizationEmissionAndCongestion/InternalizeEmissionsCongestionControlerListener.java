@@ -39,8 +39,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionInternalizationHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
-import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -63,7 +63,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
-	private MarginalCongestionHandlerImplV3 congestionHandler;
+	private CongestionHandlerImplV3 congestionHandler;
 
 
 	public InternalizeEmissionsCongestionControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule,ScenarioImpl scenario, TollHandler tollHandler) {
@@ -78,13 +78,13 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 		this.controler = event.getControler();
 
 		EventsManager eventsManager = this.controler.getEvents();
-		this.congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, this.scenario);
+		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, this.scenario);
 
 		eventsManager.addHandler(this.emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(this.emissionModule.getColdEmissionHandler());
 
 		eventsManager.addHandler(this.congestionHandler);
-		eventsManager.addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
+		eventsManager.addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
 		eventsManager.addHandler(this.tollHandler);
 
 		this.firstIt = this.controler.getConfig().controler().getFirstIteration();

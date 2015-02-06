@@ -37,7 +37,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -184,7 +184,7 @@ public class TestingPricing4SamplePopulation {
 
 	private static double getDelaysFromEventsDefaultHandler(String outputDir, ScenarioImpl sc){
 		EventsManager eventManager = EventsUtils.createEventsManager();
-		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
+		CongestionHandlerImplV3 congestionHandlerImplV3= new CongestionHandlerImplV3(eventManager, sc);
 
 		eventManager.addHandler(congestionHandlerImplV3);
 

@@ -35,7 +35,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
  * @author amit
@@ -104,7 +104,7 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 	
 	public void checkTotalDelayUsingAlternativeMethod(){
 		EventsManager em = EventsUtils.createEventsManager();
-		MarginalCongestionHandlerImplV3 implV3 = new MarginalCongestionHandlerImplV3(em, (ScenarioImpl) this.scenario);
+		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, (ScenarioImpl) this.scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);

@@ -38,8 +38,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.handlers.CongestionHandler;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionEventHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
  * @author ikaddoura
@@ -59,11 +59,11 @@ public class MarginalCongestionHandlerV3Test {
 		Controler controler = new Controler(configFile);
 		
 		EventsManager events = controler.getEvents();
-		events.addHandler(new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario()));
+		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario()));
 				
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 		
-		events.addHandler( new CongestionHandler() {
+		events.addHandler( new CongestionEventHandler() {
 
 			@Override
 			public void reset(int iteration) {				

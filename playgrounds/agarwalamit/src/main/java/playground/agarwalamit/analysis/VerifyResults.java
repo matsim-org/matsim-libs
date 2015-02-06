@@ -33,7 +33,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
-import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
  * @author amit
@@ -105,7 +105,7 @@ public class VerifyResults {
 
 	public static void calculateDelaysCosts(String eventsFile,Scenario scenario, String runNr){
 		EventsManager em = EventsUtils.createEventsManager();
-		MarginalCongestionHandlerImplV3 congestionHandler = new MarginalCongestionHandlerImplV3(em, (ScenarioImpl) scenario);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(em, (ScenarioImpl) scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(congestionHandler);
 		eventsReader.readFile(eventsFile);

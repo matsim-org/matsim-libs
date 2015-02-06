@@ -47,7 +47,7 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  * @author ikaddoura
  *
  */
-public class TollHandler implements CongestionHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
+public class TollHandler implements CongestionEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 	private static final Logger log = Logger.getLogger(TollHandler.class);
 	private double timeBinSize = 900.;
 	
