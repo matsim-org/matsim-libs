@@ -42,35 +42,35 @@ public class PSimPlanStrategyTranslationAndRegistration {
 	private final ArrayList<String> compatibleStrategies = new ArrayList<>();
 
 	public PSimPlanStrategyTranslationAndRegistration(PSimControler controler) {
-		String strategyName = DefaultPlanStrategiesModule.Selector.BestScore
+		String strategyName = DefaultPlanStrategiesModule.DefaultSelectors.BestScore
 				.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimBestScorePlanStrategyFactory());
-		strategyName = DefaultPlanStrategiesModule.Selector.KeepLastSelected
+		strategyName = DefaultPlanStrategiesModule.DefaultSelectors.KeepLastSelected
 				.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimKeepLastSelectedPlanStrategyFactory());
-		strategyName = DefaultPlanStrategiesModule.Selector.SelectExpBeta.toString();
+		strategyName = DefaultPlanStrategiesModule.DefaultSelectors.SelectExpBeta.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectExpBetaPlanStrategyFactory());
-		strategyName = DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString();
+		strategyName = DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimChangeExpBetaPlanStrategyFactory());
-		strategyName = DefaultPlanStrategiesModule.Selector.SelectRandom.toString();
+		strategyName = DefaultPlanStrategiesModule.DefaultSelectors.SelectRandom.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectRandomStrategyFactory());
-		strategyName = DefaultPlanStrategiesModule.Selector.SelectPathSizeLogit
+		strategyName = DefaultPlanStrategiesModule.DefaultSelectors.SelectPathSizeLogit
 				.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimSelectPathSizeLogitStrategyFactory());
 
-		strategyName = DefaultPlanStrategiesModule.Names.ReRoute.toString();
+		strategyName = DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
 				new PSimReRoutePlanStrategyFactory(controler));

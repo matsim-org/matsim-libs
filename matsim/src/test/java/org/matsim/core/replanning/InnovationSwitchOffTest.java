@@ -65,25 +65,25 @@ public class InnovationSwitchOffTest {
 
 		{
 			StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class)) ;
-			settings.setStrategyName( DefaultPlanStrategiesModule.Selector.BestScore.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.DefaultSelectors.BestScore.toString() ) ;
 			settings.setWeight(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(2, StrategySettings.class)) ;
-			settings.setStrategyName( DefaultPlanStrategiesModule.Selector.ChangeExpBeta.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString() ) ;
 			settings.setWeight(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(3, StrategySettings.class)) ;
-			settings.setStrategyName( DefaultPlanStrategiesModule.Names.TimeAllocationMutator.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator.toString() ) ;
 			settings.setWeight(0.1) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
 			StrategySettings settings = new StrategySettings(Id.create(4, StrategySettings.class)) ;
-			settings.setStrategyName( DefaultPlanStrategiesModule.Names.ReRoute.toString() ) ;
+			settings.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.toString() ) ;
 			settings.setWeight(0.1) ;
 			settings.setDisableAfter(11) ;
 			config.strategy().addStrategySettings(settings) ;

@@ -45,7 +45,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("car");
 			changeExpBetaStrategySettings.setWeight(0.7);
@@ -55,7 +55,7 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("car");
 			timeStrategySettings.setWeight(0.15);
@@ -74,7 +74,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("commercial");
 			changeExpBetaStrategySettings.setWeight(0.80);
@@ -94,7 +94,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("bus");
 			changeExpBetaStrategySettings.setWeight(0.7);
@@ -104,7 +104,7 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("bus");
 			timeStrategySettings.setWeight(0.15);
@@ -122,7 +122,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("taxi");
 			changeExpBetaStrategySettings.setWeight(0.7);
@@ -132,7 +132,7 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("taxi");
 			timeStrategySettings.setWeight(0.15);
@@ -150,7 +150,7 @@ final class GautengUtils {
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			changeExpBetaStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Selector.ChangeExpBeta
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta
 					.toString());
 			changeExpBetaStrategySettings.setSubpopulation("ext");
 			changeExpBetaStrategySettings.setWeight(0.7);
@@ -160,7 +160,7 @@ final class GautengUtils {
 			StrategySettings timeStrategySettings = new StrategySettings(
 					ConfigUtils.createAvailableStrategyId(config));
 			timeStrategySettings
-			.setStrategyName(DefaultPlanStrategiesModule.Names.TimeAllocationMutator
+			.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator
 					.toString());
 			timeStrategySettings.setSubpopulation("ext");
 			timeStrategySettings.setWeight(0.15);
