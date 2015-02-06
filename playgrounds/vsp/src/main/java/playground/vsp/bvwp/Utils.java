@@ -424,7 +424,7 @@ class Utils {
 		            //verlagertNMAb/Auf: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
 				
 					line.add("Verlagerte Fahrleistung:");
-					line.add(Math.round(verlagertNMAuf.get(mode)[2])+" PKW-KM/Jahr");
+					line.add(Math.round(verlagertNMAuf.get(mode)[2])+" Pkw-km");
 					totalHtml.tableRowFromList(line,false);
 					line.clear();
 	                
@@ -440,12 +440,12 @@ class Utils {
 	                line.clear();
 										
 					line.add("Verlagerte Fahrzeit:");
-					line.add(Math.round(verlagertNMAuf.get(mode)[4])+" PKW-h/Jahr");
+					line.add(Math.round(verlagertNMAuf.get(mode)[4])+" Pkw-h");
 					totalHtml.tableRowFromList(line,false);
 					line.clear();
 					
 					line.add("Mittlere Nutzerkosten des verlagerten Verkehrs:");
-                    line.add(Math.round(Math.abs(verlagertNMAuf.get(mode)[5]*100/verlagertNMAuf.get(mode)[2]))+" c/PKW-km");
+                    line.add(Math.round(Math.abs(verlagertNMAuf.get(mode)[5]*100/verlagertNMAuf.get(mode)[2]))+" c/Pkw-km");
                     totalHtml.tableRowFromList(line,false);
                     line.clear();
                     
@@ -547,7 +547,7 @@ class Utils {
                 //induziertNM: 0 - personen 1- personenKM 2 - pkw-KM 3 - personen-h 4 - pkw-h 5 - nutzerkosten  
 				
 			    line.add("Zus&auml;tzliche Fahrten des induzierten Verkehrs:");
-	            line.add(Math.round(induziertNM[0])+" <b>Personen</b>/Jahr");
+	            line.add(Math.round(induziertNM[0])+" Personen");
 	            totalHtml.tableRowFromList(line,false);
 	            line.clear();
 				
@@ -555,7 +555,7 @@ class Utils {
 	            
 	            line.add("Zus&auml;tzliche Fahrten des induzierten Verkehrs:");
 	            double pkwf = induziertNM[0]/bsg ;
-                line.add(Math.round(pkwf)+" <b>PKW</b>/Jahr");
+                line.add(Math.round(pkwf)+" Pkw");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
 	            
@@ -566,12 +566,12 @@ class Utils {
                 
 	            
 			    line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[2])+" <b>PKW</b>-KM/Jahr");
+                line.add(Math.round(induziertNM[2])+" Pkw-km");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
                 
                 line.add("Zus&auml;tzliche Fahrleistung des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[1])+" <b>Personen</b>-KM/Jahr");
+                line.add(Math.round(induziertNM[1])+" Personen-km");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
                            
@@ -582,12 +582,12 @@ class Utils {
                 line.clear();
                                     
                 line.add("Zus&auml;tzliche Fahrzeit des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[4])+" PKW-h/Jahr");
+                line.add(Math.round(induziertNM[4])+" Pkw-h");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
                 
                 line.add("Mittlere Nutzerkosten des induzierten Verkehrs:");
-                line.add(Math.round(induziertNM[5]*100/induziertNM[2])+" c/PKW-km");
+                line.add(Math.round(induziertNM[5]*100/induziertNM[2])+" c/Pkw-km");
                 totalHtml.tableRowFromList(line,false);
                 line.clear();
 				
