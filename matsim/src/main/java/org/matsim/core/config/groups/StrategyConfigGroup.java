@@ -29,6 +29,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemovers;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelectors;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategies;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -78,8 +80,20 @@ public class StrategyConfigGroup extends ConfigGroup {
 			Map<String,String> map = super.getComments();
 
 			// put comments only for the first strategy to improve readability
+			// I think that the above comment is a todo, not a description of the code status. kai, feb'15
+			
+			StringBuilder sels = new StringBuilder() ;
+			for ( DefaultSelectors sel : DefaultSelectors.values() ) {
+				sels.append( sel.toString() + " " ) ;
+			}
+			
+			StringBuilder strats = new StringBuilder() ;
+			for ( DefaultStrategies strat : DefaultStrategies.values() ) {
+				strats.append( strat.toString() + " ") ;
+			}
+			
 			map.put( "strategyName",
-					"name of strategy");
+					"name of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );
 			map.put( "weight",
 					"weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight");
 			map.put( "disableAfterIteration",
