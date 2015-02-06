@@ -117,18 +117,18 @@ public class RunNationalFreight {
 		
 			/* Generic strategy */
 		StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpBetaStrategySettings.setWeight(0.8);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 			/* Subpopulation strategy */
 		StrategySettings commercialStrategy = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		commercialStrategy.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		commercialStrategy.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		commercialStrategy.setWeight(0.85);
 		commercialStrategy.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialStrategy);
 			/* Subpopulation ReRoute */
 		StrategySettings commercialReRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		commercialReRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.name());
+		commercialReRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		commercialReRoute.setWeight(0.15);
 		commercialReRoute.setSubpopulation("commercial");
 		config.strategy().addStrategySettings(commercialReRoute);

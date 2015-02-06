@@ -36,41 +36,43 @@ import javax.inject.Provider;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
 	
-	public static enum DefaultPlansRemovers { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval, 
-		PathSizeLogitSelectorForRemoval } ;
+	public static enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval, 
+		PathSizeLogitSelectorForRemoval }
+
+	public static final String Selector = null; ;
 
     @Override
     public void install() {
-        addPlanSelectorForRemovalBinding(DefaultPlansRemovers.WorstPlanSelector.toString()).to(WorstPlanForRemovalSelector.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemovers.SelectRandom.toString()).to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
-        addPlanSelectorForRemovalBinding(DefaultPlansRemovers.SelectExpBetaForRemoval.toString()).toProvider(ExpBetaPlanSelectorForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemovers.ChangeExpBetaForRemoval.toString()).toProvider(ExpBetaPlanChangerForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemovers.PathSizeLogitSelectorForRemoval.toString()).toProvider(PathSizeLogitSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding(DefaultPlansRemover.WorstPlanSelector.toString()).to(WorstPlanForRemovalSelector.class);
+        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectRandom.toString()).to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
+        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectExpBetaForRemoval.toString()).toProvider(ExpBetaPlanSelectorForRemoval.class);
+        addPlanSelectorForRemovalBinding(DefaultPlansRemover.ChangeExpBetaForRemoval.toString()).toProvider(ExpBetaPlanChangerForRemoval.class);
+        addPlanSelectorForRemovalBinding(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString()).toProvider(PathSizeLogitSelectorForRemoval.class);
 
         // strategy packages that only select:
-		addPlanStrategyBindingToFactory(DefaultSelectors.KeepLastSelected.toString(), new KeepLastSelectedPlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultSelectors.BestScore.toString(), new SelectBestPlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultSelectors.SelectExpBeta.toString(), new SelectExpBetaPlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultSelectors.ChangeExpBeta.toString(), new ChangeExpBetaPlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultSelectors.SelectRandom.toString(), new SelectRandomStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultSelectors.SelectPathSizeLogit.toString(), new SelectPathSizeLogitStrategyFactory());
+		addPlanStrategyBindingToFactory(DefaultSelector.KeepLastSelected.toString(), new KeepLastSelectedPlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultSelector.BestScore.toString(), new SelectBestPlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultSelector.SelectExpBeta.toString(), new SelectExpBetaPlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultSelector.ChangeExpBeta.toString(), new ChangeExpBetaPlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultSelector.SelectRandom.toString(), new SelectRandomStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultSelector.SelectPathSizeLogit.toString(), new SelectPathSizeLogitStrategyFactory());
 
         // strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
         // at least once).
-        addPlanStrategyBindingToFactory(DefaultStrategies.ReRoute.toString(), new ReRoutePlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.TimeAllocationMutator.toString(), new TimeAllocationMutatorPlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.TimeAllocationMutator_ReRoute.toString(), new TimeAllocationMutatorReRoutePlanStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.ChangeSingleLegMode.toString(), new ChangeSingleLegModeStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.ChangeSingleTripMode.toString(), new ChangeSingleTripModeStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.SubtourModeChoice.toString(), new SubtourModeChoiceStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.ChangeTripMode.toString(), new ChangeTripModeStrategyFactory());
-        addPlanStrategyBindingToFactory(DefaultStrategies.TripSubtourModeChoice.toString(), new TripSubtourModeChoiceStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.ReRoute.toString(), new ReRoutePlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.TimeAllocationMutator.toString(), new TimeAllocationMutatorPlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.TimeAllocationMutator_ReRoute.toString(), new TimeAllocationMutatorReRoutePlanStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeSingleLegMode.toString(), new ChangeSingleLegModeStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeSingleTripMode.toString(), new ChangeSingleTripModeStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.SubtourModeChoice.toString(), new SubtourModeChoiceStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeTripMode.toString(), new ChangeTripModeStrategyFactory());
+        addPlanStrategyBindingToFactory(DefaultStrategy.TripSubtourModeChoice.toString(), new TripSubtourModeChoiceStrategyFactory());
     }
 
-    public static enum DefaultSelectors { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
+    public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
 
-    public static enum DefaultStrategies { ReRoute, TimeAllocationMutator, ChangeLegMode, TimeAllocationMutator_ReRoute, 
+    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, ChangeLegMode, TimeAllocationMutator_ReRoute, 
     	ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, TripSubtourModeChoice }
     
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 

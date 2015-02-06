@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.*;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelectors;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.*;
 import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGroup;
@@ -93,7 +93,7 @@ public final class StrategyManagerPopsConfigLoader {
 				// --- begin new ---
 				if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
 					boolean innovative = true ;
-					for ( DefaultSelectors sel : DefaultPlanStrategiesModule.DefaultSelectors.values() ) {
+					for ( DefaultSelector sel : DefaultPlanStrategiesModule.DefaultSelector.values() ) {
 						System.out.flush();
 						if ( moduleName.equals( sel.toString() ) ) {
 							innovative = false ;

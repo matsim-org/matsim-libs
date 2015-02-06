@@ -183,7 +183,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestM4UConfig{
 		// strategy module
 		ConfigGroup strategyModule = config.createModule(strategyModuleName);
 		strategyModule.addParam(startegyModule4ProbabilityPramName, startegyModuleProbabilityValue + "");
-		strategyModule.addParam(startegyModule4ParamName, DefaultPlanStrategiesModule.DefaultStrategies.ChangeLegMode.toString() );
+		strategyModule.addParam(startegyModule4ParamName, DefaultPlanStrategiesModule.DefaultStrategy.ChangeLegMode.toString() );
 		
 		// generating already existing MATSim4UrbanSim entries in external MATsim config
 		

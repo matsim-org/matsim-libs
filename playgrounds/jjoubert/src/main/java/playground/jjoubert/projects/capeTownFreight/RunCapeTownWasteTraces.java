@@ -44,7 +44,7 @@ public class RunCapeTownWasteTraces {
 
 		/* Generic strategy */
 		StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpBetaStrategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 

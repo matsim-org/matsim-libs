@@ -149,7 +149,7 @@ public class GfipQueuePassingControler extends Controler{
 		/* Subpopulations */
 		StrategySettings best = new StrategySettings();
 		best.setWeight(1.0);
-		best.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		best.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		config.strategy().addStrategySettings(best);
 		
 		/* Set input files */

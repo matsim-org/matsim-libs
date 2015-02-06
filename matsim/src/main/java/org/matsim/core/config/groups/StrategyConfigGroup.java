@@ -28,9 +28,9 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemovers;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelectors;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategies;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemover;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -83,12 +83,12 @@ public class StrategyConfigGroup extends ConfigGroup {
 			// I think that the above comment is a todo, not a description of the code status. kai, feb'15
 			
 			StringBuilder sels = new StringBuilder() ;
-			for ( DefaultSelectors sel : DefaultSelectors.values() ) {
+			for ( DefaultSelector sel : DefaultSelector.values() ) {
 				sels.append( sel.toString() + " " ) ;
 			}
 			
 			StringBuilder strats = new StringBuilder() ;
-			for ( DefaultStrategies strat : DefaultStrategies.values() ) {
+			for ( DefaultStrategy strat : DefaultStrategy.values() ) {
 				strats.append( strat.toString() + " ") ;
 			}
 			
@@ -247,7 +247,7 @@ public class StrategyConfigGroup extends ConfigGroup {
 		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 
 		StringBuilder strb = new StringBuilder() ;
-		for ( DefaultPlansRemovers name : DefaultPlansRemovers.values() ) {
+		for ( DefaultPlansRemover name : DefaultPlansRemover.values() ) {
 			strb.append( name.toString() + " " ) ;
 		}
 		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  "

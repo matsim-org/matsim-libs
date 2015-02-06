@@ -104,13 +104,13 @@ public class RunSubpopulationsExample {
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			timeStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator.toString());
+			timeStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
 			timeStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			timeStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
@@ -119,13 +119,13 @@ public class RunSubpopulationsExample {
 			/* Set up the `reroute' subpopulation to consider rerouting as a 
 			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
 			StrategySettings rerouteStrategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-			rerouteStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.toString());
+			rerouteStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			rerouteStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(rerouteStrategySettings);
 
 			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);

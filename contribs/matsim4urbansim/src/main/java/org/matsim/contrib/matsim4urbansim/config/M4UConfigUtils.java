@@ -349,19 +349,19 @@ public class M4UConfigUtils {
 		config.strategy().setMaxAgentPlanMemorySize( 5 );
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
-		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpBeta.setWeight( 0.8 ) ;
 		config.strategy().addStrategySettings(changeExpBeta);
 
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
-		timeAlocationMutator.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator.toString());
+		timeAlocationMutator.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
 		timeAlocationMutator.setWeight( 0.1 ); 
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		config.timeAllocationMutator().setMutationRange(7200.) ;
 
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(Id.create(3, StrategySettings.class));
-		reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.toString());
+		reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		reroute.setWeight( 0.1 );
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);

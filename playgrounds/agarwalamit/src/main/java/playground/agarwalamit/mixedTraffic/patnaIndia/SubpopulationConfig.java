@@ -85,7 +85,7 @@ public class SubpopulationConfig {
 
 		for(String subPop : subPopulations){
 			StrategySettings timeAllocationMutator	= new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			timeAllocationMutator.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.TimeAllocationMutator.name());
+			timeAllocationMutator.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.name());
 			timeAllocationMutator.setWeight(0.05);
 
 			StrategySettings expChangeBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
@@ -93,7 +93,7 @@ public class SubpopulationConfig {
 			expChangeBeta.setWeight(0.9);
 
 			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.name());
+			reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 			reRoute.setWeight(0.1);
 
 			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));

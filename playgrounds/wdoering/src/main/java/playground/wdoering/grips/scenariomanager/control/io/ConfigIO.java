@@ -119,11 +119,11 @@ public class ConfigIO
 		
 		//settings to activate pt simulation
 		config.strategy().addParam("maxAgentPlanMemorySize", "3");
-		config.strategy().addParam("Module_1", DefaultPlanStrategiesModule.DefaultStrategies.ReRoute.toString());
+		config.strategy().addParam("Module_1", DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		config.strategy().addParam("ModuleProbability_1", "0.1");
-		config.strategy().addParam("Module_2", DefaultPlanStrategiesModule.DefaultSelectors.ChangeExpBeta.toString());
+		config.strategy().addParam("Module_2", DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		config.strategy().addParam("ModuleProbability_2", "0.8");
-		config.strategy().addParam("Module_3", DefaultPlanStrategiesModule.DefaultStrategies.ChangeLegMode.toString());
+		config.strategy().addParam("Module_3", DefaultPlanStrategiesModule.DefaultStrategy.ChangeLegMode.toString());
 		config.strategy().addParam("ModuleProbability_3", "0.4");
 		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
 		
