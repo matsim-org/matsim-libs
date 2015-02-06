@@ -30,8 +30,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.noise.NoiseTollHandler;
+import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author ikaddoura

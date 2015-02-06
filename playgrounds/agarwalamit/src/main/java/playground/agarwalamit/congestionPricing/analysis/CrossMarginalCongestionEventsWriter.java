@@ -28,9 +28,9 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.agarwalamit.congestionPricing.MarginalCongestionHandlerImplV4;
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
-import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
 
 /**
  * Basically the idea is to read the events file from implementation A and then write congestion events of implementation B.

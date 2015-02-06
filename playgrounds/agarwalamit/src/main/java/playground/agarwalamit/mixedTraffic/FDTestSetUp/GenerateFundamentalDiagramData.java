@@ -116,12 +116,12 @@ public class GenerateFundamentalDiagramData {
 
 		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
 
-		String OUTPUT_FOLDER ="/carBikePassingRate/1c8b";
+		String OUTPUT_FOLDER ="/carBikePassingRate/1c4b_6";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
 		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
 
 		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1.,2.};
+		Double [] modalSplit = {1.,1.};
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -133,7 +133,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(args[0]);
 		//		generateFDData.setUseHoles(false);
-//		generateFDData.setReduceDataPointsByFactor(10);
+		generateFDData.setReduceDataPointsByFactor(10);
 		//		generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
 		//		generateFDData.setIsPlottingDistribution(false);

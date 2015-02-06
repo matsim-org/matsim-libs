@@ -48,7 +48,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
+import playground.vsp.congestion.events.MarginalCongestionEvent;
 
 /**
  * This handler calculates car delays (due to flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.

@@ -32,9 +32,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.ikaddoura.internalizationCar.MarginalCostPricing;
-import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
-import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.ikaddoura.noise.ExtCostEventHandlerNoise;
 import playground.ikaddoura.noise.NoiseCostPricingHandler;
@@ -43,6 +40,10 @@ import playground.ikaddoura.noise.NoiseInternalizationControlerListenerWithoutPr
 import playground.ikaddoura.noise.NoiseTollDisutilityCalculatorFactory;
 import playground.ikaddoura.noise.NoiseTollHandler;
 import playground.ikaddoura.noise.SpatialInfo;
+import playground.vsp.congestion.controler.CongestionPricingContolerListner;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author ikaddoura
@@ -95,7 +96,7 @@ public class CongestionNoisePricingControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
+			controler.addControlerListener(new CongestionPricingContolerListner( controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
 			controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing((ScenarioImpl) controler.getScenario(), noiseTollHandler, spatialInfo, extCostEventHandlerNoise));
 			
 		} else if(runId.equalsIgnoreCase("noise")) {
@@ -134,7 +135,7 @@ public class CongestionNoisePricingControler {
 			
 			ExtCostEventHandlerNoise extCostEventHandlerNoise = new ExtCostEventHandlerNoise(controler.getScenario(), false);
 			
-			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), congestionTollHandler ));
+			controler.addControlerListener(new CongestionPricingContolerListner( controler.getScenario(), congestionTollHandler, new MarginalCongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario())  ));
 			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, pricingHandler , spatialInfo , extCostEventHandlerNoise ));
 			
 		} else if(runId.equalsIgnoreCase("baseCase")) {

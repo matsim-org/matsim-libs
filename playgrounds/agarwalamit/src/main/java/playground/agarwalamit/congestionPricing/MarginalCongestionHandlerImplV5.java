@@ -41,14 +41,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
+import playground.vsp.congestion.LinkCongestionInfoExtended;
+import playground.vsp.congestion.events.MarginalCongestionEvent;
 
 /**
  * @author amit
  * Simplest version of congestion handler, if a person is delayed, it will charge everything to the person who just left before.
  */
 
-public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, CongestionPricingHandler {
+public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	public static final Logger  log = Logger.getLogger(MarginalCongestionHandlerImplV5.class);
 
@@ -181,7 +182,6 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 		return roundingErrors;
 	}
 
-	@Override
 	public void writeCongestionStats(String fileName) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
@@ -198,5 +198,4 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 		}
 		log.info("Congestion statistics written to " + fileName);	
 	}
-
 }

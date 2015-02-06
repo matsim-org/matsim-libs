@@ -30,8 +30,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
 
 /**
  * @author amit

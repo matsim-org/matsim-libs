@@ -39,9 +39,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionInternalizationHandler;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
-import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
-import playground.ikaddoura.internalizationCar.TollHandler;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
+import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author amit after Benjamin and Ihab

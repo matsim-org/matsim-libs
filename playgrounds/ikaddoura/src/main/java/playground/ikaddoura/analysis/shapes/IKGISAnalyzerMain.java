@@ -34,8 +34,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.analysis.ExtCostEventHandler;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
 
 /**
  * 

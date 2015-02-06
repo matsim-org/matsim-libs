@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import playground.benjamin.internalization.EmissionCostModule;
-import playground.ikaddoura.internalizationCar.TollHandler;
+import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author amit after Banjamin and Ihab

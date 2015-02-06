@@ -43,7 +43,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
+import playground.vsp.congestion.analysis.ExtCostEventHandler;
+import playground.vsp.congestion.events.MarginalCongestionEventsReader;
 
 /**
  * @author ikaddoura , lkroeger

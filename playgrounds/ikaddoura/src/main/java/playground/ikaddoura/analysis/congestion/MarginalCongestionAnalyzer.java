@@ -23,14 +23,14 @@
  */
 package playground.ikaddoura.analysis.congestion;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
-import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
+import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.handlers.CongestionHandler;
 
 /**
  * @author Ihab
  *
  */
-public class MarginalCongestionAnalyzer implements  MarginalCongestionEventHandler {
+public class MarginalCongestionAnalyzer implements  CongestionHandler {
 
 	private double delaySum = 0;
 	

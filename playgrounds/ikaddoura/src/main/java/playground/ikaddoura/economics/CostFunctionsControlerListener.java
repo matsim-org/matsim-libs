@@ -29,7 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
 
 /**
  * @author ikaddoura

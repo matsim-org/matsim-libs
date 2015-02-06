@@ -25,19 +25,17 @@
 package playground.ikaddoura.optimization;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-
 import org.matsim.core.controler.events.StartupEvent;
-
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV2;
-import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
 import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
-import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
+import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
 import playground.ikaddoura.optimization.users.ConstantFareHandler;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCostPricingCarHandler;
 
 /**
  * @author Ihab
@@ -96,7 +94,7 @@ public class OptControlerListener implements StartupListener {
 		
 		// car mode
 		if (this.calculate_carCongestionEffects) {
-			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV2(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerImplV3(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingCar) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));

@@ -40,12 +40,14 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-import playground.ikaddoura.internalizationCar.MarginalCostPricing;
-import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
-import playground.ikaddoura.internalizationCar.TollHandler;
+
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
+import playground.vsp.congestion.controler.CongestionPricingContolerListner;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -115,7 +117,7 @@ public class EconomicsControler {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		controler.addControlerListener(new CongestionPricingContolerListner( controler.getScenario(), tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
 		
 		controler.setOverwriteFiles(true);
         controler.getConfig().controler().setCreateGraphs(true);

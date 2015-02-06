@@ -64,9 +64,11 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
-import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.handlers.CongestionHandler;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -158,7 +160,7 @@ public class TestNetworkExperiment {
 
 		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
 
-		events.addHandler( new MarginalCongestionEventHandler() {
+		events.addHandler( new CongestionHandler() {
 
 			@Override
 			public void reset(int iteration) {				

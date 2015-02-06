@@ -44,6 +44,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
 		this.bikesPassedByEachCarPerKm = new ArrayList<Double>();
+		this.bikesPassedByAllCarPerKm = new ArrayList<Double>();
 		this.carsPerKm = new ArrayList<Double>();
 	}
 
@@ -51,6 +52,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private Map<Id<Person>, String> personId2LegMode;
 
 	private List<Double> bikesPassedByEachCarPerKm;
+	private List<Double> bikesPassedByAllCarPerKm;
 	private List<Double> carsPerKm;
 
 	private final static Id<Link> trackStartLink = Id.createLinkId(0);
@@ -58,12 +60,13 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private boolean firstBikeLeavingTrack = false;
 	private Id<Person> firstCarId ;
 	private double noOfCycles = 0;
-
+	
 	@Override
 	public void reset(int iteration) {
 		this.personId2LinkEnterTime.clear();
 		this.personId2LegMode.clear();
 		this.bikesPassedByEachCarPerKm.clear();
+		this.bikesPassedByAllCarPerKm.clear();
 		this.carsPerKm.clear();
 	}
 
@@ -75,6 +78,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		}
 	}
 
+	private List<Double> tempAvgBikePassedPerCar  = new ArrayList<Double>();
 	@Override 
 	public void handleEvent(LinkLeaveEvent event){
 		Id<Person> personId = Id.createPersonId(event.getVehicleId());
@@ -93,12 +97,27 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 				double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(personId);
 				double noOfBikesPerCarPerKm = numberOfBicyclesOvertaken *1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
 				this.bikesPassedByEachCarPerKm.add(noOfBikesPerCarPerKm);
+				this.tempAvgBikePassedPerCar.add(noOfBikesPerCarPerKm);
 
-				if(firstCarId.equals(personId)) noOfCycles ++;
+				if(firstCarId.equals(personId)) {
+					noOfCycles ++;
+					double noOfPassedBikesByAllCars =0;
+//					for (double d : this.bikesPassedByEachCarPerKm){
+//						noOfPassedBikesByAllCars += d;
+//					}
+//					noOfPassedBikesByAllCars = noOfPassedBikesByAllCars/noOfCycles;
+					for (double d : this.tempAvgBikePassedPerCar){
+						noOfPassedBikesByAllCars += d;
+					}
+					double noOfPassedBikesByAllCarsPerKm = noOfPassedBikesByAllCars*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
+					this.bikesPassedByAllCarPerKm.add(noOfPassedBikesByAllCarsPerKm);
+					this.tempAvgBikePassedPerCar = new ArrayList<Double>();
+				}
 				
 				double noOfCars = getCars();
 				double noOfCarsPerkm = noOfCars*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
 				this.carsPerKm.add(noOfCarsPerkm);
+//				this.bikesPassedByAllCarPerKm.add(noOfBikesPerCarPerKm*noOfCarsPerkm);
 			}
 
 			this.personId2LinkEnterTime.remove(personId);
@@ -143,10 +162,15 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 
 	public double getTotalBikesPassedByAllCarsPerKm(){
 		double sum =0;
-		for(double d:this.bikesPassedByEachCarPerKm){
+//		for(double d:this.bikesPassedByEachCarPerKm){
+//			sum += d;
+//		}
+//		return (sum/noOfCycles)*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
+		
+		for(double d:this.bikesPassedByAllCarPerKm){
 			sum += d;
 		}
-		return (sum/noOfCycles)*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
+		return sum/bikesPassedByAllCarPerKm.size();
 	}
 	
 	public double getNoOfCarsPerKm(){

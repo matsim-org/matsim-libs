@@ -34,11 +34,11 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.extCost.ExtCostEventHandler;
-import playground.ikaddoura.analysis.extCost.TripInfoWriter;
 import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
-import playground.ikaddoura.internalizationCar.TollHandler;
+import playground.vsp.congestion.analysis.ExtCostEventHandler;
+import playground.vsp.congestion.analysis.TripInfoWriter;
+import playground.vsp.congestion.handlers.MarginalCongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * (1) Computes marginal congestion events based on a standard events file.
