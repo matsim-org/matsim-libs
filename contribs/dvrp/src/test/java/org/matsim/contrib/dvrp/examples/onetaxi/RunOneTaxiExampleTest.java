@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.junit.Test;
 
 
-public class OneTaxiLauncherTest
+public class RunOneTaxiExampleTest
 {
     @Test
     public void testGo()
