@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
@@ -117,7 +117,7 @@ public class EconomicsControler {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new MarginalCongestionPricingContolerListner( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
 		
 		controler.setOverwriteFiles(true);
         controler.getConfig().controler().setCreateGraphs(true);

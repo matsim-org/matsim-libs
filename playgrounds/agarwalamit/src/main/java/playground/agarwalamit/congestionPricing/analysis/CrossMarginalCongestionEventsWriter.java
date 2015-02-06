@@ -28,7 +28,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 
@@ -82,7 +82,7 @@ public class CrossMarginalCongestionEventsWriter {
 
 	}
 	
-	public List<MarginalCongestionEvent> getCongestionEventsList(){
+	public List<CongestionEvent> getCongestionEventsList(){
 		return this.eh.getCongestionEventsAsList();
 	}
 

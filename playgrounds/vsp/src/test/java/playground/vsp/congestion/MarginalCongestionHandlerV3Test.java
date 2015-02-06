@@ -37,7 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
@@ -61,7 +61,7 @@ public class MarginalCongestionHandlerV3Test {
 		EventsManager events = controler.getEvents();
 		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario()));
 				
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -70,7 +70,7 @@ public class MarginalCongestionHandlerV3Test {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -84,7 +84,7 @@ public class MarginalCongestionHandlerV3Test {
 		List<Id> persons = new ArrayList<Id>();
 		double totalDelay = 0.;
 		
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 			
 			if (!persons.contains(event.getCausingAgentId())) {
 				persons.add(event.getCausingAgentId());

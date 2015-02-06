@@ -23,7 +23,7 @@
  */
 package playground.ikaddoura.analysis.congestion;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 /**
@@ -40,7 +40,7 @@ public class MarginalCongestionAnalyzer implements  CongestionEventHandler {
 	}
 
 	@Override
-	public void handleEvent(MarginalCongestionEvent event) {
+	public void handleEvent(CongestionEvent event) {
 		delaySum = delaySum + event.getDelay();
 	}
 

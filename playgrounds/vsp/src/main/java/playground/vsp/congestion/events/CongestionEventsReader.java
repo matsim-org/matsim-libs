@@ -33,13 +33,13 @@ import org.xml.sax.SAXException;
  * @author ihab
  *
  */
-public class MarginalCongestionEventsReader extends MatsimXmlParser{
+public class CongestionEventsReader extends MatsimXmlParser{
 
 	private static final String EVENT = "event";
 
 	private final EventsManager eventsManager;
 
-	public MarginalCongestionEventsReader(EventsManager events) {
+	public CongestionEventsReader(EventsManager events) {
 		super();
 		this.eventsManager = events;
 		setValidating(false); // events-files have no DTD, thus they cannot validate
@@ -78,7 +78,7 @@ public class MarginalCongestionEventsReader extends MatsimXmlParser{
 		String constraint = null;
 		Double emergenceTime = 0.0;
 
-		if(MarginalCongestionEvent.EVENT_TYPE.equals(eventType)){
+		if(CongestionEvent.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));
@@ -86,29 +86,29 @@ public class MarginalCongestionEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals("type")){
 					eventType = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_LINK)){
+				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_LINK)){
 					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_PERSON)){
+				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_PERSON)){
 					causingAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_AFFECTED_AGENT)){
+				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_AFFECTED_AGENT)){
 					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_DELAY)){
+				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_DELAY)){
 					delay = Double.parseDouble(attributes.getValue(i));
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.EVENT_CAPACITY_CONSTRAINT)){
+				else if(attributes.getQName(i).equals(CongestionEvent.EVENT_CAPACITY_CONSTRAINT)){
 					constraint = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_EMERGENCETIME)){
+				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_EMERGENCETIME)){
 					emergenceTime = Double.parseDouble(attributes.getValue(i));
 				}				
 				else {
 					throw new RuntimeException("Unknown event attribute. Aborting...");
 				}
 			}
-			this.eventsManager.processEvent(new MarginalCongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime));
+			this.eventsManager.processEvent(new CongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime));
 		}
 		
 		else{

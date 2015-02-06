@@ -54,13 +54,13 @@ public class IKNetworkPopulationWriter {
 
 	private Scenario scenario;
 	
-//	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
-//	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
-//	private final String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
+	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/network.xml";
+	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/input/bvg.run189.10pct.100.plans.selected.genericPt.xml.gz";
+	private final String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
 
-	private final String networkFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_network.xml.gz";
-	private final String populationFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_plans.xml.gz";
-	private final String outputPath = "../../shared-svn/studies/ihab/noiseTestScenario/output/shapeFiles/";
+//	private final String networkFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_network.xml.gz";
+//	private final String populationFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_plans.xml.gz";
+//	private final String outputPath = "../../shared-svn/studies/ihab/noiseTestScenario/output/shapeFiles/";
 
 	public static void main(String[] args) {
 		
@@ -76,7 +76,7 @@ public class IKNetworkPopulationWriter {
 		file.mkdirs();
 		
 		exportNetwork2Shp();
-		exportActivities2Shp();
+//		exportActivities2Shp();
 		
 	}
 	
@@ -136,14 +136,16 @@ public class IKNetworkPopulationWriter {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 						
 		for (Link link : scenario.getNetwork().getLinks().values()){
-			SimpleFeature feature = factory.createPolyline(
-					new Coordinate[]{
-							new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
-							new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord()))
-					}, new Object[] {link.getId(), link.getLength(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(), link.getAllowedModes()
-					}, null
-			);
-			features.add(feature);
+			if (link.getAllowedModes().contains("car")) {
+				SimpleFeature feature = factory.createPolyline(
+						new Coordinate[]{
+								new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
+								new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord()))
+						}, new Object[] {link.getId(), link.getLength(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(), link.getAllowedModes()
+						}, null
+				);
+				features.add(feature);
+			}
 		}
 		
 		log.info("Writing out network lines shapefile... ");

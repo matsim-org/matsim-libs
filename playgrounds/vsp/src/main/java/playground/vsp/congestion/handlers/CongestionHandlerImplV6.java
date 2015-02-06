@@ -50,7 +50,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import playground.vsp.congestion.CongestionType;
 import playground.vsp.congestion.LinkCongestionInfoExtended;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * @author amit
@@ -180,7 +180,7 @@ PersonStuckEventHandler
 				congestionType = CongestionType.FlowDelay.toString();
 			}
 
-			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, congestionType, causingAgent, 
+			CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, congestionType, causingAgent, 
 					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
 						System.out.println(congestionEvent);
 			this.events.processEvent(congestionEvent);

@@ -35,8 +35,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
-import playground.vsp.congestion.analysis.ExtCostEventHandler;
-import playground.vsp.congestion.analysis.TripInfoWriter;
+import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
+import playground.vsp.congestion.analysis.CongestionAnalysisWriter;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -115,7 +115,7 @@ public class CongestionCostAnalysis {
 		TollHandler tollHandler = new TollHandler(scenario);
 		events.addHandler(tollHandler);
 
-		ExtCostEventHandler extCostHandler = new ExtCostEventHandler(scenario, false);
+		CongestionAnalysisEventHandler extCostHandler = new CongestionAnalysisEventHandler(scenario, false);
 		events.addHandler(extCostHandler);
 		
 		log.info("Reading events file...");
@@ -128,7 +128,7 @@ public class CongestionCostAnalysis {
 		congestionHandler.writeCongestionStats(outputDirectory + config.controler().getLastIteration() + ".congestionStats_Offline.csv");
 		tollHandler.writeTollStats(outputDirectory + config.controler().getLastIteration() + ".tollStats_Offline.csv");
 
-		TripInfoWriter writer = new TripInfoWriter(extCostHandler, outputDirectory);
+		CongestionAnalysisWriter writer = new CongestionAnalysisWriter(extCostHandler, outputDirectory);
 		writer.writeDetailedResults(TransportMode.car);
 		writer.writeAvgTollPerTimeBin(TransportMode.car);
 		writer.writeAvgTollPerDistance(TransportMode.car);

@@ -33,7 +33,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.vsp.congestion.events.MarginalCongestionEventsReader;
+import playground.vsp.congestion.events.CongestionEventsReader;
 
 public class CongestionAnalysisMain {
 
@@ -77,7 +77,7 @@ public class CongestionAnalysisMain {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
+		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
 		congestionEventsReader.parse(eventsFile);
 
 		System.out.println("Delay sum from marginal congestion effects: " + handler1.getDelaySum() );

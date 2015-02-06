@@ -30,9 +30,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.vsp.congestion.analysis.ExtCostEventHandler;
-import playground.vsp.congestion.analysis.TripInfoWriter;
-import playground.vsp.congestion.events.MarginalCongestionEventsReader;
+import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
+import playground.vsp.congestion.analysis.CongestionAnalysisWriter;
+import playground.vsp.congestion.events.CongestionEventsReader;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class ExtCostMain {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 
-		ExtCostEventHandler extCostTripHandler = new ExtCostEventHandler(scenario, true);
+		CongestionAnalysisEventHandler extCostTripHandler = new CongestionAnalysisEventHandler(scenario, true);
 		events.addHandler(extCostTripHandler);
 		
 		log.info("Reading events file...");
@@ -77,7 +77,7 @@ public class ExtCostMain {
 		
 		log.info("Writing output files...");
 
-		TripInfoWriter writer = new TripInfoWriter(extCostTripHandler, outputFolder);
+		CongestionAnalysisWriter writer = new CongestionAnalysisWriter(extCostTripHandler, outputFolder);
 		writer.writeDetailedResults(TransportMode.car);
 		writer.writeAvgTollPerDistance(TransportMode.car);
 		writer.writeAvgTollPerTimeBin(TransportMode.car);

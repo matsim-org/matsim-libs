@@ -41,8 +41,8 @@ import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionEventsWriter {
-	private static final Logger log = Logger.getLogger(MarginalCongestionEventsWriter.class);
+public class CongestionEventsWriter {
+	private static final Logger log = Logger.getLogger(CongestionEventsWriter.class);
 	
 	static String runDirectory;
 	
@@ -57,7 +57,7 @@ public class MarginalCongestionEventsWriter {
 			runDirectory = "../../runs-svn/berlin_internalizationCar2/output/baseCase_2/";
 		}
 		
-		MarginalCongestionEventsWriter congestionEventsWriter = new MarginalCongestionEventsWriter();
+		CongestionEventsWriter congestionEventsWriter = new CongestionEventsWriter();
 		congestionEventsWriter.run();
 	}
 

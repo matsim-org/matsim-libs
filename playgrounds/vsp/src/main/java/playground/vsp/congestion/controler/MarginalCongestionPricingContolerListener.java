@@ -35,8 +35,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.analysis.ExtCostEventHandler;
-import playground.vsp.congestion.analysis.TripInfoWriter;
+import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
+import playground.vsp.congestion.analysis.CongestionAnalysisWriter;
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -45,21 +45,21 @@ import playground.vsp.congestion.handlers.TollHandler;
  *
  */
 
-public class MarginalCongestionPricingContolerListner implements StartupListener, IterationEndsListener {
-	private final Logger log = Logger.getLogger(MarginalCongestionPricingContolerListner.class);
+public class MarginalCongestionPricingContolerListener implements StartupListener, IterationEndsListener {
+	private final Logger log = Logger.getLogger(MarginalCongestionPricingContolerListener.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
 	private MarginalCongestionPricingHandler pricingHandler;
-	private ExtCostEventHandler extCostHandler;
+	private CongestionAnalysisEventHandler extCostHandler;
 	
 	/**
 	 * @param scenario
 	 * @param tollHandler
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
-	public MarginalCongestionPricingContolerListner(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
+	public MarginalCongestionPricingContolerListener(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
 		this.scenario = (ScenarioImpl) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = congestionHandler;
@@ -71,7 +71,7 @@ public class MarginalCongestionPricingContolerListner implements StartupListener
 		EventsManager eventsManager = event.getControler().getEvents();
 		
 		this.pricingHandler = new MarginalCongestionPricingHandler(eventsManager, this.scenario);
-		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
+		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, true);
 		
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(this.pricingHandler);
@@ -89,7 +89,7 @@ public class MarginalCongestionPricingContolerListner implements StartupListener
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
 //		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
 		writerCar.writeDetailedResults(TransportMode.car);
 		writerCar.writeAvgTollPerDistance(TransportMode.car);
 		writerCar.writeAvgTollPerTimeBin(TransportMode.car);

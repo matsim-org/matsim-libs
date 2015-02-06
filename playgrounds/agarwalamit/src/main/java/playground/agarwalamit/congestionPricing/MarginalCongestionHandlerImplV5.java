@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.vsp.congestion.LinkCongestionInfoExtended;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * @author amit
@@ -147,7 +147,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 			}
 			Id<Person> causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
 
-			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkLeaveTime, "Delay", causingAgent, 
+			CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, "Delay", causingAgent, 
 					personId, delay, linkId, linkInfo.getPersonId2linkEnterTime().get(causingAgent));
 			this.events.processEvent(congestionEvent);
 			System.out.println(congestionEvent.toString());

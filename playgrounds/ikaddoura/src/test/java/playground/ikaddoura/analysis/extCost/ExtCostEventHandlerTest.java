@@ -43,8 +43,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.vsp.congestion.analysis.ExtCostEventHandler;
-import playground.vsp.congestion.events.MarginalCongestionEventsReader;
+import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
+import playground.vsp.congestion.events.CongestionEventsReader;
 
 /**
  * @author ikaddoura , lkroeger
@@ -77,13 +77,13 @@ public class ExtCostEventHandlerTest {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 
-		ExtCostEventHandler handler = new ExtCostEventHandler(sc, true);
+		CongestionAnalysisEventHandler handler = new CongestionAnalysisEventHandler(sc, true);
 		events.addHandler(handler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
+		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
 		congestionEventsReader.parse(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmount = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);
@@ -127,13 +127,13 @@ public class ExtCostEventHandlerTest {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 
-		ExtCostEventHandler handler = new ExtCostEventHandler(sc, true);
+		CongestionAnalysisEventHandler handler = new CongestionAnalysisEventHandler(sc, true);
 		events.addHandler(handler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
+		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
 		congestionEventsReader.parse(eventsFile);
 	
 		Map<Double, Double> tripDepTime2avgAmountCar = handler.getAvgAmountPerTripDepartureTime(TransportMode.car);

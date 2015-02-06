@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 
 /**
@@ -61,7 +61,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 	}
 
 	@Override
-	public void handleEvent(MarginalCongestionEvent event) {
+	public void handleEvent(CongestionEvent event) {
 		
 		double amount = event.getDelay() / 3600 * this.vtts_car;
 		this.amountSum = this.amountSum + amount;

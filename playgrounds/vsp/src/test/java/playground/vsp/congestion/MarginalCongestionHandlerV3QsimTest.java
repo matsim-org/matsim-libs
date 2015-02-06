@@ -68,8 +68,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -119,7 +119,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario1();
 		setPopulation1(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -128,7 +128,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -138,7 +138,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
 			
@@ -162,7 +162,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario2();
 		setPopulation2(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -171,7 +171,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -193,7 +193,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 			System.out.println(event.toString());
 		}
 		
@@ -222,7 +222,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		controler.addControlerListener(new MarginalCongestionPricingContolerListner(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
 	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
@@ -336,7 +336,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario4();
 		setPopulation4(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -345,7 +345,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -367,7 +367,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
 			
@@ -375,7 +375,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
 		
-		for(MarginalCongestionEvent mce : congestionEvents){
+		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
 				Assert.assertEquals("delay", 10., mce.getDelay(), MatsimTestUtils.EPSILON);
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
@@ -394,7 +394,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario5();
 		setPopulation5(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -403,7 +403,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -425,7 +425,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
 			
@@ -433,7 +433,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
 		
-		for(MarginalCongestionEvent mce : congestionEvents){
+		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent3))){
 				Assert.assertEquals("delay", 4., mce.getDelay(), MatsimTestUtils.EPSILON);
 			}else if((mce.getCausingAgentId().equals(testAgent3))&&(mce.getAffectedAgentId().equals(testAgent2))){
@@ -454,7 +454,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario4();
 		setPopulation6(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -463,7 +463,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -485,7 +485,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
 			
@@ -493,7 +493,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		Assert.assertEquals("numberOfCongestionEvents", congestionEvents.size(), 3, MatsimTestUtils.EPSILON);
 		
-		for(MarginalCongestionEvent mce : congestionEvents){
+		for(CongestionEvent mce : congestionEvents){
 			if((mce.getCausingAgentId().equals(testAgent1))&&(mce.getAffectedAgentId().equals(testAgent2))){
 				Assert.assertEquals("delay", 5., mce.getDelay(), MatsimTestUtils.EPSILON);
 			}else if((mce.getCausingAgentId().equals(testAgent2))&&(mce.getAffectedAgentId().equals(testAgent3))){
@@ -511,7 +511,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Scenario sc = loadScenario1b();
 		setPopulation1(sc);
 		
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
 		events.addHandler( new CongestionEventHandler() {
 
@@ -520,7 +520,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
@@ -554,7 +554,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 						
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 		
 			System.out.println(event.toString());
 			

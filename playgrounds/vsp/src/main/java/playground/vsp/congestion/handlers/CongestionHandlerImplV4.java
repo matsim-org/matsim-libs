@@ -61,7 +61,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.LinkCongestionInfoExtended;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 
 /**
@@ -98,7 +98,7 @@ PersonStuckEventHandler
 	double totalStorageDelay = 0.0;
 	double delayNotInternalized_roundingErrors = 0.0;
 	
-	private List<MarginalCongestionEvent> congestionEventsList = new ArrayList<MarginalCongestionEvent>();
+	private List<CongestionEvent> congestionEventsList = new ArrayList<CongestionEvent>();
 
 	public CongestionHandlerImplV4(EventsManager events, Scenario scenario) {
 		this.events = events;
@@ -373,7 +373,7 @@ PersonStuckEventHandler
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
 								System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);
@@ -388,7 +388,7 @@ PersonStuckEventHandler
 			} else {
 				// using the time when the causing agent entered the link
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
 						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
 								System.out.println(congestionEvent.toString());
 				this.events.processEvent(congestionEvent);	
@@ -492,7 +492,7 @@ PersonStuckEventHandler
 		return delayNotInternalized_roundingErrors;
 	}
 	
-	public List<MarginalCongestionEvent> getCongestionEventsAsList(){
+	public List<CongestionEvent> getCongestionEventsAsList(){
 		return this.congestionEventsList;
 	}
 }

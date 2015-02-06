@@ -27,7 +27,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
@@ -80,7 +80,7 @@ public class PricingControler {
 		case "implV4":
 			{
 				controler.setTravelDisutilityFactory(fact);
-				controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
 				Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 4.");
 			}
 			break;
@@ -88,7 +88,7 @@ public class PricingControler {
 		case "implV5":
 		{
 			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 5.");
 		}
 		break;
@@ -96,7 +96,7 @@ public class PricingControler {
 		case "implV6":
 		{
 			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new MarginalCongestionPricingContolerListner(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 		}
 		break;

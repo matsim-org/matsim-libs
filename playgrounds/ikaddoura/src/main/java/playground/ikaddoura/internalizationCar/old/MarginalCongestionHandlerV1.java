@@ -48,7 +48,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * This handler calculates car delays (due to flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
@@ -289,7 +289,7 @@ public class MarginalCongestionHandlerV1 implements
 			if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 				
 //				System.out.println("	Person " + id.toString() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec() + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId(), event.getTime());
+				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId(), event.getTime());
 				this.events.processEvent(congestionEvent);	
 				
 				delayToPayFor = delayToPayFor - linkInfo.getMarginalDelayPerLeavingVehicle_sec();
@@ -298,7 +298,7 @@ public class MarginalCongestionHandlerV1 implements
 				if (delayToPayFor > 0) {
 					
 //					System.out.println("	Person " + id + " --> Marginal delay: " + delayToPayFor + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), delayToPayFor, event.getLinkId(), event.getTime());
+					CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), delayToPayFor, event.getLinkId(), event.getTime());
 					this.events.processEvent(congestionEvent);
 					
 					delayToPayFor = 0;
@@ -329,7 +329,7 @@ public class MarginalCongestionHandlerV1 implements
 			throw new RuntimeException("No agent identified who is causing the delay due to storage capacity. Check downstream links with reached storage capacity. Aborting...");
 		}
 		
-		MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId(), event.getTime());
+		CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId(), event.getTime());
 		this.events.processEvent(congestionEvent);
 	}
 	

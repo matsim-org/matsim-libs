@@ -25,7 +25,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListner;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -73,7 +73,7 @@ public class CompareTwoMethodsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new MarginalCongestionPricingContolerListner((ScenarioImpl) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener((ScenarioImpl) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 		}
 		
 		if(newMethod) {
@@ -81,7 +81,7 @@ public class CompareTwoMethodsControler {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-			controler.addControlerListener(new MarginalCongestionPricingContolerListner(controler.getScenario(), tollHandler, new CongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
 		}
 
 		controler.setOverwriteFiles(true);

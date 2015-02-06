@@ -64,7 +64,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -158,7 +158,7 @@ public class TestNetworkExperiment {
 
 		Map<Id<Person>, Double> personId2Delay = new HashMap<Id<Person>, Double>();
 
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -167,7 +167,7 @@ public class TestNetworkExperiment {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
 		});
@@ -179,7 +179,7 @@ public class TestNetworkExperiment {
 		QSim sim = createQSim(sc, events, false);
 		sim.run();
 
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 			Id<Person> desiredPerson = null;
 			if(affectedOrCausing.equalsIgnoreCase("affected")) desiredPerson = event.getAffectedAgentId();
 			else if(affectedOrCausing.equalsIgnoreCase("causing")) desiredPerson = event.getCausingAgentId();

@@ -59,7 +59,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
@@ -83,7 +83,7 @@ public class MarginalCongestionPricingTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -92,7 +92,7 @@ public class MarginalCongestionPricingTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
 
@@ -114,7 +114,7 @@ public class MarginalCongestionPricingTest {
 		double repetationPerson6Count=0;
 		double repetationPerson8Count=0;
 
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 
 			affectedPersons.add(event.getAffectedAgentId().toString());
 			causingPersons.add(Integer.valueOf(event.getCausingAgentId().toString()));
@@ -186,7 +186,7 @@ public class MarginalCongestionPricingTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -195,7 +195,7 @@ public class MarginalCongestionPricingTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
 
@@ -221,7 +221,7 @@ public class MarginalCongestionPricingTest {
 		int repetationPerson8_6Count=0;
 		int repetationPerson8_4Count=0;
 
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 
 			affectedPersons.add(event.getAffectedAgentId().toString());
 			causingPersons.add(Integer.valueOf(event.getCausingAgentId().toString()));
@@ -323,7 +323,7 @@ public class MarginalCongestionPricingTest {
 
 		Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
 
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -332,7 +332,7 @@ public class MarginalCongestionPricingTest {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
 
@@ -344,7 +344,7 @@ public class MarginalCongestionPricingTest {
 		QSim sim = createQSim(sc, events);
 		sim.run();
 
-		for (MarginalCongestionEvent event : congestionEvents) {
+		for (CongestionEvent event : congestionEvents) {
 			if(personId2affectedDelay.containsKey(event.getAffectedAgentId())){
 				double delaySoFar = personId2affectedDelay.get(event.getAffectedAgentId());
 				personId2affectedDelay.put(event.getAffectedAgentId(), event.getDelay()+delaySoFar);

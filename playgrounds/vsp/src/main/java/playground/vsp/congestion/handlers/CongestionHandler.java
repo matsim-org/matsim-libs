@@ -53,7 +53,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.LinkCongestionInfo;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * This handler calculates delays (caused by the flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
@@ -66,14 +66,14 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
  * @author ikaddoura
  *
  */
-public abstract class MarginalCongestionHandler implements
+public abstract class CongestionHandler implements
 	LinkEnterEventHandler,
 	LinkLeaveEventHandler,
 	TransitDriverStartsEventHandler,
 	PersonDepartureEventHandler, 
 	PersonStuckEventHandler {
 	
-	final static Logger log = Logger.getLogger(MarginalCongestionHandler.class);
+	final static Logger log = Logger.getLogger(CongestionHandler.class);
 	
 	// If the following parameter is false, a Runtime Exception is thrown in case an agent is delayed by the storage capacity.
 	final boolean allowForStorageCapacityConstraint = true;
@@ -93,7 +93,7 @@ public abstract class MarginalCongestionHandler implements
 	double delayNotInternalized_roundingErrors = 0.0;
 	double delayNotInternalized_spillbackNoCausingAgent = 0.0;
 		
-	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
+	public CongestionHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 		
@@ -239,7 +239,7 @@ public abstract class MarginalCongestionHandler implements
 //					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 				} else {
 					// using the time when the causing agent entered the link
-					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, Id.createPersonId(event.getVehicleId()), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
+					CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", id, Id.createPersonId(event.getVehicleId()), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
 					this.events.processEvent(congestionEvent);
 					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				}
@@ -252,7 +252,7 @@ public abstract class MarginalCongestionHandler implements
 //						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 					} else {
 						// using the time when the causing agent entered the link
-						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, Id.createPersonId(event.getVehicleId()), delayToPayFor, event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
+						CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", id, Id.createPersonId(event.getVehicleId()), delayToPayFor, event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
 						this.events.processEvent(congestionEvent);	
 						this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 					}

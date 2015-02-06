@@ -20,7 +20,7 @@ package playground.vsp.congestion.handlers;
 
 import org.matsim.core.events.handler.EventHandler;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * A common congestion pricing handler to handle different implementations of congestion pricing schemes.
@@ -37,6 +37,6 @@ import playground.vsp.congestion.events.MarginalCongestionEvent;
 
 public interface CongestionEventHandler extends EventHandler {
 	
-	public void handleEvent (MarginalCongestionEvent event);
+	public void handleEvent (CongestionEvent event);
 	
 }

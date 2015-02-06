@@ -58,7 +58,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
@@ -77,8 +77,8 @@ public class TestForEmergenceTime {
 		String [] congestionPricingImpl = {"v4","v6"};
 
 		for(String impl :congestionPricingImpl){
-			List<MarginalCongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
-			for(MarginalCongestionEvent event : congestionEvents){
+			List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays(impl);
+			for(CongestionEvent event : congestionEvents){
 				if(event.getCausingAgentId().equals(Id.createPersonId("21"))){
 					Assert.assertEquals("wrong emergence time", 8*3600+55, event.getEmergenceTime(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("wrong linkId", Id.createLinkId("3"), event.getLinkId());
@@ -87,7 +87,7 @@ public class TestForEmergenceTime {
 		}
 	}
 
-	private List<MarginalCongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
+	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
 
 		int numberOfPersonInPlan = 10;
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
@@ -97,7 +97,7 @@ public class TestForEmergenceTime {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		events.addHandler( new CongestionEventHandler() {
 
@@ -106,7 +106,7 @@ public class TestForEmergenceTime {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
 

@@ -48,7 +48,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 /**
@@ -56,8 +56,8 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
  * @author ikaddoura , lkroeger
  *
  */
-public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionEventHandler {
-	private final static Logger log = Logger.getLogger(ExtCostEventHandler.class);
+public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler , PersonDepartureEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler , CongestionEventHandler {
+	private final static Logger log = Logger.getLogger(CongestionAnalysisEventHandler.class);
 	private final double vtts_car;
 	
 	// This analysis uses either money events or congestion events.
@@ -85,7 +85,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private double maxDistance = 40 * distance; // TODO: set dynamically!
 	private double timeBinSize = 900.0; // TODO: set dynamically!
 	
-	public ExtCostEventHandler(Scenario scenario, boolean useMoneyEvents) {
+	public CongestionAnalysisEventHandler(Scenario scenario, boolean useMoneyEvents) {
 		this.scenario = scenario;
 		this.useMoneyEvents = useMoneyEvents;
 		log.info("UseMoneyEvents : " + useMoneyEvents);
@@ -109,7 +109,7 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	}
 
 	@Override
-	public void handleEvent(MarginalCongestionEvent event) {
+	public void handleEvent(CongestionEvent event) {
 		
 		if (useMoneyEvents == false){
 			

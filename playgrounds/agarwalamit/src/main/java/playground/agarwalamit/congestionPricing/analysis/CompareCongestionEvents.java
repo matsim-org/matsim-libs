@@ -33,8 +33,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.vsp.congestion.events.MarginalCongestionEvent;
-import playground.vsp.congestion.events.MarginalCongestionEventsReader;
+import playground.vsp.congestion.events.CongestionEvent;
+import playground.vsp.congestion.events.CongestionEventsReader;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 
@@ -47,12 +47,12 @@ public class CompareCongestionEvents  {
 	private String eventsFile_v3 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events.xml.gz";
 	private String eventsFile_v4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events_implV4.xml.gz";
 
-	private List<MarginalCongestionEvent>  getCongestionEvents (String eventsFile){
+	private List<CongestionEvent>  getCongestionEvents (String eventsFile){
 
-		final List<MarginalCongestionEvent> congestionevents = new ArrayList<MarginalCongestionEvent>();
+		final List<CongestionEvent> congestionevents = new ArrayList<CongestionEvent>();
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		MarginalCongestionEventsReader reader = new MarginalCongestionEventsReader(eventsManager);
+		CongestionEventsReader reader = new CongestionEventsReader(eventsManager);
 
 		eventsManager.addHandler(new CongestionEventHandler () {
 			@Override
@@ -61,7 +61,7 @@ public class CompareCongestionEvents  {
 			}
 
 			@Override
-			public void handleEvent(MarginalCongestionEvent event) {
+			public void handleEvent(CongestionEvent event) {
 				congestionevents.add(event);
 			}
 		});
@@ -144,10 +144,10 @@ public class CompareCongestionEvents  {
 		System.out.println("In wrongly events causing persons are "+ causingPersons.size());
 	}
 
-	private List<String> eventList2StringList(List<MarginalCongestionEvent> l){
+	private List<String> eventList2StringList(List<CongestionEvent> l){
 		List<String> outList = new ArrayList<String>();
 
-		for(MarginalCongestionEvent e :l){
+		for(CongestionEvent e :l){
 			outList.add(e.toString());	
 		}
 		return outList;
@@ -155,8 +155,8 @@ public class CompareCongestionEvents  {
 
 	private void run(String outputFolder){
 
-		List<MarginalCongestionEvent> eventsImpl3 = getCongestionEvents(eventsFile_v3);
-		List<MarginalCongestionEvent> eventsImpl4 = getCongestionEvents(eventsFile_v4);
+		List<CongestionEvent> eventsImpl3 = getCongestionEvents(eventsFile_v3);
+		List<CongestionEvent> eventsImpl4 = getCongestionEvents(eventsFile_v4);
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/congestionEventsInfo.txt");
 		try {
@@ -173,17 +173,17 @@ public class CompareCongestionEvents  {
 		}
 	}
 
-	private Set<Id<Person>> getAffectedPersons(List<MarginalCongestionEvent> mce){
+	private Set<Id<Person>> getAffectedPersons(List<CongestionEvent> mce){
 		Set<Id<Person>> affectedPersons = new HashSet<Id<Person>>();
-		for(MarginalCongestionEvent e : mce) {
+		for(CongestionEvent e : mce) {
 			affectedPersons.add(e.getAffectedAgentId());
 		}
 		return affectedPersons;
 	}
 
-	private Set<Id<Person>> getCausingPersons(List<MarginalCongestionEvent> mce){
+	private Set<Id<Person>> getCausingPersons(List<CongestionEvent> mce){
 		Set<Id<Person>> causingPersons = new HashSet<Id<Person>>();
-		for(MarginalCongestionEvent e : mce) {
+		for(CongestionEvent e : mce) {
 			causingPersons.add(e.getCausingAgentId());
 		}
 		return causingPersons;

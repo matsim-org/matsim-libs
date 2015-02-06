@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Person;
  * 
  * @author ikaddoura
  */
-public final class MarginalCongestionEvent extends Event {
+public final class CongestionEvent extends Event {
 	
 	public static final String EVENT_TYPE = "MarginalCongestionEffect";
 	public static final String EVENT_CAPACITY_CONSTRAINT = "capacityConstraint";
@@ -51,7 +51,7 @@ public final class MarginalCongestionEvent extends Event {
 	private final String capacityConstraint;
 	private final double emergenceTime;
 
-	public MarginalCongestionEvent(double time, String capacityConstraint, Id<Person> causingAgentId, Id<Person> affectedAgentId, double externalDelay, Id<Link> linkId, double emergenceTime) {
+	public CongestionEvent(double time, String capacityConstraint, Id<Person> causingAgentId, Id<Person> affectedAgentId, double externalDelay, Id<Link> linkId, double emergenceTime) {
 		super(time);
 		this.capacityConstraint = capacityConstraint;
 		this.causingAgentId = causingAgentId;

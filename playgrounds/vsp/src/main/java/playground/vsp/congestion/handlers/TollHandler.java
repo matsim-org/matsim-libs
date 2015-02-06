@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.vsp.congestion.events.MarginalCongestionEvent;
+import playground.vsp.congestion.events.CongestionEvent;
 
 /**
  * @author ikaddoura
@@ -54,7 +54,7 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 	private Map<Id<Link>, Map<Double, Double>> linkId2timeBin2tollSum = new HashMap<Id<Link>, Map<Double, Double>>();
 	private Map<Id<Link>, Map<Double, Integer>> linkId2timeBin2enteringAndDepartingAgents = new HashMap<Id<Link>, Map<Double, Integer>>();
 	
-	private List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+	private List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 	private List<LinkEnterEvent> linkEnterEvents = new ArrayList<LinkEnterEvent>();
 	private List<PersonDepartureEvent> personDepartureEvents = new ArrayList<PersonDepartureEvent>();
 
@@ -86,7 +86,7 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 	}
 
 	@Override
-	public void handleEvent(MarginalCongestionEvent event) {
+	public void handleEvent(CongestionEvent event) {
 		this.congestionEvents.add(event);
 	}
 	
@@ -271,7 +271,7 @@ public class TollHandler implements CongestionEventHandler, LinkEnterEventHandle
 
 	private void setlinkId2timeBin2tollSum() {
 
-		for (MarginalCongestionEvent event : this.congestionEvents) {
+		for (CongestionEvent event : this.congestionEvents) {
 			Map<Double, Double> timeBin2tollSum = new HashMap<Double, Double>();
 
 			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {

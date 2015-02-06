@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura , lkroeger
  *
  */
-public class TripInfoWriter {
-	private static final Logger log = Logger.getLogger(TripInfoWriter.class);
+public class CongestionAnalysisWriter {
+	private static final Logger log = Logger.getLogger(CongestionAnalysisWriter.class);
 
-	ExtCostEventHandler handler;
+	CongestionAnalysisEventHandler handler;
 	String outputFolder;
 	
-	public TripInfoWriter(ExtCostEventHandler handler, String outputFolder) {
+	public CongestionAnalysisWriter(CongestionAnalysisEventHandler handler, String outputFolder) {
 		this.handler = handler;
 		String directory = outputFolder + (outputFolder.endsWith("/") ? "" : "/");
 		this.outputFolder = directory;
