@@ -537,7 +537,11 @@ public class PathDependentNetwork {
 		}
 	}
 
-	
+	/**
+	 * Writing some basic graph statistics: the number of nodes and edges; the
+	 * density of the graph, and the time taken to build it. The time taken may 
+	 * be zero if the network is just read in and not built from scratch. 
+	 */
 	public void writeNetworkStatisticsToConsole(){
 		LOG.info("---------------------  Graph statistics  -------------------");
 		LOG.info("     Number of vertices: " + this.getNumberOfNodes());
@@ -549,16 +553,41 @@ public class PathDependentNetwork {
 	
 	
 	/**
-	 * TODO Fix
-	 * @return
+	 * Class to aggregate the path-dependent network to a path-independent
+	 * network.
+	 * 
+	 * TODO I think this is now correct, but it must still be checked 
+	 * (preferably using tests).
+	 * @return a {@link Map} containing for each possible origin node another
+	 * 		   {@link Map} with all possible destination nodes from that origin. 
 	 */
-	public List<Tuple<Id<Node>, Id<Node>>> getEdges(){
+	public Map<Id<Node>, Map<Id<Node>, Double>> getEdges(){
+		Map<Id<Node>, Map<Id<Node>, Double>> edgeMap = new HashMap<>();
+		
 		Map<Id<Node>, PathDependentNode> nodes = this.getPathDependentNodes();
 		for(PathDependentNode node : nodes.values()){
-			Id<Node> oId = node.getId();
+			Map<Id<Node>, Double> thisMap = new HashMap<>(); 
+			edgeMap.put(node.getId(), thisMap);
+			
+			Map<Id<Node>, Map<Id<Node>, Double>> pathDependence = node.getPathDependence();
+			for(Id<Node> previous : pathDependence.keySet()){
+				Map<Id<Node>, Double> map = pathDependence.get(previous);
+				for(Id<Node> next : map.keySet()){
+					if(!next.equals(Id.createNodeId("sink"))){
+						double weight = map.get(next);
+						if(!thisMap.containsKey(next)){
+							thisMap.put(next, weight);
+						} else{
+							double oldValue = thisMap.get(next);
+							thisMap.put(next, oldValue + weight);
+						}
+					}
+				}
+			}
 		}
 		
-		return null;
+		/* Now we should have all the edges,ignoring the path-dependence. */
+		return edgeMap;
 	}
 	
 	public void reportSamplingStatus(){
