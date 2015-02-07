@@ -1,5 +1,10 @@
 package playground.nmviljoen.network;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+
 public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
 	public String id;
@@ -31,7 +36,7 @@ public class NmvNode implements Comparable<NmvNode>{
 
 	@Override
 	public int compareTo(NmvNode o) {
-		return o.getId().compareTo(this.getId().toString());
+		return this.getId().compareTo(o.getId().toString());
 	}
-
+	
 }
