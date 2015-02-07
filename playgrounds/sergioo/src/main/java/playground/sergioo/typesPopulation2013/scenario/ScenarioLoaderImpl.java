@@ -264,6 +264,9 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadVehicles() throws UncheckedIOException {
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
+
 		new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 

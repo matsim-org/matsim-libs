@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -61,6 +62,8 @@ public class ModeAvailabilityChecker {
 	
 	public ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		this.vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = new WalkSpeedComparator();
@@ -73,6 +76,8 @@ public class ModeAvailabilityChecker {
 	private ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider, 
 			WalkSpeedComparator walkSpeedComparator) {
 		this.scenario = scenario;
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		this.vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = walkSpeedComparator;		

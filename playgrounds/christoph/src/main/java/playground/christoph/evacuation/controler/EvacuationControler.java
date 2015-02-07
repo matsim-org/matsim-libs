@@ -466,6 +466,8 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Write vehicles to file.
 		 */
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		new VehicleWriterV1(scenarioData.getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 			
 		/*

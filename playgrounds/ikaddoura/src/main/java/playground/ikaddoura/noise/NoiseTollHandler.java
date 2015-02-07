@@ -325,6 +325,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		}
 		
 		// TODO: Consider pt-vehicles
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		if(!(scenario.getTransitVehicles() == null)) {
 			for(Id transitVehicleId : scenario.getTransitVehicles().getVehicles().keySet()) {
 				hdvVehicles.add(transitVehicleId);

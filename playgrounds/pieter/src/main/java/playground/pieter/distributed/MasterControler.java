@@ -322,9 +322,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
         if (this.config.scenario().isUseTransit()) {
             new TransitScheduleReader(scenario).readFile(this.config.transit().getTransitScheduleFile());
-            if (this.config.scenario().isUseVehicles()) {
+//            if (this.config.scenario().isUseVehicles()) {
                 new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
-            }
+//            }
         }
     }
 

@@ -32,6 +32,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
 
 /**
@@ -102,6 +103,8 @@ public class InternalControler {
 
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		new VehicleReaderV1((scenario).getTransitVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
 
 		Controler controler = new Controler(this.scenario);

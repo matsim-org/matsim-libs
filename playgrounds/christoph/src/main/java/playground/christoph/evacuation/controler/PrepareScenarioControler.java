@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.controler;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
@@ -40,6 +41,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.VehicleWriterV1;
+
 import playground.christoph.controler.KTIEnergyFlowsController;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
@@ -138,6 +140,8 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Write vehicles to file.
 		 */
+		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+		System.exit(-1); 
 		new VehicleWriterV1(scenarioData.getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 		
 		/*

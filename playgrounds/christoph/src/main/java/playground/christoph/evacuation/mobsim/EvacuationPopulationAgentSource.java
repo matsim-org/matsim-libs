@@ -95,6 +95,9 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 				parkedWriter.write("\n");
 			}
 			
+			Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
+			System.exit(-1); 
+
 			Vehicles vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 			
 			for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
