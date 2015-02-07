@@ -5,6 +5,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.Graph;
+
 public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
 	public String id;
@@ -66,6 +69,13 @@ public class NmvNode implements Comparable<NmvNode>{
 		
 		log.info("Is n1 in there? " + map.containsKey(n11));
 		log.info("Is n1 and n11 the same? " + n1.equals(n11));
+		log.info("Check keyset: " + map.keySet().contains(n11));
+		
+		/* Play with a small network. */
+		Graph<NmvNode, NmvLink> graph = new DirectedSparseGraph<NmvNode, NmvLink>();
+		graph.addVertex(n1);
+		log.info("Check if graph contains n11: " + graph.containsVertex(n11));
+		
 	}
 
 }

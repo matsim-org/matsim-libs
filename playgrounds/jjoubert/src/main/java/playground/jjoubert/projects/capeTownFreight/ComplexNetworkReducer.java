@@ -5,6 +5,7 @@ package playground.jjoubert.projects.capeTownFreight;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -147,21 +148,41 @@ public class ComplexNetworkReducer {
 	
 	public Graph<NmvNode, NmvLink> convertToGraph(PathDependentNetwork network, Map<Id<Node>, Map<Id<Node>, Double>> map){
 		LOG.info("Converting map to formal graph...");
+		
+		Map<Id<Node>, NmvNode> nodeMap = new HashMap<>();
+		
+		
 		Graph<NmvNode, NmvLink> graph = new DirectedSparseGraph<NmvNode, NmvLink>();
 		for(Id<Node> o : map.keySet()){
 			Map<Id<Node>, Double> thisMap = map.get(o);
 			for(Id<Node> d : thisMap.keySet()){
-				NmvNode n1 = new NmvNode(o.toString(), 
-						o.toString(), 
-						network.getPathDependentNode(o).getCoord().getX(),
-						network.getPathDependentNode(o).getCoord().getY());
-				NmvNode n2 = new NmvNode(d.toString(), 
-						d.toString(), 
-						network.getPathDependentNode(d).getCoord().getX(),
-						network.getPathDependentNode(d).getCoord().getY());
+				
+				/* Create the nodes, but only if they don't exist yet! */
+				NmvNode n1;
+				if(!nodeMap.containsKey(o)){
+					n1 = new NmvNode(o.toString(), 
+							o.toString(), 
+							network.getPathDependentNode(o).getCoord().getX(),
+							network.getPathDependentNode(o).getCoord().getY());
+					nodeMap.put(o, n1);
+					graph.addVertex(n1);
+				} else{
+					n1 = nodeMap.get(o);
+				}
+
+				NmvNode n2;
+				if(!nodeMap.containsKey(d)){
+					n2 = new NmvNode(d.toString(), 
+							d.toString(), 
+							network.getPathDependentNode(d).getCoord().getX(),
+							network.getPathDependentNode(d).getCoord().getY());
+					nodeMap.put(d, n2);
+					graph.addVertex(n2);
+				} else{
+					n2 = nodeMap.get(d);
+				}
 				double weight = thisMap.get(d);
-				graph.addVertex(n1);
-				graph.addVertex(n2);
+				
 				NmvLink l = new NmvLink(o.toString() + "_" + d.toString(), weight);
 				graph.addEdge(l, n1, n2);
 			}
