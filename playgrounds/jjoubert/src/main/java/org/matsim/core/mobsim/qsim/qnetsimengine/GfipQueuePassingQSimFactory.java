@@ -61,6 +61,11 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 			log.info("  Using link density-based priority queue (allowing passing) in mobility simulation."); 
 			log.info("---------------------------------------------------------------------------------------");
 			break;
+		case GFIP_FIFO:
+			log.info("---------------------------------------------------------------------------------------");
+			log.info("  Using link density-based velocity fifo queue in mobility simulation."); 
+			log.info("---------------------------------------------------------------------------------------");
+			break;
 		default:
 			throw new IllegalArgumentException("Do not know what to do with queue type " + queueType.toString());
 		}
@@ -86,6 +91,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 				VehicleQ<QVehicle> vehicleQ = null;
 				switch (queueType) {
 				case FIFO:
+				case GFIP_FIFO:
 					vehicleQ = new FIFOVehicleQ();
 					break;
 				case BASIC_PASSING:
@@ -105,11 +111,26 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		QNetsimEngine netsimEngine = new QNetsimEngine(qsim, netsimNetworkFactory);
 		
 		/* Add the custom GFIP link speed calculator, but only when required. */
-		if(queueType == QueueType.GFIP_PASSING){
-			log.info("------------------------------------------------------------------");
-			log.info("  Using custom GFIP-link-density-based link speed calculator. "); 
-			log.info("------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim));
+		if(queueType == QueueType.FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic FIFO link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			netsimEngine.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator());
+		} else if(queueType == QueueType.BASIC_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic passing link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
+		} else if(queueType == QueueType.GFIP_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
+			log.info("------------------------------------------------------------------------------");
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
+		} else if(queueType == QueueType.GFIP_FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
+			log.info("------------------------------------------------------------------------------");
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
 		}
 		
 		qsim.addMobsimEngine(netsimEngine);
@@ -133,7 +154,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	
 	
 	public enum QueueType{
-		FIFO, BASIC_PASSING, GFIP_PASSING;
+		FIFO, BASIC_PASSING, GFIP_PASSING, GFIP_FIFO;
 	}
 
 }

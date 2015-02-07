@@ -87,15 +87,15 @@ import org.matsim.vehicles.VehiclesFactory;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
-public class GfipQueuePassingControler extends Controler{
+public class GfipQueuePassingControler_v1 extends Controler{
 
-	public GfipQueuePassingControler(Scenario scenario, QueueType queueType) {
+	public GfipQueuePassingControler_v1(Scenario scenario, QueueType queueType) {
 		super(scenario);
 		this.setMobsimFactory(new GfipQueuePassingQSimFactory(queueType));
 	}
 
 	public static void main(String[] args){
-		Header.printHeader(GfipQueuePassingControler.class.toString(), args);
+		Header.printHeader(GfipQueuePassingControler_v1.class.toString(), args);
 
 		/* Clear and set the output directory. */
 		String outputDirectory = args[0];
@@ -110,7 +110,7 @@ public class GfipQueuePassingControler extends Controler{
 
 		Config config = getDefaultConfig(outputDirectory, queueType);
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		GfipQueuePassingControler controler = new GfipQueuePassingControler(sc, queueType);
+		GfipQueuePassingControler_v1 controler = new GfipQueuePassingControler_v1(sc, queueType);
 
 		LinkCounter linkCounter = controler.new LinkCounter(sc);
 		controler.getEvents().addHandler(linkCounter);
