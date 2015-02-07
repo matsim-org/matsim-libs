@@ -63,6 +63,7 @@ public class ComplexNetworkReducer {
 		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
 		nr.parse(networkFile);
 		PathDependentNetwork network = nr.getPathDependentNetwork();
+		network.writeNetworkStatisticsToConsole();
 		
 		/* Read Cape Town */
 		ShapeFileReader ctReader = new ShapeFileReader();
