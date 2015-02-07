@@ -282,8 +282,12 @@ public class ScenarioLoaderImpl {
 	}
 	private void loadVehicles() throws UncheckedIOException {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
-		log.info("loading vehicles from " + vehiclesFile );
-		new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
+		if ( vehiclesFile != null ) {
+			log.info("loading vehicles from " + vehiclesFile );
+			new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
+		} else {
+			log.warn("NOT loading vehicles since filename is null.  If possible, switch of useVehicles in scenario (transit vehicles are now separate).") ;
+		}
 	}
 
 	private void loadLanes() {

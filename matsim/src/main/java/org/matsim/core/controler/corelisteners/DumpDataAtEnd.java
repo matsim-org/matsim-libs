@@ -83,8 +83,11 @@ public class DumpDataAtEnd implements ShutdownListener {
 		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
 			new TransitScheduleWriter(this.scenarioData.getTransitSchedule()).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
 		}
+		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
+			new VehicleWriterV1(this.scenarioData.getTransitVehicles()).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
+		}
 		if (this.scenarioData.getConfig().scenario().isUseVehicles()) {
-			new VehicleWriterV1(this.scenarioData.getTransitVehicles()).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
+			new VehicleWriterV1(this.scenarioData.getVehicles()).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
 		}
 		if (this.scenarioData.getConfig().scenario().isUseHouseholds()) {
 			new HouseholdsWriterV10(scenarioData.getHouseholds()).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));

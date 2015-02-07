@@ -252,8 +252,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 
 		@Override
 		public Vehicles getVehicles() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
+			return this.delegate.getVehicles() ;
 		}
 	}
 	

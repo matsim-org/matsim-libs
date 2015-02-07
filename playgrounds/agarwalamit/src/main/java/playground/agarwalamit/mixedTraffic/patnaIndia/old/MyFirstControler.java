@@ -40,31 +40,31 @@ public class MyFirstControler {
 		car.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("car"));
 		car.setPcuEquivalents(1.0);
 		modesType.put("car", car);
-		sc.getTransitVehicles().addVehicleType(car);
+		sc.getVehicles().addVehicleType(car);
 
 		VehicleType motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
 		motorbike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("motorbike"));
 		motorbike.setPcuEquivalents(0.25);
 		modesType.put("motorbike", motorbike);
-		sc.getTransitVehicles().addVehicleType(motorbike);
+		sc.getVehicles().addVehicleType(motorbike);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
 		bike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("bike"));
 		bike.setPcuEquivalents(0.25);
 		modesType.put("bike", bike);
-		sc.getTransitVehicles().addVehicleType(bike);
+		sc.getVehicles().addVehicleType(bike);
 
 		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
 		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
 		//		walk.setPcuEquivalents(0.10);  			
 		modesType.put("walk",walk);
-		sc.getTransitVehicles().addVehicleType(walk);
+		sc.getVehicles().addVehicleType(walk);
 
 		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
 		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("pt",pt);
-		sc.getTransitVehicles().addVehicleType(pt);
+		sc.getVehicles().addVehicleType(pt);
 
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
@@ -76,7 +76,7 @@ public class MyFirstControler {
 				}
 			}
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			sc.getTransitVehicles().addVehicle(vehicle);
+			sc.getVehicles().addVehicle(vehicle);
 		}
 
 		Controler controler = new Controler(sc);

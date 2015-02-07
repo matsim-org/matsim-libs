@@ -186,6 +186,15 @@ public class ScenarioImpl implements Scenario {
 		this.population = population;
 	}
 
+	// NOTE: Thibaut is not so happy about just returning null, since someone may code something like
+	// Vehicles vehicles = scenario.getVehicles() ; // returning null
+	// ... // lots of code
+	// ... vehicles.getVehicles() ... // throwing a null pointer exception
+	// That is, in such a situation the null pointer exception is thrown much later than when the null pointer was obtained.
+	// He rather wants to have this fail when it is called.
+	// I (kn) am a bit sceptic if it makes sense to establish such a convention when most other people use "if ... == null" use as the
+	// official dialect to check if something is there (since this would cause an exception with Thibaut's approach). kai, feb'15
+	
 	@Override
 	public final Households getHouseholds() {
 		if ( this.households == null ) {
@@ -209,8 +218,28 @@ public class ScenarioImpl implements Scenario {
 	@Override
 	public final Vehicles getTransitVehicles() {
 		if ( this.transitVehicles == null ) {
-			if ( this.config.scenario().isUseVehicles() ) {
+			if ( this.config.scenario().isUseTransit() ) {
 				this.createTransitVehicleContainer();
+			}
+			else {
+				// throwing an exception should be the right approach,
+				// but it requires some testing (there may be places in the code
+				// which are happy with getting a null pointer, and would then
+				// not work anymore)
+				// throw new IllegalStateException(
+				log.info(
+						"no transit vehicles container, and transit not activated from config. You must first call the create method of ScenarioImpl." );
+			}
+		}
+
+		return this.transitVehicles;
+	}
+
+	@Override
+	final public Vehicles getVehicles() {
+		if ( this.vehicles == null ) {
+			if ( this.config.scenario().isUseVehicles() ) {
+				this.createVehicleContainer();
 			}
 			else {
 				// throwing an exception should be the right approach,
@@ -223,9 +252,11 @@ public class ScenarioImpl implements Scenario {
 			}
 		}
 
-		return this.transitVehicles;
+		return this.vehicles;
 	}
 
+
+	
     @Override
 	public final TransitSchedule getTransitSchedule() {
 		if ( this.transitSchedule == null ) {
@@ -307,11 +338,6 @@ public class ScenarioImpl implements Scenario {
 	}
 	final void setTransitVehicles( Vehicles vehicles ) {
 		this.transitVehicles = vehicles ;
-	}
-
-	@Override
-	final public Vehicles getVehicles() {
-		return vehicles;
 	}
 
 }

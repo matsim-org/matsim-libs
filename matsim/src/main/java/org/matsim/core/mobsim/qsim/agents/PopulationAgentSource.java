@@ -67,6 +67,8 @@ public final class PopulationAgentSource implements AgentSource {
 		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
+
+				// to through all legs:
 				Leg leg = (Leg) planElement;
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
@@ -88,7 +90,7 @@ public final class PopulationAgentSource implements AgentSource {
                         if (qsim.getScenario().getConfig().qsim().getUseDefaultVehicles()) {
                             vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
                         } else {
-                            vehicle = qsim.getScenario().getTransitVehicles().getVehicles().get(vehicleId);
+                            vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
                             if (vehicle == null) {
                                 throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
                             }
