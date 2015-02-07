@@ -65,6 +65,11 @@
     	<artifactId>jzy3d-api</artifactId>
     	<version>0.9.1</version>
 	</dependency>
+    <dependency>
+    	<groupId>playground</groupId>
+    	<artifactId>nmviljoen</artifactId>
+    	<version>0.7.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   <build>
 	<plugins>
