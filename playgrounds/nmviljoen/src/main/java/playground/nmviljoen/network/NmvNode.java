@@ -1,9 +1,5 @@
 package playground.nmviljoen.network;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 
 public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
