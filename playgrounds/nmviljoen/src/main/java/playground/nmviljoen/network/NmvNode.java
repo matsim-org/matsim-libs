@@ -1,6 +1,6 @@
 package playground.nmviljoen.network;
 
-public class NmvNode {
+public class NmvNode implements Comparable<NmvNode>{
 	public String intID;
 	public String id;
 	public double X;
@@ -27,6 +27,11 @@ public class NmvNode {
 	
 	public String getYAsString(){
 		return Double.toString(Y);
+	}
+
+	@Override
+	public int compareTo(NmvNode o) {
+		return o.getId().compareTo(this.getId().toString());
 	}
 
 }
