@@ -237,7 +237,7 @@ public class PSeudoQSimCompareEventsTest {
 		final TransitSchedule schedule = ((ScenarioImpl) sc).getTransitSchedule();
 		final TransitScheduleFactory factory = schedule.getFactory();
 
-		final Vehicles vehicles = ((ScenarioImpl) sc).getVehicles();
+		final Vehicles vehicles = ((ScenarioImpl) sc).getTransitVehicles();
 
 		final VehicleType vehicleType =
 			vehicles.getFactory().createVehicleType(

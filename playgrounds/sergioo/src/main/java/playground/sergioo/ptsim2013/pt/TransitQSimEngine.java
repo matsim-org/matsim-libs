@@ -129,7 +129,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
 		Scenario scenario = this.qSim.getScenario();
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
 		UmlaufCache umlaufCache = (UmlaufCache) scenario.getScenarioElement(UmlaufCache.ELEMENT_NAME) ;
 		if (umlaufCache != null && umlaufCache.getTransitSchedule() == transitSchedule) { // has someone put a new transitschedule into the scenario?
@@ -169,7 +169,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private Collection<MobsimAgent> createVehiclesAndDriversWithoutUmlaeufe(TransitSchedule schedule,
 			TransitStopAgentTracker agentTracker) {
-		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl) this.qSim.getScenario()).getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<MobsimAgent>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {

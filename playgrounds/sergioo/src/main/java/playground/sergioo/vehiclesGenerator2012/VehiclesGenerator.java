@@ -44,9 +44,9 @@ public class VehiclesGenerator {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new VehicleReaderV1(scenario.getVehicles()).readFile(args[1]);
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(args[1]);
 		List<Vehicle> vehicles = new ArrayList<Vehicle>();
-		for(Vehicle vehicle:scenario.getVehicles().getVehicles().values())
+		for(Vehicle vehicle:scenario.getTransitVehicles().getVehicles().values())
 			if(new Integer(vehicle.getType().getId().toString())<20)
 				vehicles.add(vehicle);
 		int i=0;

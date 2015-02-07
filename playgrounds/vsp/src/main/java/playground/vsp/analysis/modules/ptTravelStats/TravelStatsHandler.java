@@ -215,8 +215,8 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	}
 	
 	private double getCapacityForVehicle(Id<Vehicle> vehicleId) {
-		int vehSeats = this.scenario.getVehicles().getVehicles().get(vehicleId).getType().getCapacity().getSeats();
-		int vehStand = this.scenario.getVehicles().getVehicles().get(vehicleId).getType().getCapacity().getStandingRoom();
+		int vehSeats = this.scenario.getTransitVehicles().getVehicles().get(vehicleId).getType().getCapacity().getSeats();
+		int vehStand = this.scenario.getTransitVehicles().getVehicles().get(vehicleId).getType().getCapacity().getStandingRoom();
 		return vehSeats + vehStand;
 	}
 

@@ -64,7 +64,9 @@ public class ScenarioImpl implements Scenario {
 	private TransitSchedule transitSchedule = null;
 
 	private Households households;
-	private Vehicles vehicles;
+	private Vehicles transitVehicles;
+	
+	private Vehicles vehicles ;
 
 	protected ScenarioImpl(Config config) {
 		this.config = config;
@@ -75,10 +77,10 @@ public class ScenarioImpl implements Scenario {
             this.createHouseholdsContainer();
         }
         if (this.config.scenario().isUseVehicles()){
-            this.createVehicleContainer();
         }
         if (this.config.scenario().isUseTransit()) {
             this.createTransitSchedule();
+            this.createTransitVehicleContainer();
         }
     }
 
@@ -90,6 +92,15 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
+	 public final boolean createTransitVehicleContainer(){
+		if ( this.transitVehicles != null ) return false;
+
+		if ( !this.config.scenario().isUseTransit() ) {
+			log.info( "creating transit vehicles container while transit switch in config set to false. File will not be loaded automatically." );
+		}
+		this.transitVehicles = VehicleUtils.createVehiclesContainer();
+		return true;
+	}
 	 public final boolean createVehicleContainer(){
 		if ( this.vehicles != null ) return false;
 
@@ -196,10 +207,10 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public final Vehicles getVehicles() {
-		if ( this.vehicles == null ) {
+	public final Vehicles getTransitVehicles() {
+		if ( this.transitVehicles == null ) {
 			if ( this.config.scenario().isUseVehicles() ) {
-				this.createVehicleContainer();
+				this.createTransitVehicleContainer();
 			}
 			else {
 				// throwing an exception should be the right approach,
@@ -212,7 +223,7 @@ public class ScenarioImpl implements Scenario {
 			}
 		}
 
-		return this.vehicles;
+		return this.transitVehicles;
 	}
 
     @Override
@@ -294,8 +305,13 @@ public class ScenarioImpl implements Scenario {
 	final void setTransitSchedule( TransitSchedule schedule ) {
 		this.transitSchedule = schedule ;
 	}
-	final void setVehicles( Vehicles vehicles ) {
-		this.vehicles = vehicles ;
+	final void setTransitVehicles( Vehicles vehicles ) {
+		this.transitVehicles = vehicles ;
+	}
+
+	@Override
+	final public Vehicles getVehicles() {
+		return vehicles;
 	}
 
 }

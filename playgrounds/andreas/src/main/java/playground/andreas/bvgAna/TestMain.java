@@ -98,7 +98,7 @@ public class TestMain {
 
 		new TransitScheduleReader(sc).readFile(transitScheduleFile);
 
-		new VehicleReaderV1(sc.getVehicles()).readFile(vehDefinitionFile);
+		new VehicleReaderV1(sc.getTransitVehicles()).readFile(vehDefinitionFile);
 
 		TreeSet<Id<Person>> agentIds = new TreeSet<>();
 		agentIds.add(Id.create("1000", Person.class));
@@ -127,7 +127,7 @@ public class TestMain {
 		VehId2OccupancyHandler veh2occu = new VehId2OccupancyHandler();
 //		eventsManager.addHandler(veh2occu);
 
-		VehId2LoadMap veh2load = new VehId2LoadMap(sc.getVehicles());
+		VehId2LoadMap veh2load = new VehId2LoadMap(sc.getTransitVehicles());
 //		eventsManager.addHandler(veh2load);
 
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();

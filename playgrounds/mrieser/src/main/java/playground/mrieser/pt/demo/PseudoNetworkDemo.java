@@ -108,7 +108,7 @@ public class PseudoNetworkDemo {
 		events.addHandler(writer);
 
 		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		new CreateVehiclesForSchedule(schedule, scenario.getTransitVehicles()).run();
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		

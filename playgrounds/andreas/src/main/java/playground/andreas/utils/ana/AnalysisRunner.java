@@ -106,7 +106,7 @@ public class AnalysisRunner {
 		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(outputDir + "/" + runId + "/", runId, true, true);
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
+		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
 		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
@@ -155,14 +155,14 @@ public class AnalysisRunner {
 		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
 		// still beta
-		PtCircuityAnalyzer circuityAnalyzer = new PtCircuityAnalyzer(sc, ((ScenarioImpl) sc).getVehicles());
+		PtCircuityAnalyzer circuityAnalyzer = new PtCircuityAnalyzer(sc, ((ScenarioImpl) sc).getTransitVehicles());
 		analyzer.addAnalysisModule(circuityAnalyzer);
 		
-		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
+		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
 		
 		// still beta
-		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
+		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptLines2PaxAnalysis);
 		
 		// still beta

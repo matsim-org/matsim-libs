@@ -60,68 +60,68 @@ public class SubPopControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createVehicleContainer();
+		((ScenarioImpl) sc).createTransitVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType slum_car = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));
 		slum_car.setMaximumVelocity(60.0/3.6);
 		slum_car.setPcuEquivalents(1.0);
 		modesType.put("slum_car", slum_car);
-		sc.getVehicles().addVehicleType(slum_car);
+		sc.getTransitVehicles().addVehicleType(slum_car);
 		
 		VehicleType nonSlum_car = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_car",VehicleType.class));
 		nonSlum_car.setMaximumVelocity(60.0/3.6);
 		nonSlum_car.setPcuEquivalents(1.0);
 		modesType.put("nonSlum_car", nonSlum_car);
-		sc.getVehicles().addVehicleType(nonSlum_car);
+		sc.getTransitVehicles().addVehicleType(nonSlum_car);
 
 		VehicleType slum_motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("slum_motorbike",VehicleType.class));
 		slum_motorbike.setMaximumVelocity(60.0/3.6);
 		slum_motorbike.setPcuEquivalents(0.25);
 		modesType.put("slum_motorbike", slum_motorbike);
-		sc.getVehicles().addVehicleType(slum_motorbike);
+		sc.getTransitVehicles().addVehicleType(slum_motorbike);
 		
 		VehicleType nonSlum_motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_motorbike",VehicleType.class));
 		nonSlum_motorbike.setMaximumVelocity(60.0/3.6);
 		nonSlum_motorbike.setPcuEquivalents(0.25);
 		modesType.put("nonSlum_motorbike", nonSlum_motorbike);
-		sc.getVehicles().addVehicleType(nonSlum_motorbike);
+		sc.getTransitVehicles().addVehicleType(nonSlum_motorbike);
 
 		VehicleType slum_bike = VehicleUtils.getFactory().createVehicleType(Id.create("slum_bike",VehicleType.class));
 		slum_bike.setMaximumVelocity(15.0/3.6);
 		slum_bike.setPcuEquivalents(0.25);
 		modesType.put("slum_bike", slum_bike);
-		sc.getVehicles().addVehicleType(slum_bike);
+		sc.getTransitVehicles().addVehicleType(slum_bike);
 		
 		VehicleType nonSlum_bike = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_bike",VehicleType.class));
 		nonSlum_bike.setMaximumVelocity(15.0/3.6);
 		nonSlum_bike.setPcuEquivalents(0.25);
 		modesType.put("nonSlum_bike", nonSlum_bike);
-		sc.getVehicles().addVehicleType(nonSlum_bike);
+		sc.getTransitVehicles().addVehicleType(nonSlum_bike);
 
 		VehicleType slum_walk = VehicleUtils.getFactory().createVehicleType(Id.create("slum_walk",VehicleType.class));
 		slum_walk.setMaximumVelocity(1.5);
 		//		walk.setPcuEquivalents(0.10);  			
 		modesType.put("slum_walk",slum_walk);
-		sc.getVehicles().addVehicleType(slum_walk);
+		sc.getTransitVehicles().addVehicleType(slum_walk);
 		
 		VehicleType nonSlum_walk = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_walk",VehicleType.class));
 		nonSlum_walk.setMaximumVelocity(1.5);
 		//		walk.setPcuEquivalents(0.10);  			
 		modesType.put("nonSlum_walk",nonSlum_walk);
-		sc.getVehicles().addVehicleType(nonSlum_walk);
+		sc.getTransitVehicles().addVehicleType(nonSlum_walk);
 
 		VehicleType slum_pt = VehicleUtils.getFactory().createVehicleType(Id.create("slum_pt",VehicleType.class));
 		slum_pt.setMaximumVelocity(40/3.6);
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("slum_pt",slum_pt);
-		sc.getVehicles().addVehicleType(slum_pt);
+		sc.getTransitVehicles().addVehicleType(slum_pt);
 		
 		VehicleType nonSlum_pt = VehicleUtils.getFactory().createVehicleType(Id.create("nonSlum_pt",VehicleType.class));
 		nonSlum_pt.setMaximumVelocity(40/3.6);
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("nonSlum_pt",nonSlum_pt);
-		sc.getVehicles().addVehicleType(nonSlum_pt);
+		sc.getTransitVehicles().addVehicleType(nonSlum_pt);
 
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
@@ -133,7 +133,7 @@ public class SubPopControler {
 				}
 			}
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			sc.getVehicles().addVehicle(vehicle);
+			sc.getTransitVehicles().addVehicle(vehicle);
 		}
 
 		Controler controler = new Controler(sc);

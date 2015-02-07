@@ -166,7 +166,7 @@ public class PTransitLineMerger {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(networkFile);
 		
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getVehicles());
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
 		vehicleReader.readFile(vehicleFile);
 		TransitScheduleReaderV1 scheduleReader = new TransitScheduleReaderV1(scenario);
 		scheduleReader.readFile(transitScheduleInFile);

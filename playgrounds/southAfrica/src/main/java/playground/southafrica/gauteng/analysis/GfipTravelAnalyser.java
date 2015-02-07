@@ -84,8 +84,8 @@ public class GfipTravelAnalyser {
 		new MatsimPopulationReader(sc).parse(populationFile);
 		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(populationAttributesFile);
 		new MatsimNetworkReader(sc).parse(networkFile);
-		((ScenarioImpl)sc).createVehicleContainer();
-		new VehicleReaderV1(sc.getVehicles()).parse(vehiclesFile);
+		((ScenarioImpl)sc).createTransitVehicleContainer();
+		new VehicleReaderV1(sc.getTransitVehicles()).parse(vehiclesFile);
 		
 		calculateGfipTravel(sc, eventsFile);
 		writeGfipTravelToFile(outputFile);

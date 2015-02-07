@@ -80,7 +80,7 @@ public class ScenarioPlayer {
 
 		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).parse("test/scenarios/pt-tutorial/transitschedule.xml");
-		new CreateVehiclesForSchedule(schedule, ((ScenarioImpl) scenario).getVehicles()).run();
+		new CreateVehiclesForSchedule(schedule, ((ScenarioImpl) scenario).getTransitVehicles()).run();
 
 		final EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML("./transitEvents.xml");

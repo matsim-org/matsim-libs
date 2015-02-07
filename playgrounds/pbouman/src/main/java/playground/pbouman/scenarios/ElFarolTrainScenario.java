@@ -220,7 +220,7 @@ public class ElFarolTrainScenario
 		
 		
 		
-		VehiclesFactory vFac = scen.getVehicles().getFactory();
+		VehiclesFactory vFac = scen.getTransitVehicles().getFactory();
 		
 		Vehicle [] vehicles = new Vehicle[numVehicles];
 		for (int t=0; t < numVehicles; t++)
@@ -231,9 +231,9 @@ public class ElFarolTrainScenario
 			VehicleType type = vFac.createVehicleType(Id.create("vtype"+t, VehicleType.class));
 			type.setCapacity(cap);
 			type.setMaximumVelocity(speed);
-			scen.getVehicles().addVehicleType( type);
+			scen.getTransitVehicles().addVehicleType( type);
 			Vehicle veh = vFac.createVehicle(Id.create("vehicle"+t, Vehicle.class), type);
-			scen.getVehicles().addVehicle( veh);
+			scen.getTransitVehicles().addVehicle( veh);
 			vehicles[t] = veh;
 		}
 		

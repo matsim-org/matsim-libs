@@ -176,7 +176,7 @@ public class AccessEgressDemoSimple {
 	}
 	
 	private void createVehicles() {
-		Vehicles vehicles = this.scenario.getVehicles();
+		Vehicles vehicles = this.scenario.getTransitVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
 		
 		// bus like

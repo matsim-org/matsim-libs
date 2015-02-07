@@ -67,7 +67,7 @@ public class RouterTester {
 		s.getConfig().scenario().setUseTransit(true);
 		s.getConfig().scenario().setUseVehicles(true);
 
-		Vehicles v = s.getVehicles();
+		Vehicles v = s.getTransitVehicles();
 		TransitSchedule ts = s.getTransitSchedule();
 		PopulationImpl p = (PopulationImpl) s.getPopulation();
 

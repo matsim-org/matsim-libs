@@ -34,14 +34,14 @@ public class ScenarioImplTest {
 	public void testCreateOnlyOneVehiclesContainer() {
 		final ScenarioImpl sc = new ScenarioImpl( ConfigUtils.createConfig() );
 
-		final boolean created = sc.createVehicleContainer();
-		final Vehicles vehicles = sc.getVehicles();
-		final boolean recreated = sc.createVehicleContainer();
+		final boolean created = sc.createTransitVehicleContainer();
+		final Vehicles vehicles = sc.getTransitVehicles();
+		final boolean recreated = sc.createTransitVehicleContainer();
 
 		Assert.assertSame(
 				"vehicles re-created!",
 				vehicles,
-				sc.getVehicles() );
+				sc.getTransitVehicles() );
 
 		Assert.assertTrue( "vehicles said not created" , created );
 		Assert.assertFalse( "vehicles said recreated" , recreated );

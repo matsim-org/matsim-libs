@@ -576,7 +576,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rPtCircuityAnalysis(){
 		ScenarioImpl sc = (ScenarioImpl) scenario;
-		Vehicles vehicles = sc.getVehicles();
+		Vehicles vehicles = sc.getTransitVehicles();
 		PtCircuityAnalyzer analysis = new PtCircuityAnalyzer(scenario, vehicles);
 		analysis.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
@@ -611,7 +611,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		//scenario.getScenarioElement(vehicles)
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
-		Vehicles vehicles = sc.getVehicles();
+		Vehicles vehicles = sc.getTransitVehicles();
 		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
 		PtLines2PaxAnalysis ppa = new PtLines2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));
 		
@@ -685,7 +685,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		//scenario.getScenarioElement(vehicles)
 		ScenarioImpl sc = (ScenarioImpl) scenario;
 
-		Vehicles vehicles = sc.getVehicles();
+		Vehicles vehicles = sc.getTransitVehicles();
 		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval in seconds, int maxSlices)
 		PtRoutes2PaxAnalysis ppa = new PtRoutes2PaxAnalysis(lines, vehicles, 60*60, 24*(60/60));
 		

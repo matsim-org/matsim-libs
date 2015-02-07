@@ -128,13 +128,13 @@ public class PassingTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		((ScenarioImpl)net.scenario).createVehicleContainer();
+		((ScenarioImpl)net.scenario).createTransitVehicleContainer();
 		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
 
 		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
 
 		for(String str:mode2VehType.keySet()){
-			net.scenario.getVehicles().addVehicleType(mode2VehType.get(str));
+			net.scenario.getTransitVehicles().addVehicleType(mode2VehType.get(str));
 		}
 
 		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
@@ -161,7 +161,7 @@ public class PassingTest {
 
 			Id<Vehicle> vehId = Id.create(i,Vehicle.class);
 			Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, mode2VehType.get(transportModes[i]));
-			net.scenario.getVehicles().addVehicle(veh);
+			net.scenario.getTransitVehicles().addVehicle(veh);
 
 		}
 

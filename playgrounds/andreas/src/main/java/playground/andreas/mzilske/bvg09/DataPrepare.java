@@ -112,7 +112,7 @@ public class DataPrepare {
 		log.info("reading visum network.");
 		new VisumNetworkReader(vNetwork).read(InVisumNetFile);
 		log.info("converting visum data to TransitSchedule.");
-		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getTransitVehicles());
 
 		// configure how transport modes must be converted
 		// the ones for Berlin
@@ -135,7 +135,7 @@ public class DataPrepare {
 		log.info("writing TransitSchedule to file.");
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule()).write(IntermediateTransitScheduleWithoutNetworkFile);
 		log.info("writing vehicles to file.");
-		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(OutVehicleFile);
+		new VehicleWriterV1(this.scenario.getTransitVehicles()).writeFile(OutVehicleFile);
 		new NetworkWriter(this.pseudoNetwork).write(IntermediateTransitNetworkFile);
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(OutTransitScheduleWithNetworkFile);
 	}
@@ -231,27 +231,27 @@ public class DataPrepare {
 		GreedyUmlaufBuilderImpl greedyUmlaufBuilder = new GreedyUmlaufBuilderImpl(new UmlaufInterpolator(this.scenario.getNetwork(), this.scenario.getConfig().planCalcScore()), transitLines);
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
-		VehiclesFactory vb = this.scenario.getVehicles().getFactory();
+		VehiclesFactory vb = this.scenario.getTransitVehicles().getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create(
 				"defaultTransitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		this.scenario.getVehicles().addVehicleType(
+		this.scenario.getTransitVehicles().addVehicleType(
 				vehicleType);
 
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
 			Vehicle veh = vb.createVehicle(Id.create("veh_"+ Long.toString(vehId++), Vehicle.class), vehicleType);
-			this.scenario.getVehicles().addVehicle( veh);
+			this.scenario.getTransitVehicles().addVehicle( veh);
 			umlauf.setVehicleId(veh.getId());
 		}
 	}
 
 
 	private void emptyVehicles() {
-		this.scenario.getVehicles().getVehicles().clear();
+		this.scenario.getTransitVehicles().getVehicles().clear();
 	}
 
 

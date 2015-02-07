@@ -729,8 +729,8 @@ public class GtfsConverter {
             vt = getVehicleType(gtfsVehicleType);
 
             // Vehicle
-			Vehicle v = scenario.getVehicles().getFactory().createVehicle(Id.create(s, Vehicle.class), vt);
-			scenario.getVehicles().addVehicle(v);
+			Vehicle v = scenario.getTransitVehicles().getFactory().createVehicle(Id.create(s, Vehicle.class), vt);
+			scenario.getTransitVehicles().addVehicle(v);
 		}
 	}
 
@@ -752,15 +752,15 @@ public class GtfsConverter {
     }
 
     private VehicleType vehicleType(Id<VehicleType> type) {
-        VehicleType vt = scenario.getVehicles().getVehicleTypes().get(type);
+        VehicleType vt = scenario.getTransitVehicles().getVehicleTypes().get(type);
         if (vt == null) {
-            VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
+            VehicleCapacity vc = scenario.getTransitVehicles().getFactory().createVehicleCapacity();
             vc.setSeats(50);
             vc.setStandingRoom(50);
-            vt = scenario.getVehicles().getFactory().createVehicleType(type);
+            vt = scenario.getTransitVehicles().getFactory().createVehicleType(type);
             vt.setCapacity(vc);
             vt.setLength(5);
-            scenario.getVehicles().addVehicleType(vt);
+            scenario.getTransitVehicles().addVehicleType(vt);
         }
         return vt;
     }

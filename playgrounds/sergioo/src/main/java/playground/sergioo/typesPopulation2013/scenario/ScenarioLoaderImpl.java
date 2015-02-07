@@ -264,7 +264,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadVehicles() throws UncheckedIOException {
-		new VehicleReaderV1(this.scenario.getVehicles()).readFile(this.config.transit().getVehiclesFile());
+		new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
 	}
 
 	private void loadLanes() {

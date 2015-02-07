@@ -143,7 +143,7 @@ public class PControler extends Controler {
 			ReplanTimeSchedule replanTS = new ReplanTimeSchedule();
 			replanTS.replan(pConfig, sc.getNetwork());
 			
-			new VehicleWriterV1(sc.getVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
+			new VehicleWriterV1(sc.getTransitVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
 		}
 		
 	}

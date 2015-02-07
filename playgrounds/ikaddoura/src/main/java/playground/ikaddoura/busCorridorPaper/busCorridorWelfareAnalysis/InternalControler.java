@@ -86,7 +86,7 @@ public class InternalControler {
 	public void run() {
 	
 		new TransitScheduleReaderV1(scenario).readFile(this.directoryExtIt + "/scheduleFile.xml");
-		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
+		new VehicleReaderV1(((ScenarioImpl) scenario).getTransitVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
 
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);

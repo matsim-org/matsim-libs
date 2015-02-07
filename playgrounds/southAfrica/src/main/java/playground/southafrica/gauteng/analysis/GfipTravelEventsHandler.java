@@ -55,7 +55,7 @@ public class GfipTravelEventsHandler implements LinkEnterEventHandler{
 		
 		if(links.contains(linkId)){
 			double linkDistance = this.sc.getNetwork().getLinks().get(linkId).getLength();
-			VehicleType vehicleType = this.sc.getVehicles().getVehicles().get(vehicleId).getType();
+			VehicleType vehicleType = this.sc.getTransitVehicles().getVehicles().get(vehicleId).getType();
 			if(!map.containsKey(vehicleType.getId())){
 				map.put(vehicleType.getId(), new TreeMap<Id<Vehicle>, Double>());
 			}

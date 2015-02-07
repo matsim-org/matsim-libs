@@ -131,7 +131,7 @@ public class TransitScheduleAreaCut2 {
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		this.newSchedule = sc.getTransitSchedule();
-		this.newVehicles = ((ScenarioImpl) sc).getVehicles();
+		this.newVehicles = ((ScenarioImpl) sc).getTransitVehicles();
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
 		
 		//copy the vehicles
@@ -421,7 +421,7 @@ public class TransitScheduleAreaCut2 {
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "remainingSchedule.xml.gz");
-		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
+		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
 		
 		BVGLines2PtModes lines2mode = new BVGLines2PtModes();
 		lines2mode.setPtModesForEachLine(sc.getTransitSchedule(), "p");
@@ -430,7 +430,7 @@ public class TransitScheduleAreaCut2 {
 		}};
 		
 		DaShapeWriter.writeTransitLines2Shape(dir + "oldSchedule.shp", sc.getTransitSchedule(), null, TransitSchedule2Shape.getAttributesForLines(sc.getTransitSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
-		TransitScheduleAreaCut2 areacut = new TransitScheduleAreaCut2(sc.getTransitSchedule(), dir + "scenarioArea.shp", lines2mode, modes2Cut, ((ScenarioImpl)sc).getVehicles());
+		TransitScheduleAreaCut2 areacut = new TransitScheduleAreaCut2(sc.getTransitSchedule(), dir + "scenarioArea.shp", lines2mode, modes2Cut, ((ScenarioImpl)sc).getTransitVehicles());
 		areacut.run(dir);
 		DaShapeWriter.writeTransitLines2Shape(dir + "cuttedSchedule.shp", areacut.getNewSchedule(), null, TransitSchedule2Shape.getAttributesForLines(areacut.getNewSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
 

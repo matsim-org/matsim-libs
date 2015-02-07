@@ -256,7 +256,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		
 		//Vehicles
-		Vehicles vehicles = ((ScenarioImpl)this.sc).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)this.sc).getTransitVehicles();
 		VehiclesFactory vf = vehicles.getFactory();
 		VehicleType vt = vf.createVehicleType(Id.create("bus", VehicleType.class));
 		VehicleCapacity vc = vf.createVehicleCapacity();

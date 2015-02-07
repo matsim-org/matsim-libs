@@ -98,7 +98,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		schedule.addTransitLine(tLine1);
 
 		// build vehicles
-		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+		new CreateVehiclesForSchedule(schedule, scenario.getTransitVehicles()).run();
 
 		// build population
 		Population population = scenario.getPopulation();

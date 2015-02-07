@@ -59,7 +59,7 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		} 
 		
 		/* Determine toll class from vehicle type. */
-		VehicleType type = sc.getVehicles().getVehicles().get(vehicleId).getType();
+		VehicleType type = sc.getTransitVehicles().getVehicles().get(vehicleId).getType();
 		if(type.getId().toString().equalsIgnoreCase("A2")){
 			/* Nothing, it stays 1.00. */
 		} else if(type.getId().toString().equalsIgnoreCase("B")){
@@ -104,12 +104,12 @@ public class SanralTollFactor_Subpopulation implements TollFactorI {
 		}
 		
 		Assert.assertNotNull( this.sc );
-		Assert.assertNotNull( this.sc.getVehicles() );
-		Assert.assertNotNull( this.sc.getVehicles().getVehicles() );
-		if( this.sc.getVehicles().getVehicles().get(vehicleId)==null ) {
+		Assert.assertNotNull( this.sc.getTransitVehicles() );
+		Assert.assertNotNull( this.sc.getTransitVehicles().getVehicles() );
+		if( this.sc.getTransitVehicles().getVehicles().get(vehicleId)==null ) {
 			Logger.getLogger(this.getClass()).warn("vehicleId: " + vehicleId ) ;
 		}
-		VehicleType type = this.sc.getVehicles().getVehicles().get(vehicleId).getType();
+		VehicleType type = this.sc.getTransitVehicles().getVehicles().get(vehicleId).getType();
 		
 		if(type.getId().toString().equalsIgnoreCase("A1") || 
 				type.getId().toString().equalsIgnoreCase("A2")){

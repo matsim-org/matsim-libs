@@ -61,7 +61,7 @@ public class ModeAvailabilityChecker {
 	
 	public ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
-		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
+		this.vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = new WalkSpeedComparator();
 		
@@ -73,7 +73,7 @@ public class ModeAvailabilityChecker {
 	private ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider, 
 			WalkSpeedComparator walkSpeedComparator) {
 		this.scenario = scenario;
-		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
+		this.vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = walkSpeedComparator;		
 	}

@@ -173,8 +173,8 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.transitSchedule.xml.gz");
-		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz");
-		PtRoutes2PaxAnalysis ptRoutesPax = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600, 24);
+		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz");
+		PtRoutes2PaxAnalysis ptRoutesPax = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptRoutesPax);
 		analyzer.run();
 		

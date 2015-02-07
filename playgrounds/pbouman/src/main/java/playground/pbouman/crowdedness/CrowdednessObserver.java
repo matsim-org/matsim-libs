@@ -78,7 +78,7 @@ public class CrowdednessObserver implements
 	public CrowdednessObserver( Scenario sc, EventsManager ev , SeatAssignmentRule rule) {
 		this.sc = sc ;
 		this.ev = ev ;
-		this.vehs = ((ScenarioImpl)this.sc).getVehicles() ;
+		this.vehs = ((ScenarioImpl)this.sc).getTransitVehicles() ;
 		this.rule = rule;
 		this.personsInVehicles = new HashMap<Vehicle,SeatAdministration>();
 		this.pendingObservation = new HashSet<Vehicle>();

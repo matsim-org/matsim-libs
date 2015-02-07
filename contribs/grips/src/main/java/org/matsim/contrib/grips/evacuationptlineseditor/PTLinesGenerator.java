@@ -151,7 +151,7 @@ public class PTLinesGenerator {
 		TransitRoute tr = this.fac.createTransitRoute(Id.create(id, TransitRoute.class), route, stops, "bus");
 
 		// Vehicles
-		Vehicles vehicles = ((ScenarioImpl) this.sc).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl) this.sc).getTransitVehicles();
 		VehiclesFactory vf = vehicles.getFactory();
 		VehicleType vt = vf.createVehicleType(Id.create(id, VehicleType.class));
 		VehicleCapacity vc = vf.createVehicleCapacity();

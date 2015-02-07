@@ -34,7 +34,7 @@ public class GtfsTests extends MatsimTestCase {
 		// The Conversion is done, now read the checked scenario
 		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
-		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
+		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule.xml");
 		
 		this.compareResults(checkedScenario, scenario);		
@@ -54,7 +54,7 @@ public class GtfsTests extends MatsimTestCase {
 		// The Conversion is done, now read the checked scenario
 		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
-		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
+		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule_shaped.xml");
 		
 		this.compareResults(checkedScenario, scenario);	
@@ -95,8 +95,8 @@ public class GtfsTests extends MatsimTestCase {
 	}
 
 	private void compareTransitVehicles(ScenarioImpl sc1, ScenarioImpl sc2) {
-		Vehicles v1 = sc1.getVehicles();
-		Vehicles v2 = sc2.getVehicles();
+		Vehicles v1 = sc1.getTransitVehicles();
+		Vehicles v2 = sc2.getTransitVehicles();
 		assertEquals(v1.getVehicles().size(),v2.getVehicles().size());
 		assertEquals(v1.getVehicleTypes().size(),v2.getVehicleTypes().size());
 	}

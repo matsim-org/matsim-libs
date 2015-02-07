@@ -33,38 +33,38 @@ public class MyFirstControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createVehicleContainer();
+		((ScenarioImpl) sc).createTransitVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
 		car.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("car"));
 		car.setPcuEquivalents(1.0);
 		modesType.put("car", car);
-		sc.getVehicles().addVehicleType(car);
+		sc.getTransitVehicles().addVehicleType(car);
 
 		VehicleType motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
 		motorbike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("motorbike"));
 		motorbike.setPcuEquivalents(0.25);
 		modesType.put("motorbike", motorbike);
-		sc.getVehicles().addVehicleType(motorbike);
+		sc.getTransitVehicles().addVehicleType(motorbike);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
 		bike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("bike"));
 		bike.setPcuEquivalents(0.25);
 		modesType.put("bike", bike);
-		sc.getVehicles().addVehicleType(bike);
+		sc.getTransitVehicles().addVehicleType(bike);
 
 		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
 		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
 		//		walk.setPcuEquivalents(0.10);  			
 		modesType.put("walk",walk);
-		sc.getVehicles().addVehicleType(walk);
+		sc.getTransitVehicles().addVehicleType(walk);
 
 		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
 		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("pt",pt);
-		sc.getVehicles().addVehicleType(pt);
+		sc.getTransitVehicles().addVehicleType(pt);
 
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
@@ -76,7 +76,7 @@ public class MyFirstControler {
 				}
 			}
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			sc.getVehicles().addVehicle(vehicle);
+			sc.getTransitVehicles().addVehicle(vehicle);
 		}
 
 		Controler controler = new Controler(sc);

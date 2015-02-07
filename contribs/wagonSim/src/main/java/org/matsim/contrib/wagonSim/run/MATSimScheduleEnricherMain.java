@@ -70,7 +70,7 @@ public class MATSimScheduleEnricherMain {
 		scenario = ScenarioUtils.createScenario(config);
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
 		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
-		new VehicleReaderV1(((ScenarioImpl)scenario).getVehicles()).readFile(transitVehiclesFile);
+		new VehicleReaderV1(((ScenarioImpl)scenario).getTransitVehicles()).readFile(transitVehiclesFile);
 		vehicleAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(vehicleAttributes).parse(transitVehicleAttributesFile);
 	}
@@ -152,7 +152,7 @@ public class MATSimScheduleEnricherMain {
 		new NetworkWriter(enricher.getScenario().getNetwork()).write(outputBase+"/network.enriched.xml.gz");
 		new TransitScheduleWriter(enricher.getScenario().getTransitSchedule()).writeFile(outputBase+"/transitSchedule.enriched.xml.gz");
 		Utils.writeShuntingTimes(enricher.getScenario(), shuntingTimes,outputBase+"/shuntingTimes.enriched.txt");
-		new VehicleWriterV1(((ScenarioImpl)enricher.getScenario()).getVehicles()).writeFile(outputBase+"/transitVehicles.enriched.xml.gz");
+		new VehicleWriterV1(((ScenarioImpl)enricher.getScenario()).getTransitVehicles()).writeFile(outputBase+"/transitVehicles.enriched.xml.gz");
 		Utils.writeShuntingTable(enricher.getScenario().getTransitSchedule(),outputBase+"/shuntingTable.enriched.txt");
 		new ObjectAttributesXmlWriter(enricher.getVehicleAttributes()).writeFile(outputBase+"/transitVehicleAttributes.enriched.xml.gz");
 	}

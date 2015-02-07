@@ -112,7 +112,7 @@ public class UCSBTransitScheduleCreator {
 
 		Network network = scenario.getNetwork();
 		
-		Vehicles vehicles = ((ScenarioImpl)scenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();
 		VehicleType defaultVehicleType = vehicles.getFactory().createVehicleType(Id.create(1, VehicleType.class));
 		vehicles.addVehicleType(defaultVehicleType);
 		defaultVehicleType.setDescription("generic default");
@@ -514,6 +514,6 @@ public class UCSBTransitScheduleCreator {
 		new NetworkWriter(scenario.getNetwork()).write(outBase+"network.xml.gz");
 		new NetworkWriteAsTable(outBase).run(scenario.getNetwork());
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(outBase+"transitSchedule.xml.gz");
-		new VehicleWriterV1(((ScenarioImpl)scenario).getVehicles()).writeFile(outBase+"transitVehicles.xml.gz");
+		new VehicleWriterV1(((ScenarioImpl)scenario).getTransitVehicles()).writeFile(outBase+"transitVehicles.xml.gz");
 	}
 }

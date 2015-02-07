@@ -123,7 +123,7 @@ public class PtScenarioAdaption {
 		this.transitFactory = schedule.getFactory();
 		new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		
-		Vehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getTransitVehicles();
 		new VehicleReaderV1(vehicles).readFile(transitVehicleFile);
 		
 		log.info("Initialization ... done");
@@ -157,7 +157,7 @@ public class PtScenarioAdaption {
 				
 				implDeparture = departuresTimes.firstKey();
 				Id vehicleId = departuresTimes.get(implDeparture).getVehicleId();
-				currentVehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+				currentVehicle = scenario.getTransitVehicles().getVehicles().get(vehicleId);
 				
 				copyFirstDeparture();
 				
@@ -184,7 +184,7 @@ public class PtScenarioAdaption {
 		for(Double depTime : departuresTimes.keySet()){
 			
 			Id vehicleId = departuresTimes.get(depTime).getVehicleId();
-			currentVehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+			currentVehicle = scenario.getTransitVehicles().getVehicles().get(vehicleId);
 			
 			if(departuresTimes.lastKey() != depTime &&
 					(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
@@ -213,14 +213,14 @@ public class PtScenarioAdaption {
 
 	private void removeVehicles() {
 		
-		scenario.getVehicles().getVehicles().clear();
+		scenario.getTransitVehicles().getVehicles().clear();
 	}
 	
 	private void copyNewVehicles() {
 		
 		for(Id id : newVehiclesMap.keySet()){
 			
-			scenario.getVehicles().addVehicle( newVehiclesMap.get(id));
+			scenario.getTransitVehicles().addVehicle( newVehiclesMap.get(id));
 		}
 	}
 
@@ -320,7 +320,7 @@ public class PtScenarioAdaption {
 		
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(this.outpath + "newTransitSchedule.xml.gz");
 		
-		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(this.outpath + "newTransitVehicles.xml.gz");
+		new VehicleWriterV1(this.scenario.getTransitVehicles()).writeFile(this.outpath + "newTransitVehicles.xml.gz");
 		
 		log.info("Writing new network file ... done");
 	}

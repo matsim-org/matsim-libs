@@ -157,7 +157,7 @@ public class SingleLineScenario
 		stops1.add(sFac.createTransitRouteStop(iStop, 2.1 * 3600, 2.1 * 3600));
 		stops1.add(sFac.createTransitRouteStop(bStop, 4.2 * 3600, 4.2 * 3600));
 		
-		VehiclesFactory vFac = scen.getVehicles().getFactory();
+		VehiclesFactory vFac = scen.getTransitVehicles().getFactory();
 		
 		NetworkRoute route1 = RouteUtils.createNetworkRoute(routeIds1, net);
 		TransitRoute transitRoute1 = sFac.createTransitRoute(Id.create("l1r1", TransitRoute.class), route1, stops1, "pt");
@@ -171,9 +171,9 @@ public class SingleLineScenario
 			VehicleType type = vFac.createVehicleType(Id.create("r1dep"+t+"type", VehicleType.class));
 			type.setCapacity(cap);
 			type.setMaximumVelocity(20);
-			scen.getVehicles().addVehicleType(type);
+			scen.getTransitVehicles().addVehicleType(type);
 			Vehicle veh = vFac.createVehicle(Id.create("r1dep"+t+"veh", Vehicle.class), type);
-			scen.getVehicles().addVehicle( veh);
+			scen.getTransitVehicles().addVehicle( veh);
 			dep.setVehicleId(veh.getId());
 			
 			

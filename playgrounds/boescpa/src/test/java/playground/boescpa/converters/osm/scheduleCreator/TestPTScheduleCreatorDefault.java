@@ -58,7 +58,7 @@ public class TestPTScheduleCreatorDefault {
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().scenario().setUseVehicles(true);
         schedule = scenario.getTransitSchedule();
-        vehicles = scenario.getVehicles();
+        vehicles = scenario.getTransitVehicles();
         scheduleCreator = new PTScheduleCreatorDefault(schedule, vehicles);
     }
 

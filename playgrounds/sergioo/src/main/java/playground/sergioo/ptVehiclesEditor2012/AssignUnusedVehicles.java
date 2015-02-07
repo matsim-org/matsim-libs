@@ -23,9 +23,9 @@ public class AssignUnusedVehicles {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new VehicleReaderV1(scenario.getVehicles()).readFile(args[1]);
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(args[1]);
 		Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
-		for(Vehicle vehicle:((ScenarioImpl)scenario).getVehicles().getVehicles().values())
+		for(Vehicle vehicle:((ScenarioImpl)scenario).getTransitVehicles().getVehicles().values())
 			vehicleIds.add(vehicle.getId());
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())

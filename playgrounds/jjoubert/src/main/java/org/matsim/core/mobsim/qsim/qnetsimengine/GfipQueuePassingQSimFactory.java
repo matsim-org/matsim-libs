@@ -143,8 +143,8 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		 * passed to the mobsim, not some default-per-mode vehicle. */		
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qsim);
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-		for(Id<VehicleType> id : sc.getVehicles().getVehicleTypes().keySet()){
-			modeVehicleTypes.put(id.toString(), sc.getVehicles().getVehicleTypes().get(id));
+		for(Id<VehicleType> id : sc.getTransitVehicles().getVehicleTypes().keySet()){
+			modeVehicleTypes.put(id.toString(), sc.getTransitVehicles().getVehicleTypes().get(id));
 		}
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qsim.addAgentSource(agentSource);

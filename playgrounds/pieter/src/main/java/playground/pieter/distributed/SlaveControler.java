@@ -315,7 +315,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (config.scenario().isUseTransit()) {
             new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
             if (this.config.scenario().isUseVehicles()) {
-                new VehicleReaderV1(this.scenario.getVehicles()).readFile(this.config.transit().getVehiclesFile());
+                new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
             }
         }
     }

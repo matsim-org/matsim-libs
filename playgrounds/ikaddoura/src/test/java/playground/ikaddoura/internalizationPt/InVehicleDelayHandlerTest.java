@@ -74,7 +74,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		new VehicleReaderV1(scenario.getVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 			
 		events.addHandler(new TransferDelayInVehicleEventHandler() {
 
@@ -121,19 +121,19 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 				
 				// Person1, Bus1
 				if (delay.getCausingAgent().toString().equals(this.testAgent1.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 0, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 				
 				// Person2, Bus1
 				else if (delay.getCausingAgent().toString().equals(this.testAgent2.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 1, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 				
 				// Person3, Bus1
 				else if (delay.getCausingAgent().toString().equals(this.testAgent3.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 2, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 			}
@@ -166,19 +166,19 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 				
 				// Person1, Bus1
 				if (delay.getCausingAgent().toString().equals(this.testAgent1.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 2, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 				
 				// Person2, Bus1
 				else if (delay.getCausingAgent().toString().equals(this.testAgent2.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 1, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 				
 				// Person3, Bus1
 				else if (delay.getCausingAgent().toString().equals(this.testAgent3.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-					Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 					Assert.assertEquals("affected agents", 0, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 				}
 			}
@@ -221,7 +221,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 			EventsManager events = EventsUtils.createEventsManager();
 			config.scenario().setUseVehicles(true);
 			config.scenario().setUseTransit(true);
-			new VehicleReaderV1(scenario.getVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
+			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 				
 			events.addHandler(new TransferDelayInVehicleEventHandler() {
 
@@ -266,19 +266,19 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 					
 					// Person1, Bus1
 					if (delay.getCausingAgent().toString().equals(this.testAgent1.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-						Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 						Assert.assertEquals("affected agents", 0, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 					}
 					
 					// Person2, Bus1
 					else if (delay.getCausingAgent().toString().equals(this.testAgent2.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-						Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 						Assert.assertEquals("affected agents", 1, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 					}
 					
 					// Person3, Bus1
 					else if (delay.getCausingAgent().toString().equals(this.testAgent3.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-						Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getAccessTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 						Assert.assertEquals("affected agents", 2, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 					}
 				}
@@ -311,13 +311,13 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 					
 					// Person1, Bus1
 					if (delay.getCausingAgent().toString().equals(this.testAgent1.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-						Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+						Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 						Assert.assertEquals("affected agents", 2, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 					}
 					
 					// Person2, Bus1
 					else if (delay.getCausingAgent().toString().equals(this.testAgent2.toString()) && delay.getVehicleId().toString().equals(this.vehicleId1.toString())){
-							Assert.assertEquals("delay", scenario.getVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
+							Assert.assertEquals("delay", scenario.getTransitVehicles().getVehicles().get(vehicleId1).getType().getEgressTime(), delay.getDelay(), MatsimTestUtils.EPSILON);
 							Assert.assertEquals("affected agents", 1, delay.getAffectedAgents(), MatsimTestUtils.EPSILON);
 					}
 					else {

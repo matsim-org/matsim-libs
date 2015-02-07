@@ -2117,7 +2117,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestInVehicleDelay01(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -2316,7 +2316,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestInVehicleDelay02(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 	
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -2631,7 +2631,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestInVehicleDelay03(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -2906,7 +2906,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay01(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -3181,7 +3181,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay02(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -3463,7 +3463,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay03(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -3749,7 +3749,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay03b(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -4041,7 +4041,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay04(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -4329,7 +4329,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay05(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -4729,7 +4729,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestWaitingDelay06(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -5039,7 +5039,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestCapacityDelay01(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -5349,7 +5349,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestCapacityDelay02(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -5685,7 +5685,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestCapacityDelay03(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -6008,7 +6008,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestCapacityDelay04(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
@@ -6344,7 +6344,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 	
 	private void fillVehicleTestCapacityDelay05(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
+		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
 		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);

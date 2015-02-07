@@ -76,7 +76,7 @@ public class VehicleType2ScenarioTest {
 		
 		if(! useModifiedMobsimFactory){
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			((ScenarioImpl) scenario).createVehicleContainer();
+			((ScenarioImpl) scenario).createTransitVehicleContainer();
 		}
 	}
 
@@ -158,10 +158,10 @@ public class VehicleType2ScenarioTest {
 				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
 				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
 			
-				if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
-					scenario.getVehicles().addVehicleType(vehTypes[i]);
+				if(! scenario.getTransitVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					scenario.getTransitVehicles().addVehicleType(vehTypes[i]);
 				}
-				scenario.getVehicles().addVehicle(v);
+				scenario.getTransitVehicles().addVehicle(v);
 			}
 		}
 

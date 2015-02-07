@@ -156,7 +156,7 @@ public class OttToMATSimScheduleConverterMain {
 			new NetworkWriter(converter.getScenario().getNetwork()).write(outputBase+"/network.ott.performance.xml.gz");
 			new TransitScheduleWriter(converter.getScenario().getTransitSchedule()).writeFile(outputBase+"/transitSchedule.ott.performance.xml.gz");
 			Utils.writeShuntingTimes(converter.getScenario(),null,outputBase+"/shuntingTimes.ott.performance.txt");
-			new VehicleWriterV1(((ScenarioImpl)converter.getScenario()).getVehicles()).writeFile(outputBase+"/transitVehicles.ott.performance.xml.gz");
+			new VehicleWriterV1(((ScenarioImpl)converter.getScenario()).getTransitVehicles()).writeFile(outputBase+"/transitVehicles.ott.performance.xml.gz");
 			Utils.writeShuntingTable(converter.getScenario().getTransitSchedule(),outputBase+"/shuntingTable.ott.performance.txt");
 			new ObjectAttributesXmlWriter(converter.getVehicleAttributes()).writeFile(outputBase+"/transitVehicleAttributes.ott.performance.xml.gz");
 		}
@@ -164,7 +164,7 @@ public class OttToMATSimScheduleConverterMain {
 			new NetworkWriter(converter.getScenario().getNetwork()).write(outputBase+"/network.ott.target.xml.gz");
 			new TransitScheduleWriter(converter.getScenario().getTransitSchedule()).writeFile(outputBase+"/transitSchedule.ott.target.xml.gz");
 			Utils.writeShuntingTimes(converter.getScenario(),null,outputBase+"/shuntingTimes.ott.target.txt");
-			new VehicleWriterV1(((ScenarioImpl)converter.getScenario()).getVehicles()).writeFile(outputBase+"/transitVehicles.ott.target.xml.gz");
+			new VehicleWriterV1(((ScenarioImpl)converter.getScenario()).getTransitVehicles()).writeFile(outputBase+"/transitVehicles.ott.target.xml.gz");
 			Utils.writeShuntingTable(converter.getScenario().getTransitSchedule(),outputBase+"/shuntingTable.ott.target.txt");
 			new ObjectAttributesXmlWriter(converter.getVehicleAttributes()).writeFile(outputBase+"/transitVehicleAttributes.ott.target.xml.gz");
 		}

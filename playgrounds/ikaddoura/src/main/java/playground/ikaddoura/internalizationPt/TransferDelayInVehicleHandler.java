@@ -128,7 +128,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			agentsTransferingAtThisStop.add(event.getPersonId());
 			this.vehId2agentsBoardingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
 													
-			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			double delay = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
 			this.events.processEvent(delayInVehicleEvent);
@@ -163,7 +163,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			int passengersInVeh = this.vehId2passengers.get(event.getVehicleId());
 			this.vehId2passengers.put(event.getVehicleId(), passengersInVeh - 1);
 			
-			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			double delay = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			
 			// throw delay event

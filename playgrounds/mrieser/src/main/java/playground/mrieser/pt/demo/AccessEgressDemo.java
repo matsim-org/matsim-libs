@@ -140,7 +140,7 @@ public class AccessEgressDemo {
 	}
 
 	private void createVehicles() {
-		Vehicles vehicles = this.scenario.getVehicles();
+		Vehicles vehicles = this.scenario.getTransitVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = vb.createVehicleCapacity();

@@ -56,7 +56,7 @@ public class CreateVehiclesForHouseholds {
 	}
 
 	private void createVehiclesForHousehold(Household household) {
-		Vehicles vehicles = ((ScenarioImpl)this.scenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)this.scenario).getTransitVehicles();
 
 		HouseholdVehiclesInfo info = householdVehicles.get(household.getId());
 		

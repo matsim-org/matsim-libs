@@ -464,7 +464,7 @@ public class QSimIntegrationTest {
 			"	<vehicle id=\"tr_2\" type=\"1\"/>" +
 			"	<vehicle id=\"tr_3\" type=\"1\"/>" +
 			"</vehicleDefinitions>";
-			new VehicleReaderV1(this.scenario.getVehicles()).parse(new ByteArrayInputStream(vehiclesXml.getBytes()));
+			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(new ByteArrayInputStream(vehiclesXml.getBytes()));
 		}
 
 		private void setDefaultLinkAttributes(final Link link) {

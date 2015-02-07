@@ -122,7 +122,7 @@ public class DataPrepare {
 		new VisumNetworkReader(vNetwork).read(VISUM_FILE);
 		log.info("converting visum data to TransitSchedule.");
 		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork,
-				this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+				this.scenario.getTransitSchedule(), this.scenario.getTransitVehicles());
 
 		// configure how transport modes must be converted
 		// the ones for Berlin
@@ -144,7 +144,7 @@ public class DataPrepare {
 		new TransitScheduleWriterV1(this.scenario.getTransitSchedule())
 				.write(TRANSIT_SCHEDULE_WITHOUT_NETWORK_FILE);
 		log.info("writing vehicles to file.");
-		new VehicleWriterV1(this.scenario.getVehicles())
+		new VehicleWriterV1(this.scenario.getTransitVehicles())
 				.writeFile(VEHICLE_FILE);
 	}
 

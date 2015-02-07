@@ -73,7 +73,7 @@ public class DgTransitBuilder {
 	public void createSchedule(DgOagFlightsData flightsData, Map<Id<Node>, SfMatsimAirport> airportMap) {
 		this.createFacilities(airportMap);
 		
-		Vehicles veh = this.scenario.getVehicles();
+		Vehicles veh = this.scenario.getTransitVehicles();
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleFactory sf = schedule.getFactory();
 		
@@ -133,7 +133,7 @@ public class DgTransitBuilder {
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(this.scenario.getTransitSchedule());
 		scheduleWriter.write(scheduleFilename);
 		
-		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(this.scenario.getVehicles());
+		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(this.scenario.getTransitVehicles());
 		vehicleWriter.writeFile(vehicleFilename);
 	}
 

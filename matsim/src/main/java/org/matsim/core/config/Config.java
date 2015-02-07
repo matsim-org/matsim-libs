@@ -76,6 +76,7 @@ public class Config {
 	private SubtourModeChoiceConfigGroup subtourModeChoice = null;
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 	private PtCountsConfigGroup ptCounts = null;
+	private VehiclesConfigGroup vehicles = null ;
 
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
@@ -85,6 +86,7 @@ public class Config {
 	private static final Logger log = Logger.getLogger(Config.class);
 
 	private boolean locked = false;
+
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructor
@@ -168,6 +170,9 @@ public class Config {
 
 		this.subtourModeChoice = new SubtourModeChoiceConfigGroup();
 		this.modules.put( SubtourModeChoiceConfigGroup.GROUP_NAME , this.subtourModeChoice );
+		
+		this.vehicles = new VehiclesConfigGroup() ;
+		this.modules.put( VehiclesConfigGroup.GROUP_NAME , this.vehicles ) ;
 		
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 	}
@@ -497,6 +502,10 @@ public class Config {
 			log.error("Controler ctrl = new Controler( config );");
 			log.error("This will be changed to an abortive error in the future."); // kai, feb'13
 		}
+	}
+
+	public final VehiclesConfigGroup vehicles() {
+		return vehicles;
 	}
 
 }

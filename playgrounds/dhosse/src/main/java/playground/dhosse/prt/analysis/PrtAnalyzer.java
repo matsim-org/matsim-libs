@@ -52,7 +52,7 @@ public class PrtAnalyzer {
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_miv_pt2.xml");
 		TransitScheduleReader scheduleReader = new TransitScheduleReader(scenario);
 		scheduleReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/schedule.xml");
-		VehicleReaderV1 vReader = new VehicleReaderV1(scenario.getVehicles());
+		VehicleReaderV1 vReader = new VehicleReaderV1(scenario.getTransitVehicles());
 		vReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/transitVehicles.xml");
 		VrpData data = new VrpDataImpl();
 		ElectricVehicleReader vehReader = new ElectricVehicleReader(scenario, data);
@@ -63,7 +63,7 @@ public class PrtAnalyzer {
 			vehicleIds.add(veh.getId());
 		}
 		
-		for(org.matsim.vehicles.Vehicle veh : scenario.getVehicles().getVehicles().values()){
+		for(org.matsim.vehicles.Vehicle veh : scenario.getTransitVehicles().getVehicles().values()){
 			Id<Vehicle> vehicleId = Id.create(veh.getId().toString(), Vehicle.class);
 			vehicleIds.add(vehicleId);
 		}

@@ -59,7 +59,7 @@ public class Connections2PTNetwork {
 		sc.getConfig().scenario().setUseVehicles(true);
 		Network PTnetwork = sc.getNetwork();
 		TransitSchedule PTschedule = sc.getTransitSchedule();
-		Vehicles PTvehicles = sc.getVehicles();
+		Vehicles PTvehicles = sc.getTransitVehicles();
 
 		// ------------------- read in PTnetwork ----------------------------
 		log.info("Reading pt network...");	
@@ -77,7 +77,7 @@ public class Connections2PTNetwork {
 
 		// ------------------- read in PTvehicles ----------------------------
 		log.info("Reading pt vehicles...");
-		VehicleReaderV1 VehicleReader = new VehicleReaderV1(sc.getVehicles());
+		VehicleReaderV1 VehicleReader = new VehicleReaderV1(sc.getTransitVehicles());
 		VehicleReader.parse("./input/02-OeV_2030+_DWV_Ref_Mit_IterationGerman_adapted_PTVehicles.xml"); 
 		log.info("Reading pt vehicles...done.");
 		log.info("Vehicle files contains " +PTvehicles.getVehicleTypes().size()+ " vehicle types and "

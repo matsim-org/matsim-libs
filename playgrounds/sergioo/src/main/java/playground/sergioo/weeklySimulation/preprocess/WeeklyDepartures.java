@@ -34,11 +34,11 @@ public class WeeklyDepartures {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new VehicleReaderV1(scenario.getVehicles()).readFile(args[1]);
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(args[1]);
 		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = factory.createTransitSchedule();
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		for(VehicleType vehicleType:scenario.getVehicles().getVehicleTypes().values())
+		for(VehicleType vehicleType:scenario.getTransitVehicles().getVehicleTypes().values())
 			vehicles.addVehicleType(vehicleType);
 		for(TransitStopFacility stop: scenario.getTransitSchedule().getFacilities().values())
 			transitSchedule.addStopFacility(stop);
@@ -56,7 +56,7 @@ public class WeeklyDepartures {
 					for(Entry<Id<Departure>, Departure> departureEntry:addDepartures.entrySet()) {
 						Departure departure = factory.createDeparture(Id.create(Time.Week.values()[i].getShortName()+departureEntry.getKey().toString(), Departure.class), i*Time.MIDNIGHT+departureEntry.getValue().getDepartureTime());
 						Id<Vehicle> vehicleId = departureEntry.getValue().getVehicleId();
-						Vehicle vehicle = new VehicleImpl(Id.create(vehicleId+Time.Week.values()[i].getShortName(),Vehicle.class), scenario.getVehicles().getVehicles().get(vehicleId).getType());
+						Vehicle vehicle = new VehicleImpl(Id.create(vehicleId+Time.Week.values()[i].getShortName(),Vehicle.class), scenario.getTransitVehicles().getVehicles().get(vehicleId).getType());
 						vehicles.addVehicle(vehicle);
 						departure.setVehicleId(vehicle.getId());
 						newRoute.addDeparture(departure);

@@ -102,7 +102,7 @@ public class InternalControler {
 
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
-		new VehicleReaderV1((scenario).getVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
+		new VehicleReaderV1((scenario).getTransitVehicles()).readFile(this.scenario.getConfig().transit().getVehiclesFile());
 
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);

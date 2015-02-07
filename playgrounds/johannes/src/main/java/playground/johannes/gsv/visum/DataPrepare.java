@@ -89,7 +89,7 @@ public class DataPrepare {
 		log.info("reading visum network.");
 		new VisumNetworkReader(vNetwork).read(VISUM_FILE);
 		log.info("converting visum data to TransitSchedule.");
-		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getVehicles());
+		Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork, this.scenario.getTransitSchedule(), this.scenario.getTransitVehicles());
 
 		/*
 		 * 1;temp;OV;1.000

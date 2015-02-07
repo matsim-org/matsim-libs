@@ -95,7 +95,7 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 				parkedWriter.write("\n");
 			}
 			
-			Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
+			Vehicles vehicles = ((ScenarioImpl) scenario).getTransitVehicles();
 			
 			for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 				

@@ -293,28 +293,28 @@ public class GfipQueuePassingControler extends Controler{
 		new NetworkWriter(sc.getNetwork()).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network.xml.gz");
 
 		/* Create the vehicle types. */
-		((ScenarioImpl)sc).createVehicleContainer();
+		((ScenarioImpl)sc).createTransitVehicleContainer();
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		VehicleType A1 = vf.createVehicleType(Id.create(GfipMode.GFIP_A1.toString(), VehicleType.class));
 		A1.setDescription("Motorcycle");
 		A1.setMaximumVelocity(140.0/3.6);
 		A1.setLength(0.5*7.5);
 		A1.setPcuEquivalents(0.5);
-		sc.getVehicles().addVehicleType(A1);
+		sc.getTransitVehicles().addVehicleType(A1);
 		//
 		VehicleType A2 = vf.createVehicleType(Id.create(GfipMode.GFIP_A2.toString(), VehicleType.class));
 		A2.setDescription("Light vehicle");
 		A2.setMaximumVelocity(110.0/3.6);
 		A2.setLength(1*7.5);
 		A2.setPcuEquivalents(1.0);
-		sc.getVehicles().addVehicleType(A2);
+		sc.getTransitVehicles().addVehicleType(A2);
 		//
 		VehicleType B = vf.createVehicleType(Id.create(GfipMode.GFIP_B.toString(), VehicleType.class));
 		B.setDescription("Medium vehicle");
 		B.setMaximumVelocity(40.0/3.6);
 		B.setLength(2*7.5);
 		B.setPcuEquivalents(2.0);
-		sc.getVehicles().addVehicleType(B);
+		sc.getTransitVehicles().addVehicleType(B);
 		//
 		VehicleType C = vf.createVehicleType(Id.create(GfipMode.GFIP_C.toString(), VehicleType.class));
 		C.setDescription("Heavy vehicle");
@@ -469,7 +469,7 @@ public class GfipQueuePassingControler extends Controler{
 		public void handleEvent(LinkEnterEvent event) {
 			/* Add the pcu-equivalents to the NetsimLink. */
 			NetsimLink netsimLink = this.qsim.getNetsimNetwork().getNetsimLink(event.getLinkId());
-			double pcuEquivalent = this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
+			double pcuEquivalent = this.sc.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
 			double oldPcuTotal = (double) netsimLink.getCustomAttributes().get("pcu");
 			netsimLink.getCustomAttributes().put("pcu", oldPcuTotal+pcuEquivalent);
 
@@ -507,7 +507,7 @@ public class GfipQueuePassingControler extends Controler{
 		public void handleEvent(LinkLeaveEvent event) {
 			/* Deduct the pcu-equivalents to the NetsimLink. */
 			NetsimLink netsimLink = this.qsim.getNetsimNetwork().getNetsimLink(event.getLinkId());
-			double pcuEquivalent = this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
+			double pcuEquivalent = this.sc.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
 			double oldPcuTotal = (double) netsimLink.getCustomAttributes().get("pcu");
 			netsimLink.getCustomAttributes().put("pcu", oldPcuTotal-pcuEquivalent);
 
@@ -523,7 +523,7 @@ public class GfipQueuePassingControler extends Controler{
 				if(thisList.size() == 7){
 					String s = "";
 					s += event.getVehicleId() + ",";
-					s += this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString() + ",";
+					s += this.sc.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString() + ",";
 					for(int i = 0; i < thisList.size()-1; i++){
 						s += String.valueOf(thisList.get(i)) + ",";
 					}

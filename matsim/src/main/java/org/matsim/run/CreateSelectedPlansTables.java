@@ -386,13 +386,19 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public Vehicles getVehicles() {
-			return scenario.getVehicles();
+		public Vehicles getTransitVehicles() {
+			return scenario.getTransitVehicles();
 		}
 
 		@Override
 		public Households getHouseholds() {
 			return scenario.getHouseholds();
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 
 	}

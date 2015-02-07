@@ -73,7 +73,7 @@ class ExtendPtTutorial {
 		sc.getConfig().scenario().setUseVehicles(true);
 		new MatsimNetworkReader(sc).readFile(DIR + "multimodalnetwork.xml");
 		new TransitScheduleReader(sc).readFile(DIR + "transitschedule.xml");
-		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(DIR + "transitVehicles.xml");
+		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(DIR + "transitVehicles.xml");
 		
 		List<Id<Link>> links = new ArrayList<Id<Link>>(){/**
 			 * 
@@ -117,9 +117,9 @@ class ExtendPtTutorial {
 		TransitRoute route = fac.createTransitRoute(Id.create("busroute", TransitRoute.class), nRoute, stops, "bus");
 		Departure d;
 		Vehicle v;
-		VehiclesFactory vFac = ((ScenarioImpl) sc).getVehicles().getFactory();
+		VehiclesFactory vFac = ((ScenarioImpl) sc).getTransitVehicles().getFactory();
 		VehicleType type = vFac.createVehicleType(Id.create("bus", VehicleType.class));
-		((ScenarioImpl) sc).getVehicles().addVehicleType(type);
+		((ScenarioImpl) sc).getTransitVehicles().addVehicleType(type);
 		VehicleCapacity vCap = vFac.createVehicleCapacity();
 		vCap.setSeats(100);
 		type.setCapacity(vCap);
@@ -127,14 +127,14 @@ class ExtendPtTutorial {
 		for(int i = 0; i< 86400; i+= 600){
 			d = fac.createDeparture(Id.create(i, Departure.class), i);
 			v = vFac.createVehicle(Id.create(i, Vehicle.class), type);
-			((ScenarioImpl) sc).getVehicles().addVehicle( v);
+			((ScenarioImpl) sc).getTransitVehicles().addVehicle( v);
 			d.setVehicleId(v.getId());
 			route.addDeparture(d);
 		}
 		line.addRoute(route);
 		schedule.addTransitLine(line);
 		new TransitScheduleWriter(schedule).writeFileV1(DIR + "scheduleWithBus.xml.gz");
-		new VehicleWriterV1(((ScenarioImpl) sc).getVehicles()).writeFile(DIR + "vehiclesWithBus.xml.gz");
+		new VehicleWriterV1(((ScenarioImpl) sc).getTransitVehicles()).writeFile(DIR + "vehiclesWithBus.xml.gz");
 		
 		Config c = ConfigUtils.loadConfig(DIR + "config.xml");
 		c.transit().setTransitScheduleFile(DIR + "scheduleWithBus.xml.gz");

@@ -76,7 +76,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	public void notifyStartup(StartupEvent event) {
 		this.pBox.notifyStartup(event);
         addPTransitScheduleToOriginalOne(event.getControler().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
-		addPVehiclesToOriginalOnes(event.getControler().getScenario().getVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+		addPVehiclesToOriginalOnes(event.getControler().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
 
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getControler().getConfig());
 		this.pTransitRouterFactory.updateTransitSchedule(event.getControler().getScenario().getTransitSchedule());
@@ -95,8 +95,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			this.pBox.notifyIterationStarts(event);
             removePreviousPTransitScheduleFromOriginalOne(event.getControler().getScenario().getTransitSchedule());
 			addPTransitScheduleToOriginalOne(event.getControler().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
-			removePreviousPVehiclesFromScenario(event.getControler().getScenario().getVehicles());
-            addPVehiclesToOriginalOnes(event.getControler().getScenario().getVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+			removePreviousPVehiclesFromScenario(event.getControler().getScenario().getTransitVehicles());
+            addPVehiclesToOriginalOnes(event.getControler().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
 
 			this.pTransitRouterFactory.updateTransitSchedule(event.getControler().getScenario().getTransitSchedule());
 			
@@ -184,7 +184,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	
 	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(controler.getScenario().getTransitSchedule());
-		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getVehicles());
+		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getTransitVehicles());
 		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
 		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}

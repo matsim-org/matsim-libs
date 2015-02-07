@@ -200,12 +200,12 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			this.vehId2agentsTransferingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
 
 			// start tracking the delay effect induced by that person entering the public vehicle
-			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			double transferTime = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			TransferDelayWaiting delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
 			this.boardingDelayEffects.add(delayEffect);
 			
 			// update the vehicle delay
-			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
+			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			if (this.vehicleId2isFirstTransfer.get(event.getVehicleId())) {
 				delay = delay + this.doorOpeningTime;
 				this.vehicleId2isFirstTransfer.put(event.getVehicleId(), false);
@@ -281,12 +281,12 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			this.vehId2agentsTransferingAtThisStop.put(event.getVehicleId(), agentsTransferingAtThisStop);
 			
 			// start tracking the delay effect induced by that person leaving the public vehicle
-			double transferTime = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			double transferTime = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			TransferDelayWaiting delayEffect = startTrackingDelayEffect(event.getVehicleId(), event.getPersonId(), transferTime);
 			this.alightingDelayEffects.add(delayEffect);
 			
 			// update the vehicle delay
-			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
+			double delay = this.vehicleId2delay.get(event.getVehicleId()) + this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getEgressTime();
 			if (this.vehicleId2isFirstTransfer.get(event.getVehicleId())) {
 				delay = delay + this.doorOpeningTime;
 				this.vehicleId2isFirstTransfer.put(event.getVehicleId(), false);

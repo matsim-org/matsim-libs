@@ -90,7 +90,7 @@ class CreateTestScenario {
 		
 		createScheduleAndVehicles(sc);
 		new TransitScheduleWriter(sc.getTransitSchedule()).writeFile(DIR + "schedule.xml");
-		new VehicleWriterV1(((ScenarioImpl) sc).getVehicles()).writeFile(DIR + "vehicles.xml");
+		new VehicleWriterV1(((ScenarioImpl) sc).getTransitVehicles()).writeFile(DIR + "vehicles.xml");
 		
 		createPopulation(sc);
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(DIR + "plans.xml");
@@ -250,8 +250,8 @@ class CreateTestScenario {
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
 		String mode = "bus";
 		//  create vehicleType
-		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
-		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
+		VehicleType vType = ((ScenarioImpl) sc).getTransitVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
+		((ScenarioImpl) sc).getTransitVehicles().addVehicleType(vType);
 		vType.setLength(15);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(51);
@@ -310,7 +310,7 @@ class CreateTestScenario {
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
 				v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
-				((ScenarioImpl) sc).getVehicles().addVehicle( v);
+				((ScenarioImpl) sc).getTransitVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
 				if(vehicles.peekFirst().getSecond() <= i){
@@ -320,7 +320,7 @@ class CreateTestScenario {
 				else{
 					
 					v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
-					((ScenarioImpl) sc).getVehicles().addVehicle( v);
+					((ScenarioImpl) sc).getTransitVehicles().addVehicle( v);
 				}
 			}
 			
@@ -338,8 +338,8 @@ class CreateTestScenario {
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
 		String mode = "train";
 		//  create vehicleType
-		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
-		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
+		VehicleType vType = ((ScenarioImpl) sc).getTransitVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
+		((ScenarioImpl) sc).getTransitVehicles().addVehicleType(vType);
 		vType.setLength(45);
 		VehicleCapacity cap = new VehicleCapacityImpl();
 		cap.setSeats(150);
@@ -396,7 +396,7 @@ class CreateTestScenario {
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
 				v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
-				((ScenarioImpl) sc).getVehicles().addVehicle( v);
+				((ScenarioImpl) sc).getTransitVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
 				if(vehicles.peekFirst().getSecond() <= i){
@@ -406,7 +406,7 @@ class CreateTestScenario {
 				else{
 					
 					v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
-					((ScenarioImpl) sc).getVehicles().addVehicle( v);
+					((ScenarioImpl) sc).getTransitVehicles().addVehicle( v);
 				}
 			}
 			

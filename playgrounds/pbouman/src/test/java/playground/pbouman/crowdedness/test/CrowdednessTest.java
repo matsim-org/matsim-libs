@@ -115,7 +115,7 @@ public class CrowdednessTest
 						if (scen.getPopulation().getPersons().get(event.getPersonId()) != null)
 						{
 						
-							Vehicle v = scen.getVehicles().getVehicles().get(event.getVehicleId());
+							Vehicle v = scen.getTransitVehicles().getVehicles().get(event.getVehicleId());
 							VehicleCapacity cap = v.getType().getCapacity();
 							
 							// As we create only 1 agent and there should be a driver in the vehicle,
@@ -309,7 +309,7 @@ public class CrowdednessTest
 		
 		
 		
-		VehiclesFactory vFac = scen.getVehicles().getFactory();
+		VehiclesFactory vFac = scen.getTransitVehicles().getFactory();
 		
 		VehicleCapacity cap = vFac.createVehicleCapacity();
 		cap.setSeats(2);
@@ -317,10 +317,10 @@ public class CrowdednessTest
 		VehicleType type = vFac.createVehicleType(Id.create("vtype", VehicleType.class));
 		type.setCapacity(cap);
 		type.setMaximumVelocity(speed);
-		scen.getVehicles().addVehicleType(type);
+		scen.getTransitVehicles().addVehicleType(type);
 		Vehicle vehicle = vFac.createVehicle(Id.create("vehicle", Vehicle.class), type);
 
-		scen.getVehicles().addVehicle(vehicle);
+		scen.getTransitVehicles().addVehicle(vehicle);
 		
 		NetworkRoute route = RouteUtils.createNetworkRoute(routeIds, net);
 		TransitRoute transitRoute = sFac.createTransitRoute(Id.create("route", TransitRoute.class), route, stopList, "pt");

@@ -60,12 +60,12 @@ public class TransitPerformanceRecorder {
 
     public TransitPerformanceRecorder(Scenario scenario, EventsManager eventsManager) {
 //        identifyVehicleRoutes();
-        vehicletrackers = new VehicleTrackerCollection(scenario.getVehicles().getVehicles().size());
+        vehicletrackers = new VehicleTrackerCollection(scenario.getTransitVehicles().getVehicles().size());
         this.handler = new RidershipHandler();
         eventsManager.addHandler(handler);
         this.scenario = scenario;
-        this.vehicles = scenario.getVehicles().getVehicles();
-        this.vehicleTypes = scenario.getVehicles().getVehicleTypes();
+        this.vehicles = scenario.getTransitVehicles().getVehicles();
+        this.vehicleTypes = scenario.getTransitVehicles().getVehicleTypes();
         this.transitPerformance = new TransitPerformance();
     }
 
@@ -96,7 +96,7 @@ public class TransitPerformanceRecorder {
 
         @Override
         public void reset(int iteration) {
-            vehicletrackers = new VehicleTrackerCollection(scenario.getVehicles().getVehicles().size());
+            vehicletrackers = new VehicleTrackerCollection(scenario.getTransitVehicles().getVehicles().size());
             transitPerformance = new TransitPerformance();
         }
 

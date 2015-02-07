@@ -57,12 +57,12 @@ public class MainTR {
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
 		(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
-		(new VehicleReaderV1(((ScenarioImpl)scenario).getVehicles())).readFile(args[8]);
+		(new VehicleReaderV1(((ScenarioImpl)scenario).getTransitVehicles())).readFile(args[8]);
 		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
 		WaitTimeStuckCalculator waitTimeStuckCalculator = new WaitTimeStuckCalculator(scenario.getPopulation(), scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
 		StopStopTimeCalculatorTuple stopStopTimeCalculatorTuple = new StopStopTimeCalculatorTuple(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
-		VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getVehicles(), (int)binSize, (int) (endTime-startTime));
+		VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getTransitVehicles(), (int)binSize, (int) (endTime-startTime));
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(waitTimeStuckCalculator);

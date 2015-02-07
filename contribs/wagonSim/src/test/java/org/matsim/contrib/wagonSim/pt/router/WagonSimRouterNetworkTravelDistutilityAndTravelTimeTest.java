@@ -297,7 +297,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 */
 	@SuppressWarnings("deprecation")
 	private void createVehicles(Scenario sc) {
-		Vehicles veh = ((ScenarioImpl) sc).getVehicles();
+		Vehicles veh = ((ScenarioImpl) sc).getTransitVehicles();
 		VehiclesFactory factory = veh.getFactory();
 		
 		VehicleCapacity vc = factory.createVehicleCapacity();
@@ -328,7 +328,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 */
 	private ObjectAttributes createVehicleLinkSpeedAttributes(Scenario sc) {
 		ObjectAttributes oa = new ObjectAttributes();
-		for(Id<Vehicle> v: ((ScenarioImpl)sc).getVehicles().getVehicles().keySet()){
+		for(Id<Vehicle> v: ((ScenarioImpl)sc).getTransitVehicles().getVehicles().keySet()){
 			for(Id<Link> l: sc.getNetwork().getLinks().keySet()){
 				oa.putAttribute(v.toString(), l.toString(), 10000.);
 			}

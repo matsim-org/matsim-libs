@@ -154,7 +154,7 @@ public class ConfigIO
 		
 		new NetworkWriter(controller.getScenario().getNetwork()).write(config.network().getInputFile());
 		new TransitScheduleWriterV1(schedule).write(scenarioPath+"/transitSchedule.xml");
-		new VehicleWriterV1(((ScenarioImpl)controller.getScenario()).getVehicles()).writeFile(scenarioPath+"/transitVehicles.xml");
+		new VehicleWriterV1(((ScenarioImpl)controller.getScenario()).getTransitVehicles()).writeFile(scenarioPath+"/transitVehicles.xml");
 		
 		
 		

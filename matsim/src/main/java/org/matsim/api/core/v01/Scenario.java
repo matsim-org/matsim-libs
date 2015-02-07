@@ -83,6 +83,9 @@ public interface Scenario {
 
 	public ActivityFacilities getActivityFacilities();
 
+	Vehicles getTransitVehicles();
+	// maybe they should only be there via scenario element, but since transit schedule is already in the api, this does not seem so bad. kai, feb'15
+
 	Vehicles getVehicles();
 
 	Households getHouseholds();

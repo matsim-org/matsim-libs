@@ -39,12 +39,12 @@ public class TransitLiveSimMain {
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 
 		new TransitScheduleReaderV1(scenario.getTransitSchedule(), scenario.getNetwork()).readFile(inputDir + "transitSchedule.xml");
-		new VehicleReaderV1(scenario.getVehicles()).parse(inputDir + "vehicles.xml");
+		new VehicleReaderV1(scenario.getTransitVehicles()).parse(inputDir + "vehicles.xml");
 
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
 				scenario.getNetwork(),
 				scenario.getTransitSchedule().getTransitLines().values(),
-				scenario.getVehicles(),
+				scenario.getTransitVehicles(),
 				scenario.getConfig().planCalcScore());
 		reconstructingUmlaufBuilder.build();
 

@@ -31,7 +31,7 @@ public class VehicleTypeChanger {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		TransitScheduleReader readerTransit = new TransitScheduleReader(scenario);
 		readerTransit.readFile(args[0]);
-		Vehicles vehicles = ((ScenarioImpl)scenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();
 		VehicleReaderV1 readerVehicles = new VehicleReaderV1(vehicles);
 		readerVehicles.readFile(args[1]);
 		TransitSchedule transitSchedule = ((ScenarioImpl)scenario).getTransitSchedule();

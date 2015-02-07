@@ -155,7 +155,7 @@ public class StopFacilityGenerator {
 
 		/*Write created transit schedule and vehicle files*/
 		new TransitScheduleWriter(stopFacilityGenerator.getTransitSchedule()).writeFile(outputTransitSchedule);
-		new VehicleWriterV1(stopFacilityGenerator.sc.getVehicles()).writeFile(outputVehicles);
+		new VehicleWriterV1(stopFacilityGenerator.sc.getTransitVehicles()).writeFile(outputVehicles);
 
 		/*Remove old links before writing*/
 		System.out.print("DELETING LINKS: ");
@@ -171,7 +171,7 @@ public class StopFacilityGenerator {
 	}	
 
 	private void createVehicles(TransitSchedule ts) {
-		Vehicles vehicles = this.sc.getVehicles();
+		Vehicles vehicles = this.sc.getTransitVehicles();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
 		VehicleType standardBus = vehicleFactory.createVehicleType(Id.create("Bus MAN NL323F", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();

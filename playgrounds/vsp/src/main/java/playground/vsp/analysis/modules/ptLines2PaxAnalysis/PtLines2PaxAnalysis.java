@@ -158,8 +158,8 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
 //		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
-		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
-		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600, 24);
+		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
+		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptLinesPax);
 		analyzer.run();
 	}

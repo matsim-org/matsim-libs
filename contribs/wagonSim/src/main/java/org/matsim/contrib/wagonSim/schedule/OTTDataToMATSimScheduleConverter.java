@@ -129,7 +129,7 @@ public class OTTDataToMATSimScheduleConverter {
 	
 	private final void convertSchedules(OTTDataContainer dataContainer, ObjectAttributes trainTypes, boolean isPerformance) {
 		TransitScheduleFactory scheduleFactory = scenario.getTransitSchedule().getFactory();
-		VehiclesFactory vehiclesFactory = ((ScenarioImpl)scenario).getVehicles().getFactory();
+		VehiclesFactory vehiclesFactory = ((ScenarioImpl)scenario).getTransitVehicles().getFactory();
 		
 		VehicleType vehicleType = vehiclesFactory.createVehicleType(Id.create(WagonSimConstants.DEFAULT_VEHICLE_TYPE, VehicleType.class));
 		VehicleCapacity vehicleCapacity = vehiclesFactory.createVehicleCapacity();
@@ -143,7 +143,7 @@ public class OTTDataToMATSimScheduleConverter {
 		vehicleType.setAccessTime(0);
 		vehicleType.setEgressTime(0);
 		vehicleType.setCapacity(vehicleCapacity);
-		((ScenarioImpl)scenario).getVehicles().addVehicleType(vehicleType);
+		((ScenarioImpl)scenario).getTransitVehicles().addVehicleType(vehicleType);
 		
 		Date startDate = extractStartDate(dataContainer,isPerformance);
 		System.out.println("startDate="+startDate.toString());
@@ -193,7 +193,7 @@ public class OTTDataToMATSimScheduleConverter {
 				line.addRoute(route);
 				
 				Vehicle vehicle = vehiclesFactory.createVehicle(Id.create(route.getId(), Vehicle.class), vehicleType);
-				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
+				((ScenarioImpl)scenario).getTransitVehicles().addVehicle(vehicle);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
 				this.vehicleAttributes.putAttribute(vehicle.getId().toString(),WagonSimConstants.TRAIN_TYPE, locomotive.type);
@@ -203,7 +203,7 @@ public class OTTDataToMATSimScheduleConverter {
 
 				// the next day
 				vehicle = vehiclesFactory.createVehicle(Id.create(route.getId()+".1", Vehicle.class),vehicleType);
-				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
+				((ScenarioImpl)scenario).getTransitVehicles().addVehicle(vehicle);
 				departure = scheduleFactory.createDeparture(Id.create(vehicle.getId(), Departure.class), departure.getDepartureTime()+24*3600);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);
@@ -214,7 +214,7 @@ public class OTTDataToMATSimScheduleConverter {
 
 				// the day after the next day
 				vehicle = vehiclesFactory.createVehicle(Id.create(route.getId()+".2", Vehicle.class),vehicleType);
-				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
+				((ScenarioImpl)scenario).getTransitVehicles().addVehicle(vehicle);
 				departure = scheduleFactory.createDeparture(Id.create(vehicle.getId(), Departure.class), departure.getDepartureTime()+24*3600);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);

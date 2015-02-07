@@ -295,7 +295,7 @@ public class T6_Transit {
 	}
 
 	private void createTransitVehicles() {
-		new CreateVehiclesForSchedule(this.scenario.getTransitSchedule(), this.scenario.getVehicles()).run();
+		new CreateVehiclesForSchedule(this.scenario.getTransitSchedule(), this.scenario.getTransitVehicles()).run();
 	}
 
 	private void runSim() {

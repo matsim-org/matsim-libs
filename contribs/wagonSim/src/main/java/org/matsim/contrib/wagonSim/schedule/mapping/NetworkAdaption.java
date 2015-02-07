@@ -261,7 +261,7 @@ public class NetworkAdaption {
 		sc.getConfig().scenario().setUseVehicles(true);
 		new MatsimNetworkReader(sc).readFile(networkFile);
 		new TransitScheduleReaderV1(sc).readFile(transitScheduleFile);
-		new VehicleReaderV1(sc.getVehicles()).readFile(transitVehiclesFile);
+		new VehicleReaderV1(sc.getTransitVehicles()).readFile(transitVehiclesFile);
 		log.info("done. (parsing)");
 
 		log.info("getting link travel time offsets...");
@@ -281,11 +281,11 @@ public class NetworkAdaption {
 		log.info("done. (adapting link capacities)");
 
 		log.info("adapting vehicle capacities...");
-		adaptVehicleCapacities(sc.getVehicles(), popsample);
+		adaptVehicleCapacities(sc.getTransitVehicles(), popsample);
 		log.info("done. (adapting vehicle capacities)");
 
 		log.info("adapting vehicle access and egress times...");
-		adaptVehicleAETimes(sc.getVehicles(), popsample);
+		adaptVehicleAETimes(sc.getTransitVehicles(), popsample);
 		log.info("done. (adapting vehicle access and egress times)");
 
 		if (!(new File(outputBase).mkdir())) { log.warn("Could not create "+outputBase); }
@@ -297,7 +297,7 @@ public class NetworkAdaption {
 		log.info("done. (write network)");
 
 		log.info("writing transit vehicles...");
-		new VehicleWriterV1(sc.getVehicles()).writeFile(outputBase+"/transitVehicles.final.xml.gz");
+		new VehicleWriterV1(sc.getTransitVehicles()).writeFile(outputBase+"/transitVehicles.final.xml.gz");
 		log.info("done. (writing)");
 
 	}

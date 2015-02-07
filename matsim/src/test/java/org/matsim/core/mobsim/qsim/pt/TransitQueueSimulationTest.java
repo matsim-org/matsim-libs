@@ -101,7 +101,7 @@ public class TransitQueueSimulationTest {
         network.addLink(link2);
 
         // setup: vehicles
-        Vehicles vehicles = scenario.getVehicles();
+        Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
         VehicleCapacity capacity = vb.createVehicleCapacity();
@@ -661,7 +661,7 @@ public class TransitQueueSimulationTest {
         tRoute.addDeparture(dep);
         tLine.addRoute(tRoute);
         schedule.addTransitLine(tLine);
-        new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+        new CreateVehiclesForSchedule(schedule, scenario.getTransitVehicles()).run();
 
         // prepare test
         EventsManager events = EventsUtils.createEventsManager();
@@ -751,7 +751,7 @@ public class TransitQueueSimulationTest {
         tRoute.addDeparture(dep);
         tLine.addRoute(tRoute);
         schedule.addTransitLine(tLine);
-        new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
+        new CreateVehiclesForSchedule(schedule, scenario.getTransitVehicles()).run();
 
         // build population with 1 person
         Population population = scenario.getPopulation();

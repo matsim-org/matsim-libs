@@ -183,7 +183,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	}
 	
 	private static class CollectorScenario implements Scenario {
-		// yy I would very much prefer to make ScenarioImpl final.  Can some other solution be found? kai, nov'14
 		// yyyy Why is this necessary at all?  Could you please explain your design decisions?  The same instance is passed to all threads, so 
 		// what is the difference to using the underlying population directly?
 		
@@ -242,13 +241,19 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 
 		@Override
-		public Vehicles getVehicles() {
-			return this.delegate.getVehicles();
+		public Vehicles getTransitVehicles() {
+			return this.delegate.getTransitVehicles();
 		}
 
 		@Override
 		public Households getHouseholds() {
 			return this.delegate.getHouseholds();
+		}
+
+		@Override
+		public Vehicles getVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 	

@@ -44,7 +44,7 @@ public class OSM2MixedConvMain {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		Network network = scenario.getNetwork();
 		TransitSchedule schedule = scenario.getTransitSchedule();
-		Vehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getTransitVehicles();
 		// Get resources:
 		String osmFile = args[0];
 		String hafasFolder = args[1];

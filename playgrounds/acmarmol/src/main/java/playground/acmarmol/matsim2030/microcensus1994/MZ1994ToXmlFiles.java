@@ -127,7 +127,7 @@ public class MZ1994ToXmlFiles {
 		Households households = scenario.getHouseholds();
 		ObjectAttributes householdAttributes = new ObjectAttributes();
 		//vehicles
-		Vehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getTransitVehicles();
 		ObjectAttributes vehiclesAttributes = new ObjectAttributes();
 		ObjectAttributes wegeAttributes = new ObjectAttributes(); 
 		//wegeAttributes is just used while handling border crossing trips, to identify the border crossing.

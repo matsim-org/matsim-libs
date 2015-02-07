@@ -144,9 +144,10 @@ public class ScenarioLoaderImpl {
 		}
 		if (this.config.scenario().isUseTransit()) {
 			this.loadTransit();
+			this.loadTransitVehicles();
 		}
 		if (this.config.scenario().isUseVehicles()) {
-			this.loadVehicles();
+			this.loadVehicles() ;
 		}
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
@@ -274,8 +275,13 @@ public class ScenarioLoaderImpl {
 		}
 	}
 
-	private void loadVehicles() throws UncheckedIOException {
+	private void loadTransitVehicles() throws UncheckedIOException {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
+		log.info("loading transit vehicles from " + vehiclesFile );
+		new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
+	}
+	private void loadVehicles() throws UncheckedIOException {
+		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		log.info("loading vehicles from " + vehiclesFile );
 		new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
 	}

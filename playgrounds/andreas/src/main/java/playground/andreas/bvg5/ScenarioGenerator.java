@@ -85,7 +85,7 @@ public class ScenarioGenerator {
 		this.baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(this.baseScenario).readFile(netFile);
 		new TransitScheduleReaderV1(this.baseScenario).readFile(scheduleFile);
-		new VehicleReaderV1(this.baseScenario.getVehicles()).readFile(vehiclesFile);
+		new VehicleReaderV1(this.baseScenario.getTransitVehicles()).readFile(vehiclesFile);
 		this.outputDir = outputDir;
 	}
 
@@ -141,7 +141,7 @@ public class ScenarioGenerator {
 		lines2Modes.setPtModesForEachLine(this.baseScenario.getTransitSchedule(), "none");
 		TreeSet<String> modes2Cut = new TreeSet<String>();
 		modes2Cut.add("bvg_bus");
-		TransitScheduleAreaCut2 cutter = new TransitScheduleAreaCut2(this.baseScenario.getTransitSchedule(), scenarioAreaFilename, lines2Modes, modes2Cut, this.baseScenario.getVehicles());
+		TransitScheduleAreaCut2 cutter = new TransitScheduleAreaCut2(this.baseScenario.getTransitSchedule(), scenarioAreaFilename, lines2Modes, modes2Cut, this.baseScenario.getTransitVehicles());
 		cutter.run(this.outputDir);		
 	}
 	

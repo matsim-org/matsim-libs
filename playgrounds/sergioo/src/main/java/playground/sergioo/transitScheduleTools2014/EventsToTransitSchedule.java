@@ -117,9 +117,9 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new VehicleReaderV1(((ScenarioImpl)scenario).getVehicles()).readFile(args[1]);
+		new VehicleReaderV1(((ScenarioImpl)scenario).getTransitVehicles()).readFile(args[1]);
 		EventsManager events = new EventsManagerImpl();
-		EventsToTransitSchedule eventsToTransitSchedule = new EventsToTransitSchedule(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getVehicles());
+		EventsToTransitSchedule eventsToTransitSchedule = new EventsToTransitSchedule(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getTransitVehicles());
 		events.addHandler(eventsToTransitSchedule);
 		new MatsimEventsReader(events).readFile(args[2]);
 		System.out.println(eventsToTransitSchedule.startDrivers.size());

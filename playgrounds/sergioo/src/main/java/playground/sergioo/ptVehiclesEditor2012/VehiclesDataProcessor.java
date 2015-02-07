@@ -174,7 +174,7 @@ public class VehiclesDataProcessor {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(transitFile);
-		Vehicles vehicles = ((ScenarioImpl)scenario).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();
 		for(TransitLine transitLine:((ScenarioImpl)scenario).getTransitSchedule().getTransitLines().values()) {
 			if(transitLine.getRoutes().values().iterator().hasNext()) {
 				ResultSet result = dataBaseVehicles.executeQuery("SELECT * FROM pt_systems.Lines WHERE name='"+transitLine.getId().toString()+"'");

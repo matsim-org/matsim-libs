@@ -84,7 +84,7 @@ public class ScenarioUtils {
 		 * This is here if you want to instantiate the empty container
 		 */
 		public void createVehicleContainer() {
-			scenario.createVehicleContainer() ;
+			scenario.createTransitVehicleContainer() ;
 		}
 		public void setNetwork( Network network ) {
 			scenario.setNetwork(network);
@@ -99,7 +99,7 @@ public class ScenarioUtils {
 			scenario.setHouseholds(households);
 		}
 		public void setVehicles( Vehicles vehicles ) {
-			scenario.setVehicles(vehicles);
+			scenario.setTransitVehicles(vehicles);
 		}
 		public void setTransitSchedule( TransitSchedule schedule ) {
 			scenario.setTransitSchedule(schedule);

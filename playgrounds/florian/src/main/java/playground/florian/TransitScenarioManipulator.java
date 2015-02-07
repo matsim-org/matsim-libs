@@ -27,14 +27,14 @@ class TransitScenarioManipulator {
 		// READ SCENARIO
 		Config c = ConfigUtils.loadConfig("../../gtfsOutput/config_gtfs.xml");
 		ScenarioImpl sc = (ScenarioImpl)(ScenarioUtils.createScenario(c));
-		new VehicleReaderV1(sc.getVehicles()).readFile("../../gtfsOutput/transitVehicles_gtfs.xml");
+		new VehicleReaderV1(sc.getTransitVehicles()).readFile("../../gtfsOutput/transitVehicles_gtfs.xml");
 		new TransitScheduleReader(sc).readFile("../../gtfsOutput/transitSchedule_gtfs.xml");
 		// MANIPULATE
 		TransitScenarioManipulator tsman = new TransitScenarioManipulator(sc);
 //		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Subway","dummy_Rail","dummy_Tram","dummy_Funicular"});
 		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Tram"});
 		// WRITE NEW SCENARIO
-		VehicleWriterV1 vw = new VehicleWriterV1(newSc.getVehicles());
+		VehicleWriterV1 vw = new VehicleWriterV1(newSc.getTransitVehicles());
 		vw.writeFile("../../gtfsOutput/transitVehicles_new.xml");
 		TransitScheduleWriter tsw = new TransitScheduleWriter(newSc.getTransitSchedule());
 		tsw.writeFile("../../gtfsOutput/transitSchedule_new.xml");
@@ -50,14 +50,14 @@ class TransitScenarioManipulator {
 	
 	public ScenarioImpl extractTransitVehicleTypes(String[] vehicleTypes){
 		ScenarioImpl result = (ScenarioImpl) ScenarioUtils.createScenario(sc.getConfig());
-		Vehicles vh = sc.getVehicles();
+		Vehicles vh = sc.getTransitVehicles();
 		TransitSchedule ts = sc.getTransitSchedule();
 		TreeSet<String> vt = new TreeSet<String>();
 		for(String type: vehicleTypes){
 			vt.add(type);
-			if(sc.getVehicles().getVehicleTypes().containsKey(Id.create(type, Vehicle.class))){
-				VehicleType vehTyp = sc.getVehicles().getVehicleTypes().get(Id.create(type, VehicleType.class));
-				result.getVehicles().addVehicleType( vehTyp);
+			if(sc.getTransitVehicles().getVehicleTypes().containsKey(Id.create(type, Vehicle.class))){
+				VehicleType vehTyp = sc.getTransitVehicles().getVehicleTypes().get(Id.create(type, VehicleType.class));
+				result.getTransitVehicles().addVehicleType( vehTyp);
 			}else{
 				System.out.println(type + " doesn't exist as a vehicletype");
 			}
@@ -73,7 +73,7 @@ class TransitScenarioManipulator {
 					if(vt.contains(v.getType().getId().toString())){
 						toBeAdded = true;
 						newRoute.addDeparture(d);
-						result.getVehicles().addVehicle( v);
+						result.getTransitVehicles().addVehicle( v);
 					}
 				}
 				if(toBeAdded){

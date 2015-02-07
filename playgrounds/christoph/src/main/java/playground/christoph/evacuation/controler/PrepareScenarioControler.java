@@ -138,7 +138,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Write vehicles to file.
 		 */
-		new VehicleWriterV1(scenarioData.getVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
+		new VehicleWriterV1(scenarioData.getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 		
 		/*
 		 * Assign vehicles to agent's plans.

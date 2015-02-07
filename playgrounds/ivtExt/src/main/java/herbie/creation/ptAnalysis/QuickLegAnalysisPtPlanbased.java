@@ -131,7 +131,7 @@ public class QuickLegAnalysisPtPlanbased {
 		this.transitFactory = schedule.getFactory();
 		new TransitScheduleReaderV1(schedule, network).readFile(transitScheduleFile);
 		
-		Vehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getTransitVehicles();
 		new VehicleReaderV1(vehicles).readFile(transitVehicleFile);
 		
 			

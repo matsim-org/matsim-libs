@@ -44,7 +44,7 @@ public class RunResource {
 		new MatsimPopulationReader(scenario).readFile(wd + "/" + runPrefix() + "output_plans.xml.gz");
 		if (scenario.getConfig().scenario().isUseTransit()) {
 			new TransitScheduleReader(scenario).readFile(wd + "/" + runPrefix() + "output_transitSchedule.xml.gz");
-			new VehicleReaderV1(scenario.getVehicles()).readFile(wd + "/" + runPrefix() + "output_vehicles.xml.gz");
+			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(wd + "/" + runPrefix() + "output_vehicles.xml.gz");
 		}
 		return scenario;
 	}

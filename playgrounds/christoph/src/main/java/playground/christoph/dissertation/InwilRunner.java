@@ -86,7 +86,7 @@ public class InwilRunner {
 			config.scenario().setUseTransit(true);
 			config.scenario().setUseVehicles(true);
 			new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
-			new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
+			new VehicleReaderV1(((ScenarioImpl) scenario).getTransitVehicles()).readFile(config.transit().getVehiclesFile());
 			config.scenario().setUseTransit(false);
 			config.scenario().setUseVehicles(false);
 			

@@ -60,7 +60,7 @@ public class TransitScheduleModifier {
 		
 		/*Write created transit schedule and vehicle files*/
 		new TransitScheduleWriter(modifier.getTransitSchedule()).writeFile(outputTransitSchedule);
-		new VehicleWriterV1(modifier.getSc().getVehicles()).writeFile(outputVehicles);
+		new VehicleWriterV1(modifier.getSc().getTransitVehicles()).writeFile(outputVehicles);
 	}
 
 	private void changeHeadway(String newServiceInterval) {
@@ -127,7 +127,7 @@ public class TransitScheduleModifier {
 	}
 	
 	private void createVehicles(TransitSchedule ts) {
-		Vehicles vehicles = this.sc.getVehicles();
+		Vehicles vehicles = this.sc.getTransitVehicles();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
 		VehicleType standardBus = vehicleFactory.createVehicleType(Id.create("Bus MAN NL323F", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();

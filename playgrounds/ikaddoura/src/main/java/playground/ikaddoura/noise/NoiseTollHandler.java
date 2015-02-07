@@ -325,8 +325,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		}
 		
 		// TODO: Consider pt-vehicles
-		if(!(scenario.getVehicles() == null)) {
-			for(Id transitVehicleId : scenario.getVehicles().getVehicles().keySet()) {
+		if(!(scenario.getTransitVehicles() == null)) {
+			for(Id transitVehicleId : scenario.getTransitVehicles().getVehicles().keySet()) {
 				hdvVehicles.add(transitVehicleId);
 			}
 		}

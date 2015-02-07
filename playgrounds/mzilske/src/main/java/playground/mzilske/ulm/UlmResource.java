@@ -50,7 +50,7 @@ class UlmResource {
 
 		new NetworkWriter(scenario.getNetwork()).write(wd + "/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(wd + "/transit-schedule.xml");
-		new VehicleWriterV1(scenario.getVehicles()).writeFile(wd + "/transit-vehicles.xml");
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(wd + "/transit-vehicles.xml");
 	}
 
 	public void population() {
@@ -126,7 +126,7 @@ class UlmResource {
 		Config config = getConfig();
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-		new VehicleReaderV1(scenario.getVehicles()).readFile(config.transit().getVehiclesFile());
+		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		return scenario;
 	}

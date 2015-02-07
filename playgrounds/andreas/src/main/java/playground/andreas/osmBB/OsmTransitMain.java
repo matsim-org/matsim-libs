@@ -101,7 +101,7 @@ public class OsmTransitMain {
 		log.info("Writing transit schedule to " + this.transitScheduleOutFile);
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(this.transitScheduleOutFile);
 		log.info("Writing vehicles to " + this.vehiclesOutFile);
-		new VehicleWriterV1(scenario.getVehicles()).writeFile(this.vehiclesOutFile);
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(this.vehiclesOutFile);
 		log.info("Done...");
 	}
 

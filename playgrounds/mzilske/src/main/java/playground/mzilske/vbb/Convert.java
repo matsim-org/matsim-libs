@@ -44,7 +44,7 @@ public class Convert {
 //		}
 		new NetworkWriter(scenario.getNetwork()).write("/Users/zilske/gtfs-bvg/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/zilske/gtfs-bvg/transit-schedule.xml");
-		new VehicleWriterV1(((ScenarioImpl) scenario).getVehicles()).writeFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");		
+		new VehicleWriterV1(((ScenarioImpl) scenario).getTransitVehicles()).writeFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");		
 	}
 	
 	private static Scenario readScenario() {

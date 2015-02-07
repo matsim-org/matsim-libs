@@ -98,7 +98,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// update pt mode for each line in schedule
 		updateLineId2ptModeMap(event.getControler().getScenario().getTransitSchedule());
-		updateVehicleTypes(event.getControler().getScenario().getVehicles());
+		updateVehicleTypes(event.getControler().getScenario().getTransitVehicles());
 	}
 
 	@Override

@@ -150,7 +150,7 @@ import java.util.List;
 	}
 
 	void buildVehicles() {
-		Vehicles vehicles = scenario.getVehicles();
+		Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
         VehicleCapacity capacity = vb.createVehicleCapacity();

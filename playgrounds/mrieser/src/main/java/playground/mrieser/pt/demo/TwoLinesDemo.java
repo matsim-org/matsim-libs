@@ -293,7 +293,7 @@ public class TwoLinesDemo {
 	}
 
 	private void createTransitVehicles() {
-		new CreateVehiclesForSchedule(this.scenario.getTransitSchedule(), this.scenario.getVehicles()).run();
+		new CreateVehiclesForSchedule(this.scenario.getTransitSchedule(), this.scenario.getTransitVehicles()).run();
 	}
 
 	private void runSim() {

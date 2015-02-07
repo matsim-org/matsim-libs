@@ -144,7 +144,7 @@ public class RunNationalFreight {
 		config.scenario().setUseVehicles(true);
 		
 		/* Set the population as "subpopulation", and create a vehicle for each. */
-		Vehicles vehicles = ((ScenarioImpl)sc).getVehicles();
+		Vehicles vehicles = ((ScenarioImpl)sc).getTransitVehicles();
 		VehicleType truckType = new VehicleTypeImpl(Id.create("commercial", VehicleType.class));
 		truckType.setMaximumVelocity(100./3.6);
 		truckType.setLength(18.);

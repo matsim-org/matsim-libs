@@ -292,13 +292,19 @@ public class CreateEvacuationAreaSubScenario {
 		}
 
 		@Override
-		public Vehicles getVehicles() {
+		public Vehicles getTransitVehicles() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
 		public Households getHouseholds() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Vehicles getVehicles() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
