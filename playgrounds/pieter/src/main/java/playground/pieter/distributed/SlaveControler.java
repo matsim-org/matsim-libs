@@ -39,11 +39,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
+import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
+import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
@@ -70,6 +73,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final ReplaceableTravelTime travelTime;
     private final boolean quickReplannning;
     private final boolean fullTransitPerformanceTransmission;
+    private final boolean SingaporeScenario;
+    private final boolean TrackGenome;
+    private final boolean IntelligentRouters;
     private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
@@ -110,7 +116,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         options.addOption("c", true, "Config file location");
         options.addOption("h", true, "Host name or IP");
         options.addOption("p", true, "Port number of MasterControler");
-        options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         options.addOption("t", true, "Number of threads for parallel events handling.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
@@ -119,7 +124,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (commandLine.hasOption("c")) {
             try {
                 config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"), new DestinationChoiceConfigGroup());
-                ;
 
             } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
@@ -155,9 +159,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             hostname = commandLine.getOptionValue("h");
         } else
             System.err.println("No host specified, using default (localhost)");
-
-
-
 
         /*
         * INITIALIZING COMMS
@@ -196,6 +197,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         initialRouting = reader.readBoolean();
         quickReplannning = reader.readBoolean();
         fullTransitPerformanceTransmission = reader.readBoolean();
+        SingaporeScenario = reader.readBoolean();
+        TrackGenome = reader.readBoolean();
+        IntelligentRouters = reader.readBoolean();
 
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
@@ -212,12 +216,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
-        scenario = ScenarioUtils.createScenario(config);
-        //assume basic scenario for now, can create a loadScenario later
-        loadScenario();
+        scenario =ScenarioUtilsForPlanGenomes.buildAndLoadScenario(config,TrackGenome,true);
 
-
-        DistributedPlanStrategyTranslationAndRegistration.substituteSelectorStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
+        DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
         new DistributedPlanStrategyTranslationAndRegistration(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
@@ -235,6 +236,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 include(new ScenarioElementsModule());
                 include(new StrategyManagerModule());
                 include(new TravelDisutilityModule());
+//                bindToInstance(TransitSchedule.class, scenario.getTransitSchedule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });
@@ -254,7 +256,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         }
 
-        if (commandLine.hasOption("s")) {
+        if (SingaporeScenario) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
             //this is a fix for location choice to work with pt, by sergioo
             //in location choice, if the facility's link doesn't accommodate the mode you're using,
@@ -279,9 +281,17 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
             //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
-//            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
         }
-        matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
+
+        if(IntelligentRouters) {
+            matsimControler.setTransitRouterFactory(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
+        }else{
+            matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
+        }
+        if(TrackGenome) {
+            matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
+            matsimControler.addControlerListener(new GenomeAnalysis(false,false));
+        }
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);
@@ -302,22 +312,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         } catch (NullPointerException e) {
         }
         return total;
-    }
-
-    /**
-     * currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.
-     */
-    private void loadScenario() {
-        slaveLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
-        new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
-        if (config.facilities().getInputFile() != null)
-            new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-        if (config.scenario().isUseTransit()) {
-            new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
-//            if (this.config.scenario().isUseVehicles()) {
-                new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
-//            }
-        }
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
@@ -405,8 +399,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     public void transmitPlans() throws IOException, ClassNotFoundException {
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
-        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values())
-            tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
+        for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
+            PlanSerializable planSerializable = new PlanSerializable(person.getSelectedPlan());
+            planSerializable.pSimScore = planSerializable.getScore()==null?0:planSerializable.getScore();
+            tempPlansCopyForSending.put(person.getId().toString(), planSerializable);
+        }
         plansCopyForSending = tempPlansCopyForSending;
         slaveLogger.warn("Sending " + plansCopyForSending.size() + " plans...");
         writer.writeInt(currentIteration);
@@ -579,7 +576,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
         selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
         if (event.getIteration() == 0) {
             plancatcher.init();

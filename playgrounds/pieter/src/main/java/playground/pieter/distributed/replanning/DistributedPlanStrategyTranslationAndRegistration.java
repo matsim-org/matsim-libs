@@ -44,6 +44,8 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     public static Map<String, Class<? extends PlanStrategyFactory>> SupportedSelectors = new HashMap<>();
 
     public static Map<String, Class<? extends PlanStrategyFactory>> SupportedMutators = new HashMap<>();
+    public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
+    public static boolean TrackGenome = false;
 
     static void initMaps() {
         SupportedSelectors.put("KeepLastSelected", KeepLastSelectedPlanStrategyFactory.class);
@@ -59,12 +61,30 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         SupportedMutators.put("ChangeLegMode", ChangeLegModeStrategyFactory.class);
         SupportedMutators.put("ChangeSingleLegMode", ChangeSingleLegModeStrategyFactory.class);
         SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripModeStrategyFactory.class);
-        SupportedMutators.put("SubtourModeChoice", SubtourModeChoiceStrategyFactory.class);
+        if(TrackGenome){
+        //the original class casts to PersonImpl, can't have that if tracking plan evolution
+            SupportedMutators.put("SubtourModeChoice", playground.pieter.distributed.replanning.factories.SubtourModeChoiceStrategyFactory.class);
+        }else{
+            SupportedMutators.put("SubtourModeChoice", org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory.class);
+        }
         SupportedMutators.put("ChangeTripMode", ChangeTripModeStrategyFactory.class);
         SupportedMutators.put("TripSubtourModeChoice", TripSubtourModeChoiceStrategyFactory.class);
         SupportedMutators.put("TransitLocationChoice", TransitLocationChoiceFactory.class);
 
+        SupportedMutatorGenes.put("ReRoute", new Character('A'));
+        SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));
+        SupportedMutatorGenes.put("TimeAllocationMutator_ReRoute", new Character('C'));
+        SupportedMutatorGenes.put("ChangeLegMode", new Character('D'));
+        SupportedMutatorGenes.put("ChangeSingleLegMode", new Character('E'));
+        SupportedMutatorGenes.put("ChangeSingleTripMode", new Character('F'));
+        SupportedMutatorGenes.put("SubtourModeChoice", new Character('G'));
+        SupportedMutatorGenes.put("ChangeTripMode", new Character('H'));
+        SupportedMutatorGenes.put("TripSubtourModeChoice", new Character('J'));
+        SupportedMutatorGenes.put("TransitLocationChoice", new Character('K'));
+
     }
+
+
 
     public static final String SUFFIX = "PSIM";
 
@@ -82,14 +102,15 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
             if(e.getKey().equals( "TransitLocationChoice")){
-                TransitLocationChoiceFactory factory = new TransitLocationChoiceFactory(slave);
+                TransitLocationChoiceFactory factory = new TransitLocationChoiceFactory(slave,SupportedMutatorGenes.get("TransitLocationChoice"),TrackGenome, controler);
                 controler.addPlanStrategyFactory("TransitLocationChoicePSIM", factory);
                 continue;
             }
             try {
                 controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanMutatorStrategyFactory<>(slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance()));
+                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(),
+                                SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }
@@ -103,12 +124,10 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             initMaps();
         if (SupportedSelectors.containsKey(name))
             return true;
-        else if (SupportedMutators.containsKey(name))
-            return true;
-        else return false;
+        else return SupportedMutators.containsKey(name);
     }
 
-    public static void substituteSelectorStrategies(Config config, boolean quickReplanning, int selectionInflationFactor) {
+    public static void substituteStrategies(Config config, boolean quickReplanning, int selectionInflationFactor) {
         for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
             String classname = settings.getStrategyName();

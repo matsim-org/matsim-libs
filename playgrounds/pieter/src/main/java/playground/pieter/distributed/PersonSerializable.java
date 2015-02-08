@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.population.Desires;
+import playground.pieter.distributed.plans.PersonForPlanGenomes;
 
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
@@ -44,7 +45,7 @@ public class PersonSerializable implements Serializable {
     private Boolean isEmployed;
 
     public Person getPerson() {
-        PersonImpl person = new PersonImpl(Id.createPersonId(id));
+        PersonForPlanGenomes person = new PersonForPlanGenomes(Id.createPersonId(id));
         person.setAge(age);
         person.setCarAvail(carAvail);
 

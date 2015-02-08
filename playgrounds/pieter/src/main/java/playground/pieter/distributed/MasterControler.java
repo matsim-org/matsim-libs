@@ -29,9 +29,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStats;
+import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.controler.SlaveScoreWriter;
 import playground.pieter.distributed.listeners.events.transit.BoardingModelStochasticLinear;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformanceRecorder;
+import playground.pieter.distributed.plans.PersonForPlanGenomes;
+import playground.pieter.distributed.plans.PopulationReaderMatsimV5ForPlanGenomes;
+import playground.pieter.distributed.plans.PopulationUtilsForPlanGenomes;
+import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -53,6 +58,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final long startMillis;
     private final Hydra hydra;
+    private final boolean SingaporeScenario;
+    private final boolean TrackGenome;
+    private final boolean IntelligentRouters;
     private int writeFullPlansInterval;
     private long bytesPerPerson;
     private Scenario scenario;
@@ -99,7 +107,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("c", true, "Config file location");
         options.addOption("p", true, "Port number of MasterControler");
         options.addOption("m", false, "A switch to change SimulationMode from PARALLEL (PSim execution during QSim execution) to SERIAL (PSim waits for QSim to finish and vice-versa.)");
-        options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
+        options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. special scoring function");
         options.addOption("n", true, "Number of slaves to distribute to.");
         options.addOption("i", true, "Number of PSim iterations for every QSim iteration.");
         options.addOption("r", false, "Perform initial routing of plans on slaves.");
@@ -108,75 +116,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         options.addOption("w", true, "Number of iterations between dumping plans from all slaves. Defaults to the value in the config (so disabled if set to zero).");
         options.addOption("q", false, "Quick replanning: each replanning strategy operates at 1/(number of PSim iters), \n " +
                 "effectively producing the same number of new plans per QSim iteration as a normal MATSim run, but having a multinomial distribution");
+        options.addOption("g", false, "Track plan genomes");
+        options.addOption("x", false, "Intelligent routers");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
-        int numSlaves = 1;
-        if (commandLine.hasOption("n"))
-            numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
-        else {
-            masterLogger.warn("Unspecified number of slaves. Will start with the default of a single slave.");
-        }
-        if (commandLine.hasOption("f")) {
-            FullTransitPerformanceTransmission = true;
-            masterLogger.warn("Transmitting full transit performance to slaves.");
-        } else {
-            FullTransitPerformanceTransmission = false;
-            masterLogger.warn("Transmitting standard transit travel time structures only to slave");
-        }
 
-        if (commandLine.hasOption("m")) {
-            SelectedSimulationMode = SimulationMode.SERIAL;
-            masterLogger.warn("Running in SERIAL mode (PSim waits for QSim to finish and vice-versa).");
-        } else {
-            masterLogger.warn("Running in PARALLEL mode (PSim execution during QSim execution).");
-        }
-
-        if (commandLine.hasOption("i")) {
-            numberOfPSimIterations = Integer.parseInt(commandLine.getOptionValue("i"));
-            masterLogger.warn("Running  " + numberOfPSimIterations + " PSim iterations for every QSim iteration run on the master");
-        } else {
-            masterLogger.warn("Unspecified number of PSim iterations for every QSim iteration run on the master.");
-            masterLogger.warn("Using default value of " + numberOfPSimIterations);
-        }
-
-        if (commandLine.hasOption("q")) {
-            QuickReplanning = true;
-            masterLogger.warn("QUICK replanning: each replanning strategy operates at 1/" + numberOfPSimIterations + " (numberOfPSimIterations), \n " +
-                    "effectively producing the same number of new plans per QSim iteration as a normal MATSim run, but having a multinomial distribution");
-        } else {
-            QuickReplanning = false;
-            masterLogger.warn("NORMAL Replanning: each replanning strategy operates at the rate specified in the config for each PSim iteration");
-        }
-
-        slaves = new TreeMap<>();
-        if (commandLine.hasOption("p"))
-            try {
-                socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
-            } catch (NumberFormatException e) {
-                masterLogger.warn("Port number should be integer");
-                System.out.println(options.toString());
-                System.exit(1);
-            }
-        else {
-            masterLogger.warn("Will accept connections on default port number 12345");
-        }
-        loadBalanceInterval = 5;
-        if (commandLine.hasOption("l"))
-            try {
-                loadBalanceInterval = Integer.parseInt(commandLine.getOptionValue("l"));
-                masterLogger.warn("Will perform LOAD BALANCING every " + loadBalanceInterval + " iterations");
-            } catch (NumberFormatException e) {
-                masterLogger.warn("loadBalanceInterval number should be integer");
-                System.out.println(options.toString());
-                System.exit(1);
-            }
-        else {
-            masterLogger.warn("Will perform LOAD BALANCING every 5 iterations as per default");
-        }
-        if (commandLine.hasOption("r")) {
-            masterLogger.warn("ROUTING iFnitial plans on slaves.");
-            initialRoutingOnSlaves = true;
-        }
         if (commandLine.hasOption("c")) {
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
         } else {
@@ -184,42 +128,119 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             System.out.println(options.toString());
             System.exit(1);
         }
+
+        StringBuilder masterInitialLogString = new StringBuilder();
+        int numSlaves = 1;
+        if (commandLine.hasOption("n"))
+            numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
+        else {
+            masterInitialLogString.append("Unspecified number of slaves. Will start with the default of a single slave.\n");
+        }
+        if (commandLine.hasOption("f")) {
+            FullTransitPerformanceTransmission = true;
+            masterInitialLogString.append("Transmitting full transit performance to slaves.\n");
+        } else {
+            FullTransitPerformanceTransmission = false;
+            masterInitialLogString.append("Transmitting standard transit travel time structures only to slave\n");
+        }
+
+        if (commandLine.hasOption("m")) {
+            SelectedSimulationMode = SimulationMode.SERIAL;
+            masterInitialLogString.append("Running in SERIAL mode (PSim waits for QSim to finish and vice-versa).\n");
+        } else {
+            masterInitialLogString.append("Running in PARALLEL mode (PSim execution during QSim execution).\n");
+        }
+
+        if (commandLine.hasOption("i")) {
+            numberOfPSimIterations = Integer.parseInt(commandLine.getOptionValue("i"));
+            masterInitialLogString.append("Running  " + numberOfPSimIterations + " PSim iterations for every QSim iteration run on the master\n");
+        } else {
+            masterInitialLogString.append("Unspecified number of PSim iterations for every QSim iteration run on the master.\n");
+            masterInitialLogString.append("Using default value of " + numberOfPSimIterations);
+        }
+
+        if (commandLine.hasOption("q")) {
+            QuickReplanning = true;
+            masterInitialLogString.append("QUICK replanning: each replanning strategy operates at 1/" + numberOfPSimIterations + " (numberOfPSimIterations), \n " +
+                    "effectively producing the same number of new plans per QSim iteration as a normal MATSim run, but having a multinomial distribution\n");
+        } else {
+            QuickReplanning = false;
+            masterInitialLogString.append("NORMAL Replanning: each replanning strategy operates at the rate specified in the config for each PSim iteration\n");
+        }
+
+        if (commandLine.hasOption("g")) {
+            TrackGenome = true;
+            masterInitialLogString.append("Tracking plan genomes and comparing QSim and Psim scores\n");
+        } else {
+            TrackGenome = false;
+            masterInitialLogString.append("No genome tracking\n");
+        }
+
+        if (commandLine.hasOption("x")) {
+            IntelligentRouters = true;
+            masterInitialLogString.append("Using intelligent routers for transit and car\n");
+        } else {
+            IntelligentRouters = false;
+            masterInitialLogString.append("Using random routers for transit and car\n");
+        }
+
+        slaves = new TreeMap<>();
+        if (commandLine.hasOption("p"))
+            try {
+                socketNumber = Integer.parseInt(commandLine.getOptionValue("p"));
+            } catch (NumberFormatException e) {
+                masterLogger.error("Port number should be integer\n");
+                System.out.println(options.toString());
+                System.exit(1);
+            }
+        else {
+            masterInitialLogString.append("Will accept connections on default port number 12345\n");
+        }
+        loadBalanceInterval = 5;
+        if (commandLine.hasOption("l"))
+            try {
+                loadBalanceInterval = Integer.parseInt(commandLine.getOptionValue("l"));
+                masterInitialLogString.append("Will perform LOAD BALANCING every " + loadBalanceInterval + " iterations\n");
+            } catch (NumberFormatException e) {
+                masterLogger.error("loadBalanceInterval number should be integer\n");
+                System.out.println(options.toString());
+                System.exit(1);
+            }
+        else {
+            masterInitialLogString.append("Will perform LOAD BALANCING every 5 iterations as per default\n");
+        }
+        if (commandLine.hasOption("r")) {
+            masterInitialLogString.append("ROUTING initial plans on slaves.\n");
+            initialRoutingOnSlaves = true;
+        }
         slaveScoreStats = new SlaveScoreStats(config);
+        this.SingaporeScenario = commandLine.hasOption("s");
 //        register initial number of slaves
         ServerSocket writeServer = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket socket = writeServer.accept();
-            masterLogger.warn("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.");
+            masterInitialLogString.append("Slave " + (i + 1) + " out of an initial " + numSlaves + " accepted.\n");
             Slave slave = new Slave(socket, slaveUniqueNumber);
             slaves.put(slaveUniqueNumber, slave);
             //order is important
-            slave.sendNumber(slaveUniqueNumber++);
-            slave.sendNumber(numberOfPSimIterations);
-            slave.sendNumber(config.controler().getLastIteration()*numberOfPSimIterations+numberOfPSimIterations*2);
-            slave.sendBoolean(initialRoutingOnSlaves);
-            slave.sendBoolean(QuickReplanning);
-            slave.sendBoolean(FullTransitPerformanceTransmission);
-            slave.readMemoryStats();
-            slave.readNumberOfThreadsOnSlave();
+            initializeSlave(slave,slaveUniqueNumber++, initialRoutingOnSlaves);
             Thread.sleep(1000);
         }
         writeServer.close();
-        masterLogger.warn("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.");
+        masterInitialLogString.append("MASTER accepted minimum number of incoming connections. All further slaves will be registered on the Hydra.\n");
         hydra = new Hydra();
         Thread hydraThread = new Thread(hydra);
         hydraThread.setName("HYDRA");
         hydraThread.start();
 
-        scenario = ScenarioUtils.createScenario(config);
-        loadScenario();
+        scenario = ScenarioUtilsForPlanGenomes.buildAndLoadScenario(config,TrackGenome,false);
 //        determine the memory use of the population for some initial load balancing
         MemoryUsageCalculator memoryUsageCalculator = new MemoryUsageCalculator();
         scenarioMemoryUse = memoryUsageCalculator.getMemoryUse();
-        loadPopulation();
         long currentPopulationMemoryUse = memoryUsageCalculator.getMemoryUse() - scenarioMemoryUse;
-        bytesPerPlan = currentPopulationMemoryUse / getTotalNumberOfPlansOnMaster();
+        bytesPerPlan = Math.max(1000,currentPopulationMemoryUse / getTotalNumberOfPlansOnMaster());
         bytesPerPerson = bytesPerPlan;
-        masterLogger.warn("Estimated memory use per plan is " + bytesPerPlan + " bytes");
+        masterInitialLogString.append("Estimated memory use per plan is " + bytesPerPlan + " bytes\n");
 
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
@@ -228,10 +249,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         this.writeFullPlansInterval = config.controler().getWritePlansInterval();
         if (commandLine.hasOption("w")) {
             writeFullPlansInterval = Integer.parseInt(commandLine.getOptionValue("w"));
-            masterLogger.warn("Will dump all plans from all slaves every  " + writeFullPlansInterval + " cycles.");
+            masterInitialLogString.append("Will dump all plans from all slaves every  " + writeFullPlansInterval + " cycles.\n");
         } else {
-            masterLogger.warn("No interval defined for writing all plans from all slaves to disk.");
-            masterLogger.warn("Will use the interval from the config " + writeFullPlansInterval);
+            masterInitialLogString.append("No interval defined for writing all plans from all slaves to disk.\n");
+            masterInitialLogString.append("Will use the interval from the config " + writeFullPlansInterval+"\n");
         }
 
         //split the population to be sent to the slaves
@@ -250,12 +271,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             j++;
         }
         int[] initialWeights = getSlaveTargetPopulationSizes(totalIterationTime, personsPerSlave, maxMemoryPerSlave, usedMemoryPerSlave, bytesPerPlan, bytesPerPerson, 0.0, scenario.getPopulation().getPersons().size());
-        List<PersonImpl>[] personSplit = (List<PersonImpl>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
+        List<Person>[] personSplit = (List<Person>[]) CollectionUtils.split(scenario.getPopulation().getPersons().values(), initialWeights);
         j = 0;
         for (int i : slaves.keySet()) {
             List<PersonSerializable> personsToSend = new ArrayList<>();
-            for (PersonImpl p : personSplit[j]) {
-                personsToSend.add(new PersonSerializable(p));
+            for (Person p : personSplit[j]) {
+                personsToSend.add(new PersonSerializable((PersonForPlanGenomes)p));
             }
             slaves.get(i).slavePersonPool = personsToSend;
             j++;
@@ -279,13 +300,28 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
         matsimControler.addControlerListener(this);
-        if (commandLine.hasOption("s")) {
-            masterLogger.warn("Singapore scenario: Doing events-based transit routing.");
+        if (SingaporeScenario) {
+            masterInitialLogString.append("Singapore scenario: special scoring function.");
             //our scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), matsimControler.getScenario()));
             //this qsim engine uses our boarding and alighting model, derived from smart card data
-            matsimControler.setMobsimFactory(new PTQSimFactory());
+//            masterInitialLogString.append("SG boarding and alighting model.");
+//            matsimControler.setMobsimFactory(new PTQSimFactory());
         }
+        masterLogger.warn(masterInitialLogString);
+        String outputDirectory = config.controler().getOutputDirectory();
+        outputDirectory += "_P"+numberOfPSimIterations+
+                (commandLine.hasOption("m")?"_m":"")+
+                (commandLine.hasOption("s")?"_s":"")+
+                (commandLine.hasOption("f")?"_f":"")+
+                (commandLine.hasOption("q")?"_q":"")+
+                (commandLine.hasOption("x")?"_x":"");
+        config.controler().setOutputDirectory(outputDirectory);
+        if(TrackGenome){
+            matsimControler.addControlerListener(new GenomeAnalysis(true,true));
+            matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
+        }
+
     }
 
 
@@ -303,29 +339,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             total += person.getPlans().size();
         }
         return total;
-    }
-
-    /**
-     * Currently a simple population without attributes
-     */
-    private void loadPopulation() {
-        new MatsimPopulationReader(scenario).readFile(config.plans().getInputFile());
-    }
-
-    /**
-     * currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.
-     */
-    private void loadScenario() {
-        masterLogger.warn("Loading scenario. Currently just standard scenario without attribute files and fancy stuff. should be overridden for fancier scenarios.");
-        new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
-        if (config.facilities().getInputFile() != null)
-            new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
-        if (this.config.scenario().isUseTransit()) {
-            new TransitScheduleReader(scenario).readFile(this.config.transit().getTransitScheduleFile());
-//            if (this.config.scenario().isUseVehicles()) {
-                new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.config.transit().getVehiclesFile());
-//            }
-        }
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -411,7 +424,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         IterationStopWatch stopwatch = matsimControler.stopwatch;
         if ((writeFullPlansInterval > 0) &&
                 ((event.getIteration() % writeFullPlansInterval == 0) && event.getIteration() > 0)) {
-            masterLogger.warn("Dumping plans on slaves. Can be re-assemebled into monlithic plans file afterwards.");
+            masterLogger.warn("Dumping plans on slaves. Can be re-assembled into monolithic plans file afterwards.");
             waitForSlaveThreads();
             startSlavesInMode(CommunicationsMode.TRANSMIT_PERFORMANCE);
             waitForSlaveThreads();
@@ -946,7 +959,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             this.usedMemory = reader.readLong();
             this.maxMemory = reader.readLong();
             this.numberOfPlans = reader.readInt();
-            ;
         }
     }
 
@@ -970,14 +982,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     accessingMap.set(true);
                     hydraSlaves.put(i, slave);
                     //order is important
-                    slave.sendNumber(i);
-                    slave.sendNumber(numberOfPSimIterations);
-                    slave.sendNumber(config.controler().getLastIteration()*numberOfPSimIterations);
-                    slave.sendBoolean(false);
-                    slave.sendBoolean(QuickReplanning);
-                    slave.sendBoolean(FullTransitPerformanceTransmission);
-                    slave.readMemoryStats();
-                    slave.readNumberOfThreadsOnSlave();
+                    initializeSlave(slave,i,false);
                     slave.slavePersonPool = new ArrayList<>();
                     accessingMap.set(false);
                     Thread.sleep(1000);
@@ -1010,6 +1015,20 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             accessingMap.set(false);
             return slaveBatch;
         }
+    }
+
+    private void initializeSlave(Slave slave, int i, boolean initialRoutingOnSlaves) throws IOException {
+        slave.sendNumber(i);
+        slave.sendNumber(numberOfPSimIterations);
+        slave.sendNumber(config.controler().getLastIteration() * numberOfPSimIterations);
+        slave.sendBoolean(initialRoutingOnSlaves);
+        slave.sendBoolean(QuickReplanning);
+        slave.sendBoolean(FullTransitPerformanceTransmission);
+        slave.sendBoolean(SingaporeScenario);
+        slave.sendBoolean(TrackGenome);
+        slave.sendBoolean(IntelligentRouters);
+        slave.readMemoryStats();
+        slave.readNumberOfThreadsOnSlave();
     }
 
 }

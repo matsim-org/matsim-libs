@@ -51,7 +51,7 @@ public class DistributedPlanSelector<T extends PlanStrategyFactory>implements Pl
     public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
         if (MatsimRandom.getLocalInstance().nextDouble() <= this.selectionFrequency){
             Plan plan = (Plan)delegate.selectPlan(person);
-            slave.addPlansForPsim(plan);
+            if(slave != null) slave.addPlansForPsim(plan);
             return plan;
         }
         else

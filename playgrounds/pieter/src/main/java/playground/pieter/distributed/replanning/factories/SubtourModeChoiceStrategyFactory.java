@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,39 +21,23 @@ package playground.pieter.distributed.replanning.factories;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPSim;
+import playground.pieter.distributed.replanning.modules.SubtourModeChoiceForPlanGenomes;
 
-/**
- * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
- * in a cycle to the value specified in the config for the selector, thus updating plan scores to the latest travel time information
- * but preventing excessive repeated execution of plans during the cycle.
- *         .
- */
-public class DistributedPlanMutatorStrategyFactory<T extends PlanStrategyFactory> implements
-		PlanStrategyFactory {
-    private final PlanCatcher slave;
-    private final char gene;
-    private final boolean trackGenome;
-    private final Controler controler;
-    T delegate;
-    public DistributedPlanMutatorStrategyFactory(PlanCatcher slave, T delegate, char gene, boolean trackGenome, Controler controler) {
-        this.delegate = delegate;
-        this.slave = slave;
-        this.gene=gene;
-        this.trackGenome=trackGenome;
-        this.controler=controler;
-    }
+public class SubtourModeChoiceStrategyFactory implements PlanStrategyFactory {
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-        PlanStrategyImpl planStrategy = (PlanStrategyImpl) delegate.createPlanStrategy(scenario, eventsManager);
-        planStrategy.addStrategyModule(new RegisterMutatedPlanForPSim(slave,gene,trackGenome,controler));
-        return planStrategy;
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		strategy.addStrategyModule(new SubtourModeChoiceForPlanGenomes(scenario.getConfig()));
+		strategy.addStrategyModule(new ReRoute(scenario));
+		return strategy;
 	}
 
 }

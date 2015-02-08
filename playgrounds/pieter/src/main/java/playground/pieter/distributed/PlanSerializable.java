@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -16,6 +15,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
+import playground.pieter.distributed.plans.PlanGenome;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,9 +23,69 @@ import java.util.List;
 
 class PlanSerializable implements Serializable {
     public static boolean isUseTransit = false;
+    private final ArrayList<PlanElementSerializable> planElements;
+    private final String personId;
+    private final Double score;
+    private final String type;
+    double pSimScore;
+    private String genome = "";
+    public PlanSerializable(Plan plan) {
+        planElements = new ArrayList<>();
+        for (PlanElement planElement : plan.getPlanElements())
+            if (planElement instanceof Activity)
+                planElements.add(new ActivitySerializable((Activity) planElement));
+            else
+                planElements.add(new LegSerializable((Leg) planElement));
+        personId = plan.getPerson().getId().toString();
+        score = plan.getScore();
+//        score = 0.0;
+        type = plan.getType();
+        if (plan instanceof PlanGenome) {
+            PlanGenome planGenome = (PlanGenome) plan;
+            genome = planGenome.getGenome();
+            pSimScore = planGenome.getpSimScore();
+        }
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public Plan getPlan(Population population) {
+
+        PlanGenome plan = new PlanGenome(population.getPersons().get(Id.createPersonId(personId)));
+        plan.setGenome(genome);
+        plan.setpSimScore(pSimScore);
+        plan.setScore(score);
+        plan.setType(type);
+        for (PlanElementSerializable planElementSerializable : planElements)
+            if (planElementSerializable instanceof ActivitySerializable)
+                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
+            else
+                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
+        return plan;
+    }
+
+    public Plan getPlan() {
+        PlanGenome plan = new PlanGenome();
+        plan.setGenome(genome);
+        plan.setpSimScore(pSimScore);
+        plan.setScore(score);
+        plan.setType(type);
+        for (PlanElementSerializable planElementSerializable : planElements)
+            if (planElementSerializable instanceof ActivitySerializable)
+                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
+            else
+                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
+        return plan;
+    }
 
     private interface PlanElementSerializable extends Serializable {
 
+    }
+
+    interface RouteSerializable extends Serializable {
+        Route getRoute(String mode);
     }
 
     class ActivitySerializable implements PlanElementSerializable {
@@ -101,10 +161,6 @@ class PlanSerializable implements Serializable {
         }
     }
 
-    interface RouteSerializable extends Serializable {
-        Route getRoute(String mode);
-    }
-
     class LinkNetworkRouteSerializable implements RouteSerializable {
 
         private final double distance;
@@ -178,48 +234,6 @@ class PlanSerializable implements Serializable {
             return route;
         }
 
-    }
-
-    private final ArrayList<PlanElementSerializable> planElements;
-    private final String personId;
-    private final Double score;
-    private final String type;
-
-    public PlanSerializable(Plan plan) {
-        planElements = new ArrayList<>();
-        for (PlanElement planElement : plan.getPlanElements())
-            if (planElement instanceof Activity)
-                planElements.add(new ActivitySerializable((Activity) planElement));
-            else
-                planElements.add(new LegSerializable((Leg) planElement));
-        personId = plan.getPerson().getId().toString();
-        score = plan.getScore();
-//        score = 0.0;
-        type = plan.getType();
-    }
-
-    public Plan getPlan(Population population) {
-        Plan plan = new PlanImpl(population.getPersons().get(Id.createPersonId(personId)));
-        plan.setScore(score);
-        plan.setType(type);
-        for (PlanElementSerializable planElementSerializable : planElements)
-            if (planElementSerializable instanceof ActivitySerializable)
-                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
-            else
-                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
-        return plan;
-    }
-
-    public Plan getPlan() {
-        Plan plan = new PlanImpl();
-        plan.setScore(score);
-        plan.setType(type);
-        for (PlanElementSerializable planElementSerializable : planElements)
-            if (planElementSerializable instanceof ActivitySerializable)
-                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
-            else
-                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
-        return plan;
     }
 
 }
