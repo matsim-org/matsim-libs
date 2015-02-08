@@ -1,6 +1,7 @@
 package playground.nmviljoen.network.salience;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,14 +16,20 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
+import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
 
 import playground.nmviljoen.network.NmvLink;
 import playground.nmviljoen.network.NmvNode;
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -78,9 +85,18 @@ public class SalienceCalculator {
 		LOG.info("Calculating the shortest path trees for all root nodes.");
 		Matrices matrices = new Matrices();
 		
+		/* Create a temporary folder for the matrices. See if this actually 
+		 * reduced the enormous memory burden. */
+		File tmpFolder = new File("./tmp/");
+		FileUtils.delete(tmpFolder);
+		boolean tmpFolderCreated = tmpFolder.mkdir();
+		if(!tmpFolderCreated){
+			throw new RuntimeException("Cannot create a temporary folder './tmp/' ");
+		}
+		
 		/* Set up the multi-threaded infrastructure. */
 		ExecutorService threadExecutorSpt = Executors.newFixedThreadPool(numberOfThreads);
-		List<Future<Matrix>> listOfJobsSpt = new ArrayList<Future<Matrix>>();
+		List<Future<Boolean>> listOfJobsSpt = new ArrayList<Future<Boolean>>();
 		
 		DijkstraShortestPath<NmvNode, NmvLink> dsp = new DijkstraShortestPath<NmvNode, NmvLink>(this.graph, weightTransformer);
 		Iterator<NmvNode> iteratorO = graph.getVertices().iterator();
@@ -88,8 +104,8 @@ public class SalienceCalculator {
 		Counter sptCounter = new Counter("   root node # ");
 		while(iteratorO.hasNext()){
 			NmvNode node = iteratorO.next();
-			Callable<Matrix> job = new sptCallable(this.graph, node, dsp, sptCounter);
-			Future<Matrix> result = threadExecutorSpt.submit(job);
+			Callable<Boolean> job = new sptCallable(this.graph, node, dsp, sptCounter);
+			Future<Boolean> result = threadExecutorSpt.submit(job);
 			listOfJobsSpt.add(result);
 		}
 
@@ -99,18 +115,18 @@ public class SalienceCalculator {
 		sptCounter.printCounter();
 		
 		/* Aggregate the output. */
-		for(Future<Matrix> job : listOfJobsSpt){
-			Matrix matrix = null;
-			try {
-				matrix = job.get();
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot get multithreaded shortest path tree for root node.");
-			}
-			matrices.getMatrices().put(matrix.getId(), matrix);
-		}
-		LOG.info("Done calculating the shortest path trees.");
-		LOG.info("  |_ Number of matrices: " + matrices.getMatrices().size());
+//		for(Future<Boolean> job : listOfJobsSpt){
+//			Matrix matrix = null;
+//			try {
+//				matrix = job.get();
+//			} catch (InterruptedException | ExecutionException e) {
+//				e.printStackTrace();
+//				throw new RuntimeException("Cannot get multithreaded shortest path tree for root node.");
+//			}
+//			matrices.getMatrices().put(matrix.getId(), matrix);
+//		}
+//		LOG.info("Done calculating the shortest path trees.");
+//		LOG.info("  |_ Number of matrices: " + matrices.getMatrices().size());
 		
 		
 		/* Calculate the salience for each link. First set up the multi-threaded 
@@ -123,7 +139,7 @@ public class SalienceCalculator {
 		Iterator<NmvLink> linkIterator = this.graph.getEdges().iterator();
 		while(linkIterator.hasNext()){
 			NmvLink link = linkIterator.next();
-			Callable<Map<NmvLink, Double>> job = new salienceCallable(this.graph, matrices, link, salienceCounter);
+			Callable<Map<NmvLink, Double>> job = new salienceCallable(this.graph, link, salienceCounter);
 			Future<Map<NmvLink, Double>> result = threadExecutorSalience.submit(job);
 			listOfJobsSalience.add(result);
 		}
@@ -149,18 +165,19 @@ public class SalienceCalculator {
 		}
 		
 		LOG.info("Done calculating the salience.");
+		
+		LOG.info("Cleaning up the temporary folder...");
+		FileUtils.delete(tmpFolder);
 		return salienceMap;
 	}
 	
 	private class salienceCallable implements Callable<Map<NmvLink, Double>>{
 		private Graph<NmvNode, NmvLink> graph;
-		private Matrices matrices;
 		private NmvLink link;
 		private Counter counter;
 		
-		public salienceCallable(Graph<NmvNode, NmvLink> graph, Matrices matrices, NmvLink link, Counter counter) {
+		public salienceCallable(Graph<NmvNode, NmvLink> graph, NmvLink link, Counter counter) {
 			this.graph = graph;
-			this.matrices = matrices;
 			this.link = link;
 			this.counter = counter;
 		}
@@ -169,12 +186,23 @@ public class SalienceCalculator {
 		public Map<NmvLink, Double> call() throws Exception {
 			Map<NmvLink, Double> result = new TreeMap<NmvLink, Double>();
 			
+			/* Get the list of all temporary matrices. */
+			List<File> matrixFiles = FileUtils.sampleFiles(new File("./tmp/"), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			
 			Pair<NmvNode> nodes = this.graph.getEndpoints(this.link);
 			String o = nodes.getFirst().getId();
 			String d = nodes.getSecond().getId();
 			double total = 0.0;
-			for(Matrix m : this.matrices.getMatrices().values()){
-				Entry entry = m.getEntry(o, d);
+			
+			for(File f : matrixFiles){
+				String matrixName = f.getAbsolutePath().substring(
+						f.getAbsolutePath().lastIndexOf("/")+1, 
+						f.getAbsolutePath().length()-7);
+				Matrices m = new Matrices();
+				new MatsimMatricesReader(m, sc).parse(f.getAbsolutePath());
+				Matrix matrix = m.getMatrix(matrixName);
+				Entry entry = matrix.getEntry(o, d);
 				if(entry != null){
 					total += entry.getValue();
 				}
@@ -188,7 +216,7 @@ public class SalienceCalculator {
 		}
 	}
 	
-	private class sptCallable implements Callable<Matrix>{
+	private class sptCallable implements Callable<Boolean>{
 		private DijkstraShortestPath<NmvNode, NmvLink> dsp;
 		private Graph<NmvNode, NmvLink> graph;
 		private NmvNode node;
@@ -202,7 +230,7 @@ public class SalienceCalculator {
 		}
 		
 		@Override
-		public Matrix call() throws Exception {
+		public Boolean call() throws Exception {
 			NmvNode source = this.node;
 			Matrix matrix = new Matrix(this.node.getId(), "");
 			
@@ -221,8 +249,14 @@ public class SalienceCalculator {
 					} 
 				}
 			}
+			
+			/* Write the matrix to file. */
+			Matrices m = new Matrices();
+			m.getMatrices().put(matrix.getId(), matrix);
+			new MatricesWriter(m).write("./tmp/" + matrix.getId() + ".xml.gz");
+			
 			this.counter.incCounter();
-			return matrix;
+			return true;
 		}
 	}
 	
