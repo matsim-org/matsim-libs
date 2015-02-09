@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
+import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
