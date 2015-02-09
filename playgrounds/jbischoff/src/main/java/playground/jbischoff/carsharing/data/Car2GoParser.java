@@ -38,12 +38,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class DriveNowParser
+public class Car2GoParser
 {
 
     public static void main(String[] args)
     {
-        DriveNowParser dnp = new DriveNowParser();
+        Car2GoParser dnp = new Car2GoParser();
         Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("/users/jb/cs/");
         for (CarsharingVehicleData cv : currentGrep.values()){
             System.out.println(cv.toString());
@@ -60,28 +60,26 @@ public class DriveNowParser
     
     
     try {
-        url = new URL("https://www.drive-now.com/php/metropolis/json.vehicle_filter?cit=6099");
+        url = new URL("https://www.car2go.com/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
         JSONObject jsonObject = (JSONObject)jp.parse(in);
-        JSONObject rec = (JSONObject)jsonObject.get("rec");    
-        JSONObject veh = (JSONObject)rec.get("vehicles");    
+ 
         
-        JSONArray msg = (JSONArray) veh.get("vehicles");
+        JSONArray msg = (JSONArray) jsonObject.get("placemarks");
         Iterator<JSONObject> iterator = msg.iterator();
         while (iterator.hasNext()) {
             JSONObject car = iterator.next();
             String vin = (String)car.get("vin");
             Id<CarsharingVehicleData> vid = Id.create(vin, CarsharingVehicleData.class);
-            String mileage = car.get("mileage").toString();
-            String fuel = car.get("fuelState").toString();
+
+            String fuel = car.get("fuel").toString();
             
-            JSONObject loc = (JSONObject)car.get("position");
-            String latitude = loc.get("latitude").toString();
-            String longitude = loc.get("longitude").toString();
-            currentGrep.put(vid, new CarsharingVehicleData(vid, latitude, longitude, mileage, fuel));
+            JSONArray loc = (JSONArray)car.get("coordinates");
+//            System.out.println(vin+" "+fuel+" "+loc);	
+//            currentGrep.put(vid, new CarsharingVehicleData(vid, latitude, longitude,"0" , fuel));
             
         }
-        BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder+"dn_"+System.currentTimeMillis()+".json.gz");
+        BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder+"c2g_"+System.currentTimeMillis()+".json.gz");
         bw.write(jsonObject.toString());
         bw.flush();
         bw.close();
@@ -104,47 +102,5 @@ public class DriveNowParser
 
 }
 
-class CarsharingVehicleData {
-    private Id<CarsharingVehicleData> vid;
-    private Coord location;
-    private double mileage;
-    private double fuel;
-    private long time;
-    CarsharingVehicleData(Id<CarsharingVehicleData> vid, String lati, String longi, String mileage, String fuel){
-        this.vid = vid;
-        this.location = new CoordImpl(longi,lati);
-        this.mileage = Double.parseDouble(mileage);
-        this.fuel = Double.parseDouble(fuel);
-        this.time = System.currentTimeMillis();
-    }
-
-    public Id<CarsharingVehicleData> getVid()
-    {
-        return vid;
-    }
-
-    public Coord getLocation()
-    {
-        return location;
-    }
-
-    public double getMileage()
-    {
-        return mileage;
-    }
-
-    public double getFuel()
-    {
-        return fuel;
-    }
-    public long getTime()
-    {
-        return time;
-    }
-    @Override
-    public String toString()
-    {
-        return (vid+"\t"+location+"\t"+mileage);
-    }
     
-}
+

@@ -26,6 +26,7 @@ public class DriveNowGrepTimerTask
     extends TimerTask
 {
     DriveNowParser dnp = new DriveNowParser();
+    Car2GoParser cp = new Car2GoParser(); 
     
     public static void main(String[] args)
     {
@@ -37,7 +38,9 @@ public class DriveNowGrepTimerTask
     @Override
     public void run()
     {
-        dnp.grepAndDumpOnlineDatabase("C:/local_jb/drivenowgrep/");
+    	String folder = "./";
+        dnp.grepAndDumpOnlineDatabase(folder +"drivenow/");
+        cp.grepAndDumpOnlineDatabase(folder + "car2go/");
     }
 
 }
