@@ -30,7 +30,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.artemc.socialCost.SocialCostController;
-import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
+import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 
 /**
  * @author ikaddoura
