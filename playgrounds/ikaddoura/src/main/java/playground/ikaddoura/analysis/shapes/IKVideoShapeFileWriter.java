@@ -43,8 +43,8 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.ikaddoura.noise2.NoiseContext;
-import playground.ikaddoura.noise2.ReceiverPoint;
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
