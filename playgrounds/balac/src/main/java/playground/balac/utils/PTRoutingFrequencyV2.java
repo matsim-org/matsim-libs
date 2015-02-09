@@ -498,6 +498,258 @@ public class PTRoutingFrequencyV2 {
 			
 			else {
 				
+				/*if the first found route was a pure walk route */
+				
+				departureTime = m * 60;
+				
+				for (double time = departureTime + 7200; time >= departureTime - 7200; time -= timeStep) {
+					
+					List<? extends PlanElement> routeNew =  routingModule.calcRoute(startFacility, endFacility, time, person);
+					
+					double travelTimeNew = getTraveltime (routeNew);
+						
+					((Leg)routeNew.get(0)).setDepartureTime(time);
+						
+					if(!isDominatedWithoutTran(routeNew, allRoutesFirst)) {
+						if (routeNew.size() != 1) {
+								
+							allRoutesFirst.add(routeNew);	
+							if (travelTimeNew < 1.30 * travelTime && numberOfTransfers + 2 > this.getNumberOfTransfers(routeNew) && 
+									!isDominatedWithTran(routeNew, allRoutes)	
+									) {
+							
+								allRoutes.add(routeNew);
+								
+							}
+								
+						}
+						
+						
+						
+			}
+			}
+			
+			for (List<? extends PlanElement> routeIter : allRoutesFirst) {
+				
+				double lastArrival = ((Leg)routeIter.get(0)).getDepartureTime();
+				
+				int countTransfers = -1;
+				
+				double transferTime = 0.0;
+				
+				boolean writtenAccessTime = false;
+				
+				double egressTime = 0.0;
+				
+				double distance = 0.0;
+				
+				
+				outLink.write(arr[0] + " "); // writing the ID of the person routed
+				for(PlanElement pe1: routeIter) {
+					
+					if (pe1 instanceof Leg && ((Leg) pe1).getMode().equals("pt")) {
+						countTransfers++;
+						//plan.addLeg((Leg)pe1);
+						ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+						double temp = Double.MAX_VALUE;
+						//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+						for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
+							
+							double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
+														
+							if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
+								
+								temp = d.getDepartureTime() + fromStopArrivalOffset;
+								
+							}
+						}
+						
+						distance += ((Leg) pe1).getRoute().getDistance();
+						
+						double transfertTimePart = temp - lastArrival;
+						
+						if (countTransfers == 0)
+							outLink.write(Double.toString(transfertTimePart) + " "); //writing first waiting time
+						
+						else
+							
+						transferTime += transfertTimePart;
+							
+						lastArrival +=  ((Leg) pe1).getTravelTime();
+					}
+					else if (pe1 instanceof Leg) {
+						//plan.addLeg((Leg)pe1);
+						lastArrival += ((Leg) pe1).getTravelTime();
+						
+						if (!writtenAccessTime) {
+							
+							if (routeIter.size() == 1) {
+								outLink.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+
+							
+								
+								outLink.write(Double.toString(0.0) + " "); //writing access time
+							}
+														
+							else {
+								outLink.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+								
+								outLink.write(Double.toString(((Leg) pe1).getTravelTime()) + " "); //writing access time
+								
+								
+
+							}
+							writtenAccessTime = true;
+						}
+						
+						egressTime = ((Leg) pe1).getTravelTime();
+						
+					}
+					
+				}
+				if (routeIter.size() == 1)
+					outLink.write(Double.toString(0.0) + " "); //
+				outLink.write(Double.toString(transferTime) + " "); //writing transfer times not including first wait time
+				
+				outLink.write(Integer.toString(countTransfers) + " "); //writing the number of transfers (-1 means pure walk trip)
+				if (routeIter.size() == 1)
+					outLink.write(Double.toString(0.0) + " "); //writing egress time
+
+				else
+					outLink.write(Double.toString(egressTime) + " ");  //writing egress time
+				
+				outLink.write(Double.toString(lastArrival - ((Leg)routeIter.get(0)).getDepartureTime()) + " "); //writing the total travel time from door to door
+				
+				outLink.write(Double.toString(distance));
+	
+				outLink.newLine();
+				
+				
+				
+			}
+			
+			
+			for (List<? extends PlanElement> routeIter : allRoutes) {
+			
+				double lastArrival = ((Leg)routeIter.get(0)).getDepartureTime();
+
+				
+				int countTransfers = -1;
+				
+				double transferTime = 0.0;
+				
+				boolean writtenAccessTime = false;
+				
+				double egressTime = 0.0;
+				
+				double distance = 0.0;
+				
+				
+					if (routeIter.size() != 1) {
+						if (lastTime == 0.0)
+							lastTime = lastArrival;
+						else if (lastTime < lastArrival)
+							lastTime = lastArrival;
+												
+						if (firstTime == 0.0)
+							firstTime = lastArrival;
+						else if (firstTime > lastArrival)
+							firstTime = lastArrival;
+												
+						count++;
+					}
+					outLinkF.write(arr[0] + " "); // writing the ID of the person routed
+				for(PlanElement pe1: routeIter) {
+					
+					if (pe1 instanceof Leg && ((Leg) pe1).getMode().equals("pt")) {
+						countTransfers++;
+						//plan.addLeg((Leg)pe1);
+						ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+						double temp = Double.MAX_VALUE;
+						//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+						for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
+							
+							double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
+														
+							if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
+								
+								temp = d.getDepartureTime() + fromStopArrivalOffset;
+								
+							}
+						}
+						
+						distance += ((Leg) pe1).getRoute().getDistance();
+						
+						double transfertTimePart = temp - lastArrival;
+						
+						if (countTransfers == 0)
+							outLinkF.write(Double.toString(transfertTimePart) + " "); //writing first waiting time
+						
+						else
+							
+						transferTime += transfertTimePart;
+							
+						lastArrival +=  ((Leg) pe1).getTravelTime();
+					}
+					else if (pe1 instanceof Leg) {
+						lastArrival += ((Leg) pe1).getTravelTime();
+						
+						if (!writtenAccessTime) {
+							
+							if (routeIter.size() == 1) {
+								outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+
+							
+								
+								outLinkF.write(Double.toString(0.0) + " "); //writing access time
+							}						
+							else{			
+								outLinkF.write(Double.toString(((Leg) pe1).getDepartureTime()) + " ");  //writing departure time
+							
+
+								outLinkF.write(Double.toString(((Leg) pe1).getTravelTime()) + " "); //writing access time
+							}
+							writtenAccessTime = true;
+						}
+						
+						egressTime = ((Leg) pe1).getTravelTime();
+						
+					}
+					
+				}
+				if (routeIter.size() == 1)
+					outLinkF.write(Double.toString(0.0) + " "); //
+				outLinkF.write(Double.toString(transferTime) + " "); //writing transfer times not including first wait time
+				
+				outLinkF.write(Integer.toString(countTransfers) + " "); //writing the number of transfers (-1 means pure walk trip)
+				if (routeIter.size() == 1)
+					outLinkF.write(Double.toString(0.0) + " "); //writing egress time
+
+				else
+					outLinkF.write(Double.toString(egressTime) + " ");  //writing egress time
+				
+				outLinkF.write(Double.toString(lastArrival - ((Leg)routeIter.get(0)).getDepartureTime()) + " "); //writing the total travel time from door to door
+				
+				outLinkF.write(Double.toString(distance));
+				
+				outLinkF.newLine();
+			
+			
+			
+			}
+			outFrequency.write(arr[0] + " ");
+			
+			if (count == 1)
+				outFrequency.write(Integer.toString(0));
+			else
+				outFrequency.write(Double.toString((lastTime - firstTime)/(count - 1)));
+			
+			outFrequency.newLine();
+				
+				
+				
+				
+				
 				//TODO: write the pure walk trip
 				outLink.write(arr[0] + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(0.0)
 						 + " " + Double.toString(0.0) + " " + Double.toString(0.0) + " " + Double.toString(((Leg)route.get(0)).getTravelTime()) + " " + Double.toString(0.0));	

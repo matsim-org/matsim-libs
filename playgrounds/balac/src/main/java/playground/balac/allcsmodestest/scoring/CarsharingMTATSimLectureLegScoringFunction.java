@@ -230,7 +230,7 @@ private ArrayList<Stats> freefloatingRentals = new ArrayList<Stats>();
 			}
 		}
 		
-		else if (("onewaycarsharing").equals(leg.getMode())) {				
+		if (("onewaycarsharing").equals(leg.getMode())) {				
 			
 			travelTime = arrivalTime - departureTime;
 			tmpScore += Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("constantOneWayCarsharing"));

@@ -29,7 +29,7 @@ public class bla {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140506_trip_car/output/outputStatistics_trips_6.txt");
+final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/outputStatistics_car_new.txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {
@@ -59,11 +59,11 @@ final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/rout
 				
 			}
 			
-			outLink.write(per.getId() + " ");
-			outLink.write(Double.toString(time) + " ");
-			outLink.write(Double.toString(routeDistance) + " ");
-			outLink.write(String.valueOf(CoordUtils.calcDistance(((Activity)p.getPlanElements().get(0)).getCoord(), sc.getNetwork().getLinks().get(linkId).getCoord())) + " ");
-			outLink.write(String.valueOf(CoordUtils.calcDistance(a.getCoord(), sc.getNetwork().getLinks().get(linkId2).getCoord())));
+			outLink.write(per.getId() + ";");
+			outLink.write(Double.toString(time) + ";");
+			outLink.write(Double.toString(routeDistance) + ";");
+		//	outLink.write(String.valueOf(CoordUtils.calcDistance(((Activity)p.getPlanElements().get(0)).getCoord(), sc.getNetwork().getLinks().get(linkId).getCoord())) + " ");
+		//	outLink.write(String.valueOf(CoordUtils.calcDistance(a.getCoord(), sc.getNetwork().getLinks().get(linkId2).getCoord())));
 			outLink.newLine();
 			
 			
