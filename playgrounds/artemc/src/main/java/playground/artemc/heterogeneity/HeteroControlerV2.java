@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.pricing.ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
@@ -86,7 +86,7 @@ public class HeteroControlerV2 {
 
 //		controler.setModules(new IncomeHeterogeneityModule(input));
 
-		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
 
 		controler.addOverridingModule( new AbstractModule() {
 			@Override

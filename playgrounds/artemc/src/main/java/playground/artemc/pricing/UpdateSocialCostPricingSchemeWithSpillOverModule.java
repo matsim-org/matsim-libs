@@ -15,18 +15,17 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
  * Created by artemc on 2/2/15.
  */
-public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
+public class UpdateSocialCostPricingSchemeWithSpillOverModule extends AbstractModule {
 
 	static private Logger log;
 
-	public UpdateSocialCostPricingSchemeModule(){
-		this.log = Logger.getLogger(UpdateSocialCostPricingSchemeModule.class);
+	public UpdateSocialCostPricingSchemeWithSpillOverModule(){
+		this.log = Logger.getLogger(UpdateSocialCostPricingSchemeWithSpillOverModule.class);
 	}
 
 	@Override
@@ -39,13 +38,15 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 
 		RoadPricingSchemeImpl roadPricingScheme;
 		SocialCostCalculator scc;
+		LinkOccupancyAnalyzer linkOccupancyAnalyzer;
 
-		private final int timeslice = 5 * 60;
+		private int timeslice;
 		private final double blendFactor = 0.1;
 
 		@Inject
-		public costUpdater(RoadPricingScheme roadPricingScheme) {
+		public costUpdater(RoadPricingScheme roadPricingScheme, LinkOccupancyAnalyzer linkOccupancyAnalyzer) {
 			this.roadPricingScheme = (RoadPricingSchemeImpl) roadPricingScheme;
+			this.linkOccupancyAnalyzer = linkOccupancyAnalyzer;
 		}
 
 //		//setter method injector
@@ -58,6 +59,7 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0) {
 				Controler controler = event.getControler();
+				this.timeslice = controler.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 				this.scc = new SocialCostCalculator(controler.getScenario().getNetwork(), timeslice, controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
 				controler.addControlerListener(scc);
 				controler.getEvents().addHandler(scc);
@@ -75,8 +77,11 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 
 			for (Id<Link> link : event.getControler().getScenario().getNetwork().getLinks().keySet()) {
 
+				Link networkLink = controler.getScenario().getNetwork().getLinks().get(link);
+
 			if(roadPricingScheme.getTypicalCostsForLink().containsKey(link))
 				roadPricingScheme.getTypicalCostsForLink().get(link).clear();
+
 
 					for (int i = 0; i < scc.getSocialCostsMap().get(link).socialCosts.length; i++) {
 						double socialCost = scc.getSocialCostsMap().get(link).socialCosts[i];
@@ -86,6 +91,16 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 						if(toll<0.01){
 							toll=0.0;
 							scc.getSocialCostsMap().get(link).socialCosts[i] = 0.0;
+						}else{
+							for(Id<Link> outLinkId:networkLink.getToNode().getOutLinks().keySet()){
+								Link outLink = controler.getScenario().getNetwork().getLinks().get(outLinkId);
+								double maxCapacity = outLink.getNumberOfLanes()*outLink.getLength()*controler.getConfig().qsim().getStorageCapFactor()/7.5;
+								if(linkOccupancyAnalyzer.getOccupancyPercentage(outLinkId,(double) i* (double) this.timeslice, 0.99*maxCapacity)>0.2){
+									//if(linkOccupancyAnalyzer.getAverageLinkOccupancy(outLinkId,(double) i* (double) this.timeslice)>0.8*maxCapacity){
+									log.info("Toll for link "+link.toString()+" is set to zero, as outgoing link "+outLinkId+" is full.");
+									toll = 0.0;
+								}
+							}
 						}
 
 						RoadPricingSchemeImpl.Cost cost = new RoadPricingSchemeImpl.Cost(i * timeslice, (i + 1) * timeslice - 1, toll);

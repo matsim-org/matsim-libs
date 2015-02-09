@@ -33,15 +33,15 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Arrays;
 
-public class ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule extends AbstractModule {
+public class RoadPricingWithoutTravelDisutilityModule extends AbstractModule {
 
     private final RoadPricingScheme roadPricingScheme;
 
-    public ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule() {
+    public RoadPricingWithoutTravelDisutilityModule() {
         this.roadPricingScheme = null;
     }
 
-    public ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(RoadPricingScheme roadPricingScheme) {
+    public RoadPricingWithoutTravelDisutilityModule(RoadPricingScheme roadPricingScheme) {
         this.roadPricingScheme = roadPricingScheme;
     }
 

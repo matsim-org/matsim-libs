@@ -22,14 +22,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
+import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
+import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
 import playground.artemc.scoring.CharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
@@ -67,7 +72,12 @@ public final class RunSocialCostPricingExample {
 		// use the road pricing module.
         // (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
 
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule(), new UpdateSocialCostPricingSchemeModule());
+		controler.setModules(new ControlerDefaultsModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+//		controler.addOverridingModule( new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+//			}});
 
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);

@@ -20,8 +20,10 @@ import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
 import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
-import playground.artemc.pricing.ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
+import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
@@ -85,7 +87,8 @@ public class ControlerWithHeteroAndToll {
 
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new ControlerDefaultsWithRoadPricingWithoutTravelDisutilityModule(), new UpdateSocialCostPricingSchemeModule());
+//			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
 			controler.addOverridingModule( new AbstractModule() {
 				@Override
 				public void install() {

@@ -5,9 +5,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 
 import java.io.File;
 import java.util.HashSet;
@@ -39,6 +42,8 @@ public class BasicControler {
         Scenario scenario = initSampleScenario();
         System.setProperty("matsim.preferLocalDtds", "true");
         controler = new Controler(scenario);
+        controler.setModules(new ControlerDefaultsModule(), new LinkOccupancyAnalyzerModule());
+        controler.setOverwriteFiles(true);
         controler.run();
     }
 

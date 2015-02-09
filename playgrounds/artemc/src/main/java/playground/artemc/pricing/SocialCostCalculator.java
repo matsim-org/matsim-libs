@@ -169,7 +169,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 			 * PseudoFreeSpeedTravelTime.
 			 */
 			double pseudoFreeSpeedTravelTime = scd.freeSpeedTravelTime;
-			double pseudoFactor = Math.max(pseudoFreeSpeedTravelTime * 0.01, 1.0); // 1%, but at least 2 seconds
+			double pseudoFactor = Math.max(pseudoFreeSpeedTravelTime * 0.01, 2.0); // 1%, but at least 2 seconds
 			pseudoFreeSpeedTravelTime = pseudoFreeSpeedTravelTime + pseudoFactor;
 
 			scd.pseudoFreeSpeedTravelTime = pseudoFreeSpeedTravelTime;
@@ -576,7 +576,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				if (travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null) <= data.pseudoFreeSpeedTravelTime) ke = k;
 
 				// Ca(k) = max(0, (ke - k)*T - tfree)
-				double socialCost = (ke - k) * travelTimeBinSize - data.freeSpeedTravelTime;
+				//double socialCost = (ke - k) * travelTimeBinSize - data.freeSpeedTravelTime;
+
+				double socialCost = (ke - k) * travelTimeBinSize - travelTime.getLinkTravelTime(data.link, k * travelTimeBinSize, null, null);
 				if (socialCost < 0.0) {
 					socialCost = 0.0;
 				}
