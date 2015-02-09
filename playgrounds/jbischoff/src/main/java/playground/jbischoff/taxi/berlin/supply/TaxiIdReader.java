@@ -32,9 +32,13 @@ public class TaxiIdReader {
 	
 	public static void main(String[] args) throws ParseException {
 //		for (int i = 15; i<22; i++){
-	    Date start = SDF.parse("2013-04-15 00:00:00");
+	    Date start = SDF.parse("2014-10-13 00:00:00");
+	    Date end = SDF.parse("2014-10-20 23:30:00");
+
+		
+//	    Date start = SDF.parse("2013-04-15 00:00:00");
 //	    Date start = SDF.parse("2014-04-07 00:00:00");
-	    Date end = SDF.parse("2013-04-22 00:30:00");
+//	    Date end = SDF.parse("2013-04-22 00:30:00");
 //	    Date end = SDF.parse("2014-04-14 00:30:00");
 		TaxiIdReader tir = new TaxiIdReader(start,end);
 		tir.go();
@@ -44,12 +48,14 @@ public class TaxiIdReader {
 		
 		TaxiIdParser tip = new TaxiIdParser();
 //		this.read("C:/local_jb/data/OD/kw9/rawFCD_20130225-20130304.dat", tip);
-		this.read("C:/local_jb/data/taxi_berlin/2013/vehicles/rawFCD_20130415-20130422.dat", tip);
-//		this.read("C:/local_jb/data/taxi_berlin/2014/vehicles/status_congegrated.dat", tip);
+//		this.read("C:/local_jb/data/taxi_berlin/2013/vehicles/rawFCD_20130415-20130422.dat", tip);
+		this.read("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct.dat", tip);
+
+		//		this.read("C:/local_jb/data/taxi_berlin/2014/vehicles/status_congegrated.dat", tip);
 		this.taxiIdData = tip.getTaxiIds();
 		this.analyse();
-		this.write("C:/local_jb/data/taxi_berlin/2013/vehicles/2013_taxisweekly1.csv");
-		this.writeRollingAverage("C:/local_jb/data/taxi_berlin/2013/vehicles/2013_taxisWeekly_15min.csv", 15*60);
+		this.write("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt");
+		this.writeRollingAverage("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis_av15.txt", 15*60);
 		
 	}
 	

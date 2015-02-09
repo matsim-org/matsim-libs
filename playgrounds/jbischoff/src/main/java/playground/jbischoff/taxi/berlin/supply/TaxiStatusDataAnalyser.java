@@ -154,10 +154,11 @@ public class TaxiStatusDataAnalyser
             "yyyyMMddHHmmss");
 
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws ParseException
     {
 //        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
-        String dir = "c:/local_jb/data/taxi_berlin/2014/status/";
+//        String dir = "c:/local_jb/data/taxi_berlin/2014/status/";
+        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
         String statusMatricesFile = dir + "statusMatrix.xml.gz";
 
         String averagesFile = dir + "averages.csv";
@@ -169,7 +170,7 @@ public class TaxiStatusDataAnalyser
         String avgStatusMatricesXmlFile = dir + "statusMatrixAvg.xml";
         String avgStatusMatricesTxtFile = dir + "statusMatrixAvg.txt";
 
-        String zonalStatuses = dir + "statusByZone.txt";
+        String zonalStatuses = dir + "statusByZone_tuesday.txt";
 
 //
         Matrices statusMatrices = MatrixUtils.readMatrices(statusMatricesFile);
@@ -177,19 +178,27 @@ public class TaxiStatusDataAnalyser
 //                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
 //                        taxisOverTimeFile);
 //
-        writeStatusByZone(statusMatrices, zonalStatuses);
-//        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
-//        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
+        String start = 	"20140408040000";
+        String end = 	"20140409035500";
+        
+        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
+        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
+        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
 //
 //        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
 //                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
     }
 
 
-    private static void writeStatusByZone(Matrices statusMatrices, String zonalStatuses)
+    private static void writeStatusByZone(Matrices statusMatrices, String zonalStatuses, String start, String end) throws ParseException
     {   
-            Map<String,IdleStatusEntry> statuses = new TreeMap<String, IdleStatusEntry>();
-            for (Matrix m: statusMatrices.getMatrices().values()){
+        Date currentTime = STATUS_DATE_FORMAT.parse(start);
+        Date endTime = STATUS_DATE_FORMAT.parse(end);
+        Map<String,IdleStatusEntry> statuses = new TreeMap<String, IdleStatusEntry>();
+            
+        while (!currentTime.equals(endTime)) {
+        	Matrix  m = statusMatrices.getMatrix(STATUS_DATE_FORMAT.format(currentTime));   
+        	System.out.println(STATUS_DATE_FORMAT.format(currentTime));
                 for (ArrayList<Entry> l : m.getFromLocations().values()){
                     
                     for (Entry e : l ){
@@ -198,15 +207,22 @@ public class TaxiStatusDataAnalyser
                         }
                         IdleStatusEntry ent = statuses.get(e.getFromLocation()); 
                         if (e.getToLocation().equals("65")) ent.inc65(e.getValue());
+                        if (e.getToLocation().equals("66")) ent.inc66(e.getValue());
                         if (e.getToLocation().equals("70")) ent.inc70(e.getValue());
+                        if (e.getToLocation().equals("75")) ent.inc75(e.getValue());
+                        if (e.getToLocation().equals("79")) ent.inc79(e.getValue());
                         if (e.getToLocation().equals("80")) ent.inc80(e.getValue());
                         if (e.getToLocation().equals("83")) ent.inc83(e.getValue());
+                        if (e.getToLocation().equals("85")) ent.inc85(e.getValue());
+                        if (e.getToLocation().equals("87")) ent.inc87(e.getValue());
+                        if (e.getToLocation().equals("90")) ent.inc90(e.getValue());
                     }
                 }
+                currentTime = getNextTime(currentTime);
             }
         BufferedWriter bw = IOUtils.getBufferedWriter(zonalStatuses);
         try {
-            bw.append("zone\t65\t70\t80\t83\tsum");
+            bw.append("zone\ts65\ts66\ts70\ts75\ts79\tss80\ts83\ts85\ts87\ts90\tsum (wait)");
             bw.newLine();
             for (IdleStatusEntry ise : statuses.values()) {
                 bw.append(ise.toString());
@@ -226,9 +242,16 @@ public class TaxiStatusDataAnalyser
     class IdleStatusEntry{
         private String zone;
         private double status65 = 0;
+        private double status66 = 0;
+        
         private double status70 = 0;
+        private double status75 = 0;
+        private double status79 = 0;
         private double status80 = 0;
         private double status83 = 0;
+        private double status85 = 0;
+        private double status87 = 0;
+        private double status90 = 0;
         
         public IdleStatusEntry(String zone){
             this.zone = zone;
@@ -237,8 +260,17 @@ public class TaxiStatusDataAnalyser
         public void inc65(double value){
             status65+=value;
         }
+        public void inc66(double value){
+            status66+=value;
+        }
         public void inc70(double value){
             status70+=value;
+        }
+        public void inc75(double value){
+        	status75+=value;
+        }
+        public void inc79(double value){
+        	status79+=value;
         }
         public void inc80(double value){
             status80+=value;
@@ -246,8 +278,18 @@ public class TaxiStatusDataAnalyser
         public void inc83(double value){
             status83+=value;
         }
+        public void inc85(double value){
+        	status85+=value;
+        }
+        public void inc87(double value){
+        	status87+=value;
+        }
+        public void inc90(double value){
+        	status90+=value;
+        }
+        
       
         public String toString(){
-            return zone+"\t"+Math.round(status65)+"\t"+Math.round(status70)+"\t"+Math.round(status80)+"\t"+Math.round(status83)+"\t"+Math.round(status70+status80+status65+status83);
+            return zone+"\t"+Math.round(status65)+"\t"+Math.round(status66)+"\t"+Math.round(status70)+"\t"+Math.round(status75)+"\t"+Math.round(status79)+"\t"+Math.round(status80)+"\t"+Math.round(status83)+"\t"+Math.round(status85)+"\t"+Math.round(status87)+"\t"+Math.round(status90)+"\t"+Math.round(status70+status80+status65+status83);
         }
     } 

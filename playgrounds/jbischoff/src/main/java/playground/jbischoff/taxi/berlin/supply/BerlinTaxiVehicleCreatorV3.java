@@ -70,20 +70,21 @@ public class BerlinTaxiVehicleCreatorV3
     public static void main(String[] args)
         throws ParseException
     {
-        String dir = "C:/local_jb/data/";
-        String taxisOverTimeFile = dir + "taxi_berlin/2013/vehicles/taxisweekly.csv";
-        String statusMatrixFile = dir + "taxi_berlin/2013/status/statusMatrixAvg.xml";
+        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/";
+        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/taxisweekly.txt";
         String networkFile = dir + "scenarios/2014_10_basic_scenario_v4/berlin_brb.xml";
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
-        String vehicleFile = dir + "scenarios/2014_10_basic_scenario_v4/taxis4to4_EV";
-
+        String vehicleFile = dir + "scenarios/2015_02_strike/taxis.xml";
+        String statusMatrixFile = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/statusMatrixAvg.xml";
+        
+        
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
         btv.evShare = 0.0;
         btv.minTime = 14.0 * 3600;
         btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
-        btv.createAverages(SDF.parse("2013-04-16 04:00:00"), 1);
+        btv.createAverages(SDF.parse("2014-10-15 04:00:00"), 1);
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
         btv.prepareMatrices(statusMatrixFile);
         btv.createVehicles();

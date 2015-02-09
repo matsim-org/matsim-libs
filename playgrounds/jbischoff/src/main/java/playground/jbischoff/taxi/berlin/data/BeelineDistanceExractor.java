@@ -51,8 +51,8 @@ public class BeelineDistanceExractor
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         this.zones = new TreeMap<>();
-        this.zones.putAll(Zones.readZones(scenario, "C:/local_jb/data/shp_merged/zones.xml",
-                "C:/local_jb/data/shp_merged/zones.shp"));                 
+        this.zones.putAll(Zones.readZones(scenario, "/Users/jb/sustainability-w-michal-and-dlr/data/shp_merged/zones.xml",
+                "/Users/jb/sustainability-w-michal-and-dlr/data/shp_merged/zones.shp"));                 
         
         
     }

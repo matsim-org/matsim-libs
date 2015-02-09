@@ -34,7 +34,8 @@ public class BerlinTaxiDemandEvaluator
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final SimpleDateFormat filenameformat = new SimpleDateFormat("yyyyMMddHHmmss");
 
-   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
+   static String fileprefix = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/OD_BRB_2014-10/oct/";
+//   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2013\\OD\\";
 //   static String fileprefix = "C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\";
 
 
@@ -49,14 +50,14 @@ public class BerlinTaxiDemandEvaluator
 //        Date start = filenameformat.parse("20140407000000");
 //        Date end = filenameformat.parse("20130421230000");
 //        Date end = filenameformat.parse("20140413230000");
-//        bte.read(fileprefix+"demandMatrices.xml",start, end);
         
         
-        Date start = filenameformat.parse("20130416040000");
-        Date end = filenameformat.parse("20130417040100");
+        Date start = filenameformat.parse("20141013000000");
+        Date end =	 filenameformat.parse("20141020230000");
       
+        bte.read(fileprefix+"demandMatrices.xml",start, end);
         
-        bte.dumpSym(fileprefix+"demandMatrices.xml",start, end);
+//        bte.dumpSym(fileprefix+"demandMatrices.xml",start, end);
 //        Id alex = Id.create("01011303");
 //        Id friedrichshain = Id.create("02040701");
 //        Id zoo = Id.create("04030931");
@@ -70,7 +71,7 @@ public class BerlinTaxiDemandEvaluator
 //        bte.read(fileprefix+"demandMatrices.xml",start, end,  alex, zoo);
 //        bte.read(fileprefix+"demandMatrices.xml",start, end,  txl);
 //        
-//        bte.write(fileprefix+"demandWeekly.csv");
+        bte.write(fileprefix+"demandWeekly.csv");
 
     }
     

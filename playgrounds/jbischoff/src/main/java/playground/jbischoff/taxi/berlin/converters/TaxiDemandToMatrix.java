@@ -25,7 +25,7 @@ public class TaxiDemandToMatrix
 
     public static void main(String[] args)
     {
-        TaxiDemandToMatrix m = new TaxiDemandToMatrix("C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\");
+        TaxiDemandToMatrix m = new TaxiDemandToMatrix("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/OD_BRB_2014-10/nov/");
         m.read();
         m.write();
     }

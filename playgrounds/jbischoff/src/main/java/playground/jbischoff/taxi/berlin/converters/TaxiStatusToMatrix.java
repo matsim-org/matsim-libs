@@ -23,7 +23,7 @@ public class TaxiStatusToMatrix
 
     public static void main(String[] args)
     {
-        TaxiStatusToMatrix m = new TaxiStatusToMatrix("C:\\local_jb\\data\\taxi_berlin\\2013\\status/");
+        TaxiStatusToMatrix m = new TaxiStatusToMatrix("/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/nov/");
         m.read();
         m.write();
     }
