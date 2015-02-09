@@ -114,14 +114,13 @@ public class GenerateFundamentalDiagramData {
 
 	public static void main(String[] args) {
 
-		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/";
+		String RUN_DIR = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularNetwork/run308/";
 
-		String OUTPUT_FOLDER ="/carBikePassingRate/1c4b_6";
+		String OUTPUT_FOLDER ="/withHoles/car/";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
-		args = new String [] { RUN_DIR+OUTPUT_FOLDER};
 
-		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1.,1.};
+		String [] travelModes= {"car"};
+		Double [] modalSplit = {1.}; // in pcu
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -131,10 +130,10 @@ public class GenerateFundamentalDiagramData {
 		//		generateFDData.setSeepageAllowed(false);
 		generateFDData.setIsWritingFinalFdData(true);
 		generateFDData.setWriteInputFiles(true);
-		generateFDData.setRunDirectory(args[0]);
-		//		generateFDData.setUseHoles(false);
-		generateFDData.setReduceDataPointsByFactor(10);
-		//		generateFDData.setUsingSeepNetworkFactory(true);
+		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
+				generateFDData.setUseHoles(true);
+//		generateFDData.setReduceDataPointsByFactor(10);
+				generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
 		//		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.run();

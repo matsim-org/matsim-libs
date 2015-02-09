@@ -386,13 +386,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( MyQueueWithBuffer.HOLES ) {
 			remainingHolesStorageCapacity = this.storageCapacity;
-			// the number of holes really just needs to be the storage capacity!
-//			for ( int ii=0 ; ii< this.storageCapacity; ii++ ) {
-//				MyQueueWithBuffer.Hole hole = new MyQueueWithBuffer.Hole() ;
-//				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
-//				hole.setSizeInEquivalents(1.);
-//				holes.add( hole ) ;
-//			}
 		}
 	}
 
@@ -481,7 +474,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
 			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
 			holes.add( hole ) ;
-			remainingHolesStorageCapacity = remainingHolesStorageCapacity +veh2Remove.getSizeInEquivalents();
 		}
 		return veh ;
 	}
@@ -520,8 +512,6 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final boolean isAcceptingFromUpstream() {
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 		if ( !MyQueueWithBuffer.HOLES ) {
 			return storageOk ;
@@ -532,14 +522,10 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			return false ;
 		}
 		// at this point, storage is ok, so start checking holes:
-		HolesQItem hole = holes.peek();
 		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
-		} else if ( hole!=null && hole.getEarliestLinkExitTime() > now ) {
-			//						log.warn( " !hasSpace since all hole arrival times lie in future ") ;
-			return false ;
-		}
+		} 
 		return true ;
 	}
 
@@ -689,32 +675,7 @@ final class MyQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.add(veh);
 
 		if ( MyQueueWithBuffer.HOLES ) {
-//			MyQueueWithBuffer.Hole removedHole = holes.poll();
 			remainingHolesStorageCapacity = remainingHolesStorageCapacity - veh.getSizeInEquivalents();
-////			if(removedHole!=null){
-//////				double removedHolePCU = removedHole.getSizeInEquivalents();
-//////				double earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
-////
-////				if(removedHolePCU > veh.getSizeInEquivalents()){
-////					MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-////					hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
-////					hole2.setSizeInEquivalents(removedHolePCU-veh.getSizeInEquivalents());
-////					holes.addFirst(hole2);
-////				} else if(removedHolePCU < veh.getSizeInEquivalents()){
-////					double totalRemovedPCU = removedHolePCU;
-////					while(holes.size() > 0 && totalRemovedPCU < veh.getSizeInEquivalents()){
-////						removedHole = holes.poll();
-////						earliestLinkExitTimeOfRemovedHole = removedHole.getEarliestLinkExitTime();
-////						totalRemovedPCU += removedHole.getSizeInEquivalents();
-////					};
-////					if(totalRemovedPCU > veh.getSizeInEquivalents()){
-////						MyQueueWithBuffer.Hole hole2 = new MyQueueWithBuffer.Hole() ;
-////						hole2.setEarliestLinkExitTime(earliestLinkExitTimeOfRemovedHole);
-////						hole2.setSizeInEquivalents(totalRemovedPCU-veh.getSizeInEquivalents());
-////						holes.addFirst(hole2);
-////					}
-////				}
-//			}
 		}
 	}
 
