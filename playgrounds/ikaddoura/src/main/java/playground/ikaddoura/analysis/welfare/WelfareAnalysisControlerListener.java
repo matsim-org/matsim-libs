@@ -22,7 +22,7 @@
  * 
  */
 
-package playground.ikaddoura.internalizationCar;
+package playground.ikaddoura.analysis.welfare;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.axis.NumberAxis;

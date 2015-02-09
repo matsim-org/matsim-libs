@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.internalizationCar;
+package playground.ikaddoura.analysis.welfare;
 
 import java.util.HashMap;
 import java.util.Map;
