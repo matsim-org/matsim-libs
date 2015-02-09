@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.events;
 
 import org.matsim.core.events.handler.EventHandler;
 
@@ -29,6 +29,6 @@ import org.matsim.core.events.handler.EventHandler;
  *
  */
 
-public interface NoiseEventCausedHandler extends EventHandler{
-	public void handleEvent (NoiseEventCaused event);
+public interface NoiseEventAffectedHandler extends EventHandler{
+	public void handleEvent (NoiseEventAffected event);
 }

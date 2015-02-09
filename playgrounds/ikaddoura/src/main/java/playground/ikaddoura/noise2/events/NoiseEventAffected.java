@@ -20,13 +20,15 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
+
+import playground.ikaddoura.noise2.ReceiverPoint;
 
 /**
  * @author lkroeger, ikaddoura

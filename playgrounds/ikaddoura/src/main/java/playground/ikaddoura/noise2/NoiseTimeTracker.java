@@ -38,6 +38,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import playground.ikaddoura.noise2.events.NoiseEventAffected;
+import playground.ikaddoura.noise2.events.NoiseEventCaused;
+
 /**
  * A handler which computes noise emissions, immisions, affected agent units and damages for each receiver point and time interval.
  * Throws noise damage events for each affected and causing agent.
