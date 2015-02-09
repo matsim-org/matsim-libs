@@ -60,7 +60,7 @@ public class SubPopControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createTransitVehicleContainer();
+		((ScenarioImpl) sc).createVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType slum_car = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));

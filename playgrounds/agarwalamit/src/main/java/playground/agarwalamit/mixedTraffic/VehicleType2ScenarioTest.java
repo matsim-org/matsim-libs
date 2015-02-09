@@ -76,14 +76,14 @@ public class VehicleType2ScenarioTest {
 		
 		if(! useModifiedMobsimFactory){
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			((ScenarioImpl) scenario).createTransitVehicleContainer();
+			((ScenarioImpl) scenario).createVehicleContainer();
 		}
 	}
 
 
 	private static final boolean useModifiedMobsimFactory = false;
 	private Scenario scenario ;
-	static String transportModes [] = new String [] {"bicycle","car"};
+	static String transportModes [] = new String [] {"bike","car"};
 	Link link1;
 	Link link2;
 	Link link3;
@@ -158,10 +158,10 @@ public class VehicleType2ScenarioTest {
 				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
 				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
 			
-				if(! scenario.getTransitVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
-					scenario.getTransitVehicles().addVehicleType(vehTypes[i]);
+				if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+					scenario.getVehicles().addVehicleType(vehTypes[i]);
 				}
-				scenario.getTransitVehicles().addVehicle(v);
+				scenario.getVehicles().addVehicle(v);
 			}
 		}
 
@@ -173,7 +173,7 @@ public class VehicleType2ScenarioTest {
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
 		config.qsim().setMainModes(Arrays.asList(transportModes));
-		config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
+//		config.plansCalcRoute().setNetworkModes(Arrays.asList(transportModes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
 		config.network().setInputFile("./input/network.xml");
