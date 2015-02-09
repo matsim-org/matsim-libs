@@ -164,7 +164,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 
 			this.increaseCount(countVehicles, event.getTime(), 1);
 			
-			double vehCapacity = getCapacityForVehicle(event.getVehicleId());
+			double vehCapacity = getCapacityForPtVehicle(event.getVehicleId());
 			this.increaseCount(countCapacity, event.getTime(), vehCapacity);
 			
 			double vehCapacity_m = vehCapacity * this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
@@ -214,10 +214,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		v.setValue(v.getValue() + amount);
 	}
 	
-	private double getCapacityForVehicle(Id<Vehicle> vehicleId) {
-		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
-		System.exit(-1); 
-
+	private double getCapacityForPtVehicle(Id<Vehicle> vehicleId) {
 		int vehSeats = this.scenario.getTransitVehicles().getVehicles().get(vehicleId).getType().getCapacity().getSeats();
 		int vehStand = this.scenario.getTransitVehicles().getVehicles().get(vehicleId).getType().getCapacity().getStandingRoom();
 		return vehSeats + vehStand;
