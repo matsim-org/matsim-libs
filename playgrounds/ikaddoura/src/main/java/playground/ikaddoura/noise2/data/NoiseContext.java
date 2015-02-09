@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +38,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
+
+import playground.ikaddoura.noise2.NoiseParameters;
+import playground.ikaddoura.noise2.handler.NoiseEquations;
 
 /**
  * Computes a grid of receiver points and further spatial data which is required during the computation of noise immissions and damages.

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.ikaddoura.noise2.ReceiverPoint;
+import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
  * @author lkroeger, ikaddoura

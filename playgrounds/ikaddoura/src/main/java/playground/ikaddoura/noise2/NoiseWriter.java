@@ -27,18 +27,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
-import org.opengis.feature.simple.SimpleFeature;
+
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
  * 

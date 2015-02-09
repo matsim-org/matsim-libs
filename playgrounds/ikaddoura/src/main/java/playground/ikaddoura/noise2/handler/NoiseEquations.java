@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.handler;
 
 import java.util.Collection;
 

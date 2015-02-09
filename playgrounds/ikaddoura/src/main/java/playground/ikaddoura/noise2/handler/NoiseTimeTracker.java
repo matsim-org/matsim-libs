@@ -38,13 +38,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import playground.ikaddoura.noise2.NoiseContext;
-import playground.ikaddoura.noise2.NoiseEquations;
-import playground.ikaddoura.noise2.NoiseLink;
-import playground.ikaddoura.noise2.NoiseVehicleType;
 import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.PersonActivityInfo;
-import playground.ikaddoura.noise2.ReceiverPoint;
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.NoiseLink;
+import playground.ikaddoura.noise2.data.NoiseVehicleType;
+import playground.ikaddoura.noise2.data.PersonActivityInfo;
+import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
 import playground.ikaddoura.noise2.events.NoiseEventCaused;
 

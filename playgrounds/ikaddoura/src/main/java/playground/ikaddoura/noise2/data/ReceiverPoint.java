@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;

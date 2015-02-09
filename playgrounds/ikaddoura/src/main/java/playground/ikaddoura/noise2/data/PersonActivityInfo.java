@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.data;
 
 import org.matsim.core.utils.misc.Time;
 

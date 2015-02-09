@@ -39,9 +39,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.pt.PtConstants;
 
-import playground.ikaddoura.noise2.NoiseContext;
-import playground.ikaddoura.noise2.PersonActivityInfo;
-import playground.ikaddoura.noise2.ReceiverPoint;
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.PersonActivityInfo;
+import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
  * 
