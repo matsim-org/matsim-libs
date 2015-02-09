@@ -25,7 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -65,9 +67,12 @@ public class ScheduleCutter {
 
 
         // Read schedule
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
+        Config config = ConfigUtils.loadConfig(args[0]);
+        Scenario scenario = ScenarioUtils.createScenario(config);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().scenario().setUseVehicles(true);
+        new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+        new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 
         // Cut schedule
         ScheduleCutter cutter = new ScheduleCutter(
