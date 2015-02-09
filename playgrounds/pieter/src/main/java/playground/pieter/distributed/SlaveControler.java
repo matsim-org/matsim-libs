@@ -24,8 +24,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -35,17 +33,14 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioElementsModule;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
+import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
@@ -68,6 +63,7 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener, StartupListener, BeforeMobsimListener, IterationEndsListener, Runnable {
+    public static int numberOfPSimIterationsPerCycle;
     private final Scenario scenario;
     private final MemoryUsageCalculator memoryUsageCalculator;
     private final ReplaceableTravelTime travelTime;
@@ -76,20 +72,14 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final boolean SingaporeScenario;
     private final boolean TrackGenome;
     private final boolean IntelligentRouters;
-    private boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
-    public static int numberOfPSimIterationsPerCycle;
+    private final PlanCatcher plancatcher;
+    private boolean initialRouting;
     private int numberOfIterations = -1;
-
     private int executedPlanCount;
     private int currentIteration = 0;
     private int masterCurrentIteration = -1;
-
-    public Config getConfig() {
-        return config;
-    }
-
     private Config config;
     private double totalIterationTime;
     private Controler matsimControler;
@@ -106,9 +96,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private long fSLEEP_INTERVAL = 100;
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
-    private final PlanCatcher plancatcher;
     private TransitPerformance transitPerformance;
-
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
@@ -216,7 +204,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         config.controler().setWriteEventsInterval(0);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
-        scenario =ScenarioUtilsForPlanGenomes.buildAndLoadScenario(config,TrackGenome,true);
+        scenario = ScenarioUtilsForPlanGenomes.buildAndLoadScenario(config, TrackGenome, true);
 
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
@@ -235,8 +223,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 include(new CharyparNagelScoringFunctionModule());
                 include(new ScenarioElementsModule());
                 include(new StrategyManagerModule());
-                include(new TravelDisutilityModule());
-//                bindToInstance(TransitSchedule.class, scenario.getTransitSchedule());
+                if (!IntelligentRouters)
+                    include(new TravelDisutilityModule());
+                else
+                    include(new RandomizedCarRouterTravelTimeAndDisutilityModule());
                 bindToInstance(TravelTime.class, travelTime);
             }
         });
@@ -283,18 +273,37 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration
         }
 
-        if(IntelligentRouters) {
+        if (IntelligentRouters) {
             matsimControler.setTransitRouterFactory(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
-        }else{
+        } else {
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }
-        if(TrackGenome) {
+        if (TrackGenome) {
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            matsimControler.addControlerListener(new GenomeAnalysis(false,false));
+            matsimControler.addControlerListener(new GenomeAnalysis(false, false));
         }
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);
+    }
+
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
+        SlaveControler slave = new SlaveControler(args);
+        new Thread(slave).start();
+        System.out.printf("Enter KILL to kill the slave: ");
+        Scanner in = new Scanner(System.in);
+        String s;
+        boolean running = true;
+        do {
+            s = in.nextLine();
+            if (s.equals("KILL"))
+                running = false;
+        } while (running);
+        slave.requestShutDown();
+    }
+
+    public Config getConfig() {
+        return config;
     }
 
     private void writeMemoryStats() throws IOException {
@@ -312,21 +321,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         } catch (NullPointerException e) {
         }
         return total;
-    }
-
-    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
-        SlaveControler slave = new SlaveControler(args);
-        new Thread(slave).start();
-        System.out.printf("Enter KILL to kill the slave: ");
-        Scanner in = new Scanner(System.in);
-        String s;
-        boolean running = true;
-        do {
-            s = in.nextLine();
-            if (s.equals("KILL"))
-                running = false;
-        } while (running);
-        slave.requestShutDown();
     }
 
     @Override
@@ -401,7 +395,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
         for (Person person : matsimControler.getScenario().getPopulation().getPersons().values()) {
             PlanSerializable planSerializable = new PlanSerializable(person.getSelectedPlan());
-            planSerializable.pSimScore = planSerializable.getScore()==null?0:planSerializable.getScore();
+            planSerializable.pSimScore = planSerializable.getScore() == null ? 0 : planSerializable.getScore();
             tempPlansCopyForSending.put(person.getId().toString(), planSerializable);
         }
         plansCopyForSending = tempPlansCopyForSending;

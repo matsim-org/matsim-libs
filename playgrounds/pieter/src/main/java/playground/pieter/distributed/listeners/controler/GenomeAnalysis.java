@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.io.IOUtils;
 import playground.pieter.distributed.plans.PlanGenome;
 
 import java.io.BufferedWriter;
@@ -36,17 +37,14 @@ public class GenomeAnalysis implements IterationEndsListener {
         try {
             PrintWriter writer = null;
             if (writePlanScores) {
-                writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/planS" +
-                        "cores.csv", append)));
-                if (!append)
-                    writer.println(String.format("iter\tpersonid\tgenome\tscore\taltscore"));
+                writer = getWriter(append,"/planScores.csv","iter,personid,genome,score,altscore" );
             }
             for (Person person : persons.values()) {
                 List<? extends Plan> plans = person.getPlans();
                 for (Plan plan : plans) {
                     PlanGenome planGenome = (PlanGenome) plan;
                     if (writePlanScores) {
-                        writer.println(String.format("%d\t%s\t%s\t%.3f\t%.3f", event.getIteration(), person.getId(), planGenome.getGenome(), planGenome.getScore(), planGenome.getpSimScore()));
+                        writer.println(String.format("%d,%s,%s,%.3f,%.3f", event.getIteration(), person.getId(), planGenome.getGenome(), planGenome.getScore(), planGenome.getpSimScore()));
                     }
                     try {
                         int count = fullGeneCount.get(planGenome.getGenome());
@@ -75,11 +73,9 @@ public class GenomeAnalysis implements IterationEndsListener {
         if (writeFullGenomeStats) {
             logger.info("Printing genome stats");
             try {
-                PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/planEvo.csv", append)));
-                if (!append)
-                    writer.println(String.format("iter\tgenome\tcount\tscore\taltscore"));
+                PrintWriter writer = getWriter(append,"/planEvo.csv","iter,genome,count,score,altscore" );
                 for (String key : keys) {
-                    writer.println(String.format("%d\t%s\t%d\t%.3f\t%.3f", event.getIteration(), key, fullGeneCount.get(key), fullGeneScore.get(key), fullGeneAltScore.get(key)));
+                    writer.println(String.format("%d,%s,%d,%.3f,%.3f", event.getIteration(), key, fullGeneCount.get(key), fullGeneScore.get(key), fullGeneAltScore.get(key)));
                 }
                 writer.flush();
                 writer.close();
@@ -88,9 +84,9 @@ public class GenomeAnalysis implements IterationEndsListener {
 //                edges.add(new SimpleLink(key, fullGeneCount.get(key),fullGeneScore.get(key),fullGeneAltScore.get(key)));
 //            }
 //            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/planEvoEdges.csv", false)));
-//                writer.println(String.format("Id\tSource\tTarget\tType\tLabel\tCount\tScore\taltscore"));
+//                writer.println(String.format("Id,Source,Target,Type,Label,Count,Score,altscore"));
 //            for (SimpleLink edge : edges) {
-//                writer.println(String.format("%s\t%s\t%s\tUndirected\t%s\t%d\t%.3f\t%.3f", edge.to,edge.from,edge.to,edge.type, edge.count,edge.score,edge.altscore));
+//                writer.println(String.format("%s,%s,%s,Undirected,%s,%d,%.3f,%.3f", edge.to,edge.from,edge.to,edge.type, edge.count,edge.score,edge.altscore));
 //            }
 //            writer.flush();
 //            writer.close();
@@ -151,13 +147,11 @@ public class GenomeAnalysis implements IterationEndsListener {
         logger.warn("Printing mutation counts in surviving plans");
         PrintWriter writer = null;
         try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/survivorMutationCounts.csv", append)));
-            if (!append)
-                writer.println(String.format("iter\tmutator\tcount"));
+            writer = getWriter(append,"/survivorMutationCounts.csv","iter,mutator,count" );
             Iterator<Map.Entry<String, Integer>> iterator = strategyMutationCount.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Integer> next = iterator.next();
-                writer.println(String.format("%d\t%s\t%d", event.getIteration(), next.getKey(), next.getValue()));
+                writer.println(String.format("%d,%s,%d", event.getIteration(), next.getKey(), next.getValue()));
             }
             writer.flush();
             writer.close();
@@ -165,21 +159,17 @@ public class GenomeAnalysis implements IterationEndsListener {
             keys = new ArrayList<>();
             keys.addAll(simpleGeneCount.keySet());
             Collections.sort(keys);
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/mutationAtIterSurvivorCounts.csv", append)));
-            if (!append)
-                writer.println(String.format("%s\t%s\t%s\t%s\t%s\t%s", "iter", "mutator", "mutationIter", "survivors", "avg.score", "avg.alt.score"));
+            writer = getWriter(append,"/mutationAtIterSurvivorCounts.csv",String.format("%s,%s,%s,%s,%s,%s", "iter", "mutator", "mutationIter", "survivors", "avg.score", "avg.alt.score") );
             for (String key : keys) {
-                writer.println(String.format("%s\t%s\t%d\t%d\t%.3f\t%.3f", event.getIteration(), key.substring(0, 1), Integer.parseInt(key.substring(1)), simpleGeneCount.get(key), simpleGeneScore.get(key), simpleGeneAltScore.get(key)));
+                writer.println(String.format("%s,%s,%d,%d,%.3f,%.3f", event.getIteration(), key.substring(0, 1), Integer.parseInt(key.substring(1)), simpleGeneCount.get(key), simpleGeneScore.get(key), simpleGeneAltScore.get(key)));
 
             }
             writer.flush();
             writer.close();
             logger.warn("Gene lengths and average scores");
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/geneLengths.csv", append)));
-            if (!append)
-                writer.println(String.format("%s\t%s\t%s\t%s", "iter", "len", "num", "avgscor"));
+            writer = getWriter(append,"/geneLengths.csv",String.format("%s,%s,%s,%s", "iter", "len", "num", "avgscor") );
             for (int gl : geneLengths.keySet()) {
-                writer.println(String.format("%d\t%d\t%d\t%.3f", event.getIteration(), gl, geneLengths.get(gl), geneScoresbyLength.get(gl)));
+                writer.println(String.format("%d,%d,%d,%.3f", event.getIteration(), gl, geneLengths.get(gl), geneScoresbyLength.get(gl)));
             }
             writer.flush();
             writer.close();
@@ -188,6 +178,16 @@ public class GenomeAnalysis implements IterationEndsListener {
         }
         logger.warn("Done");
 
+    }
+    public PrintWriter getWriter(boolean append, String fileName, String header) throws IOException{
+        PrintWriter writer;
+        if(append){
+            writer = new PrintWriter(IOUtils.getAppendingBufferedWriter(fileName));
+        }else{
+            writer = new PrintWriter(IOUtils.getBufferedWriter(fileName));
+            writer.println(header);
+        }
+        return writer;
     }
 }
 

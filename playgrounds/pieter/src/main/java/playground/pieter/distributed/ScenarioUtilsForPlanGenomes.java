@@ -34,7 +34,7 @@ public class ScenarioUtilsForPlanGenomes {
             else
                 new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
             if (config.scenario().isUseVehicles()) {
-                new VehicleReaderV1(scenario.getVehicles()).readFile(config.transit().getVehiclesFile());
+                new VehicleReaderV1(scenario.getTransitVehicles()).readFile(config.transit().getVehiclesFile());
             }
         }
         if (!isSlaveControler) {

@@ -7,17 +7,8 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
-import playground.pieter.distributed.plans.PopulationFactoryForPlanGenomes;
-import playground.pieter.distributed.plans.PopulationReaderMatsimV5ForPlanGenomes;
-import playground.pieter.distributed.plans.PopulationUtilsForPlanGenomes;
+import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -60,7 +51,7 @@ public class ControlerReference {
         if (singapore) {
             logger.warn("Singapore scoring function");
             delegate.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(delegate.getConfig().planCalcScore(), delegate.getScenario()));
-            config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_SG");
+
 //        for (Link link : scenario.getNetwork().getLinks().values()) {
 //            Set<String> modes = new HashSet<>(link.getAllowedModes());
 //            modes.add("pt");
@@ -100,7 +91,7 @@ public class ControlerReference {
             delegate.getEvents().addHandler(stopStopTimes);
             delegate.setTransitRouterFactory(new TransitRouterEventsWSFactory(delegate.getScenario(), waitTimes.getWaitTimes(), stopStopTimes.getStopStopTimes()));
         } else {
-
+            delegate.addOverridingModule(new RandomizedCarRouterTravelTimeAndDisutilityModule());
             delegate.addOverridingModule(new RandomizedTransitRouterModule());
         }
         if (trackGenome) {

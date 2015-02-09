@@ -7,11 +7,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
+import playground.pieter.distributed.scoring.PlanScoreComponent;
+import playground.pieter.distributed.scoring.ScoreComponentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +27,35 @@ import java.util.Map;
 public class PlanGenome implements Plan {
     private final static Logger log = Logger.getLogger(PlanImpl.class);
     protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+
+    public ArrayList<PlanScoreComponent> getScoreComponents() {
+        return scoreComponents;
+    }
+
+    public void setScoreComponents(ArrayList<PlanScoreComponent> scoreComponents) {
+        this.scoreComponents = scoreComponents;
+    }
+
+    public ArrayList<PlanScoreComponent> getAltScoreComponents() {
+        return altScoreComponents;
+    }
+
+    public void setAltScoreComponents(ArrayList<PlanScoreComponent> altScoreComponents) {
+        this.altScoreComponents = altScoreComponents;
+    }
+
+    public void addScoreComponent(ScoreComponentType type, double score){
+        scoreComponents.add(new PlanScoreComponent(type,score));
+    }
+
+    ArrayList<PlanScoreComponent> scoreComponents = new ArrayList<>();
+    ArrayList<PlanScoreComponent> altScoreComponents = new ArrayList<>();
     private double pSimScore;
     private String genome = "";
     private Double score = null;
     private Person person = null;
     private String type = null;
     private Customizable customizableDelegate;
-
     public PlanGenome() {
     }
     /*
@@ -82,10 +105,6 @@ public class PlanGenome implements Plan {
         return leg;
     }
 
-    //////////////////////////////////////////////////////////////////////
-    // create methods
-    //////////////////////////////////////////////////////////////////////
-
     private final void verifyCreateLeg() throws IllegalStateException {
         if (getPlanElements().size() == 0) {
             throw new IllegalStateException("The order of 'acts'/'legs' is wrong in some way while trying to create a 'leg'.");
@@ -131,7 +150,7 @@ public class PlanGenome implements Plan {
     }
 
     //////////////////////////////////////////////////////////////////////
-    // remove methods
+    // create methods
     //////////////////////////////////////////////////////////////////////
 
     /**
@@ -161,6 +180,10 @@ public class PlanGenome implements Plan {
     public final PersonForPlanGenomes getPerson() {
         return (PersonForPlanGenomes) this.person;
     }
+
+    //////////////////////////////////////////////////////////////////////
+    // remove methods
+    //////////////////////////////////////////////////////////////////////
 
     @Override
     public void setPerson(final Person person) {
@@ -354,4 +377,6 @@ public class PlanGenome implements Plan {
     public void setpSimScore(double pSimScore) {
         this.pSimScore = pSimScore;
     }
+
+
 }
