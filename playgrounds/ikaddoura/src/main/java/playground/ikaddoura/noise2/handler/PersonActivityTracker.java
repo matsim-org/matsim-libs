@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.noise2.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +38,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.pt.PtConstants;
+
+import playground.ikaddoura.noise2.NoiseContext;
+import playground.ikaddoura.noise2.PersonActivityInfo;
+import playground.ikaddoura.noise2.ReceiverPoint;
 
 /**
  * 

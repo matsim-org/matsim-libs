@@ -20,9 +20,11 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2.events;
+package playground.ikaddoura.noise2.handler;
 
 import org.matsim.core.events.handler.EventHandler;
+
+import playground.ikaddoura.noise2.events.NoiseEventCaused;
 
 /**
  * @author lkroeger
