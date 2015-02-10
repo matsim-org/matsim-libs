@@ -3,6 +3,8 @@ package playground.tobiqui.master;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -29,8 +31,11 @@ public class Test {
 		String populationInput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/output_plans.xml";
 		String vehiclesInput = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
 		String transitScheduleInput = "E:/MA/workspace/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
-		String output = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo_.xml";
+		String outputRoutes = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo_.rou.xml";
+		String outputAdditional = "E:/MA/workspace.bak/master/output/siouxfalls-2014/input_additional.add.xml"; //additional data like busstops
 		String populationOutput = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestSorted.xml"; //if inputPopulation (input) NOT already sorted by end_times of first activity of selectedPlans:
+	
+		
 		
 		List<Person> persons = new ArrayList<>();
 		Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<>();
@@ -45,7 +50,8 @@ public class Test {
 		TransitSchedule transitSchedule = tsr.getTransitSchedule();
 		
 		TqMatsimPlansReader pr = new TqMatsimPlansReader(populationInput);
-		persons = pr.getPlans();
+//		persons = pr.getPlans();
+		persons = pr.getPlansWithModeCareOnly();
 		System.out.println("getPlans completed");
 
         List<Person> personsSorted = new ArrayList<Person>(persons); //id's sorted by end_times of first activity of selectedPlans
@@ -68,7 +74,7 @@ public class Test {
 //		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(personsSorted, vehicleTypes, vehicles, transitSchedule, output);
 		
 	//else if inputPopulation (input) already sorted by end_times of activity of selectedPlans:
-		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(personsSorted, vehicleTypes, vehicles, transitSchedule, output);
+		TqSumoRoutesWriter routesWriter = new TqSumoRoutesWriter(personsSorted, vehicleTypes, vehicles, transitSchedule, outputRoutes, outputAdditional);
 		
 		routesWriter.writeFile();
 	}

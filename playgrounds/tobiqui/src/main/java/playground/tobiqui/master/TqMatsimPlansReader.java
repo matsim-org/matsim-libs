@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -25,6 +26,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.population.algorithms.PlansFilterByLegMode;
+import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 
 
 /**
@@ -58,6 +61,34 @@ public class TqMatsimPlansReader{
 
 		public List<Person> getPlans() {
 			this.persons = this.scenario.getPopulation().getPersons();
+			
+			return new ArrayList<Person>(this.persons.values());
+		}
+		
+		public List<Person> getPlansWithModeCareOnly() {
+			this.persons = this.pop.getPersons();
+			TreeSet<Id<Person>> pid_set = new TreeSet<>();	// ids of persons to remove
+			for (Person person : this.persons.values()){
+
+				for (int j=1; j<person.getSelectedPlan().getPlanElements().size(); j+=2) {
+					LegImpl leg = (LegImpl)person.getSelectedPlan().getPlanElements().get(j);
+					if (!(leg.getMode().equals("car"))) {
+						pid_set.add(person.getId());
+					}
+				}
+			}
+			// okay, now remove in a 2nd step all persons we do no longer need
+			Iterator<Id<Person>> pid_it = pid_set.iterator();
+			while (pid_it.hasNext()) {
+				Id<Person> pid = pid_it.next();
+				this.persons.remove(pid);
+			}
+			
+//			PlansFilterByLegMode filter = new PlansFilterByLegMode("car", FilterType.keepPlansWithOnlyThisMode);
+//			
+//			filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);filter.run(this.pop);
+//			
+//			this.persons = this.pop.getPersons();
 			
 			return new ArrayList<Person>(this.persons.values());
 		}
