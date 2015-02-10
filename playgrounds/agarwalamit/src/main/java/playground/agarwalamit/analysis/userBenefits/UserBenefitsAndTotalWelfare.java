@@ -53,9 +53,10 @@ public class UserBenefitsAndTotalWelfare {
 	}
 
 	public static void main(String[] args) {
-		 String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa/";
-		 String [] runCases = new String [] {"baseCaseCtd", "ei", "ci", "eci"};
-		new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
+		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+		String [] runCases =  {"baseCaseCtd","ei","ci","eci","ei_10"};
+		
+		 new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
 	}
 
 	public void runAndWrite(String [] runCases){

@@ -61,7 +61,7 @@ public class EmissionsPerPersonPerUserGroup {
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
-		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
+		String [] runCases = {"baseCaseCtd","ei","ci","eci","ei_10"};
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);
 	}

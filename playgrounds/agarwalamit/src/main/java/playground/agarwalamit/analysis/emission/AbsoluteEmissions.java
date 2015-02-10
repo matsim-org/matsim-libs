@@ -42,8 +42,8 @@ public class AbsoluteEmissions {
 	}
 
 	public static void main(String[] args) {
-		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
-		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};//{"run201","run202","run203","run204"};
+		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
+		String [] runCases =  {"baseCaseCtd","ei","ci","eci","ei_10"};
 		
 		new AbsoluteEmissions(clusterPathDesktop).runAndWrite(runCases);
 	}

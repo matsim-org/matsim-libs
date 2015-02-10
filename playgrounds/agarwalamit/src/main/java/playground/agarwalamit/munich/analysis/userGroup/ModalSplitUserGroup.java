@@ -41,7 +41,7 @@ public class ModalSplitUserGroup {
 	
 	public static void main(String[] args) {
 		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
-		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
+		String [] runCases = {"baseCaseCtd","ei","ci","eci","ei_10"};
 		for(String runCase :runCases){
 		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
 		msUG.run(outputDir+runCase);
