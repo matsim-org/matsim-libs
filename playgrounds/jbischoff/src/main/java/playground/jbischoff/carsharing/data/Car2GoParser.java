@@ -60,7 +60,10 @@ public class Car2GoParser
     
     
     try {
+    	System.setProperty("https.protocols", "TLSv1");
+//    	url = new URL("https", "www.car2go.com", 443, "/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
         url = new URL("https://www.car2go.com/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
+        
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
         JSONObject jsonObject = (JSONObject)jp.parse(in);
  

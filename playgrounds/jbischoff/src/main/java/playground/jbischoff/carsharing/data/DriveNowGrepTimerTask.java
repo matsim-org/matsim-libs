@@ -19,6 +19,7 @@
 
 package playground.jbischoff.carsharing.data;
 
+import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,8 +40,16 @@ public class DriveNowGrepTimerTask
     public void run()
     {
     	String folder = "./";
-        dnp.grepAndDumpOnlineDatabase(folder +"drivenow/");
-        cp.grepAndDumpOnlineDatabase(folder + "car2go/");
+
+    	File car2go = new File(folder+"car2go");
+    	car2go.mkdirs();
+
+    	File drivenow = new File(folder+"drivenow");
+    	drivenow.mkdirs();
+    	
+
+    	dnp.grepAndDumpOnlineDatabase(drivenow.getAbsolutePath()+"/");
+        cp.grepAndDumpOnlineDatabase(car2go.getAbsolutePath()+"/");
     }
 
 }
