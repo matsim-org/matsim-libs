@@ -65,7 +65,7 @@ public class TqMatsimPlansReader{
 			return new ArrayList<Person>(this.persons.values());
 		}
 		
-		public List<Person> getPlansWithModeCareOnly() {
+		public List<Person> getPlansWithModeCarOnly() {
 			this.persons = this.pop.getPersons();
 			TreeSet<Id<Person>> pid_set = new TreeSet<>();	// ids of persons to remove
 			for (Person person : this.persons.values()){

@@ -51,7 +51,7 @@ public class Test {
 		
 		TqMatsimPlansReader pr = new TqMatsimPlansReader(populationInput);
 //		persons = pr.getPlans();
-		persons = pr.getPlansWithModeCareOnly();
+		persons = pr.getPlansWithModeCarOnly();
 		System.out.println("getPlans completed");
 
         List<Person> personsSorted = new ArrayList<Person>(persons); //id's sorted by end_times of first activity of selectedPlans
