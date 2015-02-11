@@ -85,8 +85,8 @@ public class DoublyWeightedSocialNetworkTest {
 	public void testMaximumCapacity() {
 		if ( true ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
 
-		final int popSize = 100;
-		final int maxSize = 20;
+		final int popSize = 1000;
+		final int maxSize = 100;
 		final DoublyWeightedSocialNetwork testee =
 			new DoublyWeightedSocialNetwork(
 					2 ,
@@ -98,6 +98,11 @@ public class DoublyWeightedSocialNetworkTest {
 		final Random random = new Random( 1234 );
 		for ( int alter=1; alter < popSize; alter++ ) {
 			testee.addBidirectionalTie( ego , alter , random.nextFloat() , random.nextFloat() );
+			
+			Assert.assertEquals(
+					"number of elements connected to the root differs from size!",
+					testee.getSize( ego ),
+					testee.getTreeSize( ego ) );
 		}
 
 		Assert.assertEquals(

@@ -131,6 +131,11 @@ public class DoublyWeightedSocialNetwork {
 		return alters[ ego ].size;
 	}
 
+	// for tests
+	/*package*/ int getTreeSize( final int ego ) {
+		return alters[ ego ].computeTreeSize();
+	}
+
 	// point quad-tree
 	// No check is done that is is balanced!
 	// should be ok, as agents are got in random order
@@ -245,14 +250,18 @@ public class DoublyWeightedSocialNetwork {
 			if ( childNE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNE[ toRemoveIndex ] , toRemoveIndex ) );
 			if ( childNW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNW[ toRemoveIndex ] , toRemoveIndex ) );
 			if ( childSE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSE[ toRemoveIndex ] , toRemoveIndex ) );
-			if ( childSW[toRemoveIndex] != -1 ) toReaddStack.push( shift( childSW[toRemoveIndex] , toRemoveIndex ) );
+			if ( childSW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSW[toRemoveIndex] , toRemoveIndex ) );
 
 			if ( toRemoveParent != -1 ) {
 				// separate subtree
-				( childNW[toRemoveParent] == toRemoveIndex ? childNW :
-				  childNE[toRemoveParent] == toRemoveIndex ? childNE :
-				  childSE[toRemoveParent] == toRemoveIndex ? childSE :
-				  childSW )[toRemoveParent] = -1;
+				( childNW[ toRemoveParent ] == toRemoveIndex ? childNW :
+				  childNE[ toRemoveParent ] == toRemoveIndex ? childNE :
+				  childSE[ toRemoveParent ] == toRemoveIndex ? childSE :
+				  // one should be able to only put "childSW" here,
+				  // but the null value allows to crash if somthing strange is
+				  // happening...
+				  childSW[ toRemoveParent ] == toRemoveIndex ? childSW :
+				  null )[ toRemoveParent ] = -1;
 			}
 
 			size--;
@@ -270,7 +279,7 @@ public class DoublyWeightedSocialNetwork {
 				childSW[i] = childSW[i + 1];
 			}
 
-			// update pointers
+			// update pointers to new indices
 			for ( int i = 0; i < size; i++ ) {
 				if ( childNE[i] >= toRemoveIndex ) childNE[i]--;
 				if ( childNW[i] >= toRemoveIndex ) childNW[i]--;
@@ -278,20 +287,20 @@ public class DoublyWeightedSocialNetwork {
 				if ( childSW[i] >= toRemoveIndex ) childSW[i]--;
 			}
 
-			// "readd" to the tree.
+			// "re-add" to the tree.
 			final int treeHead = toRemoveParent >= 0 ? toRemoveParent : 0;
 			while ( toReaddStack.size() > 0 ) {
 				final short toReadd = toReaddStack.pop();
 
-				if ( childNE[toReadd] != -1 ) toReaddStack.push( childNE[toReadd] );
-				if ( childNW[toReadd] != -1 ) toReaddStack.push( childNW[toReadd] );
-				if ( childSE[toReadd] != -1 ) toReaddStack.push( childSE[toReadd] );
-				if ( childSW[toReadd] != -1 ) toReaddStack.push( childSW[toReadd] );
+				if ( childNE[ toReadd ] != -1 ) toReaddStack.push( childNE[ toReadd ] );
+				if ( childNW[ toReadd ] != -1 ) toReaddStack.push( childNW[ toReadd ] );
+				if ( childSE[ toReadd ] != -1 ) toReaddStack.push( childSE[ toReadd ] );
+				if ( childSW[ toReadd ] != -1 ) toReaddStack.push( childSW[ toReadd ] );
 
-				childNE[toReadd] = -1;
-				childNW[toReadd] = -1;
-				childSE[toReadd] = -1;
-				childSW[toReadd] = -1;
+				childNE[ toReadd ] = -1;
+				childNW[ toReadd ] = -1;
+				childSE[ toReadd ] = -1;
+				childSW[ toReadd ] = -1;
 
 				if ( toReadd != 0 ) {
 					// find a new daddy
@@ -428,6 +437,26 @@ public class DoublyWeightedSocialNetwork {
 			}
 			// always look to the NW
 			fillWithGreaterPoints( childNE[ head ] , alters , firstWeight , secondWeight );
+		}
+
+		// for tests
+		public int computeTreeSize() {
+			final TIntStack stack = new TIntArrayStack();
+			stack.push( 0 );
+
+			int treeSize = 0;
+			while ( stack.size() > 0 ) {
+				treeSize++;
+				if ( treeSize > size ) throw new RuntimeException( "seems to be cycles in the tree!" );
+				final int curr = stack.pop();
+
+				if ( childNE[ curr ] != -1 ) stack.push( childNE[ curr ] );
+				if ( childNW[ curr ] != -1 ) stack.push( childNW[ curr ] );
+				if ( childSE[ curr ] != -1 ) stack.push( childSE[ curr ] );
+				if ( childSW[ curr ] != -1 ) stack.push( childSW[ curr ] );
+			}
+
+			return treeSize;
 		}
 
 		public synchronized void trim() {
