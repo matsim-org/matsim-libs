@@ -21,8 +21,8 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
+import gnu.trove.stack.TShortStack;
+import gnu.trove.stack.array.TShortArrayStack;
 
 import java.util.Arrays;
 
@@ -209,9 +209,9 @@ public class DoublyWeightedSocialNetwork {
 				// max size reached: replace value with smallest secondary weight
 				// (primary weight always "make sense" in preprocessed model runner)
 				// 1 - find element with smallest *secondary* weight
-				final int[] smallestSecondaryIndexAndParent = searchSmallestSecondaryIndex();
-				final int smallestSecondaryIndex = smallestSecondaryIndexAndParent[ 0 ];
-				final int smallestSecondaryParent = smallestSecondaryIndexAndParent[ 1 ];
+				final short[] smallestSecondaryIndexAndParent = searchSmallestSecondaryIndex();
+				final short smallestSecondaryIndex = smallestSecondaryIndexAndParent[ 0 ];
+				final short smallestSecondaryParent = smallestSecondaryIndexAndParent[ 1 ];
 
 				// 2 - check if new element better. if not, abort.
 				if ( weights2[smallestSecondaryIndex] >= secondWeight ) return;
@@ -219,42 +219,64 @@ public class DoublyWeightedSocialNetwork {
 				// 3 - remove element to replace:
 				//     a - reconnect the tree
 				remove( smallestSecondaryIndex , smallestSecondaryParent );
+				assert size == maxSize -1;
 
-				//     b - put new element in the slot in the array, and "connect" to proper parent.
-				final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
-
-				final short[] quadrant = getQuadrant( parent, firstWeight, secondWeight );
-				friends[smallestSecondaryIndex] = friend;
-
-				weights1[smallestSecondaryIndex] = firstWeight;
-				weights2[smallestSecondaryIndex] = secondWeight;
-
-				quadrant[smallestSecondaryIndex] = size;
+				add( friend , firstWeight , secondWeight );
 			}
 		}
 
 		private void remove(
-				final int toRemoveIndex,
-				final int parentIndex ) {
-			throw new UnsupportedOperationException( "still todo: remove("+toRemoveIndex+","+parentIndex+")" );
-			// search for replacemenent in subtree and update pointers
-			// remove replacement recursively.
+				final short toRemoveIndex,
+				final short toRemoveParent ) {
+			// rebuild the whole subtree
+
+			final TShortStack toRemoveStack = new TShortArrayStack();
+			// TODO: invalidate in parent pointers!
+			toRemoveStack.push( toRemoveIndex );
+
+			// separate subtree
+			( childNW[ toRemoveParent ] == toRemoveIndex ? childNW :
+				childNE[ toRemoveParent ] == toRemoveIndex ? childNE :
+				childSE[ toRemoveParent ] == toRemoveIndex ? childSE :
+				childSW )[ toRemoveIndex ] = -1;
+
+			// "remove" from the tree.
+			while ( toRemoveStack.size() > 0 ) {
+				final short toRemove = toRemoveStack.pop();
+
+				if ( childNE[ toRemove ] != -1 ) toRemoveStack.push( childNE[ toRemove ] );
+				if ( childNW[ toRemove ] != -1 ) toRemoveStack.push( childNW[ toRemove ] );
+				if ( childSE[ toRemove ] != -1 ) toRemoveStack.push( childSE[ toRemove ] );
+				if ( childSW[ toRemove ] != -1 ) toRemoveStack.push( childSW[ toRemove ] );
+
+				childNE[ toRemove ] = -1;
+				childNW[ toRemove ] = -1;
+				childSE[ toRemove ] = -1;
+				childSW[ toRemove ] = -1;
+
+				// find a new daddy
+				final int parent = searchParentLeaf( toRemoveParent , weights1[ toRemove ] , weights2[ toRemove ] );
+				final short[] quadrant = getQuadrant( parent , weights1[ toRemove ] , weights2[ toRemove ] );
+				quadrant[ parent ] = toRemove;
+			}
+
+			size--;
 		}
 
-		private int[] searchSmallestSecondaryIndex() {
+		private short[] searchSmallestSecondaryIndex() {
 			float currentMin = Float.POSITIVE_INFINITY;
-			int currentMinIndex = -1;
-			int currentMinParent = -1;
+			short currentMinIndex = -1;
+			short currentMinParent = -1;
 
-			final TIntStack indexStack = new TIntArrayStack();
-			indexStack.push( 0 );
+			final TShortStack indexStack = new TShortArrayStack();
+			indexStack.push( (short) 0 );
 
-			final TIntStack parentStack = new TIntArrayStack();
-			parentStack.push( -1 );
+			final TShortStack parentStack = new TShortArrayStack();
+			parentStack.push( (short) -1 );
 
 			while ( indexStack.size() > 0 ) {
-				final int currentIndex = indexStack.pop();
-				final int currentParent = parentStack.pop();
+				final short currentIndex = indexStack.pop();
+				final short currentParent = parentStack.pop();
 
 				if ( weights2[ currentIndex ] < currentMin ) {
 					currentMin = weights2[ currentIndex ];
@@ -272,7 +294,7 @@ public class DoublyWeightedSocialNetwork {
 				}
 			}
 
-			return new int[]{ currentMinIndex , currentMinParent };
+			return new short[]{ currentMinIndex , currentMinParent };
 		}
 
 		private synchronized void expand() {
