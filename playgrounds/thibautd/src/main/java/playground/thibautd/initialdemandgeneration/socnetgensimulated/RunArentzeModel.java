@@ -81,11 +81,12 @@ public class RunArentzeModel {
 		final SocialNetworkGenerationConfigGroup config = new SocialNetworkGenerationConfigGroup();
 		final PreprocessedModelRunnerConfigGroup runnerConfig = new PreprocessedModelRunnerConfigGroup();
 		final TRBModelConfigGroup pars = new TRBModelConfigGroup();
-		loadAndLogGroups( configFile , config , runnerConfig , pars );
+		load( configFile , config , runnerConfig , pars );
 
 		Logger.getLogger( SoftCache.class ).setLevel( Level.TRACE );
 
 		MoreIOUtils.initOut( config.getOutputDirectory() );
+		logGroups( config , runnerConfig , pars );
 
 		log.info( "################################################################################" );
 		log.info( "###### start socnet gen" );
@@ -191,11 +192,16 @@ public class RunArentzeModel {
 		}
 	}
 
-	private static void loadAndLogGroups( final String file , final ConfigGroup... groups ) {
+	private static void load( final String file , final ConfigGroup... groups ) {
 		final Config config = new Config();
 		for ( ConfigGroup group : groups ) config.addModule( group );
 
 		new MatsimConfigReader( config ).readFile( file );
+	}
+
+	private static void logGroups( final ConfigGroup... groups ) {
+		final Config config = new Config();
+		for ( ConfigGroup group : groups ) config.addModule( group );
 
 		final String newline = System.getProperty( "line.separator" );// use native line endings for logfile
 		final StringWriter writer = new StringWriter();
