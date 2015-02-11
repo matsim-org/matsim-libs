@@ -128,7 +128,9 @@ public class WeightedSocialNetwork {
 
 	private static final class WeightedFriends {
 		private int[] friends;
-		private double[] weights;
+		// use float instead of double for saving memory.
+		// TODO: check robustness of the results facing this...
+		private float[] weights;
 
 		private final int maximalSize;
 		private int size = 0;
@@ -136,13 +138,14 @@ public class WeightedSocialNetwork {
 		public WeightedFriends( final int initialSize , final int maximalSize ) {
 			this.maximalSize = maximalSize;
 			this.friends = new int[ initialSize ];
-			this.weights = new double[ initialSize ];
-			Arrays.fill( weights , Double.POSITIVE_INFINITY  );
+			this.weights = new float[ initialSize ];
+			Arrays.fill( weights , Float.POSITIVE_INFINITY  );
 		}
 
 		public synchronized void add( final int friend , final double weight ) {
-			final int insertionPoint = getInsertionPoint( weight );
-			insert( friend, weight , insertionPoint );
+			final float fweight = (float) weight; // TODO check overflow?
+			final int insertionPoint = getInsertionPoint( fweight );
+			insert( friend, fweight , insertionPoint );
 			assert size <= friends.length;
 			assert weights.length == friends.length;
 		}
@@ -172,15 +175,15 @@ public class WeightedSocialNetwork {
 
 		public int[] getAltersOverWeight(
 				final double weight ) {
-			final int insertionPoint = getInsertionPoint( weight );
+			final int insertionPoint = getInsertionPoint( (float) weight );
 			return Arrays.copyOfRange( friends , insertionPoint , size );
 		}
 
-		private int getInsertionPoint( final double weight ) {
+		private int getInsertionPoint( final float weight ) {
 			return getInsertionPoint( weight , 0 );
 		}
 
-		private int getInsertionPoint( final double weight , final int from ) {
+		private int getInsertionPoint( final float weight , final int from ) {
 			// only search the range actually filled with values.
 			// lower index can be specified, if known
 			final int index = Arrays.binarySearch( weights , from , size , weight );
@@ -189,7 +192,7 @@ public class WeightedSocialNetwork {
 
 		private synchronized void insert(
 				final int friend,
-				final double weight,
+				final float weight,
 				int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
