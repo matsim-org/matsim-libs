@@ -110,17 +110,6 @@ public class WeightedSocialNetwork {
 		alters[ ego ].fillWithAltersOverWeight( set , weight );
 	}
 
-	/* unused
-	public Set<Id<Person>> getAltersInWeightInterval(
-			final Id<Person> ego,
-			final double low,
-			final double high ) {
-		if ( low < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+low+" is lower than lowest stored weight "+lowestAllowedWeight );
-		if ( low > high ) throw new IllegalArgumentException( "lower bound "+low+" is higher than higher bound "+high );
-		return altersMap.get( ego ).getAltersIn( low , high );
-	}
-	*/
-
 	// for tests
 	/*package*/ int getSize( final int ego ) {
 		return alters[ ego ].size;
