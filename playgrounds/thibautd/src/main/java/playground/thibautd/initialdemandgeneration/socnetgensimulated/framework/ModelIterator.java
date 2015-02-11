@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 
@@ -42,8 +43,6 @@ public class ModelIterator {
 
 	private static final double PRECISION_CLUSTERING = 1E-2;
 	private static final double PRECISION_DEGREE = 1E-1;
-
-	private static final double SEARCH_STEP = 10;
 
 	// TODO: make adaptive (the closer to the target value,
 	// the more precise is should get)
@@ -69,7 +68,7 @@ public class ModelIterator {
 		for ( int iter=1; true; iter++ ) {
 			log.info( "Iteration # "+iter );
 			final Thresholds thresholds =
-					memory.createNewThresholds( iter );
+					memory.createNewThresholds( );
 
 			log.info( "generate network for "+thresholds );
 			final SocialNetwork sn = runner.runModel( thresholds );
@@ -109,118 +108,107 @@ public class ModelIterator {
 	}
 
 	private class ThresholdMemory {
-		private final Iterator<Thresholds> initialThresholds;
+		private final Queue<Thresholds> queue = new ArrayDeque< >();
 
-		private final ThresholdsReference bestSouthWest = new ThresholdsReference( "southWest" );
-		private final ThresholdsReference bestSouthEast = new ThresholdsReference( "southEast" );
-		private final ThresholdsReference bestNorthEast = new ThresholdsReference( "northEast" );
-		private final ThresholdsReference bestNorthWest = new ThresholdsReference( "northWest" );
+		private Thresholds bestNetSize = null;
+		private Thresholds bestClustering = null;
 
-		public ThresholdMemory( final Iterable<Thresholds> initial ) {
-			this.initialThresholds = initial.iterator();
+		private double primaryStepSizeDegree = 50;
+		private double secondaryStepSizeDegree = 50;
+
+		private double primaryStepSizeClustering = 50;
+		private double secondaryStepSizeClustering = 50;
+
+		boolean hadDegreeImprovement = false;
+		boolean hadClusteringImprovement = false;
+
+		public ThresholdMemory( final Collection<Thresholds> initial ) {
+			this.queue.addAll( initial );
 		}
 
 		public void add( final Thresholds t ) {
-			final ThresholdsReference ref = getQuadrant( t );
-
-			if ( ref.thresholds == null ) {
-				log.info("not yet a value for quadrant "+ref.name+", putting "+t );
-				ref.thresholds = t;
-			}
-			else if ( distDegree( t ) <= distDegree( ref.thresholds ) &&
-					distClustering( t ) <= distClustering( ref.thresholds ) ) {
-				log.info( t+" strictly better than "+ref.thresholds+" for quadrant "+ref.name );
+			if ( bestNetSize == null || distDegree( t ) < distDegree( bestNetSize ) ) {
+				log.info( t+" better than best value for net size "+bestNetSize );
 				log.info( "replacing value" );
-				ref.thresholds = t;
-			}
-			else if ( distDegree( t ) < distDegree( ref.thresholds ) ||
-					distClustering( t ) < distClustering( ref.thresholds ) ) {
-				log.info( t+" partly better than "+ref.thresholds+" for quadrant "+ref.name );
-				log.info( "replacing value" );
-				ref.thresholds = t;
+				bestNetSize = t;
+				hadDegreeImprovement = true;
 			}
 			else {
-				log.warn( "DROPPING VALUE "+t+" for quadrant "+ref.name+" with value "+ref.thresholds+"!" );
+				log.info( t+" not better than best value for net size "+bestNetSize+" => NOT KEPT" );
 			}
-
+			
+			if (  bestClustering == null || distClustering( t ) < distClustering( bestClustering ) ) {
+				log.info( t+" better than best value for clustering "+bestClustering );
+				log.info( "replacing value" );
+				bestClustering = t;
+				hadClusteringImprovement = true;
+			}
+			else {
+				log.info( t+" not better than best value for clustering "+bestClustering+" => NOT KEPT" );
+			}
 		}
 
-		private final ThresholdsReference getQuadrant( final Thresholds t ) {
-			final boolean isSouth = t.getResultingAverageDegree() < targetDegree;
-			final boolean isWest = t.getResultingClustering() < targetClustering;
-			return getQuadrant( isSouth , isWest );
+		public Thresholds createNewThresholds() {
+			if ( queue.isEmpty() ) fillQueue();
+			return queue.remove();
 		}
 
-		private final Thresholds getAttemptToUnnullify( final int iteration ) {
-			if ( null == bestSouthWest.thresholds && null != bestNorthWest.thresholds ) {
-				return moveByStep( bestNorthWest , -1 , 0 , iteration );
+		private void fillQueue() {
+			// no improvement means "overshooting": decrease step sizes
+			if ( !hadDegreeImprovement ) {
+				primaryStepSizeDegree /= 2;
+				secondaryStepSizeDegree /= 2;
 			}
-			if ( null == bestSouthEast.thresholds && null != bestNorthEast.thresholds ) {
-				return moveByStep( bestNorthEast , -1 , 0 , iteration );
+
+			if ( !hadClusteringImprovement ) {
+				primaryStepSizeClustering /= 2;
+				secondaryStepSizeClustering /= 2;
 			}
-			if ( null == bestNorthEast.thresholds && null != bestSouthEast.thresholds ) {
-				return moveByStep( bestSouthEast , 1 , 0 , iteration );
+
+			hadDegreeImprovement = false;
+			hadClusteringImprovement = false;
+
+			log.info( "New step Sizes:" );
+			log.info( "primary - degree: "+primaryStepSizeDegree );
+			log.info( "secondary - degree: "+secondaryStepSizeDegree );
+			log.info( "primary - Clustering: "+primaryStepSizeClustering );
+			log.info( "secondary - Clustering: "+secondaryStepSizeClustering );
+
+
+			fillQueueWithChildren(
+					bestNetSize,
+					bestNetSize.getResultingAverageDegree() > targetDegree ? primaryStepSizeDegree : -primaryStepSizeDegree,
+					bestNetSize.getResultingClustering() > targetClustering ? -secondaryStepSizeDegree : secondaryStepSizeDegree );
+
+			if ( bestNetSize != bestClustering ) {
+				fillQueueWithChildren(
+						bestClustering,
+						bestClustering.getResultingAverageDegree() > targetDegree ? primaryStepSizeClustering : -primaryStepSizeClustering,
+						bestClustering.getResultingClustering() > targetClustering ? -secondaryStepSizeClustering : secondaryStepSizeClustering );
+				fillQueueWithCombinations();
 			}
-			if ( null == bestNorthWest.thresholds && null != bestSouthWest.thresholds ) {
-				return moveByStep( bestSouthWest , 1 , 0 , iteration );
-			}
-			return null;
 		}
 
-		private final ThresholdsReference getQuadrant( final boolean isSouth , final boolean isWest ) {
-			if ( isSouth && isWest ) return bestSouthWest;
-			if ( isSouth && !isWest ) return bestSouthEast;
-			if ( !isSouth && !isWest ) return bestNorthEast;
-			if ( !isSouth && isWest ) return bestNorthWest;
-
-			throw new RuntimeException( "impossible to get there!" );
+		private void fillQueueWithCombinations() {
+			// risk of re-exploring...
+			// And when adding, cannot simple modify step size
+			//queue.add( new Thresholds( bestNetSize.getPrimaryThreshold() , bestClustering.getSecondaryReduction() ) );
+			//queue.add( new Thresholds( bestClustering.getPrimaryThreshold() , bestNetSize.getSecondaryReduction() ) );
 		}
 
-		public Thresholds createNewThresholds( final int iteration ) {
-			if ( initialThresholds.hasNext() ) return initialThresholds.next();
-
-			final Thresholds unnullifier = getAttemptToUnnullify( iteration );
-
-			return unnullifier != null ?
-				// step-based movement
-				unnullifier :
-				// no null quadrant
-				combineAll();
-		}
-
-		private Thresholds combineAll() {
-			return new Thresholds(
-					(bestSouthWest.thresholds.getPrimaryThreshold() +
-						 bestSouthEast.thresholds.getPrimaryThreshold() +
-						 bestNorthEast.thresholds.getPrimaryThreshold() +
-						 bestNorthWest.thresholds.getPrimaryThreshold() ) / 4d,
-					(bestSouthWest.thresholds.getSecondaryReduction() +
-						 bestSouthEast.thresholds.getSecondaryReduction() +
-						 bestNorthEast.thresholds.getSecondaryReduction() +
-						 bestNorthWest.thresholds.getSecondaryReduction() ) / 4d );
+		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
+			queue.add( moveByStep( point , stepDegree , stepSecondary ) );
+			queue.add( moveByStep( point , 0 , stepSecondary ) );
+			queue.add( moveByStep( point , stepDegree , 0 ) );
 		}
 
 		private Thresholds moveByStep(
-				final ThresholdsReference start,
-				final int degreeSign,
-				final int clusteringSign,
-				final int iteration ) {
-			final double step = Math.pow( 2 , iteration ) * SEARCH_STEP;
-
+				final Thresholds point,
+				final double degreeStep,
+				final double clusteringStep ) {
 			return new Thresholds(
-					start.thresholds.getPrimaryThreshold() + degreeSign * step,
-					// move secondary reduction in opposite direction as clustering
-					Math.max( 0 , start.thresholds.getSecondaryReduction() - clusteringSign * step ) );
-		}
-	}
-
-	private static class ThresholdsReference {
-		public final String name;
-		public Thresholds thresholds = null;
-
-		public ThresholdsReference(
-				final String name ) {
-			this.name = name;
+					point.getPrimaryThreshold() + degreeStep,
+					Math.max( 0 , point.getSecondaryReduction() + clusteringStep ) );
 		}
 	}
 
