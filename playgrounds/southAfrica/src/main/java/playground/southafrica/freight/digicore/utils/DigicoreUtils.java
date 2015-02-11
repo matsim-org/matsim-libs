@@ -177,6 +177,23 @@ public class DigicoreUtils {
 		return String.format("%d/%02d/%02d", year, month, day);
 	}
 	
+	/**
+	 * Converts a {@link GregorianCalendar} to an easy-to-read {@link String} 
+	 * in the format <code>YYYY/MM/DD HH:mm</code>.
+	 * @param cal
+	 * @return
+	 */
+	public static String getShortDateAndTime(GregorianCalendar cal){
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH)+1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		int min = cal.get(Calendar.MINUTE);
+		
+		return String.format("%d/%02d/%02d %02d:%02d", year, month, day, hour, min);
+	}
+	
 
 
 
