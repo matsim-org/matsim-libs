@@ -74,22 +74,22 @@ public class PreprocessedModelRunnerConfigGroup extends ReflectiveConfigGroup {
 		this.randomSeed = randomSeed;
 	}
 
-	@StringGetter( "primarySampleRate" )
+	@StringGetter( "primarySamplingRate" )
 	public double getPrimarySampleRate() {
 		return primarySampleRate;
 	}
 
-	@StringSetter( "primarySampleRate" )
+	@StringSetter( "primarySamplingRate" )
 	public void setPrimarySampleRate( double primarySampleRate ) {
 		this.primarySampleRate = primarySampleRate;
 	}
 
-	@StringGetter( "secondarySampleRate" )
+	@StringGetter( "secondarySamplingRate" )
 	public double getSecondarySampleRate() {
 		return secondarySampleRate;
 	}
 
-	@StringSetter( "secondarySampleRate" )
+	@StringSetter( "secondarySamplingRate" )
 	public void setSecondarySampleRate( double secondarySampleRate ) {
 		this.secondarySampleRate = secondarySampleRate;
 	}
