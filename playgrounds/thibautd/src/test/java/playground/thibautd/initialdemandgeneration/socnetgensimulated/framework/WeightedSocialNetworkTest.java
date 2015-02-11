@@ -47,7 +47,7 @@ public class WeightedSocialNetworkTest {
 					100d, 200d, 300d, 400d, 500d );
 		Collections.shuffle( weights );
 
-		final WeightedSocialNetwork testee = new WeightedSocialNetwork( 2 , 0 , 1 + weights.size() );
+		final WeightedSocialNetwork testee = new WeightedSocialNetwork( 1 + weights.size() , 0 , 1 + weights.size() );
 
 		final int ego = 0;
 		int alter = 1;
@@ -66,5 +66,31 @@ public class WeightedSocialNetworkTest {
 				result.length,
 				5 );
 	}
+
+	//@Test
+	//public void testLimitedSize() {
+	//	final int maxSize = 10;
+	//	final int popSize = 20;
+
+	//	final WeightedSocialNetwork testee = new WeightedSocialNetwork( 2 , Double.NEGATIVE_INFINITY , 10 );
+
+	//	final int ego = 0;
+	//	for ( int alter=1; alter < popSize; alter++ ) {
+	//		testee.addBidirectionalTie( ego , alter , alter );
+	//	}
+
+	//	Assert.assertEquals(
+	//			"unexpected size of stored elements",
+	//			10,
+	//			testee.getSize( ego ) );
+
+	//	for ( int score = popSize - maxSize; score < popSize; score-- ) {
+	//		Assert.assertEquals(
+	//				"unexpected number of elements over "+score,
+	//				score - popSize + maxSize + 1,
+	//				testee.getAltersOverWeight( ego , score ).length );
+	//	}
+
+	//}
 }
 
