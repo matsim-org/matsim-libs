@@ -20,10 +20,7 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -154,12 +151,20 @@ public class ModelIterator {
 			return getQuadrant( isSouth , isWest );
 		}
 
-		private final ThresholdsReference getOppositeQuadrant( final ThresholdsReference t ) {
-			if ( t == null ) throw new NullPointerException();
-			if ( t == bestSouthWest ) return bestNorthEast;
-			if ( t == bestSouthEast ) return bestNorthWest;
-			if ( t == bestNorthEast ) return bestSouthWest;
-			return bestSouthEast;
+		private final Thresholds getAttemptToUnnullify( final int iteration ) {
+			if ( null == bestSouthWest.thresholds && null != bestNorthWest.thresholds ) {
+				return moveByStep( bestNorthWest , -1 , 0 , iteration );
+			}
+			if ( null == bestSouthEast.thresholds && null != bestNorthEast.thresholds ) {
+				return moveByStep( bestNorthEast , -1 , 0 , iteration );
+			}
+			if ( null == bestNorthEast.thresholds && null != bestSouthEast.thresholds ) {
+				return moveByStep( bestSouthEast , 1 , 0 , iteration );
+			}
+			if ( null == bestNorthWest.thresholds && null != bestSouthWest.thresholds ) {
+				return moveByStep( bestSouthWest , 1 , 0 , iteration );
+			}
+			return null;
 		}
 
 		private final ThresholdsReference getQuadrant( final boolean isSouth , final boolean isWest ) {
@@ -174,67 +179,38 @@ public class ModelIterator {
 		public Thresholds createNewThresholds( final int iteration ) {
 			if ( initialThresholds.hasNext() ) return initialThresholds.next();
 
-			final boolean accordingToDegree = iteration % 2 == 0;
+			final Thresholds unnullifier = getAttemptToUnnullify( iteration );
 
-			final ThresholdsReference best = getBestQuadrant( accordingToDegree );
-			final ThresholdsReference opposite = getOppositeQuadrant( best );
-
-			assert best != null;
-			assert best.thresholds != null;
-			return opposite.thresholds == null ?
+			return unnullifier != null ?
 				// step-based movement
-				moveByStep( best , iteration ) :
-				// best cannot be null, because if there is one non-null,
-				// it is the best
-				new Thresholds(
-					(best.thresholds.getPrimaryThreshold() + opposite.thresholds.getPrimaryThreshold()) / 2d,
-					(best.thresholds.getSecondaryReduction() + opposite.thresholds.getSecondaryReduction()) / 2d );
+				unnullifier :
+				// no null quadrant
+				combineAll();
+		}
+
+		private Thresholds combineAll() {
+			return new Thresholds(
+					(bestSouthWest.thresholds.getPrimaryThreshold() +
+						 bestSouthEast.thresholds.getPrimaryThreshold() +
+						 bestNorthEast.thresholds.getPrimaryThreshold() +
+						 bestNorthWest.thresholds.getPrimaryThreshold() ) / 4d,
+					(bestSouthWest.thresholds.getSecondaryReduction() +
+						 bestSouthEast.thresholds.getSecondaryReduction() +
+						 bestNorthEast.thresholds.getSecondaryReduction() +
+						 bestNorthWest.thresholds.getSecondaryReduction() ) / 4d );
 		}
 
 		private Thresholds moveByStep(
-				final ThresholdsReference best,
+				final ThresholdsReference start,
+				final int degreeSign,
+				final int clusteringSign,
 				final int iteration ) {
 			final double step = Math.pow( 2 , iteration ) * SEARCH_STEP;
-			final double primarySign =
-				best.thresholds.getResultingAverageDegree() < targetDegree ?
-				-1 : 1; // if degree lower, need to decrease threshold
-			final double secondarySign =
-				best.thresholds.getResultingClustering() < targetClustering ?
-				1 : -1; // if clustering lower, need to INCREASE threshold REDUCTION
 
 			return new Thresholds(
-					best.thresholds.getPrimaryThreshold() + primarySign * step,
-					Math.max( 0 , best.thresholds.getSecondaryReduction() + secondarySign * step ) );
-		}
-
-		private ThresholdsReference getBestQuadrant( final boolean accordingToDegree ) {
-			return Collections.min(
-					Arrays.asList(
-						bestSouthWest,
-						bestSouthEast,
-						bestNorthEast,
-						bestNorthWest ),
-					 new Comparator<ThresholdsReference>() {
-							@Override
-							public int compare( ThresholdsReference o1 , ThresholdsReference o2 ) {
-								if ( o1.thresholds == null ) {
-									// null > whatever
-									return o2.thresholds == null ? 0 : 1;
-								}
-								if ( o2.thresholds == null ) {
-									// o1 is not null
-									return -1;
-								}
-
-								return accordingToDegree ?
-									Double.compare(
-										distDegree( o1.thresholds ),
-										distDegree( o2.thresholds ) ) :
-									Double.compare(
-										distClustering( o1.thresholds ),
-										distClustering( o2.thresholds ) );
-							}
-					} );
+					start.thresholds.getPrimaryThreshold() + degreeSign * step,
+					// move secondary reduction in opposite direction as clustering
+					Math.max( 0 , start.thresholds.getSecondaryReduction() - clusteringSign * step ) );
 		}
 	}
 

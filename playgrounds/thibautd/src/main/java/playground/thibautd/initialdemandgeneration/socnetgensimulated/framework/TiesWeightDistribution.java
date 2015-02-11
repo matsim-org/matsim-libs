@@ -98,6 +98,13 @@ public class TiesWeightDistribution {
 		return Double.NEGATIVE_INFINITY;
 	}
 
+	/**
+	 * @return the utility above which are proportion of the ties
+	 */
+	public double findPercentile( final double proportion ) {
+		 return findLowerBound( (long) (proportion * overallCount) );
+	}
+
 	public double[] getBinStarts() {
 		final double[] starts = new double[ size ];
 

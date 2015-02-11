@@ -162,14 +162,17 @@ public class RunArentzeModel {
 		final double targetMore = 1.1 * targetDegree;
 		final double thresholdMore = distr.findLowerBound( (long) (populationSize * targetMore) );
 
+		final double thresholdMost = distr.findPercentile( 0.75 );
+		final double initialReduction = thresholdOne - thresholdMost;
+
 		log.info( "threshold for network size 1: "+thresholdOne );
 		log.info( "threshold for network size "+targetMore+": "+thresholdMore );
 
 		final Collection<Thresholds> thresholds = new ArrayList<Thresholds>( 4 );
 		thresholds.add( new Thresholds( thresholdOne , 0 ) );
-		thresholds.add( new Thresholds( thresholdOne , 20 ) );
+		thresholds.add( new Thresholds( thresholdOne , initialReduction ) );
 		thresholds.add( new Thresholds( thresholdMore , 0 ) );
-		thresholds.add( new Thresholds( thresholdMore , 20 ) );
+		thresholds.add( new Thresholds( thresholdMore , initialReduction ) );
 		log.info( "generated thresholds: "+thresholds );
 		return thresholds;
 	}
