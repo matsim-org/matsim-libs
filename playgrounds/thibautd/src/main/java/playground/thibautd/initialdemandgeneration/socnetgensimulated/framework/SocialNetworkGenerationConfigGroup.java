@@ -39,6 +39,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
 
+	private double samplingRateForClusteringEstimation = 0.1;
+
 	public SocialNetworkGenerationConfigGroup( ) {
 		super( GROUP_NAME );
 	}
@@ -81,6 +83,17 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "targetClustering" )
 	public void setTargetClustering( double targetClustering ) {
 		this.targetClustering = targetClustering;
+	}
+
+	@StringGetter( "samplingRateForClusteringEstimation" )
+	public double getSamplingRateForClusteringEstimation() {
+		return samplingRateForClusteringEstimation;
+	}
+
+	@StringSetter( "samplingRateForClusteringEstimation" )
+	public void setSamplingRateForClusteringEstimation( double rate ) {
+		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
+		this.samplingRateForClusteringEstimation = rate;
 	}
 
 	@Override

@@ -53,6 +53,11 @@ public class ModelIterator {
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
+	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
+		this( config.getTargetClustering() , config.getTargetDegree() );
+		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
+	}
+
 	public ModelIterator( double targetClustering , double targetDegree ) {
 		this.targetClustering = targetClustering;
 		this.targetDegree = targetDegree;

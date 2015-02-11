@@ -121,15 +121,10 @@ public class RunArentzeModel {
 					population,
 					utility );
 
-		final ModelIterator modelIterator =
-			new ModelIterator(
-					config.getTargetClustering(),
-					config.getTargetDegree() );
+		final ModelIterator modelIterator = new ModelIterator( config );
 
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory()+"/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
-
-		modelIterator.setSamplingRateClustering( 0.01 );
 
 		final SocialNetwork network =
 			modelIterator.iterateModelToTarget(
