@@ -288,8 +288,7 @@ public class DoublyWeightedSocialNetwork {
 			}
 
 			// "re-add" to the tree.
-			final int treeHead = 0;
-			//final int treeHead = toRemoveParent >= 0 ? toRemoveParent : 0;
+			final int treeHead = toRemoveParent >= 0 ? shift( toRemoveParent , toRemoveIndex ) : 0;
 			while ( toReaddStack.size() > 0 ) {
 				final short toReadd = toReaddStack.pop();
 
@@ -388,13 +387,59 @@ public class DoublyWeightedSocialNetwork {
 			int currentHead = head;
 			int nSeen = 0;
 			while ( true ) {
-				if ( nSeen++ > size ) throw new RuntimeException( "seems to be a cycle in the tree!!!" );
+				if ( nSeen++ > size ) {
+					synchronized ( getClass() ) {
+						log.error( "seems to be a cycle in the tree when searching leaf with weights "+firstWeight+", "+secondWeight+" with head "+head );
+						logTree( head );
+					}
+					throw new RuntimeException( "seems to be a cycle in the tree!!!" );
+				}
 
-				short[] quadrant = getQuadrant( currentHead , firstWeight, secondWeight );
+				short[] quadrant = getQuadrant( currentHead, firstWeight, secondWeight );
 
-				final int child = quadrant[ currentHead ];
+				final int child = quadrant[currentHead];
 				if ( child == -1 ) return currentHead;
 				currentHead = child;
+			}
+		}
+
+		private void logTree( final int toHighlight ) {
+			log.info( "state of the tree for "+this );
+
+			final TIntStack stack = new TIntArrayStack();
+			stack.push( 0 );
+
+			final TIntStack levelstack = new TIntArrayStack();
+			levelstack.push( 0 );
+
+			while ( stack.size() > 0 ) {
+				final int point = stack.pop();
+				final int level = levelstack.pop();
+
+				final StringBuffer buff = new StringBuffer();
+				for ( int i = 0; i < level; i++ ) buff.append( "|" );
+				buff.append( " "+point+" ("+weights1[point]+";"+weights2[point]+") -> "+friends[ point ] );
+				if ( point == toHighlight ) buff.append( "   <<<<<" );
+
+				log.info( buff.toString() );
+
+				if ( childNE[ point ] != -1 ) {
+					stack.push( childNE[ point ] );
+					levelstack.push( level + 1 );
+				}
+				if ( childNW[ point ] != -1 ) {
+					stack.push( childNW[ point ] );
+					levelstack.push( level + 1 );
+				}
+				if ( childSE[ point ] != -1 ) {
+					stack.push( childSE[ point ] );
+					levelstack.push( level + 1 );
+				}
+				if ( childSW[ point ] != -1 ) {
+					stack.push( childSW[ point ] );
+					levelstack.push( level + 1 );
+				}
+
 			}
 		}
 

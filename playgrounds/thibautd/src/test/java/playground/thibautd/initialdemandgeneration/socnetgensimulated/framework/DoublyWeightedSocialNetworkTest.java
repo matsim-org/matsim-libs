@@ -83,7 +83,7 @@ public class DoublyWeightedSocialNetworkTest {
 
 	@Test
 	public void testMaximumCapacity() {
-		if ( true ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
+		if ( false ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
 
 		// get a population size much greater than the max size to need a lot
 		// of replacements, but get a maximum size big enough to have a somehow
