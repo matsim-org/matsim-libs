@@ -253,15 +253,46 @@ final class QGisProjectFileWriter {
 		
 		out.write("\t\t\t<provider encoding=\"System\">delimitedtext</provider>\n");
 				
+//		out.write("\t\t\t<renderer-v2 attr=\"field_8\" symbollevels=\"0\" type=\"graduatedSymbol\">\n");
+//		out.write("\t\t\t\t<ranges>\n");
+//		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"0\" lower=\"0.000000\" upper=\"200.000000\" label=\" 0 - 200 \"/>					<!-- make configurable -->\n");
+//		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"1\" lower=\"200.000000\" upper=\"2726.000000\" label=\" 200 - 2726 \"/>			<!-- make configurable -->\n");
+//		out.write("\t\t\t\t</ranges>\n");
+		
 		out.write("\t\t\t<renderer-v2 attr=\"field_8\" symbollevels=\"0\" type=\"graduatedSymbol\">\n");
 		out.write("\t\t\t\t<ranges>\n");
-		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"0\" lower=\"0.000000\" upper=\"200.000000\" label=\" 0 - 200 \"/>					<!-- make configurable -->\n");
-		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"1\" lower=\"200.000000\" upper=\"2726.000000\" label=\" 200 - 2726 \"/>			<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"0\" lower=\"0.000000\" upper=\"50.000000\" label=\" 0 - 50 \"/>					<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"1\" lower=\"50.000000\" upper=\"100.000000\" label=\" 50 - 100 \"/>			<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"2\" lower=\"100.000000\" upper=\"200.000000\" label=\" 100 - 200 \"/>			<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t<range render=\"true\" symbol=\"3\" lower=\"200.000000\" upper=\"2726.000000\" label=\" 200 - 2726 \"/>			<!-- make configurable -->\n");
 		out.write("\t\t\t\t</ranges>\n");
 		
 		out.write("\t\t\t\t<symbols>\n");
 		
 		out.write("\t\t\t\t\t<symbol alpha=\"1\" type=\"marker\" name=\"0\">\n");
+		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"SimpleMarker\" locked=\"0\">\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"angle\" v=\"0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"255,255,255,255\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"horizontal_anchor_point\" v=\"1\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"name\" v=\"rectangle\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_color\" v=\"0,0,0,255\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"no\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width\" v=\"0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"scale_method\" v=\"area\"/>\n");
+		// make size of density tiles 10% bigger to avoid unintended edges that show up if tiles are smaller 
+		out.write("\t\t\t\t\t\t\t<prop k=\"size\" v=\"1100\"/>												<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"size_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"size_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"vertical_anchor_point\" v=\"1\"/>\n");
+		out.write("\t\t\t\t\t\t</layer>\n");
+		out.write("\t\t\t\t\t</symbol>\n");
+		
+		out.write("\t\t\t\t\t<symbol alpha=\"0.666667\" type=\"marker\" name=\"1\">\n");
 		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"SimpleMarker\" locked=\"0\">\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"angle\" v=\"0\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"255,255,255,255\"/>\n");
@@ -283,7 +314,29 @@ final class QGisProjectFileWriter {
 		out.write("\t\t\t\t\t\t</layer>\n");
 		out.write("\t\t\t\t\t</symbol>\n");
 		
-		out.write("\t\t\t\t\t<symbol alpha=\"1\" type=\"marker\" name=\"1\">\n");
+		out.write("\t\t\t\t\t<symbol alpha=\"0.333333\" type=\"marker\" name=\"2\">\n");
+		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"SimpleMarker\" locked=\"0\">\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"angle\" v=\"0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"255,255,255,255\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"horizontal_anchor_point\" v=\"1\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"name\" v=\"rectangle\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"offset_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_color\" v=\"0,0,0,255\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"no\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width\" v=\"0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"scale_method\" v=\"area\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"size\" v=\"1100\"/>												<!-- make configurable -->\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"size_map_unit_scale\" v=\"0,0\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"size_unit\" v=\"MapUnit\"/>\n");
+		out.write("\t\t\t\t\t\t\t<prop k=\"vertical_anchor_point\" v=\"1\"/>\n");
+		out.write("\t\t\t\t\t\t</layer>\n");
+		out.write("\t\t\t\t\t</symbol>\n");
+		
+		out.write("\t\t\t\t\t<symbol alpha=\"0\" type=\"marker\" name=\"3\">\n");
 		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"SimpleMarker\" locked=\"0\">\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"angle\" v=\"0\"/>\n");
 		out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"255,255,255,0\"/>\n");

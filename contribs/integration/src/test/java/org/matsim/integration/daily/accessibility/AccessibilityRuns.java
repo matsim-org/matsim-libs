@@ -34,7 +34,9 @@ public class AccessibilityRuns {
 
 	public static final Boolean doPopulationWeightedPlot = null;
 
-	public static final Boolean doNonPopulationWeightedPlot = null; 
+	public static final Boolean doNonPopulationWeightedPlot = null;
+	
+	private static final double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -90,6 +92,8 @@ public class AccessibilityRuns {
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
+		
+		// two loops over activity types and modes to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 				//				if ( !actType.equals("w") ) {
@@ -119,7 +123,7 @@ public class AccessibilityRuns {
 				// listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 				listener.setComputingAccessibilityForMode(mode, true);
 				listener.addAdditionalFacilityData(homes) ;
-				listener.generateGridsAndMeasuringPointsByNetwork(1000.);
+				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
 				listener.writeToSubdirectoryWithName(actType + "/" + mode);
 
@@ -133,6 +137,7 @@ public class AccessibilityRuns {
 		//		GnuplotScriptWriter.createGnuplotScript(config, activityTypes);
 
 
+		// write mapnik file that is neded to have osm layer in QGis project
 		final String mapnikFileName = "osm_mapnik.xml";
 		String osmMapnikFile = config.controler().getOutputDirectory() + mapnikFileName;
 
@@ -198,7 +203,7 @@ public class AccessibilityRuns {
 					//					handler.writeLegendLayer(writer,key);
 					//					handler.writeProjectLayer(writer, key, geometry, claz, type);
 
-					//TODO Should be split up into modules later, so far just a big collection of everything
+					//TODO Should be split up into (customizable) modules later, so far just a big collection of everything
 					qgisWriter.writeEverything(writer, "../../"+mapnikFileName);
 
 					//					handler.endProjectLayers(writer);
@@ -211,11 +216,15 @@ public class AccessibilityRuns {
 					e.printStackTrace();
 					throw new RuntimeException( "writing QGis project file did not work") ;
 				}
-
-				if ( System.getProperty("os.arch").contains("win")) {
-
-					// now creating a snapshot based on above-created project file
-					// Remember to set the PATH varibales correctly to be able to call "qgis.bat" on the command line
+				
+				
+				// now creating a snapshot based on above-created project file
+				
+				// if OS is Windows
+				// example (daniel) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
+				if ( System.getProperty("os.name").contains("Win") || System.getProperty("os.name").contains("win")) {
+					// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
+					// This needs to be done manually. It does not seem to be set automatically when installing QGis
 					String cmd = "qgis.bat " + config.controler().getOutputDirectory() + actType + "/" + mode + "/QGisProjectFile.qgs" +
 							" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.png";
 
@@ -223,10 +232,11 @@ public class AccessibilityRuns {
 					int timeout = 99999;
 
 					ExeRunner.run(cmd, stdoutFileName, timeout);
-				} else if ( System.getProperty("os.arch").contains("mac") ) {
-					
-					// now creating a snapshot based on above-created project file
-					// Remember to set the PATH varibales correctly to be able to call "qgis.bat" on the command line
+				
+				// if OS is Macintosh
+				// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
+				//} else if ( System.getProperty("os.arch").contains("mac")) {
+				} else if ( System.getProperty("os.name").contains("Mac") || System.getProperty("os.name").contains("mac") ) {
 					String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + config.controler().getOutputDirectory() + actType + "/" + mode + "/QGisProjectFile.qgs" +
 							" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.png";
 
@@ -234,6 +244,13 @@ public class AccessibilityRuns {
 					int timeout = 99999;
 
 					ExeRunner.run(cmd, stdoutFileName, timeout);
+				
+				// if OS is Linux
+				// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
+				//} else if ( System.getProperty("os.name").contains("Lin") || System.getProperty("os.name").contains("lin") ) {
+					// TODO for linux
+					
+				// if OS is other
 				} else {
 					log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
 				}
