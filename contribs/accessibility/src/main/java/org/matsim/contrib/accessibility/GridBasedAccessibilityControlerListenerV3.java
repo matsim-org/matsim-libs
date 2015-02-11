@@ -134,11 +134,9 @@ implements ShutdownListener, StartupListener {
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
-	
-	//new ... testing
+	// for consideration of different activity types or different modes (or both) subdirectories are
+	// required in order not to confuse the output
 	private String outputSubdirectory;
-	// end new
-	
 	
 
 	// ////////////////////////////////////////////////////////////////////
@@ -149,6 +147,7 @@ implements ShutdownListener, StartupListener {
 		this(opportunities, null, config, network); // PtMatrix is optional and in a different contrib
 	}
 	
+	
 	/**
 	 * constructor
 	 * 
@@ -158,7 +157,7 @@ implements ShutdownListener, StartupListener {
 	 * @param network MATSim road network
 	 */
 	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network){
-		// I thought about chaning the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
+		// I thought about changing the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
 		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
 
 		log.info("Initializing  ...");
@@ -183,6 +182,7 @@ implements ShutdownListener, StartupListener {
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// I moved this from the constructor since it did actually NOT work in situations where the output directory hierarchy was not there
@@ -192,20 +192,16 @@ implements ShutdownListener, StartupListener {
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		
-		// new ... testing
+		// in case multiple AccessibilityControlerListeners are added to the controller, e.g. if various calculations are done for
+		// different activity types or different modes (or both) subdirectories are required in order not to confuse the output
 		if (outputSubdirectory == null) {
-			// end new
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
-		// new ... testing
 		} else {
 			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
-//			file.mkdir();
 			file.mkdirs();
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
 					config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 		}
-		// end new
-
 	}
 
 
@@ -215,6 +211,7 @@ implements ShutdownListener, StartupListener {
 	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
 	private boolean lockedForAdditionalFacilityData = false;
 
+	
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
 		if ( alreadyActive ) {
@@ -305,15 +302,17 @@ implements ShutdownListener, StartupListener {
 			
 
 		urbansimAccessibilityWriter.close();
-		// new ... testing
+		
+		
+		// as for the other writer above: In case multiple AccessibilityControlerListeners are added to the controller, e.g. if 
+		// various calculations are done for different activity types or different modes (or both) subdirectories are required
+		// in order not to confuse the output
 		if (outputSubdirectory == null) {
-			// end new
 			writePlottingData(matsimOutputDirectory);
-			// new testing....
 		} else {
 			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
 		}
-		// end new
+		
 
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
@@ -323,6 +322,7 @@ implements ShutdownListener, StartupListener {
 
 	}
 
+	
 	/**
 	 * Writes the measured accessibility for the current measurePoint instantly
 	 * to disc in csv format.
@@ -343,6 +343,7 @@ implements ShutdownListener, StartupListener {
 		urbansimAccessibilityWriter.writeRecord(measurePoint, fromNode, accessibilities ) ;
 	}
 
+	
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 * 
@@ -365,7 +366,8 @@ implements ShutdownListener, StartupListener {
 		log.info("Writing plotting data for R done!");
 
 		
-		//
+		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
+		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
@@ -403,6 +405,11 @@ implements ShutdownListener, StartupListener {
 		
 		
 		// Write accessibility (so far only for mode freeSpeed) to a shapefile
+		
+		// this was used to create point objects with accessibility values in a shapefile and then load this
+		// shapefile in QGis and draw theses points as tiles coloured with respect to their accessibility values
+		// now that we know how handling csv files in QGis works, the conversion into points and storing them
+		// in a shapefile does not seem to be needed anymore
 //		PointFeatureFactory factory = new PointFeatureFactory.Builder()
 //		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
 //		.setName("accessibility")
@@ -457,6 +464,7 @@ implements ShutdownListener, StartupListener {
 			}
 		}
 	}
+	
 
 	/**
 	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
@@ -487,6 +495,7 @@ implements ShutdownListener, StartupListener {
 		BoundingBox bb = BoundingBox.createBoundingBox(network);
 		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 	}
+	
 
 	/**
 	 * Common method for generateGridsAndMeasuringPointsByCustomBoundary and 
@@ -516,6 +525,7 @@ implements ShutdownListener, StartupListener {
 			this.additionalSpatialGrids.put( facilities.getName(), spatialGrids ) ;
 		}
 	}
+	
 
 	/**
 	 * I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
@@ -543,6 +553,7 @@ implements ShutdownListener, StartupListener {
 
 		this.additionalFacilityData.add( facilities ) ;
 	}
+	
 
 	// new .... testing
 	public void writeToSubdirectoryWithName(String subdirectory) {

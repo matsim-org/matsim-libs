@@ -135,6 +135,7 @@ abstract class AccessibilityControlerListenerImpl {
 		}
 	}
 
+	
 	/**
 	 * setting parameter for accessibility calculation
 	 * @param config TODO
@@ -189,6 +190,7 @@ abstract class AccessibilityControlerListenerImpl {
 		// printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of config dump)
 	}
 
+	
 	/**
 	 * displays settings
 	 */
@@ -211,8 +213,9 @@ abstract class AccessibilityControlerListenerImpl {
 		log.info("Beta Walk Travel Monetary Cost: " + betaWalkTMC );
 	}
 
+	
 	/**
-	 * This aggregates the disjutilities Vjk to get from node j to all k that are attached to j.
+	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
 	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
 	 * 
 	 *     j---k1 
@@ -228,7 +231,7 @@ abstract class AccessibilityControlerListenerImpl {
 		// yyyy this method ignores the "capacities" of the facilities.  kai, mar'14
 
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
-		Map<Id, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<Id, AggregationObject>();
+		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<Id<Node>, AggregationObject>();
 		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
 
 		for ( ActivityFacility opportunity : opportunities.getFacilities().values() ) {
@@ -277,7 +280,7 @@ abstract class AccessibilityControlerListenerImpl {
 				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
-			// yyyy if we would know the activity type, we could to do capacities as follows:
+			// yyyy if we knew the activity type, we could to do capacities as follows:
 //			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
 //			Assert.assertNotNull(opt);
 //			final double capacity = opt.getCapacity();
@@ -304,6 +307,7 @@ abstract class AccessibilityControlerListenerImpl {
 		return jobClusterArray;
 	}
 
+	
 	final void accessibilityComputation(TravelTime ttc,
 			LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
@@ -321,7 +325,7 @@ abstract class AccessibilityControlerListenerImpl {
 
 
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();
+		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<Id<Node>, ArrayList<ActivityFacility>>();
 		// ========================================================================
 		for ( ActivityFacility aFac : mp.getFacilities().values() ) {
 
@@ -329,7 +333,7 @@ abstract class AccessibilityControlerListenerImpl {
 			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
 
 			// this is used as a key for hash map lookups
-			Id nodeId = fromNode.getId();
+			Id<Node> nodeId = fromNode.getId();
 
 			// create new entry if key does not exist!
 			if(!aggregatedOrigins.containsKey(nodeId)) {
@@ -347,14 +351,14 @@ abstract class AccessibilityControlerListenerImpl {
 
 		ProgressBar bar = new ProgressBar( aggregatedOrigins.size() );
 		// ========================================================================
-		// go through all nodes (key's) that have a measuring point (origin) assigned
-		for ( Id nodeId : aggregatedOrigins.keySet() ) {
+		// go through all nodes (keys) that have a measuring point (origin) assigned
+		for ( Id<Node> nodeId : aggregatedOrigins.keySet() ) {
 
 			bar.update();
 
 			Node fromNode = network.getNodes().get( nodeId );
 
-			// run dijkstra on network
+			// run Dijkstra on network
 			// this is done once for all origins in the "origins" list, see below
 			if(this.isComputingMode.get(Modes4Accessibility.freeSpeed) ) {
 				lcptExtFreeSpeedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
@@ -450,9 +454,9 @@ abstract class AccessibilityControlerListenerImpl {
 
 		}
 		// ========================================================================
-
 	}
 
+	
 	private void computeAndAddExpUtilContributions(LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime, LeastCostPathTree lcptTravelDistance, SumOfExpUtils[] gcs,
 			Node fromNode, double distanceMeasuringPoint2Road_meter, double distanceRoad2Node_meter,
@@ -461,7 +465,7 @@ abstract class AccessibilityControlerListenerImpl {
 			final AggregationObject aggregatedFacility) {
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = aggregatedFacility.getNearestNode();
-		Id nodeID = destinationNode.getId();
+		Id<Node> nodeID = destinationNode.getId();
 
 		// disutilities on the road network
 		double congestedCarDisutility = Double.NaN;
@@ -538,6 +542,7 @@ abstract class AccessibilityControlerListenerImpl {
 		}
 	}
 
+	
 	/**
 	 * @param nearestLink
 	 */
@@ -568,6 +573,7 @@ abstract class AccessibilityControlerListenerImpl {
 		log.info("... done!");
 	}
 
+	
 	/**
 	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
 	 * @param l
@@ -581,6 +587,7 @@ abstract class AccessibilityControlerListenerImpl {
 		log.info("... done!");
 	}
 
+	
 	/**
 	 * Writes measured accessibilities as csv format to disc
 	 * 
