@@ -33,7 +33,6 @@ public class Thresholds {
 			final double primaryThreshold,
 			final double secondaryReduction ) {
 		this.primaryThreshold = primaryThreshold;
-		if ( secondaryReduction < 0 ) throw new IllegalArgumentException( "secondary reduction must be positive, got "+secondaryReduction );
 		this.secondaryReduction = secondaryReduction;
 	}
 	

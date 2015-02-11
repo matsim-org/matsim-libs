@@ -208,7 +208,7 @@ public class ModelIterator {
 				final double clusteringStep ) {
 			return new Thresholds(
 					point.getPrimaryThreshold() + degreeStep,
-					Math.max( 0 , point.getSecondaryReduction() + clusteringStep ) );
+					point.getSecondaryReduction() + clusteringStep );
 		}
 	}
 
