@@ -137,7 +137,9 @@ public class DoublyWeightedSocialNetwork {
 		// cannot exceed the maximum value of the "children" arrays:
 		// set to short, even if it might have only limited impact on
 		// memory
-		private short size = 0;
+		// "shift" the size to store 2 times more values
+		private static final short MIN_SHIFTED_INDEX = Short.MIN_VALUE + 1;
+		private short shiftedSize = MIN_SHIFTED_INDEX;
 
 		public DoublyWeightedFriends(final int initialSize) {
 			this.friends = new int[ initialSize ];
@@ -153,10 +155,21 @@ public class DoublyWeightedSocialNetwork {
 			this.childNE = new short[ initialSize ];
 			this.childNW = new short[ initialSize ];
 
-			Arrays.fill( childSE , (short) -1 );
-			Arrays.fill( childSW , (short) -1 );
-			Arrays.fill( childNE , (short) -1 );
-			Arrays.fill( childNW , (short) -1 );
+			Arrays.fill( childSE , shift( -1 ) );
+			Arrays.fill( childSW , shift( -1 ) );
+			Arrays.fill( childNE , shift( -1 ) );
+			Arrays.fill( childNW , shift( -1 ) );
+		}
+
+		private int unshift( final short shiftedIndex ) {
+			return shiftedIndex - MIN_SHIFTED_INDEX;
+		}
+
+		private short shift( final int index ) {
+			final int shifted = index + MIN_SHIFTED_INDEX;
+			if ( shifted < Short.MIN_VALUE ) throw new IllegalArgumentException( "underflow" );
+			if ( shifted > Short.MAX_VALUE ) throw new IllegalArgumentException( "overflow" );
+			return (short) shifted;
 		}
 
 		public synchronized void add(
@@ -170,7 +183,7 @@ public class DoublyWeightedSocialNetwork {
 				final int friend,
 				final float firstWeight,
 				final float secondWeight ) {
-			if ( size == 0 ) {
+			if ( unshift( shiftedSize ) == 0 ) {
 				// first element is the head: special case...
 				friends[ 0 ] = friend;
 
@@ -180,17 +193,18 @@ public class DoublyWeightedSocialNetwork {
 			else {
 				final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
 
-				if ( size == friends.length ) expand();
+				final int index = unshift( shiftedSize );
+				if ( index == friends.length ) expand();
 
 				final short[] quadrant = getQuadrant( parent , firstWeight, secondWeight );
-				friends[ size ] = friend;
+				friends[ index ] = friend;
 
-				weights1[ size ] = firstWeight;
-				weights2[ size ] = secondWeight;
+				weights1[ index ] = firstWeight;
+				weights2[ index ] = secondWeight;
 
-				quadrant[ parent ] = size;
+				quadrant[ parent ] = shiftedSize;
 			}
-			size++;
+			shiftedSize++;
 		}
 
 		private synchronized void expand() {
@@ -200,18 +214,18 @@ public class DoublyWeightedSocialNetwork {
 			weights1 = Arrays.copyOf( weights1 , newLength );
 			weights2 = Arrays.copyOf( weights2 , newLength );
 
-			Arrays.fill( weights1 , size , newLength , Float.POSITIVE_INFINITY );
-			Arrays.fill( weights2 , size , newLength , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights1 , unshift( shiftedSize ) , newLength , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , unshift( shiftedSize ) , newLength , Float.POSITIVE_INFINITY );
 
 			childSE = Arrays.copyOf( childSE , newLength );
 			childSW = Arrays.copyOf( childSW , newLength );
 			childNE = Arrays.copyOf( childNE , newLength );
 			childNW = Arrays.copyOf( childNW , newLength );
 
-			Arrays.fill( childSE , size , newLength , (short) -1 );
-			Arrays.fill( childSW , size , newLength , (short) -1 );
-			Arrays.fill( childNE , size , newLength , (short) -1 );
-			Arrays.fill( childNW , size , newLength , (short) -1 );
+			Arrays.fill( childSE , unshift( shiftedSize ) , newLength , shift( -1 ) );
+			Arrays.fill( childSW , unshift( shiftedSize ) , newLength , shift( -1 ) );
+			Arrays.fill( childNE , unshift( shiftedSize ) , newLength , shift( -1 ) );
+			Arrays.fill( childNW , unshift( shiftedSize ) , newLength , shift( -1 ) );
 		}
 
 		private int searchParentLeaf(
@@ -220,7 +234,8 @@ public class DoublyWeightedSocialNetwork {
 				final float secondWeight ) {
 			short[] quadrant = getQuadrant( head, firstWeight, secondWeight );
 
-			return quadrant[ head ] == -1 ? head : searchParentLeaf( quadrant[head], firstWeight, secondWeight );
+			return quadrant[ head ] == shift( -1 ) ? head :
+				searchParentLeaf( unshift( quadrant[ head ] ), firstWeight, secondWeight );
 		}
 
 		private short[] getQuadrant(
@@ -259,20 +274,20 @@ public class DoublyWeightedSocialNetwork {
 
 			if ( weights1[ head ] > firstWeight && weights2[ head ] > secondWeight ) {
 				alters.add( friends[ head ] );
-				fillWithGreaterPoints( childSW[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( unshift( childSW[ head ] ) , alters , firstWeight , secondWeight );
 			}
 			if ( weights1[ head ] > firstWeight ) {
-				fillWithGreaterPoints( childNW[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( unshift( childNW[ head ] ) , alters , firstWeight , secondWeight );
 			}
 			if ( weights2[ head ] > secondWeight ) {
-				fillWithGreaterPoints( childSE[ head ] , alters , firstWeight , secondWeight );
+				fillWithGreaterPoints( unshift( childSE[ head ] ) , alters , firstWeight , secondWeight );
 			}
 			// always look to the NW
-			fillWithGreaterPoints( childNE[ head ] , alters , firstWeight , secondWeight );
+			fillWithGreaterPoints( unshift( childNE[ head ] ) , alters , firstWeight , secondWeight );
 		}
 
 		public synchronized void trim() {
-			final int newSize = Math.max( 1 , size );
+			final int newSize = Math.max( 1 , unshift( shiftedSize ) );
 			friends = Arrays.copyOf( friends , newSize );
 
 			weights1 = Arrays.copyOf( weights1 , newSize );
