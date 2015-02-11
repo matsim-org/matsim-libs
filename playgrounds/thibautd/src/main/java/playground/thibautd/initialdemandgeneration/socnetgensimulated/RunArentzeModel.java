@@ -22,6 +22,8 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated;
 import gnu.trove.list.TCharList;
 import gnu.trove.list.array.TCharArrayList;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -40,7 +42,9 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
@@ -54,6 +58,7 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TiesWeightDistribution;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
@@ -115,26 +120,45 @@ public class RunArentzeModel {
 					},
 					new GumbelErrorTerm(),
 					false ); // cache
+		TiesWeightDistribution distr = new TiesWeightDistribution( 1 );
 		final ModelRunner runner =
 			new PreprocessedModelRunner(
 					runnerConfig,
 					population,
-					utility );
+					utility,
+					distr );
+		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
+		distr = null;
 
 		final ModelIterator modelIterator = new ModelIterator( config );
 
-		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory()+"/threshold-evolution.dat" );
+		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
 
-		final SocialNetwork network =
-			modelIterator.iterateModelToTarget(
-					runner,
-					config.getInitialPoints() );
+		final SocialNetwork network = modelIterator.iterateModelToTarget( runner, config.getInitialPoints() );
 
 		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();
+	}
+
+	private static void write(
+			final TiesWeightDistribution distr,
+			final String file ) {
+		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( file ) ) {
+			writer.write( "binStart\tbinEnd\tcount" );
+			
+			final double[] binStarts = distr.getBinStarts();
+			final int[] binCounts = distr.getBinCounts();
+			for ( int i = 0; i < binStarts.length; i++ ) {
+				writer.newLine();
+				writer.write( binStarts[ i ]+"\t"+(binStarts[ i ] + distr.getBinWidth())+"\t"+binCounts[ i ] );
+			}
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
 	}
 
 	private static void loadAndLogGroups( final String file , final ConfigGroup... groups ) {

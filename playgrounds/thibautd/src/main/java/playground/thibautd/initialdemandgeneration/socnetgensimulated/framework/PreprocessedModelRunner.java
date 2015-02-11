@@ -81,7 +81,8 @@ public class PreprocessedModelRunner implements ModelRunner {
 	public PreprocessedModelRunner(
 			final PreprocessedModelRunnerConfigGroup config,
 			final IndexedPopulation population ,
-			final TieUtility utility) {
+			final TieUtility utility,
+			final TiesWeightDistribution distributionToFill) {
 		this.lowestStoredPrimary = config.getLowestStoredPrimary();
 		this.lowestStoredSecondary = config.getLowestStoredSecondary();
 
@@ -94,10 +95,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 		this.maxSizeSecondary = config.getMaxSizeSecondary();
 		this.randomSeed = config.getRandomSeed();
 
-		this.updatePrimaryPreprocess();
+		this.updatePrimaryPreprocess( distributionToFill );
 	}
 
-	private void updatePrimaryPreprocess() {
+	private void updatePrimaryPreprocess( final TiesWeightDistribution distributionToFill ) {
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );
 		Gbl.printMemoryUsage();
 
@@ -115,6 +116,11 @@ public class PreprocessedModelRunner implements ModelRunner {
 				new Runnable() {
 					@Override
 					public void run() {
+						final TiesWeightDistribution threadDistribution =
+							distributionToFill != null ?
+								new TiesWeightDistribution( distributionToFill.getBinWidth() ) :
+								null;
+
 						final Random random = new Random( randomSeed + threadNumber );
 						// initialize out loop to reduce stress on GC
 						final TIntList potentialAlters = new TIntArrayList( population.size() - startThreadAgents );
@@ -131,12 +137,18 @@ public class PreprocessedModelRunner implements ModelRunner {
 								counter.incCounter();
 								final int alter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
 
+								final double score = utility.getTieUtility( ego , alter );
+
 								preprocess.addBidirectionalTie(
 										ego,
 										alter,
-										utility.getTieUtility( ego , alter ) );
+										score );
+
+								if ( threadDistribution != null ) threadDistribution.addValue( score );
 							}
 						}
+
+						if ( distributionToFill != null ) distributionToFill.addCounts( threadDistribution );
 					}
 				} );
 		}
@@ -155,7 +167,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 	public SocialNetwork runModel( final Thresholds thresholds ) {
 		if ( thresholds.getPrimaryThreshold() < lowestStoredPrimary ) {
 			this.lowestStoredPrimary = thresholds.getPrimaryThreshold() - 1;
-			updatePrimaryPreprocess();
+			updatePrimaryPreprocess( null );
 		}
 
 		if ( thresholds.getPrimaryThreshold() < this.lowestKnownPrimaryThreshold ||
