@@ -1,13 +1,31 @@
 package playground.balac.allcsmodestest.controler;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.*;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
 import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
@@ -19,15 +37,10 @@ import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfi
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
+import playground.balac.utils.Events2TTCalculator;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+public class CSJustMembersControler {
 
-public class AllCSModesTestControler {
-	
-	
 	public static void main(final String[] args) {
 		//Logger.getLogger( "org.matsim.core.reader..." ).setLevel( Level.OFF );
 		
@@ -49,9 +62,14 @@ public class AllCSModesTestControler {
 		
 		final Controler controler = new Controler( sc );
 		
+		
+		
+		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
+		
+		
 		try {
 			controler.setMobsimFactory( new AllCSModesQsimFactory(sc, controler) );
-		
+			final TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, args[1]);
 			controler.setTripRouterFactory(
 					new TripRouterFactory() {
 						@Override
@@ -62,7 +80,18 @@ public class AllCSModesTestControler {
 							// This allows us to just add our module and go.
 							final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
 	
-							final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+							TravelDisutilityFactory travelCostCalculatorFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+							TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), controler.getConfig().planCalcScore());		
+							
+							
+							RoutingContext rContext = new RoutingContextImpl(
+									travelCostCalculator,
+									travelTimeCalculator.getLinkTravelTimes() );
+							
+							
+							
+							
+							final TripRouter router = delegate.instantiateAndConfigureTripRouter(rContext);
 							
 							// add our module to the instance
 							router.setRoutingModule(

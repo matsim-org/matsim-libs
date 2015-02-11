@@ -11,10 +11,12 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import com.google.inject.Inject;
+
 
 public class RandomTripToCarsharingStrategy implements PlanStrategy{
 	private final PlanStrategyImpl strategy;
-	
+	@Inject
 	public RandomTripToCarsharingStrategy(final Scenario scenario) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 		 	

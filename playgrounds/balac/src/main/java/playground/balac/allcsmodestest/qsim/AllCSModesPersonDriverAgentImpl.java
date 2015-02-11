@@ -150,7 +150,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.twvehiclesLocation = twvehiclesLocation;
 		this.tripRouter = tripRouter;
 		
-		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
+		beelineFactor = ((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
 		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		mapTW = new HashMap<Link, Link>();

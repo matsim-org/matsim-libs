@@ -31,6 +31,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
+import com.google.inject.Inject;
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
  * mode choice and re-routing
@@ -38,7 +40,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  */
 public class SubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
-
+	@Inject
 	public SubtourModeChoiceStrategy(final Scenario scenario) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
