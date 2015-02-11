@@ -20,6 +20,7 @@
 package org.matsim.contrib.dynagent.run;
 
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 
 
@@ -28,6 +29,11 @@ public class DynConfigUtils
     public static Config createConfig()
     {
         Config config = ConfigUtils.createConfig();
+        
+        ModeRoutingParams taxiParams = new ModeRoutingParams() ;
+        taxiParams.setMode("taxi");
+		config.plansCalcRoute().addModeRoutingParams(taxiParams);
+        
         updateQSimConfigGroup(config);
         return config;
     }
