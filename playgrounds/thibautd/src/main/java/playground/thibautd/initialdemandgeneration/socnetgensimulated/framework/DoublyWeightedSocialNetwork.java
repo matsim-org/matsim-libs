@@ -21,6 +21,8 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.Arrays;
 
@@ -31,30 +33,33 @@ public class DoublyWeightedSocialNetwork {
 	private final DoublyWeightedFriends[] alters;
 	private final double lowestAllowedFirstWeight;
 	private final double lowestAllowedSecondWeight;
-	private int initialSize;
+	private final int initialSize;
+	private final short maxSize;
 
 	public DoublyWeightedSocialNetwork(
 			final int initialSize,
 			final double lowestWeight,
-			final int populationSize ) {
+			final int populationSize,
+			final int maxSize ) {
 		this.initialSize  = initialSize;
+		this.maxSize = (short) maxSize;
 		this.lowestAllowedFirstWeight = lowestWeight;
 		this.lowestAllowedSecondWeight = lowestWeight;
 		this.alters = new DoublyWeightedFriends[ populationSize ];
 		for ( int i = 0; i < populationSize; i++ ) {
-			this.alters[ i ] = new DoublyWeightedFriends( initialSize );
+			this.alters[ i ] = new DoublyWeightedFriends( initialSize , this.maxSize );
 		}
 	}
 
 	public DoublyWeightedSocialNetwork(
 			final double lowestWeight,
 			final int populationSize ) {
-		this( 20 , lowestWeight , populationSize );
+		this( 20 , lowestWeight , populationSize , Short.MAX_VALUE );
 	}
 
 	public void clear() {
 		for ( int i = 0; i < alters.length; i++ ) {
-			this.alters[ i ] = new DoublyWeightedFriends( initialSize );
+			this.alters[ i ] = new DoublyWeightedFriends( initialSize , maxSize );
 		}
 	}
 
@@ -140,7 +145,12 @@ public class DoublyWeightedSocialNetwork {
 		// memory
 		private short size = 0;
 
-		public DoublyWeightedFriends(final int initialSize) {
+		private final short maxSize;
+
+		public DoublyWeightedFriends(
+				final int initialSize,
+				final short maxSize) {
+			this.maxSize = maxSize;
 			this.friends = new int[ initialSize ];
 
 			this.weights1 = new float[ initialSize ];
@@ -177,8 +187,10 @@ public class DoublyWeightedSocialNetwork {
 
 				weights1[ 0 ] = firstWeight;
 				weights2[ 0 ] = secondWeight;
+
+				size++;
 			}
-			else {
+			else if ( size != maxSize ) {
 				final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
 
 				if ( size == friends.length ) expand();
@@ -190,13 +202,81 @@ public class DoublyWeightedSocialNetwork {
 				weights2[ size ] = secondWeight;
 
 				quadrant[ parent ] = size;
+
+				size++;
 			}
-			if ( size == Short.MAX_VALUE ) throw new IllegalStateException( "maximum capacity exceeded" );
-			size++;
+			else {
+				// max size reached: replace value with smallest secondary weight
+				// (primary weight always "make sense" in preprocessed model runner)
+				// 1 - find element with smallest *secondary* weight
+				final int[] smallestSecondaryIndexAndParent = searchSmallestSecondaryIndex();
+				final int smallestSecondaryIndex = smallestSecondaryIndexAndParent[ 0 ];
+				final int smallestSecondaryParent = smallestSecondaryIndexAndParent[ 1 ];
+
+				// 2 - check if new element better. if not, abort.
+				if ( weights2[smallestSecondaryIndex] >= secondWeight ) return;
+
+				// 3 - remove element to replace:
+				//     a - reconnect the tree
+				remove( smallestSecondaryIndex , smallestSecondaryParent );
+
+				//     b - put new element in the slot in the array, and "connect" to proper parent.
+				final int parent = searchParentLeaf( 0, firstWeight, secondWeight );
+
+				final short[] quadrant = getQuadrant( parent, firstWeight, secondWeight );
+				friends[smallestSecondaryIndex] = friend;
+
+				weights1[smallestSecondaryIndex] = firstWeight;
+				weights2[smallestSecondaryIndex] = secondWeight;
+
+				quadrant[smallestSecondaryIndex] = size;
+			}
+		}
+
+		private void remove(
+				final int toRemoveIndex,
+				final int parentIndex ) {
+			throw new UnsupportedOperationException( "still todo: remove("+toRemoveIndex+","+parentIndex+")" );
+			// search for replacemenent in subtree and update pointers
+			// remove replacement recursively.
+		}
+
+		private int[] searchSmallestSecondaryIndex() {
+			float currentMin = Float.POSITIVE_INFINITY;
+			int currentMinIndex = -1;
+			int currentMinParent = -1;
+
+			final TIntStack indexStack = new TIntArrayStack();
+			indexStack.push( 0 );
+
+			final TIntStack parentStack = new TIntArrayStack();
+			parentStack.push( -1 );
+
+			while ( indexStack.size() > 0 ) {
+				final int currentIndex = indexStack.pop();
+				final int currentParent = parentStack.pop();
+
+				if ( weights2[ currentIndex ] < currentMin ) {
+					currentMin = weights2[ currentIndex ];
+					currentMinIndex = currentIndex;
+					currentMinParent = currentParent;
+				}
+
+				if ( childSE[ currentIndex ] != -1 ) {
+					indexStack.push( childSE[ currentIndex ] );
+					parentStack.push( currentIndex );
+				}
+				if ( childSW[ currentIndex ] != -1 ) {
+					indexStack.push( childSW[ currentIndex ] );
+					parentStack.push( currentIndex );
+				}
+			}
+
+			return new int[]{ currentMinIndex , currentMinParent };
 		}
 
 		private synchronized void expand() {
-			final int newLength = 2 * friends.length;
+			final int newLength = Math.min( maxSize , 2 * friends.length );
 			friends = Arrays.copyOf( friends , newLength );
 
 			weights1 = Arrays.copyOf( weights1 , newLength );

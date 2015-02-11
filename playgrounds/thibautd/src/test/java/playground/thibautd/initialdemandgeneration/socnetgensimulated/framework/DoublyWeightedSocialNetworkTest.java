@@ -58,7 +58,7 @@ public class DoublyWeightedSocialNetworkTest {
 					100d, 200d, 300d, 400d, 500d );
 		Collections.shuffle( weights2 );
 
-		final DoublyWeightedSocialNetwork testee = new DoublyWeightedSocialNetwork( 2 , 0 , 1 + weights1.size() * weights2.size() );
+		final DoublyWeightedSocialNetwork testee = new DoublyWeightedSocialNetwork( 2 , 0 , 1 + weights1.size() * weights2.size() , Short.MAX_VALUE );
 
 		final int ego = 0;
 		int alter = 1;
