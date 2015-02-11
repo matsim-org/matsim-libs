@@ -36,17 +36,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private String inputPopulationFile = null;
 	private String outputDirectory = null;
 
-	private double primarySamplingRate = 0.01;
-	private double secondarySamplingRate = 1;
-
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
-
-	private double lowestCachedUtilityPrimary = -50;
-	private double lowestCachedUtilitySecondary = -400;
-
-	private int nThreads = 1;
-
 
 	public SocialNetworkGenerationConfigGroup( ) {
 		super( GROUP_NAME );
@@ -72,26 +63,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.outputDirectory = outputDirectory;
 	}
 
-	@StringGetter( "primarySamplingRate" )
-	public double getPrimarySamplingRate() {
-		return primarySamplingRate;
-	}
-
-	@StringSetter( "primarySamplingRate" )
-	public void setPrimarySamplingRate( double primarySamplingRate ) {
-		this.primarySamplingRate = primarySamplingRate;
-	}
-
-	@StringGetter( "secondarySamplingRate" )
-	public double getSecondarySamplingRate() {
-		return secondarySamplingRate;
-	}
-
-	@StringSetter( "secondarySamplingRate" )
-	public void setSecondarySamplingRate( double secondarySamplingRate ) {
-		this.secondarySamplingRate = secondarySamplingRate;
-	}
-
 	@StringGetter( "targetDegree" )
 	public double getTargetDegree() {
 		return targetDegree;
@@ -110,37 +81,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "targetClustering" )
 	public void setTargetClustering( double targetClustering ) {
 		this.targetClustering = targetClustering;
-	}
-
-	@StringGetter( "lowestCachedUtilityPrimary" )
-	public double getLowestCachedUtilityPrimary() {
-		return lowestCachedUtilityPrimary;
-	}
-
-	@StringSetter( "lowestCachedUtilityPrimary" )
-	public void setLowestCachedUtilityPrimary( double lowestCachedUtility ) {
-		this.lowestCachedUtilityPrimary = lowestCachedUtility;
-	}
-
-	@StringGetter( "lowestCachedUtilitySecondary" )
-	public double getLowestCachedUtilitySecondary() {
-		return lowestCachedUtilitySecondary;
-	}
-
-	@StringSetter( "lowestCachedUtilitySecondary" )
-	public void setLowestCachedUtilitySecondary( double lowestCachedUtility ) {
-		this.lowestCachedUtilitySecondary = lowestCachedUtility;
-	}
-
-
-	@StringGetter( "nThreads" )
-	public int getNThreads() {
-		return nThreads;
-	}
-
-	@StringSetter( "nThreads" )
-	public void setNThreads( int nThreads ) {
-		this.nThreads = nThreads;
 	}
 
 	@Override

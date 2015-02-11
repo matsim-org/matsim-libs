@@ -49,6 +49,7 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunner;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
@@ -71,8 +72,9 @@ public class RunArentzeModel {
 		final String configFile = args[ 0 ];
 
 		final SocialNetworkGenerationConfigGroup config = new SocialNetworkGenerationConfigGroup();
+		final PreprocessedModelRunnerConfigGroup runnerConfig = new PreprocessedModelRunnerConfigGroup();
 		final TRBModelConfigGroup pars = new TRBModelConfigGroup();
-		loadAndLogGroups( configFile , config , pars );
+		loadAndLogGroups( configFile , config , runnerConfig , pars );
 
 		Logger.getLogger( SoftCache.class ).setLevel( Level.TRACE );
 
@@ -82,8 +84,8 @@ public class RunArentzeModel {
 		log.info( "###### start socnet gen" );
 		log.info( "###### popfile: " + config.getInputPopulationFile() );
 		log.info( "###### outputdir: " + config.getOutputDirectory() );
-		log.info( "###### primary sampling rate: " + config.getPrimarySamplingRate() );
-		log.info( "###### secondary sampling rate: " + config.getSecondarySamplingRate() );
+		log.info( "###### primary sampling rate: " + runnerConfig.getPrimarySampleRate() );
+		log.info( "###### secondary sampling rate: " + runnerConfig.getSecondarySampleRate() );
 		log.info( "################################################################################" );
 
 		final ArentzePopulation population = parsePopulation( config.getInputPopulationFile() );
@@ -115,13 +117,9 @@ public class RunArentzeModel {
 					false ); // cache
 		final ModelRunner runner =
 			new PreprocessedModelRunner(
-					config.getLowestCachedUtilityPrimary(),
-					config.getLowestCachedUtilitySecondary(),
+					runnerConfig,
 					population,
-					utility,
-					config.getPrimarySamplingRate(),
-					config.getSecondarySamplingRate(),
-					config.getNThreads() );
+					utility );
 
 		final ModelIterator modelIterator =
 			new ModelIterator(

@@ -60,12 +60,12 @@ public class PreprocessedModelRunner implements ModelRunner {
 	private WeightedSocialNetwork preprocess = null;
 	private DoublyWeightedSocialNetwork preprocessFriendsOfFriends = null;
 
-	private double lowestStoredPrimary = 0;
-	private double lowestStoredSecondary = 0;
+	private double lowestStoredPrimary;
+	private double lowestStoredSecondary;
 
 	private double lowestKnownPrimaryThreshold = Double.POSITIVE_INFINITY;
 
-	private final int randomSeed = 20150116;
+	private final int randomSeed;
 
 	private final IndexedPopulation population;
 	private final TieUtility utility;
@@ -73,29 +73,26 @@ public class PreprocessedModelRunner implements ModelRunner {
 	private final double primarySampleRate;
 	private final double secondarySampleRate;
 
-	// TODO: make configurable (pass config group to ctor,
-	// it is becoming messy)
-	private final int maxSizePrimary = 50;
-	private final int maxSizeSecondary = 100;
+	private final int maxSizePrimary;
+	private final int maxSizeSecondary;
 
 	private final int nThreads;
 
 	public PreprocessedModelRunner(
-			final double minUtilityPrimary,
-			final double minUtilitySecondary,
+			final PreprocessedModelRunnerConfigGroup config,
 			final IndexedPopulation population ,
-			final TieUtility utility ,
-			final double primarySampleRate ,
-			final double secondarySampleRate ,
-			final int nThreads ) {
-		this.lowestStoredPrimary = minUtilityPrimary;
-		this.lowestStoredSecondary = minUtilitySecondary;
+			final TieUtility utility) {
+		this.lowestStoredPrimary = config.getLowestStoredPrimary();
+		this.lowestStoredSecondary = config.getLowestStoredSecondary();
 
-		this.primarySampleRate = primarySampleRate;
-		this.secondarySampleRate = secondarySampleRate;
+		this.primarySampleRate = config.getPrimarySampleRate();
+		this.secondarySampleRate = config.getSecondarySampleRate();
 		this.population = population;
 		this.utility = utility;
-		this.nThreads = nThreads;
+		this.nThreads = config.getNThreads();
+		this.maxSizePrimary = config.getMaxSizePrimary();
+		this.maxSizeSecondary = config.getMaxSizeSecondary();
+		this.randomSeed = config.getRandomSeed();
 
 		this.updatePrimaryPreprocess();
 	}
