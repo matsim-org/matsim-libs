@@ -195,7 +195,7 @@ public class ModelIterator {
 				-1 : 1; // if degree lower, need to decrease threshold
 			final double secondarySign =
 				best.thresholds.getResultingClustering() < targetClustering ?
-				-1 : 1; // if degree lower, need to decrease threshold
+				1 : -1; // if clustering lower, need to INCREASE threshold REDUCTION
 
 			return new Thresholds(
 					best.thresholds.getPrimaryThreshold() + primarySign * step,
