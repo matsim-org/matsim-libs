@@ -24,6 +24,7 @@ import gnu.trove.set.TIntSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -78,6 +79,37 @@ public class DoublyWeightedSocialNetworkTest {
 				"unexpected nuber of returned elements: "+result,
 				result.size(),
 				25 );
+	}
+
+	@Test
+	public void testMaximumCapacity() {
+		if ( true ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
+
+		final int popSize = 100;
+		final int maxSize = 20;
+		final DoublyWeightedSocialNetwork testee =
+			new DoublyWeightedSocialNetwork(
+					2 ,
+					Double.NEGATIVE_INFINITY ,
+					popSize ,
+					maxSize );
+
+		final int ego = 0;
+		final Random random = new Random( 1234 );
+		for ( int alter=1; alter < popSize; alter++ ) {
+			testee.addBidirectionalTie( ego , alter , random.nextFloat() , random.nextFloat() );
+		}
+
+		Assert.assertEquals(
+				"unexpected number of alters",
+				maxSize,
+				testee.getAltersOverWeights( ego , Double.NEGATIVE_INFINITY , Double.NEGATIVE_INFINITY ).size() );
+
+		Assert.assertEquals(
+				"invalid size",
+				testee.getSize( ego ),
+				testee.getAltersOverWeights( ego , Double.NEGATIVE_INFINITY , Double.NEGATIVE_INFINITY ).size() );
+
 	}
 }
 

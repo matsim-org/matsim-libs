@@ -26,10 +26,15 @@ import gnu.trove.stack.array.TShortArrayStack;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author thibautd
  */
 public class DoublyWeightedSocialNetwork {
+	private static final Logger log =
+		Logger.getLogger(DoublyWeightedSocialNetwork.class);
+
 	private final DoublyWeightedFriends[] alters;
 	private final double lowestAllowedFirstWeight;
 	private final double lowestAllowedSecondWeight;
@@ -128,7 +133,6 @@ public class DoublyWeightedSocialNetwork {
 	// No check is done that is is balanced!
 	// should be ok, as agents are got in random order
 	private static final class DoublyWeightedFriends {
-		// TODO: maximum size
 		private int[] friends;
 
 		// use float and short for memory saving
@@ -228,39 +232,80 @@ public class DoublyWeightedSocialNetwork {
 		private void remove(
 				final short toRemoveIndex,
 				final short toRemoveParent ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "remove element at "+toRemoveIndex );
+			}
 			// rebuild the whole subtree
 
-			final TShortStack toRemoveStack = new TShortArrayStack();
-			// TODO: invalidate in parent pointers!
-			toRemoveStack.push( toRemoveIndex );
+			final TShortStack toReaddStack = new TShortArrayStack();
 
-			// separate subtree
-			( childNW[ toRemoveParent ] == toRemoveIndex ? childNW :
-				childNE[ toRemoveParent ] == toRemoveIndex ? childNE :
-				childSE[ toRemoveParent ] == toRemoveIndex ? childSE :
-				childSW )[ toRemoveIndex ] = -1;
+			// shift values by one
+			if ( childNE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNE[ toRemoveIndex ] , toRemoveIndex ) );
+			if ( childNW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNW[ toRemoveIndex ] , toRemoveIndex ) );
+			if ( childSE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSE[ toRemoveIndex ] , toRemoveIndex ) );
+			if ( childSW[toRemoveIndex] != -1 ) toReaddStack.push( shift( childSW[toRemoveIndex] , toRemoveIndex ) );
 
-			// "remove" from the tree.
-			while ( toRemoveStack.size() > 0 ) {
-				final short toRemove = toRemoveStack.pop();
-
-				if ( childNE[ toRemove ] != -1 ) toRemoveStack.push( childNE[ toRemove ] );
-				if ( childNW[ toRemove ] != -1 ) toRemoveStack.push( childNW[ toRemove ] );
-				if ( childSE[ toRemove ] != -1 ) toRemoveStack.push( childSE[ toRemove ] );
-				if ( childSW[ toRemove ] != -1 ) toRemoveStack.push( childSW[ toRemove ] );
-
-				childNE[ toRemove ] = -1;
-				childNW[ toRemove ] = -1;
-				childSE[ toRemove ] = -1;
-				childSW[ toRemove ] = -1;
-
-				// find a new daddy
-				final int parent = searchParentLeaf( toRemoveParent , weights1[ toRemove ] , weights2[ toRemove ] );
-				final short[] quadrant = getQuadrant( parent , weights1[ toRemove ] , weights2[ toRemove ] );
-				quadrant[ parent ] = toRemove;
+			if ( toRemoveParent != -1 ) {
+				// separate subtree
+				( childNW[toRemoveParent] == toRemoveIndex ? childNW :
+				  childNE[toRemoveParent] == toRemoveIndex ? childNE :
+				  childSE[toRemoveParent] == toRemoveIndex ? childSE :
+				  childSW )[toRemoveParent] = -1;
 			}
 
 			size--;
+
+			// fill gap
+			for ( int i = toRemoveIndex; i < size; i++ ) {
+				friends[i] = friends[i + 1];
+
+				weights1[i] = weights1[i + 1];
+				weights2[i] = weights2[i + 1];
+
+				childNE[i] = childNE[i + 1];
+				childNW[i] = childNW[i + 1];
+				childSE[i] = childSE[i + 1];
+				childSW[i] = childSW[i + 1];
+			}
+
+			// update pointers
+			for ( int i = 0; i < size; i++ ) {
+				if ( childNE[i] >= toRemoveIndex ) childNE[i]--;
+				if ( childNW[i] >= toRemoveIndex ) childNW[i]--;
+				if ( childSE[i] >= toRemoveIndex ) childSE[i]--;
+				if ( childSW[i] >= toRemoveIndex ) childSW[i]--;
+			}
+
+			// "readd" to the tree.
+			final int treeHead = toRemoveParent >= 0 ? toRemoveParent : 0;
+			while ( toReaddStack.size() > 0 ) {
+				final short toReadd = toReaddStack.pop();
+
+				if ( childNE[toReadd] != -1 ) toReaddStack.push( childNE[toReadd] );
+				if ( childNW[toReadd] != -1 ) toReaddStack.push( childNW[toReadd] );
+				if ( childSE[toReadd] != -1 ) toReaddStack.push( childSE[toReadd] );
+				if ( childSW[toReadd] != -1 ) toReaddStack.push( childSW[toReadd] );
+
+				childNE[toReadd] = -1;
+				childNW[toReadd] = -1;
+				childSE[toReadd] = -1;
+				childSW[toReadd] = -1;
+
+				if ( toReadd != 0 ) {
+					// find a new daddy
+					final int parent = searchParentLeaf( treeHead, weights1[toReadd], weights2[toReadd] );
+					final short[] quadrant = getQuadrant( parent, weights1[toReadd], weights2[toReadd] );
+					quadrant[parent] = toReadd;
+				}
+			}
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "remove element at " + toRemoveIndex + " DONE" );
+			}
+		}
+
+		private static short shift( final short i , final int index ) {
+			return i > index ? (short) (i - 1) : i;
 		}
 
 		private short[] searchSmallestSecondaryIndex() {
