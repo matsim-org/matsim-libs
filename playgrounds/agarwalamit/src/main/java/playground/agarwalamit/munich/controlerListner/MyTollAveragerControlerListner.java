@@ -91,18 +91,17 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		this.moneyHandler = new MoneyEventHandler();
-		event.getControler().getEvents().addHandler(moneyHandler);
-
+		if(event.getIteration() >= averagingStartIteration){
+			this.moneyHandler = new MoneyEventHandler();
+			event.getControler().getEvents().addHandler(moneyHandler);
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		this.pId2NowTolls = this.moneyHandler.getPersonId2amount();
-
-		event.getControler().getEvents().removeHandler(moneyHandler);
 
 		if(event.getIteration() >= averagingStartIteration){
+			this.pId2NowTolls = this.moneyHandler.getPersonId2amount();
 			counter++;
 			for(Id<Person> personId:pId2NowTolls.keySet()){
 				double nowToll = pId2NowTolls.get(personId);
@@ -158,6 +157,5 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
 	}
 }

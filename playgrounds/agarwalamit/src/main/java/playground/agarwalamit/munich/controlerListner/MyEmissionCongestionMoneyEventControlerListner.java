@@ -26,12 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -44,7 +41,7 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
  * @author amit
  */
 
-public class MyEmissionCongestionMoneyEventControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener{
+public class MyEmissionCongestionMoneyEventControlerListner implements StartupListener, IterationEndsListener{
 
 	public MyEmissionCongestionMoneyEventControlerListner(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
 		this.emissionCostModule = emissionCostModule;
@@ -59,8 +56,6 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private ScenarioImpl scenario;
 	private EmissionCostModule emissionCostModule;
-	private BufferedWriter writer;
-	private Controler controler;
 
 	private MoneyEventHandler moneyHandler;
 	private CongestionPerPersonHandler congestionCostHandler;
@@ -70,36 +65,19 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.controler = event.getControler();
-		this.scenario = (ScenarioImpl) controler.getScenario();
+		this.scenario = (ScenarioImpl) event.getControler().getScenario();
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
+		this.moneyHandler = new MoneyEventHandler();
+		this.congestionCostHandler = new CongestionPerPersonHandler(1, event.getControler().getConfig().qsim().getEndTime(), scenario);
 
+		event.getControler().getEvents().addHandler(congestionCostHandler);
+		event.getControler().getEvents().addHandler(moneyHandler);
 		event.getControler().getEvents().addHandler(emissionModule.getWarmEmissionHandler());
 		event.getControler().getEvents().addHandler(emissionModule.getColdEmissionHandler());
+		
 		emissionModule.getEmissionEventsManager().addHandler(emissCostHandler);
-
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		
-		this.moneyHandler = new MoneyEventHandler();
-		event.getControler().getEvents().addHandler(moneyHandler);
-		
-		this.congestionCostHandler = new CongestionPerPersonHandler(1, controler.getConfig().qsim().getEndTime(), scenario);
-		event.getControler().getEvents().addHandler(congestionCostHandler);
-		
-		String outputFile = controler.getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
-		this.writer =IOUtils.getBufferedWriter(outputFile);
-		try {
-			this.writer.write("personId \t delaysCosts \t coldEmissionsCosts \t"
-					+ "warmEmissionsCosts \t totalEmissionsCosts \t toll \n");
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
-		}
 	}
 
 	@Override
@@ -107,11 +85,18 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 		log.info("Per person delays costs, cold and warm emissions costs and toll will be written to a file for each iteration.");
 
 		this.pId2Tolls = this.moneyHandler.getPersonId2amount();
-		this.pId2CongestionCosts = this.congestionCostHandler.getDelayPerPersonAndTimeInterval().get(controler.getConfig().qsim().getEndTime());
+		this.pId2CongestionCosts = this.congestionCostHandler.getDelayPerPersonAndTimeInterval().get(event.getControler().getConfig().qsim().getEndTime());
 		this.pId2ColdEmissionsCosts = this.emissCostHandler.getPersonId2ColdEmissCosts();
 		this.pId2WarmEmissionsCosts = this.emissCostHandler.getPersonId2WarmEmissCosts();
 
+		String outputFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "person2VariousCosts.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+
 		try {
+
+			writer.write("personId \t delaysCosts \t coldEmissionsCosts \t"
+					+ "warmEmissionsCosts \t totalEmissionsCosts \t toll \n");
+
 			for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
 				double delaysCosts ;
 				double coldEmissCosts;
@@ -132,7 +117,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 				double totalEmissCosts = coldEmissCosts+warmEmissCosts;
 
-				this.writer.write(personId+"\t"+
+				writer.write(personId+"\t"+
 						delaysCosts+"\t"+
 						coldEmissCosts+"\t"+
 						warmEmissCosts+"\t"+
@@ -144,7 +129,5 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-	event.getControler().getEvents().removeHandler(moneyHandler);
-	event.getControler().getEvents().removeHandler(congestionCostHandler);
 	}
 }
