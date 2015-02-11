@@ -27,8 +27,8 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 public class PreprocessedModelRunnerConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "preprocessedRunner";
 
-	private double lowestStoredPrimary = 0;
-	private double lowestStoredSecondary = 0;
+	private double lowestStoredPrimary = Double.NEGATIVE_INFINITY;
+	private double lowestStoredSecondary = Double.NEGATIVE_INFINITY;
 
 	private int randomSeed = 20150116;
 
