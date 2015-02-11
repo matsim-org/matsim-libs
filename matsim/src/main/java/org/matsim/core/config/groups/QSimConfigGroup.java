@@ -33,10 +33,6 @@ import java.util.Map;
 
 public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
 
-    public static enum LinkDynamics { FIFO, PassingQ }
-	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
-	private static final String LINK_DYNAMICS = "linkDynamics" ;
-
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";
@@ -84,7 +80,6 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
 	
 	// ---
-
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	public static final String SNAPSHOT_EQUI_DIST = "equiDist";
 	public static final String SNAPSHOT_AS_QUEUE = "queue";
@@ -92,7 +87,6 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
 	
 	// ---
-	
 	private static final String MAIN_MODE = "mainMode";
 	private Collection<String> mainModes = Arrays.asList(TransportMode.car);
 	
@@ -100,6 +94,12 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
+	// ---
+    public static enum LinkDynamics { FIFO, PassingQ }
+	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
+	private static final String LINK_DYNAMICS = "linkDynamics" ;
+
+	// ---
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
 	private boolean usingThreadpool = false ;
