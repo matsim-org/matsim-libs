@@ -21,7 +21,9 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.TShortStack;
+import gnu.trove.stack.array.TIntArrayStack;
 import gnu.trove.stack.array.TShortArrayStack;
 
 import java.util.Arrays;
@@ -367,9 +369,19 @@ public class DoublyWeightedSocialNetwork {
 				final int head,
 				final float firstWeight,
 				final float secondWeight ) {
-			short[] quadrant = getQuadrant( head, firstWeight, secondWeight );
+			final TIntStack stack = new TIntArrayStack();
+			stack.push( head );
 
-			return quadrant[ head ] == -1 ? head : searchParentLeaf( quadrant[head], firstWeight, secondWeight );
+			while ( stack.size() > 0 ) {
+				final int currentHead = stack.pop();
+				short[] quadrant = getQuadrant( currentHead , firstWeight, secondWeight );
+
+				final int child = quadrant[ currentHead ];
+				if ( child == -1 ) return currentHead;
+				stack.push( child );
+			}
+
+			throw new RuntimeException( "Loop should never complete!?" );
 		}
 
 		private short[] getQuadrant(
