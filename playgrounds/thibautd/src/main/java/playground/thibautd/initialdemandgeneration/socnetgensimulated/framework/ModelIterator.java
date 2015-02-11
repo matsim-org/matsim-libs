@@ -41,8 +41,11 @@ public class ModelIterator {
 	private final double targetClustering;
 	private final double targetDegree;
 
-	private static final double PRECISION_CLUSTERING = 1E-2;
-	private static final double PRECISION_DEGREE = 1E-1;
+	private final double precisionClustering;
+	private final double precisionDegree;
+
+	private final double initialPrimaryStep;
+	private final double initialSecondaryStep;
 
 	// TODO: make adaptive (the closer to the target value,
 	// the more precise is should get)
@@ -50,14 +53,17 @@ public class ModelIterator {
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
-		this( config.getTargetClustering() , config.getTargetDegree() );
-		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
-	}
+		this.targetClustering = config.getTargetClustering();
+		this.targetDegree = config.getTargetDegree();
 
-	public ModelIterator( double targetClustering , double targetDegree ) {
-		this.targetClustering = targetClustering;
-		this.targetDegree = targetDegree;
 		listeners.add( new EvolutionLogger() );
+
+		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
+		this.precisionClustering = config.getPrecisionClustering();
+		this.precisionDegree = config.getPrecisionDegree();
+
+		this.initialPrimaryStep = config.getInitialPrimaryStep();
+		this.initialSecondaryStep = config.getInitialSecondaryStep();
 	}
 
 	public SocialNetwork iterateModelToTarget(
@@ -80,7 +86,10 @@ public class ModelIterator {
 
 			memory.add( thresholds );
 
-			if ( isAcceptable( thresholds ) ) return sn;
+			if ( isAcceptable( thresholds ) ) {
+				log.info( thresholds+" fulfills the precision criteria!" );
+				return sn;
+			}
 		}
 	}
 
@@ -95,8 +104,8 @@ public class ModelIterator {
 
 	private boolean isAcceptable(
 			final Thresholds thresholds ) {
-		return distClustering( thresholds ) < PRECISION_CLUSTERING &&
-			distDegree( thresholds ) < PRECISION_DEGREE;
+		return distClustering( thresholds ) < precisionClustering &&
+			distDegree( thresholds ) < precisionDegree;
 	}
 
 	private double distClustering( final Thresholds thresholds ) {
@@ -113,11 +122,11 @@ public class ModelIterator {
 		private Thresholds bestNetSize = null;
 		private Thresholds bestClustering = null;
 
-		private double primaryStepSizeDegree = 50;
-		private double secondaryStepSizeDegree = 50;
+		private double primaryStepSizeDegree = initialPrimaryStep;
+		private double secondaryStepSizeDegree = initialSecondaryStep;
 
-		private double primaryStepSizeClustering = 50;
-		private double secondaryStepSizeClustering = 50;
+		private double primaryStepSizeClustering = initialPrimaryStep;
+		private double secondaryStepSizeClustering = initialSecondaryStep;
 
 		boolean hadDegreeImprovement = false;
 		boolean hadClusteringImprovement = false;
@@ -194,6 +203,11 @@ public class ModelIterator {
 			// And when adding, cannot simple modify step size
 			//queue.add( new Thresholds( bestNetSize.getPrimaryThreshold() , bestClustering.getSecondaryReduction() ) );
 			//queue.add( new Thresholds( bestClustering.getPrimaryThreshold() , bestNetSize.getSecondaryReduction() ) );
+
+			queue.add(
+					new Thresholds(
+						( bestNetSize.getPrimaryThreshold() + bestClustering.getPrimaryThreshold() ) / 2d ,
+						( bestNetSize.getSecondaryReduction() + bestClustering.getSecondaryReduction() ) / 2d ) );
 		}
 
 		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {

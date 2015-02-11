@@ -36,6 +36,12 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private String inputPopulationFile = null;
 	private String outputDirectory = null;
 
+	private double initialPrimaryStep = 10;
+	private double initialSecondaryStep = 10;
+
+	private double precisionClustering = 1E-3;
+	private double precisionDegree = 1E-2;
+
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
 
@@ -108,6 +114,46 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 			ts.add( new Thresholds( set.getInitialPrimaryThreshold() , set.getInitialSecondaryReduction() ) );
 		}
 		return ts;
+	}
+
+	@StringGetter( "precisionClustering" )
+	public double getPrecisionClustering() {
+		return precisionClustering;
+	}
+
+	@StringSetter( "precisionClustering" )
+	public void setPrecisionClustering( double precisionClustering ) {
+		this.precisionClustering = precisionClustering;
+	}
+
+	@StringGetter( "precisionDegree" )
+	public double getPrecisionDegree() {
+		return precisionDegree;
+	}
+
+	@StringSetter( "precisionDegree" )
+	public void setPrecisionDegree( double precisionDegree ) {
+		this.precisionDegree = precisionDegree;
+	}
+
+	@StringGetter( "initialPrimaryStep" )
+	public double getInitialPrimaryStep() {
+		return initialPrimaryStep;
+	}
+
+	@StringSetter( "initialPrimaryStep" )
+	public void setInitialPrimaryStep( double initialPrimaryStep ) {
+		this.initialPrimaryStep = initialPrimaryStep;
+	}
+
+	@StringGetter( "initialSecondaryStep" )
+	public double getInitialSecondaryStep() {
+		return initialSecondaryStep;
+	}
+
+	@StringSetter( "initialSecondaryStep" )
+	public void setInitialSecondaryStep( double initialSecondaryStep ) {
+		this.initialSecondaryStep = initialSecondaryStep;
 	}
 
 	public static class InitialPointParameterSet extends ReflectiveConfigGroup {
