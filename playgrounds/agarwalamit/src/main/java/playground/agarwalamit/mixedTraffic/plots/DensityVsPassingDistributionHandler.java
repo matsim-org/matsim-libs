@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.plots;
 
+import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,14 +47,15 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 	private double localDensity = 0.;
 	private Map<Id<Person>, Double> personId2LinkEnterTime;
 	private final Id<Link> linkId;
+	private BufferedWriter writer;
 
-	public DensityVsPassingDistributionHandler(Id<Link> linkId) {
+	public DensityVsPassingDistributionHandler(Id<Link> linkId, BufferedWriter writer) {
 		this.personId2LegMode = new HashMap<Id<Person>, String>();
 		this.density2TotalOvertakenBicycles = new HashMap<Double, Double>();
 		this.density2AverageOvertakenBicycles=new HashMap<Double, Double>();
 		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
 		this.linkId = linkId;
-
+		this.writer = writer;
 	}
 
 	@Override
@@ -97,6 +99,14 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(event);
 		double noOfVehiclesOnLink = this.personId2LinkEnterTime.size();
 		this.density2TotalOvertakenBicycles.put(localDensity, numberOfBicyclesOvertaken);
+		
+		try {
+			this.writer.write(localDensity+"\t"+numberOfBicyclesOvertaken+"\n");
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
+		}
+		
 		this.density2AverageOvertakenBicycles.put(localDensity, numberOfBicyclesOvertaken/noOfVehiclesOnLink);
 	}
 

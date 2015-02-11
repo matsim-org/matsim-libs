@@ -43,7 +43,7 @@ public class QPositionDataWriterForR {
 //		private static String eventFile = outputDir+"ITERS/data_Patna_3modes_withoutPassing_alternativeSpeed_events.xml";//outputDir+"/ITERS/it.10/10.events.xml.gz";//
 //		private static String networkFile="../../patnaIndiaSim/input/dreieck_network.xml";
 //	private static String configFile ="../../patnaIndiaSim/outputSS/2modesNoStuck/config.xml";
-	private static String outputDir ="./outputSeepage/";//"../../patnaIndiaSim/outputSS/2modesNoStuck/";
+	private static String outputDir ="/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/triangularTest/run306/carBikePassing_5TimesLessPoints/";//"../../patnaIndiaSim/outputSS/2modesNoStuck/";
 	private static String eventFile = outputDir+"/events.xml";
 	private static String networkFile=outputDir+"/network.xml";//"../../patnaIndiaSim/outputSS/2modesNoStuck/dreieck_network.xml";
 	

@@ -28,7 +28,6 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
