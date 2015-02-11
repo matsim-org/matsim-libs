@@ -150,7 +150,6 @@ public class WeightedSocialNetwork {
 
 		public synchronized void add( final int friend , final double weight ) {
 			final float fweight = (float) weight; // TODO check overflow?
-			if ( fweight != weight ) throw new RuntimeException( "Over/underflow: "+fweight+" != "+weight );
 			final int insertionPoint = getInsertionPoint( fweight );
 			insert( friend, fweight , insertionPoint );
 			assert size <= friends.length;
@@ -197,7 +196,10 @@ public class WeightedSocialNetwork {
 			return index >= 0 ? index : - 1 - index;
 		}
 
-		private synchronized void insert( int friend , float weight , int insertionPoint ) {
+		private synchronized void insert(
+				final int friend,
+				final float weight,
+				int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
 			}
@@ -215,6 +217,9 @@ public class WeightedSocialNetwork {
 					friends[ i ] = friends[ i + 1 ];
 					weights[ i ] = weights[ i + 1 ];
 				}
+
+				// shift  insertion point, as array shifted
+				insertionPoint--;
 			}
 			else {
 				size++;
