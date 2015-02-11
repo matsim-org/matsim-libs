@@ -67,30 +67,29 @@ public class WeightedSocialNetworkTest {
 				5 );
 	}
 
-	//@Test
-	//public void testLimitedSize() {
-	//	final int maxSize = 10;
-	//	final int popSize = 20;
+	@Test
+	public void testLimitedSize() {
+		final int maxSize = 10;
+		final int popSize = 20;
 
-	//	final WeightedSocialNetwork testee = new WeightedSocialNetwork( 2 , Double.NEGATIVE_INFINITY , 10 );
+		final WeightedSocialNetwork testee = new WeightedSocialNetwork( maxSize , Double.NEGATIVE_INFINITY , popSize );
 
-	//	final int ego = 0;
-	//	for ( int alter=1; alter < popSize; alter++ ) {
-	//		testee.addBidirectionalTie( ego , alter , alter );
-	//	}
+		final int ego = 0;
+		for ( int alter=1; alter < popSize; alter++ ) {
+			testee.addBidirectionalTie( ego , alter , alter );
+		}
 
-	//	Assert.assertEquals(
-	//			"unexpected size of stored elements",
-	//			10,
-	//			testee.getSize( ego ) );
+		Assert.assertEquals(
+				"unexpected size of stored elements",
+				10,
+				testee.getSize( ego ) );
 
-	//	for ( int score = popSize - maxSize; score < popSize; score-- ) {
-	//		Assert.assertEquals(
-	//				"unexpected number of elements over "+score,
-	//				score - popSize + maxSize + 1,
-	//				testee.getAltersOverWeight( ego , score ).length );
-	//	}
-
-	//}
+		for ( int score = popSize - maxSize; score < popSize; score++ ) {
+			Assert.assertEquals(
+					"unexpected number of elements over "+score,
+					popSize - score,
+					testee.getAltersOverWeight( ego , score ).length );
+		}
+	}
 }
 
