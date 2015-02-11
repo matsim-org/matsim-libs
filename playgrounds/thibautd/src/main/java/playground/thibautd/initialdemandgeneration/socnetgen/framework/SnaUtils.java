@@ -30,6 +30,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
@@ -42,6 +43,9 @@ import playground.thibautd.utils.CollectionUtils;
  * @author thibautd
  */
 public class SnaUtils {
+	private static final Logger log =
+		Logger.getLogger(SnaUtils.class);
+
 	private SnaUtils() {}
 
 	public static double estimateClusteringCoefficient(
@@ -57,6 +61,7 @@ public class SnaUtils {
 		if ( samplingRate <= 0 ) throw new IllegalArgumentException( "sampling rate must be positive, got "+samplingRate );
 		if ( samplingRate > 1 ) throw new IllegalArgumentException( "sampling rate must lower than 1, got "+samplingRate );
 
+		log.info( "estimate clustering coefficient with sampling rate "+samplingRate );
 		final Counter tripleCounter = new Counter( "clustering calculation: look at triple # " );
 		long nTriples = 0;
 		long nTriangles = 0;

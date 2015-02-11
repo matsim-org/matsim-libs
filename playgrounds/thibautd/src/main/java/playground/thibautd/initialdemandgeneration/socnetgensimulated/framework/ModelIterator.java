@@ -48,6 +48,7 @@ public class ModelIterator {
 
 	private static final double SEARCH_STEP = 10;
 
+	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
 	public ModelIterator( double targetClustering , double targetDegree ) {
@@ -70,7 +71,7 @@ public class ModelIterator {
 			final SocialNetwork sn = runner.runModel( thresholds );
 
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
-			thresholds.setResultingClustering( SnaUtils.calcClusteringCoefficient( sn ) );
+			thresholds.setResultingClustering( SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn ) );
 
 			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds );
 
@@ -82,6 +83,11 @@ public class ModelIterator {
 
 	public void addListener( final EvolutionListener l ) {
 		listeners.add( l );
+	}
+
+	public void setSamplingRateClustering( final double rate ) {
+		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
+		this.samplingRateClustering = rate;
 	}
 
 	private boolean isAcceptable(
