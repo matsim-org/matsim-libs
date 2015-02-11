@@ -3,9 +3,6 @@ package playground.dhosse.qgis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import playground.dhosse.qgis.layerTemplates.networkCapacity.CategorizedSymbolRenderer;
-import playground.dhosse.qgis.layerTemplates.networkCapacity.CategorizedSymbolRenderer.Category;
-
 public class QGisWriterHandler {
 	
 	private final QGisWriter writer;
@@ -202,18 +199,18 @@ public class QGisWriterHandler {
 		
 		if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
 			
-			out.write("\t\t\t<renderer-v2 attr=\"" + ((CategorizedSymbolRenderer)layer.getRenderer()).getAttribute() + "\" symbollevels=\"0\" type=\"" + layer.getRenderer().getRenderingType().toString() + "\">\n");
-			out.write("\t\t\t\t<categories>\n");
-			CategorizedSymbolRenderer renderer = (CategorizedSymbolRenderer)layer.getRenderer();
-			
-			for(Category category : renderer.getCategories()){
-				
-				out.write("\t\t\t\t\t<category symbol=\"" + Integer.toString(category.getId()) + "\" value=\"" +
-						Integer.toString((int)category.getValue()) + "\" label=\"" + category.getLabel() + "\"" + "/>\n");
-				
-			}
-			
-			out.write("\t\t\t\t</categories>\n");
+//			out.write("\t\t\t<renderer-v2 attr=\"" + ((CategorizedSymbolRenderer)layer.getRenderer()).getAttribute() + "\" symbollevels=\"0\" type=\"" + layer.getRenderer().getRenderingType().toString() + "\">\n");
+//			out.write("\t\t\t\t<categories>\n");
+//			CategorizedSymbolRenderer renderer = (CategorizedSymbolRenderer)layer.getRenderer();
+//			
+//			for(Category category : renderer.getCategories()){
+//				
+//				out.write("\t\t\t\t\t<category symbol=\"" + Integer.toString(category.getId()) + "\" value=\"" +
+//						Integer.toString((int)category.getValue()) + "\" label=\"" + category.getLabel() + "\"" + "/>\n");
+//				
+//			}
+//			
+//			out.write("\t\t\t\t</categories>\n");
 			
 		} else if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
 			
