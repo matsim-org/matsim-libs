@@ -73,6 +73,11 @@ public class PreprocessedModelRunner implements ModelRunner {
 	private final double primarySampleRate;
 	private final double secondarySampleRate;
 
+	// TODO: make configurable (pass config group to ctor,
+	// it is becoming messy)
+	private final int maxSizePrimary = 50;
+	private final int maxSizeSecondary = 100;
+
 	private final int nThreads;
 
 	public PreprocessedModelRunner(
@@ -99,7 +104,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		log.info( "create preprocess network using sampling rate "+primarySampleRate );
 		Gbl.printMemoryUsage();
 
-		this.preprocess = new WeightedSocialNetwork( lowestStoredPrimary , population.size() );
+		this.preprocess = new WeightedSocialNetwork( maxSizePrimary , lowestStoredPrimary , population.size() );
 
 		final Counter counter = new Counter( "consider (primary) pair # " );
 		final ThreadGroup threads = new ThreadGroup();
@@ -231,8 +236,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 		preprocessFriendsOfFriends =
 			new DoublyWeightedSocialNetwork(
+					20,
 					lowestStoredSecondary,
-					population.size() );
+					population.size(),
+					maxSizeSecondary );
 
 		final Counter counter = new Counter( "add secondary pair # " );
 		final ThreadGroup threads = new ThreadGroup();
