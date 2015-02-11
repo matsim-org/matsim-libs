@@ -189,7 +189,7 @@ public class ModelIterator {
 		private Thresholds moveByStep(
 				final ThresholdsReference best,
 				final int iteration ) {
-			final double step = iteration * SEARCH_STEP;
+			final double step = Math.pow( 2 , iteration ) * SEARCH_STEP;
 			final double primarySign =
 				best.thresholds.getResultingAverageDegree() < targetDegree ?
 				-1 : 1; // if degree lower, need to decrease threshold
