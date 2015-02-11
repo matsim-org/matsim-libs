@@ -158,13 +158,11 @@ public class RunArentzeModel {
 			final double targetDegree ) {
 		log.info( "generating heuristic initial points" );
 
-		final double thresholdOne = distr.findLowerBound( populationSize );
-		final double targetMore = 1.1 * targetDegree;
-		final double thresholdMore = distr.findLowerBound( (long) (populationSize * targetMore) );
+		final double target = 0.5 * targetDegree;
+		final double threshold = distr.findLowerBound( (long) (populationSize * target) );
 
 		final Collection<Thresholds> thresholds = new ArrayList<Thresholds>( 4 );
-		thresholds.add( new Thresholds( thresholdOne , 0 ) );
-		thresholds.add( new Thresholds( thresholdMore , 0 ) );
+		thresholds.add( new Thresholds( threshold , 0 ) );
 		log.info( "generated thresholds: "+thresholds );
 		return thresholds;
 	}
