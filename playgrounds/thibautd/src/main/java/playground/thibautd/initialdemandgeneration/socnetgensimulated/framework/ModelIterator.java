@@ -48,6 +48,8 @@ public class ModelIterator {
 
 	private static final double SEARCH_STEP = 10;
 
+	// TODO: make adaptive (the closer to the target value,
+	// the more precise is should get)
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
