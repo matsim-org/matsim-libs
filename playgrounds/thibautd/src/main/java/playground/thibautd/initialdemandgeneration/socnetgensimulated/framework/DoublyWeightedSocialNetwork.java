@@ -116,7 +116,7 @@ public class DoublyWeightedSocialNetwork {
 
 	// for tests
 	/*package*/ int getSize( final int ego ) {
-		return alters[ ego ].size;
+		return alters[ ego ].shiftedSize;
 	}
 
 	// point quad-tree
