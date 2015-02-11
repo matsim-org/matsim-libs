@@ -369,21 +369,17 @@ public class DoublyWeightedSocialNetwork {
 				final int head,
 				final float firstWeight,
 				final float secondWeight ) {
-			final TIntStack stack = new TIntArrayStack();
-			stack.push( head );
-
+			int currentHead = head;
 			int nSeen = 0;
-			while ( stack.size() > 0 ) {
-				if ( nSeen++ > size ) throw new RuntimeException( "seems to be a loop in the tree!!!" );
-				final int currentHead = stack.pop();
+			while ( true ) {
+				if ( nSeen++ > size ) throw new RuntimeException( "seems to be a cycle in the tree!!!" );
+
 				short[] quadrant = getQuadrant( currentHead , firstWeight, secondWeight );
 
 				final int child = quadrant[ currentHead ];
 				if ( child == -1 ) return currentHead;
-				stack.push( child );
+				currentHead = child;
 			}
-
-			throw new RuntimeException( "Loop should never complete!?" );
 		}
 
 		private short[] getQuadrant(
