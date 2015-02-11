@@ -54,19 +54,13 @@ public class WeightedSocialNetwork {
 		this.maximalSize = maximalSize;
 
 		for ( int i=0; i < this.alters.length; i++ ) {
-			this.alters[ i ] = new WeightedFriends( maximalSize );
+			this.alters[ i ] = new WeightedFriends( 10 , maximalSize );
 		}
-	}
-
-	public WeightedSocialNetwork(
-			final double lowestWeight,
-			final int populationSize ) {
-		this( 20 , lowestWeight , populationSize );
 	}
 
 	public void clear() {
 		for ( int i=0; i < this.alters.length; i++ ) {
-			this.alters[ i ] = new WeightedFriends( maximalSize );
+			this.alters[ i ] = new WeightedFriends( 10 , maximalSize );
 		}
 	}
 
@@ -84,14 +78,13 @@ public class WeightedSocialNetwork {
 	 * unused slots.
 	 */
 	public void trim( final int ego ) {
-		if ( ego == ego ) {} // avoid compilation error
-		//this.alters[ ego ].trim();
+		this.alters[ ego ].trim();
 	}
 
 	public void trimAll() {
-		//for ( int i = 0; i < alters.length; i++ ) {
-		//	trim( i );
-		//}
+		for ( int i = 0; i < alters.length; i++ ) {
+			trim( i );
+		}
 	}
 
 	public Set<Id<Person>> getAltersOverWeight(
@@ -134,17 +127,18 @@ public class WeightedSocialNetwork {
 	}
 
 	private static final class WeightedFriends {
-		private final int[] friends;
+		private int[] friends;
 		// use float instead of double for saving memory.
 		// TODO: check robustness of the results facing this...
-		private final float weights[];
-		// as such, using short here might look as overdoing...
-		// but we have one such structure per agent: this might make sense.
-		private short size = 0;
+		private float[] weights;
 
-		public WeightedFriends( final int maximalSize ) {
-			this.friends = new int[ maximalSize ];
-			this.weights = new float[ maximalSize ];
+		private final int maximalSize;
+		private int size = 0;
+
+		public WeightedFriends( final int initialSize , final int maximalSize ) {
+			this.maximalSize = maximalSize;
+			this.friends = new int[ initialSize ];
+			this.weights = new float[ initialSize ];
 			Arrays.fill( weights , Float.POSITIVE_INFINITY  );
 		}
 
@@ -204,14 +198,12 @@ public class WeightedSocialNetwork {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
 			}
 
-			if ( size == friends.length && insertionPoint == 0 ) {
+			if ( size == maximalSize && insertionPoint == 0 ) {
 				// full: do not add a low utility friend
 				return;
 			}
 
-			if ( size == friends.length ) {
-				// friends = Arrays.copyOf( friends , size * 2 );
-				// weights = Arrays.copyOf( weights , size * 2 );
+			if ( size == maximalSize ) {
 				// delete lowest entry
 				for ( int i=0; i < size - 1; i++ ) {
 					friends[ i ] = friends[ i + 1 ];
@@ -222,6 +214,11 @@ public class WeightedSocialNetwork {
 				insertionPoint--;
 			}
 			else {
+				if ( size == friends.length ) {
+					final int newSize = Math.min( maximalSize , size * 2 );
+					friends = Arrays.copyOf( friends , newSize );
+					weights = Arrays.copyOf( weights , newSize );
+				}
 				size++;
 			}
 
@@ -234,11 +231,11 @@ public class WeightedSocialNetwork {
 			weights[ insertionPoint ] = weight;
 		}
 
-		//public synchronized void trim() {
-		//	final int newSize = Math.max( 1 , size );
-		//	friends = Arrays.copyOf( friends , newSize );
-		//	weights = Arrays.copyOf( weights , newSize );
-		//}
+		public synchronized void trim() {
+			final int newSize = Math.max( 1 , size );
+			friends = Arrays.copyOf( friends , newSize );
+			weights = Arrays.copyOf( weights , newSize );
+		}
 	}
 }
 
