@@ -142,10 +142,11 @@ public class DoublyWeightedSocialNetwork {
 	private static final class DoublyWeightedFriends {
 		private int[] friends;
 
-		// use float and short for memory saving
-		private float[] weights1;
-		private float[] weights2;
+		private double[] weights1;
+		private double[] weights2;
 
+		// use short for memory saving
+		// storing 32 000 potential friends is useless...
 		private short[] childSE;
 		private short[] childSW;
 		private short[] childNE;
@@ -164,11 +165,11 @@ public class DoublyWeightedSocialNetwork {
 			this.maxSize = maxSize;
 			this.friends = new int[ initialSize ];
 
-			this.weights1 = new float[ initialSize ];
-			this.weights2 = new float[ initialSize ];
+			this.weights1 = new double[ initialSize ];
+			this.weights2 = new double[ initialSize ];
 
-			Arrays.fill( weights1 , Float.POSITIVE_INFINITY );
-			Arrays.fill( weights2 , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights1 , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , Double.POSITIVE_INFINITY );
 
 			this.childSE = new short[ initialSize ];
 			this.childSW = new short[ initialSize ];
@@ -185,13 +186,6 @@ public class DoublyWeightedSocialNetwork {
 				final int friend,
 				final double firstWeight,
 				final double secondWeight ) {
-			add( friend , (float) firstWeight , (float) secondWeight );
-		}
-
-		public synchronized void add(
-				final int friend,
-				final float firstWeight,
-				final float secondWeight ) {
 			if ( size == 0 ) {
 				// first element is the head: special case...
 				friends[ 0 ] = friend;
@@ -325,7 +319,7 @@ public class DoublyWeightedSocialNetwork {
 		}
 
 		private short[] searchSmallestSecondaryIndex() {
-			float currentMin = Float.POSITIVE_INFINITY;
+			double currentMin = Double.POSITIVE_INFINITY;
 			short currentMinIndex = -1;
 			short currentMinParent = -1;
 
@@ -366,8 +360,8 @@ public class DoublyWeightedSocialNetwork {
 			weights1 = Arrays.copyOf( weights1 , newLength );
 			weights2 = Arrays.copyOf( weights2 , newLength );
 
-			Arrays.fill( weights1 , size , newLength , Float.POSITIVE_INFINITY );
-			Arrays.fill( weights2 , size , newLength , Float.POSITIVE_INFINITY );
+			Arrays.fill( weights1 , size , newLength , Double.POSITIVE_INFINITY );
+			Arrays.fill( weights2 , size , newLength , Double.POSITIVE_INFINITY );
 
 			childSE = Arrays.copyOf( childSE , newLength );
 			childSW = Arrays.copyOf( childSW , newLength );
@@ -382,8 +376,8 @@ public class DoublyWeightedSocialNetwork {
 
 		private int searchParentLeaf(
 				final int head,
-				final float firstWeight,
-				final float secondWeight ) {
+				final double firstWeight,
+				final double secondWeight ) {
 			int currentHead = head;
 			int nSeen = 0;
 			while ( true ) {
@@ -445,8 +439,8 @@ public class DoublyWeightedSocialNetwork {
 
 		private short[] getQuadrant(
 				final int head,
-				final float firstWeight,
-				final float secondWeight ) {
+				final double firstWeight,
+				final double secondWeight ) {
 			if ( firstWeight > weights1[ head ] ) {
 				return secondWeight > weights2[ head ] ? childNE : childSE;
 			}
