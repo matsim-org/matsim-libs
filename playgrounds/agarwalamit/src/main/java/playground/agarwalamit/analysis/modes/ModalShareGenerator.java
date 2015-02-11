@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis;
+package playground.agarwalamit.analysis.modes;
 
 import java.util.List;
 import java.util.Map;

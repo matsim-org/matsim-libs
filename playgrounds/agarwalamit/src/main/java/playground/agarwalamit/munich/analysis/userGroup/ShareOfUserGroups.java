@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.userGroup;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 /**
  * @author amit
  */
-public class ShareOfSubPopulation {
+public class ShareOfUserGroups {
 
 	private static String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9//";/*"./output/run2/";*/
 //	private static String populationFile =outputDir+ "/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";//"/network.xml";

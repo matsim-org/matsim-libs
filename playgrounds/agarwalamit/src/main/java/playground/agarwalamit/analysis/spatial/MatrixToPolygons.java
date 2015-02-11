@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.analysis.spatial;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -41,7 +39,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author amit
  */
 
-public class Array2Grids {
+public class MatrixToPolygons {
 	
 	private int xBins = 160;
 	private int yBins = 120;
@@ -53,7 +51,7 @@ public class Array2Grids {
 	private String inputFile_weight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
 
 	public static void main(String[] args) {
-		new Array2Grids().writeRData();
+		new MatrixToPolygons().writeRData();
 	}
 	
 	private void writeRData(){
