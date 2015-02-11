@@ -82,9 +82,10 @@ public class ModelIterator {
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
 			thresholds.setResultingClustering( SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn ) );
 
-			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds );
+			final boolean added = memory.add( thresholds );
 
-			memory.add( thresholds );
+			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds , added );
+
 
 			if ( isAcceptable( thresholds ) ) {
 				log.info( thresholds+" fulfills the precision criteria!" );
@@ -135,12 +136,14 @@ public class ModelIterator {
 			this.queue.addAll( initial );
 		}
 
-		public void add( final Thresholds t ) {
+		public boolean add( final Thresholds t ) {
+			boolean added = false;
 			if ( bestNetSize == null || distDegree( t ) < distDegree( bestNetSize ) ) {
 				log.info( t+" better than best value for net size "+bestNetSize );
 				log.info( "replacing value" );
 				bestNetSize = t;
 				hadDegreeImprovement = true;
+				added = true;
 			}
 			else {
 				log.info( t+" not better than best value for net size "+bestNetSize+" => NOT KEPT" );
@@ -151,10 +154,13 @@ public class ModelIterator {
 				log.info( "replacing value" );
 				bestClustering = t;
 				hadClusteringImprovement = true;
+				added = true;
 			}
 			else {
 				log.info( t+" not better than best value for clustering "+bestClustering+" => NOT KEPT" );
 			}
+
+			return added;
 		}
 
 		public Thresholds createNewThresholds() {
@@ -201,8 +207,8 @@ public class ModelIterator {
 		private void fillQueueWithCombinations() {
 			// risk of re-exploring...
 			// And when adding, cannot simple modify step size
-			//queue.add( new Thresholds( bestNetSize.getPrimaryThreshold() , bestClustering.getSecondaryReduction() ) );
-			//queue.add( new Thresholds( bestClustering.getPrimaryThreshold() , bestNetSize.getSecondaryReduction() ) );
+			queue.add( new Thresholds( bestNetSize.getPrimaryThreshold() , bestClustering.getSecondaryReduction() ) );
+			queue.add( new Thresholds( bestClustering.getPrimaryThreshold() , bestNetSize.getSecondaryReduction() ) );
 
 			queue.add(
 					new Thresholds(
@@ -227,12 +233,12 @@ public class ModelIterator {
 	}
 
 	public static interface EvolutionListener {
-		public void handleNewResult( Thresholds t );
+		public void handleNewResult( Thresholds t , boolean keptInMemory );
 	}
 
 	private static class EvolutionLogger implements EvolutionListener {
 		@Override
-		public void handleNewResult( final Thresholds t ) {
+		public void handleNewResult( final Thresholds t , final boolean keptInMemory ) {
 			log.info( "generated network for "+t );
 		}
 	}
