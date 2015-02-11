@@ -98,7 +98,7 @@ public class ConsecutiveActivityFacilityReporter {
 		List<File> tmpOutputs = FileUtils.sampleFiles(new File("tmp/"), Integer.MAX_VALUE, FileUtils.getFileFilter(".csv.gz"));
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputfile);
 		try{
-			bw.write("vehId,facilityId,position,chainDay,x,y,lon,lat,activityDay,dateTime,waitMinutes,isDuplicate");
+			bw.write("vehId,facilityId,chainLength,position,chainDay,x,y,lon,lat,activityDay,dateTime,waitMinutes,isDuplicate");
 			bw.newLine();
 			
 			for(File file : tmpOutputs){
