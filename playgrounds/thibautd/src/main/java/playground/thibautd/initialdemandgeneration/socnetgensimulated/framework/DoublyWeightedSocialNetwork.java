@@ -204,6 +204,7 @@ public class DoublyWeightedSocialNetwork {
 
 				quadrant[ parent ] = shiftedSize;
 			}
+			if ( shiftedSize == Short.MAX_VALUE ) throw new IllegalStateException( "maximum capacity exceeded" );
 			shiftedSize++;
 		}
 
