@@ -86,7 +86,6 @@ public class ModelIterator {
 
 			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds , added );
 
-
 			if ( isAcceptable( thresholds ) ) {
 				log.info( thresholds+" fulfills the precision criteria!" );
 				return sn;
@@ -120,14 +119,13 @@ public class ModelIterator {
 	private class ThresholdMemory {
 		private final Queue<Thresholds> queue = new ArrayDeque< >();
 
-		private Thresholds bestNetSize = null;
-		private Thresholds bestClustering = null;
+		// we want an improvement of one precision unit to result in the same effect
+		// on mono-objective version.
+		private final double factorClustering = precisionDegree / precisionClustering;
+		private Thresholds best = null;
 
-		private double primaryStepSizeDegree = initialPrimaryStep;
-		private double secondaryStepSizeDegree = initialSecondaryStep;
-
-		private double primaryStepSizeClustering = initialPrimaryStep;
-		private double secondaryStepSizeClustering = initialSecondaryStep;
+		private double primaryStepSize = initialPrimaryStep;
+		private double secondaryStepSize = initialSecondaryStep;
 
 		boolean hadDegreeImprovement = false;
 		boolean hadClusteringImprovement = false;
@@ -137,30 +135,27 @@ public class ModelIterator {
 		}
 
 		public boolean add( final Thresholds t ) {
-			boolean added = false;
-			if ( bestNetSize == null || distDegree( t ) < distDegree( bestNetSize ) ) {
-				log.info( t+" better than best value for net size "+bestNetSize );
+
+			if ( best == null || function( t ) < function( best ) ) {
+				hadDegreeImprovement = best != null && distDegree( t ) < distDegree( best );
+				hadClusteringImprovement = best != null && distClustering( t ) < distClustering( best );
+
+				log.info( t+" better than best value "+best );
 				log.info( "replacing value" );
-				bestNetSize = t;
-				hadDegreeImprovement = true;
-				added = true;
-			}
-			else {
-				log.info( t+" not better than best value for net size "+bestNetSize+" => NOT KEPT" );
-			}
-			
-			if (  bestClustering == null || distClustering( t ) < distClustering( bestClustering ) ) {
-				log.info( t+" better than best value for clustering "+bestClustering );
-				log.info( "replacing value" );
-				bestClustering = t;
-				hadClusteringImprovement = true;
-				added = true;
-			}
-			else {
-				log.info( t+" not better than best value for clustering "+bestClustering+" => NOT KEPT" );
+				best = t;
+
+				queue.clear();
+				fillQueue();
+
+				return true;
 			}
 
-			return added;
+			log.info( t+" not better than best value "+best+" => NOT KEPT" );
+			return false;
+		}
+
+		private double function( final Thresholds t ) {
+			return Math.pow( distDegree( t ) , 2 ) + Math.pow( factorClustering * distClustering( t ) , 2 );
 		}
 
 		public Thresholds createNewThresholds() {
@@ -171,49 +166,27 @@ public class ModelIterator {
 		private void fillQueue() {
 			// no improvement means "overshooting": decrease step sizes
 			if ( !hadDegreeImprovement ) {
-				primaryStepSizeDegree /= 2;
-				secondaryStepSizeDegree /= 2;
+				primaryStepSize /= 2;
 			}
+			else primaryStepSize *= 1.5;
 
 			if ( !hadClusteringImprovement ) {
-				primaryStepSizeClustering /= 2;
-				secondaryStepSizeClustering /= 2;
+				secondaryStepSize /= 2;
 			}
+			else secondaryStepSize *= 1.5;
 
-			hadDegreeImprovement = false;
 			hadClusteringImprovement = false;
+			hadDegreeImprovement = false;
 
 			log.info( "New step Sizes:" );
-			log.info( "primary - degree: "+primaryStepSizeDegree );
-			log.info( "secondary - degree: "+secondaryStepSizeDegree );
-			log.info( "primary - Clustering: "+primaryStepSizeClustering );
-			log.info( "secondary - Clustering: "+secondaryStepSizeClustering );
+			log.info( "primary : "+primaryStepSize );
+			log.info( "secondary : "+secondaryStepSize );
 
 
 			fillQueueWithChildren(
-					bestNetSize,
-					bestNetSize.getResultingAverageDegree() > targetDegree ? primaryStepSizeDegree : -primaryStepSizeDegree,
-					bestNetSize.getResultingClustering() > targetClustering ? -secondaryStepSizeDegree : secondaryStepSizeDegree );
-
-			if ( bestNetSize != bestClustering ) {
-				fillQueueWithChildren(
-						bestClustering,
-						bestClustering.getResultingAverageDegree() > targetDegree ? primaryStepSizeClustering : -primaryStepSizeClustering,
-						bestClustering.getResultingClustering() > targetClustering ? -secondaryStepSizeClustering : secondaryStepSizeClustering );
-				fillQueueWithCombinations();
-			}
-		}
-
-		private void fillQueueWithCombinations() {
-			// risk of re-exploring...
-			// And when adding, cannot simple modify step size
-			queue.add( new Thresholds( bestNetSize.getPrimaryThreshold() , bestClustering.getSecondaryReduction() ) );
-			queue.add( new Thresholds( bestClustering.getPrimaryThreshold() , bestNetSize.getSecondaryReduction() ) );
-
-			queue.add(
-					new Thresholds(
-						( bestNetSize.getPrimaryThreshold() + bestClustering.getPrimaryThreshold() ) / 2d ,
-						( bestNetSize.getSecondaryReduction() + bestClustering.getSecondaryReduction() ) / 2d ) );
+					best,
+					best.getResultingAverageDegree() > targetDegree ? primaryStepSize : -primaryStepSize,
+					best.getResultingClustering() > targetClustering ? -secondaryStepSize : secondaryStepSize );
 		}
 
 		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
