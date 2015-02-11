@@ -66,7 +66,7 @@ public class JointPseudoSimTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore( "fails since refactoring in DriverAgent. to fix!!!" )
+	//@Ignore( "fails since refactoring in DriverAgent. to fix!!!" )
 	public void testPSimEventsSimilarToQsim() {
 		if (TRACE) Logger.getLogger( "playground.thibautd" ).setLevel( Level.TRACE );
 		utils.getOutputDirectory(); // intended side effect: delete content

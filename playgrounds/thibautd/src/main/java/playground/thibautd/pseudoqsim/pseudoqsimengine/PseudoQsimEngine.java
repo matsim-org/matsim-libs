@@ -422,7 +422,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 
 			final Id nextLinkId = agent.chooseNextLinkId();
 
-			if ( nextLinkId != null ) {
+			if ( !agent.isWantingToArriveOnCurrentLink() ) {
 				eventsManager.processEvent(
 					new LinkLeaveEvent(
 						time,
