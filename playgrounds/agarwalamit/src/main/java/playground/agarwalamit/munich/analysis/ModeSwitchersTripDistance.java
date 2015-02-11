@@ -46,9 +46,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class ModeSwitchersTravelDistance {
+public class ModeSwitchersTripDistance {
 
-	private Logger log = Logger.getLogger(ModeSwitchersTravelDistance.class);
+	private Logger log = Logger.getLogger(ModeSwitchersTripDistance.class);
 
 	private final String [] modeSwitchTypes = {"car2car","car2nonCar","nonCar2car","nonCar2nonCar"};
 	private ModeSwitcherInfoCollector modeSwitchInfo;
@@ -59,13 +59,13 @@ public class ModeSwitchersTravelDistance {
 		String runCases[] ={"baseCaseCtd","ei","ci","eci","ei_10"};
 
 		for(String runCase : runCases){
-			ModeSwitchersTravelDistance mstd = new ModeSwitchersTravelDistance();
+			ModeSwitchersTripDistance mstd = new ModeSwitchersTripDistance();
 			mstd.run(dir+runCase);
 			mstd.modeSwitchInfo.writeModeSwitcherTripDistances(dir+runCase);
 		}
 	}
 
-	public ModeSwitchersTravelDistance (){
+	public ModeSwitchersTripDistance (){
 		modeSwitchInfo = new ModeSwitcherInfoCollector(modeSwitchTypes);
 	}
 
