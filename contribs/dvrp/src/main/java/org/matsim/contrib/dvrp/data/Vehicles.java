@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.supply;
+package org.matsim.contrib.dvrp.data;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.util.Comparator;
 
 
-public interface VehicleCreator
+public class Vehicles
 {
-    Vehicle createVehicle(double t0, double t1);
+    public static final Comparator<Vehicle> T0_COMPARATOR = new Comparator<Vehicle>() {
+        public int compare(Vehicle v1, Vehicle v2)
+        {
+            return Double.compare(v1.getT0(), v2.getT0());
+        }
+    };
+
+    public static final Comparator<Vehicle> T1_COMPARATOR = new Comparator<Vehicle>() {
+        public int compare(Vehicle v1, Vehicle v2)
+        {
+            return Double.compare(v1.getT1(), v2.getT1());
+        }
+    };
 }

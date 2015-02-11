@@ -17,14 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.supply;
+package org.matsim.contrib.dvrp.data;
 
 import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import pl.poznan.put.util.random.*;
+import org.matsim.contrib.util.random.*;
 
 
 public class VehicleGenerator
@@ -37,8 +35,8 @@ public class VehicleGenerator
     private final VehicleCreator vehicleCreator;
 
     private Queue<Vehicle> activeVehicles;
-    private double periodDuration;
-    private double currentTimePeriod;
+    private double previousTime;
+    private double currentTime;
 
 
     public VehicleGenerator(double minWorkTime, double maxWorkTime, VehicleCreator vehicleCreator)
@@ -51,58 +49,53 @@ public class VehicleGenerator
 
     public void generateVehicles(double[] vehicleCounts, double startTime, double periodDuration)
     {
-        initPeriodDuration(periodDuration);
-        initQueue(vehicleCounts);
-
-        currentTimePeriod = startTime;
-        for (int i = 0; i < vehicleCounts.length; i++) {
-            removeVehiclesOnT1();
-
-            int vehsToAdd = calculateNumberOfVehiclesToAdd(vehicleCounts[i]);
-
-            if (vehsToAdd > 0) {
-                addVehicles(vehsToAdd);
-            }
-            else {
-                removeVehiclesBeforeT1(-vehsToAdd);
-            }
-
-            currentTimePeriod += periodDuration;
-        }
-
-        removeVehiclesOnT1();
-        removeVehiclesBeforeT1(-calculateNumberOfVehiclesToAdd(0));
-    }
-
-
-    private void initPeriodDuration(double periodDuration)
-    {
         if (periodDuration > minWorkTime) {
             throw new IllegalArgumentException();
         }
 
-        this.periodDuration = periodDuration;
+        initQueue(vehicleCounts);
+
+        //only iteration 0; in order to have zero vehicles before startTime
+        previousTime = startTime;
+        currentTime = startTime;
+
+        for (int i = 0; i < vehicleCounts.length; i++) {
+            removeVehiclesOnT1();
+            reachExpectedVehicleCount(vehicleCounts[i]);
+            previousTime = currentTime;
+            currentTime += periodDuration;
+        }
+
+        //get down to 0 after the last vehicle count
+        currentTime = previousTime;
+        reachExpectedVehicleCount(0);
+    }
+
+
+    //reach the expected vehicle count at currentTime
+    private void reachExpectedVehicleCount(double expectedVehicleCount)
+    {
+        int vehsToAdd = calculateNumberOfVehiclesToAdd(expectedVehicleCount);
+        if (vehsToAdd > 0) {
+            addVehicles(vehsToAdd);
+        }
+        else {
+            removeVehiclesBeforeT1(-vehsToAdd);
+        }
     }
 
 
     private void initQueue(double[] vehicleCounts)
     {
         int queueCapacity = (int)new Max().evaluate(vehicleCounts) + 1;
-        activeVehicles = new PriorityQueue<>(queueCapacity, new Comparator<Vehicle>() {
-            public int compare(Vehicle v1, Vehicle v2)
-            {
-                int diff = Double.compare(v1.getT1(), v2.getT1());
-                return diff != 0 ? diff : Double.compare(v1.getT0(), v2.getT0());
-            }
-        });
+        activeVehicles = new PriorityQueue<>(queueCapacity, Vehicles.T1_COMPARATOR);
     }
 
 
     private void removeVehiclesOnT1()
     {
-        double maxT1 = currentTimePeriod + periodDuration;
         while (!activeVehicles.isEmpty()) {
-            if (activeVehicles.peek().getT1() > maxT1) {
+            if (activeVehicles.peek().getT1() >= currentTime) {
                 return;
             }
 
@@ -111,24 +104,22 @@ public class VehicleGenerator
     }
 
 
-    private int calculateNumberOfVehiclesToAdd(double vehicleCount)
+    private int calculateNumberOfVehiclesToAdd(double expectedVehicleCount)
     {
-        if (vehicleCount < 0) {
+        if (expectedVehicleCount < 0) {
             throw new IllegalArgumentException();
         }
 
-        return (int)uniform.floorOrCeil(vehicleCount) - activeVehicles.size();
+        return (int)uniform.floorOrCeil(expectedVehicleCount) - activeVehicles.size();
     }
 
 
     private void addVehicles(int count)
     {
-        double maxT0 = currentTimePeriod + periodDuration;
         for (int i = 0; i < count; i++) {
-            double t0 = uniform.nextDouble(currentTimePeriod, maxT0);
-            double workTime = uniform.nextDouble(minWorkTime, maxWorkTime);
+            double t0 = Math.floor(uniform.nextDouble(previousTime, currentTime));
+            double workTime = Math.round(uniform.nextDouble(minWorkTime, maxWorkTime));
             Vehicle veh = vehicleCreator.createVehicle(t0, t0 + workTime);
-
             activeVehicles.add(veh);
             vehicles.add(veh);
         }
@@ -137,10 +128,10 @@ public class VehicleGenerator
 
     private void removeVehiclesBeforeT1(int count)
     {
-        double maxT1 = currentTimePeriod + periodDuration;
         for (int i = 0; i < count; i++) {
             Vehicle veh = activeVehicles.poll();
-            veh.setT1(uniform.nextDouble(currentTimePeriod, maxT1));
+            double t1 = Math.floor(uniform.nextDouble(previousTime, currentTime));
+            veh.setT1(t1);
         }
     }
 

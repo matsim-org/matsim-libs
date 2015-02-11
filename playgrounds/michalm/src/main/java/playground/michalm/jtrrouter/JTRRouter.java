@@ -22,8 +22,7 @@ package playground.michalm.jtrrouter;
 import java.util.*;
 
 import org.apache.commons.configuration.*;
-
-import pl.poznan.put.util.random.*;
+import org.matsim.contrib.util.random.*;
 
 
 /**

@@ -27,16 +27,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import pl.poznan.put.util.random.WeightedRandomSelection;
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
-import playground.michalm.supply.VehicleCreator;
 import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.Point;

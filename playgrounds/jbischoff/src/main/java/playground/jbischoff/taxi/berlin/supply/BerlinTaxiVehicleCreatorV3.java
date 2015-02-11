@@ -22,7 +22,6 @@ package playground.jbischoff.taxi.berlin.supply;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,9 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,8 +42,6 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
-import pl.poznan.put.util.random.WeightedRandomSelection;
-import playground.michalm.supply.VehicleGenerator;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
 import playground.michalm.zone.Zones;
@@ -71,7 +69,7 @@ public class BerlinTaxiVehicleCreatorV3
         throws ParseException
     {
         String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/";
-        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/taxisweekly.txt";
+        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt";
         String networkFile = dir + "scenarios/2014_10_basic_scenario_v4/berlin_brb.xml";
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
@@ -84,7 +82,7 @@ public class BerlinTaxiVehicleCreatorV3
         btv.minTime = 14.0 * 3600;
         btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
-        btv.createAverages(SDF.parse("2014-10-15 04:00:00"), 1);
+        btv.createAverages(SDF.parse("2014-10-15 03:30:00"), 1);
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
         btv.prepareMatrices(statusMatrixFile);
         btv.createVehicles();
@@ -128,8 +126,10 @@ public class BerlinTaxiVehicleCreatorV3
     @SuppressWarnings("deprecation")
     private void createAverages(Date start, int days)
     {
-        if (start.getMinutes() != 0 || start.getSeconds() != 0) {
-            throw new RuntimeException("Must start with hh:00:00");
+        if (start.getMinutes() != 30 || start.getSeconds() != 0) {
+            //we want to obtain estimates for full hours, i.e. 4:00 or 5:00
+            //by calculating averages for 3:30-4:29:59 and 4:30-5:29:59  
+            throw new RuntimeException("Must start with hh:30:00");
         }
 
         long startTime = start.getTime() / 1000;//in seconds
@@ -145,7 +145,7 @@ public class BerlinTaxiVehicleCreatorV3
                 sum += this.taxisOverTime.get(new Date(t * 1000));//seconds -> milliseconds
                 n++;
             }
-            if ( (t + 1) % 3600 == 0) {
+            if ( (t + 1801) % 3600 == 0) {
                 taxisOverTimeHourlyAverage[hour % 24] += (double)sum / n / days;
                 sum = 0;
                 hour++;
@@ -155,7 +155,6 @@ public class BerlinTaxiVehicleCreatorV3
 
         for (int i = 0; i<24;i++){
             System.out.println(i+ " : "+ taxisOverTimeHourlyAverage[i]);
-            
         }
     }
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ttcalc_error;
+package org.matsim.contrib.util.random;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelTime;
+import org.apache.commons.math3.random.*;
 
 
-public class SimLauncher
+/**
+ * Based on org.matsim.core.gbl.MatsimRandom
+ */
+public class RandomUtils
 {
-    @SuppressWarnings("deprecation")
-    public static void main(String[] args)
+    public static final int DEFAULT_SEED = 4357;
+
+    private static final RandomGenerator rg = new MersenneTwister(DEFAULT_SEED);
+
+    private static final UniformRandom uniform = new UniformRandom(rg);
+
+
+    public static void reset()
     {
-        String cfg = "src/test/java/playground/michalm/ttcalc_error/error_1/config.xml";
-        // cfg = "src/test/java/playground/michalm/ttcalc_error/error_2/config.xml";
+        reset(DEFAULT_SEED);
+    }
 
-        Controler controler = new Controler(new String[] { cfg });
-        controler.setOverwriteFiles(true);
-        controler.run();
 
-        TravelTime travelTime = controler.getLinkTravelTimes();
+    public static void reset(final int seed)
+    {
+        rg.setSeed(seed);
+    }
 
-        Map<Id<Link>, ? extends Link> links = controler.getScenario().getNetwork().getLinks();
-        Id<Link> idB = Id.create("B", Link.class);
-        Link linkB = links.get(idB);
 
-        System.out.println("\ndeparture time [min] : travel time [s]\n");
+    public static RandomGenerator getGlobalGenerator()
+    {
+        return rg;
+    }
 
-        for (int i = 0; i < 2 * 60 * 60; i += 5 * 60) {// each 5 minutes during the first 2 hours
-            int m = i / 60;
-            System.out.println(m + " : " + travelTime.getLinkTravelTime(linkB, i, null, null));
-        }
+
+    public static UniformRandom getGlobalUniform()
+    {
+        return uniform;
+    }
+
+
+    /**
+     * Returns an instance of a random number generator, which can be used locally, e.g. in threads.
+     */
+    public static RandomGenerator getLocalGenerator()
+    {
+        return new MersenneTwister(rg.nextInt());
     }
 }

@@ -27,12 +27,12 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.util.random.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 
-import pl.poznan.put.util.random.*;
 import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;

@@ -22,11 +22,11 @@ package playground.michalm.demand;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.util.random.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import pl.poznan.put.util.random.*;
 import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.*;

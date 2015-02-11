@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ttcalc_error;
+package org.matsim.contrib.util.random;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelTime;
+import org.apache.commons.math3.random.RandomGenerator;
 
 
-public class SimLauncher
+public class UniformRandom
 {
-    @SuppressWarnings("deprecation")
-    public static void main(String[] args)
+    private final RandomGenerator rg;
+
+
+    public UniformRandom(RandomGenerator rg)
     {
-        String cfg = "src/test/java/playground/michalm/ttcalc_error/error_1/config.xml";
-        // cfg = "src/test/java/playground/michalm/ttcalc_error/error_2/config.xml";
+        this.rg = rg;
+    }
 
-        Controler controler = new Controler(new String[] { cfg });
-        controler.setOverwriteFiles(true);
-        controler.run();
 
-        TravelTime travelTime = controler.getLinkTravelTimes();
+    public double nextDouble(double from, double to)
+    {
+        return from == to ? from : from + (to - from) * rg.nextDouble();
+    }
 
-        Map<Id<Link>, ? extends Link> links = controler.getScenario().getNetwork().getLinks();
-        Id<Link> idB = Id.create("B", Link.class);
-        Link linkB = links.get(idB);
 
-        System.out.println("\ndeparture time [min] : travel time [s]\n");
-
-        for (int i = 0; i < 2 * 60 * 60; i += 5 * 60) {// each 5 minutes during the first 2 hours
-            int m = i / 60;
-            System.out.println(m + " : " + travelTime.getLinkTravelTime(linkB, i, null, null));
+    public int nextInt(int from, int to)
+    {
+        if (from == to) {
+            return from;
         }
+
+        long delta = (long) ( (1L + (long)to - (long)from) * rg.nextDouble());
+        return (int) (from + delta);
+    }
+
+
+    public double floorOrCeil(double value)
+    {
+        double floor = Math.floor(value);
+        boolean selectCeil = trueOrFalse(value - floor);
+        return selectCeil ? floor + 1 : floor;
+    }
+
+
+    public boolean trueOrFalse(double trueProbability)
+    {
+        return rg.nextDouble() < trueProbability;
     }
 }

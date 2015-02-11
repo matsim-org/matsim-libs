@@ -23,10 +23,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.util.random.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.matrices.*;
 
-import pl.poznan.put.util.random.*;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
 
