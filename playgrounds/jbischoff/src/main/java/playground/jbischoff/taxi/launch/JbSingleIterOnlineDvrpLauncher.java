@@ -26,6 +26,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
@@ -230,7 +231,7 @@ import playground.michalm.util.MovingAgentsRegister;
         olutils.initVrpSimEngine(qSim, context, optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
+                TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
                 passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, pickupDuration));

@@ -31,9 +31,6 @@ import playground.michalm.taxi.data.TaxiRequest;
 public class TaxiRequestCreator
     implements PassengerRequestCreator
 {
-    public static final String MODE = "taxi";
-
-
     @Override
     public TaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
             Link toLink, double t0, double t1, double now)

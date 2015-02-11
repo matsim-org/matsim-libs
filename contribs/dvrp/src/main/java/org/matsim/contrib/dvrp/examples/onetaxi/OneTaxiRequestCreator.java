@@ -29,9 +29,6 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 public class OneTaxiRequestCreator
     implements PassengerRequestCreator
 {
-    public static final String MODE = "taxi";
-
-
     @Override
     public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger,
             Link fromLink, Link toLink, double t0, double t1, double now)

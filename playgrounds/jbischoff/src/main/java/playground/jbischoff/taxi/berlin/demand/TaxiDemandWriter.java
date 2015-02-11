@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -368,7 +369,7 @@ public class TaxiDemandWriter
         double activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 3600.);
         //		if (hr == 27 )  activityStart = Math.round(hr * 3600. + rnd.nextDouble() * 1200.);
         plan.addActivity(this.addActivity("home", 0.0, activityStart, fromLink));
-        plan.addLeg(this.addLeg(activityStart, "taxi", fromLink, toLink));
+        plan.addLeg(this.addLeg(activityStart, TaxiUtils.TAXI_MODE, fromLink, toLink));
         plan.addActivity(this.addActivity("work", toLink));
 
         return plan;

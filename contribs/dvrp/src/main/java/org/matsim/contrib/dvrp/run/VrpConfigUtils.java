@@ -19,9 +19,11 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dynagent.run.DynConfigUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 
 public class VrpConfigUtils
@@ -29,6 +31,7 @@ public class VrpConfigUtils
     public static Config createConfig()
     {
         Config config = DynConfigUtils.createConfig();
+        updatePlansCalcRouteConfigGroup(config);
         updateTravelTimeCalculatorConfigGroup(config);
         return config;
     }
@@ -37,10 +40,20 @@ public class VrpConfigUtils
     public static Config loadConfig(final String filename)
     {
         Config config = DynConfigUtils.loadConfig(filename);
+        updatePlansCalcRouteConfigGroup(config);
         updateTravelTimeCalculatorConfigGroup(config);
         return config;
     }
 
+    
+    private static void updatePlansCalcRouteConfigGroup(Config config)
+    {
+        ModeRoutingParams taxiParams = new ModeRoutingParams() ;
+        taxiParams.setMode(TaxiUtils.TAXI_MODE);
+        taxiParams.setTeleportedModeFreespeedFactor(1.0);
+        config.plansCalcRoute().addModeRoutingParams(taxiParams);
+    }
+    
 
     private static void updateTravelTimeCalculatorConfigGroup(Config config)
     {

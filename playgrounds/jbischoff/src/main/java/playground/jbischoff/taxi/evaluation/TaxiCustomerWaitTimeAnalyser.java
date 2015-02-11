@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 
 import playground.michalm.taxi.TaxiRequestCreator;
 
@@ -129,7 +130,7 @@ public class TaxiCustomerWaitTimeAnalyser
     @Override
     public void handleEvent(PersonDepartureEvent event)
     {
-        if (!event.getLegMode().equals(TaxiRequestCreator.MODE))
+        if (!event.getLegMode().equals(TaxiUtils.TAXI_MODE))
             return;
         this.taxicalltime.put(event.getPersonId(), event.getTime());
         this.linkAg.put(event.getPersonId(), event.getLinkId());

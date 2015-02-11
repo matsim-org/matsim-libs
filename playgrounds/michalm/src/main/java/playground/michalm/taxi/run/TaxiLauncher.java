@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
@@ -89,7 +90,7 @@ class TaxiLauncher
         if (params.taxiCustomersFile != null) {
             List<String> passengerIds = PersonCreatorWithRandomTaxiMode
                     .readTaxiCustomerIds(params.taxiCustomersFile);
-            VrpPopulationUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
+            VrpPopulationUtils.convertLegModes(passengerIds, TaxiUtils.TAXI_MODE, scenario);
         }
 
         //TaxiDemandUtils.preprocessPlansBasedOnCoordsOnly(scenario);
@@ -152,7 +153,7 @@ class TaxiLauncher
         qSim.addQueueSimulationListeners(optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiRequestCreator.MODE, new TaxiRequestCreator(), optimizer, context, qSim);
+                TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         if (params.advanceRequestSubmission) {
             // yy to my ears, this is not completely clear.  I don't think that it enables advance request submission

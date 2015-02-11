@@ -23,10 +23,9 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.michalm.taxi.TaxiRequestCreator;
 
 
 public class ServedRequestsBasedDemandGenerator
@@ -62,7 +61,7 @@ public class ServedRequestsBasedDemandGenerator
             plan.addActivity(startAct);
 
             // leg
-            plan.addLeg(pf.createLeg(TaxiRequestCreator.MODE));
+            plan.addLeg(pf.createLeg(TaxiUtils.TAXI_MODE));
 
             // act1
             plan.addActivity(pf.createActivityFromCoord("dummy", r.to));

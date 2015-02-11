@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent.run;
+package org.matsim.contrib.dvrp.extensions.taxi;
 
-import org.matsim.core.config.*;
-import org.matsim.core.config.groups.QSimConfigGroup;
-
-
-public class DynConfigUtils
+public class TaxiUtils
 {
-    public static Config createConfig()
-    {
-        Config config = ConfigUtils.createConfig();
-        updateQSimConfigGroup(config);
-        return config;
-    }
-
-
-    public static Config loadConfig(final String filename)
-    {
-        Config config = ConfigUtils.loadConfig(filename);
-        updateQSimConfigGroup(config);
-        return config;
-    }
-
-
-    private static void updateQSimConfigGroup(Config config)
-    {
-        QSimConfigGroup qSimConfig = config.qsim();
-        qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-        qSimConfig.setRemoveStuckVehicles(false);
-        qSimConfig.setStartTime(0);
-        qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
-    }
+    public static final String TAXI_MODE = "taxi";
 }
