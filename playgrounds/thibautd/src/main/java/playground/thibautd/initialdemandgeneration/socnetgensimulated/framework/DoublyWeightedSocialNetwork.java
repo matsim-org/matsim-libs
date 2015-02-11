@@ -225,13 +225,13 @@ public class DoublyWeightedSocialNetwork {
 				final short smallestSecondaryParent = smallestSecondaryIndexAndParent[ 1 ];
 
 				// 2 - check if new element better. if not, abort.
-				if ( weights2[smallestSecondaryIndex] >= secondWeight ) return;
+				if ( weights2[ smallestSecondaryIndex ] >= secondWeight ) return;
 
 				// 3 - remove element to replace:
-				//     a - reconnect the tree
 				remove( smallestSecondaryIndex , smallestSecondaryParent );
 				assert size == maxSize -1;
 
+				// 4 - add
 				add( friend , firstWeight , secondWeight );
 			}
 		}
@@ -288,7 +288,8 @@ public class DoublyWeightedSocialNetwork {
 			}
 
 			// "re-add" to the tree.
-			final int treeHead = toRemoveParent >= 0 ? toRemoveParent : 0;
+			final int treeHead = 0;
+			//final int treeHead = toRemoveParent >= 0 ? toRemoveParent : 0;
 			while ( toReaddStack.size() > 0 ) {
 				final short toReadd = toReaddStack.pop();
 
@@ -304,9 +305,13 @@ public class DoublyWeightedSocialNetwork {
 
 				if ( toReadd != 0 ) {
 					// find a new daddy
-					final int parent = searchParentLeaf( treeHead, weights1[toReadd], weights2[toReadd] );
-					final short[] quadrant = getQuadrant( parent, weights1[toReadd], weights2[toReadd] );
-					quadrant[parent] = toReadd;
+					final int parent = searchParentLeaf( treeHead, weights1[ toReadd ], weights2[ toReadd ] );
+					final short[] quadrant = getQuadrant( parent, weights1[ toReadd ], weights2[ toReadd ] );
+					assert quadrant[ parent ] == -1;
+					quadrant[ parent ] = toReadd;
+				}
+				else if ( toRemoveParent != -1 ) {
+					throw new RuntimeException( "something is wrong: trying to re-add head whereas parent is "+toRemoveParent+" (removed "+toRemoveIndex+")" );
 				}
 			}
 
@@ -332,6 +337,7 @@ public class DoublyWeightedSocialNetwork {
 			parentStack.push( (short) -1 );
 
 			while ( indexStack.size() > 0 ) {
+				assert indexStack.size() == parentStack.size();
 				final short currentIndex = indexStack.pop();
 				final short currentParent = parentStack.pop();
 

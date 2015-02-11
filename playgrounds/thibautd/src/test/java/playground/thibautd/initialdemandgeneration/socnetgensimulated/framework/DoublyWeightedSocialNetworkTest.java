@@ -85,8 +85,11 @@ public class DoublyWeightedSocialNetworkTest {
 	public void testMaximumCapacity() {
 		if ( true ) Logger.getLogger(DoublyWeightedSocialNetwork.class).setLevel( Level.TRACE );
 
-		final int popSize = 1000;
-		final int maxSize = 100;
+		// get a population size much greater than the max size to need a lot
+		// of replacements, but get a maximum size big enough to have a somehow
+		// "complex" tree, increasing the chances to fail if something is wrong
+		final int popSize = 500_000;
+		final int maxSize = 500;
 		final DoublyWeightedSocialNetwork testee =
 			new DoublyWeightedSocialNetwork(
 					2 ,
