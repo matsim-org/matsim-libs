@@ -17,11 +17,11 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.artemc.scoring.DisaggregatedSumScoringFunction;
-import playground.artemc.scoring.PersonalScoringFunctionFactory;
-import playground.artemc.scoring.functions.ActivityUtilityParameters;
-import playground.artemc.scoring.functions.PersonalScoringParameters;
-import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
+import playground.artemc.heterogeneity.scoring.DisaggregatedSumScoringFunction;
+import playground.artemc.heterogeneity.scoring.PersonalScoringFunctionFactory;
+import playground.artemc.heterogeneity.scoring.functions.ActivityUtilityParameters;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
 import java.util.ArrayList;
 import java.util.HashMap;

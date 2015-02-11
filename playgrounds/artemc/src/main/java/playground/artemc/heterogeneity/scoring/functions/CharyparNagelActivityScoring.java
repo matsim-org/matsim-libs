@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring.functions;
+package playground.artemc.heterogeneity.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;

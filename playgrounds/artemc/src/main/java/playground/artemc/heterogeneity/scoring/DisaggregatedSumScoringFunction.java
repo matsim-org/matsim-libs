@@ -1,4 +1,4 @@
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
 import org.matsim.core.utils.misc.Time;
 
-import playground.artemc.scoring.functions.PersonalScoringParameters;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
 
 public class DisaggregatedSumScoringFunction implements ScoringFunction {
 	

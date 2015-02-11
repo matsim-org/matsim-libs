@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -31,12 +31,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.artemc.heterogeneity.IncomeHeterogeneity;
-import playground.artemc.scoring.functions.CharyparNagelActivityScoring;
-import playground.artemc.scoring.functions.CharyparNagelAgentStuckScoring;
-import playground.artemc.scoring.functions.CharyparNagelLegScoring;
-import playground.artemc.scoring.functions.CharyparNagelMoneyScoring;
-import playground.artemc.scoring.functions.PersonalScoringParameters;
-import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
+import playground.artemc.heterogeneity.scoring.functions.CharyparNagelActivityScoring;
+import playground.artemc.heterogeneity.scoring.functions.CharyparNagelAgentStuckScoring;
+import playground.artemc.heterogeneity.scoring.functions.CharyparNagelLegScoring;
+import playground.artemc.heterogeneity.scoring.functions.CharyparNagelMoneyScoring;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
 import javax.inject.Inject;
 
@@ -115,6 +115,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	}
 	
 	public PersonalScoringParameters adjustParametersForHeterogeneity(String simulationType, Person person, PersonalScoringParameters params){
+
 		if(incomeFactors!=null && !simulationType.equals("homo")){
 			
 			/*Calculate the mean in order to adjust the utility parameters*/

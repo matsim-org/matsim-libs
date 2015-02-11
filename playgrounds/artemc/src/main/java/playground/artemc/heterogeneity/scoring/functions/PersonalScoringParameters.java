@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring.functions;
+package playground.artemc.heterogeneity.scoring.functions;
 
 import java.util.Collections;
 import java.util.Map;

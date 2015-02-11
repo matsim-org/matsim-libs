@@ -1,4 +1,4 @@
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scoring.ScoringFunction;

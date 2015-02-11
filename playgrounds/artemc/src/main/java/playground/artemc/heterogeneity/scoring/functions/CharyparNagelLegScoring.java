@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring.functions;
+package playground.artemc.heterogeneity.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
+import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a

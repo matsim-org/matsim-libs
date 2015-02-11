@@ -12,8 +12,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
-import playground.artemc.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
+import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -95,7 +95,7 @@ public class UpdateSocialCostPricingSchemeWithSpillOverModule extends AbstractMo
 							for(Id<Link> outLinkId:networkLink.getToNode().getOutLinks().keySet()){
 								Link outLink = controler.getScenario().getNetwork().getLinks().get(outLinkId);
 								double maxCapacity = outLink.getNumberOfLanes()*outLink.getLength()*controler.getConfig().qsim().getStorageCapFactor()/7.5;
-								if(linkOccupancyAnalyzer.getOccupancyPercentage(outLinkId,(double) i* (double) this.timeslice, 0.99*maxCapacity)>0.2){
+								if(linkOccupancyAnalyzer.getOccupancyPercentage(outLinkId,(double) i* (double) this.timeslice, 0.99*maxCapacity)>0.1){
 									//if(linkOccupancyAnalyzer.getAverageLinkOccupancy(outLinkId,(double) i* (double) this.timeslice)>0.8*maxCapacity){
 									log.info("Toll for link "+link.toString()+" is set to zero, as outgoing link "+outLinkId+" is full.");
 									toll = 0.0;

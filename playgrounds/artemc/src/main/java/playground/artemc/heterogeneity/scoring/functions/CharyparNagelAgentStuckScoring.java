@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring.functions;
+package playground.artemc.heterogeneity.scoring.functions;
 
 import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;

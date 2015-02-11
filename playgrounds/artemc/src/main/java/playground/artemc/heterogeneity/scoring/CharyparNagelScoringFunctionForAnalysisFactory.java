@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import playground.artemc.scoring.functions.*;
+import playground.artemc.heterogeneity.scoring.functions.*;
 
 import java.util.HashMap;
 

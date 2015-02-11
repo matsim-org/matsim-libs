@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring.functions;
+package playground.artemc.heterogeneity.scoring.functions;
 
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;

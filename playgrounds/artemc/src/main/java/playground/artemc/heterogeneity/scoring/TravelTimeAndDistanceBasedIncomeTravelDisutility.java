@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package playground.artemc.scoring;
+package playground.artemc.heterogeneity.scoring;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.axis.NumberAxis;
@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
-public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
-	private static final Logger log = Logger.getLogger(DisaggregatedScoreAnalyzer.class);
+public class DisaggregatedHeterogeneousScoreAnalyzer implements IterationEndsListener{
+	private static final Logger log = Logger.getLogger(DisaggregatedHeterogeneousScoreAnalyzer.class);
 
 	private ScenarioImpl scenario;
 	private Map<Id, DisaggregatedScore> disaggregatedScores = new HashMap<Id, DisaggregatedScore>();
@@ -34,7 +34,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private Map<Integer, Double> sumUtility2it = new TreeMap<Integer, Double>();
 	private TripAnalysisHandler tripAnalysisHandler;
 
-	public DisaggregatedScoreAnalyzer(ScenarioImpl scenario, TripAnalysisHandler tripAnalysisHandler) {
+	public DisaggregatedHeterogeneousScoreAnalyzer(ScenarioImpl scenario, TripAnalysisHandler tripAnalysisHandler) {
 		super();
 		this.scenario = scenario;
 		this.tripAnalysisHandler = tripAnalysisHandler;
@@ -65,7 +65,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 
         for(Person person: event.getControler().getScenario().getPopulation().getPersons().values()) {
 			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
-			CharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (CharyparNagelScoringFunctionForAnalysisFactory) event.getControler().getScoringFunctionFactory();
+			HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory) event.getControler().getScoringFunctionFactory();
 			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
 
 			disaggregatedScores.put(person.getId(), new DisaggregatedScore(sf.getActivityTotalScore(), sf.getLegScores(), sf.getMoneyTotalScore(), sf.getStuckScore()));
