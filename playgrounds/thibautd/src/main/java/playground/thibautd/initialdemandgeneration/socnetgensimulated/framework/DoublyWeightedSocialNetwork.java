@@ -250,7 +250,7 @@ public class DoublyWeightedSocialNetwork {
 			if ( childNE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNE[ toRemoveIndex ] , toRemoveIndex ) );
 			if ( childNW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childNW[ toRemoveIndex ] , toRemoveIndex ) );
 			if ( childSE[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSE[ toRemoveIndex ] , toRemoveIndex ) );
-			if ( childSW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSW[toRemoveIndex] , toRemoveIndex ) );
+			if ( childSW[ toRemoveIndex ] != -1 ) toReaddStack.push( shift( childSW[ toRemoveIndex ] , toRemoveIndex ) );
 
 			if ( toRemoveParent != -1 ) {
 				// separate subtree
@@ -281,10 +281,10 @@ public class DoublyWeightedSocialNetwork {
 
 			// update pointers to new indices
 			for ( int i = 0; i < size; i++ ) {
-				if ( childNE[i] >= toRemoveIndex ) childNE[i]--;
-				if ( childNW[i] >= toRemoveIndex ) childNW[i]--;
-				if ( childSE[i] >= toRemoveIndex ) childSE[i]--;
-				if ( childSW[i] >= toRemoveIndex ) childSW[i]--;
+				childNE[i] = shift( childNE[i] , toRemoveIndex );
+				childNW[i] = shift( childNW[i] , toRemoveIndex );
+				childSE[i] = shift( childSE[i] , toRemoveIndex );
+				childSW[i] = shift( childSW[i] , toRemoveIndex );
 			}
 
 			// "re-add" to the tree.
@@ -316,6 +316,7 @@ public class DoublyWeightedSocialNetwork {
 		}
 
 		private static short shift( final short i , final int index ) {
+			if ( i == index ) throw new IllegalArgumentException( "nothing should point the removed index!?" );
 			return i > index ? (short) (i - 1) : i;
 		}
 
