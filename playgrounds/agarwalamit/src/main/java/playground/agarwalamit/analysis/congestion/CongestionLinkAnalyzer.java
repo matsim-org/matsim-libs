@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -40,7 +41,7 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 	private final String eventsFile;
 	private CongestionPerLinkHandler congestionPerLinkHandler;
 	private final int noOfTimeBins;
-	private Map<Double, Map<Id, Double>> congestionPerLinkTimeInterval;
+	private Map<Double, Map<Id<Link>, Double>> congestionPerLinkTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
 	private double simulationEndTime;
@@ -91,7 +92,7 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 		return this.congestionPerLinkHandler.getTotalDelayInHours();
 	}
 	
-	public Map<Double, Map<Id, Double>> getCongestionPerLinkTimeInterval() {
+	public Map<Double, Map<Id<Link>, Double>> getCongestionPerLinkTimeInterval() {
 		return this.congestionPerLinkTimeInterval;
 	}
 	

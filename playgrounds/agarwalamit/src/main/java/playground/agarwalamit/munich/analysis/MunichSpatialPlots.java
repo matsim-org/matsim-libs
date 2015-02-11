@@ -27,12 +27,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -53,8 +53,8 @@ public class MunichSpatialPlots {
 	}
 
 	public void writeCongestionCells(){
-		Map<Double, Map<Id, Double>> linkDelaysBau = new HashMap<>();
-		Map<Double, Map<Id, Double>> linkDelaysPolicy = new HashMap<>();
+		Map<Double, Map<Id<Link>, Double>> linkDelaysBau = new HashMap<>();
+		Map<Double, Map<Id<Link>, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);

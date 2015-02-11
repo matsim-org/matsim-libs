@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 PersonDepartureEventHandler, PersonArrivalEventHandler {
-	public static final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
+	public final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
 
 	private Map<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id<Person>, Double>>();
 	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id<Link>, Map<Id<Person>,Double>>();
@@ -114,7 +114,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 
 		double actualTravelTime = event.getTime()-this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
 		this.linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
@@ -143,7 +143,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public void handleEvent(LinkEnterEvent event) {
 		double time = event.getTime();
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 
 		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		personId2LinkEnterTime.put(personId, time);

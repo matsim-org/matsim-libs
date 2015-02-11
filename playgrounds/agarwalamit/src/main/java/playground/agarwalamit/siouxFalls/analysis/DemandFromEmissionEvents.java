@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 
 /**

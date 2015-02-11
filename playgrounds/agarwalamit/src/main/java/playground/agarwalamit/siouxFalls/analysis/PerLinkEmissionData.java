@@ -36,9 +36,9 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 
 /**

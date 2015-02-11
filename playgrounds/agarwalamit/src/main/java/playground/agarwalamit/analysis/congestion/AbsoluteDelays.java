@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Simplified class to get the absolute delays for all the specified run cases

@@ -101,11 +101,11 @@ public class SpatialAveragingCongestion {
 		processCongestions(eventsFileBAU);
 		processEmissions(emissionFileBAU);
 
-		 Map<Double, Map<Id, Double>> time2LinkDelays = this.congestionPerLinkHandler.getDelayPerLinkAndTimeInterval();
+		 Map<Double, Map<Id<Link>, Double>> time2LinkDelays = this.congestionPerLinkHandler.getDelayPerLinkAndTimeInterval();
 		//to keep the same demand in emission and congestion pricing, more logical is using demand from warm emission analysis module.
 		Map<Double, Map<Id<Link>, Double>> time2CountsPerLink = this.warmHandler.getTime2linkIdLeaveCount(); 
 
-		Map<Double, double[][]> time2WeightedCongestion = fillWeightedCongestionValues(filterLinks(changeIdToGenericIdForDelays(time2LinkDelays)));
+		Map<Double, double[][]> time2WeightedCongestion = fillWeightedCongestionValues(filterLinks(time2LinkDelays));
 		Map<Double, double[][]> time2WeightedDemand = fillWeightedDemandValues(filterLinks(time2CountsPerLink));
 
 		this.congestionPerLinkHandler.reset(0);
@@ -133,11 +133,11 @@ public class SpatialAveragingCongestion {
 		if(compareToBAU){
 			processCongestions(eventsFile2);
 			processEmissions(emissionFile2);
-			Map<Double, Map<Id, Double>> time2LinkDelays2 = this.congestionPerLinkHandler.getDelayPerLinkAndTimeInterval();
+			Map<Double, Map<Id<Link>, Double>> time2LinkDelays2 = this.congestionPerLinkHandler.getDelayPerLinkAndTimeInterval();
 			Map<Double, Map<Id<Link>, Double>> time2CountsPerLink2 = this.warmHandler.getTime2linkIdLeaveCount();
 
 
-			Map<Double, double[][]> time2WeightedCongestion2 = fillWeightedCongestionValues(filterLinks(changeIdToGenericIdForDelays(time2LinkDelays2)));
+			Map<Double, double[][]> time2WeightedCongestion2 = fillWeightedCongestionValues(filterLinks(time2LinkDelays2));
 			Map<Double, double[][]> normalizedTime2WeightedCongestion2 = normalizeAllArrays(time2WeightedCongestion2);
 
 			Map<Double, double[][]> time2WeightedDemand2 = fillWeightedDemandValues(filterLinks(time2CountsPerLink2));
@@ -169,19 +169,6 @@ public class SpatialAveragingCongestion {
 		}
 	}
 	
-	private Map<Double, Map<Id<Link>, Double>> changeIdToGenericIdForDelays (Map<Double, Map<Id, Double>> inputMap){
-		Map<Double, Map<Id<Link>, Double>> outMap = new HashMap<>();
-		for(double d:inputMap.keySet()){
-			Map<Id<Link>, Double> tempMap = new HashMap<>();
-			for(Id id : inputMap.get(d).keySet()){
-				tempMap.put(Id.createLinkId(id), inputMap.get(d).get(id));
-			}
-			outMap.put(d, tempMap);
-		}
-		
-		return outMap;	
-	}
-
 	private Map<Double, double[][]> calculateSpecificDelaysPerBin(
 			Map<Double, double[][]> time2weightedDelays,
 			Map<Double, double[][]> time2weightedDemand) {
@@ -209,17 +196,17 @@ public class SpatialAveragingCongestion {
 		return time2NormalizedArray;
 	}
 
-	private <T> Map<Double, Map<Id<T>,  Double>> filterLinks (Map<Double, Map<Id<T>, Double>> time2LinksData) {
-		Map<Double, Map<Id<T>, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id<T>, Double>>();
+	private Map<Double, Map<Id<Link>,  Double>> filterLinks (Map<Double, Map<Id<Link>, Double>> time2LinksData) {
+		Map<Double, Map<Id<Link>, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id<Link>, Double>>();
 
 		for(Double endOfTimeInterval : time2LinksData.keySet()){
-			Map<Id<T>,  Double> linksData = time2LinksData.get(endOfTimeInterval);
-			Map<Id<T>, Double> linksDataFiltered = new HashMap<Id<T>,  Double>();
+			Map<Id<Link>,  Double> linksData = time2LinksData.get(endOfTimeInterval);
+			Map<Id<Link>, Double> linksDataFiltered = new HashMap<Id<Link>,  Double>();
 
 			for(Link link : network.getLinks().values()){
 				Coord linkCoord = link.getCoord();
 				if(this.sau.isInResearchArea(linkCoord)){
-					Id linkId = link.getId();
+					Id<Link> linkId = link.getId();
 
 					if(linksData.get(linkId) == null){
 						linksDataFiltered.put(linkId, 0.);
@@ -240,7 +227,7 @@ public class SpatialAveragingCongestion {
 		for(Double endOfTimeInterval : map.keySet()){
 			double[][]weightedDelays = new double[noOfXbins][noOfYbins];
 
-			for(Id linkId : map.get(endOfTimeInterval).keySet()){
+			for(Id<Link> linkId : map.get(endOfTimeInterval).keySet()){
 				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
 				double xLink = linkCoord.getX();
 				double yLink = linkCoord.getY();
@@ -276,7 +263,7 @@ public class SpatialAveragingCongestion {
 		for(Double endOfTimeInterval : map.keySet()){
 			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
 
-			for(Id linkId : map.get(endOfTimeInterval).keySet()){
+			for(Id<Link> linkId : map.get(endOfTimeInterval).keySet()){
 				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
 				double xLink = linkCoord.getX();
 				double yLink = linkCoord.getY();

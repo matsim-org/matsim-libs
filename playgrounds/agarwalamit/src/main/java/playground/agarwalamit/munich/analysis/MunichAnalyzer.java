@@ -22,9 +22,9 @@ import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionAnalyzer;
 import playground.agarwalamit.analysis.legModeHandler.LegModeTripTimeDistributionAnalyzer;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit

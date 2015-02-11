@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -62,7 +62,7 @@ public class PerLinkCongestionData {
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
 		linkAnalyzer.checkTotalDelayUsingAlternativeMethod();
-		Map<Double, Map<Id, Double>> time2linkIdDelays = linkAnalyzer.getCongestionPerLinkTimeInterval();
+		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = linkAnalyzer.getCongestionPerLinkTimeInterval();
 		
 		writer1.write("time \t linkId \t delay(in sec) \n");
 		for(double time : time2linkIdDelays.keySet()){

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit

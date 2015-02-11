@@ -39,7 +39,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 

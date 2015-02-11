@@ -39,7 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit

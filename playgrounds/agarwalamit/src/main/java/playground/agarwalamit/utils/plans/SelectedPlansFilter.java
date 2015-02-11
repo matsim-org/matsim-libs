@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Take input plans and write selected plans from choice set of all person in a new file.

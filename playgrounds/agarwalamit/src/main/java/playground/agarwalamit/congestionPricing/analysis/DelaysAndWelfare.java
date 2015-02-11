@@ -24,9 +24,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.AbsoluteDelays;
 import playground.agarwalamit.analysis.userBenefits.UserBenefitsAndTotalWelfare;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 

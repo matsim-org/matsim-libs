@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -84,7 +84,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		cLinkAnalyzer.postProcessData();
 		cLinkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 
-		Map<Double, Map<Id, Double>> time2linkIdDelays = cLinkAnalyzer.getCongestionPerLinkTimeInterval();
+		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = cLinkAnalyzer.getCongestionPerLinkTimeInterval();
 		new File(outputDir+runCase+"/analysis/emissionVsCongestion/").mkdirs();
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+runCase+"/analysis/emissionVsCongestion/"+runCase+".hourlyDelaysAndEmissionsPerLink.txt");
 

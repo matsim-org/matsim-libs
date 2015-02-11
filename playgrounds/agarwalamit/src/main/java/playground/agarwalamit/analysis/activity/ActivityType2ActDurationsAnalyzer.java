@@ -31,7 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**

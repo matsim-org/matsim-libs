@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**

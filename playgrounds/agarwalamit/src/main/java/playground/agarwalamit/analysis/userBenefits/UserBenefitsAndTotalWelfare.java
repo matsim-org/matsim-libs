@@ -34,7 +34,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 

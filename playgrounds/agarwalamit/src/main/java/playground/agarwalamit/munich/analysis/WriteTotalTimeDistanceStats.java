@@ -35,9 +35,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionHandler;
 import playground.agarwalamit.analysis.legModeHandler.LegModeTravelTimeHandler;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 

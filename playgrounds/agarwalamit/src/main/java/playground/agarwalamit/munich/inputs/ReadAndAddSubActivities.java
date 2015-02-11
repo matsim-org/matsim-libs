@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 
 /**

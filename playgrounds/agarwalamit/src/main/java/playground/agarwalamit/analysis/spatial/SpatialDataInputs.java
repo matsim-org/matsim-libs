@@ -22,8 +22,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 
 /**
