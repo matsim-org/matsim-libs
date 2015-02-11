@@ -22,8 +22,8 @@ import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionAnalyzer;
-import playground.agarwalamit.analysis.legModeHandler.LegModeTripTimeDistributionAnalyzer;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionAnalyzer;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeTripTimeDistributionAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.legModeHandler;
+package playground.agarwalamit.analysis.legMode.distributions;
 
 import java.util.ArrayList;
 import java.util.HashMap;

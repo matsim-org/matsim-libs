@@ -34,8 +34,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.modes.ModeSwitcherInfoCollector;
+import playground.agarwalamit.analysis.legMode.ModeSwitcherInfoCollector;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 

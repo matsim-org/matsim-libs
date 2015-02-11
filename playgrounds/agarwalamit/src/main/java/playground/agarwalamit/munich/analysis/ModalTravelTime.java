@@ -31,7 +31,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legModeHandler.LegModeTravelTimeHandler;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
 
 /**
  * @author amit

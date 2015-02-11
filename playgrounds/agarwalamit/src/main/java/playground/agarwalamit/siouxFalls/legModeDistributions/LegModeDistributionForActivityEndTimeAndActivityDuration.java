@@ -37,7 +37,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legModeHandler.LegModeActivityEndTimeAndActDurationHandler;
+import playground.agarwalamit.analysis.legMode.distributions.LegModeActivityEndTimeAndActDurationHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
