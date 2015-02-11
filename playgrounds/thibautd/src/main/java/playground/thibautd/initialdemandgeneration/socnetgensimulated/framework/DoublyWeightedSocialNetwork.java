@@ -372,7 +372,9 @@ public class DoublyWeightedSocialNetwork {
 			final TIntStack stack = new TIntArrayStack();
 			stack.push( head );
 
+			int nSeen = 0;
 			while ( stack.size() > 0 ) {
+				if ( nSeen++ > size ) throw new RuntimeException( "seems to be a loop in the tree!!!" );
 				final int currentHead = stack.pop();
 				short[] quadrant = getQuadrant( currentHead , firstWeight, secondWeight );
 
