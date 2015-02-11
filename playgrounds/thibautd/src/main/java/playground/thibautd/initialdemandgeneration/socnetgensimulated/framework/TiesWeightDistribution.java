@@ -91,7 +91,7 @@ public class TiesWeightDistribution {
 	// but in absolute count...
 	public double findLowerBound( final long countOverValue ) {
 		long count = 0;
-		for ( int i = size - 1; i >= 0; i++ ) {
+		for ( int i = size - 1; i >= 0; i-- ) {
 			count += binCount[ i ];
 			if ( count > countOverValue ) return binNumbers[ i ] * binWidth;
 		}

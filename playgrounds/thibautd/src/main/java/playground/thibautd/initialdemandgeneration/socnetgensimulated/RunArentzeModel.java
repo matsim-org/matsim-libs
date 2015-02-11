@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -55,6 +56,7 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.Thresholds;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;
@@ -128,19 +130,47 @@ public class RunArentzeModel {
 					utility,
 					distr );
 		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
-		distr = null;
+		final Collection<Thresholds> initialPoints =
+			generateInitialPoints(
+					distr,
+					population.size(),
+					config.getTargetDegree() );
+		// TODO: add initial points from config?
+		distr = null; // dirty! should be in a subfunction
 
 		final ModelIterator modelIterator = new ModelIterator( config );
 
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
 
-		final SocialNetwork network = modelIterator.iterateModelToTarget( runner, config.getInitialPoints() );
+		final SocialNetwork network = modelIterator.iterateModelToTarget( runner, initialPoints );
 
 		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();
+	}
+
+	private static Collection<Thresholds> generateInitialPoints(
+			final TiesWeightDistribution distr ,
+			final int populationSize,
+			final double targetDegree ) {
+		log.info( "generating heuristic initial points" );
+
+		final double thresholdOne = distr.findLowerBound( populationSize );
+		final double targetMore = 1.1 * targetDegree;
+		final double thresholdMore = distr.findLowerBound( (long) (populationSize * targetMore) );
+
+		log.info( "threshold for network size 1: "+thresholdOne );
+		log.info( "threshold for network size "+targetMore+": "+thresholdMore );
+
+		final Collection<Thresholds> thresholds = new ArrayList<Thresholds>( 4 );
+		thresholds.add( new Thresholds( thresholdOne , 0 ) );
+		thresholds.add( new Thresholds( thresholdOne , 20 ) );
+		thresholds.add( new Thresholds( thresholdMore , 0 ) );
+		thresholds.add( new Thresholds( thresholdMore , 20 ) );
+		log.info( "generated thresholds: "+thresholds );
+		return thresholds;
 	}
 
 	private static void write(
