@@ -1,4 +1,4 @@
-package pl.poznan.put.util.collect;
+package playground.michalm.util;
 
 import java.util.*;
 
@@ -67,5 +67,4 @@ public class MapOfMapIterator<K1, K2, V>
     {
         throw new UnsupportedOperationException();
     }
-
 }

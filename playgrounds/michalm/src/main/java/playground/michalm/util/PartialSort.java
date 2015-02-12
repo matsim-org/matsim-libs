@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package pl.poznan.put.util.collect;
+package playground.michalm.util;
 
 import java.util.*;
 
