@@ -19,13 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -76,6 +78,7 @@ public class ModelIterator {
 
 		for ( int iter=1; true; iter++ ) {
 			log.info( "Iteration # "+iter );
+			final long start = System.currentTimeMillis();
 			final Thresholds thresholds =
 					memory.createNewThresholds( );
 
@@ -83,17 +86,24 @@ public class ModelIterator {
 			final SocialNetwork sn = runner.runModel( thresholds );
 
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
-			thresholds.setResultingClustering( SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn ) );
+			thresholds.setResultingClustering( estimateClustering( sn ) );
 
 			final boolean added = memory.add( thresholds );
 
 			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds , added );
 
+			log.info( "Iteration # "+iter+" took "+(System.currentTimeMillis() - start)+" ms" );
 			if ( isAcceptable( thresholds ) ) {
 				log.info( thresholds+" fulfills the precision criteria!" );
 				return sn;
 			}
 		}
+	}
+
+	private double estimateClustering( final SocialNetwork sn ) {
+		final double estimate = SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn );
+
+		return Math.abs( targetClustering - estimate ) > 10 * precisionClustering ? estimate : SnaUtils.calcClusteringCoefficient( sn );
 	}
 
 	public void addListener( final EvolutionListener l ) {
@@ -119,15 +129,26 @@ public class ModelIterator {
 		return Math.abs( targetDegree -  thresholds.getResultingAverageDegree() );
 	}
 
+	// TODO: write moves to file, to be able to plot tree
 	private class ThresholdMemory {
 		private final Set<Thresholds> tabu = new HashSet<Thresholds>();
-		private final Deque<Move> stack = new ArrayDeque< >();
-		private final Deque<Move> reducstack = new ArrayDeque< >();
+		private final Queue<Move> queue =
+			new PriorityQueue<Move>(
+					10,
+					 new Comparator<Move>() {
+							@Override
+							public int compare( Move o1 , Move o2 ) {
+								return Double.compare( function( o2.parent ) , function( o1.parent ) );
+							}
+						} );
 
 		// we want an improvement of one precision unit to result in the same effect
 		// on mono-objective version.
 		private final double factorClustering = precisionDegree / precisionClustering;
-		private final double exponent = 5;
+
+		private final double exponent = 1;
+		private final double contractionFactor = 2;
+		private final double expansionFactor = 1;
 
 		private Move lastMove = null;
 
@@ -154,21 +175,21 @@ public class ModelIterator {
 			if ( lastMove == null || isBetter( t ) ) {
 
 				log.info( "improvement with "+t );
+				log.info( "new value "+function( t ) );
 				fillQueueWithChildren(
-						stack,
 						t,
-						primaryStepSize,
-						secondaryStepSize );
+						primaryStepSize * expansionFactor,
+						secondaryStepSize * expansionFactor );
 
 				return true;
 			}
 
 			log.info( "no improvement with "+t );
+			log.info( "new value "+function( t ) );
 			fillQueueWithChildren(
-					reducstack,
 					lastMove.parent,
-					primaryStepSize / 2d,
-					secondaryStepSize / 2d );
+					primaryStepSize / contractionFactor,
+					secondaryStepSize / contractionFactor );
 
 			return false;
 		}
@@ -185,21 +206,21 @@ public class ModelIterator {
 		public Thresholds createNewThresholds() {
 			if ( initial.hasNext() ) return initial.next();
 
-			lastMove = stack.isEmpty() ? reducstack.removeFirst() : stack.removeFirst();
+			lastMove = queue.remove();
 			return lastMove.child;
 		}
 
-		private void fillQueueWithChildren( final Deque<Move> thestack , final Thresholds point , final double stepDegree , final double stepSecondary ) {
+		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
 			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
-			addToStack( thestack , new Move( point , 0 , stepSecondary ) );
-			addToStack( thestack , new Move( point , stepDegree , 0 ) );
-			addToStack( thestack , new Move( point , 0 , -stepSecondary ) );
-			addToStack( thestack , new Move( point , -stepDegree , 0 ) );
+			addToStack( new Move( point , 0 , stepSecondary ) );
+			addToStack( new Move( point , stepDegree , 0 ) );
+			addToStack( new Move( point , 0 , -stepSecondary ) );
+			addToStack( new Move( point , -stepDegree , 0 ) );
 		}
 		
-		private void addToStack( final Deque<Move> thestack , final Move move  ) {
+		private void addToStack( final Move move  ) {
 			if ( !tabu.add( move.child ) ) return;
-			thestack.addFirst( move );
+			queue.add( move );
 		}
 	}
 
