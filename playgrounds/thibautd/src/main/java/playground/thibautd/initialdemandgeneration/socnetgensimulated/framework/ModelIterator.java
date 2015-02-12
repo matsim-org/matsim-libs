@@ -133,19 +133,24 @@ public class ModelIterator {
 					 new Comparator<Move>() {
 							@Override
 							public int compare( Move o1 , Move o2 ) {
-								if ( !o1.getParent().equals( o2.getParent() ) ) {
-									return Double.compare( function( o2.getParent() ) , function( o1.getParent() ) );
+								// Note: priority queue returns the LOWEST
+								// element (which is awfully confusing
+								// when one thinks in terms of comparing
+								// PRIORITY...)
+								if ( o1.getParent() != o2.getParent() ) {
+									// if not same parent, starting from lower function is better (try to minimize)
+									return Double.compare( function( o1.getParent() ) , function( o2.getParent() ) );
 								}
 
 								final double parentDegree = o1.getParent().getResultingAverageDegree();
 								final double parentClustering = o1.getParent().getResultingClustering();
 
-								final int primaryCompare = Double.compare( o1.getStepPrimary() , o2.getStepPrimary() );
-								final int secondaryCompare = Double.compare(o1.getStepSecondary() , o2.getStepSecondary() );
+								final int primaryCompare = Double.compare( o2.getStepPrimary() , o1.getStepPrimary() );
+								final int secondaryCompare = Double.compare(o2.getStepSecondary() , o1.getStepSecondary() );
 
 								if ( primaryCompare != 0 ) {
-									// if degree too low, bigger increase move is better
-									return parentDegree < targetDegree ? primaryCompare : - primaryCompare;
+									// if degree too high, bigger threshold increase move is better
+									return parentDegree > targetDegree ? primaryCompare : - primaryCompare;
 								}
 
 								if ( secondaryCompare != 0 ) {
@@ -180,8 +185,8 @@ public class ModelIterator {
 			//final boolean hadClusteringImprovement = lastMove == null || distClustering( t ) < distClustering( lastMove.parent );
 
 			// no improvement means "overshooting": decrease step sizes
-			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.getStepPrimary();
-			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.getStepSecondary();
+			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.stepSizePrimary;
+			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.stepSizeSecondary;
 
 			log.info( "New step Sizes:" );
 			log.info( "primary : "+primaryStepSize );
@@ -235,10 +240,10 @@ public class ModelIterator {
 
 		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
 			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
-			addToStack( new Move( point , 0 , stepSecondary ) );
-			addToStack( new Move( point , stepDegree , 0 ) );
-			addToStack( new Move( point , 0 , -stepSecondary ) );
-			addToStack( new Move( point , -stepDegree , 0 ) );
+			addToStack( new Move( point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
+			addToStack( new Move( point , stepDegree , 0 , stepDegree ,stepSecondary ) );
+			addToStack( new Move( point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
+			addToStack( new Move( point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
 		}
 		
 		private void addToStack( final Move move  ) {
@@ -253,16 +258,23 @@ public class ModelIterator {
 		private final double stepSecondary;
 		private final Thresholds child;
 
+		private final double stepSizePrimary;
+		private final double stepSizeSecondary;
+
 		private Move(
 				final Thresholds parent,
 				final double stepPrimary,
-				final double stepSecondary ) {
+				final double stepSecondary,
+				final double stepSizePrimary,
+				final double stepSizeSecondary ) {
 			this.parent = parent;
 			this.stepPrimary = stepPrimary;
 			this.stepSecondary = stepSecondary;
 			this.child = new Thresholds(
 					parent.getPrimaryThreshold() + stepPrimary,
 					parent.getSecondaryReduction() + stepSecondary );
+			this.stepSizePrimary = stepSizePrimary;
+			this.stepSizeSecondary = stepSizeSecondary;
 		}
 
 		public Thresholds getParent() {
