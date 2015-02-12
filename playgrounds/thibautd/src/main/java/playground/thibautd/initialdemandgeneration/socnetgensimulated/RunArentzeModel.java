@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -131,8 +130,8 @@ public class RunArentzeModel {
 					utility,
 					distr );
 		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
-		final Collection<Thresholds> initialPoints =
-			generateInitialPoints(
+		final Thresholds initialPoint =
+			generateInitialPoint(
 					distr,
 					population.size(),
 					config.getTargetDegree() );
@@ -144,7 +143,7 @@ public class RunArentzeModel {
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );
 
-		final SocialNetwork network = modelIterator.iterateModelToTarget( runner, initialPoints );
+		final SocialNetwork network = modelIterator.iterateModelToTarget( runner, initialPoint );
 
 		fileListener.close();
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
@@ -152,17 +151,17 @@ public class RunArentzeModel {
 		MoreIOUtils.closeOutputDirLogging();
 	}
 
-	private static Collection<Thresholds> generateInitialPoints(
+	private static Thresholds generateInitialPoint(
 			final TiesWeightDistribution distr ,
 			final int populationSize,
 			final double targetDegree ) {
 		log.info( "generating heuristic initial points" );
 
-		final double target = 0.5 * targetDegree;
+		// rationale: sqrt(n) alters * sqrt(n) alters_of_alter
+		final double target = Math.sqrt( targetDegree );
 		final double threshold = distr.findLowerBound( (long) (populationSize * target) );
 
-		final Collection<Thresholds> thresholds = new ArrayList<Thresholds>( 4 );
-		thresholds.add( new Thresholds( threshold , 0 ) );
+		final Thresholds thresholds = new Thresholds( threshold , 0 );
 		log.info( "generated thresholds: "+thresholds );
 		return thresholds;
 	}

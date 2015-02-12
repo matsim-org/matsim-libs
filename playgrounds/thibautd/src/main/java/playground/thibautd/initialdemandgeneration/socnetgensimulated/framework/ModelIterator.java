@@ -20,10 +20,8 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -72,7 +70,7 @@ public class ModelIterator {
 
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
-			final Collection<Thresholds> initialThresholds ) {
+			final Thresholds initialThresholds ) {
 		final ThresholdMemory memory = new ThresholdMemory( initialThresholds );
 
 		for ( int iter=1; true; iter++ ) {
@@ -149,10 +147,10 @@ public class ModelIterator {
 
 		private Move lastMove = null;
 
-		private final Iterator<Thresholds> initial;
+		private Thresholds initial;
 
-		public ThresholdMemory( final Collection<Thresholds> initial ) {
-			this.initial = initial.iterator();
+		public ThresholdMemory( final Thresholds initial ) {
+			this.initial = initial;
 		}
 
 		public boolean add( final Thresholds t ) {
@@ -205,7 +203,11 @@ public class ModelIterator {
 		}
 
 		public Thresholds createNewThresholds() {
-			if ( initial.hasNext() ) return initial.next();
+			if ( initial != null ) {
+				final Thresholds v = initial;
+				initial = null;
+				return v;
+			}
 
 			lastMove = queue.remove();
 			return lastMove.getChild();
