@@ -133,7 +133,27 @@ public class ModelIterator {
 					 new Comparator<Move>() {
 							@Override
 							public int compare( Move o1 , Move o2 ) {
-								return Double.compare( function( o2.getParent() ) , function( o1.getParent() ) );
+								if ( !o1.getParent().equals( o2.getParent() ) ) {
+									return Double.compare( function( o2.getParent() ) , function( o1.getParent() ) );
+								}
+
+								final double parentDegree = o1.getParent().getResultingAverageDegree();
+								final double parentClustering = o1.getParent().getResultingClustering();
+
+								final int primaryCompare = Double.compare( o1.getStepPrimary() , o2.getStepPrimary() );
+								final int secondaryCompare = Double.compare(o1.getStepSecondary() , o2.getStepSecondary() );
+
+								if ( primaryCompare != 0 ) {
+									// if degree too low, bigger increase move is better
+									return parentDegree < targetDegree ? primaryCompare : - primaryCompare;
+								}
+
+								if ( secondaryCompare != 0 ) {
+									// if clustering too low, bigger increase in reduction is better
+									return parentClustering < targetClustering ? secondaryCompare : - secondaryCompare;
+								}
+
+								return 0;
 							}
 						} );
 
