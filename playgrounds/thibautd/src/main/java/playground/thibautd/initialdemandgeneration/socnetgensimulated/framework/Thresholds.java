@@ -72,5 +72,17 @@ public class Thresholds {
 	public String toString() {
 		return "[Thresholds: primary="+primaryThreshold+" secondary="+getSecondaryThreshold()+"; clustering="+resultingClustering+"; avgDegree="+resultingAverageDegree+"]";
 	}
+
+	@Override
+	public boolean equals( final Object other ) {
+		return other instanceof Thresholds &&
+			Math.abs( primaryThreshold - ((Thresholds) other).primaryThreshold ) < 1E-9 &&
+			Math.abs( secondaryReduction - ((Thresholds) other).secondaryReduction ) < 1E-9;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) ( ( Double.doubleToLongBits( primaryThreshold ) + Double.doubleToLongBits( secondaryReduction ) ) % Integer.MAX_VALUE );
+	}
 }
 

@@ -22,8 +22,10 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -117,11 +119,14 @@ public class ModelIterator {
 	}
 
 	private class ThresholdMemory {
-		private final Queue<Thresholds> queue = new ArrayDeque< >();
+		private final Set<Thresholds> tabu = new HashSet<Thresholds>();
+		private final Deque<Thresholds> stack = new ArrayDeque< >();
 
 		// we want an improvement of one precision unit to result in the same effect
 		// on mono-objective version.
 		private final double factorClustering = precisionDegree / precisionClustering;
+		private final double exponent = 5;
+
 		private Thresholds best = null;
 
 		private double primaryStepSize = initialPrimaryStep;
@@ -131,36 +136,40 @@ public class ModelIterator {
 		boolean hadClusteringImprovement = false;
 
 		public ThresholdMemory( final Collection<Thresholds> initial ) {
-			this.queue.addAll( initial );
+			this.stack.addAll( initial );
 		}
 
 		public boolean add( final Thresholds t ) {
 
-			if ( best == null || function( t ) < function( best ) ) {
+			if ( best == null || isBetter( t ) ) {
 				hadDegreeImprovement = best != null && distDegree( t ) < distDegree( best );
 				hadClusteringImprovement = best != null && distClustering( t ) < distClustering( best );
 
-				log.info( t+" better than best value "+best );
+				log.info( t + " better than best value " + best );
 				log.info( "replacing value" );
 				best = t;
 
-				queue.clear();
 				fillQueue();
 
 				return true;
 			}
 
-			log.info( t+" not better than best value "+best+" => NOT KEPT" );
+			log.info( t + " not better than best value " + best + " => NOT KEPT" );
 			return false;
 		}
 
-		private double function( final Thresholds t ) {
-			return Math.pow( distDegree( t ) , 2 ) + Math.pow( factorClustering * distClustering( t ) , 2 );
+		private boolean isBetter( Thresholds t ) {
+			return function( t ) < function( best );
+		}
+
+		private double function( Thresholds t ) {
+			return Math.pow( distDegree( t ) , exponent ) +
+				Math.pow( factorClustering * distClustering( t ) , exponent );
 		}
 
 		public Thresholds createNewThresholds() {
-			if ( queue.isEmpty() ) fillQueue();
-			return queue.remove();
+			if ( stack.isEmpty() ) fillQueue();
+			return stack.removeFirst();
 		}
 
 		private void fillQueue() {
@@ -168,12 +177,13 @@ public class ModelIterator {
 			if ( !hadDegreeImprovement ) {
 				primaryStepSize /= 2;
 			}
-			else primaryStepSize *= 1.5;
+			// if improvement, continue harder in the same direction
+			//else primaryStepSize *= 1.5;
 
 			if ( !hadClusteringImprovement ) {
 				secondaryStepSize /= 2;
 			}
-			else secondaryStepSize *= 1.5;
+			//else secondaryStepSize *= 1.5;
 
 			hadClusteringImprovement = false;
 			hadDegreeImprovement = false;
@@ -182,17 +192,23 @@ public class ModelIterator {
 			log.info( "primary : "+primaryStepSize );
 			log.info( "secondary : "+secondaryStepSize );
 
-
 			fillQueueWithChildren(
 					best,
-					best.getResultingAverageDegree() > targetDegree ? primaryStepSize : -primaryStepSize,
-					best.getResultingClustering() > targetClustering ? -secondaryStepSize : secondaryStepSize );
+					primaryStepSize,
+					secondaryStepSize );
 		}
 
 		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
-			queue.add( moveByStep( point , stepDegree , stepSecondary ) );
-			queue.add( moveByStep( point , 0 , stepSecondary ) );
-			queue.add( moveByStep( point , stepDegree , 0 ) );
+			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
+			addToStack( moveByStep( point , 0 , stepSecondary ) );
+			addToStack( moveByStep( point , stepDegree , 0 ) );
+			addToStack( moveByStep( point , 0 , -stepSecondary ) );
+			addToStack( moveByStep( point , -stepDegree , 0 ) );
+		}
+		
+		private void addToStack( final Thresholds t ) {
+			if ( !tabu.add( t ) ) return;
+			stack.addFirst( t );
 		}
 
 		private Thresholds moveByStep(
