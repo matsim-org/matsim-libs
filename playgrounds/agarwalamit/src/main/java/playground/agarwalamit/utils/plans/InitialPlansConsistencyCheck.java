@@ -54,21 +54,21 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class InitialPlansConsistencyCheck {
 	public static final Logger log = Logger.getLogger(InitialPlansConsistencyCheck.class);
 	private Scenario sc;
-	private Map<Person, List<String>> person2ActivityType;
-	private Map<Person, List<String>> person2Legs;
-	private Map<UserGroup, Integer> userGroup2NumberOfPersons;
+	private Map<Person, List<String>> person2ActivityType = new HashMap<Person, List<String>>();
+	private Map<Person, List<String>> person2Legs = new HashMap<Person, List<String>>();
+	private Map<UserGroup, Integer> userGroup2NumberOfPersons = new HashMap<UserGroup, Integer>();
 	private PersonFilter pf;
 	private BufferedWriter writer;
 
 	public InitialPlansConsistencyCheck(String initialPlans) {
-		LoadMyScenarios.loadScenarioFromPlans(initialPlans);
+		this.sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 	}
 
 	public static void main(String[] args) {
-		String initialPlansFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input"
+		String initialPlansFile = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input"
 				+ "/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCase.xml";
-		String outputFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+		String initialConfig = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/config_munich_1pct_baseCase.xml";
+		String outputFile = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run7/";
 
 		new InitialPlansConsistencyCheck(initialPlansFile).run(outputFile,initialConfig);
 	}
@@ -86,7 +86,7 @@ public class InitialPlansConsistencyCheck {
 
 		getUserGrp2NumberOfPersons();
 		getPersonId2ActivitiesAndLegs();
-
+		
 		writer = IOUtils.getBufferedWriter(outputFile+"analysis/plansConsistency_differentFirstAndLastActivities.txt");
 
 		try {
@@ -101,9 +101,6 @@ public class InitialPlansConsistencyCheck {
 	}
 
 	private void getPersonId2ActivitiesAndLegs(){
-
-		person2ActivityType = new HashMap<Person, List<String>>();
-		person2Legs = new HashMap<Person, List<String>>();
 
 		for(Person p : sc.getPopulation().getPersons().values()){
 			for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
@@ -121,7 +118,6 @@ public class InitialPlansConsistencyCheck {
 	}
 
 	private void getUserGrp2NumberOfPersons() {
-		userGroup2NumberOfPersons = new HashMap<UserGroup, Integer>();
 
 		for(UserGroup ug : UserGroup.values()){
 			userGroup2NumberOfPersons.put(ug, 0);
