@@ -195,11 +195,14 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 			pt.setTeleportedModeFreespeedFactor( 2.0 );
 			addParameterSet( pt );
 		}
-		{
-			final ModeRoutingParams transit_walk = new ModeRoutingParams( TransportMode.transit_walk ) ;
-			transit_walk.setBeelineDistanceFactor(1.3); // old default; necessary for backwards compatibility.  kai, feb'15
-			addParameterSet( transit_walk );
-		}
+
+		//		{
+//			final ModeRoutingParams transit_walk = new ModeRoutingParams( TransportMode.transit_walk ) ;
+//			transit_walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+//			addParameterSet( transit_walk );
+//		}
+		// one might add the above but it was not added in the original design.  Not sure about the reason. kai, feb'15
+		
 		this.acceptModeParamsWithoutClearing = false;
 	}
 
