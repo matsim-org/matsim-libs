@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -120,46 +121,60 @@ public class ModelIterator {
 
 	private class ThresholdMemory {
 		private final Set<Thresholds> tabu = new HashSet<Thresholds>();
-		private final Deque<Thresholds> stack = new ArrayDeque< >();
+		private final Deque<Move> stack = new ArrayDeque< >();
+		private final Deque<Move> reducstack = new ArrayDeque< >();
 
 		// we want an improvement of one precision unit to result in the same effect
 		// on mono-objective version.
 		private final double factorClustering = precisionDegree / precisionClustering;
 		private final double exponent = 5;
 
-		private Thresholds best = null;
+		private Move lastMove = null;
 
-		private double primaryStepSize = initialPrimaryStep;
-		private double secondaryStepSize = initialSecondaryStep;
-
-		boolean hadDegreeImprovement = false;
-		boolean hadClusteringImprovement = false;
+		private final Iterator<Thresholds> initial;
 
 		public ThresholdMemory( final Collection<Thresholds> initial ) {
-			this.stack.addAll( initial );
+			this.initial = initial.iterator();
 		}
 
 		public boolean add( final Thresholds t ) {
+			if ( lastMove != null && t != lastMove.child ) throw new IllegalArgumentException();
 
-			if ( best == null || isBetter( t ) ) {
-				hadDegreeImprovement = best != null && distDegree( t ) < distDegree( best );
-				hadClusteringImprovement = best != null && distClustering( t ) < distClustering( best );
+			//final boolean hadDegreeImprovement = lastMove == null || distDegree( t ) < distDegree( lastMove.parent );
+			//final boolean hadClusteringImprovement = lastMove == null || distClustering( t ) < distClustering( lastMove.parent );
 
-				log.info( t + " better than best value " + best );
-				log.info( "replacing value" );
-				best = t;
+			// no improvement means "overshooting": decrease step sizes
+			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.stepPrimary;
+			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.stepSecondary;
 
-				fillQueue();
+			log.info( "New step Sizes:" );
+			log.info( "primary : "+primaryStepSize );
+			log.info( "secondary : "+secondaryStepSize );
+
+			if ( lastMove == null || isBetter( t ) ) {
+
+				log.info( "improvement with "+t );
+				fillQueueWithChildren(
+						stack,
+						t,
+						primaryStepSize,
+						secondaryStepSize );
 
 				return true;
 			}
 
-			log.info( t + " not better than best value " + best + " => NOT KEPT" );
+			log.info( "no improvement with "+t );
+			fillQueueWithChildren(
+					reducstack,
+					lastMove.parent,
+					primaryStepSize / 2d,
+					secondaryStepSize / 2d );
+
 			return false;
 		}
 
 		private boolean isBetter( Thresholds t ) {
-			return function( t ) < function( best );
+			return function( t ) < function( lastMove.parent );
 		}
 
 		private double function( Thresholds t ) {
@@ -168,56 +183,42 @@ public class ModelIterator {
 		}
 
 		public Thresholds createNewThresholds() {
-			if ( stack.isEmpty() ) fillQueue();
-			return stack.removeFirst();
+			if ( initial.hasNext() ) return initial.next();
+
+			lastMove = stack.isEmpty() ? reducstack.removeFirst() : stack.removeFirst();
+			return lastMove.child;
 		}
 
-		private void fillQueue() {
-			// no improvement means "overshooting": decrease step sizes
-			if ( !hadDegreeImprovement ) {
-				primaryStepSize /= 2;
-			}
-			// if improvement, continue harder in the same direction
-			//else primaryStepSize *= 1.5;
-
-			if ( !hadClusteringImprovement ) {
-				secondaryStepSize /= 2;
-			}
-			//else secondaryStepSize *= 1.5;
-
-			hadClusteringImprovement = false;
-			hadDegreeImprovement = false;
-
-			log.info( "New step Sizes:" );
-			log.info( "primary : "+primaryStepSize );
-			log.info( "secondary : "+secondaryStepSize );
-
-			fillQueueWithChildren(
-					best,
-					primaryStepSize,
-					secondaryStepSize );
-		}
-
-		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
+		private void fillQueueWithChildren( final Deque<Move> thestack , final Thresholds point , final double stepDegree , final double stepSecondary ) {
 			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
-			addToStack( moveByStep( point , 0 , stepSecondary ) );
-			addToStack( moveByStep( point , stepDegree , 0 ) );
-			addToStack( moveByStep( point , 0 , -stepSecondary ) );
-			addToStack( moveByStep( point , -stepDegree , 0 ) );
+			addToStack( thestack , new Move( point , 0 , stepSecondary ) );
+			addToStack( thestack , new Move( point , stepDegree , 0 ) );
+			addToStack( thestack , new Move( point , 0 , -stepSecondary ) );
+			addToStack( thestack , new Move( point , -stepDegree , 0 ) );
 		}
 		
-		private void addToStack( final Thresholds t ) {
-			if ( !tabu.add( t ) ) return;
-			stack.addFirst( t );
+		private void addToStack( final Deque<Move> thestack , final Move move  ) {
+			if ( !tabu.add( move.child ) ) return;
+			thestack.addFirst( move );
 		}
+	}
 
-		private Thresholds moveByStep(
-				final Thresholds point,
-				final double degreeStep,
-				final double clusteringStep ) {
-			return new Thresholds(
-					point.getPrimaryThreshold() + degreeStep,
-					point.getSecondaryReduction() + clusteringStep );
+	private static class Move {
+		private final Thresholds parent;
+		private final double stepPrimary;
+		private final double stepSecondary;
+		private final Thresholds child;
+
+		public Move(
+				final Thresholds parent,
+				final double stepPrimary,
+				final double stepSecondary ) {
+			this.parent = parent;
+			this.stepPrimary = stepPrimary;
+			this.stepSecondary = stepSecondary;
+			this.child = new Thresholds(
+					parent.getPrimaryThreshold() + stepPrimary,
+					parent.getSecondaryReduction() + stepSecondary );
 		}
 	}
 
