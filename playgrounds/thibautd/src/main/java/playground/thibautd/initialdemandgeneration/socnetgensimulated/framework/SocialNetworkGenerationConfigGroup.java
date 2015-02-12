@@ -47,6 +47,9 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private double samplingRateForClusteringEstimation = 0.1;
 
+	private int stagnationLimit = 10;
+	private int maxIterations = 500;
+
 	public SocialNetworkGenerationConfigGroup( ) {
 		super( GROUP_NAME );
 	}
@@ -154,6 +157,26 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "initialSecondaryStep" )
 	public void setInitialSecondaryStep( double initialSecondaryStep ) {
 		this.initialSecondaryStep = initialSecondaryStep;
+	}
+
+	@StringGetter( "stagnationLimit" )
+	public int getStagnationLimit() {
+		return stagnationLimit;
+	}
+
+	@StringSetter( "stagnationLimit" )
+	public void setStagnationLimit( int stagnationLimit ) {
+		this.stagnationLimit = stagnationLimit;
+	}
+
+	@StringGetter( "maxIterations" )
+	public int getMaxIterations() {
+		return maxIterations;
+	}
+
+	@StringSetter( "maxIterations" )
+	public void setMaxIterations( int maxIterations ) {
+		this.maxIterations = maxIterations;
 	}
 
 	public static class InitialPointParameterSet extends ReflectiveConfigGroup {

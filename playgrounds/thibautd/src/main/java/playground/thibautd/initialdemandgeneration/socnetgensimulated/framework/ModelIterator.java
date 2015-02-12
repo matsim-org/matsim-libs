@@ -49,6 +49,9 @@ public class ModelIterator {
 	private final double initialPrimaryStep;
 	private final double initialSecondaryStep;
 
+	private final int stagnationLimit;
+	private final int maxIterations;
+
 	// TODO: make adaptive (the closer to the target value,
 	// the more precise is should get)
 	private double samplingRateClustering = 1;
@@ -66,6 +69,9 @@ public class ModelIterator {
 
 		this.initialPrimaryStep = config.getInitialPrimaryStep();
 		this.initialSecondaryStep = config.getInitialSecondaryStep();
+
+		this.stagnationLimit = config.getStagnationLimit();
+		this.maxIterations = config.getMaxIterations();
 	}
 
 	public SocialNetwork iterateModelToTarget(
@@ -73,7 +79,10 @@ public class ModelIterator {
 			final Thresholds initialThresholds ) {
 		final ThresholdMemory memory = new ThresholdMemory( initialThresholds );
 
-		for ( int iter=1; true; iter++ ) {
+		int stagnationCount = 0;
+		Thresholds currentBest = initialThresholds;
+
+		for ( int iter=1; iter < maxIterations; iter++ ) {
 			log.info( "Iteration # "+iter );
 			final long start = System.currentTimeMillis();
 			final Thresholds thresholds =
@@ -85,14 +94,28 @@ public class ModelIterator {
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
 			thresholds.setResultingClustering( estimateClustering( sn ) );
 
-			memory.add( thresholds );
+			final Thresholds newBest = memory.add( thresholds );
 
 			log.info( "Iteration # "+iter+" took "+(System.currentTimeMillis() - start)+" ms" );
 			if ( isAcceptable( thresholds ) ) {
 				log.info( thresholds+" fulfills the precision criteria!" );
 				return sn;
 			}
+
+			if ( newBest == currentBest && stagnationCount++ > stagnationLimit ) {
+				log.info( "stagnating on "+currentBest+" since "+stagnationCount+" iterations." );
+				log.warn( "stop iterations before reaching the required precision level!" );
+				return runner.runModel( currentBest );
+			}
+			else {
+				stagnationCount = 0;
+				currentBest = newBest;
+			}
 		}
+
+		log.warn( "Maximum number of iterations reached." );
+		log.warn( "stop iterations before reaching the required precision level!" );
+		return runner.runModel( currentBest );
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
@@ -126,9 +149,9 @@ public class ModelIterator {
 
 	// TODO: write moves to file, to be able to plot tree
 	private class ThresholdMemory {
-		private final Set<Thresholds> tabu = new HashSet<Thresholds>();
+		private final Set<Thresholds> tabu = new HashSet< >();
 		private final Queue<Move> queue =
-			new PriorityQueue<Move>(
+			new PriorityQueue< >(
 					10,
 					 new Comparator<Move>() {
 							@Override
@@ -178,7 +201,10 @@ public class ModelIterator {
 			this.initial = initial;
 		}
 
-		public boolean add( final Thresholds t ) {
+		/**
+		 * @return the current best thresholds
+		 */
+		public Thresholds add( final Thresholds t ) {
 			if ( lastMove != null && t != lastMove.getChild() ) throw new IllegalArgumentException();
 
 			//final boolean hadDegreeImprovement = lastMove == null || distDegree( t ) < distDegree( lastMove.parent );
@@ -203,7 +229,7 @@ public class ModelIterator {
 
 				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
 
-				return true;
+				return t;
 			}
 
 			log.info( "no improvement with "+t );
@@ -215,7 +241,7 @@ public class ModelIterator {
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
 
-			return false;
+			return lastMove.getParent();
 		}
 
 		private boolean isBetter( Thresholds t ) {
