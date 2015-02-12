@@ -122,10 +122,10 @@ public class SubpopulationConfig {
 		config.plansCalcRoute().setNetworkModes(mainModes);
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 
-		config.plansCalcRoute().setTeleportedModeSpeed("slum_walk", 4/3.6);
-		config.plansCalcRoute().setTeleportedModeSpeed("nonSlum_walk", 4/3.6);
-		config.plansCalcRoute().setTeleportedModeSpeed("slum_pt", 20/3.6);
-		config.plansCalcRoute().setTeleportedModeSpeed("nonSlum_pt", 20/3.6);
+		config.plansCalcRoute().getTeleportedModeSpeeds().put("slum_walk", 4/3.6);
+		config.plansCalcRoute().getTeleportedModeSpeeds().put("nonSlum_walk", 4/3.6);
+		config.plansCalcRoute().getTeleportedModeSpeeds().put("slum_pt", 20/3.6);
+		config.plansCalcRoute().getTeleportedModeSpeeds().put("nonSlum_pt", 20/3.6);
 
 		ActivityParams workAct = new ActivityParams("work");
 		workAct.setTypicalDuration(8*3600);

@@ -183,6 +183,10 @@ public class AddingActivitiesInPlans {
 		}
 		log.info("Population is stored.");
 	}
+	
+	public Population getOutPop(){
+		return this.scOut.getPopulation();
+	}
 
 	private void writePlans( String outplans){
 		new PopulationWriter(scOut.getPopulation()).write(outplans);
