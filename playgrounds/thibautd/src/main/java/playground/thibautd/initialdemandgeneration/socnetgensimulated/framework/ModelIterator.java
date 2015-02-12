@@ -230,6 +230,7 @@ public class ModelIterator {
 		public Thresholds createNewThresholds() {
 			if ( initial != null ) {
 				final Thresholds v = initial;
+				tabu.add( initial );
 				initial = null;
 				return v;
 			}
