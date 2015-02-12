@@ -22,7 +22,6 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -88,9 +87,7 @@ public class ModelIterator {
 			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
 			thresholds.setResultingClustering( estimateClustering( sn ) );
 
-			final boolean added = memory.add( thresholds );
-
-			for ( EvolutionListener l : listeners ) l.handleNewResult( thresholds , added );
+			memory.add( thresholds );
 
 			log.info( "Iteration # "+iter+" took "+(System.currentTimeMillis() - start)+" ms" );
 			if ( isAcceptable( thresholds ) ) {
@@ -138,7 +135,7 @@ public class ModelIterator {
 					 new Comparator<Move>() {
 							@Override
 							public int compare( Move o1 , Move o2 ) {
-								return Double.compare( function( o2.parent ) , function( o1.parent ) );
+								return Double.compare( function( o2.getParent() ) , function( o1.getParent() ) );
 							}
 						} );
 
@@ -146,7 +143,7 @@ public class ModelIterator {
 		// on mono-objective version.
 		private final double factorClustering = precisionDegree / precisionClustering;
 
-		private final double exponent = 1;
+		private final double exponent = 4;
 		private final double contractionFactor = 2;
 		private final double expansionFactor = 1;
 
@@ -159,14 +156,14 @@ public class ModelIterator {
 		}
 
 		public boolean add( final Thresholds t ) {
-			if ( lastMove != null && t != lastMove.child ) throw new IllegalArgumentException();
+			if ( lastMove != null && t != lastMove.getChild() ) throw new IllegalArgumentException();
 
 			//final boolean hadDegreeImprovement = lastMove == null || distDegree( t ) < distDegree( lastMove.parent );
 			//final boolean hadClusteringImprovement = lastMove == null || distClustering( t ) < distClustering( lastMove.parent );
 
 			// no improvement means "overshooting": decrease step sizes
-			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.stepPrimary;
-			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.stepSecondary;
+			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.getStepPrimary();
+			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.getStepSecondary();
 
 			log.info( "New step Sizes:" );
 			log.info( "primary : "+primaryStepSize );
@@ -181,21 +178,25 @@ public class ModelIterator {
 						primaryStepSize * expansionFactor,
 						secondaryStepSize * expansionFactor );
 
+				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
+
 				return true;
 			}
 
 			log.info( "no improvement with "+t );
 			log.info( "new value "+function( t ) );
 			fillQueueWithChildren(
-					lastMove.parent,
+					lastMove.getParent(),
 					primaryStepSize / contractionFactor,
 					secondaryStepSize / contractionFactor );
+
+			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
 
 			return false;
 		}
 
 		private boolean isBetter( Thresholds t ) {
-			return function( t ) < function( lastMove.parent );
+			return function( t ) < function( lastMove.getParent() );
 		}
 
 		private double function( Thresholds t ) {
@@ -207,7 +208,7 @@ public class ModelIterator {
 			if ( initial.hasNext() ) return initial.next();
 
 			lastMove = queue.remove();
-			return lastMove.child;
+			return lastMove.getChild();
 		}
 
 		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
@@ -219,18 +220,18 @@ public class ModelIterator {
 		}
 		
 		private void addToStack( final Move move  ) {
-			if ( !tabu.add( move.child ) ) return;
+			if ( !tabu.add( move.getChild() ) ) return;
 			queue.add( move );
 		}
 	}
 
-	private static class Move {
+	public static class Move {
 		private final Thresholds parent;
 		private final double stepPrimary;
 		private final double stepSecondary;
 		private final Thresholds child;
 
-		public Move(
+		private Move(
 				final Thresholds parent,
 				final double stepPrimary,
 				final double stepSecondary ) {
@@ -241,16 +242,32 @@ public class ModelIterator {
 					parent.getPrimaryThreshold() + stepPrimary,
 					parent.getSecondaryReduction() + stepSecondary );
 		}
+
+		public Thresholds getParent() {
+			return parent;
+		}
+
+		public double getStepPrimary() {
+			return stepPrimary;
+		}
+
+		public double getStepSecondary() {
+			return stepSecondary;
+		}
+
+		public Thresholds getChild() {
+			return child;
+		}
 	}
 
 	public static interface EvolutionListener {
-		public void handleNewResult( Thresholds t , boolean keptInMemory );
+		public void handleMove( Move m , boolean improved );
 	}
 
 	private static class EvolutionLogger implements EvolutionListener {
 		@Override
-		public void handleNewResult( final Thresholds t , final boolean keptInMemory ) {
-			log.info( "generated network for "+t );
+		public void handleMove( final Move m , final boolean improved ) {
+			log.info( "generated network for "+m.getChild() );
 		}
 	}
 }
