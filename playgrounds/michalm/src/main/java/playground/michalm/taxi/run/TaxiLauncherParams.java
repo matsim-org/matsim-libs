@@ -3,7 +3,7 @@ package playground.michalm.taxi.run;
 import java.io.File;
 import java.util.Map;
 
-import pl.poznan.put.util.ParameterFileReader;
+import playground.michalm.util.ParameterFileReader;
 
 
 class TaxiLauncherParams

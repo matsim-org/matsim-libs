@@ -25,7 +25,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.google.common.base.Predicate;
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.prep.*;
+import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
 
 public class ServedRequests
@@ -41,11 +41,11 @@ public class ServedRequests
     }
 
 
-    public static boolean isWithinArea(ServedRequest request, PreparedPolygonContains ppc)
+    public static boolean isWithinArea(ServedRequest request, PreparedPolygon preparedPolygon)
     {
         Point from = MGC.coord2Point(request.from);
         Point to = MGC.coord2Point(request.to);
-        return ppc.contains(from) && ppc.contains(to);
+        return preparedPolygon.contains(from) && preparedPolygon.contains(to);
     }
 
 
@@ -65,12 +65,12 @@ public class ServedRequests
 
     public static Predicate<ServedRequest> createWithinAreaPredicate(MultiPolygon area)
     {
-        final PreparedPolygonContains ppc = new PreparedPolygonContains(new PreparedPolygon(area));
+        final PreparedPolygon preparedPolygon = new PreparedPolygon(area);
 
         return new Predicate<ServedRequest>() {
             public boolean apply(ServedRequest request)
             {
-                return ServedRequests.isWithinArea(request, ppc);
+                return ServedRequests.isWithinArea(request, preparedPolygon);
             }
         };
     }

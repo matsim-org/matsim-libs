@@ -28,9 +28,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 
-import pl.poznan.put.util.array2d.*;
 import playground.michalm.demand.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
+import playground.michalm.util.array2d.*;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.*;
 

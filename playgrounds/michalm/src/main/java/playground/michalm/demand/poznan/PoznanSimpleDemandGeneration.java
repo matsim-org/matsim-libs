@@ -29,8 +29,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 
-import pl.poznan.put.util.array2d.Array2DReader;
 import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.util.array2d.Array2DReader;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.*;
 

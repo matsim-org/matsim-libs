@@ -24,9 +24,9 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-  			<artifactId>commons-lang3</artifactId>
-  			<version>3.3.2</version>
-  		</dependency>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>xmlgraphics-commons</artifactId>
@@ -67,27 +67,28 @@
 			<artifactId>velocity</artifactId>
 			<version>1.7</version>
 		</dependency>
-		
+
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>transEnergySim</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>pl.poznan.put.michalm</groupId>
 			<artifactId>gurobi</artifactId>
@@ -95,33 +96,14 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/gurobi-5.6.2.jar</systemPath>
 		</dependency>
-		
-		
-  		<!-- ============== standard option ============== -->
+
 		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/util-0.0.1-SNAPSHOT.jar</systemPath>
+			<groupId>playground</groupId>
+			<artifactId>johannes</artifactId>
+			<version>0.7.0-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 
-		<!-- ============== alternative option ============== -->
-		<!-- only when the UTIL (maven) project is created -->
-		<!-- exclusions used to simulate the SYSTEM scope --> 
-		<!-- dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency-->
-		
 	</dependencies>
 
 </project>

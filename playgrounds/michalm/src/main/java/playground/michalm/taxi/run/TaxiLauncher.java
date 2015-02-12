@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
+import org.matsim.contrib.dvrp.util.chart.ChartWindowUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.*;
@@ -45,7 +46,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import pl.poznan.put.util.ChartUtils;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
@@ -255,7 +255,7 @@ class TaxiLauncher
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
+        ChartWindowUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
                 .getVehicles()));
 
         if (params.histogramOutDir != null) {
