@@ -49,7 +49,11 @@ import playground.michalm.zone.Zones;
 
 public class BerlinTaxiVehicleCreatorV3
 {
-    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    //used in status data
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+	//used in many other files
+	private static final SimpleDateFormat ORG = new SimpleDateFormat("yyyyMMddHHmmss");
     private static final Logger log = Logger.getLogger(BerlinTaxiVehicleCreatorV3.class);
 
     private Map<Date, Integer> taxisOverTime = new TreeMap<Date,Integer>();
@@ -68,13 +72,14 @@ public class BerlinTaxiVehicleCreatorV3
     public static void main(String[] args)
         throws ParseException
     {
-        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/";
-        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt";
-        String networkFile = dir + "scenarios/2014_10_basic_scenario_v4/berlin_brb.xml";
+        String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
+//        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt";
+        String taxisOverTimeFile = dir + "/taxi_berlin/2013/status/taxisovertime.csv";
+        String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
-        String vehicleFile = dir + "scenarios/2015_02_strike/taxis.xml";
-        String statusMatrixFile = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/statusMatrixAvg.xml";
+        String vehicleFile = dir + "scenarios/2015_02_basic_scenario_v6/taxis4to4_EV";
+        String statusMatrixFile = dir+ "/taxi_berlin/2013/status/statusMatrixAvg.xml";
         
         
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
@@ -82,7 +87,8 @@ public class BerlinTaxiVehicleCreatorV3
         btv.minTime = 14.0 * 3600;
         btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
-        btv.createAverages(SDF.parse("2014-10-15 03:30:00"), 1);
+//        btv.createAverages(SDF.parse("2014-10-15 03:30:00"), 1);
+        btv.createAverages(SDF.parse("2013-04-16 03:30:00"), 1);
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
         btv.prepareMatrices(statusMatrixFile);
         btv.createVehicles();
@@ -111,7 +117,7 @@ public class BerlinTaxiVehicleCreatorV3
             public void startRow(String[] row)
             {
                 try {
-                    taxisOverTime.put(SDF.parse(row[0]), Integer.parseInt(row[1]));
+                    taxisOverTime.put(ORG.parse(row[0]), (int) Double.parseDouble(row[1]));
                 }
                 catch (Exception e) {
                     throw new RuntimeException(e);
