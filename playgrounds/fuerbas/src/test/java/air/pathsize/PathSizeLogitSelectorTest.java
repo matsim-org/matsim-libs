@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -59,8 +60,26 @@ public class PathSizeLogitSelectorTest {
 		Config config = ConfigUtils.createConfig();
 //		config.network().setInputFile(netfile);
 		config.plans().setInputFile(popfile);
+
+		{
+			ModeRoutingParams params = new ModeRoutingParams() ;
+			params.setMode("pt") ;
+			config.plansCalcRoute().addModeRoutingParams(params);
+		}
+		{
+			ModeRoutingParams params = new ModeRoutingParams() ;
+			params.setMode("transit_walk") ;
+			config.plansCalcRoute().addModeRoutingParams(params);
+		}
+		{
+			ModeRoutingParams params = new ModeRoutingParams() ;
+			params.setMode("train") ;
+			config.plansCalcRoute().addModeRoutingParams(params);
+		}
+
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		createExperimentalTransitRoutes(sc);
+		
 		return sc;
 	}
 	
@@ -71,7 +90,7 @@ public class PathSizeLogitSelectorTest {
 		Set<String> mainModes = new HashSet<String>();
 		mainModes.add("pt");
 		mainModes.add("train");
-
+		
 		//Two plans with exactly same structure but a big difference in the scores
 		PathSizeLogitSelector psls = new PathSizeLogitSelector(1, 2, mainModes);
 		Plan plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("555555", Person.class)));

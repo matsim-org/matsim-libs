@@ -168,7 +168,6 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		{
 			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
 			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
-			bike.setBeelineDistanceFactor(1.3); // old default; necessary for backwards compatibility.  kai, feb'15
 			addParameterSet( bike );
 		}
 
@@ -195,6 +194,11 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 			final ModeRoutingParams pt = new ModeRoutingParams( TransportMode.pt );
 			pt.setTeleportedModeFreespeedFactor( 2.0 );
 			addParameterSet( pt );
+		}
+		{
+			final ModeRoutingParams transit_walk = new ModeRoutingParams( TransportMode.transit_walk ) ;
+			transit_walk.setBeelineDistanceFactor(1.3); // old default; necessary for backwards compatibility.  kai, feb'15
+			addParameterSet( transit_walk );
 		}
 		this.acceptModeParamsWithoutClearing = false;
 	}
