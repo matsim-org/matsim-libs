@@ -20,6 +20,7 @@ package playground.agarwalamit.munich.calibration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -81,7 +82,7 @@ public class SubPopInputs4Munich {
 		config.plans().setSubpopulationAttributeName("userGroup");
 		
 		//remove existing subtourModeChoice strategy settings; operation is not supported, may be remove it manually later. or just load the desired config modules only.
-//		config.strategy().getStrategySettings().remove("SubtourModeChoice");
+		config.strategy().getStrategySettings().remove("SubtourModeChoice");
 
 		// add corresponding to all user groups
 		for(UserGroup ug : UserGroup.values()){
@@ -93,12 +94,7 @@ public class SubPopInputs4Munich {
 			config.strategy().addStrategySettings(modeChoice);
 
 			// first use existing pt mode parameters and set them as new pt mode parameters
-			ModeParams ptParams = config.planCalcScore().getModes().get("pt");
-			
-//			for(String param : ptParams.getParams().keySet()){
-//				config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).addParam(param, ptParams.getParams().get(param));
-//			}
-//			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).addParameterSet(ptParams);
+			ModeParams ptParams = config.planCalcScore().getModes().get(TransportMode.pt);
 			
 			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setConstant(ptParams.getConstant());
 			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setMarginalUtilityOfDistance(ptParams.getMarginalUtilityOfDistance());
@@ -106,17 +102,14 @@ public class SubPopInputs4Munich {
 			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setMonetaryDistanceCostRate(ptParams.getMonetaryDistanceCostRate());
 		
 			// teleportation speeds for different pts
-			
-			config.plansCalcRoute().getOrCreateModeRoutingParams("pt_".concat(ug.toString())).
-			setTeleportedModeSpeed(config.plansCalcRoute().getTeleportedModeSpeeds().get("pt"));
+			Double ptModeSpeed = config.plansCalcRoute().getTeleportedModeSpeeds().get("pt");
+			config.plansCalcRoute().getOrCreateModeRoutingParams("pt_".concat(ug.toString())).setTeleportedModeSpeed(ptModeSpeed);
 		}
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 		
 		// remove existing pt manually.
-
 		new ConfigWriter(config).write(outConfigFile);
-
 	}
 
 	private String getUserGroupFromPersonId(Id<Person> personId){
