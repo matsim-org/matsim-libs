@@ -80,7 +80,7 @@ public class VisumNetworkReader {
 	private final String[] ATTRIBUTE_LINKTYPE_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_LINKTYPE_KAPIV = {"CAPPRT", "KAPIV"};
 	private final String[] ATTRIBUTE_LINKTYPE_V0IV = {"V0PRT", "V0IV"};
-	private final String[] ATTRIBUTE_LINKTYPE_NOLANES = {ATTRIBUTE_UNKNOWN, "ANZFAHRSTREIFEN"};
+	private final String[] ATTRIBUTE_LINKTYPE_NOLANES = {"NUMLANES", "ANZFAHRSTREIFEN"};
 
 	private final String[] ATTRIBUTE_STOP_NO = GENERAL_NO;
 	private final String[] ATTRIBUTE_STOP_NAME = GENERAL_NAME;
