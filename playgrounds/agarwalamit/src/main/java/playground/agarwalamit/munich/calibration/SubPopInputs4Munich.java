@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.calibration;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,9 +29,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -42,80 +43,97 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class SubPopInputs4Munich {
 
 	PersonFilter pf = new PersonFilter();
+	private final String subPopAttributeName = "userGroup";
 
 	public static void main(String[] args) {
 		SubPopInputs4Munich inputs = new SubPopInputs4Munich();
+		inputs.writePersonAttributes();
 		inputs.modifyConfig();
 	}
 
-	private void modifyPlans(){
+	private void writePersonAttributes(){
 
-		// read initial plans, (may be not merged one)
-		String rawPlans = "";
-		String outPopFile = "";
+		// read plans with subActivities (basically these are inital plans from different sources + subActivities)
+		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz";
+		String outPopAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_usrGrp.xml.gz";
 
-		Scenario sc_raw = LoadMyScenarios.loadScenarioFromPlans(rawPlans);
-		Population pop = sc_raw.getPopulation();	
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
+		Population pop = sc.getPopulation();	
 
 		for(Person p : pop.getPersons().values()){
-			pop.getPersonAttributes().putAttribute(p.getId().toString(), "userGroup", getUserGroupFromPersonId(p.getId()));
+			pop.getPersonAttributes().putAttribute(p.getId().toString(), subPopAttributeName, getUserGroupFromPersonId(p.getId()));
 		}
 
-		// now  sub activity types
-		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc_raw);
-		newPlansInfo.run();
-
-		new PopulationWriter(newPlansInfo.getOutPop()).write(outPopFile);
+		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()) ;
+		writer.writeFile(outPopAttributeFile);
 	}
 
 	private void modifyConfig(){
 
 		// I think, config with all sub activities info can be taken.
 		String existingConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_subActivities_baseCase.xml"; 
-		String outConfigFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_subPop_subAct_baseCase.xml";
+		String outConfigFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml"; // need manual verification later
 
 		Config config =  ConfigUtils.loadConfig(existingConfig);
 
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1000);
+		config.plans().setSubpopulationAttributeName(subPopAttributeName); // if this is set then, one have to set same strategy for all sub pops.
 		
-		config.plans().setSubpopulationAttributeName("userGroup");
+		String usrGrps [] = {"URBAN","COMMUTER_REV_COMMUTER","FREIGHT"};
 		
-		//remove existing subtourModeChoice strategy settings; operation is not supported, may be remove it manually later. or just load the desired config modules only.
-		config.strategy().getStrategySettings().remove("SubtourModeChoice");
-
-		// add corresponding to all user groups
-		for(UserGroup ug : UserGroup.values()){
-
-			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-			modeChoice.setStrategyName("subtourModeChoice_".concat(ug.toString()));
-			modeChoice.setWeight(0.15);
-			modeChoice.setSubpopulation(ug.toString());
-			config.strategy().addStrategySettings(modeChoice);
-
-			// first use existing pt mode parameters and set them as new pt mode parameters
-			ModeParams ptParams = config.planCalcScore().getModes().get(TransportMode.pt);
+		for(String ug :usrGrps){
 			
-			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setConstant(ptParams.getConstant());
-			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setMarginalUtilityOfDistance(ptParams.getMarginalUtilityOfDistance());
-			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setMarginalUtilityOfTraveling(ptParams.getMarginalUtilityOfTraveling());
-			config.planCalcScore().getOrCreateModeParams("pt_".concat(ug.toString())).setMonetaryDistanceCostRate(ptParams.getMonetaryDistanceCostRate());
-		
-			// teleportation speeds for different pts
-			Double ptModeSpeed = config.plansCalcRoute().getTeleportedModeSpeeds().get("pt");
-			config.plansCalcRoute().getOrCreateModeRoutingParams("pt_".concat(ug.toString())).setTeleportedModeSpeed(ptModeSpeed);
+			StrategySettings reroute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
+			reroute.setSubpopulation(ug);
+			reroute.setDisableAfter(800);
+			reroute.setWeight(0.15);
+			config.strategy().addStrategySettings(reroute);
+			
+			StrategySettings expBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			expBeta.setStrategyName("ChangeExpBeta");
+			expBeta.setSubpopulation(ug);
+			expBeta.setWeight(0.7);
+			config.strategy().addStrategySettings(expBeta);
+			
+			StrategySettings modeChoice_comm = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			modeChoice_comm.setStrategyName("subtourModeChoice_".concat(ug));
+			modeChoice_comm.setDisableAfter(800);
+			modeChoice_comm.setWeight(0.15);
+			modeChoice_comm.setSubpopulation(ug);
+			config.strategy().addStrategySettings(modeChoice_comm);
 		}
+ 		
+//		// add corresponding to all user groups except urban and freight
+//		StrategySettings modeChoice_comm = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+//		modeChoice_comm.setStrategyName("subtourModeChoice_".concat("COMMUTER_REV_COMMUTER"));
+//		modeChoice_comm.setWeight(0.15);
+//		modeChoice_comm.setSubpopulation("COMMUTER_REV_COMMUTER");
+//		config.strategy().addStrategySettings(modeChoice_comm);
+
+		// first use existing pt mode parameters and set them as new pt mode parameters
+		ModeParams ptParams = config.planCalcScore().getModes().get(TransportMode.pt);
+		
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setConstant(-0.5);
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfDistance(ptParams.getMarginalUtilityOfDistance());
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMarginalUtilityOfTraveling(ptParams.getMarginalUtilityOfTraveling());
+		config.planCalcScore().getOrCreateModeParams("pt_".concat("COMMUTER_REV_COMMUTER")).setMonetaryDistanceCostRate(ptParams.getMonetaryDistanceCostRate());
+		
+		// teleportation speeds for different pts
+		config.plansCalcRoute().getOrCreateModeRoutingParams("pt_".concat("COMMUTER_REV_COMMUTER")).setTeleportedModeSpeed(50/3.6);
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 		
-		// remove existing pt manually.
+		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file."
+				+ "\n For e.g. 1) existing \"SubtourModeChoice\" is taken for urban agents and for reverse commuters and commuters new module is added."
+				+ "\n 2) Strategy settings and Some more minor modifications.");
+		
 		new ConfigWriter(config).write(outConfigFile);
 	}
 
 	private String getUserGroupFromPersonId(Id<Person> personId){
 		if(pf.isPersonFromMunich(personId)) return UserGroup.URBAN.toString();
-		else if(pf.isPersonInnCommuter(personId)) return UserGroup.COMMUTER.toString();
-		else if(pf.isPersonOutCommuter(personId)) return UserGroup.REV_COMMUTER.toString();
+		else if(pf.isPersonInnCommuter(personId)) return "COMMUTER_REV_COMMUTER";
+		else if(pf.isPersonOutCommuter(personId)) return "COMMUTER_REV_COMMUTER";
 		else if (pf.isPersonFreight(personId)) return UserGroup.FREIGHT.toString();
 		else throw new RuntimeException("Person "+personId+" does not belong to any user group. Aborting ...");
 	}
