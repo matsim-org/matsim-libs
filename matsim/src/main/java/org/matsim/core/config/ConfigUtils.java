@@ -37,6 +37,17 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
+	public static Config createConfig(ConfigGroup... customModules) {
+		Config config = new Config();
+		config.addCoreModules();
+
+        for (ConfigGroup customModule : customModules) {
+            config.addModule(customModule);
+        }
+
+		return config;
+	}
+
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();

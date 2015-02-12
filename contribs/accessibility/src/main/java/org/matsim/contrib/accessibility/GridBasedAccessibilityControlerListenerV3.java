@@ -138,6 +138,8 @@ implements ShutdownListener, StartupListener {
 	// required in order not to confuse the output
 	private String outputSubdirectory;
 	
+	
+	
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -317,7 +319,7 @@ implements ShutdownListener, StartupListener {
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
 			for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
-				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( accessibilityGrids );
+				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( getAccessibilityGrids() );
 		}
 
 	}
@@ -352,18 +354,18 @@ implements ShutdownListener, StartupListener {
 	 */
 	private final void writePlottingData(String adaptedOutputDirectory) {
 
-		log.info("Writing plotting data for R analyis into " + adaptedOutputDirectory + " ...");
-		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
-			if ( this.isComputingMode.get(mode) ) {
-				final SpatialGrid spatialGrid = this.accessibilityGrids.get(mode);
-
-				// output for R:
-				GridUtils.writeSpatialGridTable( spatialGrid, adaptedOutputDirectory
-						+ "/" + mode.toString() + Labels.ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
-
-			}
-		}
-		log.info("Writing plotting data for R done!");
+//		log.info("Writing plotting data for R analyis into " + adaptedOutputDirectory + " ...");
+//		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
+//			if ( this.isComputingMode.get(mode) ) {
+//				final SpatialGrid spatialGrid = this.getAccessibilityGrids().get(mode);
+//
+//				// output for R:
+//				GridUtils.writeSpatialGridTable( spatialGrid, adaptedOutputDirectory
+//						+ "/" + mode.toString() + Labels.ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
+//
+//			}
+//		}
+//		log.info("Writing plotting data for R done!");
 
 		
 		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
@@ -372,15 +374,15 @@ implements ShutdownListener, StartupListener {
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
-		final SpatialGrid spatialGrid = this.accessibilityGrids.get( Modes4Accessibility.freeSpeed ) ;
+		final SpatialGrid spatialGrid = this.getAccessibilityGrids().get( Modes4Accessibility.freeSpeed ) ;
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-				writer.writeField( x ) ;
-				writer.writeField( y ) ;
+				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
+				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 					if ( this.isComputingMode.get(mode) ) {
-						final SpatialGrid theSpatialGrid = this.accessibilityGrids.get(mode);
+						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
 							writer.writeField( value ) ;
@@ -460,7 +462,7 @@ implements ShutdownListener, StartupListener {
 		measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
-				this.accessibilityGrids.put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
+				this.getAccessibilityGrids().put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
 			}
 		}
 	}
@@ -512,7 +514,7 @@ implements ShutdownListener, StartupListener {
 		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
-				this.accessibilityGrids.put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
+				this.getAccessibilityGrids().put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
 			}
 		}
 		lockedForAdditionalFacilityData  = true ;

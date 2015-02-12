@@ -81,7 +81,7 @@ abstract class AccessibilityControlerListenerImpl {
 	AggregationObject[] aggregatedOpportunities;
 	
 	// storing the accessibility results
-	Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
+	private Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
 
 	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
@@ -128,6 +128,8 @@ abstract class AccessibilityControlerListenerImpl {
 	private static int cnt = 0 ;
 
 	RoadPricingScheme scheme;
+
+	private boolean urbansimMode = true;
 
 	AccessibilityControlerListenerImpl() {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
@@ -441,9 +443,11 @@ abstract class AccessibilityControlerListenerImpl {
 					}
 				}
 
-				// writing measured accessibilities for current measuring point 
-				writeCSVData4Urbansim(origin, fromNode, accessibilities ) ;
-				// (I think the above is the urbansim output.  Better not touch it. kai, feb'14) 
+				if ( this.urbansimMode ) {
+					// writing measured accessibilities for current measuring point 
+					writeCSVData4Urbansim(origin, fromNode, accessibilities ) ;
+					// (I think the above is the urbansim output.  Better not touch it. kai, feb'14)
+				}
 				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
@@ -604,6 +608,20 @@ abstract class AccessibilityControlerListenerImpl {
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
 	// ////////////////////////////////////////////////////////////////////
+
+
+	/**
+	 * Set to true if you are using this module in urbansim mode.  With false, some (or all) of the m4u output files are not written
+	 * (since they cannot be modified anyways).
+	 */
+	public void setUrbansimMode(boolean urbansimMode) {
+		this.urbansimMode = urbansimMode;
+	}
+
+	Map<Modes4Accessibility,SpatialGrid> getAccessibilityGrids() {
+		return accessibilityGrids;
+	}
+
 
 
 	/**

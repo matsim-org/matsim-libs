@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -43,8 +44,10 @@ public class AccessibilityRuns {
 	@Test
 	public void doAccessibilityTest() {
 
-		Config config = ConfigUtils.createConfig() ;
-
+		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
+		
+		AccessibilityConfigGroup acg = (AccessibilityConfigGroup) config.getModule( AccessibilityConfigGroup.GROUP_NAME ) ;
+		
 		config.network().setInputFile("../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz");
 		config.facilities().setInputFile("../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz" );
 
@@ -126,6 +129,8 @@ public class AccessibilityRuns {
 				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
 				listener.writeToSubdirectoryWithName(actType + "/" + mode);
+				
+				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
 				controler.addControlerListener(listener);
 			}

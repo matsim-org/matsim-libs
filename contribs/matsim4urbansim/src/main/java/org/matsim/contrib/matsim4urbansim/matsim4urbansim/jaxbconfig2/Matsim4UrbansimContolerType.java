@@ -63,20 +63,20 @@ import javax.xml.bind.annotation.XmlType;
 public class Matsim4UrbansimContolerType {
 
     @XmlElement(name = "zone2zoneImpedance")
-    protected boolean zone2ZoneImpedance;
-    protected boolean agentPerformance;
-    protected boolean zoneBasedAccessibility;
-    protected boolean cellBasedAccessibility;
+    private boolean zone2ZoneImpedance;
+    private boolean agentPerformance;
+    private boolean zoneBasedAccessibility;
+    private boolean cellBasedAccessibility;
     @XmlElement(required = true)
     @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger cellSizeCellBasedAccessibility;
+    private BigInteger cellSizeCellBasedAccessibility;
     @XmlElement(required = true)
-    protected FileType shapeFileCellBasedAccessibility;
-    protected boolean useCustomBoundingBox;
-    protected double boundingBoxTop;
-    protected double boundingBoxLeft;
-    protected double boundingBoxRight;
-    protected double boundingBoxBottom;
+    private FileType shapeFileCellBasedAccessibility;
+    private boolean useCustomBoundingBox;
+    private double boundingBoxTop;
+    private double boundingBoxLeft;
+    private double boundingBoxRight;
+    private double boundingBoxBottom;
 
     /**
      * Gets the value of the zone2ZoneImpedance property.
