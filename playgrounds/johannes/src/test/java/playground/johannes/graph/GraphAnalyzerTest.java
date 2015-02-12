@@ -21,9 +21,11 @@ package playground.johannes.graph;
 
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.analysis.DegreeTask;
@@ -36,25 +38,30 @@ import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
  * @author illenberger
  *
  */
-public class GraphAnalyzerTest extends TestCase {
-
-	private static final String INPUT_FILE = "../../contrib/sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
+public class GraphAnalyzerTest /* extends TestCase */ {
+	@Rule
+	MatsimTestUtils utils = new MatsimTestUtils() ;
 	
+//	private static final String INPUT_FILE = "../../contrib/sna/test/input/org/matsim/contrib/sna/graph/spatial/io/SpatialGraph.k7.graphml.gz";
+	
+	@Test
 	public void test() {
+		final String INPUT_FILE = utils.getPackageInputDirectory() + "/SpatialGraph.k7.graphml.gz" ;
+		
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(INPUT_FILE);
 		
 		Map<String, DescriptiveStatistics> stats = GraphAnalyzer.analyze(graph, new TopologyAnalyzerTask());
 		
-		assertEquals(7.1462, stats.get(DegreeTask.KEY).getMean(), 0.0001);
-		assertEquals(19.0, stats.get(DegreeTask.KEY).getMax());
-		assertEquals(0.0, stats.get(DegreeTask.KEY).getMin());
+		Assert.assertEquals(7.1462, stats.get(DegreeTask.KEY).getMean(), 0.0001);
+		Assert.assertEquals(19.0, stats.get(DegreeTask.KEY).getMax());
+		Assert.assertEquals(0.0, stats.get(DegreeTask.KEY).getMin());
 		
-		assertEquals(0.0018, stats.get("r_k").getMean(), 0.0001);
+		Assert.assertEquals(0.0018, stats.get("r_k").getMean(), 0.0001);
 		
-		assertEquals(0.0008, stats.get(TransitivityTask.KEY).getMean(), 0.0001);
-		assertEquals(1.0, stats.get(TransitivityTask.KEY).getMax());
-		assertEquals(0.0, stats.get(TransitivityTask.KEY).getMin());
-		assertEquals(0.0008, stats.get("c_global").getMean(), 0.0001);
+		Assert.assertEquals(0.0008, stats.get(TransitivityTask.KEY).getMean(), 0.0001);
+		Assert.assertEquals(1.0, stats.get(TransitivityTask.KEY).getMax());
+		Assert.assertEquals(0.0, stats.get(TransitivityTask.KEY).getMin());
+		Assert.assertEquals(0.0008, stats.get("c_global").getMean(), 0.0001);
 	}
 }
