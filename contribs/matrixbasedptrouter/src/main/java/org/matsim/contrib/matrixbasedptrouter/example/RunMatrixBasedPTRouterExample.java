@@ -46,18 +46,26 @@ public class RunMatrixBasedPTRouterExample
 
     public static void main(String[] args)
     {
-        //load Matsim scenario - check the config file for required PT Matrix input file data
+        //load config - check the config file for required PT Matrix input file data
         String path = "src/main/resources/example/";
-        Config config = ConfigUtils.loadConfig(path+"example_config.xml");
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Controler controler = new Controler(config);
+        Config config = ConfigUtils.loadConfig(path+"example_config.xml", new MatrixBasedPtRouterConfigGroup());
         
+        //fetching relevant groups ot of the config
+        MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+        
+
+        //setting up scenario
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
         // Bounding Box for PT Matrix - may be scaled down to a smaller area
         BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
+        // setting up PT Matrix
+        PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
         
-        // setting up the PT Matrix and routing
-        PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
-        PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
+        //and finally setting up the controler
+        Controler controler = new Controler(config);
+        // setting up routing 
         controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
         
         controler.run();
