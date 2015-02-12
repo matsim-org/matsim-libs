@@ -63,7 +63,7 @@ public class RelationsDiffPlot {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "629";
+		String runId = "700";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 		String refFile2 = "/home/johannes/gsv/matrices/refmatrices/bmbv2010.xml";
 		String refFile1 = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
@@ -95,7 +95,7 @@ public class RelationsDiffPlot {
 		 * load zones
 		 */
 		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
+		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		/*
@@ -147,8 +147,8 @@ public class RelationsDiffPlot {
 					
 					double rotation = Math.atan(deltaY/deltaX) * 180/Math.PI;
 					
-//					coords[1].x = coords[0].x + deltaX/2.0;
-//					coords[1].y = coords[0].y + deltaY/2.0;
+					coords[1].x = coords[0].x + deltaX/2.0;
+					coords[1].y = coords[0].y + deltaY/2.0;
 					
 //					double labelX = coords[0].x + deltaX/4.0;
 //					double labelY = coords[0].y + deltaY/4.0;

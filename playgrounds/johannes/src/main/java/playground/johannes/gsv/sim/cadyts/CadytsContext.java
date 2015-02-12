@@ -21,6 +21,8 @@
 package playground.johannes.gsv.sim.cadyts;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,8 +47,12 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
+import playground.johannes.gsv.sim.Simulator;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.supply.SimResults;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
@@ -66,13 +72,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	
 	private AnalyticalCalibrator<Link> calibrator;
 	private PlanToPlanStepBasedOnEvents ptStep;
-	private SimResults<Link> simResults;
+	private SimResultsAdaptor simResults;
 	
 	private final LinkOccupancyCalculator occupancy;
 	
 	private final double scale;
 	
+	private final Config config;
+	
 	public CadytsContext(Config config, Counts counts, LinkOccupancyCalculator occupancy) {
+		this.config = config;
 		this.scale = config.counts().getCountsScaleFactor();
 		this.occupancy = occupancy;
 //		this.countsScaleFactor = config.counts().getCountsScaleFactor();
@@ -123,6 +132,28 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
 		event.getControler().getEvents().addHandler(ptStep);
 
+		if(Boolean.parseBoolean(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
+			KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+			reader.setValidating(false);
+			reader.parse(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
+			KeyMatrix m = reader.getMatrix();
+			
+			String data;
+			try {
+				data = new String(Files.readAllBytes(Paths.get(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
+				ZoneCollection zones = new ZoneCollection();
+				zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+				
+				ODCalibrator odCalibrartor = new ODCalibrator(event.getControler().getScenario().getNetwork(), this, m, zones);
+				event.getControler().getEvents().addHandler(odCalibrartor);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		Logger.getRootLogger().setLevel(Level.FATAL);
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
@@ -158,6 +189,18 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	@Override
 	public AnalyticalCalibrator<Link> getCalibrator() {
 		return this.calibrator;
+	}
+	
+	SimResultsAdaptor getSimResultsAdaptor() {
+		return simResults;
+	}
+	
+	Counts getCounts() {
+		return counts;
+	}
+	
+	double getScalingFactor() {
+		return scale;
 	}
 
 	// ===========================================================================================================================

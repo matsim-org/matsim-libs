@@ -92,7 +92,7 @@ public class CountsCompare2GeoJSON {
 			properties.put("simulation", simVal);
 			properties.put("observation", obsVal);
 			properties.put("error", relErr);
-			properties.put("color", "#" + String.format("%06x", ColorUtils.getRedGreenColor(Math.abs(relErr)).getRGB() & 0x00FFFFFF));
+			properties.put("color", "#" + String.format("%06x", ColorUtils.getRedGreenColor(Math.min(1, Math.abs(relErr))).getRGB() & 0x00FFFFFF));
 			
 			Feature obsFeature = new Feature(jsonWriter.write(obsPoint), properties);
 			Feature simFeature = new Feature(jsonWriter.write(simPoint), properties);

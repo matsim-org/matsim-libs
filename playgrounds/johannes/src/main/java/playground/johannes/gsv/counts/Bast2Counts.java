@@ -162,7 +162,7 @@ public class Bast2Counts {
 		MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467));
 		
 		Counts theCounts = new Counts();
-		theCounts.setYear(2009);
+		theCounts.setYear(2013);
 		theCounts.setName("BaSt Zählstellen");
 		
 		int noreturn = 0;

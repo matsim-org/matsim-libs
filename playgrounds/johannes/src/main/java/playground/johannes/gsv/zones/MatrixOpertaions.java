@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -135,72 +136,99 @@ public class MatrixOpertaions {
 		}
 		return marginals;
 	}
-	
+
 	public static KeyMatrix average(Collection<KeyMatrix> matrices) {
 		Set<String> keys = new HashSet<>();
-		for(KeyMatrix m : matrices) {
+		for (KeyMatrix m : matrices) {
 			keys.addAll(m.keys());
 		}
-		
+
 		KeyMatrix avr = new KeyMatrix();
-		for(KeyMatrix m : matrices) {
-			for(String i : keys) {
-				for(String j : keys) {
+		for (KeyMatrix m : matrices) {
+			for (String i : keys) {
+				for (String j : keys) {
 					Double val = m.get(i, j);
-					if(val == null) val = 0.0;
-					
+					if (val == null)
+						val = 0.0;
+
 					Double val2 = avr.get(i, j);
-					if(val2 == null) val2 = 0.0;
-					
+					if (val2 == null)
+						val2 = 0.0;
+
 					double sum = val + val2;
-					if(sum > 0)	avr.set(i, j, sum);
+					if (sum > 0)
+						avr.set(i, j, sum);
+				}
+			}
+		}
+
+		for (String i : keys) {
+			for (String j : keys) {
+				avr.applyFactor(i, j, 1 / (double) matrices.size());
+			}
+		}
+
+		return avr;
+	}
+
+	public static void sysmetrize(KeyMatrix m) {
+		List<String> keys = new ArrayList<>(m.keys());
+
+		for (int i = 0; i < keys.size(); i++) {
+			String key1 = keys.get(i);
+			for (int j = (i + 1); j < keys.size(); j++) {
+				String key2 = keys.get(j);
+				Double val1 = m.get(key1, key2);
+				if (val1 == null)
+					val1 = 0.0;
+
+				Double val2 = m.get(key2, key1);
+				if (val2 == null)
+					val2 = 0.0;
+
+				double sum = val1 + val2;
+				// double p = Math.random() - 0.5;
+				//
+				// double f = 0.5 + (p * 0.1);
+				//
+				// double maxf = Math.max(f, 1-f);
+				//
+				// double v1;
+				// double v2;
+				//
+				// if(val1 < val2) {
+				// v1 = sum * maxf;
+				// v2 = sum * (1 - maxf);
+				// } else {
+				// v1 = sum * (1 - maxf);
+				// v2 = sum * maxf;
+				// }
+
+				m.set(key1, key2, sum / 2.0);
+				m.set(key2, key1, sum / 2.0);
+			}
+		}
+	}
+
+	public static KeyMatrix aggregate(KeyMatrix m, Map<String, Zone> zones, String key) {
+		KeyMatrix newM = new KeyMatrix();
+
+		Set<String> keys = m.keys();
+		for (String i : keys) {
+			for (String j : keys) {
+				Double val = m.get(i, j);
+				if (val != null) {
+					Zone zone_i = zones.get(i);
+					Zone zone_j = zones.get(j);
+
+					String att_i = zone_i.getAttribute(key);
+					String att_j = zone_j.getAttribute(key);
+
+					newM.add(att_i, att_j, val);
 				}
 			}
 		}
 		
-		for(String i : keys) {
-			for(String j : keys) {
-				avr.applyFactor(i, j, 1/(double)matrices.size());
-			}
-		}
-		
-		return avr;
-	}
-	
-	public static void sysmetrize(KeyMatrix m) {
-		List<String> keys = new ArrayList<>(m.keys());
-		
-		for(int i = 0; i < keys.size(); i++) {
-			String key1 = keys.get(i);
-			for(int j = (i+1); j < keys.size(); j++) {
-				String key2 = keys.get(j);
-				Double val1 = m.get(key1, key2);
-				if(val1 == null) val1 = 0.0;
-				
-				Double val2 = m.get(key2, key1);
-				if(val2 == null) val2 = 0.0;
-				
-				double sum = val1 + val2;
-//				double p = Math.random() - 0.5;
-//				
-//				double f = 0.5 + (p * 0.1);
-//						
-//				double maxf = Math.max(f, 1-f);				
-//				
-//				double v1;
-//				double v2;
-//				
-//				if(val1 < val2) {
-//					v1 = sum * maxf;
-//					v2 = sum * (1 - maxf);
-//				} else {
-//					v1 = sum * (1 - maxf);
-//					v2 = sum * maxf;
-//				}
-				
-				m.set(key1, key2, sum/2.0);
-				m.set(key2, key1, sum/2.0);
-			}
-		}
+		return newM;
 	}
 }

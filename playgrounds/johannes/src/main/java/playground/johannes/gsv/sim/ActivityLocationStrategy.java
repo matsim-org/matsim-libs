@@ -121,6 +121,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 			quadTrees = new HashMap<String, QuadTree<ActivityFacility>>();
 			for (ActivityFacility facility : facilities.getFacilities().values()) {
+
 				for (ActivityOption option : facility.getActivityOptions().values()) {
 					QuadTree<ActivityFacility> quadTree = quadTrees.get(option.getType());
 					if (quadTree == null) {
@@ -130,6 +131,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 					Coord coord = facility.getCoord();
 					quadTree.put(coord.getX(), coord.getY(), facility);
 				}
+
 			}
 		}
 
@@ -203,7 +205,8 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 			/*
 			 * check if not blacklisted activity
 			 */
-			if (!act.getType().equalsIgnoreCase(blacklist)) {
+//			if (!act.getType().equalsIgnoreCase(blacklist)) {
+			if(isValid(plan, act, idx)) {
 				/*
 				 * use the target distance of the from-trip as reference, except
 				 * when it is the first activity. This needs to be done before
@@ -221,25 +224,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 				plan = person.createCopyOfSelectedPlanAndMakeSelected();
 				act = (ActivityImpl) plan.getPlanElements().get(idx);
 
-				// ActivityFacility ref = null;
-				// if (idx == 0) {
-				// ActivityImpl next = (ActivityImpl)
-				// plan.getPlanElements().get(idx + 2);
-				// ref = facilities.getFacilities().get(next.getFacilityId());
-				// } else {
-				// ActivityImpl prev = (ActivityImpl)
-				// plan.getPlanElements().get(idx - 2);
-				// ref = facilities.getFacilities().get(prev.getFacilityId());
-				// }
-				//
 				ActivityFacility current = facilities.getFacilities().get(act.getFacilityId());
-				//
-				// double dx = current.getCoord().getX() -
-				// ref.getCoord().getX();
-				// double dy = current.getCoord().getY() -
-				// ref.getCoord().getY();
-				// double d = Math.sqrt(dx * dx + dy * dy);
-
 				/*
 				 * get quadtree for activity type
 				 */
@@ -343,6 +328,33 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 			double d = Math.sqrt(dx * dx + dy * dy);
 			
 			return d;
+		}
+		
+		private boolean isValid(Plan plan, Activity act, int idx) {
+			/*
+			 * check activity type
+			 */
+			if(act.getType().equalsIgnoreCase(blacklist)) {
+				return false;
+			}
+			/*
+			 * valid if first or last activity
+			 */
+			if(idx == 0) {
+				return true;
+			} else if(idx == plan.getPlanElements().size() - 1) {
+				return true;
+			}
+			/*
+			 * check if previous and next act are at same location
+			 */
+			Activity prev = (Activity) plan.getPlanElements().get(idx - 2);
+			Activity next = (Activity) plan.getPlanElements().get(idx + 2);
+			if(prev.getFacilityId().equals(next.getFacilityId())) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 }

@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
+import gnu.trove.TObjectDoubleHashMap;
+
 import org.matsim.api.core.v01.network.Link;
 
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
@@ -37,15 +39,26 @@ public class SimResultsAdaptor implements SimResults<Link> {
 	
 	private final double scale;
 	
+	private final TObjectDoubleHashMap<Link> virtualCounts;
+	
 	public SimResultsAdaptor(LinkOccupancyCalculator occupancy, double scale) {
 		this.occupancy = occupancy;
 		this.scale = scale;
+		this.virtualCounts = new TObjectDoubleHashMap<>();
 	}
 	
 	@Override
 	public double getSimValue(Link link, int startTime_s, int endTime_s, TYPE type) {
-	
-		double val = occupancy.getOccupancy(link.getId());
+		/*
+		 * first check for virtual count
+		 */
+		double val = virtualCounts.get(link);
+		if(val == 0) {
+			/*
+			 * if zero probably, but not necessarily a real link
+			 */
+			val = occupancy.getOccupancy(link.getId());
+		}
 	
 		if(type == TYPE.COUNT_VEH) {
 			return val * scale;
@@ -56,6 +69,14 @@ public class SimResultsAdaptor implements SimResults<Link> {
 			throw new RuntimeException();
 		}
 		
+	}
+	
+	public void addVirtualCount(Link link) {
+		virtualCounts.adjustOrPutValue(link, 1, 1);
+	}
+	
+	public void resetVirtualCounts() {
+		virtualCounts.clear();
 	}
 
 }

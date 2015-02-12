@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,39 +22,39 @@ package playground.johannes.gsv.counts;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ApplyFactor {
+public class CountsCompare {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
-		reader.parse("/home/johannes/gsv/counts/counts.2013.net20140909.5.xml");
+		Counts countsOld = new Counts();
+		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(countsOld);
+		reader.parse("/home/johannes/gsv/counts/counts.2009.net20140909.5.24h.xml");
+		
+		Counts countsNew = new Counts();
+		reader = new CountsReaderMatsimV1(countsNew);
+		reader.parse("/home/johannes/gsv/counts/counts.2013.net20140909.5.24h.xml");
 
-		Counts newCounts = new Counts();
-		newCounts.setDescription(counts.getDescription());
-		newCounts.setName(counts.getName());
-		newCounts.setYear(counts.getYear());
-
-		for (Count count : counts.getCounts().values()) {
-			if (count.getVolume(1).getValue() != 0) {
-				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
-				for (int i = 1; i < 25; i++) {
-					newCount.createVolume(i, count.getVolume(i).getValue() / 24.0);
-				}
-				newCount.setCoord(count.getCoord());
+		double errsumAbs = 0;
+		double errsum = 0;
+		double cnt = 0;
+		for(Count countOld : countsOld.getCounts().values()) {
+			Count countNew = countsNew.getCount(countOld.getLocId());
+			if(countNew != null) {
+				double err = (countNew.getVolume(1).getValue() - countOld.getVolume(1).getValue()) / countOld.getVolume(1).getValue();
+				errsumAbs += Math.abs(err);
+				errsum += err;
+				cnt++;
 			}
 		}
-
-		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/gsv/counts/counts.2013.net20140909.5.24h.xml");
+		
+		System.out.println("Average error = " + errsum/cnt);
 	}
 
 }

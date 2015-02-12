@@ -54,7 +54,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 
 	private static final Logger logger = Logger.getLogger(ActivityLocationStrategyFactory.class);
-	
+
 	private Strategy strategy;
 
 	private Random random;
@@ -68,10 +68,11 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 	private final double mutationError;
 
 	private Set<Person> candidates;
-	
+
 	private final double threshold;
 
-	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler, double mutationError, double threshold) {
+	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler, double mutationError,
+			double threshold) {
 		this.random = random;
 		this.numThreads = numThreads;
 		this.blacklist = blacklist;
@@ -90,20 +91,25 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 			controler.addControlerListener(strategy);
 
 			candidates = new HashSet<>();
-			for(Person person : pop.getPersons().values()) {
+			for (Person person : pop.getPersons().values()) {
 				ObjectAttributes oatts = pop.getPersonAttributes();
-				
+
 				List<Double> atts = (List<Double>) oatts.getAttribute(person.getId().toString(), CommonKeys.LEG_GEO_DISTANCE);
-				if(atts != null) {
-				for(Double d : atts) {
-					if(d != null && d > threshold) {
-						candidates.add(person);
-						break;
+				if (atts != null) {
+					for (Double d : atts) {
+						if (d != null && d > threshold) {
+							/*
+							 * do not add the foreign dummy persons
+							 */
+							if (!person.getId().toString().startsWith("foreign")) {
+								candidates.add(person);
+								break;
+							}
+						}
 					}
 				}
-				}
 			}
-			
+
 			logger.info(String.format("%s candidates for replanning out of %s persons.", candidates.size(), pop.getPersons().size()));
 
 		}
@@ -112,17 +118,16 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 
 	private class Strategy implements PlanStrategy, IterationStartsListener {
 
-		
 		private GenericPlanStrategy<Plan, Person> delegate;
 
 		private int iteration;
-		
-//		private int count;
+
+		// private int count;
 
 		private List<HasPlansAndId> replannedPersons = new LinkedList<>();
-		
-//		private Controler controler;
-		
+
+		// private Controler controler;
+
 		public Strategy(GenericPlanStrategy<Plan, Person> delegate) {
 			this.delegate = delegate;
 		}
@@ -130,10 +135,10 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 		@Override
 		public void run(HasPlansAndId<Plan, Person> person) {
 			if (iteration >= 5) { // because of cadyts
-				if(candidates.contains(person)) {
+				if (candidates.contains(person)) {
 					delegate.run(person);
 					replannedPersons.add(person);
-//					count++;
+					// count++;
 				}
 			}
 
@@ -148,11 +153,11 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 		public void finish() {
 			delegate.finish();
 			logger.info(String.format("Replanned %s persons.", replannedPersons.size()));
-			
+
 			String file = controler.getControlerIO().getIterationFilename(iteration, "replannedPersons.txt");
 			try {
 				BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-				for(HasPlansAndId person : replannedPersons) {
+				for (HasPlansAndId person : replannedPersons) {
 					writer.write(person.getId().toString());
 					writer.newLine();
 				}
@@ -161,9 +166,9 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			replannedPersons = new LinkedList<>();
-//			count = 0;
+			// count = 0;
 		}
 
 		/*

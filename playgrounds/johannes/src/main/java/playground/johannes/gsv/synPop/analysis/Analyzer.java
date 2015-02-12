@@ -25,10 +25,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ApplySampleProbas;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.analysis.MonthTask;
+import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -43,10 +44,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String output = args[1];
-//		String output = "/home/johannes/gsv/mid2008/analysis/car.3-100km/";
-		String personFile = args[0];
-//		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.3-1000km.xml";
+//		String output = args[1];
+		String output = "/home/johannes/gsv/mid2008/analysis/car.3-100km/";
+//		String personFile = args[0];
+		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.3-1000km.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -55,9 +56,9 @@ public class Analyzer {
 
 		Set<ProxyPerson> persons = parser.getPersons();
 		
-//		logger.info("Cloning persons...");
-//		Random random = new XORShiftRandom();
-//		persons = PersonCloner.weightedClones(persons, 200000, random);
+		logger.info("Cloning persons...");
+		Random random = new XORShiftRandom();
+		persons = PersonCloner.weightedClones(persons, 200000, random);
 //		new ApplySampleProbas(82000000).apply(persons);
 //		logger.info(String.format("Generated %s persons.", persons.size()));
 		
@@ -85,8 +86,9 @@ public class Analyzer {
 		task.addTask(new DistanceJourneyDaysTask("car"));
 		task.addTask(new TripDayVolumeTask("car"));
 //		task.addTask(new SpeedFactorAnalyzer());
-//		task.addTask(new SeasonsTask());
+		task.addTask(new SeasonsTask());
 		task.addTask(new PkmTask("car"));
+		task.addTask(new MonthTask());
 //		task.addTask(new PopulationDensityTask(geometries, facilities, output));
 		
 		task.setOutputDirectory(output);

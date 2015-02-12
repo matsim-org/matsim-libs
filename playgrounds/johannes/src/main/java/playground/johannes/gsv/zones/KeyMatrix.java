@@ -46,6 +46,15 @@ public class KeyMatrix {
 		
 		return col.put(key2, value);
 	}
+	
+	public Double add(String key1, String key2, double value) {
+		Double val = get(key1, key2);
+		if(val == null) {
+			return set(key1, key2, value);
+		} else {
+			return set(key1, key2, val + value);
+		}
+	}
 
 	public Double get(String key1, String key2) {
 //		Map<String, Double> row = matrix.get(key1);

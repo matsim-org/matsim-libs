@@ -30,9 +30,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,9 +58,14 @@ import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.TopologyException;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 
@@ -70,7 +77,7 @@ public class NetworkExtender {
 
 	private static final Logger logger = Logger.getLogger(NetworkExtender.class);
 
-//	private static final GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
+	private static final GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
 
 	private static final DistanceCalculator distCalc = CartesianDistanceCalculator.getInstance();
 
@@ -180,14 +187,14 @@ public class NetworkExtender {
 		Link fLink1 = network.getFactory().createLink(linkId, centroidNode, neighbourNode);
 		fLink1.setLength(1);
 		fLink1.setCapacity(99999);
-		fLink1.setFreespeed(120/3.6);
-				
+		fLink1.setFreespeed(120 / 3.6);
+
 		linkId = Id.createLinkId(String.format("%s.l%s", id, 1));
 		Link fLink2 = network.getFactory().createLink(linkId, neighbourNode, centroidNode);
 		fLink2.setLength(1);
 		fLink2.setCapacity(99999);
-		fLink2.setFreespeed(120/3.6);
-		
+		fLink2.setFreespeed(120 / 3.6);
+
 		network.addLink(fLink1);
 		network.addLink(fLink2);
 		/*
@@ -197,23 +204,51 @@ public class NetworkExtender {
 		Point nPoint = MatsimCoordUtils.coordToPoint(neighbourNode.getCoord());
 		for (Node node : nodes) {
 			double dist = distCalc.distance(MatsimCoordUtils.coordToPoint(node.getCoord()), nPoint);
-			
+
 			linkId = Id.createLinkId(String.format("%s.l%s", id, cnt));
 			Link toLink = network.getFactory().createLink(linkId, neighbourNode, node);
 			toLink.setLength(dist);
 			toLink.setCapacity(99999);
-			toLink.setFreespeed(120/3.6);
+			toLink.setFreespeed(120 / 3.6);
 			cnt++;
 
 			linkId = Id.createLinkId(String.format("%s.l%s", id, cnt));
 			Link fromLink = network.getFactory().createLink(linkId, node, neighbourNode);
 			fromLink.setLength(dist);
 			fromLink.setCapacity(99999);
-			fromLink.setFreespeed(120/3.6);
+			fromLink.setFreespeed(120 / 3.6);
 			cnt++;
 
 			network.addLink(toLink);
 			network.addLink(fromLink);
+		}
+	}
+
+	private static Point getPosition(Geometry geometry, Random random) {
+		Point centroid = geometry.getCentroid();
+		try {
+			if (geometry.contains(centroid)) {
+				return centroid;
+			} else {
+				PreparedGeometry prepGeo = PreparedGeometryFactory.prepare(geometry);
+				Envelope env = geometry.getEnvelopeInternal();
+				double dx = env.getMaxX() - env.getMinX();
+				double dy = env.getMaxY() - env.getMinY();
+				Point p = null;
+				boolean inbounds = false;
+				while (!inbounds) {
+					double x = (random.nextDouble() * dx) + env.getMinX();
+					double y = (random.nextDouble() * dy) + env.getMinY();
+					Coordinate c = new Coordinate(x, y);
+					p = factory.createPoint(c);
+					inbounds = prepGeo.contains(p);
+				}
+
+				return p;
+			}
+		} catch (TopologyException e) {
+			logger.warn(e.getMessage());
+			return centroid;
 		}
 	}
 
@@ -223,7 +258,7 @@ public class NetworkExtender {
 		String zonesFile = args[2];
 		String boundaryFile = args[3];
 		String outDir = args[4];
-		
+
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
@@ -234,7 +269,7 @@ public class NetworkExtender {
 		logger.info("Loading facilities....");
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(facFile);
-		
+
 		logger.info("Loading geometries...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
 		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
@@ -251,7 +286,7 @@ public class NetworkExtender {
 				euZones.add(zone);
 			}
 		}
-	
+
 		logger.info("Loading boundary...");
 		data = new String(Files.readAllBytes(Paths.get(boundaryFile)));
 		Set<Zone> tmp = Zone2GeoJSON.parseFeatureCollection(data);
@@ -261,13 +296,15 @@ public class NetworkExtender {
 		Set<Link> links = getIntersectingLinks(scenario.getNetwork(), PreparedGeometryFactory.prepare(boundary));
 
 		logger.info(String.format("Connecting %s zones..", euZones.size()));
+		Random random = new XORShiftRandom();
 		ProgressLogger.init(euZones.size(), 2, 10);
 		for (Zone zone : euZones) {
 			Point centroid = zone.getGeometry().getCentroid();
 			// logger.info("get nearest Nodes");
 			Set<Node> nodes = getNearestNodes(centroid, links);
 			// logger.info("connect zones");
-			connectZone(zone.getGeometry().getCentroid(), nodes, scenario.getNetwork(), scenario.getActivityFacilities(), zone.getAttribute("NO"));
+			Point p = getPosition(zone.getGeometry(), random);
+			connectZone(p, nodes, scenario.getNetwork(), scenario.getActivityFacilities(), zone.getAttribute("NO"));
 			ProgressLogger.step();
 		}
 		ProgressLogger.termiante();
@@ -275,11 +312,11 @@ public class NetworkExtender {
 		logger.info("Writing network...");
 		NetworkWriter netWriter = new NetworkWriter(scenario.getNetwork());
 		netWriter.write(String.format("%s/network.xml.gz", outDir));
-		
+
 		logger.info("Writing facilities...");
 		FacilitiesWriter facWriter = new FacilitiesWriter(scenario.getActivityFacilities());
 		facWriter.write(String.format("%s/facilities.xml.gz", outDir));
-		
+
 		logger.info("Done.");
 
 	}

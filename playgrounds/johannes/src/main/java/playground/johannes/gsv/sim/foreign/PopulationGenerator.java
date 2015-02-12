@@ -24,12 +24,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +48,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -50,10 +56,12 @@ import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -66,9 +74,15 @@ public class PopulationGenerator {
 
 	private static final Random random = new XORShiftRandom();
 
-	private static final double scaleFactor = 11*365;
+	private static final double scaleFactor = 11;
 
 	private static Map<Zone, List<ActivityFacility>> facilityMap;
+
+	private static ChoiceSet<String> dayProbas;
+	
+	private static ChoiceSet<String> monthProbas;
+	
+	private static ChoiceSet<String> vacationProbas;
 
 	/**
 	 * @param args
@@ -80,8 +94,10 @@ public class PopulationGenerator {
 		String matrixDir = args[2];
 		File dir = new File(matrixDir);
 		String[] matrixFiles = dir.list();
-		
+
 		String outFile = args[3];
+
+		int numThreads = 20;
 		/*
 		 * load zones
 		 */
@@ -90,6 +106,7 @@ public class PopulationGenerator {
 		Set<Zone> zones = Zone2GeoJSON.parseFeatureCollection(data);
 		ZoneCollection zoneCollection = new ZoneCollection();
 		zoneCollection.addAll(zones);
+		zoneCollection.setPrimaryKey("NO");
 
 		Set<Zone> deZones = new HashSet<>();
 		Set<Zone> euZones = new HashSet<>();
@@ -100,8 +117,11 @@ public class PopulationGenerator {
 				euZones.add(zone);
 			}
 		}
+		logger.info(String.format("%s de zones, %s eu zones.", deZones.size(), euZones.size()));
+
 		ZoneCollection deZoneLayer = new ZoneCollection();
 		deZoneLayer.addAll(deZones);
+		deZoneLayer.setPrimaryKey("NO");
 		/*
 		 * load facilities
 		 */
@@ -113,15 +133,51 @@ public class PopulationGenerator {
 		logger.info("Assigning facilities to zones...");
 		facilityMap = assignFacilities(zoneCollection, scenario.getActivityFacilities());
 		/*
+		 * 
+		 */
+		dayProbas = new ChoiceSet<>(random);
+		dayProbas.addChoice(CommonKeys.MONDAY, 1.02);
+		dayProbas.addChoice(CommonKeys.TUESDAY, 1.04);
+		dayProbas.addChoice(CommonKeys.WEDNESDAY, 1.08);
+		dayProbas.addChoice(CommonKeys.WEDNESDAY, 1.08);
+		dayProbas.addChoice(CommonKeys.FRIDAY, 1.15);
+		dayProbas.addChoice(CommonKeys.SATURDAY, 0.95);
+		dayProbas.addChoice(CommonKeys.SUNDAY, 0.67);
+		/*
+		 * 
+		 */
+		monthProbas = new ChoiceSet<>(random);
+		monthProbas.addChoice(MIDKeys.JANUARY, 0.083);
+		monthProbas.addChoice(MIDKeys.FEBRUARY, 0.094);
+		monthProbas.addChoice(MIDKeys.MARCH, 0.099);
+		monthProbas.addChoice(MIDKeys.APRIL, 0.095);
+		monthProbas.addChoice(MIDKeys.MAY, 0.091);
+		monthProbas.addChoice(MIDKeys.JUNE, 0.085);
+		// july is missing in mid2008
+		monthProbas.addChoice(MIDKeys.AUGUST, 0.092);
+		monthProbas.addChoice(MIDKeys.SEPTEMBER, 0.093);
+		monthProbas.addChoice(MIDKeys.OCTOBER, 0.088);
+		monthProbas.addChoice(MIDKeys.NOVEMBER, 0.092);
+		monthProbas.addChoice(MIDKeys.DECEMBER, 0.088);
+		/*
+		 * 
+		 */
+		vacationProbas = new ChoiceSet<>(random);
+		vacationProbas.addChoice("vacations_short", 0.76);
+		vacationProbas.addChoice("vacations_long", 0.24);
+		/*
 		 * load matrix
 		 */
 		Set<ProxyPerson> persons = new HashSet<>();
 
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		Future<?>[] futures = new Future[numThreads];
+
 		for (String file : matrixFiles) {
 			String type = file.split("\\.")[1];
-			
+
 			logger.info(String.format("Loading %s matrix...", type));
-			
+
 			Matrix m = new Matrix("modena", null);
 			VisumMatrixReader mReader = new VisumMatrixReader(m);
 			mReader.readFile(matrixDir + file);
@@ -129,51 +185,48 @@ public class PopulationGenerator {
 			 * create persons
 			 */
 			logger.info("Creating persons...");
-			ProgressLogger.init(euZones.size(), 2, 10);
-			for (Zone zone : euZones) {
-				ActivityFacility euFac = randomFacility(zone);
-				String id = zone.getAttribute("CODE");
-				/*
-				 * incoming
-				 */
-				List<Entry> entries = m.getFromLocEntries(id);
-				for (Entry entry : entries) {
-					double volume = entry.getValue() / scaleFactor;
-					volume = Math.round(volume);
-					if (volume > 0) {
-						Zone deZone = deZoneLayer.get(entry.getFromLocation());
+			ProgressLogger.init(euZones.size(), 1, 10);
 
-						for (int i = 0; i < volume; i++) {
-							ActivityFacility deFac = randomFacility(deZone);
-							ProxyPerson person = buildPerson(String.format("foreign%s.%s.0", id, i), deFac, euFac, ActivityType.HOME, type);
-							persons.add(person);
-						}
-					}
-				}
-				/*
-				 * outgoing
-				 */
-				entries = m.getToLocEntries(id);
-				for (Entry entry : entries) {
-					double volume = entry.getValue() / scaleFactor;
-					volume = Math.round(volume);
-					if (volume > 0) {
-						Zone deZone = deZoneLayer.get(entry.getToLocation());
+			double origVolume = 0;
+			double intVolume = 0;
 
-						for (int i = 0; i < volume; i++) {
-							ActivityFacility deFac = randomFacility(deZone);
-							ProxyPerson person = buildPerson(String.format("foreign%s.%s.1", id, i), euFac, deFac, type, ActivityType.HOME);
-							persons.add(person);
-						}
-					}
-				}
-				ProgressLogger.step();
+			RunThread threads[] = new RunThread[numThreads];
+			List<Zone>[] segments = CollectionUtils.split(euZones, numThreads);
+			/*
+			 * submit tasks
+			 */
+			for (int i = 0; i < segments.length; i++) {
+				threads[i] = new RunThread(m, segments[i], deZones, type);
+
+				futures[i] = executor.submit(threads[i]);
 			}
+			/*
+			 * wait for threads
+			 */
+			for (int i = 0; i < segments.length; i++) {
+				try {
+					futures[i].get();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+			}
+
 			ProgressLogger.termiante();
+
+			for (RunThread thread : threads) {
+				origVolume += thread.origVolume;
+				intVolume += thread.intVolume;
+				persons.addAll(thread.persons);
+			}
+
+			logger.info(String.format("Original = %s, discretized = %s", origVolume, intVolume));
+			logger.info(String.format("Added %s persons.", persons.size()));
 		}
 
-		logger.info(String.format("Created %s persons.", persons.size()));
-		
+		executor.shutdown();
+
 		logger.info("Writing persons...");
 		XMLWriter writer = new XMLWriter();
 		writer.write(outFile, persons);
@@ -211,14 +264,27 @@ public class PopulationGenerator {
 		return listMap;
 	}
 
-	private static ActivityFacility randomFacility(Zone zone) {
-		List<ActivityFacility> list = facilityMap.get(zone);
-		return list.get(random.nextInt(list.size()));
+	private static int getVolume(double volume) {
+		int intVolume = (int) Math.floor(volume / scaleFactor);
+		double left = (volume / scaleFactor) - intVolume;
+		if (random.nextDouble() < left) {
+			intVolume++;
+		}
+		return intVolume;
 	}
 
 	private static ProxyPerson buildPerson(String id, ActivityFacility orig, ActivityFacility target, String origType, String targetType) {
+		if(origType.equalsIgnoreCase("vacations")) {
+			origType = vacationProbas.randomWeightedChoice();
+		}
+		if(targetType.equalsIgnoreCase("vacations")) {
+			targetType = vacationProbas.randomWeightedChoice();
+		}
+		
 		ProxyPerson person = new ProxyPerson(id);
-
+		person.setAttribute(CommonKeys.DAY, dayProbas.randomWeightedChoice());
+		person.setAttribute(MIDKeys.PERSON_MONTH, monthProbas.randomWeightedChoice());
+		
 		ProxyPlan plan = new ProxyPlan();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");
 
@@ -245,4 +311,95 @@ public class PopulationGenerator {
 		return person;
 	}
 
+	private static class RunThread implements Runnable {
+
+		private final Matrix m;
+
+		private final Collection<Zone> euZones;
+
+		private final Set<Zone> deZones;
+
+		private double origVolume;
+
+		private double intVolume;
+
+		private final Set<ProxyPerson> persons;
+
+		private final String type;
+
+		private final Random random = new XORShiftRandom();
+
+		public RunThread(Matrix m, Collection<Zone> euZones, Set<Zone> deZones, String type) {
+			this.m = m;
+			this.euZones = euZones;
+			this.deZones = deZones;
+			this.type = type;
+			persons = new HashSet<>();
+		}
+
+		@Override
+		public void run() {
+			for (Zone euZone : euZones) {
+				List<ActivityFacility> euList = facilityMap.get(euZone);
+				String euZoneId = euZone.getAttribute("NO");
+
+				if (euList == null || euList.isEmpty()) {
+					logger.warn(String.format("No facilitites found for eu zone %s.", euZoneId));
+				} else {
+					ActivityFacility euFac = euList.get(random.nextInt(euList.size()));
+
+					for (Zone deZone : deZones) {
+						List<ActivityFacility> deList = facilityMap.get(deZone);
+						String deZoneId = deZone.getAttribute("NO");
+						/*
+						 * outgoing
+						 */
+						Entry de2Eu = m.getEntry(deZoneId, euZoneId);
+						if (de2Eu != null) {
+							int volume = getVolume(de2Eu.getValue());
+							origVolume += de2Eu.getValue();
+
+							if (volume > 0) {
+								if (deList == null || deList.isEmpty()) {
+									logger.warn(String.format("No facilitites found for de zone %s.", deZoneId));
+								} else {
+									for (int i = 0; i < volume; i++) {
+										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
+										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", deZoneId, euZoneId, i, type), deFac, euFac,
+												ActivityType.HOME, type);
+										persons.add(person);
+									}
+									intVolume += volume;
+								}
+							}
+						}
+						/*
+						 * incoming
+						 */
+						Entry eu2de = m.getEntry(euZoneId, deZoneId);
+						if (eu2de != null) {
+							int volume = getVolume(eu2de.getValue());
+							origVolume += eu2de.getValue();
+							if (volume > 0) {
+								if (deList == null || deList.isEmpty()) {
+									logger.warn(String.format("No facilitites found for de zone %s.", deZoneId));
+								} else {
+									for (int i = 0; i < volume; i++) {
+										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
+										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", euZoneId, deZoneId, i, type), euFac, deFac, type,
+												ActivityType.HOME);
+										persons.add(person);
+									}
+									intVolume += volume;
+								}
+							}
+						}
+					}
+				}
+				ProgressLogger.step();
+			}
+
+		}
+
+	}
 }

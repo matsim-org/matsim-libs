@@ -19,10 +19,12 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
@@ -30,6 +32,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
@@ -78,7 +81,7 @@ public class PersonFilter {
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		
-		writer.write(outDir + "pop.car.wo3km.xml", persons);
+//		writer.write(outDir + "pop.car.wo3km.xml", persons);
 //		writer.write(outDir + "hesen.car.wo3km.midjourneys.xml", persons);
 		
 		logger.info("Removing legs with more than 1000 KM...");
@@ -86,6 +89,26 @@ public class PersonFilter {
 		persons = ProxyTaskRunner.runAndDeletePerson(new DeleteNoLegs(), persons);
 		logger.info(String.format("Persons after filter: %s", persons.size()));
 		writer.write(outDir + "pop.car.3-1000km.xml", persons);
+		
+		logger.info("Extracting MID trips...");
+		Set<ProxyPerson> newPersons = new HashSet<>();
+		for(ProxyPerson person : persons) {
+			if(MIDKeys.MID_TRIPS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+				newPersons.add(person);
+			}
+		}
+		logger.info(String.format("Persons after filter: %s", newPersons.size()));
+		writer.write(outDir + "pop.car.3-1000km.trips.xml", newPersons);
+		
+		logger.info("Extracting MID journeys...");
+		newPersons = new HashSet<>();
+		for(ProxyPerson person : persons) {
+			if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+				newPersons.add(person);
+			}
+		}
+		logger.info(String.format("Persons after filter: %s", newPersons.size()));
+		writer.write(outDir + "pop.car.3-1000km.journeys.xml", newPersons);
 		
 		logger.info("Done.");
 	}

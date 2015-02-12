@@ -102,7 +102,7 @@ public class Simulator {
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
 		controler.setMobsimFactory(new MobsimConnectorFactory());
-		controler.addControlerListener(new ControllerSetup());
+		
 		/*
 		 * setup mutation module
 		 */
@@ -154,6 +154,9 @@ public class Simulator {
 			controler.addControlerListener(context);
 			controler.addControlerListener(new CadytsRegistration(context));
 		}
+		
+		controler.addControlerListener(new ControllerSetup());
+		
 		Config config = controler.getConfig();
 		String countsFile = config.findParam(GSV_CONFIG_MODULE_NAME, "countsfile");
 		double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));

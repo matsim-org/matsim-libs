@@ -61,11 +61,15 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 
 	PlanToPlanStepBasedOnEvents(final Scenario scenario, final Set<Id<Link>> calibratedLinks) {
 		this.scenario = scenario;
-		this.calibratedLinks = calibratedLinks;
+		this.calibratedLinks = new HashSet<>(calibratedLinks);
 		
 		this.driverAgents = new HashSet<Id>();
 	}
 
+	void addCalibratedItem(Id<Link> link) {
+		calibratedLinks.add(link);
+	}
+	
 	private long plansFound = 0;
 	private long plansNotFound = 0;
 

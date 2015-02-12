@@ -134,9 +134,13 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 		if(event.getIteration() > 0) {
 			append = true;
 		}
-		
+		writeErrorFile(error, String.format("%s/countsError.txt", rootOutDir), append);
+		writeErrorFile(errorAbs, String.format("%s/countsAbsError.txt", rootOutDir), append);
+	}
+	
+	private void writeErrorFile(DescriptiveStatistics error, String file, boolean append) {
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/countsError.txt", rootOutDir), append));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file, append));
 			if(!append) {
 				// write header
 				writer.write("mean\tvar\tstderr\tmin\tmax");

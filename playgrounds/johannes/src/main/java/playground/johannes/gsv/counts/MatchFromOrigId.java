@@ -50,7 +50,7 @@ public class MatchFromOrigId {
 
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse("/home/johannes/sge/prj/osm/run/248/output/counts.2009.osm20140909.xml");
+		cReader.parse("/home/johannes/sge/prj/osm/run/678/output/counts.2013.osm20140909.xml");
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -96,7 +96,7 @@ public class MatchFromOrigId {
 		System.out.println(String.format("Number of new counts: %s", newCounts.getCounts().size()));
 		
 		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/gsv/counts/counts.2009.net20140909.5.xml");
+		writer.write("/home/johannes/gsv/counts/counts.2013.net20140909.5.xml");
 	}
 
 }
