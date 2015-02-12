@@ -70,19 +70,19 @@ public class RunGripsExample
         GripsConfigModule gcm;
         Config mc;
         
-        //check for files
+       
 
         controller.openGripsConfig(gripsConfigFile);
         
         gcm = controller.getGripsConfigModule();
         gcm.setOutputDir("output/");
         
-        //generate and check matsim network/config
+        //generate matsim network/config
         ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(gripsFileString);
         scengen.run();
       
         
-        //check and open matsim scenario config file
+        //open matsim scenario config file
         System.out.println("string:" + matsimConfigFileString);
         matsimConfigFile = new File(matsimConfigFileString);
         controller.openMastimConfig(matsimConfigFile);
@@ -100,7 +100,7 @@ public class RunGripsExample
         ConfigIO.saveRoadClosures(controller, roadClosures);
 
         
-        //simulate and check scenario
+        //simulate scenario
 
         Controler matsimController = new Controler(mc);
         matsimController.setOverwriteFiles(true);
