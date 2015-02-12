@@ -1,15 +1,16 @@
 package playground.michalm.util.array2d;
 
+import static org.junit.Assert.fail;
+
 import java.io.StringReader;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 
 /**
  * @author michalm
  */
 public class Array2DReaderTest
-    extends TestCase
 {
     private void assertDoubleArray(String contents, double[][] expected)
     {
@@ -38,6 +39,7 @@ public class Array2DReaderTest
     }
 
 
+    @Test
     public void testDoubleArray()
     {
         String contents;
@@ -54,6 +56,7 @@ public class Array2DReaderTest
     }
 
 
+    @Test
     public void testIntArray()
     {
         String contents;
@@ -69,6 +72,7 @@ public class Array2DReaderTest
     }
 
 
+    @Test
     public void testStringArray()
     {
         String contents;
@@ -80,6 +84,7 @@ public class Array2DReaderTest
     }
 
 
+    @Test
     public void testExceptions()
     {
         String contents;

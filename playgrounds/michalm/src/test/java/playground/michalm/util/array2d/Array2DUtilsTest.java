@@ -1,13 +1,12 @@
 package playground.michalm.util.array2d;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 
 /**
  * @author michalm
  */
 public class Array2DUtilsTest
-    extends TestCase
 {
     private void assertTranspose(double[][] original, double[][] expected)
     {
@@ -27,6 +26,7 @@ public class Array2DUtilsTest
     }
 
 
+    @Test
     public void testDoubleTranspose()
     {
         double[][] original;
@@ -54,6 +54,7 @@ public class Array2DUtilsTest
     }
 
 
+    @Test
     public void testIntTranspose()
     {
         int[][] original;
@@ -81,6 +82,7 @@ public class Array2DUtilsTest
     }
 
 
+    @Test
     public void testObjectTranspose()
     {
         Object[][] original;
