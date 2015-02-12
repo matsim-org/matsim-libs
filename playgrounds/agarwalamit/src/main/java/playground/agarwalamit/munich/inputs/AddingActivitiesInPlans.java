@@ -50,7 +50,7 @@ public class AddingActivitiesInPlans {
 		this.sc = scenario;
 		//		params = sc.getConfig().planCalcScore();
 		actType2TypDurMinDur = new TreeMap<String, Tuple<Double,Double>>();
-		log.warn("Minimum duration for any sub activity is defined as minimum of minimum duration of parent activity and half of new tyical duration.");
+		log.warn("Minimum duration for any sub activity is defined as half of new tyical duration.");
 		log.warn("Least integer of actual activity duration of an activity is set to typical duration.");
 		log.warn("If a person do not have actual duration, plans for such persons remain unchanged. Because such plans do not have either of act end or start time.");
 	}
@@ -63,10 +63,10 @@ public class AddingActivitiesInPlans {
 	private Scenario scOut;
 
 	public static void main(String[] args) {
-		String initialPlans = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCase.xml";
+		String initialPlans = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+		String initialConfig = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/config_subPop_subAct_baseCase.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outPlans = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/plans_1pct_subActivities.xml.gz";
+		String outPlans = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/plans_1pct_subActivities_2.xml.gz";
 
 		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc);
 		newPlansInfo.run();
@@ -149,12 +149,13 @@ public class AddingActivitiesInPlans {
 						actType2TypDurMinDur.put(actTyp, typMinDur);
 
 					} else if(  ((Activity)pe).getStartTime() > Double.NEGATIVE_INFINITY && ((Activity)pe).getStartTime() < Double.POSITIVE_INFINITY  ){
+						// (dur < 0) // last activity of urban falls in this loop, since a person may have two different homes.
 						dur = 30*3600-((Activity)pe).getStartTime();
 
 						double typDur = Math.floor(dur/3600);
 
 						if(typDur< 1) typDur = 1800;
-						else typDur =typDur*3600;
+						else typDur =typDur*3600; // what if typDur is still negative
 
 						//						double minDur = Math.min(params.getActivityParams(currentAct).getMinimalDuration(), typDur/2);
 						double minDur = typDur/2;
@@ -169,7 +170,7 @@ public class AddingActivitiesInPlans {
 						actType2TypDurMinDur.put(actTyp, typMinDur);
 					}
 
-					else {
+					else { // all commuters, rev_commuters and freight comes here since they have only end times
 						planOut.addActivity((Activity)pe);
 					}
 				} else if(pe instanceof Leg){
