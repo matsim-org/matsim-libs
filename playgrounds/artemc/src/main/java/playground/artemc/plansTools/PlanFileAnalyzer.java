@@ -1,16 +1,9 @@
 package playground.artemc.plansTools;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -27,7 +20,7 @@ public class PlanFileAnalyzer {
 	String prevActivity="";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	new PopulationReaderMatsimV5(scenario).parse("H:/MATSimSimuliations/output_10000_19788pt_links_FC/it.0/0.plans.xml/0.plans.xml");
-	Population population = ((ScenarioImpl) scenario).getPopulation();
+	Population population = scenario.getPopulation();
 
 	for(Person agent:population.getPersons().values()){
 		for(Plan plan:agent.getPlans()){
