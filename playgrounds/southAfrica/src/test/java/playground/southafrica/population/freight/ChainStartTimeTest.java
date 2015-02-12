@@ -32,14 +32,14 @@ public class ChainStartTimeTest {
 	@Test
 	public void testGetStartTimeInSeconds() {
 		/* Should be in the second hour, 01:00:00 - 02:00:00. */
-		double d = 0.005;
+		double d = 0.01;
 		Assert.assertTrue("Should be after 01:00:00.", ChainStartTime.getStartTimeInSeconds(d) >= 1*3600);
 		Assert.assertTrue("Should be before 02:00:00.", ChainStartTime.getStartTimeInSeconds(d) <= 2*3600);
 		
 		/* Should be in the sixteenth hour, 15:00:00 - 16:00:00. */
 		d = 0.900;
-		Assert.assertTrue("Should be after 15:00:00.", ChainStartTime.getStartTimeInSeconds(d) >= 15*3600);
-		Assert.assertTrue("Should be before 16:00:00.", ChainStartTime.getStartTimeInSeconds(d) <= 16*3600);
+		Assert.assertTrue("Should be after 14:00:00.", ChainStartTime.getStartTimeInSeconds(d) >= 14*3600);
+		Assert.assertTrue("Should be before 15:00:00.", ChainStartTime.getStartTimeInSeconds(d) <= 15*3600);
 	}
 
 }
