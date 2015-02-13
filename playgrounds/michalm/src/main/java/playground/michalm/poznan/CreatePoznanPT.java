@@ -4,7 +4,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.*;
 import org.matsim.visum.*;
 
-import playground.johannes.gsv.visum.Visum2TransitSchedule;
+import playground.mrieser.pt.converter.Visum2TransitSchedule;
 
 
 public class CreatePoznanPT

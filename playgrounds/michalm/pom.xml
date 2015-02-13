@@ -99,7 +99,7 @@
 
 		<dependency>
 			<groupId>playground</groupId>
-			<artifactId>johannes</artifactId>
+			<artifactId>mrieser</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
