@@ -12,6 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
@@ -27,7 +28,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
-import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
+import playground.balac.allcsmodestest.controler.listeneronlymembers.CarsharingListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
 import playground.balac.allcsmodestest.scoring.AllCSModesScoringFunctionFactory;
 import playground.balac.analysis.TripsAnalyzer;
@@ -60,16 +61,12 @@ public class CSJustMembersControler {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final Controler controler = new Controler( sc );
-		
-		
-		
-		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
-		
+		final Controler controler = new Controler( sc );		
 		
 		try {
 			controler.setMobsimFactory( new AllCSModesQsimFactory(sc, controler) );
 			final TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, args[1]);
+			
 			controler.setTripRouterFactory(
 					new TripRouterFactory() {
 						@Override
@@ -79,19 +76,16 @@ public class CSJustMembersControler {
 						
 							// This allows us to just add our module and go.
 							final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
-	
+							
 							TravelDisutilityFactory travelCostCalculatorFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 							TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), controler.getConfig().planCalcScore());		
-							
 							
 							RoutingContext rContext = new RoutingContextImpl(
 									travelCostCalculator,
 									travelTimeCalculator.getLinkTravelTimes() );
 							
 							
-							
-							
-							final TripRouter router = delegate.instantiateAndConfigureTripRouter(rContext);
+							final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
 							
 							// add our module to the instance
 							router.setRoutingModule(
@@ -158,10 +152,13 @@ public class CSJustMembersControler {
 	    		sc.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
 	    		sc.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
 	    		modes, true, sc.getNetwork());
+        
+            
+        
 	    
 	    controler.addControlerListener(tripsAnalyzer);
 	    
-	    controler.addControlerListener(new AllCSModesTestListener(controler,
+	    controler.addControlerListener(new CarsharingListener(controler,
 	    		Integer.parseInt(controler.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));		
 		controler.run();
 		
@@ -172,5 +169,5 @@ public class CSJustMembersControler {
 		
 		
 	}
-
+	
 }

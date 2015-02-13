@@ -52,7 +52,7 @@ public class ParkCSVehicles implements AgentSource {
 		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
 			
 			for (String id:ffstation.getIDs()) {
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
+			//	qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
 
 			}
 			
@@ -61,7 +61,7 @@ public class ParkCSVehicles implements AgentSource {
 			for (OneWayCarsharingRDWithParkingStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
 				
 				for (String id:owstation.getIDs()) {
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("OW_"+(id), Vehicle.class), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
+				//	qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("OW_"+(id), Vehicle.class), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
 
 				}
 				
@@ -72,7 +72,7 @@ public class ParkCSVehicles implements AgentSource {
 				
 				for (String id : twstation.getIDs()) {
 					
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("TW_"+id, Vehicle.class), modeVehicleTypes.get("twowaycarsharing")), twstation.getLink().getId());
+				//	qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("TW_"+id, Vehicle.class), modeVehicleTypes.get("twowaycarsharing")), twstation.getLink().getId());
 					counterTW++;
 				}
 				

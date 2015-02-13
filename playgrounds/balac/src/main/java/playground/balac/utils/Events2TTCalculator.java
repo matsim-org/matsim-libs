@@ -3,6 +3,7 @@ package playground.balac.utils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -24,8 +25,8 @@ public class Events2TTCalculator {
 		
 		// reading events.  Will do all the processing as side effect.
 		System.out.println("processing events file...");
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-		reader.readFile(eventsFile);
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+		reader.parse(eventsFile);
 		System.out.println("done.");
 		
 		return ttc;

@@ -43,7 +43,7 @@ public class AllCSModesAgentFactory implements AgentFactory{
 		
 		
 		
-		AllCSModesPersonDriverAgentImpl agent = new AllCSModesPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation, this.tripRouter); 
+		PersonDriverAgentOnlyMembersImpl agent = new PersonDriverAgentOnlyMembersImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation, this.tripRouter); 
 		return agent;
 	}
 }

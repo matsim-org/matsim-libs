@@ -50,7 +50,7 @@ public class RideToPTChange {
 			}
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plans_25perc_noride.xml");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plans_1perc_noride.xml");		
 		
 	}
 	

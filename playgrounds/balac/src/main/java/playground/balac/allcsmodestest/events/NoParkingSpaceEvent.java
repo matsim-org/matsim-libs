@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 
 public class NoParkingSpaceEvent extends Event{
 
-public static final String EVENT_TYPE = "no parking spot";
+	public static final String EVENT_TYPE = "no parking spot";
 	
 	private final Id<Link> linkId;
 	
