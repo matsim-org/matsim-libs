@@ -152,7 +152,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		parse(osmFilename, null);
 	}
 
-	/*package*/ void parse(final InputStream stream) throws UncheckedIOException {
+	/**
+	 * Parses the given input stream and creates a MATSim network from the data.
+	 *
+	 * @param stream
+	 * @throws UncheckedIOException
+	 */
+	public void parse(final InputStream stream) throws UncheckedIOException {
 		parse(null, stream);
 	}
 
