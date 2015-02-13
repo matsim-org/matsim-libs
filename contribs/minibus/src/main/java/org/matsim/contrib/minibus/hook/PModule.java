@@ -55,7 +55,7 @@ public class PModule {
         controler.setMobsimFactory(new PQSimFactory());
 
         if (pTransitRouterFactory == null) {
-            pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
+            pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
         }
         controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
 

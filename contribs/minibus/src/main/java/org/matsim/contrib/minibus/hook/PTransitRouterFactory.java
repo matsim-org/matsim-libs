@@ -19,13 +19,16 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
+import org.matsim.contrib.minibus.performance.raptor.Raptor;
+import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
+import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * 
@@ -37,13 +40,22 @@ class PTransitRouterFactory implements TransitRouterFactory{
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;
 	private final String ptEnabler;
+	private final String ptRouter;
+	private final double costPerBoarding;
+	private final double costPerMeterTraveled;
+	
 	private boolean needToUpdateRouter = true;
 	private TransitRouterNetwork routerNetwork = null;
 	private TransitRouterFactory routerFactory = null;
 	private TransitSchedule schedule;
+	private RaptorDisutility raptorDisutility;
+	private TransitRouterQuadTree transitRouterQuadTree;
 	
-	public PTransitRouterFactory(String ptEnabler){
+	public PTransitRouterFactory(String ptEnabler, String ptRouter, double costPerBoarding, double costPerMeterTraveled){
 		this.ptEnabler = ptEnabler;
+		this.ptRouter = ptRouter;
+		this.costPerBoarding = costPerBoarding;
+		this.costPerMeterTraveled = costPerMeterTraveled;
 	}
 
 	public void createTransitRouterConfig(Config config) {
@@ -51,8 +63,16 @@ class PTransitRouterFactory implements TransitRouterFactory{
 	}
 	
 	public void updateTransitSchedule(TransitSchedule schedule) {
-		this.needToUpdateRouter = true; 
+		this.needToUpdateRouter = true;
 		this.schedule = schedule;
+		
+		if (this.ptRouter.equalsIgnoreCase("raptor")) {
+			// this could also hold updated prices
+			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
+			
+			this.transitRouterQuadTree = new TransitRouterQuadTree(this.raptorDisutility);
+			this.transitRouterQuadTree.initializeFromSchedule(this.schedule, this.transitRouterConfig.beelineWalkConnectionDistance);
+		}
 	}
 
 	@Override
@@ -61,22 +81,35 @@ class PTransitRouterFactory implements TransitRouterFactory{
 			// okay update all routers
 			this.routerFactory = createSpeedyRouter();
 			if(this.routerFactory == null) {
-				log.warn("Could not create speedy router, fall back to normal one.");
-				this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.beelineWalkConnectionDistance);
+				if (this.ptRouter.equalsIgnoreCase("raptor")) {
+					// nothing to do here
+				} else {
+					log.warn("Could not create speedy router, fall back to normal one.");
+					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.beelineWalkConnectionDistance);
+				}
 			}
 			needToUpdateRouter = false;
 		}
 		
 		if (this.routerFactory == null) {
-			// no speedy router available - return old one
-			PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig, preparedTransitSchedule);
-			return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
+			if (this.ptRouter.equalsIgnoreCase("raptor")) {
+				log.info("Using raptor routing");
+				return this.createRaptorRouter();
+			} else {
+				// no speedy router available - return old one
+				PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+				TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig, preparedTransitSchedule);
+				return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
+			}
 		} else {
 			return this.routerFactory.createTransitRouter();
 		}
 	}
 	
+	private TransitRouter createRaptorRouter() {
+		return new Raptor(this.transitRouterQuadTree, this.raptorDisutility, this.transitRouterConfig);
+	}
+
 	private TransitRouterFactory createSpeedyRouter() {
 		try {
 			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
