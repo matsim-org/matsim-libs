@@ -63,10 +63,10 @@ public class AddingActivitiesInPlans {
 	private Scenario scOut;
 
 	public static void main(String[] args) {
-		String initialPlans = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/config_subPop_subAct_baseCase.xml";
+		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+		String initialConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outPlans = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/plans_1pct_subActivities_2.xml.gz";
+		String outPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz";
 
 		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc);
 		newPlansInfo.run();
@@ -149,10 +149,11 @@ public class AddingActivitiesInPlans {
 						actType2TypDurMinDur.put(actTyp, typMinDur);
 
 					} else if(  ((Activity)pe).getStartTime() > Double.NEGATIVE_INFINITY && ((Activity)pe).getStartTime() < Double.POSITIVE_INFINITY  ){
-						// (dur < 0) // last activity of urban falls in this loop, since a person may have two different homes.
+						// (dur < 0) is not sufficient here since this does not include cases of unreal duration 
+						// last activity of urban falls in this loop, to have two different home activities based on the duration.
 						dur = 30*3600-((Activity)pe).getStartTime();
 
-						double typDur = Math.floor(dur/3600);
+						double typDur = Math.floor(dur/3600); if (typDur < 0) throw new RuntimeException("Start time of one of the activity is more than 30:00:00 hrs for person "+p.getId()+". Aborting...");
 
 						if(typDur< 1) typDur = 1800;
 						else typDur =typDur*3600; // what if typDur is still negative

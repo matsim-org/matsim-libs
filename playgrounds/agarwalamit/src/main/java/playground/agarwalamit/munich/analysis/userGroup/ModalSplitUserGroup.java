@@ -38,37 +38,44 @@ public class ModalSplitUserGroup {
 
 	private SortedMap<UserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<UserGroup, SortedMap<String,Integer>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,Double>>();
-	
+
+	private SortedMap<String, Double> wholePop_pctModalShare ;
+	private SortedMap<String, Integer> wholePop_Mode2Legs;
+
 	public static void main(String[] args) {
-		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
-		String [] runCases = {"baseCaseCtd","ei","ci","eci","ei_10"};
+		
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/";/*"./output/run2/";*/
+		String [] runCases = {"c0","c1"};
+		
 		for(String runCase :runCases){
-		ModalSplitUserGroup msUG = new ModalSplitUserGroup();
-		msUG.run(outputDir+runCase);
+			ModalSplitUserGroup msUG = new ModalSplitUserGroup();
+			int it = 0;
+			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz");
+			msUG.writeResults(outputDir+runCase+"/analysis/usrGrpToModalShare_it."+0+".txt");
 		}
 	}
-	
-	private void run(String outputDir){
+
+	public void run(String populationFile){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		String populationFile = outputDir +"/output_plans.xml.gz";
-		String networkFile = outputDir+"/output_network.xml.gz";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(populationFile, networkFile);
-		
-		SortedMap<String, Double> wholePop_pctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
-		SortedMap<String, Integer> wholePop_Mode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
-		
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
+
+		wholePop_pctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
+		wholePop_Mode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
+
 		for(UserGroup ug:UserGroup.values()){
 			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
 			SortedMap<String, Double> modalSplitPop = msg.getMode2PctShareFromPlans(usrGrpPop);
 			this.userGrp2ModalSplit.put(ug, modalSplitPop);
 			this.userGrp2Mode2Legs.put(ug, msg.getMode2NoOfLegs(usrGrpPop));
 		}
+	}
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/usrGrpToModalShare.txt");
+	public void writeResults(String outputFile){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("UserGroup \t");
-			
+
 			for(String str:wholePop_pctModalShare.keySet()){
 				writer.write(str+"\t");
 			}
@@ -87,7 +94,7 @@ public class ModalSplitUserGroup {
 					if(this.userGrp2Mode2Legs.get(ug).get(str)!=null){
 						writer.write(this.userGrp2Mode2Legs.get(ug).get(str)+"\t");
 					} else
-					writer.write(0.0+"\t");
+						writer.write(0.0+"\t");
 				}
 				writer.newLine();
 				writer.write(ug+"\t");
@@ -95,7 +102,7 @@ public class ModalSplitUserGroup {
 					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
 						writer.write(this.userGrp2ModalSplit.get(ug).get(str)+"\t");
 					} else
-					writer.write(0.0+"\t");
+						writer.write(0.0+"\t");
 				}
 				writer.newLine();
 			}
