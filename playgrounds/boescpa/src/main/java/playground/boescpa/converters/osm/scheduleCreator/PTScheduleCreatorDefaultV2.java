@@ -34,10 +34,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The default implementation of PTStationCreator (using the Swiss-HAFAS-Schedule).
@@ -45,14 +42,6 @@ import java.util.Set;
  * @author boescpa
  */
 public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
-
-	// todo-boescpa: Rewrite based on Marcel's PseudoNetworkCreator.
-	// First connect all stops as usual (but only one mode...) but for those for which no link could be found, just leave them...
-	// Then go through each stop and
-	// 	- if link and follow-stop also link then route between the two.
-	//	- if no-link but follow-stop link then create link to closest network node and route between that node and link of follow-stop.
-	//	- if link but follow-stop no link then create link to closest network node for follow stop and then route between the two.
-	//	- if no-link for both stops then standard link creation as with Marcel's network creator.
 
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
@@ -75,6 +64,9 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		printVehiclesUndefined();
 		// 5. Clean schedule
 		removeNonUsedStopFacilities();
+		uniteSameRoutesWithJustDifferentDepartures();
+		cleanDepartures();
+		cleanVehicles();
 
 		log.info("Creating the schedule based on HAFAS... done.");
 	}
@@ -326,6 +318,107 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		// Remove all stop facilities not used:
 		for (TransitStopFacility facility : unusedStopFacilites) {
 			this.schedule.removeStopFacility(facility);
+		}
+	}
+
+	private void cleanVehicles() {
+		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					usedVehicles.add(departure.getVehicleId());
+				}
+			}
+		}
+		final Set<Id<Vehicle>> vehicles2Remove = new HashSet<>();
+		for (Id<Vehicle> vehicleId : this.vehicles.getVehicles().keySet()) {
+			if (!usedVehicles.contains(vehicleId)) {
+				vehicles2Remove.add(vehicleId);
+			}
+		}
+		for (Id<Vehicle> vehicleId : vehicles2Remove) {
+			if (!usedVehicles.contains(vehicleId)) {
+				this.vehicles.removeVehicle(vehicleId);
+			}
+		}
+	}
+
+	private void cleanDepartures() {
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				final Set<Double> departureTimes = new HashSet<>();
+				final List<Departure> departuresToRemove = new ArrayList<>();
+				for (Departure departure : route.getDepartures().values()) {
+					double dt = departure.getDepartureTime();
+					if (departureTimes.contains(dt)) {
+						departuresToRemove.add(departure);
+					} else {
+						departureTimes.add(dt);
+					}
+				}
+				for (Departure departure2Remove : departuresToRemove) {
+					route.removeDeparture(departure2Remove);
+				}
+			}
+		}
+	}
+
+	protected void uniteSameRoutesWithJustDifferentDepartures() {
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			// Collect all route profiles
+			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
+			for (TransitRoute route : line.getRoutes().values()) {
+				String routeProfile = route.getStops().get(0).toString();
+				for (int i = 1; i < route.getStops().size(); i++) {
+					routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
+				}
+				List profiles = routeProfiles.get(routeProfile);
+				if (profiles == null) {
+					profiles = new ArrayList();
+					routeProfiles.put(routeProfile, profiles);
+				}
+				profiles.add(route);
+			}
+			// Check profiles and if the same, add latter to former.
+			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
+				TransitRoute finalRoute = routesToUnite.get(0);
+				for (int i = 1; i < routesToUnite.size(); i++) {
+					TransitRoute routeToAdd = routesToUnite.get(i);
+					for (Departure departure : routeToAdd.getDepartures().values()) {
+						finalRoute.addDeparture(departure);
+					}
+					line.removeRoute(routeToAdd);
+				}
+			}
+
+			/*// Collect all route profiles
+			final Map<TransitRoute, String> routesProfiled = new HashMap<>();
+			final Set<String> routeProfiles = new HashSet<>();
+			for (TransitRoute route : line.getRoutes().values()) {
+				String routeProfile = route.getStops().get(0).toString();
+				for (int i = 1; i < route.getStops().size(); i++) {
+					routeProfile = routeProfile + "-" + route.getStops().get(i).toString();
+				}
+				routesProfiled.put(route, routeProfile);
+				routeProfiles.add(routeProfile);
+			}
+			// Check profiles and if the same, add latter to former.
+			for (String currentProfile : routeProfiles) {
+				final List<TransitRoute> routesToUnite = new ArrayList<>();
+				for (TransitRoute route : routesProfiled.keySet()) {
+					if (routesProfiled.get(route).equals(currentProfile)) {
+						routesToUnite.add(route);
+					}
+				}
+				TransitRoute finalRoute = routesToUnite.get(0);
+				for (int i = 1; i < routesToUnite.size(); i++) {
+					TransitRoute routeToAdd = routesToUnite.get(i);
+					for (Departure departure : routeToAdd.getDepartures().values()) {
+						finalRoute.addDeparture(departure);
+					}
+					line.removeRoute(routeToAdd);
+				}
+			}*/
 		}
 	}
 }

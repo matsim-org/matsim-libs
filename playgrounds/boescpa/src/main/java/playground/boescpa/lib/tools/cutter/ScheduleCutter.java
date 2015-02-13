@@ -85,7 +85,7 @@ public class ScheduleCutter {
         new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(args[4]);
     }
 
-    private void cutSchedule() {
+    public void cutSchedule() {
         // Identify all stops inside specified area:
         Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
         for (TransitStopFacility stop : schedule.getFacilities().values()) {

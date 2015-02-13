@@ -46,6 +46,14 @@ import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRA
  */
 public class PTLineRouterDefaultV2 extends PTLineRouter {
 
+	// todo-boescpa: Rewrite based on Marcel's PseudoNetworkCreator.
+	// First connect all stops as usual (but only one mode...) but for those for which no link could be found, just leave them...
+	// Then go through each stop and
+	// 	- if link and follow-stop also link then route between the two.
+	//	- if no-link but follow-stop link then create link to closest network node and route between that node and link of follow-stop.
+	//	- if link but follow-stop no link then create link to closest network node for follow stop and then route between the two.
+	//	- if no-link for both stops then standard link creation as with Marcel's network creator.
+
 	private final static double SEARCH_RADIUS_BUS = 50; //[m]
 	private final static double SEARCH_RADIUS_TRAM = 50; //[m]
 
