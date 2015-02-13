@@ -64,7 +64,7 @@ public class CheckTestSetActivityChains {
 		FileUtils.delete(new File(outputFile));
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write("Id,day,hour,activities,extent");
+			bw.write("Id,day,hour,activities,extent,vkt");
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
