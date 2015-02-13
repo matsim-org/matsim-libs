@@ -44,7 +44,7 @@ public class DriveNowParser
     public static void main(String[] args)
     {
         DriveNowParser dnp = new DriveNowParser();
-        Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("/users/jb/cs/");
+        Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("./");
         for (CarsharingVehicleData cv : currentGrep.values()){
             System.out.println(cv.toString());
         }
@@ -71,6 +71,8 @@ public class DriveNowParser
         while (iterator.hasNext()) {
             JSONObject car = iterator.next();
             String vin = (String)car.get("vin");
+            String license = ((String)car.get("licensePlate")).replace(" ", "");
+                      
             Id<CarsharingVehicleData> vid = Id.create(vin, CarsharingVehicleData.class);
             String mileage = car.get("mileage").toString();
             String fuel = car.get("fuelState").toString();
@@ -78,7 +80,7 @@ public class DriveNowParser
             JSONObject loc = (JSONObject)car.get("position");
             String latitude = loc.get("latitude").toString();
             String longitude = loc.get("longitude").toString();
-            currentGrep.put(vid, new CarsharingVehicleData(vid, latitude, longitude, mileage, fuel));
+            currentGrep.put(vid, new CarsharingVehicleData(vid,license, latitude, longitude, mileage, fuel, "DN"));
             
         }
         BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder+"dn_"+System.currentTimeMillis()+".json.gz");
@@ -107,15 +109,20 @@ public class DriveNowParser
 class CarsharingVehicleData {
     private Id<CarsharingVehicleData> vid;
     private Coord location;
-    private double mileage;
+    private long mileage;
     private double fuel;
     private long time;
-    CarsharingVehicleData(Id<CarsharingVehicleData> vid, String lati, String longi, String mileage, String fuel){
+    private String provider;
+    private String license;
+    
+    CarsharingVehicleData(Id<CarsharingVehicleData> vid, String license, String lati, String longi, String mileage, String fuel, String provider){
         this.vid = vid;
+        this.license = license;
         this.location = new CoordImpl(longi,lati);
-        this.mileage = Double.parseDouble(mileage);
+        this.mileage = Long.parseLong(mileage);
         this.fuel = Double.parseDouble(fuel);
         this.time = System.currentTimeMillis();
+        this.provider = provider;
     }
 
     public Id<CarsharingVehicleData> getVid()
@@ -128,7 +135,7 @@ class CarsharingVehicleData {
         return location;
     }
 
-    public double getMileage()
+    public long getMileage()
     {
         return mileage;
     }
@@ -141,10 +148,19 @@ class CarsharingVehicleData {
     {
         return time;
     }
-    @Override
+    
+    public String getProvider() {
+		return provider;
+	}
+
+	public String getLicense() {
+		return license;
+	}
+
+	@Override
     public String toString()
     {
-        return (vid+"\t"+location+"\t"+mileage);
+        return (license+"\t"+vid+"\t"+location+"\t"+mileage);
     }
     
 }

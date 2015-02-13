@@ -44,7 +44,7 @@ public class Car2GoParser
     public static void main(String[] args)
     {
         Car2GoParser dnp = new Car2GoParser();
-        Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("/users/jb/cs/");
+        Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("./");
         for (CarsharingVehicleData cv : currentGrep.values()){
             System.out.println(cv.toString());
         }
@@ -73,14 +73,16 @@ public class Car2GoParser
         while (iterator.hasNext()) {
             JSONObject car = iterator.next();
             String vin = (String)car.get("vin");
+            String license = (String)car.get("name");
             Id<CarsharingVehicleData> vid = Id.create(vin, CarsharingVehicleData.class);
 
             String fuel = car.get("fuel").toString();
             
             JSONArray loc = (JSONArray)car.get("coordinates");
-//            System.out.println(vin+" "+fuel+" "+loc);	
-//            currentGrep.put(vid, new CarsharingVehicleData(vid, latitude, longitude,"0" , fuel));
-            
+            String longi = loc.get(0).toString();
+            String lat = loc.get(1).toString();
+            currentGrep.put(vid, new CarsharingVehicleData(vid, license, lat, longi,"0" , fuel, "CG"));
+                        
         }
         BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder+"c2g_"+System.currentTimeMillis()+".json.gz");
         bw.write(jsonObject.toString());

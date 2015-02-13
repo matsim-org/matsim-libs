@@ -19,15 +19,35 @@
 
 package playground.jbischoff.carsharing.data;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+
 public class DriveNowGrepTimerTask
     extends TimerTask
+    
+	
 {
+	Map<Id<CarsharingVehicle>,CarsharingVehicle> vehicleRegister = new HashMap<Id<CarsharingVehicle>, CarsharingVehicle>();
     DriveNowParser dnp = new DriveNowParser();
     Car2GoParser cp = new Car2GoParser(); 
+    static SimpleDateFormat MIN = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    int run = 0;
+    
     
     public static void main(String[] args)
     {
@@ -46,10 +66,267 @@ public class DriveNowGrepTimerTask
 
     	File drivenow = new File(folder+"drivenow");
     	drivenow.mkdirs();
+    	Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentvehicles = new HashMap<Id<CarsharingVehicleData>, CarsharingVehicleData>();
     	
-
-    	dnp.grepAndDumpOnlineDatabase(drivenow.getAbsolutePath()+"/");
-        cp.grepAndDumpOnlineDatabase(car2go.getAbsolutePath()+"/");
+    	currentvehicles.putAll(dnp.grepAndDumpOnlineDatabase(drivenow.getAbsolutePath()+"/"));
+    	currentvehicles.putAll(cp.grepAndDumpOnlineDatabase(car2go.getAbsolutePath()+"/"));
+    	System.out.println(MIN.format(System.currentTimeMillis())+": "+currentvehicles.size());
+    	syncVehiclesAndGenerateTrips(currentvehicles);
+    	if (run % 30 == 0){
+    		generateTripFiles(folder);
+    	}
+    	run++;
     }
 
+	private void generateTripFiles(String folder) {
+		
+		for (CarsharingVehicle vehicle : this.vehicleRegister.values() ){
+			vehicle.sortRides();
+			String filename = folder + vehicle.getProvider()+"_"+vehicle.getLicensePlate()+"_"+vehicle.getVin()+".txt";
+			for (CarsharingRide ride : vehicle.getRides()){
+			try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, true)))) {
+				out.println(ride.toLine());
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+			}
+			
+			vehicle.getRides().clear();
+		}
+
+	}
+
+	private void syncVehiclesAndGenerateTrips(
+			Map<Id<CarsharingVehicleData>, CarsharingVehicleData> currentvehicles) {
+		
+		long time = System.currentTimeMillis();
+		for (Entry<Id<CarsharingVehicleData>,CarsharingVehicleData> entry : currentvehicles.entrySet()){
+			Id<CarsharingVehicle> vin = Id.create(entry.getKey().toString(), CarsharingVehicle.class);
+			if (! this.vehicleRegister.containsKey(vin)) {
+				CarsharingVehicle vehicle = new CarsharingVehicle(entry.getValue().getProvider(), entry.getValue().getLicense() ,vin);
+				vehicle.setFuel(entry.getValue().getFuel());
+				vehicle.setMileage(entry.getValue().getMileage());
+				vehicle.setTime(time);
+				vehicle.setPosition(entry.getValue().getLocation());
+//				System.out.println("created vehicle "+vehicle.getLicensePlate()+" "+vehicle.getP);
+
+				this.vehicleRegister.put(vin, vehicle);
+				continue;
+			}
+			CarsharingVehicle currentVehicle = this.vehicleRegister.get(vin);
+			
+			if (!currentVehicle.getPosition().equals(entry.getValue().getLocation())){
+				
+				CarsharingRide ride = new CarsharingRide(currentVehicle.getPosition(), entry.getValue().getLocation(), currentVehicle.getTime(), time, currentVehicle.getFuel(), entry.getValue().getFuel(), currentVehicle.getMileage(), entry.getValue().getMileage(), 0, 0, 0, 0);
+				currentVehicle.addRide(ride);
+				
+				currentVehicle.setFuel(entry.getValue().getFuel());
+				currentVehicle.setMileage(entry.getValue().getMileage());
+				currentVehicle.setPosition(entry.getValue().getLocation());
+				currentVehicle.setTime(time);
+				System.out.println("ride registered. "+currentVehicle.getLicensePlate());
+			}
+			else {
+				currentVehicle.setTime(time);
+				// nothing has happened, so we just update the timestamp
+			}
+			
+		}
+		
+	}
+    
+      
+	
 }
+
+
+
+class CarsharingVehicle{
+	
+	private List<CarsharingRide> rides = new ArrayList<>();
+	private String provider;
+	private String licensePlate;
+	private Id<CarsharingVehicle> vin;
+	
+	private long mileage;
+	private long time;
+	private Coord position = null;
+	private double fuel;
+	
+	
+	public CarsharingVehicle(String provider, String licensePlate,
+			Id<CarsharingVehicle> vin) {
+		super();
+		this.provider = provider;
+		this.licensePlate = licensePlate;
+		this.vin = vin;
+	}
+	
+	public void sortRides() {
+		Collections.sort(this.rides);
+	}
+
+	public void addRide(CarsharingRide ride){
+		this.rides.add(ride);
+	}
+
+	public List<CarsharingRide> getRides() {
+		return rides;
+	}
+
+	public long getMileage() {
+		return mileage;
+	}
+
+	public void setMileage(long mileage) {
+		this.mileage = mileage;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
+	}
+
+	public Coord getPosition() {
+		return position;
+	}
+
+	public void setPosition(Coord position) {
+		this.position = position;
+	}
+
+	public double getFuel() {
+		return fuel;
+	}
+
+	public void setFuel(double fuel) {
+		this.fuel = fuel;
+	}
+
+	public String getProvider() {
+		return provider;
+	}
+
+	public String getLicensePlate() {
+		return licensePlate;
+	}
+
+	public Id<CarsharingVehicle> getVin() {
+		return vin;
+	}
+	
+	
+	
+	
+	
+}
+class CarsharingRide implements Comparable<CarsharingRide>
+{
+		private Coord from;
+		private Coord to;
+		
+		private long start;
+		private long end;
+		
+		private double fuelBefore;
+		private double fuelAfter;
+		
+		private double mileageBefore;
+		private double mileageAfter;
+		
+		private double roadAlternativeKM;
+		private double roadAlternativeTime;
+		
+		private double ptAlternativeKM;
+		private double ptAlternativeTime;
+		
+		
+		public CarsharingRide(Coord from, Coord to, long start, long end,
+				double fuelBefore, double fuelAfter, double mileageBefore,
+				double mileageAfter, double roadAlternativeKM,
+				double roadAlternativeTime, double ptAlternativeKM,
+				double ptAlternativeTime) {
+			super();
+			this.from = from;
+			this.to = to;
+			this.start = start;
+			this.end = end;
+			this.fuelBefore = fuelBefore;
+			this.fuelAfter = fuelAfter;
+			this.mileageBefore = mileageBefore;
+			this.mileageAfter = mileageAfter;
+			this.roadAlternativeKM = roadAlternativeKM;
+			this.roadAlternativeTime = roadAlternativeTime;
+			this.ptAlternativeKM = ptAlternativeKM;
+			this.ptAlternativeTime = ptAlternativeTime;
+		}
+		
+		
+		@Override
+		public String toString() {
+			return "CarsharingRide [from=" + from + ", to=" + to + ", start="
+					+ start + ", end=" + end + ", fuelBefore=" + fuelBefore
+					+ ", fuelAfter=" + fuelAfter + ", mileageBefore="
+					+ mileageBefore + ", mileageAfter=" + mileageAfter
+					+ ", roadAlternativeKM=" + roadAlternativeKM
+					+ ", roadAlternativeTime=" + roadAlternativeTime
+					+ ", ptAlternativeKM=" + ptAlternativeKM
+					+ ", ptAlternativeTime=" + ptAlternativeTime + "]";
+		}
+		
+		public String toLine() {
+			return   from.getY() + "," +from.getX()+ "\t" + to.getY() + ","+to.getX() +"\t" + DriveNowGrepTimerTask.MIN.format(start) + "\t" + DriveNowGrepTimerTask.MIN.format(end) + "\t" + fuelBefore + "\t" + fuelAfter+ "\t" + mileageBefore + "\t" + mileageAfter + "\t" + roadAlternativeKM + "\t" + roadAlternativeTime+ "\t" + ptAlternativeKM + "\t" + ptAlternativeTime;
+					
+		}
+
+
+		public Coord getFrom() {
+			return from;
+		}
+		public Coord getTo() {
+			return to;
+		}
+		public long getStart() {
+			return start;
+		}
+		public long getEnd() {
+			return end;
+		}
+		public double getFuelBefore() {
+			return fuelBefore;
+		}
+		public double getFuelAfter() {
+			return fuelAfter;
+		}
+		public double getMileageBefore() {
+			return mileageBefore;
+		}
+		public double getMileageAfter() {
+			return mileageAfter;
+		}
+		public double getRoadAlternativeKM() {
+			return roadAlternativeKM;
+		}
+		public double getRoadAlternativeTime() {
+			return roadAlternativeTime;
+		}
+		public double getPtAlternativeKM() {
+			return ptAlternativeKM;
+		}
+		public double getPtAlternativeTime() {
+			return ptAlternativeTime;
+		}
+
+
+		@Override
+		public int compareTo(CarsharingRide o) {
+			Long startt = start;
+			return startt.compareTo(o.getStart());
+		}
+		
+		
+		
+	}
