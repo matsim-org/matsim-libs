@@ -22,6 +22,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -54,10 +55,33 @@ public class PrtCottbusLauncher {
 //		createPtPopulation(scenario);
 //		createPrtPopulation(config, scenario);
 //		createShapes(scenario);
+		clearPopulation(scenario);
 		
-		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
-		controler.run();
+//		Controler controler = new Controler(scenario);
+//		controler.setOverwriteFiles(true);
+//		controler.run();
+		
+	}
+
+	private static void clearPopulation(Scenario scenario) {
+		
+		Population pop = scenario.getPopulation();
+		
+		List<Person> personsToRemove = new ArrayList<Person>();
+		
+		for(Person p : pop.getPersons().values()){
+			Leg leg = (Leg) p.getSelectedPlan().getPlanElements().get(1);
+			if(!leg.getMode().equals(PrtRequestCreator.MODE)){
+				personsToRemove.add(p);
+			}
+		}
+		
+		for(Person p : personsToRemove){
+			((PopulationImpl)pop).getPersons().remove(p.getId());
+		}
+		
+		PopulationWriter writer = new PopulationWriter(pop, scenario.getNetwork());
+		writer.write("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		
 	}
 

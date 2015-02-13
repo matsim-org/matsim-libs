@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -19,6 +20,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.LegRouterWrapper;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -132,26 +134,14 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 							routeAlgo,
                                 modeRouteFactory)));
 		}
-		
-		Network prtNetwork = NetworkUtils.createNetwork();
-		for(Link link : network.getLinks().values()){
-			if(link.getAllowedModes().contains(TransportMode.car)){
-				Node fromNode = link.getFromNode();
-				Node toNode = link.getToNode();
-				if(!prtNetwork.getNodes().containsKey(fromNode.getId())){
-					((NetworkImpl)prtNetwork).createAndAddNode(fromNode.getId(), fromNode.getCoord());
-				}
-				if(!prtNetwork.getNodes().containsKey(toNode.getId())){
-					((NetworkImpl)prtNetwork).createAndAddNode(toNode.getId(), toNode.getCoord());
-				}
-				prtNetwork.addLink(link);
-			}
-		}
-		
+		PlanRouter r;
 		tripRouter.setRoutingModule(PrtRequestCreator.MODE, new PrtRouterWrapper(PrtRequestCreator.MODE, network,
-				populationFactory, new VrpPathCalculatorImpl(routeAlgo, this.travelTime, this.travelDisutility),
+				populationFactory, (MatsimVrpContextImpl) this.context, new VrpPathCalculatorImpl(routeAlgo, this.travelTime, this.travelDisutility),
 				new LegRouterWrapper(TransportMode.transit_walk, populationFactory,
-						new NetworkLegRouter(network, routeAlgoPtFreeFlow, modeRouteFactory))));
+						new TeleportationLegRouter(
+                                modeRouteFactory,
+							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
+							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()))));
 		
 		return tripRouter;
 		

@@ -26,6 +26,10 @@ public class PrtData extends TaxiData {
     	this.vehicleRanks.add(rank);
     }
     
+    public void initRankQuadTree(double[] bounds){
+    	this.initRankQuadTree(bounds[0], bounds[1], bounds[2], bounds[3]);
+    }
+    
     public void initRankQuadTree(double minX, double minY, double maxX, double maxY){
     	
     	quadTreeRanks = new QuadTree<TaxiRank>(minX, minY, maxX, maxY);

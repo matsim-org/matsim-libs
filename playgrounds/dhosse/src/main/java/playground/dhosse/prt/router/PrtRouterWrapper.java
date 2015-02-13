@@ -1,13 +1,10 @@
 package playground.dhosse.prt.router;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,39 +12,25 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
+import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
-import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
+import playground.michalm.taxi.data.TaxiData;
 import playground.michalm.taxi.data.TaxiRank;
 
 public class PrtRouterWrapper implements RoutingModule {
@@ -56,13 +39,17 @@ public class PrtRouterWrapper implements RoutingModule {
 			new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 	private RoutingModule walkRouter;
 	private VrpPathCalculatorImpl calculator;
-	private Network network;
+	private NetworkImpl network;
+	private PrtData data;
 	
 	public PrtRouterWrapper(final String mode, Network network, final PopulationFactory populationFactory, 
-			final VrpPathCalculatorImpl vrpPathCalculatorImpl, final RoutingModule routingModule){
+			MatsimVrpContextImpl context, final VrpPathCalculatorImpl vrpPathCalculatorImpl, final RoutingModule routingModule){
 		this.walkRouter = routingModule;
 		this.calculator = vrpPathCalculatorImpl;
-		this.network = network;
+		this.network = (NetworkImpl) network;
+		this.data = new PrtData(network, (TaxiData) context.getVrpData());
+		double[] bounds = NetworkUtils.getBoundingBox(this.network.getNodes().values());
+		this.data.initRankQuadTree(bounds);
 	}
 	
 	@Override
@@ -106,16 +93,16 @@ public class PrtRouterWrapper implements RoutingModule {
 		trip.add(act);
         
         //prtLeg
-		VrpPathWithTravelData path = this.calculator.calcPath(this.network.getLinks().get(accessFacility.getLinkId()), 
-				this.network.getLinks().get(egressFacility.getLinkId()), time);
+//		VrpPathWithTravelData path = this.calculator.calcPath(this.network.getLinks().get(accessFacility.getLinkId()), 
+//				this.network.getLinks().get(egressFacility.getLinkId()), time);
 		leg = new LegImpl(PrtRequestCreator.MODE);
 		route = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		route.setStartLinkId(accessFacility.getLinkId());
 		route.setEndLinkId(egressFacility.getLinkId());
-		route.setTravelTime(path.getTravelTime());
-		route.setDistance(path.getTravelCost());
+//		route.setTravelTime(path.getTravelTime());
+//		route.setDistance(path.getTravelCost());
 		leg.setRoute(route);
-		leg.setTravelTime(path.getTravelTime());
+//		leg.setTravelTime(path.getTravelTime());
         trip.add(leg);
 		
 		//interaction
