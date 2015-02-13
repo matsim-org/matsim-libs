@@ -180,7 +180,7 @@ public class Raptor implements TransitRouter {
 		TransitStopFacility accessStop = routeSegment.fromStop;
         TransitStopFacility egressStop = routeSegment.toStop;
         
-        ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, routeSegment.lineTaken, routeSegment.routeTaken, egressStop, 99999999);
+        ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.lineTaken, routeSegment.routeTaken);
         leg.setRoute(ptRoute);
 
         leg.setTravelTime(routeSegment.travelTime);

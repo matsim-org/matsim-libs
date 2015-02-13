@@ -42,13 +42,20 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	/*package*/ ExperimentalTransitRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
-
-	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitLine line, final TransitRoute route, final TransitStopFacility egressFacility) {
+	
+	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitStopFacility egressFacility, final Id<TransitLine> lineId, final Id<TransitRoute> routeId) {
 		this(accessFacility.getLinkId(), egressFacility.getLinkId());
 		this.accessStopId = accessFacility.getId();
-		this.lineId = (line == null ? null : line.getId());
-		this.routeId = (route == null ? null : route.getId());
+		this.lineId = lineId;
+		this.routeId = routeId;
 		this.egressStopId = egressFacility.getId();
+	}
+
+	/**
+	 * Why do we need this constructor, if we only keep the id of the line/route? 
+	 */
+	public ExperimentalTransitRoute(final TransitStopFacility accessFacility, final TransitLine line, final TransitRoute route, final TransitStopFacility egressFacility) {
+		this(accessFacility, egressFacility, (line == null ? null : line.getId()), (route == null ? null : route.getId()));
 	}
 
 	@Override
