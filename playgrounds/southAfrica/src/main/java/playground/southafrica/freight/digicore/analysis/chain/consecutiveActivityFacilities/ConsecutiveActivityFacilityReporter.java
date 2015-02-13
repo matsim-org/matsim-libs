@@ -98,7 +98,7 @@ public class ConsecutiveActivityFacilityReporter {
 		List<File> tmpOutputs = FileUtils.sampleFiles(new File("tmp/"), Integer.MAX_VALUE, FileUtils.getFileFilter(".csv.gz"));
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputfile);
 		try{
-			bw.write("vehId,facilityId,chainLength,position,chainDay,x,y,lon,lat,activityDay,dateTime,waitMinutes,isDuplicate");
+			bw.write("vehId,facilityId,chainLength,position,chainDay,x,y,lon,lat,activityDay,dateTime,timeBetween,startToStart,isDuplicate");
 			bw.newLine();
 			
 			for(File file : tmpOutputs){
@@ -180,8 +180,10 @@ public class ConsecutiveActivityFacilityReporter {
 						}
 						long currentStartTime = current.getStartTimeGregorianCalendar().getTimeInMillis();
 						long previousEndTime = previous.getEndTimeGregorianCalendar().getTimeInMillis();
+						long previousStartTime = previous.getStartTimeGregorianCalendar().getTimeInMillis();
 						
-						double waitTimeInMinutes = (((double)currentStartTime) - ((double)previousEndTime))/(60.0*1000.0);
+						double timeBetweenDuplicates = (((double)currentStartTime) - ((double)previousEndTime))/(60.0*1000.0);
+						double startToStart = (((double)currentStartTime) - ((double)previousStartTime))/(60.0*1000.0);
 						
 						/* Check if the facility Ids are the same. */
 						String isDuplicate = "false";
@@ -197,7 +199,8 @@ public class ConsecutiveActivityFacilityReporter {
 								+ "," + String.format("%.6f,%.6f", cWgs.getX(), cWgs.getY())
 								+ "," + activityDay
 								+ "," + dateTime
-								+ "," + String.format("%.0f", waitTimeInMinutes)
+								+ "," + String.format("%.0f", timeBetweenDuplicates)
+								+ "," + String.format("%.0f", startToStart)
 								+ "," + isDuplicate;
 						
 						strings.add(line);
