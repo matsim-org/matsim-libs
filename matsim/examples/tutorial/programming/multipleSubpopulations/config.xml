@@ -16,7 +16,7 @@
 		<param name="outputDirectory" value="./output/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name="mobsim" value="queueSimulation" />
+		<param name="mobsim" value="qsim" />
 		<param name="snapshotFormat" value="" />		
 	</module>
 
