@@ -29,7 +29,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 
 /**
  * @author nagel
@@ -92,7 +91,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( !found ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("found no strategy ChangeExpBeta. vsp default is using ChangeExpBeta.");
+			log.warn("You have no strategy configured that uses ChangeExpBeta. vsp default is to use ChangeExpBeta at least in one strategy.");
 		}
 		
 		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
