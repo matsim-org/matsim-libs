@@ -29,14 +29,14 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.OpeningTime.DayType;
 
 /**
  * This class implements the activity scoring as used in Year 3 of the KTI project.

@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import com.vividsolutions.jts.geom.Polygon;

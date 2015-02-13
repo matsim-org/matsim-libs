@@ -37,7 +37,6 @@ import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.MultiNodeDijkstra;
@@ -45,6 +44,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import java.util.Collection;

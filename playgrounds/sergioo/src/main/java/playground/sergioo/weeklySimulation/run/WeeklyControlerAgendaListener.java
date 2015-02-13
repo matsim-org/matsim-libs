@@ -31,7 +31,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
@@ -41,7 +40,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.pt.router.TransitRouterFactory;
+
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;

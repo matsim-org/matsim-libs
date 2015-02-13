@@ -32,10 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.kai.urbansim.ids.Job;
 import playground.kai.urbansim.ids.Location;

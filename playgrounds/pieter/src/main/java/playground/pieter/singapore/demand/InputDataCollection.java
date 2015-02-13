@@ -15,23 +15,22 @@ import java.util.TreeMap;
 
 import javax.management.timer.Timer;
 
-
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.OpeningTime.DayType;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;

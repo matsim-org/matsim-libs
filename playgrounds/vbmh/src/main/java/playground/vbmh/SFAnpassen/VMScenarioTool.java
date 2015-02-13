@@ -17,13 +17,13 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesWriter;
 
 import playground.vbmh.vmEV.EV;
 import playground.vbmh.vmEV.EVList;

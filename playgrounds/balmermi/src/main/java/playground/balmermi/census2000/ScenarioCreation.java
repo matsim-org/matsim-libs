@@ -25,9 +25,9 @@ import java.io.IOException;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatsimMatricesReader;
 

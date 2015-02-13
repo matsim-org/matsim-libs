@@ -46,8 +46,8 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.facilities.ActivityOption;
 
 /**
  * This module is not compatible with parking search, but should be with parking

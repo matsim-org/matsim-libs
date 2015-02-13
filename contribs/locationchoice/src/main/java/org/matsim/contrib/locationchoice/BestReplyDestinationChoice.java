@@ -32,7 +32,6 @@ import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFa
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -44,6 +43,7 @@ import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 

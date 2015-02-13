@@ -21,6 +21,7 @@ package playground.ivt.matsim2030;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,8 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -50,12 +49,15 @@ import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
+
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;

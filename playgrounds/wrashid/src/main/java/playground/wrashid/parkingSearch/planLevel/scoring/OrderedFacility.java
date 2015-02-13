@@ -1,6 +1,6 @@
 package playground.wrashid.parkingSearch.planLevel.scoring;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 
 /**

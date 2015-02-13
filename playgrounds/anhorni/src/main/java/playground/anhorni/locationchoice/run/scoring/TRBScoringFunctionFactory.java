@@ -24,12 +24,13 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
 
 public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {

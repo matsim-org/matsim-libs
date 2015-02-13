@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
 
 /**
  * Creates facilities for each link where agents perform activities according to

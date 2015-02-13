@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.ciarif.data.FacilitiesPortfolio;
 import playground.ciarif.flexibletransports.router.CarSharingStations;

@@ -6,14 +6,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.FacilitiesWriter;
 
 /**
  * Class that is meant to interface with urbansim.  As of nov08, only working for the urbansim "parcel"

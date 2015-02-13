@@ -42,11 +42,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.johannes.gsv.misc.QuadTree;

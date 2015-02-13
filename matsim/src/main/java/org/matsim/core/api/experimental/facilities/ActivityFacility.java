@@ -21,7 +21,7 @@ package org.matsim.core.api.experimental.facilities;
 
 import java.util.Map;
 
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 
 
 public interface ActivityFacility extends Facility<ActivityFacility> {

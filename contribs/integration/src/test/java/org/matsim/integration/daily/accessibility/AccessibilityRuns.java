@@ -15,12 +15,12 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedWriter;

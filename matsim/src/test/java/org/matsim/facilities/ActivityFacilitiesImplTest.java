@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
+package org.matsim.facilities;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 
 /**
  * @author mrieser / Senozon AG

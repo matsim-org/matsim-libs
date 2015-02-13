@@ -3,6 +3,7 @@ package playground.artemc.scenarioTools;
 import com.mysql.jdbc.Statement;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -17,8 +18,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.artemc.utils.DataBaseAdmin;
 
 import java.io.File;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
+package org.matsim.facilities;
 
 import java.util.Collection;
 import java.util.Iterator;

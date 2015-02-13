@@ -28,11 +28,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.OpeningTime;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class RCActivityScoringFunction extends CharyparNagelActivityScoring {

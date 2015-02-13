@@ -28,10 +28,10 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.OpeningTime;
 
 public class FacilitiesCombine {
 

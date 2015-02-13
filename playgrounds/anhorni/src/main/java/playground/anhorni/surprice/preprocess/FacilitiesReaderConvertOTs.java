@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.xml.sax.Attributes;
 
 import playground.anhorni.surprice.Surprice;

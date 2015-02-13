@@ -22,19 +22,20 @@ package playground.anhorni.surprice.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
+
 //import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTime.DayType;
 
 import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;

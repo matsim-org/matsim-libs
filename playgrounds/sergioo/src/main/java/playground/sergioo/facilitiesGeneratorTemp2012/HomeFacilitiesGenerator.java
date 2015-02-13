@@ -7,14 +7,14 @@ import java.sql.SQLException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.FacilitiesUtils;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;

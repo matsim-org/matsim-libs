@@ -21,8 +21,8 @@
 package playground.balmermi.toggenburg.modules;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 public class FacilitiesCount {
 

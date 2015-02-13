@@ -23,6 +23,7 @@
 package org.matsim.contrib.accessibility.run;
 
 import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,10 +46,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.File;

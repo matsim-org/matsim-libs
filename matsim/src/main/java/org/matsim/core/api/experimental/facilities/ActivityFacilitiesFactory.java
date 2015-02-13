@@ -23,7 +23,7 @@ package org.matsim.core.api.experimental.facilities;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 
 /**
  * @author nagel

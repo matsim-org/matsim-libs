@@ -22,6 +22,7 @@ package org.matsim.contrib.parking.lib;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -49,8 +50,6 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -64,10 +63,13 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.awt.*;
 import java.io.*;
 import java.util.*;

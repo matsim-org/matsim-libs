@@ -8,10 +8,11 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.testcases.MatsimTestCase;
+
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;

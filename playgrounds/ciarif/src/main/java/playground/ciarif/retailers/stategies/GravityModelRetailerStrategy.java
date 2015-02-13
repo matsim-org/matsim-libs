@@ -2,6 +2,7 @@ package playground.ciarif.retailers.stategies;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix1D;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -11,9 +12,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+
 import playground.ciarif.retailers.RetailerGA.RunRetailerGA;
 import playground.ciarif.retailers.data.Consumer;
 import playground.ciarif.retailers.data.LinkRetailersImpl;

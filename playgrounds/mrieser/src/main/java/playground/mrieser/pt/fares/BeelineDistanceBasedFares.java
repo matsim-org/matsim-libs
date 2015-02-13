@@ -20,7 +20,7 @@
 
 package playground.mrieser.pt.fares;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.mrieser.pt.fares.api.TransitFares;
 

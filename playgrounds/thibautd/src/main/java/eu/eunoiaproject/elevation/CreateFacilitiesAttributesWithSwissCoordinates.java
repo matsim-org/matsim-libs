@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.ivt.utils.ArgParser;

@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 
 
 public class FacilityQuadTreeBuilder {

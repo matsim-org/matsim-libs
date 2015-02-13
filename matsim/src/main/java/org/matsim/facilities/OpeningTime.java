@@ -17,38 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
+package org.matsim.facilities;
 
-import java.util.SortedSet;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFacilitiesObject;
 
 /**
  * @author dgrether
- * @author mrieser / Senozon AG
  */
-public interface ActivityOption extends MatsimFacilitiesObject {
-
-	public double getCapacity();
-
-	public void setCapacity(double cap);
-
-	public void addOpeningTime(OpeningTime openingTime);
-
-	public SortedSet<OpeningTime> getOpeningTimes();
-
-	public String getType();
-
-	public ActivityFacility getFacility();
+public interface OpeningTime extends Comparable<OpeningTime>, MatsimFacilitiesObject {
 	
-	/**
-	 * Sets the reference to the facility this activity option belongs to.
-	 * This is done automatically if using {@link ActivityFacility#addActivityOption(ActivityOption)}.
-	 * Make sure that the bidirectional reference is set correctly if you are using this method!
-	 * 
-	 * @param facility
-	 */
-	public void setFacility(final ActivityFacility facility);
+	@Deprecated
+	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk}
 	
+	public double getStartTime();
+	
+	public void setStartTime(double starttime);
+	
+	public double getEndTime();
+	
+	public void setEndTime(double endtime);
 }

@@ -20,8 +20,8 @@
 
 package playground.wrashid.lib.tools.facility;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
 
 public class FacilityLib {
 

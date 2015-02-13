@@ -21,7 +21,7 @@ package playground.ciarif.retailers.data;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 public class FacilityRetailersImpl extends ActivityFacilityImpl
 {

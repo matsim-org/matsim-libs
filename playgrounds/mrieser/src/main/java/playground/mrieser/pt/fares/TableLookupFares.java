@@ -22,8 +22,8 @@ package playground.mrieser.pt.fares;
 
 import java.util.Map;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.mrieser.pt.fares.api.TransitFares;
 

@@ -31,11 +31,11 @@ import java.util.Set;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.sna.math.DescriptivePiStatistics;

@@ -23,8 +23,8 @@ package playground.balmermi.world;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 /**
  * Basic geographical class in MATSim.

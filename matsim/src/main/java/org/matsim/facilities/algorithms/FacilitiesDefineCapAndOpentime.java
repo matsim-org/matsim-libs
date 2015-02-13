@@ -23,12 +23,12 @@ package org.matsim.facilities.algorithms;
 import java.util.Iterator;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.OpeningTime.DayType;
 
 public class FacilitiesDefineCapAndOpentime {
 

@@ -7,11 +7,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.ActivityFacilityImpl;
+
 import playground.balac.retailers.data.PersonRetailersImpl;
 import playground.balac.retailers.data.RetailZone;
 import playground.balac.retailers.data.RetailZones;

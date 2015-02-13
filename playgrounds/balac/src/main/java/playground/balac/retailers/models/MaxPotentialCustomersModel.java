@@ -10,18 +10,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+
 import playground.balac.retailers.data.FacilityRetailersImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.PersonPrimaryActivity;
 import playground.balac.retailers.utils.Utils;
 
 import javax.inject.Provider;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;

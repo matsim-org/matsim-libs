@@ -23,7 +23,7 @@ package playground.mrieser.pt.fares;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.mrieser.pt.fares.api.TransitFares;
 

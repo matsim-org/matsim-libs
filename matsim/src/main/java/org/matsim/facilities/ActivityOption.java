@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: matsim
- * ActivityFacilitiesFactory.java
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
+package org.matsim.facilities;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import java.util.SortedSet;
+
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.internal.MatsimFacilitiesObject;
 
 /**
- * @author nagel
- *
+ * @author dgrether
+ * @author mrieser / Senozon AG
  */
-public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory {
+public interface ActivityOption extends MatsimFacilitiesObject {
 
-	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord) {
-		return new ActivityFacilityImpl(id,coord);
-	}
+	public double getCapacity();
 
-	@Override
-	public ActivityOption createActivityOption(String type) {
-		return new ActivityOptionImpl(type);
-	}
+	public void setCapacity(double cap);
 
+	public void addOpeningTime(OpeningTime openingTime);
+
+	public SortedSet<OpeningTime> getOpeningTimes();
+
+	public String getType();
+
+	public ActivityFacility getFacility();
+	
+	/**
+	 * Sets the reference to the facility this activity option belongs to.
+	 * This is done automatically if using {@link ActivityFacility#addActivityOption(ActivityOption)}.
+	 * Make sure that the bidirectional reference is set correctly if you are using this method!
+	 * 
+	 * @param facility
+	 */
+	public void setFacility(final ActivityFacility facility);
+	
 }

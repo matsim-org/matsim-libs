@@ -19,7 +19,7 @@
 
 package playground.anhorni.surprice;
 
-import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.facilities.OpeningTime.DayType;
 
 public class DayConverter {
 	

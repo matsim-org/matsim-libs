@@ -30,7 +30,6 @@ import org.matsim.contrib.locationchoice.timegeography.ManageSubchains;
 import org.matsim.contrib.locationchoice.timegeography.SubChain;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -38,6 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import java.util.*;
 

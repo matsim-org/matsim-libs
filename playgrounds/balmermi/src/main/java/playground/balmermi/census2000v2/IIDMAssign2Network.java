@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -40,6 +38,8 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
 

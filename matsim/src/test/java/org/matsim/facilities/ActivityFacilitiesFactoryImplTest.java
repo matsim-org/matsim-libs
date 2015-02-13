@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FacilitiesWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,39 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
+package org.matsim.facilities;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.internal.MatsimWriter;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
+import org.matsim.facilities.ActivityOption;
 
 /**
  * @author mrieser / Senozon AG
  */
-public class FacilitiesWriter implements MatsimWriter {
+public class ActivityFacilitiesFactoryImplTest {
 
-	private final ActivityFacilities facilities;
+	@Test
+	public void testCreateActivityFacility() {
+		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
+		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new CoordImpl(5, 11));
 
-	/**
-	 * Creates a new FacilitiesWriter to write the specified facilities to the file.
-	 *
-	 * @param facilities
-	 */
-	public FacilitiesWriter(final ActivityFacilities facilities) {
-		this.facilities = facilities;
+		Assert.assertEquals("1980", facility.getId().toString());
+		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);
+		Assert.assertEquals(11.0, facility.getCoord().getY(), 1e-9);
 	}
 
-	/**
-	 * Writes the activity facilities in the current default format 
-	 * (currently facilities_v1.dtd). 
-	 */
-	@Override
-	public final void write(final String filename) {
-		new FacilitiesWriterV1(facilities).write(filename);
-	}
-	
-	public final void writeV1(final String filename) {
-		new FacilitiesWriterV1(facilities).write(filename);
-	}
+	@Test
+	public void testCreateActivityOption() {
+		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
+		ActivityOption option = factory.createActivityOption("leisure");
 
+		Assert.assertEquals("leisure", option.getType());
+		Assert.assertEquals(Integer.MAX_VALUE, option.getCapacity(), 1e-9);
+		Assert.assertNull(option.getFacility());
+	}
 
 }

@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.FacilitiesWriter;
 
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesAllActivitiesFTE;
 

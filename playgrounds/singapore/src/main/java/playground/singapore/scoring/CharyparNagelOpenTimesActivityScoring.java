@@ -26,10 +26,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.OpeningTime;
 
 /**
  * Same as CharyparNagelScoringFunction, but retrieves opening time information

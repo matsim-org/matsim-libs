@@ -33,7 +33,7 @@ import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class LocationMutator implements PlanAlgorithm {

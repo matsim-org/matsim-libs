@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 
 import others.sergioo.visUtils.JetColor;
 import others.sergioo.visUtils.ScaleColor;

@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 

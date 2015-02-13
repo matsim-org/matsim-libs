@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import java.util.Random;
 import java.util.TreeMap;

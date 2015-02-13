@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import playground.anhorni.choiceSetGeneration.filters.AreaReader;
 

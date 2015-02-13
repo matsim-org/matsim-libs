@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -46,6 +45,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.facilities.ActivityOption;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.vsp.demandde.pendlermatrix.TripFlowSink;

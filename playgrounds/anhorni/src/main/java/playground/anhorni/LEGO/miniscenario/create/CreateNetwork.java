@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTimeImpl;
 
 public class CreateNetwork {
 	private ScenarioImpl scenario = null;	

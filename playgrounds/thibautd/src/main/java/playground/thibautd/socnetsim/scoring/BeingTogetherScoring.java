@@ -39,8 +39,8 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.OpeningTime;
 
 import playground.ivt.utils.MapUtils;
 import playground.ivt.utils.MapUtils.Factory;

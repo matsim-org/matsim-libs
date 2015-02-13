@@ -25,7 +25,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;

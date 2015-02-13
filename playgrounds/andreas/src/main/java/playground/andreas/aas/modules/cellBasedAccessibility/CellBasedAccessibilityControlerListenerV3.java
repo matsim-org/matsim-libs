@@ -8,11 +8,12 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.utils.LeastCostPathTree;
+
 import playground.andreas.aas.modules.cellBasedAccessibility.constants.InternalConstants;
 import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.FreeSpeedTravelTimeCostCalculator;
 import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelDistanceCalculator;

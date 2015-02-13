@@ -44,11 +44,11 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesWriter;
 
 public class BuildingsZHCreator {
 	

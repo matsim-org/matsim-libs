@@ -28,7 +28,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
@@ -36,8 +35,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
+
 import utils.BuildTrees;
 
 import java.io.File;

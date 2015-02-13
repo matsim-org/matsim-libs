@@ -35,12 +35,12 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;

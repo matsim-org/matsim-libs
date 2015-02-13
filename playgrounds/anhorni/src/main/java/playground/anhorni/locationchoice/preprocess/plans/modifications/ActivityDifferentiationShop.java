@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
 

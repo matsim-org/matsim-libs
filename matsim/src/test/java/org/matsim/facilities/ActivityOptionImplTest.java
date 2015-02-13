@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.facilities;
-
-import org.matsim.core.api.internal.MatsimFacilitiesObject;
+package org.matsim.facilities;
 
 /**
- * @author dgrether
+ * @author mrieser / Senozon AG
  */
-public interface OpeningTime extends Comparable<OpeningTime>, MatsimFacilitiesObject {
-	
-	@Deprecated
-	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk}
-	
-	public double getStartTime();
-	
-	public void setStartTime(double starttime);
-	
-	public double getEndTime();
-	
-	public void setEndTime(double endtime);
+public class ActivityOptionImplTest {
+
 }

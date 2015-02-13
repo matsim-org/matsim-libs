@@ -23,13 +23,13 @@ package playground.balmermi.datapuls;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesWriter;
 
 import playground.balmermi.datapuls.modules.PersonAdaptPlanAndCreateFacilities;
 

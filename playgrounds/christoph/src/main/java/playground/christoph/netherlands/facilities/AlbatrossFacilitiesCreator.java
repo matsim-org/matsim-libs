@@ -35,16 +35,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 
 import playground.christoph.netherlands.zones.GetZoneConnectors;
 

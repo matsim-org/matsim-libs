@@ -2,13 +2,14 @@ package playground.pieter.distributed;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
+
 import playground.pieter.distributed.plans.PopulationFactoryForPlanGenomes;
 import playground.pieter.distributed.plans.PopulationReaderMatsimV5ForPlanGenomes;
 import playground.pieter.distributed.plans.PopulationUtilsForPlanGenomes;

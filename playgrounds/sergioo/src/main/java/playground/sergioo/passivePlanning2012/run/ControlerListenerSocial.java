@@ -31,13 +31,14 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.households.PersonHouseholdMapping;
+
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningSocialFactory;
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;

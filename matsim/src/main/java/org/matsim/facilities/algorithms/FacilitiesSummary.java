@@ -24,9 +24,9 @@ import java.util.Iterator;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
 
 public class FacilitiesSummary {
 

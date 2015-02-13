@@ -31,11 +31,11 @@ import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.List;

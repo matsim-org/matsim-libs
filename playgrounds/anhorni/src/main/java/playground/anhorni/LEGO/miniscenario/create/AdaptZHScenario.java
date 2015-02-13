@@ -34,11 +34,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -50,6 +45,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
 
 public class AdaptZHScenario {
 	private final static Logger log = Logger.getLogger(AdaptZHScenario.class);

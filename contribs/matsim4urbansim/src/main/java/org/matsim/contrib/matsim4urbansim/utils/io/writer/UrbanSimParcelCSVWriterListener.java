@@ -8,7 +8,7 @@ import org.matsim.contrib.matsim4urbansim.interpolation.Interpolation;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import java.util.HashMap;
 import java.util.Map;

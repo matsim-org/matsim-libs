@@ -3,8 +3,8 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
 
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;

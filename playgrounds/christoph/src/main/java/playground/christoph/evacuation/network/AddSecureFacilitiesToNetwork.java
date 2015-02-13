@@ -39,14 +39,14 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;

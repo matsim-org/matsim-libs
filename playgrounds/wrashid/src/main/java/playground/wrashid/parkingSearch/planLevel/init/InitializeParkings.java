@@ -21,8 +21,9 @@ package playground.wrashid.parkingSearch.planLevel.init;
 
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+
 import playground.wrashid.lib.GlobalRegistry;
 
 public class InitializeParkings implements StartupListener {

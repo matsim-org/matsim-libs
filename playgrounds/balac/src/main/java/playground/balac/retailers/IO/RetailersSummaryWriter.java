@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.balac.retailers.data.Retailer;
 import playground.balac.retailers.data.Retailers;

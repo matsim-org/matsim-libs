@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 public class FacilityCapacitiesPerActivityType {
 

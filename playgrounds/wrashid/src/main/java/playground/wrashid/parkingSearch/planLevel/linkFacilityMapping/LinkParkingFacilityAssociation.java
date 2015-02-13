@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;

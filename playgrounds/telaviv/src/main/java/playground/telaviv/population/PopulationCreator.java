@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -50,8 +49,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.telaviv.config.XMLParameterParser;
 import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.zones.Emme2Zone;

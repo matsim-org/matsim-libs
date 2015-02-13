@@ -52,7 +52,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -67,6 +66,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.johannes.coopsim.analysis.PkmRouteTask;

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityOption;
+import org.matsim.facilities.ActivityOption;
 
 import playground.johannes.gsv.misc.QuadTree;
 

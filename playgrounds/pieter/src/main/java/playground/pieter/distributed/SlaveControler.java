@@ -23,7 +23,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -36,7 +35,9 @@ import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.vehicles.Vehicle;
+
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
