@@ -18,17 +18,22 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.calibration;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -54,16 +59,34 @@ public class SubPopInputs4Munich {
 
 		// read plans with subActivities (basically these are inital plans from different sources + subActivities)
 		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz";
-		String outPopAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_usrGrp.xml.gz";
-
+		String outPopAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz";
+		String outPlansFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities_subPop.xml.gz";
+		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 		Population pop = sc.getPopulation();	
-
+		
 		for(Person p : pop.getPersons().values()){
+			
 			pop.getPersonAttributes().putAttribute(p.getId().toString(), subPopAttributeName, getUserGroupFromPersonId(p.getId()));
+
+			//pt of commuter and rev_commuter need to be replaced by some other mode.
+			if(pf.isPersonInnCommuter(p.getId()) || pf.isPersonOutCommuter(p.getId())){
+				List<PlanElement> pes = p.getSelectedPlan().getPlanElements(); // only one plan each person in initial plans
+				for(PlanElement pe : pes){
+
+					if(pe instanceof Leg){
+						if(((Leg)pe).getMode().equals(TransportMode.pt)){
+							((Leg)pe).setMode("pt_COMMUTER_REV_COMMUTER");
+						}
+					}
+				}
+			}
+
 		}
 
-		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()) ;
+		new PopulationWriter(pop).write(outPlansFile);
+		
+		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(pop.getPersonAttributes()) ;
 		writer.writeFile(outPopAttributeFile);
 	}
 
@@ -122,7 +145,7 @@ public class SubPopInputs4Munich {
 	}
 
 	private String getUserGroupFromPersonId(Id<Person> personId){
-		if(pf.isPersonFromMunich(personId)) return "OTHERS";
+		if(pf.isPersonFromMID(personId)) return "OTHERS";
 		else if(pf.isPersonInnCommuter(personId)) return "COMMUTER_REV_COMMUTER";
 		else if(pf.isPersonOutCommuter(personId)) return "COMMUTER_REV_COMMUTER";
 		else if (pf.isPersonFreight(personId)) return "OTHERS";
