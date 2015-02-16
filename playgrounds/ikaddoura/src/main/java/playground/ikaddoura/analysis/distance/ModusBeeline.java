@@ -1,4 +1,4 @@
-package playground.ikaddoura.analysis.beeline;
+package playground.ikaddoura.analysis.distance;
 
 import java.util.ArrayList;
 import java.util.List;

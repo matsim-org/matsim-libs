@@ -1,4 +1,4 @@
-package playground.ikaddoura.analysis.beeline;
+package playground.ikaddoura.analysis.distance;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -11,6 +11,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.ikaddoura.analysis.beeline.Line;
+import playground.ikaddoura.analysis.beeline.TextFileWriter;
 
 public class BeelineAnalysisMain {
 
