@@ -12,7 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
-public class PlanFiles_Analysis {
+public class DistanceAnalysisMain {
 
 	String netFile1 = "input/output_network.xml";
 	String plansFile1 = "input/0.plans.xml";
@@ -31,7 +31,7 @@ public class PlanFiles_Analysis {
 	double basis = 2; 
 		
 	public static void main(String[] args) {
-		PlanFiles_Analysis analyse = new PlanFiles_Analysis();
+		DistanceAnalysisMain analyse = new DistanceAnalysisMain();
 		analyse.run();
 		}
 	
@@ -40,8 +40,8 @@ public class PlanFiles_Analysis {
 		Population population1 = getPopulation(netFile1, plansFile1);
 		Population population2 = getPopulation(netFile2, plansFile2);
 
-		SortedMap<String,Modus> modiMap1 = getModiMap(population1);
-		SortedMap<String,Modus> modiMap2 = getModiMap(population2);
+		SortedMap<String,ModusDistance> modiMap1 = getModiMap(population1);
+		SortedMap<String,ModusDistance> modiMap2 = getModiMap(population2);
 		
 		double maxDistance1 = getMaximalDistanceAllModes(modiMap1);
 		double maxDistance2 = getMaximalDistanceAllModes(modiMap2);
@@ -78,7 +78,7 @@ public class PlanFiles_Analysis {
 		return population;
 	}
 	
-	private double getMaximalDistanceAllModes(SortedMap<String, Modus> modiMap) {
+	private double getMaximalDistanceAllModes(SortedMap<String, ModusDistance> modiMap) {
 		double maximalDistanceAllModes = 0.0;
 		for (String modus : modiMap.keySet()){
 			if (maximalDistanceAllModes > modiMap.get(modus).getMaximalDistance()){}
@@ -103,8 +103,8 @@ public class PlanFiles_Analysis {
 		return maxDistance;
 	}
 	
-	private SortedMap<String, Modus> getModiMap(Population population) {
-		SortedMap<String,Modus> modiMap = new TreeMap<String, Modus>();
+	private SortedMap<String, ModusDistance> getModiMap(Population population) {
+		SortedMap<String,ModusDistance> modiMap = new TreeMap<String, ModusDistance>();
 		for(Person person : population.getPersons().values()){
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
 				if (pE instanceof Leg){
@@ -114,7 +114,7 @@ public class PlanFiles_Analysis {
 						//nothing
 					}
 					else {
-						Modus modus = new Modus(mode);
+						ModusDistance modus = new ModusDistance(mode);
 						modus.setDistances(population);
 						modiMap.put(mode,modus);
 					}
@@ -124,20 +124,20 @@ public class PlanFiles_Analysis {
 		return modiMap;
 	}
 	
-	private void setLegsPerDistanceGroups(SortedMap<String, Modus> modiMap, double maxDistance) {
-		for (Modus modus : modiMap.values()){
+	private void setLegsPerDistanceGroups(SortedMap<String, ModusDistance> modiMap, double maxDistance) {
+		for (ModusDistance modus : modiMap.values()){
 			modus.setLegsPerDistanceGroups(basis, maxDistance);
 		}
 	}
 	
-	private SortedMap<Double, Line> putTogether(SortedMap<String, Modus> modiMap) {
+	private SortedMap<Double, Line> putTogether(SortedMap<String, ModusDistance> modiMap) {
 		
 		SortedMap<Double, Line> resultMap = new TreeMap<Double, Line>();
-		Modus carModus = modiMap.get("car");
+		ModusDistance carModus = modiMap.get("car");
 		SortedMap<Double, Integer> carLegsPerDistanceGroups = carModus.getLegsPerDistanceGroups(); // zum Durchiterieren
 		for (Double distanceGroup : carLegsPerDistanceGroups.keySet()){
 			Line line = new Line(distanceGroup);
-			for (Modus modus : modiMap.values()){
+			for (ModusDistance modus : modiMap.values()){
 				String modeName = modus.getModeName();
 				line.setLegs(modeName, modus.getLegsPerDistanceGroups().get(distanceGroup));
 				resultMap.put(distanceGroup, line);

@@ -12,7 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PlanFiles_Analysis {
+public class BeelineAnalysisMain {
 
 	String netFile = "input/output_network.xml";
 	
@@ -27,7 +27,7 @@ public class PlanFiles_Analysis {
 	double basis = 2; 
 		
 	public static void main(String[] args) {
-		PlanFiles_Analysis analyse = new PlanFiles_Analysis();
+		BeelineAnalysisMain analyse = new BeelineAnalysisMain();
 		analyse.run();
 		}
 	
@@ -36,8 +36,8 @@ public class PlanFiles_Analysis {
 		Population population1 = getPopulation(netFile, plansFile1);
 		Population population2 = getPopulation(netFile, plansFile2);
 
-		SortedMap<String,Modus> modiMap1 = getModiMap(population1);
-		SortedMap<String,Modus> modiMap2 = getModiMap(population2);
+		SortedMap<String,ModusBeeline> modiMap1 = getModiMap(population1);
+		SortedMap<String,ModusBeeline> modiMap2 = getModiMap(population2);
 		
 		double maxLuftlinie1 = getMaximalLuftlinieAllModes(modiMap1);
 		double maxLuftlinie2 = getMaximalLuftlinieAllModes(modiMap2);
@@ -84,7 +84,7 @@ public class PlanFiles_Analysis {
 		return maxDistance;
 	}
 	
-	private double getMaximalLuftlinieAllModes(SortedMap<String, Modus> modiMap) {
+	private double getMaximalLuftlinieAllModes(SortedMap<String, ModusBeeline> modiMap) {
 		double maximalLuftlinieAllModes = 0.0;
 		for (String modus : modiMap.keySet()){
 			if (maximalLuftlinieAllModes > modiMap.get(modus).getMaximalLuftlinie()){}
@@ -95,8 +95,8 @@ public class PlanFiles_Analysis {
 		return maximalLuftlinieAllModes;
 	}
 	
-	private SortedMap<String, Modus> getModiMap(Population population) {
-		SortedMap<String,Modus> modiMap = new TreeMap<String, Modus>();
+	private SortedMap<String, ModusBeeline> getModiMap(Population population) {
+		SortedMap<String,ModusBeeline> modiMap = new TreeMap<String, ModusBeeline>();
 		for(Person person : population.getPersons().values()){
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
 				if (pE instanceof Leg){
@@ -106,7 +106,7 @@ public class PlanFiles_Analysis {
 						//nothing
 					}
 					else {
-						Modus modus = new Modus(mode);
+						ModusBeeline modus = new ModusBeeline(mode);
 						modus.setDistances(population);
 						modiMap.put(mode,modus);
 					}
@@ -116,20 +116,20 @@ public class PlanFiles_Analysis {
 		return modiMap;
 	}
 	
-	private void setLegsPerLuftlinienGroups(SortedMap<String, Modus> modiMap, double maxLuftlinie) {
-		for (Modus modus : modiMap.values()){
+	private void setLegsPerLuftlinienGroups(SortedMap<String, ModusBeeline> modiMap, double maxLuftlinie) {
+		for (ModusBeeline modus : modiMap.values()){
 			modus.setLegsPerLuftlinienGroups(basis, maxLuftlinie);
 		}
 	}
 	
-	private SortedMap<Double, Line> putTogether(SortedMap<String, Modus> modiMap) {
+	private SortedMap<Double, Line> putTogether(SortedMap<String, ModusBeeline> modiMap) {
 		
 		SortedMap<Double, Line> resultMap = new TreeMap<Double, Line>();
-		Modus carModus = modiMap.get("car");
+		ModusBeeline carModus = modiMap.get("car");
 		SortedMap<Double, Integer> carLegsPerLuftlinieGroups = carModus.getLegsPerLuftlinienGroups(); // zum Durchiterieren
 		for (Double luftlinienGroup : carLegsPerLuftlinieGroups.keySet()){
 			Line line = new Line(luftlinienGroup);
-			for (Modus modus : modiMap.values()){
+			for (ModusBeeline modus : modiMap.values()){
 				String modeName = modus.getModeName();
 				line.setLegs(modeName, modus.getLegsPerLuftlinienGroups().get(luftlinienGroup));
 				resultMap.put(luftlinienGroup, line);

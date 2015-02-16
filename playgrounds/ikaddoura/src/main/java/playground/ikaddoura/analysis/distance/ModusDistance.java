@@ -11,15 +11,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
-public class Modus {
+public class ModusDistance {
 	
-	public static final Logger logger = Logger.getLogger(Modus.class);
+	public static final Logger logger = Logger.getLogger(ModusDistance.class);
 	private String modeName;
 	private List<Double> distances;
 	private SortedMap<Double,Integer> legsPerDistanceGroups;
 	private double maximalDistance = 0.0;
 	
-	public Modus(String mode) {
+	public ModusDistance(String mode) {
 		this.modeName = mode;
 	}
 	

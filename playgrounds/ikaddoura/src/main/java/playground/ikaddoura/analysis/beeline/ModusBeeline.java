@@ -12,15 +12,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
-public class Modus {
+public class ModusBeeline {
 	
-	public static final Logger logger = Logger.getLogger(Modus.class);
+	public static final Logger logger = Logger.getLogger(ModusBeeline.class);
 	private String modeName;
 	private List<Double> luftlinien;
 	private SortedMap<Double,Integer> legsPerLuftlinienGroups;
 	private double maximalLuftlinie = 0.0;
 	
-	public Modus(String mode) {
+	public ModusBeeline(String mode) {
 		this.modeName = mode;
 	}
 	
