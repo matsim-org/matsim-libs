@@ -2,12 +2,14 @@ package playground.pieter.distributed.listeners.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.pieter.distributed.plans.PlanGenome;
+import playground.pieter.distributed.scoring.PlanScoreComponent;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -21,14 +23,18 @@ import java.util.*;
 public class GenomeAnalysis implements IterationEndsListener {
     private final boolean writePlanScores;
     private final boolean writeFullGenomeStats;
+    private final boolean writeScoreComponents;
+    private String outputPath;
 
-    public GenomeAnalysis(boolean writePlanScores, boolean writeFullGenomeStats) {
+    public GenomeAnalysis(boolean writePlanScores, boolean writeFullGenomeStats, boolean writeScoreComponents) {
         this.writePlanScores = writePlanScores;
         this.writeFullGenomeStats = writeFullGenomeStats;
+        this.writeScoreComponents = writeScoreComponents;
     }
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
+        outputPath=event.getControler().getControlerIO().getOutputPath();
         Map<String, Integer> fullGeneCount = new HashMap<>();
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();
@@ -36,8 +42,12 @@ public class GenomeAnalysis implements IterationEndsListener {
         boolean append = event.getIteration() != event.getControler().getConfig().controler().getFirstIteration();
         try {
             PrintWriter writer = null;
+            PrintWriter scoreComponentWriter = null;
             if (writePlanScores) {
-                writer = getWriter(append,"/planScores.csv","iter,personid,genome,score,altscore" );
+                writer = getWriter(false,"planScores.csv","iter,personid,genome,score,altscore" );
+            }
+            if(writeScoreComponents){
+                scoreComponentWriter=getWriter(false,"scoreComponents.csv","iter,personid,simtype,component,description,score");
             }
             for (Person person : persons.values()) {
                 List<? extends Plan> plans = person.getPlans();
@@ -45,6 +55,18 @@ public class GenomeAnalysis implements IterationEndsListener {
                     PlanGenome planGenome = (PlanGenome) plan;
                     if (writePlanScores) {
                         writer.println(String.format("%d,%s,%s,%.3f,%.3f", event.getIteration(), person.getId(), planGenome.getGenome(), planGenome.getScore(), planGenome.getpSimScore()));
+                    }
+                    if(writeScoreComponents){
+                        ArrayList<PlanScoreComponent> scoreComponents = planGenome.getScoreComponents();
+                        for(PlanScoreComponent component:scoreComponents){
+                            String s = String.format("%d,%s,%s,%s,%s,%.3f", event.getIteration(), person.getId(), "q", component.getType().toString(), component.getDescription(), component.getScore());
+                            scoreComponentWriter.println(s);
+                        }
+                        scoreComponents = planGenome.getAltScoreComponents();
+                        for(PlanScoreComponent component:scoreComponents){
+                            String s = String.format("%d,%s,%s,%s,%s,%.3f", event.getIteration(), person.getId(), "p", component.getType().toString(), component.getDescription(), component.getScore());
+                            scoreComponentWriter.println(s);
+                        }
                     }
                     try {
                         int count = fullGeneCount.get(planGenome.getGenome());
@@ -63,6 +85,14 @@ public class GenomeAnalysis implements IterationEndsListener {
                     }
                 }
             }
+            if(writePlanScores){
+                writer.flush();
+                writer.close();
+            }
+            if(writeScoreComponents){
+                scoreComponentWriter.flush();
+                scoreComponentWriter.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,7 +103,7 @@ public class GenomeAnalysis implements IterationEndsListener {
         if (writeFullGenomeStats) {
             logger.info("Printing genome stats");
             try {
-                PrintWriter writer = getWriter(append,"/planEvo.csv","iter,genome,count,score,altscore" );
+                PrintWriter writer = getWriter(append,"planEvo.csv","iter,genome,count,score,altscore" );
                 for (String key : keys) {
                     writer.println(String.format("%d,%s,%d,%.3f,%.3f", event.getIteration(), key, fullGeneCount.get(key), fullGeneScore.get(key), fullGeneAltScore.get(key)));
                 }
@@ -147,7 +177,7 @@ public class GenomeAnalysis implements IterationEndsListener {
         logger.warn("Printing mutation counts in surviving plans");
         PrintWriter writer = null;
         try {
-            writer = getWriter(append,"/survivorMutationCounts.csv","iter,mutator,count" );
+            writer = getWriter(append,"survivorMutationCounts.csv","iter,mutator,count" );
             Iterator<Map.Entry<String, Integer>> iterator = strategyMutationCount.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry<String, Integer> next = iterator.next();
@@ -159,7 +189,7 @@ public class GenomeAnalysis implements IterationEndsListener {
             keys = new ArrayList<>();
             keys.addAll(simpleGeneCount.keySet());
             Collections.sort(keys);
-            writer = getWriter(append,"/mutationAtIterSurvivorCounts.csv",String.format("%s,%s,%s,%s,%s,%s", "iter", "mutator", "mutationIter", "survivors", "avg.score", "avg.alt.score") );
+            writer = getWriter(append,"mutationAtIterSurvivorCounts.csv",String.format("%s,%s,%s,%s,%s,%s", "iter", "mutator", "mutationIter", "survivors", "avg.score", "avg.alt.score") );
             for (String key : keys) {
                 writer.println(String.format("%s,%s,%d,%d,%.3f,%.3f", event.getIteration(), key.substring(0, 1), Integer.parseInt(key.substring(1)), simpleGeneCount.get(key), simpleGeneScore.get(key), simpleGeneAltScore.get(key)));
 
@@ -167,7 +197,7 @@ public class GenomeAnalysis implements IterationEndsListener {
             writer.flush();
             writer.close();
             logger.warn("Gene lengths and average scores");
-            writer = getWriter(append,"/geneLengths.csv",String.format("%s,%s,%s,%s", "iter", "len", "num", "avgscor") );
+            writer = getWriter(append,"geneLengths.csv",String.format("%s,%s,%s,%s", "iter", "len", "num", "avgscor") );
             for (int gl : geneLengths.keySet()) {
                 writer.println(String.format("%d,%d,%d,%.3f", event.getIteration(), gl, geneLengths.get(gl), geneScoresbyLength.get(gl)));
             }
@@ -182,9 +212,9 @@ public class GenomeAnalysis implements IterationEndsListener {
     public PrintWriter getWriter(boolean append, String fileName, String header) throws IOException{
         PrintWriter writer;
         if(append){
-            writer = new PrintWriter(IOUtils.getAppendingBufferedWriter(fileName));
+            writer = new PrintWriter(IOUtils.getAppendingBufferedWriter(outputPath + "/"+fileName));
         }else{
-            writer = new PrintWriter(IOUtils.getBufferedWriter(fileName));
+            writer = new PrintWriter(IOUtils.getBufferedWriter(outputPath + "/"+fileName));
             writer.println(header);
         }
         return writer;

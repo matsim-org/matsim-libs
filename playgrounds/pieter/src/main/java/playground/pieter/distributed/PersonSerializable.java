@@ -53,7 +53,7 @@ public class PersonSerializable implements Serializable {
         person.setLicence(hasLicense);
         person.setSex(sex);
         for (PlanSerializable planSer : plans) {
-            Plan plan = planSer.getPlan();
+            Plan plan = planSer.getPlan(person);
             person.addPlan(plan);
             if(planSer.equals(selectedPlan))
                 person.setSelectedPlan(plan);

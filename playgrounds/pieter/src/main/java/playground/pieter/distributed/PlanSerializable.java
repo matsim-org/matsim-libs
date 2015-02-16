@@ -16,6 +16,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
 import playground.pieter.distributed.plans.PlanGenome;
+import playground.pieter.distributed.scoring.PlanScoreComponent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,6 +24,12 @@ import java.util.List;
 
 class PlanSerializable implements Serializable {
     public static boolean isUseTransit = false;
+
+    public void setScoreComponents(ArrayList<PlanScoreComponent> scoreComponents) {
+        this.scoreComponents = scoreComponents;
+    }
+
+    ArrayList<PlanScoreComponent> scoreComponents = new ArrayList<>();
     private final ArrayList<PlanElementSerializable> planElements;
     private final String personId;
     private final Double score;
@@ -44,6 +51,7 @@ class PlanSerializable implements Serializable {
             PlanGenome planGenome = (PlanGenome) plan;
             genome = planGenome.getGenome();
             pSimScore = planGenome.getpSimScore();
+            scoreComponents = planGenome.getScoreComponents();
         }
     }
 
@@ -52,12 +60,12 @@ class PlanSerializable implements Serializable {
     }
 
     public Plan getPlan(Population population) {
-
         PlanGenome plan = new PlanGenome(population.getPersons().get(Id.createPersonId(personId)));
         plan.setGenome(genome);
         plan.setpSimScore(pSimScore);
         plan.setScore(score);
         plan.setType(type);
+        plan.setAltScoreComponents(scoreComponents);
         for (PlanElementSerializable planElementSerializable : planElements)
             if (planElementSerializable instanceof ActivitySerializable)
                 plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
@@ -66,12 +74,13 @@ class PlanSerializable implements Serializable {
         return plan;
     }
 
-    public Plan getPlan() {
-        PlanGenome plan = new PlanGenome();
+    public Plan getPlan(Person person) {
+        PlanGenome plan = new PlanGenome(person);
         plan.setGenome(genome);
         plan.setpSimScore(pSimScore);
         plan.setScore(score);
         plan.setType(type);
+        plan.setAltScoreComponents(scoreComponents);
         for (PlanElementSerializable planElementSerializable : planElements)
             if (planElementSerializable instanceof ActivitySerializable)
                 plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());

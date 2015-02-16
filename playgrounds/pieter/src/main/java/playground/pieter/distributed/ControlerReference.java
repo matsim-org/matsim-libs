@@ -97,7 +97,7 @@ public class ControlerReference {
         if (trackGenome) {
 
             delegate.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            delegate.addControlerListener(new GenomeAnalysis(false,false));
+            delegate.addControlerListener(new GenomeAnalysis(false,false,false));
         }
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_ref" +

@@ -18,8 +18,10 @@ import java.util.ArrayList;
  */
 public class SumScoringFunctionForPlanGenomes implements ScoringFunction {
 
+    static final double scoreRecordingThreshold = 0.0001;
     private static Logger log = Logger.getLogger(SumScoringFunction.class);
     private final PersonForPlanGenomes person;
+    private final PlanGenome planGenome;
     private ArrayList<SumScoringFunction.BasicScoring> basicScoringFunctions = new ArrayList<SumScoringFunction.BasicScoring>();
     private ArrayList<SumScoringFunction.ActivityScoring> activityScoringFunctions = new ArrayList<SumScoringFunction.ActivityScoring>();
     private ArrayList<SumScoringFunction.MoneyScoring> moneyScoringFunctions = new ArrayList<SumScoringFunction.MoneyScoring>();
@@ -30,23 +32,41 @@ public class SumScoringFunctionForPlanGenomes implements ScoringFunction {
     public SumScoringFunctionForPlanGenomes(Person person) {
         super();
         this.person = (PersonForPlanGenomes) person;
+        planGenome = (PlanGenome) person.getSelectedPlan();
     }
 
     @Override
     public final void handleActivity(Activity activity) {
+        double startScore;
+        double contribution;
         double startTime = activity.getStartTime();
         double endTime = activity.getEndTime();
         if (startTime == Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
             for (SumScoringFunction.ActivityScoring activityScoringFunction : activityScoringFunctions) {
+                startScore = activityScoringFunction.getScore();
                 activityScoringFunction.handleFirstActivity(activity);
+                contribution = activityScoringFunction.getScore() - startScore;
+                if (Math.abs(contribution) > scoreRecordingThreshold) {
+                    planGenome.addScoreComponent(ScoreComponentType.Activity, contribution, activity.getType()+"_first");
+                }
             }
         } else if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
             for (SumScoringFunction.ActivityScoring activityScoringFunction : activityScoringFunctions) {
+                startScore = activityScoringFunction.getScore();
                 activityScoringFunction.handleActivity(activity);
+                contribution = activityScoringFunction.getScore() - startScore;
+                if (Math.abs(contribution) > scoreRecordingThreshold) {
+                    planGenome.addScoreComponent(ScoreComponentType.Activity, contribution, activity.getType());
+                }
             }
         } else if (startTime != Time.UNDEFINED_TIME && endTime == Time.UNDEFINED_TIME) {
             for (SumScoringFunction.ActivityScoring activityScoringFunction : activityScoringFunctions) {
+                startScore = activityScoringFunction.getScore();
                 activityScoringFunction.handleLastActivity(activity);
+                contribution = activityScoringFunction.getScore() - startScore;
+                if (Math.abs(contribution) > scoreRecordingThreshold) {
+                    planGenome.addScoreComponent(ScoreComponentType.Activity, contribution, activity.getType()+"_last");
+                }
             }
         } else {
             throw new RuntimeException("Trying to score an activity without start or end time. Should not happen.");
@@ -56,21 +76,40 @@ public class SumScoringFunctionForPlanGenomes implements ScoringFunction {
     @Override
     public final void handleLeg(Leg leg) {
         for (SumScoringFunction.LegScoring legScoringFunction : legScoringFunctions) {
+            String type = legScoringFunction.getClass().getSimpleName();
+            double startScore = legScoringFunction.getScore();
             legScoringFunction.handleLeg(leg);
+            double contribution = legScoringFunction.getScore() - startScore;
+            if (Math.abs(contribution) > scoreRecordingThreshold) {
+                if (type.contains("Leg"))
+                    planGenome.addScoreComponent(ScoreComponentType.Leg, contribution, leg.getMode());
+                if (type.contains("Fare"))
+                    planGenome.addScoreComponent(ScoreComponentType.Fare, contribution, "fare");
+            }
         }
     }
 
     @Override
     public void addMoney(double amount) {
         for (SumScoringFunction.MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
+            double startScore = moneyScoringFunction.getScore();
             moneyScoringFunction.addMoney(amount);
+            double contribution = moneyScoringFunction.getScore() - startScore;
+            if (Math.abs(contribution) > scoreRecordingThreshold) {
+                planGenome.addScoreComponent(ScoreComponentType.Money, contribution, "money");
+            }
         }
     }
 
     @Override
     public void agentStuck(double time) {
         for (SumScoringFunction.AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
+            double startScore = agentStuckScoringFunction.getScore();
             agentStuckScoringFunction.agentStuck(time);
+            double contribution = agentStuckScoringFunction.getScore() - startScore;
+            if (Math.abs(contribution) > scoreRecordingThreshold) {
+                planGenome.addScoreComponent(ScoreComponentType.Stuck, contribution, "stuck");
+            }
         }
     }
 
@@ -96,18 +135,6 @@ public class SumScoringFunctionForPlanGenomes implements ScoringFunction {
         double score = 0.0;
         for (SumScoringFunction.BasicScoring basicScoringFunction : basicScoringFunctions) {
             double contribution = basicScoringFunction.getScore();
-            String type = basicScoringFunction.getClass().getSimpleName();
-            PlanGenome planGenome = (PlanGenome) person.getSelectedPlan();
-            if (type.contains("Money"))
-                planGenome.addScoreComponent(ScoreComponentType.Money, contribution);
-            if (type.contains("Stuck"))
-                planGenome.addScoreComponent(ScoreComponentType.Stuck, contribution);
-            if (type.contains("Activity"))
-                planGenome.addScoreComponent(ScoreComponentType.Activity, contribution);
-            if (type.contains("Leg"))
-                planGenome.addScoreComponent(ScoreComponentType.Leg, contribution);
-            if (type.contains("Arbitrary"))
-                planGenome.addScoreComponent(ScoreComponentType.Event, contribution);
             score += contribution;
         }
         return score;
@@ -137,5 +164,6 @@ public class SumScoringFunctionForPlanGenomes implements ScoringFunction {
         }
 
     }
+
 
 }

@@ -188,7 +188,7 @@ public class PopulationReaderMatsimV5ForPlanGenomes extends MatsimXmlParser impl
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = new PlanGenome();
+		this.currplan = new PlanGenome(currperson);
         currplan.setGenome("I0000");
         this.currperson.addPlan(currplan);
         this.currperson.setSelectedPlan(currplan);

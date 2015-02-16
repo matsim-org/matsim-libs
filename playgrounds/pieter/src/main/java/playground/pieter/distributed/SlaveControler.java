@@ -41,10 +41,12 @@ import org.matsim.vehicles.Vehicle;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
+import playground.pieter.distributed.plans.PlanGenome;
 import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
+import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
@@ -202,11 +204,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         //limit IO
         config.linkStats().setWriteLinkStatsInterval(0);
         config.controler().setCreateGraphs(false);
-        config.controler().setWriteEventsInterval(0);
+        config.controler().setWriteEventsInterval(1);
         config.controler().setWritePlansInterval(0);
         config.controler().setWriteSnapshotsInterval(0);
         scenario = ScenarioUtilsForPlanGenomes.buildAndLoadScenario(config, TrackGenome, true);
-
+        DistributedPlanStrategyTranslationAndRegistration.TrackGenome = TrackGenome;
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
@@ -281,7 +283,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         if (TrackGenome) {
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            matsimControler.addControlerListener(new GenomeAnalysis(false, false));
+            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(),scenario, SingaporeScenario));
+//            matsimControler.addControlerListener(new GenomeAnalysis(false, false,false));
         }
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
@@ -566,6 +569,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     }
 
     public void addPlansForPsim(Plan plan) {
+
+
         plancatcher.addPlansForPsim(plan);
     }
 

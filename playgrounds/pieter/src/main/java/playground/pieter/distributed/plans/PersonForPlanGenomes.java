@@ -54,6 +54,7 @@ public class PersonForPlanGenomes extends PersonImpl implements Person {
 		newPlan.copyFrom(oldPlan);
         newPlan.setGenome(oldPlan.getGenome());
         newPlan.setpSimScore(oldPlan.getpSimScore());
+        newPlan.setAltScoreComponents(oldPlan.getAltScoreComponents());
 		this.getPlans().add(newPlan);
 		this.setSelectedPlan(newPlan);
 		return newPlan;

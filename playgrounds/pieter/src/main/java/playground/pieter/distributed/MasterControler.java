@@ -38,6 +38,7 @@ import playground.pieter.distributed.plans.PersonForPlanGenomes;
 import playground.pieter.distributed.plans.PopulationReaderMatsimV5ForPlanGenomes;
 import playground.pieter.distributed.plans.PopulationUtilsForPlanGenomes;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
+import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -302,12 +303,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
         matsimControler.addControlerListener(this);
         if (SingaporeScenario) {
-            masterInitialLogString.append("Singapore scenario: special scoring function.");
+            masterInitialLogString.append("Singapore scenario: fare scoring, activity open times and special ptqsim");
             //our scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), matsimControler.getScenario()));
             //this qsim engine uses our boarding and alighting model, derived from smart card data
-//            masterInitialLogString.append("SG boarding and alighting model.");
-//            matsimControler.setMobsimFactory(new PTQSimFactory());
+            masterInitialLogString.append("SG boarding and alighting model.");
+            matsimControler.setMobsimFactory(new PTQSimFactory());
         }
         masterLogger.warn(masterInitialLogString);
         String outputDirectory = config.controler().getOutputDirectory();
@@ -319,8 +320,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 (commandLine.hasOption("x")?"_x":"");
         config.controler().setOutputDirectory(outputDirectory);
         if(TrackGenome){
-            matsimControler.addControlerListener(new GenomeAnalysis(true,true));
+            matsimControler.addControlerListener(new GenomeAnalysis(true,true,true));
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
+            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(),scenario, SingaporeScenario));
         }
 
     }

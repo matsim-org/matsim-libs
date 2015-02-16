@@ -27,6 +27,28 @@ import java.util.Map;
 public class PlanGenome implements Plan {
     private final static Logger log = Logger.getLogger(PlanImpl.class);
     protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+    ArrayList<PlanScoreComponent> scoreComponents = new ArrayList<>();
+    ArrayList<PlanScoreComponent> altScoreComponents = new ArrayList<>();
+    private double pSimScore;
+    private String genome = "";
+    private Double score = null;
+    private Person person = null;
+    private String type = null;
+    private Customizable customizableDelegate;
+    public PlanGenome() {
+        System.out.print("");
+    }
+    /*
+     * Creates a new Plan for the specified Person (without adding this Plan to the Person).
+     * This is for special uses only, like if you need a Plan as a value object without adding it
+     * to a scenario.
+     *
+     * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
+     *
+     */
+    public PlanGenome(final Person person) {
+        this.person = person;
+    }
 
     public ArrayList<PlanScoreComponent> getScoreComponents() {
         return scoreComponents;
@@ -44,30 +66,8 @@ public class PlanGenome implements Plan {
         this.altScoreComponents = altScoreComponents;
     }
 
-    public void addScoreComponent(ScoreComponentType type, double score){
-        scoreComponents.add(new PlanScoreComponent(type,score));
-    }
-
-    ArrayList<PlanScoreComponent> scoreComponents = new ArrayList<>();
-    ArrayList<PlanScoreComponent> altScoreComponents = new ArrayList<>();
-    private double pSimScore;
-    private String genome = "";
-    private Double score = null;
-    private Person person = null;
-    private String type = null;
-    private Customizable customizableDelegate;
-    public PlanGenome() {
-    }
-    /*
-     * Creates a new Plan for the specified Person (without adding this Plan to the Person).
-     * This is for special uses only, like if you need a Plan as a value object without adding it
-     * to a scenario.
-     *
-     * For initial demand generation, please use scenario.getPopulation().getFactory().createPlan(...) instead.
-     *
-     */
-    public PlanGenome(final Person person) {
-        this.person = person;
+    public void addScoreComponent(ScoreComponentType type, double score, String description) {
+        scoreComponents.add(new PlanScoreComponent(type, score, description));
     }
 
     public String getGenome() {
@@ -379,4 +379,7 @@ public class PlanGenome implements Plan {
     }
 
 
+    public void resetScoreComponents() {
+        this.scoreComponents = new ArrayList<>();
+    }
 }

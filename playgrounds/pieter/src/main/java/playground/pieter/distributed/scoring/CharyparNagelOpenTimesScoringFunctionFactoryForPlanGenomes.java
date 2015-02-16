@@ -40,13 +40,15 @@ import playground.singapore.scoring.SingaporeFareScoring;
  */
 public class CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes implements ScoringFunctionFactory {
 
-	private CharyparNagelScoringParameters params = null;
+    private final boolean SingaporeScenario;
+    private CharyparNagelScoringParameters params = null;
     private Scenario scenario;
 	private PlanCalcScoreConfigGroup config;
 
-    public CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
+    public CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(final PlanCalcScoreConfigGroup config, final Scenario scenario, boolean SingaporeScenario) {
     	this.config = config;
 		this.scenario = scenario;
+        this.SingaporeScenario = SingaporeScenario;
 	}
 
 	@Override
@@ -64,7 +66,8 @@ public class CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes implemen
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-		sumScoringFunction.addScoringFunction(new SingaporeFareScoring(person.getSelectedPlan(), scenario.getTransitSchedule(), scenario.getNetwork()));
+        if(SingaporeScenario)
+		    sumScoringFunction.addScoringFunction(new SingaporeFareScoring(person.getSelectedPlan(), scenario.getTransitSchedule(), scenario.getNetwork()));
 		return sumScoringFunction;
 	}
 
