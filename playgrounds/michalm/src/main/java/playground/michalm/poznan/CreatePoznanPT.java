@@ -27,6 +27,17 @@ public class CreatePoznanPT
         Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork,
                 scenario.getTransitSchedule(), scenario.getTransitVehicles());
 
+        converter.registerTransportMode("S", TransportMode.car);
+        converter.registerTransportMode("D", TransportMode.car);
+        converter.registerTransportMode("C", TransportMode.car);
+        
+        converter.registerTransportMode("R", TransportMode.bike);
+        
+        converter.registerTransportMode("S_zewn", TransportMode.car);
+        converter.registerTransportMode("D_zewn", TransportMode.car);
+        converter.registerTransportMode("C_zewn", TransportMode.car);
+        converter.registerTransportMode("Cc_zewn", TransportMode.car);
+
         converter.registerTransportMode("A", TransportMode.pt);
         converter.registerTransportMode("AT", TransportMode.pt);
         converter.registerTransportMode("KP", TransportMode.pt);
@@ -34,6 +45,7 @@ public class CreatePoznanPT
         converter.registerTransportMode("TKS", TransportMode.pt);
         converter.registerTransportMode("U", TransportMode.pt);
         converter.registerTransportMode("UAM", TransportMode.pt);
+        
         converter.registerTransportMode("W", TransportMode.walk);
         converter.registerTransportMode("WP", TransportMode.transit_walk);
         converter.registerTransportMode("WP-2", TransportMode.transit_walk);
@@ -52,11 +64,11 @@ public class CreatePoznanPT
 
     public static void main(String[] args)
     {
-        String visumFile = "d:/OneDrive/Poznan/Visum_2014/network/network_ver.4.net";
-        String transitScheduleWithNetworkFile = "d:/transitSchedule.networkOevModellZH.xml";
-        String transitNetworkFile = "d:/network.oevModellZH.xml";
-        String vehicleFile = "d:/vehicles.xml";
-        
+        String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
+        String transitScheduleWithNetworkFile = "d:/transitSchedule.xml";
+        String transitNetworkFile = "d:/pt_network.xml";
+        String vehicleFile = "d:/pt_vehicles.xml";
+
         go(visumFile, transitScheduleWithNetworkFile, transitNetworkFile, vehicleFile);
     }
 }
