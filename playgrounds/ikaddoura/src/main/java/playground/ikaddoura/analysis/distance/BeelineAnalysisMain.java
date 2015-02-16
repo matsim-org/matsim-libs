@@ -12,9 +12,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.beeline.Line;
-import playground.ikaddoura.analysis.beeline.TextFileWriter;
-
 public class BeelineAnalysisMain {
 
 	String netFile = "input/output_network.xml";
