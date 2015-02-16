@@ -169,11 +169,9 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 			final ReplanningContext replanningContext) {
 
 		// initialize all strategies
-		for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
-			for (GenericPlanStrategy<T, I> strategy : weights.strategies) {
-				strategy.init(replanningContext);
-			}
-		}
+        for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+            strategy.init(replanningContext);
+        }
 
 		// then go through the population and ...
 		for (HasPlansAndId<T, I> person : persons ) {
@@ -199,15 +197,22 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 		}
 
 		// finally make sure all strategies have finished there work
-		for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
-			for (GenericPlanStrategy<T, I> strategy : weights.strategies) {
-				strategy.finish();
-			}
-		}
+        for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+            strategy.finish();
+        }
 
 	}
 
-	private void removePlans(final HasPlansAndId<T, I> person, final int maxNumberOfPlans) {
+    private Collection<GenericPlanStrategy<T, I>> distinctStrategies() {
+        // Leaving out duplicate strategies in different subpopulations
+        Collection<GenericPlanStrategy<T, I>> strategies = new LinkedHashSet<>();
+        for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
+            strategies.addAll(weights.strategies);
+        }
+        return strategies;
+    }
+
+    private void removePlans(final HasPlansAndId<T, I> person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			T plan = this.removalPlanSelector.selectPlan(person);
 			person.removePlan(plan);
