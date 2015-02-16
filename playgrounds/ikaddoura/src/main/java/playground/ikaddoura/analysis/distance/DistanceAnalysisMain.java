@@ -57,7 +57,7 @@ public class DistanceAnalysisMain {
 		writer.writeFile(plansFile1, outputFile1, resultMap1);
 		writer.writeFile(plansFile2, outputFile2, resultMap2);
 		
-		ChartFileWriter chartWriter = new ChartFileWriter();
+		ChartFileWriterDistance chartWriter = new ChartFileWriterDistance();
 		chartWriter.writeXYLineChartFile("PlanFile_Iteration_0", modiMap1, outputFile_XYLineChart1);
 		chartWriter.writeXYLineChartFile("PlanFile_Iteration_500", modiMap2, outputFile_XYLineChart2);
 		chartWriter.writeBarChartFile("PlanFile_Iteration_0", modiMap1, outputFile_BarChart1);

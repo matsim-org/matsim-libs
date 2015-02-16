@@ -53,7 +53,7 @@ public class BeelineAnalysisMain {
 		writer.writeFile(plansFile1, outputFile1, resultMap1);
 		writer.writeFile(plansFile2, outputFile2, resultMap2);
 		
-		ChartFileWriter chartWriter = new ChartFileWriter();
+		ChartFileWriterBeeline chartWriter = new ChartFileWriterBeeline();
 		chartWriter.writeLineChartFile("PlanFile_Iteration_0", modiMap1, outputFile_LineChart1);
 		chartWriter.writeLineChartFile("PlanFile_Iteration_500", modiMap2, outputFile_LineChart2);
 	}

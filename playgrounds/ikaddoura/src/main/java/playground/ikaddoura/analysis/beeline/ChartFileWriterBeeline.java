@@ -1,4 +1,4 @@
-package playground.ikaddoura.analysis.distance;
+package playground.ikaddoura.analysis.beeline;
 
 import java.util.SortedMap;
 
@@ -12,22 +12,22 @@ import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.charts.LineChart;
 import org.matsim.core.utils.charts.XYLineChart;
 
-public class ChartFileWriter {
+public class ChartFileWriterBeeline {
 
-	public void writeXYLineChartFile(String title, SortedMap<String, ModusDistance> modiMap, String outputFile) {
+	public void writeXYLineChartFile(String title, SortedMap<String, ModusBeeline> modiMap, String outputFile) {
 		// TODO Auto-generated method stub
 		String xAxesLabel = "Reiseweite [m]";
 		String yAxesLabel = "Anzahl an Legs";
 		XYLineChart chart = new XYLineChart(title, xAxesLabel, yAxesLabel, false);
 	    
 		for (String modusName : modiMap.keySet()){
-			ModusDistance modus = modiMap.get(modusName);
-			double[] xWerte = new double[modus.getLegsPerDistanceGroups().size()];
-			double[] yWerte = new double[modus.getLegsPerDistanceGroups().size()];
+			ModusBeeline modus = modiMap.get(modusName);
+			double[] xWerte = new double[modus.getLegsPerLuftlinienGroups().size()];
+			double[] yWerte = new double[modus.getLegsPerLuftlinienGroups().size()];
 			int counter = 0;
-			for (Double distanz : modus.getLegsPerDistanceGroups().keySet()){
+			for (Double distanz : modus.getLegsPerLuftlinienGroups().keySet()){
 				xWerte[counter] = distanz;
-				yWerte[counter] = modus.getLegsPerDistanceGroups().get(distanz);
+				yWerte[counter] = modus.getLegsPerLuftlinienGroups().get(distanz);
 				counter++;
 			}
 			chart.addSeries(modus.getModeName(), xWerte, yWerte);
@@ -43,14 +43,14 @@ public class ChartFileWriter {
 
 //-------------------------------------------------------------------------------------------------------------
 	
-	public void writeBarChartFile(String title, SortedMap<String, ModusDistance> modiMap, String outputFile) {
+	public void writeBarChartFile(String title, SortedMap<String, ModusBeeline> modiMap, String outputFile) {
 		String xAxesLabel = "Reiseweite [m]";
 		String yAxesLabel = "Anzahl an Legs";
 		
-		ModusDistance carModus = modiMap.get("car");
-		String[] distanceGroups = new String[carModus.getLegsPerDistanceGroups().size()];
+		ModusBeeline carModus = modiMap.get("car");
+		String[] distanceGroups = new String[carModus.getLegsPerLuftlinienGroups().size()];
 		int counter1 = 0;
-		for (Double distanz : carModus.getLegsPerDistanceGroups().keySet()){
+		for (Double distanz : carModus.getLegsPerLuftlinienGroups().keySet()){
 			distanceGroups[counter1] = distanz.toString();
 			counter1++;
 		}
@@ -58,12 +58,12 @@ public class ChartFileWriter {
 		BarChart chart = new BarChart(title, xAxesLabel, yAxesLabel, distanceGroups);
 
 		for (String modusName : modiMap.keySet()){
-			ModusDistance modus = modiMap.get(modusName);
-			double[] yWerte = new double[modus.getLegsPerDistanceGroups().size()];
+			ModusBeeline modus = modiMap.get(modusName);
+			double[] yWerte = new double[modus.getLegsPerLuftlinienGroups().size()];
 			int counter2 = 0;
-			for (Double distanz : modus.getLegsPerDistanceGroups().keySet()){
+			for (Double distanz : modus.getLegsPerLuftlinienGroups().keySet()){
 				distanceGroups[counter2] = distanz.toString();
-				yWerte[counter2] = modus.getLegsPerDistanceGroups().get(distanz);
+				yWerte[counter2] = modus.getLegsPerLuftlinienGroups().get(distanz);
 				counter2++;
 			}
 			chart.addSeries(modus.getModeName(), yWerte);
@@ -80,14 +80,14 @@ public class ChartFileWriter {
 	}
 //-------------------------------------------------------------------------------------------------------------
 	
-	public void writeLineChartFile(String title, SortedMap<String, ModusDistance> modiMap, String outputFile) {
+	public void writeLineChartFile(String title, SortedMap<String, ModusBeeline> modiMap, String outputFile) {
 		String xAxesLabel = "Reiseweite [m]";
 		String yAxesLabel = "Anzahl an Legs";
 		
-		ModusDistance carModus = modiMap.get("car");
-		String[] distanceGroups = new String[carModus.getLegsPerDistanceGroups().size()];
+		ModusBeeline carModus = modiMap.get("car");
+		String[] distanceGroups = new String[carModus.getLegsPerLuftlinienGroups().size()];
 		int counter1 = 0;
-		for (Double distanz : carModus.getLegsPerDistanceGroups().keySet()){
+		for (Double distanz : carModus.getLegsPerLuftlinienGroups().keySet()){
 			distanceGroups[counter1] = distanz.toString();
 			counter1++;
 		}
@@ -95,12 +95,12 @@ public class ChartFileWriter {
 		LineChart chart = new LineChart(title, xAxesLabel, yAxesLabel, distanceGroups);
 
 		for (String modusName : modiMap.keySet()){
-			ModusDistance modus = modiMap.get(modusName);
-			double[] yWerte = new double[modus.getLegsPerDistanceGroups().size()];
+			ModusBeeline modus = modiMap.get(modusName);
+			double[] yWerte = new double[modus.getLegsPerLuftlinienGroups().size()];
 			int counter2 = 0;
-			for (Double distanz : modus.getLegsPerDistanceGroups().keySet()){
+			for (Double distanz : modus.getLegsPerLuftlinienGroups().keySet()){
 				distanceGroups[counter2] = distanz.toString();
-				yWerte[counter2] = modus.getLegsPerDistanceGroups().get(distanz);
+				yWerte[counter2] = modus.getLegsPerLuftlinienGroups().get(distanz);
 				counter2++;
 			}
 			chart.addSeries(modus.getModeName(), yWerte);
