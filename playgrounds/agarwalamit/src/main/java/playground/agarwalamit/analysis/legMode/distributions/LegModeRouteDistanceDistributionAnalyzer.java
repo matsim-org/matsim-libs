@@ -37,6 +37,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
@@ -53,10 +55,12 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalyisMod
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 	private LegModeRouteDistanceDistributionHandler lmrdh;
 	private String eventsFile;
+	private UserGroup userGroup;
 
-	public LegModeRouteDistanceDistributionAnalyzer() {
+	public LegModeRouteDistanceDistributionAnalyzer(UserGroup userGroup) {
 		super(LegModeRouteDistanceDistributionAnalyzer.class.getSimpleName());
 		this.log.info("enabled");
+		this.userGroup = userGroup;
 
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
@@ -104,25 +108,44 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalyisMod
 	}
 
 	private void calculateMode2DistanceClass2LegCount() {
+		PersonFilter pf = new PersonFilter();
 		for(String mode : mode2PersonId2dist.keySet()){
 			for(Id<Person> personId :mode2PersonId2dist.get(mode).keySet()){
-				for(int index=0;index<mode2PersonId2dist.get(mode).get(personId).size();index++){
-					double distance =mode2PersonId2dist.get(mode).get(personId).get(index) ;
-					for(int i=0;i<this.distanceClasses.size()-1;i++){
-						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-							SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(mode);	
-							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
-							int newLeg = oldLeg+1;
-							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
-						} 
+				if(this.userGroup!=null ){
+					if(pf.isPersonIdFromUserGroup(personId, this.userGroup)){
+						for(int index=0;index<mode2PersonId2dist.get(mode).get(personId).size();index++){
+							double distance =mode2PersonId2dist.get(mode).get(personId).get(index) ;
+							for(int i=0;i<this.distanceClasses.size()-1;i++){
+								if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
+									SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(mode);	
+									int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
+									int newLeg = oldLeg+1;
+									distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
+								} 
+							}
+						}
+					}
+
+				} else {
+					for(int index=0;index<mode2PersonId2dist.get(mode).get(personId).size();index++){
+						double distance =mode2PersonId2dist.get(mode).get(personId).get(index) ;
+						for(int i=0;i<this.distanceClasses.size()-1;i++){
+							if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
+								SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(mode);	
+								int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
+								int newLeg = oldLeg+1;
+								distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
+							} 
+						}
 					}
 				}
+
 			}
 		}
 	}
 	@Override
 	public void writeResults(String outputFolder) {
-		String outFile = outputFolder + "legModeRouteDistanceDistribution2.txt";
+		String outFile = outputFolder + "legModeRouteDistanceDistribution.txt";
 		try{
 			BufferedWriter writer1 = IOUtils.getBufferedWriter(outFile);
 			writer1.write("class");

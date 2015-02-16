@@ -52,7 +52,7 @@ public class SubPopInputs4Munich {
 	public static void main(String[] args) {
 		SubPopInputs4Munich inputs = new SubPopInputs4Munich();
 		inputs.writePersonAttributes();
-		inputs.modifyConfig();
+//		inputs.modifyConfig();
 	}
 
 	private void writePersonAttributes(){
@@ -137,9 +137,10 @@ public class SubPopInputs4Munich {
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
-		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file."
-				+ "\n For e.g. 1) existing \"SubtourModeChoice\" is taken for urban and freight and for reverse commuters and commuters new module is added."
-				+ "\n 2) Strategy settings and Some more minor modifications.");
+		Logger.getLogger(SubPopInputs4Munich.class).warn("Config from this is not the final config used for calibration. Some unavoidable modifications are made manually in the .xml file. For e.g. "
+				+ "\n 1) existing strategies are taken for urban and freight and for reverse commuters and commuters new modules are added."
+				+ "\n 2) At the moment, same module name can not be used for two different sub populations and \n therefore parameters are added with different name in config "
+				+ " and then added to controler directly.");
 
 		new ConfigWriter(config).write(outConfigFile);
 	}

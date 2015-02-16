@@ -53,7 +53,7 @@ public class MunichAnalyzer {
 		String eventsFile = runDir+runNr+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-		LegModeRouteDistanceDistributionAnalyzer	lmdfed = new LegModeRouteDistanceDistributionAnalyzer();
+		LegModeRouteDistanceDistributionAnalyzer	lmdfed = new LegModeRouteDistanceDistributionAnalyzer(null);
 		lmdfed.init(sc,eventsFile);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
