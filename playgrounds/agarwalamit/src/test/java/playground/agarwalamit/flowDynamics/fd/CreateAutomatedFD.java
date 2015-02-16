@@ -44,6 +44,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -77,6 +78,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -87,6 +89,8 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class CreateAutomatedFD {
 
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	
 	private  final String [] travelModes = {"car","bike"};
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId("0");
 	private Scenario scenario;
@@ -188,7 +192,7 @@ public class CreateAutomatedFD {
 				outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 			}
 		}
-		scatterPlot(outData,"./output/"+linkDynamics+".png");
+		scatterPlot(outData,helper.getOutputDirectory()+linkDynamics+".png");
 	}
 
 	private void createPopulationAndVehicles(Map<String, Integer> point2run){

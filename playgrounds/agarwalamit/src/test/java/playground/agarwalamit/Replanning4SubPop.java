@@ -18,12 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -31,7 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author amit
@@ -39,18 +36,22 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class Replanning4SubPop {
 	
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	
 	final static String EQUIL_NETWORK = "../../matsim/examples/equil/network.xml";
 	final static String PLANS = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/plans.xml";
 	final static String OBJECT_ATTRIBUTES = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/personAtrributes.xml";
 	final static String CONFIG = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/config.xml";
-	final static String OUTPUT = "./output/";
+	static String OUTPUT ;
 
 	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
-	private static final String SUBPOP1_NAME = "pop1";
-	private static final String SUBPOP2_NAME = "pop2";
+	private static final String SUBPOP1_NAME = "time";
+	private static final String SUBPOP2_NAME = "reroute";
 	
 	@Test
 	public void test(){
+		
+		OUTPUT = helper.getOutputDirectory();
 		
 		{
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -58,10 +59,6 @@ public class Replanning4SubPop {
 			/* Set up network and plans. */
 			MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
 			mnr.parse(EQUIL_NETWORK);
-			createPopulation(sc, SUBPOP1_NAME, 100);
-			createPopulation(sc, SUBPOP2_NAME, 100);
-			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
-			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
 		}
 		
 		// building and running the simulation based on the example scenario:
@@ -107,35 +104,5 @@ public class Replanning4SubPop {
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
-	}
-	
-	private static void createPopulation(Scenario scenario, String prefix, int number){
-		PopulationFactory pf = scenario.getPopulation().getFactory();
-		
-		for(int i = 0; i < number; i++){
-			Person person = pf.createPerson(Id.create(prefix + "_" + i, Person.class));
-			
-			/* Create basic home-work-home activities on equil network. */
-			Plan plan = pf.createPlan();
-			Activity h1 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("1", Node.class)).getCoord());
-			h1.setEndTime(6*3600);
-			Activity w = pf.createActivityFromCoord("w", scenario.getNetwork().getNodes().get(Id.create("2", Node.class)).getCoord());
-			w.setEndTime(17*3600);
-			Activity h2 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("3", Node.class)).getCoord());
-			h2.setStartTime(18*3600);
-			
-			/* Add the activities to the plan. */
-			plan.addActivity(h1);
-			plan.addLeg(pf.createLeg( TransportMode.car ));
-			plan.addActivity(w);
-			plan.addLeg(pf.createLeg( TransportMode.car ));
-			plan.addActivity(h2);
-			
-			person.addPlan(plan);
-			scenario.getPopulation().addPerson(person);
-
-			/* Set the subpopulation attribute. */
-			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), SUBPOP_ATTRIB_NAME, prefix);
-		}
 	}
 }

@@ -18,7 +18,14 @@
  * *********************************************************************** */
 package playground.agarwalamit.flowDynamics;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,7 +35,11 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -53,11 +64,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.*;
 
 
 /**
@@ -65,6 +75,8 @@ import java.util.*;
  */
 public class PassingTest {
 
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
+	
 	/**
 	 * A bike enters at t=0; and a car at t=5sec link length = 1000m
 	 * Assume car speed = 20 m/s, bike speed = 5 m/s
@@ -173,6 +185,7 @@ public class PassingTest {
 		net.scenario.getConfig().planCalcScore().addActivityParams(ap_w);
 		net.scenario.getConfig().controler().setWriteEventsInterval(0);
 		net.scenario.getConfig().controler().setLastIteration(0);
+		net.scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
 		
 		Controler cntrlr = new Controler(net.scenario);
 		cntrlr.setOverwriteFiles(true);
