@@ -19,44 +19,15 @@
 			<version>2.3.5</version> </dependency -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.xmlgraphics</groupId>
-			<artifactId>xmlgraphics-commons</artifactId>
-			<version>1.4</version>
-		</dependency>
-		<dependency>
-			<groupId>batik</groupId>
-			<artifactId>batik-util</artifactId>
-			<version>1.6-1</version>
-		</dependency>
-		<dependency>
-			<groupId>batik</groupId>
-			<artifactId>batik-awt-util</artifactId>
-			<version>1.6-1</version>
-		</dependency>
-		<dependency>
-			<groupId>batik</groupId>
-			<artifactId>batik-svggen</artifactId>
-			<version>1.6-1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.lowagie</groupId>
-			<artifactId>itext</artifactId>
-			<version>2.1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>3.8</version>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
@@ -68,17 +39,9 @@
 			<version>1.7</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>otfvis</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
@@ -90,11 +53,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
+			<groupId>gurobi</groupId>
 			<artifactId>gurobi</artifactId>
-			<version>5.6.2</version>
+			<version>6.0.0</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/lib/gurobi-5.6.2.jar</systemPath>
+			<systemPath>${basedir}/lib/gurobi-6.0.0.jar</systemPath>
 		</dependency>
 
 		<dependency>
