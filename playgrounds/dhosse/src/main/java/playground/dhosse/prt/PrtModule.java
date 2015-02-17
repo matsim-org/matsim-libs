@@ -18,6 +18,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
@@ -48,7 +49,7 @@ public class PrtModule {
 		TravelTimeSource ttimeSource = algorithmConfig.getTravelTimeSource();
 		TravelDisutilitySource tdisSource = algorithmConfig.getTravelDisutilitySource();
 		
-		TravelTime ttime = VrpLauncherUtils.initTravelTime(scenario, ttimeSource, prtConfig.getEventsFile());
+		TravelTime ttime = new FreeSpeedTravelTime();
 		TravelDisutility tdis = VrpLauncherUtils.initTravelDisutility(tdisSource, ttime);
 		
 		LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tdis, ttime);
