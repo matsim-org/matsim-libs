@@ -23,8 +23,8 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 	private final static Logger log = Logger.getLogger(BoardAlightVehicleTransitStopHandler.class);
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
-	private static final double NON_UNIFORM_DOOR_OPERATION = 0.0;
-	private static final double ACC_DEC_DELAY = 0.0;
+	private static final double NON_UNIFORM_DOOR_OPERATION = 1.0;
+	private static final double ACC_DEC_DELAY = 8.0;
 	
 	//Attributes
 	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(Id.create("", TransitStopFacility.class), null, true);
@@ -49,7 +49,6 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 		double stopTime = 0;
 		if (((cntAccess > 0) || (cntEgress > 0)) && this.lastHandledStop != null) {
 			stopTime = getStopTimeParallel(leavingPassengers.size(), enteringPassengers.size(), vehicle);
-			stopTime = Math.max(0, stopTime-20);
 			if (this.lastHandledStop != stop)
 				stopTime += openDoorsDuration+ACC_DEC_DELAY/2;
 			for (PTPassengerAgent passenger : leavingPassengers)
