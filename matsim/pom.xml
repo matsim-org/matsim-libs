@@ -23,6 +23,12 @@
 		<tag>HEAD</tag>
 		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</url>
 	</scm>
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
+        </repository>
+    </distributionManagement>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
 		<resources>
@@ -109,6 +115,10 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
