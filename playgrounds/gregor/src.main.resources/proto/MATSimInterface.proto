@@ -1,0 +1,74 @@
+syntax = "proto2";
+option java_generic_services = true;
+option java_outer_classname="ProtoMATSimInterface";
+option java_package = "playground.gregor.proto";
+
+message MATSim2ExternPutAgent {
+	message Agent {
+		required string id = 1;
+		required string enterNode = 2;
+		repeated string nodes = 3;
+	}
+
+	required Agent agent = 15;
+}
+
+message MATSim2ExternHasSpace {
+	required string nodeId = 1;
+}
+message MATSim2ExternHasSpaceConfirmed {
+	required bool hasSpace = 1;
+}
+
+message MATSim2ExternPutAgentConfirmed {
+}
+
+message Extern2MATSim {
+	message Agent {
+		required string id = 1;
+		required string leaveNode = 2;
+	}
+
+	required Agent agent = 15;
+
+}
+
+message Extern2MATSimConfirmed {
+	required bool accepted = 1;
+}
+
+message ExternSimStepFinished {
+	required double time = 1;
+}
+message ExternSimStepFinishedReceived {
+}
+
+message ExternDoSimStep {
+	required double fromTime = 1;
+	required double toTime = 2;
+}
+
+message ExternDoSimStepReceived {
+
+}
+
+message ExternalConnect {
+
+}
+
+message ExternalConnectConfirmed {
+
+}
+
+service MATSimInterfaceService {
+	rpc reqExtern2MATSim(Extern2MATSim) returns (Extern2MATSimConfirmed);
+	rpc reqExternalConnect(ExternalConnect) returns (ExternalConnectConfirmed);
+	rpc reqExternSimStepFinished(ExternSimStepFinished) returns (ExternSimStepFinishedReceived);
+}
+service ExternInterfaceService {
+	rpc reqMATSim2ExternHasSpace(MATSim2ExternHasSpace) returns (MATSim2ExternHasSpaceConfirmed);
+	rpc reqMATSim2ExternPutAgent(MATSim2ExternPutAgent) returns (MATSim2ExternPutAgentConfirmed);
+	rpc reqExternDoSimStep(ExternDoSimStep) returns (ExternDoSimStepReceived);
+
+}
+
