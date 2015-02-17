@@ -197,8 +197,8 @@ import playground.michalm.util.MovingAgentsRegister;
         if (ranksFileName == null)
             System.out.println("ranksFileName");
 
-        TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, ttimeSource,
-                eventsFileName);
+        TravelTime travelTime = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
+                eventsFileName, 900).getLinkTravelTimes();
 
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
                 travelTime);

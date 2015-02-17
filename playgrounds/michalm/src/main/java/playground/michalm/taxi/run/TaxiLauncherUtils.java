@@ -20,6 +20,8 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
+import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 
 import playground.michalm.taxi.data.TaxiData;
 import playground.michalm.taxi.data.file.*;
@@ -36,5 +38,22 @@ public class TaxiLauncherUtils
         new TaxiRankReader(scenario, taxiData).parse(ranksFileName);
 
         return taxiData;
+    }
+    
+    
+    public static TimeDiscretizer getTimeDiscretizer(Scenario scenario,
+            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource)
+    {
+        if (tdisSource == TravelDisutilitySource.DISTANCE) {
+            return TimeDiscretizer.CYCLIC_24_HOURS;
+        }
+
+        //else if TravelDisutilitySource.Time:
+        if (ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
+                !scenario.getConfig().network().isTimeVariantNetwork()) {
+            return TimeDiscretizer.CYCLIC_24_HOURS;
+        }
+
+        return TimeDiscretizer.CYCLIC_15_MIN;
     }
 }

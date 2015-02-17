@@ -48,7 +48,7 @@ class KaiTaxiLauncher
         }
 
         launcher.initVrpPathCalculator();
-        launcher.go(false);
+        launcher.go();
     }
 
 

@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.chart.ChartWindowUtils;
 import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
@@ -42,7 +41,7 @@ import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
@@ -67,12 +66,13 @@ class TaxiLauncher
     final Scenario scenario;
 
     private TravelTimeCalculator travelTimeCalculator;
-    private LeastCostPathCalculatorWithCache routerWithCache;
+    LeastCostPathCalculatorWithCache routerWithCache;
     private VrpPathCalculator pathCalculator;
 
     LegHistogram legHistogram;
     TaxiDelaySpeedupStats delaySpeedupStats;
-    LeastCostPathCalculatorCacheStats cacheStats;
+
+    private boolean warmup;
 
 
     TaxiLauncher(TaxiLauncherParams params)
@@ -99,10 +99,22 @@ class TaxiLauncher
 
     void initVrpPathCalculator()
     {
-        TravelTime travelTime = travelTimeCalculator == null ? //
-                VrpLauncherUtils.initTravelTime(scenario, params.algorithmConfig.ttimeSource,
-                        params.eventsFile) : //
-                travelTimeCalculator.getLinkTravelTimes();
+        TimeDiscretizer timeDiscretizer = TaxiLauncherUtils.getTimeDiscretizer(scenario,
+                params.algorithmConfig.ttimeSource, params.algorithmConfig.tdisSource);
+
+        TravelTime travelTime;
+
+        if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            travelTime = new FreeSpeedTravelTime();
+        }
+        else {// TravelTimeSource.EVENTS
+            if (travelTimeCalculator == null) {
+                travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(
+                        scenario, params.eventsFile, timeDiscretizer.getTimeInterval());
+            }
+
+            travelTime = travelTimeCalculator.getLinkTravelTimes();
+        }
 
         TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
                 params.algorithmConfig.tdisSource, travelTime);
@@ -110,30 +122,21 @@ class TaxiLauncher
         LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), travelDisutility,
                 travelTime);
 
-        TimeDiscretizer timeDiscretizer = (params.algorithmConfig.tdisSource == TravelDisutilitySource.DISTANCE)
-                || //
-                (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
-                !scenario.getConfig().network().isTimeVariantNetwork()) ? //
-                TimeDiscretizer.CYCLIC_24_HOURS : //
-                TimeDiscretizer.CYCLIC_15_MIN;
-
         routerWithCache = new LeastCostPathCalculatorWithCache(router, timeDiscretizer);
         pathCalculator = new VrpPathCalculatorImpl(routerWithCache, travelTime, travelDisutility);
     }
 
 
-    void clearVrpPathCalculator()
+    void clearTravelTimeCalculator()
     {
         travelTimeCalculator = null;
-        routerWithCache = null;
-        pathCalculator = null;
     }
 
 
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    void go(boolean warmup)
+    void go()
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
@@ -181,10 +184,6 @@ class TaxiLauncher
         }
 
         if (warmup) {
-            if (travelTimeCalculator == null) {
-                travelTimeCalculator = TravelTimeCalculators.createTravelTimeCalculator(scenario);
-            }
-
             events.addHandler(travelTimeCalculator);
         }
         else {
@@ -215,10 +214,6 @@ class TaxiLauncher
             if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
                 throw new IllegalStateException();
             }
-        }
-
-        if (cacheStats != null) {
-            cacheStats.updateStats(routerWithCache);
         }
     }
 
@@ -264,12 +259,28 @@ class TaxiLauncher
     }
 
 
+    public void startWarmup()
+    {
+        warmup = true;
+
+        if (warmup && params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            throw new RuntimeException();
+        }
+    }
+
+
+    public void stopWarmup()
+    {
+        warmup = false;
+    }
+
+
     public static void main(String... args)
     {
         TaxiLauncherParams params = TaxiLauncherParams.readParams(args[0]);
         TaxiLauncher launcher = new TaxiLauncher(params);
         launcher.initVrpPathCalculator();
-        launcher.go(false);
+        launcher.go();
         launcher.generateOutput();
     }
 }

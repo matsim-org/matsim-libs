@@ -27,25 +27,33 @@ class TaxiLauncherParams
     }
 
 
-    Map<String, String> params;
+    private Map<String, String> params;
 
     String inputDir;
+    
     String netFile;
     String plansFile;
+    
     String taxiCustomersFile;
     String taxisFile;
     String ranksFile;
+    
     String eventsFile;
     String changeEventsFile;
     AlgorithmConfig algorithmConfig;
+
     Integer nearestRequestsLimit;
     Integer nearestVehiclesLimit;
+
     Boolean onlineVehicleTracker;
     Boolean advanceRequestSubmission;
     Boolean destinationKnown;
+    
     Double pickupDuration;
     Double dropoffDuration;
-    boolean otfVis;
+    
+    Boolean otfVis;
+    
     String outputDir;
     String vrpOutDir;
     String histogramOutDir;

@@ -29,9 +29,9 @@ import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.*;
@@ -51,8 +51,7 @@ public class VrpLauncherUtils
 
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED, //time-variant (CYCLIC_24_HOURS) or invariant (CYCLIC_15_MIN); depends on the network type
-        EVENTS; // based on eventsFileName, averaged over a whole day (CYCLIC_24_HOURS) or 15-minute time intervals (CYCLIC_15_MIN) 
+        FREE_FLOW_SPEED, EVENTS;
     }
 
 
@@ -93,24 +92,18 @@ public class VrpLauncherUtils
     }
 
 
-    public static TravelTime initTravelTime(Scenario scenario, TravelTimeSource ttimeSource,
-            String eventsFileName)
+    public static TravelTimeCalculator initTravelTimeCalculatorFromEvents(Scenario scenario,
+            String eventsFileName, int timeInterval)
     {
-        switch (ttimeSource) {
-            case FREE_FLOW_SPEED:
-                return new FreeSpeedTravelTime();
+        TravelTimeCalculatorConfigGroup ttCalcConfigGroup = scenario.getConfig()
+                .travelTimeCalculator();
+        ttCalcConfigGroup.setTraveltimeBinSize(timeInterval);
 
-            case EVENTS:
-                scenario.getConfig().travelTimeCalculator()
-                        .setTraveltimeBinSize(TimeDiscretizer.CYCLIC_15_MIN.getTimeInterval());
-                TravelTimeCalculator ttCalculator = TravelTimeCalculators
-                        .createTravelTimeCalculator(scenario);
-                return TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                        ttCalculator);
+        TravelTimeCalculator ttCalculator = new TravelTimeCalculatorFactoryImpl()
+                .createTravelTimeCalculator(scenario.getNetwork(), ttCalcConfigGroup);
 
-            default:
-                throw new IllegalArgumentException();
-        }
+        return TravelTimeCalculators.initTravelTimeCalculatorFromEvents(eventsFileName,
+                ttCalculator);
     }
 
 

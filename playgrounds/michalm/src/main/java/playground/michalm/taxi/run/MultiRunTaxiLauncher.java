@@ -19,8 +19,6 @@
 
 package playground.michalm.taxi.run;
 
-import static playground.michalm.taxi.run.AlgorithmConfig.*;
-
 import java.io.*;
 import java.util.EnumSet;
 
@@ -59,7 +57,6 @@ class MultiRunTaxiLauncher
         launcher.delaySpeedupStats = delaySpeedupStats;
 
         cacheStats = new LeastCostPathCalculatorCacheStats();
-        launcher.cacheStats = cacheStats;
     }
 
 
@@ -88,28 +85,26 @@ class MultiRunTaxiLauncher
     }
 
 
-    void run(AlgorithmConfig config, int runs, Boolean destinationKnown,
-            Boolean onlineVehicleTracker, Boolean advanceRequestSubmission)
+    void run(int runs)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
             throw new RuntimeException();
         }
 
-        params.algorithmConfig = config;
-        params.destinationKnown = destinationKnown;
-        params.onlineVehicleTracker = onlineVehicleTracker;
-        params.advanceRequestSubmission = advanceRequestSubmission;
-
-        launcher.clearVrpPathCalculator();
+        launcher.clearTravelTimeCalculator();
 
         //warmup
         if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS && //
                 !launcher.scenario.getConfig().network().isTimeVariantNetwork()) {
+            launcher.startWarmup();
+            
             for (int i = 0; i < runs; i += 4) {
                 MatsimRandom.reset(RANDOM_SEEDS[i]);
                 launcher.initVrpPathCalculator();
-                launcher.go(true);
+                launcher.go();
             }
+            
+            launcher.stopWarmup();
         }
 
         ///========================
@@ -120,11 +115,11 @@ class MultiRunTaxiLauncher
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            launcher.go(false);
+            launcher.go();
             TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator()
                     .calculateStats(launcher.context.getVrpData().getVehicles());
             long t1 = System.currentTimeMillis();
-
+            cacheStats.updateStats(launcher.routerWithCache);
             multipleRunStats.updateStats(evaluation, t1 - t0);
         }
 
@@ -150,95 +145,37 @@ class MultiRunTaxiLauncher
     }
 
 
-    void run(AlgorithmConfig config, int runs)
-    {
-        Boolean destinationKnown = false;
-        Boolean onlineVehicleTracker = false;
-        Boolean advanceRequestSubmission = false;
-
-        run(config, runs, destinationKnown, onlineVehicleTracker, advanceRequestSubmission);
-    }
-
-
-    void run(EnumSet<AlgorithmConfig> configs, int runs)
+    void runConfigSet(EnumSet<AlgorithmConfig> configs, int runs)
     {
         for (AlgorithmConfig cfg : configs) {
-            run(cfg, runs);
+            params.algorithmConfig = cfg;
+            run(runs);
         }
     }
 
 
-    static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
-    //        NOS_TW_TD,//
-    //        NOS_TW_FF
-    NOS_TW_15M
-            );
-
-    static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
-    //        NOS_TP_TD, //
-    //        NOS_TP_FF
-    NOS_TP_15M
-            );
-
-    static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
-    //        NOS_DSE_TD, //
-    //        NOS_DSE_FF
-    NOS_DSE_15M
-            );
-
-    static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
-            //OTS_TW_FF
-            OTS_TW_15M);
-
-    static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
-            //OTS_TP_FF
-            OTS_TP_15M);
-
-    static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
-            //RES_TW_FF
-            RES_TW_15M);
-
-    static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
-            //RES_TP_FF
-            RES_TP_15M);
-
-    static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
-            //APS_TW_TD,
-            //APS_TW_FF
-            APS_TW_15M);
-
-    static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
-            //APS_TP_TD,
-            //APS_TP_FF
-            APS_TP_15M);
-
-    static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
-            //APS_DSE_TD,
-            //APS_DSE_FF
-            APS_DSE_15M);
+    static void run(int runs, TaxiLauncherParams params)
+    {
+        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
+        multiLauncher.initOutputFiles("");
+        multiLauncher.run(runs);
+        multiLauncher.closeOutputFiles();
+    }
 
 
-    static void runAll(int runs, TaxiLauncherParams params)
+    /**
+     * One may call this method with the following params overridden: params.destinationKnown =
+     * false; params.onlineVehicleTracker = false; params.advanceRequestSubmission = false;
+     */
+    @SafeVarargs
+    static void runAll(int runs, TaxiLauncherParams params, EnumSet<AlgorithmConfig>... configSets)
     {
         MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
         multiLauncher.initOutputFiles("");
 
-        multiLauncher.run(NOS_TW_xx, runs);
-        multiLauncher.run(NOS_TP_xx, runs);
-        multiLauncher.run(NOS_DSE_xx, runs);
-        //
-        //        multiLauncher.run(OTS_TW_xx, runs);
-        //        multiLauncher.run(OTS_TP_xx, runs);
-        //
-        //        multiLauncher.run(RES_TW_xx, runs);
-        //        multiLauncher.run(RES_TP_xx, runs);
-        //
-        //        multiLauncher.run(APS_TW_xx, runs);
-        //        multiLauncher.run(APS_TP_xx, runs);
-        //        multiLauncher.run(APS_DSE_xx, runs);
-
-        //multiLauncher.run(NOS_DSE_FF, runs, true, true, true);
-        //        multiLauncher.run(MIP_TW_FF, runs, true, true, false);
+        for (EnumSet<AlgorithmConfig> cs : configSets) {
+            multiLauncher.runConfigSet(cs, runs);
+        }
 
         multiLauncher.closeOutputFiles();
     }

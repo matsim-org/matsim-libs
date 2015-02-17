@@ -300,7 +300,6 @@ public class ResultsPostProcessor
         experiments.add(new Experiment("1.5"));
         experiments.add(new Experiment("2.0"));
         experiments.add(new Experiment("2.5"));
-        //experiments.add(new Experiment("2.9"));
         experiments.add(new Experiment("3.0"));
         experiments.add(new Experiment("3.5"));
         experiments.add(new Experiment("4.0"));

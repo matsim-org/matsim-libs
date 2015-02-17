@@ -22,17 +22,15 @@ package org.matsim.contrib.dvrp.util.time;
 public class TimeDiscretizer
 {
     public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30, 1, false);//just no discretization
-    public static final TimeDiscretizer ACYCLIC_15_MIN = new TimeDiscretizer(30, 15 * 60, false);
-    public static final TimeDiscretizer ACYCLIC_1_HOUR = new TimeDiscretizer(30, 60 * 60, false);
-    public static final TimeDiscretizer ACYCLIC_30_HOURS = new TimeDiscretizer(30, 30 * 60 * 60,
-            false);
+    public static final TimeDiscretizer ACYCLIC_15_MIN = new TimeDiscretizer(30, 900, false);
+    public static final TimeDiscretizer ACYCLIC_1_HOUR = new TimeDiscretizer(30, 3600, false);
+    public static final TimeDiscretizer ACYCLIC_30_HOURS = new TimeDiscretizer(30, 30 * 3600, false);
 
     //useful for routing when running over-night scenarios, such as a 5am-5am taxi simulation
     public static final TimeDiscretizer CYCLIC_1_SEC = new TimeDiscretizer(24, 1, true);//just no discretization
-    public static final TimeDiscretizer CYCLIC_15_MIN = new TimeDiscretizer(24, 15 * 60, true);
-    public static final TimeDiscretizer CYCLIC_1_HOUR = new TimeDiscretizer(24, 60 * 60, true);
-    public static final TimeDiscretizer CYCLIC_24_HOURS = new TimeDiscretizer(24, 24 * 60 * 60,
-            true);
+    public static final TimeDiscretizer CYCLIC_15_MIN = new TimeDiscretizer(24, 900, true);
+    public static final TimeDiscretizer CYCLIC_1_HOUR = new TimeDiscretizer(24, 3600, true);
+    public static final TimeDiscretizer CYCLIC_24_HOURS = new TimeDiscretizer(24, 24 * 3600, true);
 
     private final int intervalCount;
     private final int timeInterval;

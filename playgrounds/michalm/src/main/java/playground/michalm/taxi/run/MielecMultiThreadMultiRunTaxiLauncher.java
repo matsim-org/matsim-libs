@@ -19,6 +19,8 @@
 
 package playground.michalm.taxi.run;
 
+import static playground.michalm.taxi.run.AlgorithmConfigs.*;
+
 import java.util.concurrent.*;
 
 
@@ -53,7 +55,10 @@ class MielecMultiThreadMultiRunTaxiLauncher
                 service.execute(new Runnable() {
                     public void run()
                     {
-                        MultiRunTaxiLauncher.runAll(RUNS, params);
+                        MultiRunTaxiLauncher.runAll(RUNS, params,//
+                                NOS_TW_xx, //
+                                NOS_TP_xx, //
+                                NOS_DSE_xx);
                     }
                 });
             }

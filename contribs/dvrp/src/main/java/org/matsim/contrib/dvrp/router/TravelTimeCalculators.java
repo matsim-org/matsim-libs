@@ -19,28 +19,19 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.*;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 
 public class TravelTimeCalculators
 {
-    public static TravelTimeCalculator createTravelTimeCalculator(Scenario scenario)
-    {
-        return new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-                scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-    }
-
-
-    public static TravelTime createTravelTimeFromEvents(String eventFileName,
+    public static TravelTimeCalculator initTravelTimeCalculatorFromEvents(String eventFileName,
             TravelTimeCalculator ttimeCalc)
     {
         EventsManager inputEvents = EventsUtils.createEventsManager();
         inputEvents.addHandler(ttimeCalc);
         new EventsReaderXMLv1(inputEvents).parse(eventFileName);
-        return ttimeCalc.getLinkTravelTimes();
+        return ttimeCalc;
     }
 }

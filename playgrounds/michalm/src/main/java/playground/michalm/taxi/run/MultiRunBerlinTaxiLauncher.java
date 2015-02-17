@@ -23,6 +23,6 @@ public class MultiRunBerlinTaxiLauncher
         generalParams.putAll(specificParams);//side effect: overriding params with the specific ones
         TaxiLauncherParams params = new TaxiLauncherParams(generalParams);
 
-        MultiRunTaxiLauncher.runAll(runs, params);
+        MultiRunTaxiLauncher.run(runs, params);
     }
 }
