@@ -60,7 +60,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.vsp.congestion.LinkCongestionInfoExtended;
+import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 
@@ -90,7 +90,7 @@ PersonStuckEventHandler
 	final Scenario scenario;
 	final EventsManager events;
 	final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
-	final Map<Id<Link>, LinkCongestionInfoExtended> linkId2congestionInfo = new HashMap<>();
+	final Map<Id<Link>, LinkCongestionInfo> linkId2congestionInfo = new HashMap<>();
 	private int roundingErrorWarnCount =0;
 
 	double totalInternalizedDelay = 0.0;
@@ -134,7 +134,7 @@ PersonStuckEventHandler
 
 	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();	
+			LinkCongestionInfo linkInfo = new LinkCongestionInfo();	
 
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			linkInfo.setLinkId(link.getId());
@@ -167,7 +167,7 @@ PersonStuckEventHandler
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
-			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 			linkInfo.getEnteringAgents().add(event.getPersonId());
@@ -186,7 +186,7 @@ PersonStuckEventHandler
 		if (this.ptVehicleIDs.contains(enteredPerson)){
 			log.warn("Public transport mode and mixed traffic is not tested.");
 		} else { // car
-			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getEnteringAgents().add(enteredPerson);
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(Id.createPersonId(event.getVehicleId()), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			linkInfo.getPersonId2linkEnterTime().put(Id.createPersonId(event.getVehicleId()), event.getTime());
@@ -198,7 +198,7 @@ PersonStuckEventHandler
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
 			log.warn("Public transport mode and mixed traffic is not implemented yet.");
 		} else {// car
-			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			if (linkInfo.getLeavingAgents().size() != 0) {
 				// Clear tracking of persons leaving that link previously.
 				double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
@@ -227,7 +227,7 @@ PersonStuckEventHandler
 	 */
 	private void startDelayProcessing(LinkLeaveEvent event) {
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId().toString());
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double delayOnThisLink = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(delayedPerson);
 
 		if (delayOnThisLink==0) return; 
@@ -293,7 +293,7 @@ PersonStuckEventHandler
 		//		identify delayed Person
 		Id<Link> spillBackCausingLink  = identifySpillBackCausingLink(personOnThisLink, personInFrontOfQ);
 
-		LinkCongestionInfoExtended spillBackCausingLinkInfo = this.linkId2congestionInfo.get(spillBackCausingLink);
+		LinkCongestionInfo spillBackCausingLinkInfo = this.linkId2congestionInfo.get(spillBackCausingLink);
 
 		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillBackCausingLinkInfo.getEnteringAgents()); 
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
@@ -340,7 +340,7 @@ PersonStuckEventHandler
 	 */
 	private Id<Link> identifySpillBackCausingLink(Id<Link> personOnThisLink, Id<Person> thisPerson) {
 		Id<Link> spillBackCausingLink = Id.createLinkId("NA");
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(personOnThisLink);
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(personOnThisLink);
 		if(linkInfo.getPersonId2CausingLinkId().containsKey(thisPerson)){//leaving agents list was empty
 			spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(thisPerson);
 		} else {
@@ -358,7 +358,7 @@ PersonStuckEventHandler
 	}
 
 	private void chargingPersonAndThrowingEvents(LinkLeaveEvent event, Id<Person> causingPerson, Id<Link> causingPersonOnLink){
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId());
 		double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
 

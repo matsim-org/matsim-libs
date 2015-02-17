@@ -301,8 +301,8 @@ public abstract class CongestionHandler implements
 		double marginalDelay_sec = ((1 / (flowCapacity_capPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
 		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 		
-		int storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
-		linkInfo.setStorageCapacity_cars(storageCapacity_cars);
+		double storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
+		linkInfo.setStorageCapacityCars(storageCapacity_cars);
 		
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
 	}

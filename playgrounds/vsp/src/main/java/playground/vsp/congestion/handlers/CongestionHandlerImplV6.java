@@ -49,7 +49,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.vsp.congestion.CongestionType;
-import playground.vsp.congestion.LinkCongestionInfoExtended;
+import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 /**
@@ -68,7 +68,7 @@ PersonStuckEventHandler
 	private final Scenario scenario;
 
 	private final List<String> congestedModes = new ArrayList<String>();
-	private final Map<Id<Link>, LinkCongestionInfoExtended> 	linkId2congestionInfo = new HashMap<>();
+	private final Map<Id<Link>, LinkCongestionInfo> 	linkId2congestionInfo = new HashMap<>();
 	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
 	private double totalDelay = 0;
 	private double roundingErrors =0;
@@ -106,7 +106,7 @@ PersonStuckEventHandler
 
 	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfoExtended linkInfo = new LinkCongestionInfoExtended();
+			LinkCongestionInfo linkInfo = new LinkCongestionInfo();
 			linkInfo.setLinkId(link.getId());
 			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
 			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
@@ -120,7 +120,7 @@ PersonStuckEventHandler
 		String travelMode = event.getLegMode();
 		event.getLegMode();
 		if(congestedModes.contains(travelMode)){
-			LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			linkInfo.getPersonId2linkEnterTime().put(event.getPersonId(), event.getTime());
 			linkInfo.setLastEnteredAgent(event.getPersonId());
@@ -134,7 +134,7 @@ PersonStuckEventHandler
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		double minLinkTravelTime = getEarliestLinkExitTime(scenario.getNetwork().getLinks().get(event.getLinkId()), personId2LegMode.get(personId));
 		linkInfo.getPersonId2freeSpeedLeaveTime().put(personId, event.getTime()+ minLinkTravelTime + 1.0);
 		linkInfo.getPersonId2linkEnterTime().put(personId, event.getTime());
@@ -147,7 +147,7 @@ PersonStuckEventHandler
 		Id<Link> linkId	= event.getLinkId();
 		double linkLeaveTime = event.getTime();
 
-		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(linkId);
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
 		double freeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(personId);
 		double delay = linkLeaveTime - freeSpeedLeaveTime ;
 
