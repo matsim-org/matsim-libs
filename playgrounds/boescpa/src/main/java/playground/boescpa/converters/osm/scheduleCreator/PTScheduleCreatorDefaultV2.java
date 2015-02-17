@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
@@ -79,6 +80,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 	 * @param vehicleFile from which the vehicle-specifications will be read. For an example of file-structure see test/input/playground/boescpa/converters/osm/scheduleCreator/TestPTScheduleCreatorDefault/VehicleData.csv.
 	 */
 	protected void readVehicles(String vehicleFile) {
+		log.info("  Read vehicles...");
 		try {
 			BufferedReader readsLines = new BufferedReader(new FileReader(vehicleFile));
 			// read header 1 and 2
@@ -118,9 +120,11 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("  Read vehicles... done.");
 	}
 
 	protected void readStops(String BFKOORD_GEOFile) {
+		log.info("  Read transit stops...");
 		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BFKOORD_GEOFile), "latin1"));
 			String newLine = readsLines.readLine();
@@ -143,6 +147,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("  Read transit stops... done.");
 	}
 
 	private void createStop(Id<TransitStopFacility> stopId, Coord coord, String stopName) {
@@ -153,10 +158,12 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 	}
 
 	protected void readLines(String FPLAN) {
+		log.info("  Read transit lines...");
 		try {
 			Map<Id<TransitLine>,PtLineFPLAN> linesFPLAN = new HashMap<>();
 			PtRouteFPLAN currentRouteFPLAN = null;
 
+			Counter counter = new Counter("FPLAN line # ");
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(FPLAN), "latin1"));
 			String newLine = readsLines.readLine();
 			while (newLine != null) {
@@ -267,8 +274,10 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 					}
 				}
 				newLine = readsLines.readLine();
+				counter.incCounter();
 			}
 			readsLines.close();
+			counter.printCounter();
 			// Create lines:
 			for (Id<TransitLine> transitLine : linesFPLAN.keySet()) {
 				TransitLine line = linesFPLAN.get(transitLine).createLine();
@@ -290,6 +299,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("  Read transit lines... done.");
 	}
 
 	protected void printVehiclesUndefined() {
