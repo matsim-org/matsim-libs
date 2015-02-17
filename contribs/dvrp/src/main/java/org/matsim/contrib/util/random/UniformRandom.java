@@ -39,6 +39,10 @@ public class UniformRandom
     }
 
 
+    /**
+     * @param from (inclusive)
+     * @param to (inclusive)
+     */
     public int nextInt(int from, int to)
     {
         if (from == to) {
