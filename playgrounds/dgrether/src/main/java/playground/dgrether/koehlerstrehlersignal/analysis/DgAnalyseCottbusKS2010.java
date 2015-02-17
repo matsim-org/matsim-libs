@@ -317,7 +317,7 @@ public class DgAnalyseCottbusKS2010 {
 	private void calculateResults(List<RunInfo> runInfos, List<TimeConfig> times, List<Extent> extents) {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
-			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
+			String runDirectory = DgPaths.REPOS + "runs-svn/cottbus/run"+runId+"/";
 			//			String runDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
 			String eventsFilename = runDir.getEventsFilename(runInfo.iteration);
@@ -592,7 +592,9 @@ public class DgAnalyseCottbusKS2010 {
 //		CottbusRuns.add1722BaseCaseButKsModelBasedOn1712Runs(l);
 		
 //		CottbusRuns.add1972BaseCaseRoutesOnlyRandomRuns(l);
-		CottbusRuns.add1973BaseCaseRoutesTimesRandomRuns(l);
+//		CottbusRuns.add1973BaseCaseRoutesTimesRandomRuns(l);
+		
+		CottbusRuns.add2026BaseCaseRoutesTimesRandomRuns(l);
 		
 		return l;
 	}
@@ -601,12 +603,13 @@ public class DgAnalyseCottbusKS2010 {
 	public static void main(String[] args) {
 		List<RunInfo> runIds = createRunsIdList();
 		String runIdsString = createRunIdIterationString(runIds);
-		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
+		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/" 
+				+ "2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/";
 		List<TimeConfig> times = createTimeConfig();
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2014-06-19_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2015-02-17_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);
