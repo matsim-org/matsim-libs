@@ -131,13 +131,15 @@ public class ConvertCottbusSolution2Matsim {
 	private void writeOptimizedSignalControl(String directoryPath, String inputFilename,
 			SignalsData signalsData) {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
-		String basefilename = inputFilename.substring(0,
+		String basefilename = inputFilename.substring(inputFilename.lastIndexOf("/")+1,
 				inputFilename.lastIndexOf("."));
-		writer.setSignalSystemsOutputFilename(directoryPath
+		String subdirectory = inputFilename.substring(0,inputFilename.lastIndexOf("/")+1);
+		
+		writer.setSignalSystemsOutputFilename(directoryPath + subdirectory
 				+ "signal_systems_" + basefilename + ".xml");
-		writer.setSignalGroupsOutputFilename(directoryPath
+		writer.setSignalGroupsOutputFilename(directoryPath + subdirectory
 				+ "signal_groups_" + basefilename + ".xml");
-		writer.setSignalControlOutputFilename(directoryPath
+		writer.setSignalControlOutputFilename(directoryPath + subdirectory
 				+ "signal_control_" + basefilename + ".xml");
 		writer.writeSignalsData(signalsData);
 	}
@@ -161,13 +163,15 @@ public class ConvertCottbusSolution2Matsim {
 		}
 		
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
-		String basefilename = inputFilename.substring(0,
+		String basefilename = inputFilename.substring(inputFilename.lastIndexOf("/")+1,
 				inputFilename.lastIndexOf("."));
-		writer.setSignalSystemsOutputFilename(directoryPath
+		String subdirectory = inputFilename.substring(0,inputFilename.lastIndexOf("/")+1);
+		
+		writer.setSignalSystemsOutputFilename(directoryPath + subdirectory
 				+ "signal_systems_" + substring + "_" + basefilename + ".xml");
-		writer.setSignalGroupsOutputFilename(directoryPath
+		writer.setSignalGroupsOutputFilename(directoryPath + subdirectory
 				+ "signal_groups_" + substring + "_" + basefilename + ".xml");
-		writer.setSignalControlOutputFilename(directoryPath
+		writer.setSignalControlOutputFilename(directoryPath + subdirectory
 				+ "signal_control_" + substring + "_" + basefilename + ".xml");
 		writer.writeSignalsData(signalsData);
 	}
@@ -213,14 +217,13 @@ public class ConvertCottbusSolution2Matsim {
 //			new ConvertCottbusSolution2Matsim().convertOptimalSolution(
 //					i.getFirst(), i.getSecond());
 //		}
-
-//		new ConvertCottbusSolution2Matsim().convertRandomSolution( DgPaths.REPOS
-//				+ "shared-svn/projects/cottbus/cb2ks2010/2014-05-30_minflow_50.0_morning_peak_speedFilter15_SP_t/", 
-//				"random_ttsp.xml");
 		
 		new ConvertCottbusSolution2Matsim().convertOptimalSolution( DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2014-06-27_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_bb5000.0/", 
-				"cottbus_umland_optimized.xml");
+				+ "shared-svn/projects/cottbus/cb2ks2010/2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/", 
+				"btu/new2_optimum.xml");
+		new ConvertCottbusSolution2Matsim().convertRandomSolution(DgPaths.REPOS
+				+ "shared-svn/projects/cottbus/cb2ks2010/2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/", 
+				"btu/random_coordinations.xml");
 		
 	}
 	

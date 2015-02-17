@@ -93,7 +93,7 @@ public class Cottbus2KS2010 {
 		// String name = "run run1728 output plans between 13:30 and 18:30";
 		String spCost = "tt";
 		if (!useFreeSpeedTravelTime) spCost = "dist";
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2015-02-05" 
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2015-02-06" 
 				+ "_minflow_" + minCommodityFlow + "_morning_peak_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
 				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset + "/";
 		String ksModelOutputFilename = "ks2010_model_";
