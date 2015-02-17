@@ -26,13 +26,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
@@ -40,18 +37,15 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.xml.sax.SAXException;
 import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorSimple;
 import playground.boescpa.converters.osm.ptRouter.PTLineRouterDefaultV2;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
 import playground.boescpa.lib.tools.cutter.ScheduleCutter;
-import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
+import playground.boescpa.lib.tools.merger.NetworkMerger;
+import playground.boescpa.lib.tools.merger.ScheduleMerger;
+import playground.boescpa.lib.tools.merger.VehicleMerger;
 import playground.christoph.evacuation.pt.TransitRouterNetworkThinner;
 import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
-import playground.christoph.evacuation.pt.WriteTransitRouterNetwork;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 
 /**
  * WHAT IS IT FOR?
@@ -74,11 +68,6 @@ public class OSM2MixedV2 {
 		}
 
 		// **************** Preparations ****************
-		// Get an empty network and an empty schedule:
-		final Scenario scenario = getEmptyScenario();
-		final Network network = scenario.getNetwork();
-		final TransitSchedule schedule = scenario.getTransitSchedule();
-		final Vehicles vehicles = scenario.getVehicles();
 		// Get resources:
 		final String osmFile = args[0];
 		final String hafasFolder = args[1];
@@ -97,11 +86,31 @@ public class OSM2MixedV2 {
 		final String networkPath = outbase + "Network.xml.gz";
 
 		// **************** Prepare Subscenarios ****************
-		//convertOSMNetwork(scenario, network, osmFile, networkPath);
-		//final Scenario onlyPTScenario = createOnlyPT(hafasFolder, vehicleFile_OnlyPT);
+		convertOSMNetwork(osmFile, networkPath);
+		final Scenario onlyPTScenario = createOnlyPT(hafasFolder, vehicleFile_OnlyPT);
 		final Scenario mixedScenario = createMixed(hafasFolder, vehicleFile_Mixed, networkPath);
 
+		// **************** Merge Subscenarios ****************
+		final Network mergedNetwork = NetworkMerger.mergeNetworks(mixedScenario.getNetwork(), onlyPTScenario.getNetwork());
+		final TransitSchedule mergedSchedule = ScheduleMerger.mergeSchedules(mixedScenario.getTransitSchedule(), onlyPTScenario.getTransitSchedule());
+		final Vehicles mergedVehicles = VehicleMerger.mergeVehicles(mixedScenario.getVehicles(), onlyPTScenario.getVehicles());
+
+		// **************** Write final scenario ****************
+		final String path_FinalNetwork = outbase + "FinalNetwork.xml.gz";
+		new NetworkWriter(mergedNetwork).write(path_FinalNetwork);
+		final String path_FinalSchedule = outbase + "FinalSchedule.xml.gz";
+		new TransitScheduleWriter(mergedSchedule).writeFile(path_FinalSchedule);
+		new VehicleWriterV1(mergedVehicles).writeFile(outbase + "FinalVehicles.xml.gz");
+
+		// **************** Validate final schedule ****************
+		try {
+			TransitScheduleValidator.main(new String[]{path_FinalSchedule, path_FinalNetwork});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
+
 
 	protected static Scenario createMixed(String hafasFolder, String vehicleFile_Mixed, String networkPath) {
 		final Scenario mixedScenario = getEmptyScenario();
@@ -191,8 +200,9 @@ public class OSM2MixedV2 {
 		return path_ThinnedNetwork;
 	}
 
-	protected static void convertOSMNetwork(Scenario scenario, Network network, String osmFile, String networkPath) {
-		new MultimodalNetworkCreatorSimple(scenario.getNetwork()).createMultimodalNetwork(osmFile);
+	protected static void convertOSMNetwork(String osmFile, String networkPath) {
+		final Network network = getEmptyScenario().getNetwork();
+		new MultimodalNetworkCreatorSimple(network).createMultimodalNetwork(osmFile);
 		new NetworkWriter(network).write(networkPath);
 	}
 
