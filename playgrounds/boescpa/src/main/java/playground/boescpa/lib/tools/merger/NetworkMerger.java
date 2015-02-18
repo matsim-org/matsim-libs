@@ -46,7 +46,7 @@ public class NetworkMerger {
 		final Network mergedNetwork = scenario.getNetwork();
 		final NetworkFactory factory = mergedNetwork.getFactory();
 
-		log.info("     Merging networks...");
+		log.info("Merging networks...");
 		// Nodes
 		for (Node node : networkA.getNodes().values()) {
 			Node newNode = factory.createNode(Id.create(node.getId().toString(), Node.class), node.getCoord());
@@ -85,7 +85,17 @@ public class NetworkMerger {
 			mergedNetwork.addLink(newLink);
 		}
 
-		log.info("     Merging networks... done.");
+		log.info(" Merging Stats:");
+		log.info("  Number of links network A: " + networkA.getLinks().size());
+		log.info("  Number of nodes network A: " + networkA.getNodes().size());
+		log.info("  Number of links network B: " + networkB.getLinks().size());
+		log.info("  Number of nodes network B: " + networkB.getNodes().size());
+		log.info("  Sum of links: " + (networkA.getLinks().size() + networkB.getLinks().size()));
+		log.info("  Sum of nodes: " + (networkA.getNodes().size() + networkB.getNodes().size()));
+		log.info("  Number of links merged: " + mergedNetwork.getLinks().size());
+		log.info("  Number of nodes merged: " + mergedNetwork.getNodes().size());
+
+		log.info("Merging networks... done.");
 		return mergedNetwork;
 	}
 }
