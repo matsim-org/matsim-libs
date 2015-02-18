@@ -4,13 +4,13 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.0-pre20150218_1</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/matsim/source/contrib/trunk</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/contrib/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/matsim/source/contrib/trunk</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/matsim/source/contrib/tags/contrib-0.7.0-pre20150218_1</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/contrib/tags/contrib-0.7.0-pre20150218_1</developerConnection>
+		<url>https://svn.code.sf.net/p/matsim/source/contrib/tags/contrib-0.7.0-pre20150218_1</url>
 	</scm>
 
     <distributionManagement>
@@ -130,14 +130,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.7.0-pre20150218_1</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.7.0-pre20150218_1</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
