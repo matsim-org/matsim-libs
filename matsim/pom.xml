@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.7.0.pre20150217</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>matsim.org</url>
 	<inceptionYear>2005</inceptionYear>
@@ -17,10 +18,10 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/tags/matsim-0.7.0.pre20150217</connection>
-		<developerConnection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/tags/matsim-0.7.0.pre20150217</developerConnection>
+		<connection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</connection>
+		<developerConnection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/tags/matsim-0.7.0.pre20150217</url>
+		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</url>
 	</scm>
     <distributionManagement>
         <repository>
