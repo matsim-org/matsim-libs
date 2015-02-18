@@ -130,14 +130,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-pre20150218</version>
+			<version>0.7.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-pre20150218</version>
+			<version>0.7.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
