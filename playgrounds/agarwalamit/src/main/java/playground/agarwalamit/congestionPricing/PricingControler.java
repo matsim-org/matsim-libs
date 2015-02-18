@@ -26,8 +26,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.agarwalamit.siouxFalls.simulationInputs.LinkCapacityModifier;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -44,6 +46,7 @@ public class PricingControler {
 		String configFile = args[0];
 		String outputDir = args[1];
 		String congestionPricing = args[2];
+		String reduceLinkCapBy = args [3];
 		
 		Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
@@ -55,13 +58,20 @@ public class PricingControler {
 //		
 //		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFIle, networkFile, configFile);
 		
+		String newNetworkFile = outputDir+"network_linkCap"+reduceLinkCapBy+"times.xml.gz";
+		
+		LinkCapacityModifier modifyLinkCap = new LinkCapacityModifier(sc.getNetwork());
+		modifyLinkCap.processNetwork(Double.valueOf(reduceLinkCapBy));
+		modifyLinkCap.writeNetwork(newNetworkFile);
+		
+		sc.getConfig().network().setInputFile(newNetworkFile);
+		
 		sc.getConfig().controler().setOutputDirectory(outputDir);
 		sc.getConfig().controler().setWriteEventsInterval(100);
 		sc.getConfig().controler().setWritePlansInterval(100);
 		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
         controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
@@ -72,7 +82,7 @@ public class PricingControler {
 		case "implV3":
 		{
 			controler.setTravelDisutilityFactory(fact);
-//			controler.addControlerListener(new CongestionPricingContolerListner(sc, tollHandler, new MarginalCongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;
@@ -100,8 +110,9 @@ public class PricingControler {
 		}
 		break;
 		
+		case "none":
 		default:
-			Logger.getLogger(PricingControler.class).warn("Congestion pricing implementation does not match. Possible options are implV4 implV5 implV6. No pricing implementation is introduced.");
+			Logger.getLogger(PricingControler.class).info("Congestion pricing implementation does not match. No pricing implementation is introduced.");
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
