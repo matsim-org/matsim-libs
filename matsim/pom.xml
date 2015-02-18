@@ -110,6 +110,10 @@
 				</executions>
 			</plugin>
             <plugin>
+                <!-- Usage (change version numbers, of course)
+                mvn release:prepare -Darguments="-DskipTests -Pbintray" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+                mvn release:perform -Darguments="-DskipTests -Pbintray" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+                -->
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
             </plugin>
