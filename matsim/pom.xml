@@ -23,12 +23,6 @@
 		<tag>HEAD</tag>
 		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</url>
 	</scm>
-    <distributionManagement>
-        <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
-        </repository>
-    </distributionManagement>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
 		<resources>
@@ -95,7 +89,6 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/TestDepth.java</exclude>
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
-						<exclude>org/matsim/vis/otfvis/checklists/**/*.java</exclude> <!-- manual otfvis tests -->
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
@@ -112,6 +105,9 @@
 						<goals>
 							<goal>test-jar</goal>
 						</goals>
+                        <configuration>
+                            <skip>${skipTestJar}</skip>
+                        </configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -183,16 +179,10 @@
 	<repositories>
 		<repository>
             <!-- Geotools is not on Maven central -->
-			<id>geotools</id>
+			<id>osgeo</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
-        <repository>
-            <!-- For some dependencies of Geotools which are not on Maven central -->
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
         <repository>
             <id>matsim</id>
             <url>http://dl.bintray.com/matsim/matsim</url>
@@ -350,7 +340,29 @@
 				</pluginManagement>
 			</build>
 		</profile>
+        <profile>
+            <id>bintray</id>
+            <distributionManagement>
+                <!--Defining this in a separate profile, because deploying to bintray requires not building the test
+                    jar artifact, because it is too big for bintray.
 
+                    This means deploying works like this:
+
+                    mvn deploy -Pbintray
+
+                    And nothing bad will happen if you forget the -Pbintray, it just won't do it because the repository
+                    is not defined.
+
+                    -->
+                <repository>
+                    <id>bintray</id>
+                    <url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
+                </repository>
+            </distributionManagement>
+            <properties>
+                <skipTestJar>true</skipTestJar>
+            </properties>
+        </profile>
 	</profiles>
 
 	<dependencies>
@@ -434,5 +446,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<svnRevision>${buildNumber}</svnRevision>
 		<geotools.version>2.7.3</geotools.version>
-	</properties>
+        <skipTestJar>false</skipTestJar> <!--Overridden in the bintray profile-->
+    </properties>
 </project>
