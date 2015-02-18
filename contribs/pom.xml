@@ -4,14 +4,13 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.7.0-pre20150218</version>
+	<version>0.7.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
-		<connection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/tags/contrib-0.7.0-pre20150218</connection>
-		<developerConnection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/tags/contrib-0.7.0-pre20150218</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://svn.code.sf.net/p/matsim/code/contrib/tags/contrib-0.7.0-pre20150218</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/matsim/code/contrib/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/code/contrib/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/matsim/code/contrib/trunk</url>
 	</scm>
 
     <distributionManagement>
