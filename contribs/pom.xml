@@ -15,6 +15,13 @@
 		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/trunk</url>
 	</scm>
 
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/matsim/matsim/contrib</url>
+        </repository>
+    </distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -45,6 +52,10 @@
 					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
 				</configuration>
 			</plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -121,7 +132,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
+			<version>0.7.0-pre20150218</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
