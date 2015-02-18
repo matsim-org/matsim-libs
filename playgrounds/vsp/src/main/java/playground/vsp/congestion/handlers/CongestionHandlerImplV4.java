@@ -410,17 +410,21 @@ PersonStuckEventHandler
 		Map<NetworkRoute, List<Id<Link>>> nRoutesAndLinkIds = new LinkedHashMap<NetworkRoute, List<Id<Link>>>(); // save all routes and links in each route
 		List<Double> activityEndTimes = new ArrayList<Double>();
 		for(PlanElement pe :planElements){
+			
 			if(pe instanceof Leg){
+			
 				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 				linkIds.add(nRoute.getStartLinkId());
 				linkIds.addAll(nRoute.getLinkIds());  
 				linkIds.add(nRoute.getEndLinkId());
 				nRoutesAndLinkIds.put(nRoute, linkIds);
-			}
-			if(pe instanceof Activity){
+			
+			} else if(pe instanceof Activity){
+				
 				double actEndTime = ((Activity)pe).getEndTime();
 				activityEndTimes.add(actEndTime);
+				
 			}
 		}
 
