@@ -174,7 +174,6 @@ public class M2KS2010NetworkConverter {
 				}
 				else {
 					log.debug("link: " + link.getId() + " not signalized...");
-//					theresa Feb'15: this method does nothing. TODO braucht ein equalRank crossing lights?
 					this.createCrossing4NotSignalizedLink(crossing, link, inLinkToNode, backLinkId, l2l);
 				}
 			}
@@ -484,7 +483,6 @@ public class M2KS2010NetworkConverter {
 	 * @param backLinkId
 	 * @param l2l
 	 */
-	@Deprecated // does nothing
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id<Link> backLinkId, LanesToLinkAssignment20 l2l) {
 //		DgProgram program = null;
