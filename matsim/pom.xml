@@ -18,10 +18,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</connection>
-		<developerConnection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk</url>
+        <connection>scm:svn:https://svn.code.sf.net/p/matsim/source/matsim/trunk</connection>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/matsim/trunk</developerConnection>
+        <url>https://svn.code.sf.net/p/matsim/source/matsim/trunk</url>
 	</scm>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
