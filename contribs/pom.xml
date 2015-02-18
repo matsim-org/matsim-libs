@@ -51,6 +51,18 @@
 				</configuration>
 			</plugin>
             <plugin>
+                <!-- Usage:
+                    * Put a file like release.properties.template in the root directory of this project,
+                      renaming it to release.properties and changing the version numbers in it.
+
+                    * Run the following, changing the version numbers:
+                    mvn release:prepare -Darguments="-DskipTests" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+                    mvn release:perform -Darguments="-DskipTests" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+
+                    This is ugly in the extreme, but there seems to be a bug in the release plug-in where (for our setup) it asks
+                    which version of the MATSim dependency to use over and over again. So we pretend this question was already settled
+                    by putting that file there, which marks an intermediary stage of the release process. Yuck.
+                -->
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.1</version>
             </plugin>

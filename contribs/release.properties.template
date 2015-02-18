@@ -1,0 +1,15 @@
+#release configuration
+#Wed Feb 18 18:51:09 CET 2015
+# See comments in pom.xml as to what this is for.
+scm.tagNameFormat=@{project.artifactId}-@{project.version}
+pushChanges=true
+scm.url=scm\:svn\:https\://svn.code.sf.net/p/matsim/source/contrib/trunk
+preparationGoals=clean verify
+dependency.org.matsim\:matsim.release=0.7.0-pre20150218
+remoteTagging=true
+projectVersionPolicyId=default
+scm.commentPrefix=[maven-release-plugin] 
+exec.additionalArguments=-DskipTests
+exec.snapshotReleasePluginAllowed=false
+completedPhase=check-dependency-snapshots
+dependency.org.matsim\:matsim.development=0.7.0-SNAPSHOT
