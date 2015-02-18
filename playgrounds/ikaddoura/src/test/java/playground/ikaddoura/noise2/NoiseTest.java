@@ -590,7 +590,7 @@ public class NoiseTest {
 		
 		line = null;
 		
-		String pathToDamagesFile = runDirectory + "analysis_it.0/damages/0.damages_" + Double.toString(endTime) + ".csv";
+		String pathToDamagesFile = runDirectory + "analysis_it.0/damages_receiverPoint/0.damages_receiverPoint_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<ReceiverPoint>, Double> damagesPerReceiverPointId = new HashMap<Id<ReceiverPoint>, Double>();
 		
@@ -632,6 +632,89 @@ public class NoiseTest {
 		
 		Assert.assertEquals("Wrong damage!", 0.0664164095284536, damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+		
+		// noise level at receiver point '16': 69.65439464
+		
+		// relevant link IDs
+		// link2: noise contribution: 50.45464287410944 -->  share: 0.01202333 --> damage costs:  0.00079855 
+		// linkA5: noise contribution: 69.60186152606298 ---> share: 0.98797667 --> damage costs: 0.06561786
+		// linkB5: noise contribution: 0
+		
+		line = null;
+		
+		String pathToDamageLinkFile = runDirectory + "analysis_it.0/damages_link/0.damages_link_" + Double.toString(endTime) + ".csv";
+		
+		Map<Id<Link>, Double> damagesPerlinkId = new HashMap<Id<Link>, Double>();
+		
+		idxFromKey = new ConcurrentHashMap<String, Integer>();
+		
+		br = IOUtils.getBufferedReader(pathToDamageLinkFile);
+		
+		try {
+			
+			line = br.readLine();
+			
+			String[] keys = line.split(separator);
+			for(int i = 0; i < keys.length; i++){
+				idxFromKey.put(keys[i], i);
+			}
+			
+			int idxLinkId = idxFromKey.get("Link Id");
+			int idxDamages = idxFromKey.get("Damages " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS));
+			
+			while((line = br.readLine()) != null){
+				
+				keys = line.split(separator);
+				damagesPerlinkId.put(Id.create(keys[idxLinkId], Link.class), Double.parseDouble(keys[idxDamages]));
+				
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		Assert.assertEquals("Wrong link's damage contribution!", 0.00079854651258, damagesPerlinkId.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong link's damage contribution!", 0., damagesPerlinkId.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
+				
+		// two vehicles...
+		
+		line = null;
+		
+		String pathToDamageLinkCar = runDirectory + "analysis_it.0/damages_link_car/0.damages_link_car_" + Double.toString(endTime) + ".csv";
+		
+		Map<Id<Link>, Double> damagesPerCar = new HashMap<Id<Link>, Double>();
+		
+		idxFromKey = new ConcurrentHashMap<String, Integer>();
+		
+		br = IOUtils.getBufferedReader(pathToDamageLinkCar);
+		
+		try {
+			
+			line = br.readLine();
+			
+			String[] keys = line.split(separator);
+			for(int i = 0; i < keys.length; i++){
+				idxFromKey.put(keys[i], i);
+			}
+			
+			int idxlinkId = idxFromKey.get("Link Id");
+			int idxDamages = idxFromKey.get("Average damages per car " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS));
+			
+			while((line = br.readLine()) != null){
+				
+				keys = line.split(separator);
+				damagesPerCar.put(Id.create(keys[idxlinkId], Link.class), Double.parseDouble(keys[idxDamages]));
+				
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		Assert.assertEquals("Wrong damage per car per link!", 0.00079854651258 / 2.0, damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0., damagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		
 		// +++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -685,7 +768,7 @@ public class NoiseTest {
 	
 	//tests the static methods within class "noiseEquations"
 	@Test
-	public final void Test3(){
+	public final void test3(){
 		
 		double p = 0;
 		double pInPercent = 0;

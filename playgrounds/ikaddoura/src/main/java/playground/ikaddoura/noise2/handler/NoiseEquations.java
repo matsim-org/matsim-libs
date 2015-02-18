@@ -85,12 +85,6 @@ public class NoiseEquations {
 		return resultingNoiseImmission;
 	}
 	
-	public static double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
-		
-		double shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05 * noiseImmission))) / (Math.pow(10, (0.05 * resultingNoiseImmission)))), 2);
-		return shareOfResultingNoiseImmission;	
-	}
-
 	public static double calculateLCar(double vCar) {
 		
 		double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
@@ -101,12 +95,6 @@ public class NoiseEquations {
 		
 		double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
 		return lHdv;
-	}
-
-	public static double calculateShare(int nVehicleType1, double lVehicleType1, int nVehicleType2, double lVehicleType2) {
-		
-		double share = ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
-		return share;
 	}
 
 	public static double calculateDistanceCorrection(double distance) {
@@ -155,5 +143,15 @@ public class NoiseEquations {
 		double damageCosts = ( annualCostRate * laermEinwohnerGleichwert / 365. ) * ( timeBinSize / (24.0 * 3600) );
 		
 		return damageCosts;
+	}
+	
+	public static double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
+		double shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05 * noiseImmission))) / (Math.pow(10, (0.05 * resultingNoiseImmission)))), 2);
+		return shareOfResultingNoiseImmission;	
+	}
+	
+	public static double calculateShare(int nVehicleType1, double lVehicleType1, int nVehicleType2, double lVehicleType2) {	
+		double share = ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
+		return share;
 	}
 }

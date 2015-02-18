@@ -49,15 +49,50 @@ public class NoiseParameters {
 	private String[] consideredActivitiesForDamages = {"home", "work"};
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
+	// Setting MinX/MaxX/MinY/MaxY coordinates to 0.0 means the receiver points are computed for the entire area for which any of the following activities are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
-	// Setting MinX/MaxX/MinY/MaxY coordinates to 0.0 means the receiver points are computed for the entire area for which any of the following activities are found.
+
 	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
 
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+	
+	private boolean throwNoiseEventsAffected = true;
+	private boolean throwNowiseEventsCaused = true;
+	private boolean computeCausingAgents = true;
+	
+	// ########################################################################################################
 			
+	
+	public boolean isThrowNoiseEventsAffected() {
+		return throwNoiseEventsAffected;
+	}
+
+	public void setThrowNoiseEventsAffected(boolean throwNoiseEventsAffected) {
+		log.info("Throwing noise events for the affected agents: " + throwNoiseEventsAffected);
+		this.throwNoiseEventsAffected = throwNoiseEventsAffected;
+	}
+
+	public boolean isThrowNowiseEventsCaused() {
+		return throwNowiseEventsCaused;
+	}
+
+	public void setThrowNowiseEventsCaused(boolean throwNowiseEventsCaused) {
+		log.info("Throwing noise events for the causing agents: " + throwNowiseEventsCaused);
+		this.throwNowiseEventsCaused = throwNowiseEventsCaused;
+	}
+
+	public boolean isComputeCausingAgents() {
+		return computeCausingAgents;
+	}
+	
+	public void setComputeCausingAgents(boolean computeCausingAgents) {
+		log.info("Allocating the noise damages to the causing agents: " + computeCausingAgents);
+		this.computeCausingAgents = computeCausingAgents;
+	}
+	
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("Setting the annual cost rate to " + annualCostRate);
 		this.annualCostRate = annualCostRate;

@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.NoiseLink;
+import playground.ikaddoura.noise2.data.NoiseVehicleType;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
@@ -280,11 +282,11 @@ public class NoiseWriter {
 	public static void writeDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 	
-		String outputPathDamages = outputPath + "damages/";
+		String outputPathDamages = outputPath + "damages_receiverPoint/";
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_receiverPoint_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -297,6 +299,144 @@ public class NoiseWriter {
 			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
 				bw.write(rp.getId() + ";" + rp.getDamageCosts());
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\"");
+						
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	public static void writeLinkDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+		
+		String outputPathDamages = outputPath + "damages_link/";
+		File dir = new File(outputPathDamages);
+		dir.mkdirs();
+		
+		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_" + timeInterval + ".csv";
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			bw.write("Link Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.newLine();
+			
+			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+				
+				bw.write(link.getId() + ";" + link.getDamageCost());
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\"");
+						
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	public static void writeLinkAvgCarDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+		
+		String outputPathDamages = outputPath + "damages_link_car/";
+		File dir = new File(outputPathDamages);
+		dir.mkdirs();
+		
+		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_car_" + timeInterval + ".csv";
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			bw.write("Link Id;Average damages per car " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.newLine();
+			
+			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+				
+				bw.write(link.getId() + ";" + link.getDamageCostPerCar());
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\"");
+						
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+	
+	public static void writeLinkAvgHgvDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+		
+		String outputPathDamages = outputPath + "damages_link_hgv/";
+		File dir = new File(outputPathDamages);
+		dir.mkdirs();
+		
+		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_hgv_" + timeInterval + ".csv";
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			bw.write("Link Id;Average damages per HGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.newLine();
+			
+			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+				
+				bw.write(link.getId() + ";" + link.getDamageCostPerHgv());
 				bw.newLine();
 			}
 			

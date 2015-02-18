@@ -164,10 +164,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
 		log.info("Calculating the number of affected agent units... Done.");
 
-		log.info("Calculating noise damage costs and throwing noise events...");
+		log.info("Calculating noise damage costs...");
 		calculateNoiseDamageCosts();
-		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Calculating noise damage costs and throwing noise events... Done.");
+		log.info("Calculating noise damage costs... Done.");
 			
 	}
 		
@@ -240,23 +239,33 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Calculating noise damage costs for each receiver point...");
 		calculateDamagePerReceiverPoint();
+		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Calculating noise damage costs for each receiver point... Done.");
 
-		log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
-		calculateCostSharesPerLinkPerTimeInterval();
-		log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
+		if (this.noiseContext.getNoiseParams().isThrowNoiseEventsAffected()) {
+			log.info("Throwing noise events for the affected agents...");
+			throwNoiseEventsAffected();
+			log.info("Throwing noise events for the affected agents... Done.");
+		}
 		
-		log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
-		calculateCostsPerVehiclePerLinkPerTimeInterval();
-		log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
-		
-		log.info("Throwing noise events (caused)...");
-		throwNoiseEventsCaused();
-		log.info("Throwing noise events (caused)... Done.");
-
-		log.info("Throwing noise events (affected)...");
-		throwNoiseEventsAffected();
-		log.info("Throwing noise events (affected)... Done.");
+		if (this.noiseContext.getNoiseParams().isComputeCausingAgents() || this.noiseContext.getNoiseParams().isThrowNowiseEventsCaused()) {
+			log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
+			calculateCostSharesPerLinkPerTimeInterval();
+			NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
+			log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
+			
+			log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
+			calculateCostsPerVehiclePerLinkPerTimeInterval();
+			NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
+			NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
+			log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
+			
+			if (this.noiseContext.getNoiseParams().isThrowNowiseEventsCaused()) {
+				log.info("Throwing noise events for the causing agents...");
+				throwNoiseEventsCaused();
+				log.info("Throwing noise events for the causing agents... Done.");
+			}
+		}
 		
 	}
 	
@@ -285,7 +294,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 							
 			if (rp.getDamageCosts() != 0.) {
 				for (Id<Link> linkId : rp.getLinkId2IsolatedImmission().keySet()) {
-						
+										
 						double noiseImmission = rp.getLinkId2IsolatedImmission().get(linkId);
 						double costs = 0.;
 						
@@ -318,7 +327,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private void calculateCostsPerVehiclePerLinkPerTimeInterval() {
 		
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
-			
+
 			double damageCostPerCar = 0.;
 			double damageCostPerHgv = 0.;
 			
