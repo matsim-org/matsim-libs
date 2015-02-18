@@ -9,12 +9,12 @@ public class CVCosts implements VehicleCosts {
 		// singapore - dänemark, norwegen (future work: priority lanes for evs, e.g. bus lanes).
 		// future work: close certain, areas/roads for cv driving
 		
-		return 	GlobalTESFParameters.cvPurchaseCostPerDay + GlobalTESFParameters.cvInsuranceCostPerDay + GlobalTESFParameters.cvTariffCostPerDay;
+		return 	GlobalTESFParameters.cvFixedCostPerDay + GlobalTESFParameters.cvTaxationPerDay;
 	}
 
 	@Override
 	public double getPerMeterTravelCost() {
-		return GlobalTESFParameters.cvMaintainanceCostPerMeter + GlobalTESFParameters.cvDrivingCostPerMeter + GlobalTESFParameters.cvTaxationPerMeter + GlobalTESFParameters.cvSubsidyPerMeter;
+		return GlobalTESFParameters.cvDrivingCostPerMeter + GlobalTESFParameters.cvTaxationPerMeter;
 	}
 
 	@Override

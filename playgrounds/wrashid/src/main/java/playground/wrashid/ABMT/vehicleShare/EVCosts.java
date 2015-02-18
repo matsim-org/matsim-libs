@@ -33,12 +33,12 @@ public class EVCosts implements VehicleCosts {
 		 * Importzölle
 		 * 
 		 */
-		return 	GlobalTESFParameters.evPurchaseCostPerDay + GlobalTESFParameters.evInsuranceCostPerDay + GlobalTESFParameters.evBatteryCostPerDay + GlobalTESFParameters.evTariffCostPerDay;
+		return 	GlobalTESFParameters.evFixedCostPerDay + GlobalTESFParameters.evTaxationPerDay;
 	}
 
 	@Override
 	public double getPerMeterTravelCost() {
-		return GlobalTESFParameters.evMaintainanceCostPerMeter + GlobalTESFParameters.evDrivingCostPerMeter + GlobalTESFParameters.evTaxationPerMeter + GlobalTESFParameters.evSubsidyPerMeter;
+		return GlobalTESFParameters.evDrivingCostPerMeter + GlobalTESFParameters.evTaxationPerMeter;
 	}
 
 	@Override

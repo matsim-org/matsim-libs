@@ -31,12 +31,16 @@ public class EVCVScoringFunction implements BasicScoring {
 		if (VehicleInitializer.hasCarLeg(selectedPlan)) {
 
 			if (VehicleInitializer.hasElectricVehicle.get(selectedPlan)) {
-				this.score += evCosts.getInitialInvestmentCost();
-				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * evCosts.getPerMeterTravelCost();
-		
+				this.score += evCosts.getInitialInvestmentCost() * GlobalTESFParameters.weightParameterPerDay;
+				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * evCosts.getPerMeterTravelCost() * GlobalTESFParameters.weightParameterPerMeter;
+				
+				if (DistanceTravelledWithCar.distanceTravelled.get(person.getId()) > GlobalTESFParameters.evDailyRange){
+					this.score += -1000000.0;
+				}
+						
 			} else {
-				this.score += cvCosts.getInitialInvestmentCost();
-				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * cvCosts.getPerMeterTravelCost();
+				this.score += cvCosts.getInitialInvestmentCost() * GlobalTESFParameters.weightParameterPerDay;
+				this.score += DistanceTravelledWithCar.distanceTravelled.get(person.getId()) * cvCosts.getPerMeterTravelCost() * GlobalTESFParameters.weightParameterPerMeter;		
 			}
 			
 			if (TollsManager.tollDisutilities.containsKey(person.getId())){
