@@ -34,7 +34,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.TransitScheduleValidator;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorSimple;
@@ -48,8 +47,7 @@ import playground.christoph.evacuation.pt.TransitRouterNetworkThinner;
 import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * New main to create multimodal MATSim environment from OSM and HAFAS.
  *
  * @author boescpa
  */
@@ -117,7 +115,7 @@ public class OSM2MixedV2 {
 
 		// **************** Convert Schedule ****************
 		final TransitSchedule mixedSchedule = mixedScenario.getTransitSchedule();
-		final Vehicles mixedVehicles = VehicleUtils.createVehiclesContainer();
+		final Vehicles mixedVehicles = mixedScenario.getVehicles();
 		new PTScheduleCreatorDefaultV2(mixedSchedule, mixedVehicles).createSchedule(null, hafasFolder, null, vehicleFile_Mixed);
 		new TransitScheduleWriter(mixedSchedule).writeFile(outbase + "MixedSchedule_Plain.xml.gz");
 		new VehicleWriterV1(mixedVehicles).writeFile(outbase + "MixedVehicles.xml.gz");
