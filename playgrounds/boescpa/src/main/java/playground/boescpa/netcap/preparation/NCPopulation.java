@@ -37,8 +37,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Resets a population (and its attributes) so that it can be used with a new scenario...
@@ -69,7 +67,7 @@ public class NCPopulation {
 		new PopulationWriter(newPopulation).write(args[1]);
 
 		// Filter person attributes
-		if (scenario.getConfig().plans().getInputPersonAttributeFile() != null && args.length == 3) {
+		if (scenario.getConfig().plans().getInputPersonAttributeFile() != null && args.length > 2) {
 			final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 			new ObjectAttributesXmlReader(personAttributes).parse(scenario.getConfig().plans().getInputPersonAttributeFile());
 			final ObjectAttributes filteredPersonAttributes = filterPersonAttributes(personAttributes, newPopulation);
