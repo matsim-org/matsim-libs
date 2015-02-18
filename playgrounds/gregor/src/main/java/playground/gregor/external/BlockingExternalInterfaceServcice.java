@@ -23,9 +23,13 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
 import playground.gregor.dummysim.DummySim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep;
 import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived;
 import playground.gregor.proto.ProtoMATSimInterface.ExternInterfaceService.BlockingInterface;
+import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpace;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpaceConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent;
@@ -42,11 +46,11 @@ public class BlockingExternalInterfaceServcice implements BlockingInterface {
 	private DummySim sim;
 
 	public double getFrom() {
-		return from;
+		return this.from;
 	}
 
 	public double getTo() {
-		return to;
+		return this.to;
 	}
 
 	public void setSimStepBarrier(CyclicBarrier b) {
@@ -86,6 +90,21 @@ public class BlockingExternalInterfaceServcice implements BlockingInterface {
 			e.printStackTrace();
 		}
 		return ExternDoSimStepReceived.newBuilder().build();
+	}
+
+	@Override
+	public ExternOnPrepareSimConfirmed reqExternOnPrepareSim(
+			RpcController controller, ExternOnPrepareSim request)
+			throws ServiceException {
+		this.sim.onPrepareSim(request);
+		return ExternOnPrepareSimConfirmed.newBuilder().build();
+	}
+
+	@Override
+	public ExternAfterSimConfirmed reqExternAfterSim(RpcController controller,
+			ExternAfterSim request) throws ServiceException {
+		this.sim.afterSim(request);
+		return ExternAfterSimConfirmed.newBuilder().build();
 	}
 
 }

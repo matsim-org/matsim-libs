@@ -6292,6 +6292,2070 @@ public final class ProtoMATSimInterface {
     // @@protoc_insertion_point(class_scope:ExternalConnectConfirmed)
   }
 
+  public interface ExternOnPrepareSimOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ExternOnPrepareSim)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code ExternOnPrepareSim}
+   */
+  public static final class ExternOnPrepareSim extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ExternOnPrepareSim)
+      ExternOnPrepareSimOrBuilder {
+    // Use ExternOnPrepareSim.newBuilder() to construct.
+    private ExternOnPrepareSim(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ExternOnPrepareSim(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ExternOnPrepareSim defaultInstance;
+    public static ExternOnPrepareSim getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ExternOnPrepareSim getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExternOnPrepareSim(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSim_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSim_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.class, playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ExternOnPrepareSim> PARSER =
+        new com.google.protobuf.AbstractParser<ExternOnPrepareSim>() {
+      public ExternOnPrepareSim parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExternOnPrepareSim(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExternOnPrepareSim> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ExternOnPrepareSim}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ExternOnPrepareSim)
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSim_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSim_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.class, playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSim_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim build() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim result = new playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:ExternOnPrepareSim)
+    }
+
+    static {
+      defaultInstance = new ExternOnPrepareSim(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:ExternOnPrepareSim)
+  }
+
+  public interface ExternOnPrepareSimConfirmedOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ExternOnPrepareSimConfirmed)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code ExternOnPrepareSimConfirmed}
+   */
+  public static final class ExternOnPrepareSimConfirmed extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ExternOnPrepareSimConfirmed)
+      ExternOnPrepareSimConfirmedOrBuilder {
+    // Use ExternOnPrepareSimConfirmed.newBuilder() to construct.
+    private ExternOnPrepareSimConfirmed(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ExternOnPrepareSimConfirmed(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ExternOnPrepareSimConfirmed defaultInstance;
+    public static ExternOnPrepareSimConfirmed getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ExternOnPrepareSimConfirmed getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExternOnPrepareSimConfirmed(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSimConfirmed_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSimConfirmed_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ExternOnPrepareSimConfirmed> PARSER =
+        new com.google.protobuf.AbstractParser<ExternOnPrepareSimConfirmed>() {
+      public ExternOnPrepareSimConfirmed parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExternOnPrepareSimConfirmed(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExternOnPrepareSimConfirmed> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ExternOnPrepareSimConfirmed}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ExternOnPrepareSimConfirmed)
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmedOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSimConfirmed_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSimConfirmed_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternOnPrepareSimConfirmed_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed build() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed result = new playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:ExternOnPrepareSimConfirmed)
+    }
+
+    static {
+      defaultInstance = new ExternOnPrepareSimConfirmed(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:ExternOnPrepareSimConfirmed)
+  }
+
+  public interface ExternAfterSimOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ExternAfterSim)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code ExternAfterSim}
+   */
+  public static final class ExternAfterSim extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ExternAfterSim)
+      ExternAfterSimOrBuilder {
+    // Use ExternAfterSim.newBuilder() to construct.
+    private ExternAfterSim(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ExternAfterSim(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ExternAfterSim defaultInstance;
+    public static ExternAfterSim getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ExternAfterSim getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExternAfterSim(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSim_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSim_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.class, playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ExternAfterSim> PARSER =
+        new com.google.protobuf.AbstractParser<ExternAfterSim>() {
+      public ExternAfterSim parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExternAfterSim(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExternAfterSim> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ExternAfterSim}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ExternAfterSim)
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSim_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSim_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.class, playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSim_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim build() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim result = new playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:ExternAfterSim)
+    }
+
+    static {
+      defaultInstance = new ExternAfterSim(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:ExternAfterSim)
+  }
+
+  public interface ExternAfterSimConfirmedOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ExternAfterSimConfirmed)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code ExternAfterSimConfirmed}
+   */
+  public static final class ExternAfterSimConfirmed extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ExternAfterSimConfirmed)
+      ExternAfterSimConfirmedOrBuilder {
+    // Use ExternAfterSimConfirmed.newBuilder() to construct.
+    private ExternAfterSimConfirmed(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private ExternAfterSimConfirmed(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final ExternAfterSimConfirmed defaultInstance;
+    public static ExternAfterSimConfirmed getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public ExternAfterSimConfirmed getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExternAfterSimConfirmed(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSimConfirmed_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSimConfirmed_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<ExternAfterSimConfirmed> PARSER =
+        new com.google.protobuf.AbstractParser<ExternAfterSimConfirmed>() {
+      public ExternAfterSimConfirmed parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExternAfterSimConfirmed(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExternAfterSimConfirmed> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code ExternAfterSimConfirmed}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ExternAfterSimConfirmed)
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmedOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSimConfirmed_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSimConfirmed_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_ExternAfterSimConfirmed_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed build() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed result = new playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:ExternAfterSimConfirmed)
+    }
+
+    static {
+      defaultInstance = new ExternAfterSimConfirmed(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:ExternAfterSimConfirmed)
+  }
+
+  public interface AgentsStuckOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:AgentsStuck)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    com.google.protobuf.ProtocolStringList
+        getAgentIdList();
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    int getAgentIdCount();
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    java.lang.String getAgentId(int index);
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getAgentIdBytes(int index);
+  }
+  /**
+   * Protobuf type {@code AgentsStuck}
+   */
+  public static final class AgentsStuck extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:AgentsStuck)
+      AgentsStuckOrBuilder {
+    // Use AgentsStuck.newBuilder() to construct.
+    private AgentsStuck(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private AgentsStuck(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final AgentsStuck defaultInstance;
+    public static AgentsStuck getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public AgentsStuck getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private AgentsStuck(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                agentId_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              agentId_.add(bs);
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          agentId_ = agentId_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuck_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuck_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.class, playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<AgentsStuck> PARSER =
+        new com.google.protobuf.AbstractParser<AgentsStuck>() {
+      public AgentsStuck parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new AgentsStuck(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AgentsStuck> getParserForType() {
+      return PARSER;
+    }
+
+    public static final int AGENTID_FIELD_NUMBER = 1;
+    private com.google.protobuf.LazyStringList agentId_;
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getAgentIdList() {
+      return agentId_;
+    }
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    public int getAgentIdCount() {
+      return agentId_.size();
+    }
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    public java.lang.String getAgentId(int index) {
+      return agentId_.get(index);
+    }
+    /**
+     * <code>repeated string agentId = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getAgentIdBytes(int index) {
+      return agentId_.getByteString(index);
+    }
+
+    private void initFields() {
+      agentId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      for (int i = 0; i < agentId_.size(); i++) {
+        output.writeBytes(1, agentId_.getByteString(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < agentId_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(agentId_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getAgentIdList().size();
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.AgentsStuck prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code AgentsStuck}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:AgentsStuck)
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuckOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuck_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuck_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.class, playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        agentId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuck_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuck getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuck build() {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuck result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuck buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuck result = new playground.gregor.proto.ProtoMATSimInterface.AgentsStuck(this);
+        int from_bitField0_ = bitField0_;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          agentId_ = agentId_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.agentId_ = agentId_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.AgentsStuck) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.AgentsStuck)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.AgentsStuck other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.getDefaultInstance()) return this;
+        if (!other.agentId_.isEmpty()) {
+          if (agentId_.isEmpty()) {
+            agentId_ = other.agentId_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureAgentIdIsMutable();
+            agentId_.addAll(other.agentId_);
+          }
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuck parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.AgentsStuck) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.LazyStringList agentId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureAgentIdIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          agentId_ = new com.google.protobuf.LazyStringArrayList(agentId_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getAgentIdList() {
+        return agentId_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public int getAgentIdCount() {
+        return agentId_.size();
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public java.lang.String getAgentId(int index) {
+        return agentId_.get(index);
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getAgentIdBytes(int index) {
+        return agentId_.getByteString(index);
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public Builder setAgentId(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAgentIdIsMutable();
+        agentId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public Builder addAgentId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAgentIdIsMutable();
+        agentId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public Builder addAllAgentId(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureAgentIdIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, agentId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public Builder clearAgentId() {
+        agentId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string agentId = 1;</code>
+       */
+      public Builder addAgentIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureAgentIdIsMutable();
+        agentId_.add(value);
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:AgentsStuck)
+    }
+
+    static {
+      defaultInstance = new AgentsStuck(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:AgentsStuck)
+  }
+
+  public interface AgentsStuckConfirmedOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:AgentsStuckConfirmed)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code AgentsStuckConfirmed}
+   */
+  public static final class AgentsStuckConfirmed extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:AgentsStuckConfirmed)
+      AgentsStuckConfirmedOrBuilder {
+    // Use AgentsStuckConfirmed.newBuilder() to construct.
+    private AgentsStuckConfirmed(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private AgentsStuckConfirmed(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final AgentsStuckConfirmed defaultInstance;
+    public static AgentsStuckConfirmed getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public AgentsStuckConfirmed getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private AgentsStuckConfirmed(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuckConfirmed_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuckConfirmed_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<AgentsStuckConfirmed> PARSER =
+        new com.google.protobuf.AbstractParser<AgentsStuckConfirmed>() {
+      public AgentsStuckConfirmed parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new AgentsStuckConfirmed(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<AgentsStuckConfirmed> getParserForType() {
+      return PARSER;
+    }
+
+    private void initFields() {
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code AgentsStuckConfirmed}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:AgentsStuckConfirmed)
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmedOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuckConfirmed_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuckConfirmed_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.class, playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.Builder.class);
+      }
+
+      // Construct using playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.internal_static_AgentsStuckConfirmed_descriptor;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed getDefaultInstanceForType() {
+        return playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance();
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed build() {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed buildPartial() {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed result = new playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed) {
+          return mergeFrom((playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed other) {
+        if (other == playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:AgentsStuckConfirmed)
+    }
+
+    static {
+      defaultInstance = new AgentsStuckConfirmed(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:AgentsStuckConfirmed)
+  }
+
   /**
    * Protobuf service {@code MATSimInterfaceService}
    */
@@ -6307,6 +8371,14 @@ public final class ProtoMATSimInterface {
           com.google.protobuf.RpcController controller,
           playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim request,
           com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed> done);
+
+      /**
+       * <code>rpc reqAgentStuck(.AgentsStuck) returns (.AgentsStuckConfirmed);</code>
+       */
+      public abstract void reqAgentStuck(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed> done);
 
       /**
        * <code>rpc reqExternalConnect(.ExternalConnect) returns (.ExternalConnectConfirmed);</code>
@@ -6335,6 +8407,14 @@ public final class ProtoMATSimInterface {
             playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim request,
             com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed> done) {
           impl.reqExtern2MATSim(controller, request, done);
+        }
+
+        @java.lang.Override
+        public  void reqAgentStuck(
+            com.google.protobuf.RpcController controller,
+            playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request,
+            com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed> done) {
+          impl.reqAgentStuck(controller, request, done);
         }
 
         @java.lang.Override
@@ -6378,8 +8458,10 @@ public final class ProtoMATSimInterface {
             case 0:
               return impl.reqExtern2MATSim(controller, (playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim)request);
             case 1:
-              return impl.reqExternalConnect(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternalConnect)request);
+              return impl.reqAgentStuck(controller, (playground.gregor.proto.ProtoMATSimInterface.AgentsStuck)request);
             case 2:
+              return impl.reqExternalConnect(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternalConnect)request);
+            case 3:
               return impl.reqExternSimStepFinished(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished)request);
             default:
               throw new java.lang.AssertionError("Can't get here.");
@@ -6398,8 +8480,10 @@ public final class ProtoMATSimInterface {
             case 0:
               return playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim.getDefaultInstance();
             case 1:
-              return playground.gregor.proto.ProtoMATSimInterface.ExternalConnect.getDefaultInstance();
+              return playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.getDefaultInstance();
             case 2:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternalConnect.getDefaultInstance();
+            case 3:
               return playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished.getDefaultInstance();
             default:
               throw new java.lang.AssertionError("Can't get here.");
@@ -6418,8 +8502,10 @@ public final class ProtoMATSimInterface {
             case 0:
               return playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed.getDefaultInstance();
             case 1:
-              return playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance();
+              return playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance();
             case 2:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance();
+            case 3:
               return playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived.getDefaultInstance();
             default:
               throw new java.lang.AssertionError("Can't get here.");
@@ -6436,6 +8522,14 @@ public final class ProtoMATSimInterface {
         com.google.protobuf.RpcController controller,
         playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim request,
         com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed> done);
+
+    /**
+     * <code>rpc reqAgentStuck(.AgentsStuck) returns (.AgentsStuckConfirmed);</code>
+     */
+    public abstract void reqAgentStuck(
+        com.google.protobuf.RpcController controller,
+        playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request,
+        com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed> done);
 
     /**
      * <code>rpc reqExternalConnect(.ExternalConnect) returns (.ExternalConnectConfirmed);</code>
@@ -6481,11 +8575,16 @@ public final class ProtoMATSimInterface {
               done));
           return;
         case 1:
+          this.reqAgentStuck(controller, (playground.gregor.proto.ProtoMATSimInterface.AgentsStuck)request,
+            com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed>specializeCallback(
+              done));
+          return;
+        case 2:
           this.reqExternalConnect(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternalConnect)request,
             com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed>specializeCallback(
               done));
           return;
-        case 2:
+        case 3:
           this.reqExternSimStepFinished(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished)request,
             com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived>specializeCallback(
               done));
@@ -6507,8 +8606,10 @@ public final class ProtoMATSimInterface {
         case 0:
           return playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim.getDefaultInstance();
         case 1:
-          return playground.gregor.proto.ProtoMATSimInterface.ExternalConnect.getDefaultInstance();
+          return playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.getDefaultInstance();
         case 2:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternalConnect.getDefaultInstance();
+        case 3:
           return playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished.getDefaultInstance();
         default:
           throw new java.lang.AssertionError("Can't get here.");
@@ -6527,8 +8628,10 @@ public final class ProtoMATSimInterface {
         case 0:
           return playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed.getDefaultInstance();
         case 1:
-          return playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance();
+          return playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance();
         case 2:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance();
+        case 3:
           return playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived.getDefaultInstance();
         default:
           throw new java.lang.AssertionError("Can't get here.");
@@ -6566,12 +8669,27 @@ public final class ProtoMATSimInterface {
             playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed.getDefaultInstance()));
       }
 
+      public  void reqAgentStuck(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed> done) {
+        channel.callMethod(
+          getDescriptor().getMethods().get(1),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance(),
+          com.google.protobuf.RpcUtil.generalizeCallback(
+            done,
+            playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.class,
+            playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance()));
+      }
+
       public  void reqExternalConnect(
           com.google.protobuf.RpcController controller,
           playground.gregor.proto.ProtoMATSimInterface.ExternalConnect request,
           com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed> done) {
         channel.callMethod(
-          getDescriptor().getMethods().get(1),
+          getDescriptor().getMethods().get(2),
           controller,
           request,
           playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance(),
@@ -6586,7 +8704,7 @@ public final class ProtoMATSimInterface {
           playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished request,
           com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived> done) {
         channel.callMethod(
-          getDescriptor().getMethods().get(2),
+          getDescriptor().getMethods().get(3),
           controller,
           request,
           playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived.getDefaultInstance(),
@@ -6606,6 +8724,11 @@ public final class ProtoMATSimInterface {
       public playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed reqExtern2MATSim(
           com.google.protobuf.RpcController controller,
           playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim request)
+          throws com.google.protobuf.ServiceException;
+
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed reqAgentStuck(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request)
           throws com.google.protobuf.ServiceException;
 
       public playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed reqExternalConnect(
@@ -6638,12 +8761,24 @@ public final class ProtoMATSimInterface {
       }
 
 
+      public playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed reqAgentStuck(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuck request)
+          throws com.google.protobuf.ServiceException {
+        return (playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed) channel.callBlockingMethod(
+          getDescriptor().getMethods().get(1),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed.getDefaultInstance());
+      }
+
+
       public playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed reqExternalConnect(
           com.google.protobuf.RpcController controller,
           playground.gregor.proto.ProtoMATSimInterface.ExternalConnect request)
           throws com.google.protobuf.ServiceException {
         return (playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed) channel.callBlockingMethod(
-          getDescriptor().getMethods().get(1),
+          getDescriptor().getMethods().get(2),
           controller,
           request,
           playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed.getDefaultInstance());
@@ -6655,7 +8790,7 @@ public final class ProtoMATSimInterface {
           playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished request)
           throws com.google.protobuf.ServiceException {
         return (playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived) channel.callBlockingMethod(
-          getDescriptor().getMethods().get(2),
+          getDescriptor().getMethods().get(3),
           controller,
           request,
           playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived.getDefaultInstance());
@@ -6698,6 +8833,22 @@ public final class ProtoMATSimInterface {
           playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep request,
           com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived> done);
 
+      /**
+       * <code>rpc reqExternOnPrepareSim(.ExternOnPrepareSim) returns (.ExternOnPrepareSimConfirmed);</code>
+       */
+      public abstract void reqExternOnPrepareSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed> done);
+
+      /**
+       * <code>rpc reqExternAfterSim(.ExternAfterSim) returns (.ExternAfterSimConfirmed);</code>
+       */
+      public abstract void reqExternAfterSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed> done);
+
     }
 
     public static com.google.protobuf.Service newReflectiveService(
@@ -6725,6 +8876,22 @@ public final class ProtoMATSimInterface {
             playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep request,
             com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived> done) {
           impl.reqExternDoSimStep(controller, request, done);
+        }
+
+        @java.lang.Override
+        public  void reqExternOnPrepareSim(
+            com.google.protobuf.RpcController controller,
+            playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request,
+            com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed> done) {
+          impl.reqExternOnPrepareSim(controller, request, done);
+        }
+
+        @java.lang.Override
+        public  void reqExternAfterSim(
+            com.google.protobuf.RpcController controller,
+            playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request,
+            com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed> done) {
+          impl.reqExternAfterSim(controller, request, done);
         }
 
       };
@@ -6755,6 +8922,10 @@ public final class ProtoMATSimInterface {
               return impl.reqMATSim2ExternPutAgent(controller, (playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent)request);
             case 2:
               return impl.reqExternDoSimStep(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep)request);
+            case 3:
+              return impl.reqExternOnPrepareSim(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim)request);
+            case 4:
+              return impl.reqExternAfterSim(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim)request);
             default:
               throw new java.lang.AssertionError("Can't get here.");
           }
@@ -6775,6 +8946,10 @@ public final class ProtoMATSimInterface {
               return playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent.getDefaultInstance();
             case 2:
               return playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep.getDefaultInstance();
+            case 3:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.getDefaultInstance();
+            case 4:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.getDefaultInstance();
             default:
               throw new java.lang.AssertionError("Can't get here.");
           }
@@ -6795,6 +8970,10 @@ public final class ProtoMATSimInterface {
               return playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgentConfirmed.getDefaultInstance();
             case 2:
               return playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived.getDefaultInstance();
+            case 3:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance();
+            case 4:
+              return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance();
             default:
               throw new java.lang.AssertionError("Can't get here.");
           }
@@ -6826,6 +9005,22 @@ public final class ProtoMATSimInterface {
         com.google.protobuf.RpcController controller,
         playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep request,
         com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived> done);
+
+    /**
+     * <code>rpc reqExternOnPrepareSim(.ExternOnPrepareSim) returns (.ExternOnPrepareSimConfirmed);</code>
+     */
+    public abstract void reqExternOnPrepareSim(
+        com.google.protobuf.RpcController controller,
+        playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request,
+        com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed> done);
+
+    /**
+     * <code>rpc reqExternAfterSim(.ExternAfterSim) returns (.ExternAfterSimConfirmed);</code>
+     */
+    public abstract void reqExternAfterSim(
+        com.google.protobuf.RpcController controller,
+        playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request,
+        com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed> done);
 
     public static final
         com.google.protobuf.Descriptors.ServiceDescriptor
@@ -6864,6 +9059,16 @@ public final class ProtoMATSimInterface {
             com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived>specializeCallback(
               done));
           return;
+        case 3:
+          this.reqExternOnPrepareSim(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim)request,
+            com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed>specializeCallback(
+              done));
+          return;
+        case 4:
+          this.reqExternAfterSim(controller, (playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim)request,
+            com.google.protobuf.RpcUtil.<playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed>specializeCallback(
+              done));
+          return;
         default:
           throw new java.lang.AssertionError("Can't get here.");
       }
@@ -6884,6 +9089,10 @@ public final class ProtoMATSimInterface {
           return playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent.getDefaultInstance();
         case 2:
           return playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep.getDefaultInstance();
+        case 3:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim.getDefaultInstance();
+        case 4:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim.getDefaultInstance();
         default:
           throw new java.lang.AssertionError("Can't get here.");
       }
@@ -6904,6 +9113,10 @@ public final class ProtoMATSimInterface {
           return playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgentConfirmed.getDefaultInstance();
         case 2:
           return playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived.getDefaultInstance();
+        case 3:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance();
+        case 4:
+          return playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance();
         default:
           throw new java.lang.AssertionError("Can't get here.");
       }
@@ -6969,6 +9182,36 @@ public final class ProtoMATSimInterface {
             playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived.class,
             playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived.getDefaultInstance()));
       }
+
+      public  void reqExternOnPrepareSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed> done) {
+        channel.callMethod(
+          getDescriptor().getMethods().get(3),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance(),
+          com.google.protobuf.RpcUtil.generalizeCallback(
+            done,
+            playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.class,
+            playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance()));
+      }
+
+      public  void reqExternAfterSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request,
+          com.google.protobuf.RpcCallback<playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed> done) {
+        channel.callMethod(
+          getDescriptor().getMethods().get(4),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance(),
+          com.google.protobuf.RpcUtil.generalizeCallback(
+            done,
+            playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.class,
+            playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance()));
+      }
     }
 
     public static BlockingInterface newBlockingStub(
@@ -6990,6 +9233,16 @@ public final class ProtoMATSimInterface {
       public playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived reqExternDoSimStep(
           com.google.protobuf.RpcController controller,
           playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep request)
+          throws com.google.protobuf.ServiceException;
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed reqExternOnPrepareSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request)
+          throws com.google.protobuf.ServiceException;
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed reqExternAfterSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request)
           throws com.google.protobuf.ServiceException;
     }
 
@@ -7033,6 +9286,30 @@ public final class ProtoMATSimInterface {
           controller,
           request,
           playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived.getDefaultInstance());
+      }
+
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed reqExternOnPrepareSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim request)
+          throws com.google.protobuf.ServiceException {
+        return (playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed) channel.callBlockingMethod(
+          getDescriptor().getMethods().get(3),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed.getDefaultInstance());
+      }
+
+
+      public playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed reqExternAfterSim(
+          com.google.protobuf.RpcController controller,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim request)
+          throws com.google.protobuf.ServiceException {
+        return (playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed) channel.callBlockingMethod(
+          getDescriptor().getMethods().get(4),
+          controller,
+          request,
+          playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed.getDefaultInstance());
       }
 
     }
@@ -7110,6 +9387,36 @@ public final class ProtoMATSimInterface {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ExternalConnectConfirmed_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ExternOnPrepareSim_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_ExternOnPrepareSim_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ExternOnPrepareSimConfirmed_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_ExternOnPrepareSimConfirmed_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ExternAfterSim_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_ExternAfterSim_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_ExternAfterSimConfirmed_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_ExternAfterSimConfirmed_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_AgentsStuck_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_AgentsStuck_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_AgentsStuckConfirmed_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_AgentsStuckConfirmed_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -7134,21 +9441,29 @@ public final class ProtoMATSimInterface {
       "hedReceived\"3\n\017ExternDoSimStep\022\020\n\010fromTi" +
       "me\030\001 \002(\001\022\016\n\006toTime\030\002 \002(\001\"\031\n\027ExternDoSimS" +
       "tepReceived\"\021\n\017ExternalConnect\"\032\n\030Extern" +
-      "alConnectConfirmed2\354\001\n\026MATSimInterfaceSe" +
-      "rvice\022;\n\020reqExtern2MATSim\022\016.Extern2MATSi" +
-      "m\032\027.Extern2MATSimConfirmed\022A\n\022reqExterna" +
-      "lConnect\022\020.ExternalConnect\032\031.ExternalCon" +
-      "nectConfirmed\022R\n\030reqExternSimStepFinishe",
-      "d\022\026.ExternSimStepFinished\032\036.ExternSimSte" +
-      "pFinishedReceived2\204\002\n\026ExternInterfaceSer" +
-      "vice\022S\n\030reqMATSim2ExternHasSpace\022\026.MATSi" +
-      "m2ExternHasSpace\032\037.MATSim2ExternHasSpace" +
-      "Confirmed\022S\n\030reqMATSim2ExternPutAgent\022\026." +
-      "MATSim2ExternPutAgent\032\037.MATSim2ExternPut" +
-      "AgentConfirmed\022@\n\022reqExternDoSimStep\022\020.E" +
-      "xternDoSimStep\032\030.ExternDoSimStepReceived" +
-      "B2\n\027playground.gregor.protoB\024ProtoMATSim" +
-      "Interface\210\001\001"
+      "alConnectConfirmed\"\024\n\022ExternOnPrepareSim" +
+      "\"\035\n\033ExternOnPrepareSimConfirmed\"\020\n\016Exter" +
+      "nAfterSim\"\031\n\027ExternAfterSimConfirmed\"\036\n\013" +
+      "AgentsStuck\022\017\n\007agentId\030\001 \003(\t\"\026\n\024AgentsSt" +
+      "uckConfirmed2\242\002\n\026MATSimInterfaceService\022",
+      ";\n\020reqExtern2MATSim\022\016.Extern2MATSim\032\027.Ex" +
+      "tern2MATSimConfirmed\0224\n\rreqAgentStuck\022\014." +
+      "AgentsStuck\032\025.AgentsStuckConfirmed\022A\n\022re" +
+      "qExternalConnect\022\020.ExternalConnect\032\031.Ext" +
+      "ernalConnectConfirmed\022R\n\030reqExternSimSte" +
+      "pFinished\022\026.ExternSimStepFinished\032\036.Exte" +
+      "rnSimStepFinishedReceived2\220\003\n\026ExternInte" +
+      "rfaceService\022S\n\030reqMATSim2ExternHasSpace" +
+      "\022\026.MATSim2ExternHasSpace\032\037.MATSim2Extern" +
+      "HasSpaceConfirmed\022S\n\030reqMATSim2ExternPut",
+      "Agent\022\026.MATSim2ExternPutAgent\032\037.MATSim2E" +
+      "xternPutAgentConfirmed\022@\n\022reqExternDoSim" +
+      "Step\022\020.ExternDoSimStep\032\030.ExternDoSimStep" +
+      "Received\022J\n\025reqExternOnPrepareSim\022\023.Exte" +
+      "rnOnPrepareSim\032\034.ExternOnPrepareSimConfi" +
+      "rmed\022>\n\021reqExternAfterSim\022\017.ExternAfterS" +
+      "im\032\030.ExternAfterSimConfirmedB2\n\027playgrou" +
+      "nd.gregor.protoB\024ProtoMATSimInterface\210\001\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7245,6 +9560,42 @@ public final class ProtoMATSimInterface {
     internal_static_ExternalConnectConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ExternalConnectConfirmed_descriptor,
+        new java.lang.String[] { });
+    internal_static_ExternOnPrepareSim_descriptor =
+      getDescriptor().getMessageTypes().get(12);
+    internal_static_ExternOnPrepareSim_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ExternOnPrepareSim_descriptor,
+        new java.lang.String[] { });
+    internal_static_ExternOnPrepareSimConfirmed_descriptor =
+      getDescriptor().getMessageTypes().get(13);
+    internal_static_ExternOnPrepareSimConfirmed_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ExternOnPrepareSimConfirmed_descriptor,
+        new java.lang.String[] { });
+    internal_static_ExternAfterSim_descriptor =
+      getDescriptor().getMessageTypes().get(14);
+    internal_static_ExternAfterSim_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ExternAfterSim_descriptor,
+        new java.lang.String[] { });
+    internal_static_ExternAfterSimConfirmed_descriptor =
+      getDescriptor().getMessageTypes().get(15);
+    internal_static_ExternAfterSimConfirmed_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ExternAfterSimConfirmed_descriptor,
+        new java.lang.String[] { });
+    internal_static_AgentsStuck_descriptor =
+      getDescriptor().getMessageTypes().get(16);
+    internal_static_AgentsStuck_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_AgentsStuck_descriptor,
+        new java.lang.String[] { "AgentId", });
+    internal_static_AgentsStuckConfirmed_descriptor =
+      getDescriptor().getMessageTypes().get(17);
+    internal_static_AgentsStuckConfirmed_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_AgentsStuckConfirmed_descriptor,
         new java.lang.String[] { });
   }
 

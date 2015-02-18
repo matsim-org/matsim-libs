@@ -60,15 +60,42 @@ message ExternalConnectConfirmed {
 
 }
 
+message ExternOnPrepareSim {
+
+}
+
+message ExternOnPrepareSimConfirmed {
+
+}
+message ExternAfterSim {
+
+}
+
+message ExternAfterSimConfirmed {
+
+}
+message AgentsStuck {
+	repeated string agentId = 1;
+}
+
+message AgentsStuckConfirmed{
+
+}
+
+
 service MATSimInterfaceService {
 	rpc reqExtern2MATSim(Extern2MATSim) returns (Extern2MATSimConfirmed);
+	rpc reqAgentStuck(AgentsStuck) returns (AgentsStuckConfirmed);
 	rpc reqExternalConnect(ExternalConnect) returns (ExternalConnectConfirmed);
 	rpc reqExternSimStepFinished(ExternSimStepFinished) returns (ExternSimStepFinishedReceived);
 }
+
 service ExternInterfaceService {
 	rpc reqMATSim2ExternHasSpace(MATSim2ExternHasSpace) returns (MATSim2ExternHasSpaceConfirmed);
 	rpc reqMATSim2ExternPutAgent(MATSim2ExternPutAgent) returns (MATSim2ExternPutAgentConfirmed);
 	rpc reqExternDoSimStep(ExternDoSimStep) returns (ExternDoSimStepReceived);
+	rpc reqExternOnPrepareSim(ExternOnPrepareSim) returns (ExternOnPrepareSimConfirmed);
+	rpc reqExternAfterSim(ExternAfterSim) returns (ExternAfterSimConfirmed);
 
 }
 

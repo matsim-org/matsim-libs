@@ -34,8 +34,12 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.external.BlockingExternalInterfaceServcice;
 import playground.gregor.proto.ProtoMATSimInterface;
+import playground.gregor.proto.ProtoMATSimInterface.AgentsStuck;
+import playground.gregor.proto.ProtoMATSimInterface.AgentsStuck.Builder;
 import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim;
 import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed;
+import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim;
 import playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished;
 import playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived;
 import playground.gregor.proto.ProtoMATSimInterface.ExternalConnect;
@@ -56,10 +60,10 @@ import com.googlecode.protobuf.pro.duplex.execute.ThreadPoolCallExecutor;
 
 public class DummySim {
 
-	private RpcController cntr;
-	private BlockingInterface service;
-	private BlockingExternalInterfaceServcice serviceHandler;
-	private LinkedList<Agent> agents = new LinkedList<>();
+	private final RpcController cntr;
+	private final BlockingInterface service;
+	private final BlockingExternalInterfaceServcice serviceHandler;
+	private final LinkedList<Agent> agents = new LinkedList<>();
 
 	public DummySim(BlockingInterface service, RpcController cntr,
 			BlockingExternalInterfaceServcice serviceHandler) {
@@ -69,7 +73,7 @@ public class DummySim {
 	}
 
 	public static void main(String[] args) throws IOException,
-			ServiceException, InterruptedException, BrokenBarrierException {
+	ServiceException, InterruptedException, BrokenBarrierException {
 		if (args.length != 2) {
 			System.out.println("usage: DummySim <server> <port>");
 			System.exit(-1);
@@ -106,14 +110,14 @@ public class DummySim {
 		BlockingExternalInterfaceServcice serviceHandler = new BlockingExternalInterfaceServcice();
 		clientFactory.getRpcServiceRegistry().registerService(
 				ProtoMATSimInterface.ExternInterfaceService
-						.newReflectiveBlockingService(serviceHandler));
+				.newReflectiveBlockingService(serviceHandler));
 
 		new DummySim(service, cntr, serviceHandler).run();
 
 	}
 
 	private void run() throws ServiceException, InterruptedException,
-			BrokenBarrierException {
+	BrokenBarrierException {
 
 		double stepSize = 0.01;
 
@@ -129,15 +133,37 @@ public class DummySim {
 		// connection established
 		while (true) {
 
+			int n8cnt = 0;
+			int n7cnt = 0;
 			simStepBarrier.await();
 			for (double time = this.serviceHandler.getFrom(); time < this.serviceHandler
 					.getTo(); time += stepSize) {
 				// do something
 				Iterator<Agent> it = this.agents.iterator();
+
+
+
 				while (it.hasNext()) {
 					Agent next = it.next();
 					// check whether agent wants to leave
-					if (MatsimRandom.getRandom().nextDouble() > 0.99) {
+					double threshold;
+					if (next.getNodes(0).equals("n3")) {
+						threshold = 0.9999999;
+					} else if(next.getNodes(0).equals("n7")) {
+						threshold = 0.99 + n7cnt;
+					} else if(next.getNodes(0).equals("n8")) {
+						threshold = 0.99 + n8cnt;
+					}else {
+						threshold =1;
+					}
+
+					if (MatsimRandom.getRandom().nextDouble() > threshold) {
+						if(next.getNodes(0).equals("n7")) {
+							n7cnt++;
+						}
+						if(next.getNodes(0).equals("n8")) {
+							n8cnt++;
+						}
 						ProtocolStringList nl = next.getNodesList();
 						int sz = nl.size();
 						String exNode = nl.get(sz - 1);
@@ -145,9 +171,9 @@ public class DummySim {
 								.newBuilder()
 								.setAgent(
 										Extern2MATSim.Agent.newBuilder()
-												.setId(next.getId())
-												.setLeaveNode(exNode).build())
-								.build();
+										.setId(next.getId())
+										.setLeaveNode(exNode).build())
+										.build();
 						// check whether MATSim is able to take agent
 						Extern2MATSimConfirmed resp = this.service
 								.reqExtern2MATSim(this.cntr, enterMATSimRequest);
@@ -161,7 +187,7 @@ public class DummySim {
 			ExternSimStepFinished reqNextSimStep = ExternSimStepFinished
 					.newBuilder().setTime(this.serviceHandler.getTo()).build();
 			ExternSimStepFinishedReceived reqNextSimStepResp = this.service
-					.reqExternSimStepFinished(cntr, reqNextSimStep);
+					.reqExternSimStepFinished(this.cntr, reqNextSimStep);
 
 		}
 
@@ -177,10 +203,32 @@ public class DummySim {
 
 		String node = request.getNodeId();
 		// test whether agent can enter DummySim at node right now
-		if (MatsimRandom.getRandom().nextDouble() > 0.8) {
+		if (MatsimRandom.getRandom().nextDouble() > 0) {
 			return true;
 		}
 		return false;
+	}
+
+	public void onPrepareSim(ExternOnPrepareSim request) {
+		//TODO here we can prepare things
+	}
+
+	public void afterSim(ExternAfterSim request) {
+		//TODO iteration done - time to clean up
+		if (this.agents.size() > 0) {
+			Iterator<Agent> it = this.agents.iterator();
+			Builder asb = AgentsStuck.newBuilder();
+			while (it.hasNext()) {
+				Agent next = it.next();
+				asb.addAgentId(next.getId());
+				it.remove();
+			}
+			try {
+				this.service.reqAgentStuck(this.cntr, asb.build());
+			} catch (ServiceException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

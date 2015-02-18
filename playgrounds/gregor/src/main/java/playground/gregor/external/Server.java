@@ -24,24 +24,31 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 
 import playground.gregor.proto.ProtoMATSimInterface;
+import playground.gregor.proto.ProtoMATSimInterface.ExternInterfaceService.BlockingInterface;
 
+import com.google.protobuf.RpcController;
 import com.googlecode.protobuf.pro.duplex.PeerInfo;
+import com.googlecode.protobuf.pro.duplex.RpcClientChannel;
 import com.googlecode.protobuf.pro.duplex.execute.RpcServerCallExecutor;
+import com.googlecode.protobuf.pro.duplex.execute.ServerRpcController;
 import com.googlecode.protobuf.pro.duplex.execute.ThreadPoolCallExecutor;
 import com.googlecode.protobuf.pro.duplex.server.DuplexTcpServerPipelineFactory;
 import com.googlecode.protobuf.pro.duplex.util.RenamingThreadFactoryProxy;
 
 public class Server {
 
-	private BlockingMATSimInterfaceService service;
+	private final BlockingMATSimInterfaceService service;
 
+	private BlockingInterface clientService;
+	private RpcController rpcCtr;
+	
 	public Server(BlockingMATSimInterfaceService service) {
 		this.service = service;
 		initServer();
+		service.setServer(this);
 	}
 
 	private void initServer() {
@@ -74,15 +81,20 @@ public class Server {
 						.newReflectiveBlockingService(this.service));
 
 		bootstrap.bind();
-
-		// this.service.reqExtern2MATSim(, null)
+	}
+	
+	public void setRpcController(ServerRpcController controller) {
+		RpcClientChannel c = ServerRpcController.getRpcChannel(controller);
+		this.clientService = ProtoMATSimInterface.ExternInterfaceService
+				.newBlockingStub(c);
+		this.rpcCtr = c.newRpcController();
 	}
 
-	public static void main(String[] args) {
-		CyclicBarrier b = new CyclicBarrier(2);
-		CyclicBarrier c = new CyclicBarrier(2);
-		BlockingMATSimInterfaceService s = new BlockingMATSimInterfaceService(
-				b, c, null);
-		Server serv = new Server(s);
+	public RpcController getRpcCtrl() {
+		return this.rpcCtr;
+	}
+
+	public BlockingInterface getClientService() {
+		return this.clientService;
 	}
 }

@@ -19,6 +19,9 @@
 
 package playground.gregor.external;
 
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -39,6 +42,27 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 public class HybridExternalMobsimFactory implements MobsimFactory {
 
+	private final Server server;
+	private final BlockingMATSimInterfaceService service;
+	private final CyclicBarrier simStepBarrier;
+
+
+	public HybridExternalMobsimFactory() {
+		CyclicBarrier startupBarrier = new CyclicBarrier(2);
+		this.simStepBarrier = new CyclicBarrier(2);
+		BlockingMATSimInterfaceService service = new BlockingMATSimInterfaceService(startupBarrier,this.simStepBarrier);
+		this.service = service;
+		this.server = new Server(service);
+		
+		//wait for connection here
+		try {
+			startupBarrier.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSimConfigGroup conf = sc.getConfig().qsim();
@@ -52,7 +76,8 @@ public class HybridExternalMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		ExternalEngine e = new ExternalEngine(eventsManager, qSim);
+		ExternalEngine e = new ExternalEngine(eventsManager, qSim,this.server.getRpcCtrl(),this.server.getClientService(),this.simStepBarrier);
+		this.service.setSimeEngine(e);
 		HybridQSimExternalNetworkFactory networkFactory = new HybridQSimExternalNetworkFactory(
 				e);
 

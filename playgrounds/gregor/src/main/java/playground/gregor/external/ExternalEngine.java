@@ -26,6 +26,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -36,11 +37,15 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.External2QAdapterLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
-import playground.gregor.proto.ProtoMATSimInterface;
+import playground.gregor.proto.ProtoMATSimInterface.AgentsStuck;
 import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep;
 import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived;
 import playground.gregor.proto.ProtoMATSimInterface.ExternInterfaceService.BlockingInterface;
+import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim;
+import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpace;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpaceConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent;
@@ -49,35 +54,36 @@ import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgentConfirm
 
 import com.google.protobuf.RpcController;
 import com.google.protobuf.ServiceException;
-import com.googlecode.protobuf.pro.duplex.RpcClientChannel;
-import com.googlecode.protobuf.pro.duplex.execute.ServerRpcController;
 
 public class ExternalEngine implements MobsimEngine {
 
-	private BlockingMATSimInterfaceService service;
-	private Server server;
-	private RpcController rpcCtr;
+	private final RpcController rpcCtr;
+	private final BlockingInterface clientService;
 
-	CyclicBarrier simStepBarrier = new CyclicBarrier(2);
-	private BlockingInterface clientService;
-	private Map<Id<Person>, QVehicle> vehicles = new HashMap<>();
-	private Map<Id<Link>, External2QAdapterLink> adapters = new HashMap<>();
-	private EventsManager em;
-	private Mobsim sim;
+	private final CyclicBarrier simStepBarrier;
+	private final Map<Id<Person>, QVehicle> vehicles = new HashMap<>();
+	private final Map<Id<Link>, External2QAdapterLink> adapters = new HashMap<>();
+	private final EventsManager em;
+	private final Mobsim sim;
 
-	public ExternalEngine(EventsManager eventsManager, Mobsim sim) {
+	public ExternalEngine(EventsManager eventsManager, Mobsim sim,RpcController rpcCtr,BlockingInterface clientService, CyclicBarrier simStepBarrier) {
 		this.em = eventsManager;
 		this.sim = sim;
+		this.rpcCtr = rpcCtr;
+		this.clientService = clientService;
+		this.simStepBarrier = simStepBarrier;
 	}
 
+
+	
 	@Override
 	public void doSimStep(double time) {
 		double to = time + 1;
 		ExternDoSimStep doSimStepExternal = ExternDoSimStep.newBuilder()
 				.setFromTime(time).setToTime(to).build();
 		try {
-			ExternDoSimStepReceived resp = clientService.reqExternDoSimStep(
-					rpcCtr, doSimStepExternal);
+			ExternDoSimStepReceived resp = this.clientService.reqExternDoSimStep(
+					this.rpcCtr, doSimStepExternal);
 		} catch (ServiceException e) {
 			throw new RuntimeException(e);
 		}
@@ -91,22 +97,22 @@ public class ExternalEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		CyclicBarrier startupBarrier = new CyclicBarrier(2);
-
-		this.service = new BlockingMATSimInterfaceService(startupBarrier,
-				simStepBarrier, this);
-		this.server = new Server(service);
+		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
 		try {
-			startupBarrier.await();// waiting for client to connect
-		} catch (InterruptedException | BrokenBarrierException e) {
-			throw new RuntimeException(e);
+			ExternOnPrepareSimConfirmed resp = this.clientService.reqExternOnPrepareSim(this.rpcCtr, prep);
+		} catch (ServiceException e) {
+			throw new RuntimeException();
 		}
-
 	}
 
 	@Override
 	public void afterSim() {
-		// TODO Auto-generated method stub
+		ExternAfterSim aft = ExternAfterSim.newBuilder().build();
+		try {
+			ExternAfterSimConfirmed resp = this.clientService.reqExternAfterSim(this.rpcCtr, aft);
+		} catch (ServiceException e) {
+			throw new RuntimeException();
+		}
 
 	}
 
@@ -116,12 +122,7 @@ public class ExternalEngine implements MobsimEngine {
 
 	}
 
-	public void setRpcController(ServerRpcController controller) {
-		RpcClientChannel c = ServerRpcController.getRpcChannel(controller);
-		this.clientService = ProtoMATSimInterface.ExternInterfaceService
-				.newBlockingStub(c);
-		this.rpcCtr = c.newRpcController();
-	}
+
 
 	public boolean tryAddAgent(Extern2MATSim request) {
 		playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim.Agent a = request
@@ -147,7 +148,7 @@ public class ExternalEngine implements MobsimEngine {
 				.setNodeId(id.toString()).build();
 		MATSim2ExternHasSpaceConfirmed spaceReqResp = null;
 		try {
-			spaceReqResp = clientService.reqMATSim2ExternHasSpace(rpcCtr,
+			spaceReqResp = this.clientService.reqMATSim2ExternHasSpace(this.rpcCtr,
 					spaceReq);
 		} catch (ServiceException e) {
 			throw new RuntimeException(e);
@@ -165,8 +166,8 @@ public class ExternalEngine implements MobsimEngine {
 								.setEnterNode(enterId.toString())
 								.addNodes(leaveId.toString()).build()).build();
 		try {
-			MATSim2ExternPutAgentConfirmed addReqResp = clientService
-					.reqMATSim2ExternPutAgent(rpcCtr, addReq);
+			MATSim2ExternPutAgentConfirmed addReqResp = this.clientService
+					.reqMATSim2ExternPutAgent(this.rpcCtr, addReq);
 		} catch (ServiceException e) {
 			throw new RuntimeException(e);
 		}
@@ -178,11 +179,24 @@ public class ExternalEngine implements MobsimEngine {
 	}
 
 	public EventsManager getEventsManager() {
-		return em;
+		return this.em;
 	}
 
 	public Mobsim getMobsim() {
 		return this.sim;
+	}
+
+
+
+	public void fireStuckEvents(AgentsStuck request) {
+		double now = this.sim.getSimTimer().getTimeOfDay();
+		for (String id : request.getAgentIdList()){
+			Id<Person> persId = Id.createPersonId(id);
+			QVehicle veh = this.vehicles.get(persId);
+			PersonStuckEvent e = new PersonStuckEvent(now, persId, veh.getDriver().getCurrentLinkId(), veh.getDriver().getMode());
+			this.em.processEvent(e);
+		}
+		
 	}
 
 }

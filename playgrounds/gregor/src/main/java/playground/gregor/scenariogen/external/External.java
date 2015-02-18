@@ -74,7 +74,7 @@ public class External {
 		c.strategy().addParam("ModuleProbability_2", ".9");
 
 		c.controler().setOutputDirectory(outputDir);
-		c.controler().setLastIteration(0);
+		c.controler().setLastIteration(100);
 
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
 

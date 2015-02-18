@@ -22,6 +22,8 @@ package playground.gregor.external;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
+import playground.gregor.proto.ProtoMATSimInterface.AgentsStuck;
+import playground.gregor.proto.ProtoMATSimInterface.AgentsStuckConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim;
 import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSimConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished;
@@ -36,17 +38,25 @@ import com.googlecode.protobuf.pro.duplex.execute.ServerRpcController;
 
 public class BlockingMATSimInterfaceService implements BlockingInterface {
 
-	private CyclicBarrier startupBarrier;
-	private CyclicBarrier simStepBarrier;
+	private final CyclicBarrier startupBarrier;
+	private final CyclicBarrier simStepBarrier;
 	private ExternalEngine engine;
+	private Server server;
 
 	public BlockingMATSimInterfaceService(CyclicBarrier startupBarrier,
-			CyclicBarrier simStepBarrier, ExternalEngine externalEngine) {
+			CyclicBarrier simStepBarrier) {
 		this.startupBarrier = startupBarrier;
-		this.engine = externalEngine;
 		this.simStepBarrier = simStepBarrier;
 	}
 
+	public void setSimeEngine(ExternalEngine engine) {
+		this.engine = engine;
+	}
+	
+	public CyclicBarrier getSimStepBarrier() {
+		return this.simStepBarrier;
+	}
+	
 	@Override
 	public ExternSimStepFinishedReceived reqExternSimStepFinished(
 			RpcController controller, ExternSimStepFinished request)
@@ -64,7 +74,7 @@ public class BlockingMATSimInterfaceService implements BlockingInterface {
 			RpcController controller, ExternalConnect request)
 			throws ServiceException {
 
-		this.engine.setRpcController((ServerRpcController) controller);
+		this.server.setRpcController((ServerRpcController) controller);
 		try {
 			this.startupBarrier.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
@@ -78,6 +88,18 @@ public class BlockingMATSimInterfaceService implements BlockingInterface {
 			Extern2MATSim request) throws ServiceException {
 		return Extern2MATSimConfirmed.newBuilder()
 				.setAccepted(this.engine.tryAddAgent(request)).build();
+	}
+
+	public void setServer(Server server) {
+		this.server = server;
+	}
+
+	@Override
+	public AgentsStuckConfirmed reqAgentStuck(RpcController controller,
+			AgentsStuck request) throws ServiceException {
+		
+		this.engine.fireStuckEvents(request);
+		return AgentsStuckConfirmed.newBuilder().build();
 	}
 
 }
