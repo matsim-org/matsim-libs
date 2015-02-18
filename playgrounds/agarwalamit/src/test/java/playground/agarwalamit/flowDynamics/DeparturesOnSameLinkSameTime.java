@@ -59,8 +59,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-
 /**
  * @author amit
  */
@@ -199,8 +197,8 @@ public class DeparturesOnSameLinkSameTime {
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
-			vt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
-			vt.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
+			vt.setMaximumVelocity(20);
+			vt.setPcuEquivalents(travelMode == "motorbike" ? 0.25 : 1.0);
 			scenario.getVehicles().addVehicleType(vt);
 
 			for(int i=1;i<3;i++){
