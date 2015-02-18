@@ -31,9 +31,17 @@ import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Resets a population so that it can be used with a new scenario...
+ * Resets a population (and its attributes) so that it can be used with a new scenario...
  *
  * @author boescpa
  */
@@ -41,18 +49,49 @@ public class NCPopulation {
 	private static PopulationFactory popFactory;
 
 	public static void main(String[] args) {
+		if (args.length < 2 || args.length > 3) {
+			System.out.println("Wrong number of arguments. Will abort.");
+			return;
+		}
+
+		// Load scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
+
+		// Reset population:
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		final Population population = scenario.getPopulation();
 		final Population newPopulation = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		popFactory = newPopulation.getFactory();
-
 		for (Person person : population.getPersons().values()) {
 			Person newPerson = resetPerson(person);
 			newPopulation.addPerson(newPerson);
 		}
-
 		new PopulationWriter(newPopulation).write(args[1]);
+
+		// Filter person attributes
+		if (scenario.getConfig().plans().getInputPersonAttributeFile() != null && args.length == 3) {
+			final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
+			new ObjectAttributesXmlReader(personAttributes).parse(scenario.getConfig().plans().getInputPersonAttributeFile());
+			final ObjectAttributes filteredPersonAttributes = filterPersonAttributes(personAttributes, newPopulation);
+			new ObjectAttributesXmlWriter(filteredPersonAttributes).writeFile(args[2]);
+		} else {
+			System.out.println("Person attributes not handled (either no file specified in config or no output path given in arguments).");
+		}
+	}
+
+	private static ObjectAttributes filterPersonAttributes(final ObjectAttributes personAttributes, final Population newPopulation) {
+		// Which persons in new population (and therefore attributes to keep)?
+		final ObjectAttributes filteredObjectAttributes = new ObjectAttributes();
+		for (Person person : newPopulation.getPersons().values()) {
+			Collection<String> attributeNames = ObjectAttributesUtils.getAllAttributeNames(personAttributes, person.getId().toString());
+			for (String attributeName : attributeNames) {
+				filteredObjectAttributes.putAttribute(
+						person.getId().toString(),
+						attributeName,
+						personAttributes.getAttribute(person.getId().toString(), attributeName));
+			}
+		}
+		return filteredObjectAttributes;
 	}
 
 	private static Person resetPerson(final Person oldPerson) {
