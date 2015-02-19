@@ -127,21 +127,21 @@ public class DgAnalyseCottbusKS2010 {
 		Double deltaSpeedKmH;
 		Double delayPercent;
 		Double distancePercent;
-		public Set<Id> seenPersonIds;
+		public Set<Id<Person>> seenPersonIds;
 	}
 
 	static class Results {
-		private Map<RunInfo, Map<Extent, Map<TimeConfig,Result>>> resultMap = new HashMap();  
+		private Map<RunInfo, Map<Extent, Map<TimeConfig,Result>>> resultMap = new HashMap<>();  
 
 		private void addResult(Result result) {
 			Map<Extent, Map<TimeConfig, Result>> m = resultMap.get(result.runInfo);
 			if (m == null) {
-				m = new HashMap();
+				m = new HashMap<>();
 				resultMap.put(result.runInfo, m);
 			}
 			Map<TimeConfig, Result> m2 = m.get(result.extent);
 			if (m2 == null) {
-				m2 = new HashMap();
+				m2 = new HashMap<>();
 				m.put(result.extent, m2);
 			}
 			m2.put(result.timeConfig, result);
@@ -246,12 +246,12 @@ public class DgAnalyseCottbusKS2010 {
 	}
 
 	private void createAndWritePersonDiff(Result baseResult, Result r) {
-		Set<Id> allPersonIds = new HashSet<Id>();
+		Set<Id<Person>> allPersonIds = new HashSet<>();
 		allPersonIds.addAll(baseResult.seenPersonIds);
 		allPersonIds.addAll(r.seenPersonIds);
-		Set<Id> disattractedPersonsIds = new HashSet<Id>();
-		Set<Id> attractedPersonsIds = new HashSet<Id>();
-		for (Id id : allPersonIds) {
+		Set<Id<Person>> disattractedPersonsIds = new HashSet<>();
+		Set<Id<Person>> attractedPersonsIds = new HashSet<>();
+		for (Id<Person> id : allPersonIds) {
 			if (baseResult.seenPersonIds.contains(id) && ! r.seenPersonIds.contains(id)) {
 				disattractedPersonsIds.add(id);
 			}
@@ -274,7 +274,7 @@ public class DgAnalyseCottbusKS2010 {
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");
 	}
 	
-	private Population getFilteredPopulation(Population pop, Set<Id> personIdsOfInterest){
+	private Population getFilteredPopulation(Population pop, Set<Id<Person>> personIdsOfInterest){
 		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (Person person : pop.getPersons().values()) {
 			if (personIdsOfInterest.contains(person.getId())) {
@@ -318,7 +318,6 @@ public class DgAnalyseCottbusKS2010 {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
 			String runDirectory = DgPaths.REPOS + "runs-svn/cottbus/run"+runId+"/";
-			//			String runDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
 			String eventsFilename = runDir.getEventsFilename(runInfo.iteration);
 			
@@ -594,7 +593,8 @@ public class DgAnalyseCottbusKS2010 {
 //		CottbusRuns.add1972BaseCaseRoutesOnlyRandomRuns(l);
 //		CottbusRuns.add1973BaseCaseRoutesTimesRandomRuns(l);
 		
-		CottbusRuns.add2026BaseCaseRoutesTimesRandomRuns(l);
+//		CottbusRuns.add2026BaseCaseRoutesTimesRandomRuns(l);
+		CottbusRuns.add2032BaseCaseRoutesTimesRandomRuns(l);
 		
 		return l;
 	}
@@ -609,7 +609,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2015-02-17_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2015-02-19_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);

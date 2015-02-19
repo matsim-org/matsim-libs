@@ -807,6 +807,46 @@ public class CottbusRuns {
 		ri.remark = "optimized";
 		l.add(ri);
 	}
+	
+	public static void add2032BaseCaseRoutesTimesRandomRuns(List<RunInfo> l) {
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = "2032";
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "2034";
+		ri.iteration = 1400;
+		ri.remark = "best random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "2035";
+		ri.iteration = 1400;
+		ri.remark = "worst random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "2036";
+		ri.iteration = 1400;
+		ri.remark = "avg random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "2037";
+		ri.iteration = 1400;
+		ri.remark = "median random";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "2033";
+		ri.iteration = 1400;
+		ri.remark = "optimized";
+		l.add(ri);
+	}
 
 	public static void add1987BaseCaseRoutesOnlyRandomRuns(List<RunInfo> l) {
 		RunInfo ri = null;

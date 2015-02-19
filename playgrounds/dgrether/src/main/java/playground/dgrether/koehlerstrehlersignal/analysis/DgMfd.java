@@ -29,18 +29,19 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -54,9 +55,9 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	private static final double binSizeSeconds = 5.0 * 60.0;
 	private static final double vehicleSize = 7.5;
 	
-	private Map<Id, Double> firstTimeSeenMap = new HashMap<Id, Double>();
-	private Map<Id, LinkLeaveEvent> lastTimeSeenMap = new HashMap<Id, LinkLeaveEvent>();
-	private Map<Id, LinkEnterEvent> enterEventByPersonIdMap = new HashMap<Id, LinkEnterEvent>();
+	private Map<Id<Person>, Double> firstTimeSeenMap = new HashMap<>();
+	private Map<Id<Person>, LinkLeaveEvent> lastTimeSeenMap = new HashMap<>();
+	private Map<Id<Person>, LinkEnterEvent> enterEventByPersonIdMap = new HashMap<>();
 	private Network network;
 	private double networkLengthKm;
 	private Data data;
@@ -127,7 +128,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	}
 
 	
-	private void handleLeaveNetworkOrArrival(Id personId) {
+	private void handleLeaveNetworkOrArrival(Id<Person> personId) {
 		Double firstEvent = this.firstTimeSeenMap.remove(personId);
 		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
 		this.enterEventByPersonIdMap.remove(personId);
@@ -360,7 +361,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Pers
 	
 	private static class LinksData {
 
-		private Map<Id, LinkData> linkData = new HashMap<Id, LinkData>();
+		private Map<Id<Link>, LinkData> linkData = new HashMap<>();
 		
 		public void incrementFlow(Link l) {
 			this.checkLinkData(l);

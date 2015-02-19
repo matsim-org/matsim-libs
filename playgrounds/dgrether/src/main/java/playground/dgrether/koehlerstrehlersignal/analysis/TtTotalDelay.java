@@ -23,16 +23,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -43,7 +44,7 @@ import org.matsim.api.core.v01.network.Network;
 public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
 
 	private Network network;
-	private Map<Id, LinkEnterEvent> linkEnterByPerson;
+	private Map<Id<Person>, LinkEnterEvent> linkEnterByPerson;
 	private double totalDelay;
 
 	public TtTotalDelay(Network network) {
@@ -53,7 +54,7 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void reset(int iteration) {
-		this.linkEnterByPerson = new HashMap<Id, LinkEnterEvent>();
+		this.linkEnterByPerson = new HashMap<>();
 		this.totalDelay = 0.0;
 	}
 
