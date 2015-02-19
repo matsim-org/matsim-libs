@@ -161,7 +161,7 @@ public class DeparturesOnSameLinkSameTime {
 	 * <p> o-----o------o
 	 *
 	 */
-	public class PseudoInputs {
+	private class PseudoInputs {
 
 		Scenario scenario;
 		Config config;
@@ -180,7 +180,7 @@ public class DeparturesOnSameLinkSameTime {
 			population = this.scenario.getPopulation();
 		}
 
-		public void createNetwork(double departureLinkCapacity){
+		private void createNetwork(double departureLinkCapacity){
 
 			Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
 			Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 10));
@@ -190,7 +190,7 @@ public class DeparturesOnSameLinkSameTime {
 			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,1000.0,20.0,3600,1,null,"7");
 		}
 
-		public void createPopulation(){
+		private void createPopulation(){
 
 			// Vehicles info			
 			((ScenarioImpl)scenario).createVehicleContainer();
