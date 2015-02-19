@@ -42,13 +42,17 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit
  */
 
-public class CorridorNetworkAndPlans {
+public class MergingNetworkAndPlans {
 
 
 	/**
 	 * generates network with 3 links. 
 	 *<p>			
 	 *<p>  o--1---o---2---o---3---o
+	 *<p> 		  |
+	 *<p> 		  4
+	 *<p> 		  |
+	 *<p> 		  o	
 	 *<p>				  
 	 */
 	Scenario scenario;
@@ -58,8 +62,9 @@ public class CorridorNetworkAndPlans {
 	Link link1;
 	Link link2;
 	Link link3;
+	Link link4;
 
-	public CorridorNetworkAndPlans(){
+	public MergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
 		network =  (NetworkImpl) this.scenario.getNetwork();
@@ -72,20 +77,30 @@ public class CorridorNetworkAndPlans {
 		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 10));
 		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, -10));
 		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 20));
+		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(-10, -200));
 
-		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2, 1000.0, 20.0, 3600.,1,null,"7");
-		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3, 100.0,20.0, 1080.,1,null,"7");
-		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4, 1000.0, 20.0, 3600.,1,null,"7");
+		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600.,1,null,"7");
+		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,5.0,20.0,360.,1,null,"7");
+		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,1000.0,20.0,3600.,1,null,"7");
+		link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node5, node2,1000.0,20.0,3600.,1,null,"7");
 	}
 
 	public void createPopulation(int numberOfPersons){
+
+		/*Alternative persons from different links*/
 
 		for(int i=1;i<=numberOfPersons;i++){
 			Id<Person> id = Id.createPersonId(i);
 			Person p = population.getFactory().createPerson(id);
 			Plan plan = population.getFactory().createPlan();
 			p.addPlan(plan);
-			Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+			Activity a1;
+
+			Id<Link> startLink;
+			if (i%2==0) startLink = link1.getId();
+			else startLink = link4.getId();
+
+			a1 = population.getFactory().createActivityFromLinkId("h", startLink);
 			a1.setEndTime(0*3600+i);
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			plan.addActivity(a1);
@@ -93,11 +108,12 @@ public class CorridorNetworkAndPlans {
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route;
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+			route= (NetworkRoute) factory.createRoute(startLink, link3.getId());
 			linkIds.add(link2.getId());
 			linkIds.add(link3.getId());
-			route.setLinkIds(link1.getId(), linkIds, link3.getId());
+			route.setLinkIds(startLink, linkIds, link3.getId());
 			leg.setRoute(route);
+
 			Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
 			plan.addActivity(a2);
 			population.addPerson(p);

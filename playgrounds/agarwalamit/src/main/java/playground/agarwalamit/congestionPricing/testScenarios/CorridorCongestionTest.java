@@ -26,9 +26,14 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -51,6 +56,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.agarwalamit.utils.myTestScenarios.CorridorNetworkAndPlans;
+import playground.agarwalamit.utils.myTestScenarios.MergingNetworkAndPlans;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -64,7 +70,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 public class CorridorCongestionTest {
 	
 	
-	private final int numberOfPersonInPlan = 10;
+	private final int numberOfPersonInPlan = 4;
+	private final boolean useOTFVis = false;
 	
 	public static void main(String[] args) {
 		new CorridorCongestionTest().compareV3AndV4();
@@ -113,12 +120,13 @@ public class CorridorCongestionTest {
 	}
 
 	private List<CongestionEvent> getCongestionEvents (String congestionPricingImpl) {
-		CorridorNetworkAndPlans pseudoInputs = new CorridorNetworkAndPlans();
+		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans();
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
 		Scenario sc = pseudoInputs.getDesiredScenario();
 
 		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new printAllEvents());
 
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
@@ -134,6 +142,7 @@ public class CorridorCongestionTest {
 			}
 
 		});
+		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
@@ -144,6 +153,30 @@ public class CorridorCongestionTest {
 		return congestionEvents;
 	}
 
+	private class printAllEvents implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler {
+
+		@Override
+		public void reset(int iteration) {
+			
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			System.out.println(event.toString());
+		}
+
+		@Override
+		public void handleEvent(LinkEnterEvent event) {
+			System.out.println(event.toString());
+		}
+
+		@Override
+		public void handleEvent(PersonDepartureEvent event) {
+			System.out.println(event.toString());			
+		}
+		
+	}
+	
 
 	private QSim createQSim (Scenario sc, EventsManager manager){
 		QSim qSim1 = new QSim(sc, manager);
@@ -169,7 +202,7 @@ public class CorridorCongestionTest {
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 		
-		if ( false ) {
+		if ( useOTFVis ) {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
