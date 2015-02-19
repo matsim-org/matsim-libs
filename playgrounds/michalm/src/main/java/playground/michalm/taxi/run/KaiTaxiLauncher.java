@@ -36,7 +36,7 @@ class KaiTaxiLauncher
      */
     public static void run(String file, boolean removeNonPassengers, boolean endActivitiesAtTimeZero)
     {
-        TaxiLauncher launcher = new TaxiLauncher(TaxiLauncherParams.readParams(file));
+        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
 
         if (removeNonPassengers) {
             VrpPopulationUtils
@@ -48,7 +48,7 @@ class KaiTaxiLauncher
         }
 
         launcher.initVrpPathCalculator();
-        launcher.go();
+        launcher.simulateIteration();
     }
 
 

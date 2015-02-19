@@ -302,9 +302,9 @@ public class ResultsPostProcessor
         experiments.add(new Experiment("2.5"));
         experiments.add(new Experiment("3.0"));
         experiments.add(new Experiment("3.5"));
-        experiments.add(new Experiment("4.0"));
-        experiments.add(new Experiment("4.5"));
-        experiments.add(new Experiment("5.0"));
+//        experiments.add(new Experiment("4.0"));
+//        experiments.add(new Experiment("4.5"));
+//        experiments.add(new Experiment("5.0"));
 
         int timeWindow = 14 * 3600;//very approx.
 

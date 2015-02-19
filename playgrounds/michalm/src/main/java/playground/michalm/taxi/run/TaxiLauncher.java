@@ -19,10 +19,8 @@
 
 package playground.michalm.taxi.run;
 
-import java.io.PrintWriter;
 import java.util.List;
 
-import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
@@ -30,20 +28,14 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.chart.ChartWindowUtils;
-import org.matsim.contrib.dvrp.util.gis.Schedules2GIS;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.taxi.*;
@@ -52,11 +44,7 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
-import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
-import playground.michalm.taxi.util.stats.*;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
-import playground.michalm.util.MovingAgentsRegister;
 
 
 class TaxiLauncher
@@ -65,14 +53,9 @@ class TaxiLauncher
     MatsimVrpContext context;
     final Scenario scenario;
 
-    private TravelTimeCalculator travelTimeCalculator;
+    TravelTimeCalculator travelTimeCalculator;
     LeastCostPathCalculatorWithCache routerWithCache;
-    private VrpPathCalculator pathCalculator;
-
-    LegHistogram legHistogram;
-    TaxiDelaySpeedupStats delaySpeedupStats;
-
-    private boolean warmup;
+    VrpPathCalculator pathCalculator;
 
 
     TaxiLauncher(TaxiLauncherParams params)
@@ -127,16 +110,10 @@ class TaxiLauncher
     }
 
 
-    void clearTravelTimeCalculator()
-    {
-        travelTimeCalculator = null;
-    }
-
-
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    void go()
+    void simulateIteration()
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
@@ -155,8 +132,8 @@ class TaxiLauncher
 
         qSim.addQueueSimulationListeners(optimizer);
 
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+                new TaxiRequestCreator(), optimizer, context, qSim);
 
         if (params.advanceRequestSubmission) {
             // yy to my ears, this is not completely clear.  I don't think that it enables advance request submission
@@ -175,50 +152,15 @@ class TaxiLauncher
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
-        EventsManager events = qSim.getEventsManager();
-
-        EventWriter eventWriter = null;
-        if (params.eventsOutFile != null) {
-            eventWriter = new EventWriterXML(params.eventsOutFile);
-            events.addHandler(eventWriter);
-        }
-
-        if (warmup) {
-            events.addHandler(travelTimeCalculator);
-        }
-        else {
-            optimizerConfig.scheduler.setDelaySpeedupStats(delaySpeedupStats);
-        }
-
-        MovingAgentsRegister mar = new MovingAgentsRegister();
-        events.addHandler(mar);
-
-        if (params.otfVis) { // OFTVis visualization
-            DynAgentLauncherUtils.runOTFVis(qSim, false, ColoringScheme.taxicab);
-        }
-
-        if (params.histogramOutDir != null) {
-            events.addHandler(legHistogram = new LegHistogram(300));
-        }
-
+        beforeQSim(qSim);
         qSim.run();
-
-        events.finishProcessing();
-
-        if (params.eventsOutFile != null) {
-            eventWriter.closeFile();
-        }
-
-        // check if all reqs have been served
-        for (TaxiRequest r : taxiData.getTaxiRequests()) {
-            if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
-                throw new IllegalStateException();
-            }
-        }
+        qSim.getEventsManager().finishProcessing();
+        validateResults(taxiData);
+        afterQSim(qSim);
     }
 
 
-    private TaxiOptimizerConfiguration createOptimizerConfiguration()
+    TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
                 params.pickupDuration, params.dropoffDuration);
@@ -232,55 +174,21 @@ class TaxiLauncher
     }
 
 
-    void generateOutput()
-    {
-        PrintWriter pw = new PrintWriter(System.out);
-        pw.println(params.algorithmConfig.name());
-        pw.println("m\t" + context.getVrpData().getVehicles().size());
-        pw.println("n\t" + context.getVrpData().getRequests().size());
-        pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
-                .getVehicles());
-        pw.println(stats);
-        pw.flush();
+    void beforeQSim(QSim qSim)
+    {}
 
-        if (params.vrpOutDir != null) {
-            new Schedules2GIS(context.getVrpData().getVehicles(),
-                    TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
+
+    void afterQSim(QSim qSim)
+    {}
+
+
+    void validateResults(TaxiData taxiData)
+    {
+        // check if all reqs have been served
+        for (TaxiRequest r : taxiData.getTaxiRequests()) {
+            if (r.getStatus() != TaxiRequestStatus.PERFORMED) {
+                throw new IllegalStateException();
+            }
         }
-
-        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartWindowUtils.showFrame(TaxiScheduleChartUtils.chartSchedule(context.getVrpData()
-                .getVehicles()));
-
-        if (params.histogramOutDir != null) {
-            VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);
-        }
-    }
-
-
-    public void startWarmup()
-    {
-        warmup = true;
-
-        if (warmup && params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
-            throw new RuntimeException();
-        }
-    }
-
-
-    public void stopWarmup()
-    {
-        warmup = false;
-    }
-
-
-    public static void main(String... args)
-    {
-        TaxiLauncherParams params = TaxiLauncherParams.readParams(args[0]);
-        TaxiLauncher launcher = new TaxiLauncher(params);
-        launcher.initVrpPathCalculator();
-        launcher.go();
-        launcher.generateOutput();
     }
 }

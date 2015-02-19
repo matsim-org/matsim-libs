@@ -24,21 +24,24 @@ import java.util.EnumSet;
 
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.qsim.QSim;
 
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 
 class MultiRunTaxiLauncher
+    extends TaxiLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
             643, 647, 653 };
 
-    private final TaxiLauncherParams params;
-    private final TaxiLauncher launcher;
+    private boolean warmup;
 
     private final TaxiDelaySpeedupStats delaySpeedupStats;
     private final LeastCostPathCalculatorCacheStats cacheStats;
@@ -50,12 +53,9 @@ class MultiRunTaxiLauncher
 
     MultiRunTaxiLauncher(TaxiLauncherParams params)
     {
-        this.params = params;
-        launcher = new TaxiLauncher(params);
+        super(params);
 
         delaySpeedupStats = new TaxiDelaySpeedupStats();
-        launcher.delaySpeedupStats = delaySpeedupStats;
-
         cacheStats = new LeastCostPathCalculatorCacheStats();
     }
 
@@ -77,11 +77,55 @@ class MultiRunTaxiLauncher
     }
 
 
+    @Override
+    public void beforeQSim(QSim qSim)
+    {
+        if (warmup) {
+            EventsManager events = qSim.getEventsManager();
+            events.addHandler(travelTimeCalculator);
+        }
+    }
+    
+    TaxiOptimizerConfiguration createOptimizerConfiguration()
+    {
+        TaxiOptimizerConfiguration optimizerConfig = super.createOptimizerConfiguration();
+
+        if (!warmup) {
+            optimizerConfig.scheduler.setDelaySpeedupStats(delaySpeedupStats);
+        }
+
+        return optimizerConfig;
+    }
+
+
     void closeOutputFiles()
     {
         pw.close();
         pw2.close();
         pw3.close();
+    }
+
+
+    void runWarmupConditionally(int runs)
+    {
+        if (params.algorithmConfig.ttimeSource != TravelTimeSource.EVENTS || //
+                scenario.getConfig().network().isTimeVariantNetwork()) {
+            return;//no warmup needed
+        }
+
+        warmup = true;
+
+        if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
+            throw new RuntimeException();
+        }
+
+        for (int i = 0; i < runs; i += 4) {
+            MatsimRandom.reset(RANDOM_SEEDS[i]);
+            initVrpPathCalculator();
+            simulateIteration();
+        }
+
+        warmup = false;
     }
 
 
@@ -91,39 +135,25 @@ class MultiRunTaxiLauncher
             throw new RuntimeException();
         }
 
-        launcher.clearTravelTimeCalculator();
+        travelTimeCalculator = null;
 
-        //warmup
-        if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS && //
-                !launcher.scenario.getConfig().network().isTimeVariantNetwork()) {
-            launcher.startWarmup();
-            
-            for (int i = 0; i < runs; i += 4) {
-                MatsimRandom.reset(RANDOM_SEEDS[i]);
-                launcher.initVrpPathCalculator();
-                launcher.go();
-            }
-            
-            launcher.stopWarmup();
-        }
-
-        ///========================
+        runWarmupConditionally(runs);
 
         MultiRunStats multipleRunStats = new MultiRunStats();
-        launcher.initVrpPathCalculator();//the same for all runs
+        initVrpPathCalculator();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            launcher.go();
-            TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator()
-                    .calculateStats(launcher.context.getVrpData().getVehicles());
+            simulateIteration();
+            TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator().calculateStats(context
+                    .getVrpData().getVehicles());
             long t1 = System.currentTimeMillis();
-            cacheStats.updateStats(launcher.routerWithCache);
+            cacheStats.updateStats(routerWithCache);
             multipleRunStats.updateStats(evaluation, t1 - t0);
         }
 
-        VrpData data = launcher.context.getVrpData();
+        VrpData data = context.getVrpData();
         String cfg = params.algorithmConfig.name();
 
         multipleRunStats.printStats(pw, cfg, data);
