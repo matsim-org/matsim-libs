@@ -235,7 +235,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 			));
 		}
 		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, veh.getDriver().getId(), this.id, veh.getId()
+				now, veh.getDriver().getId(), this.qLink.getLink().getId(), veh.getId()
 		));
 		return veh;
 	}
