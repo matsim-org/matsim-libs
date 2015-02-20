@@ -45,14 +45,14 @@ public class CreatePtZonesFromTransitStopCoordinates {
 
 	public static void createPtZonesFromTransitStopCoordinates(String transitStopListFilename, String zoneShapeFilename){
 		Map<String, List<Coord>> ptZoneId2TransitStopCoordinates = ReadStopTable.readGenericCSV(transitStopListFilename);
-		Map<String, Geometry> ptZoneId2MultiPointGeometry = CreateMulitipointGeometriesFromTransitStopCoordinates(ptZoneId2TransitStopCoordinates);
+		Map<String, Geometry> ptZoneId2MultiPointGeometry = createMulitipointGeometriesFromTransitStopCoordinates(ptZoneId2TransitStopCoordinates);
 		
-		Map<String, Polygon> ptZoneId2Polygon = CreatePolygonFromMultiPointGeometry(ptZoneId2MultiPointGeometry);
+		Map<String, Polygon> ptZoneId2Polygon = createPolygonFromMultiPointGeometry(ptZoneId2MultiPointGeometry);
 		
-		WriteResultAsShapeToFile(ptZoneId2Polygon, zoneShapeFilename);
+		writeResultAsShapeToFile(ptZoneId2Polygon, zoneShapeFilename);
 	}
 
-	private static Map<String, Geometry> CreateMulitipointGeometriesFromTransitStopCoordinates(Map<String, List<Coord>> ptZoneId2TransitStopCoordinates) {
+	private static Map<String, Geometry> createMulitipointGeometriesFromTransitStopCoordinates(Map<String, List<Coord>> ptZoneId2TransitStopCoordinates) {
 
 		Map<String, Geometry> ptZoneId2MultiPointGeometry = new HashMap<>();
 
@@ -71,7 +71,7 @@ public class CreatePtZonesFromTransitStopCoordinates {
 		return ptZoneId2MultiPointGeometry;
 	}
 
-	private static Map<String, Polygon> CreatePolygonFromMultiPointGeometry(Map<String, Geometry> ptZoneId2MultiPointGeometry) {
+	private static Map<String, Polygon> createPolygonFromMultiPointGeometry(Map<String, Geometry> ptZoneId2MultiPointGeometry) {
 		Map<String, Polygon> ptZoneId2Polygon = new HashMap<>();
 
 		for (String ptZoneId : ptZoneId2MultiPointGeometry.keySet()) {
@@ -91,7 +91,7 @@ public class CreatePtZonesFromTransitStopCoordinates {
 		return ptZoneId2Polygon;
 	}
 
-	private static void WriteResultAsShapeToFile(Map<String, Polygon> ptZoneId2Polygon, String filename) {
+	private static void writeResultAsShapeToFile(Map<String, Polygon> ptZoneId2Polygon, String filename) {
 
 		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
 				setCrs(MGC.getCRS("EPSG:24879")).
