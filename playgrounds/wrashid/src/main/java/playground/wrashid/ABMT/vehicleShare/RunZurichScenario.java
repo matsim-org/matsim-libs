@@ -46,8 +46,13 @@ import java.io.File;
  */
 public class RunZurichScenario {
 	public static void main(final String[] args) {
-		final String configFile = args[ 0 ];
+		final String configFile = args[0];
 
+		Controler controler = startZHScenario(configFile);
+		controler.run();
+	}
+
+	public static Controler startZHScenario(final String configFile) {
 		// This allows to get a log file containing the log messages happening
 		// before controler init.
 		OutputDirectoryLogging.catchLogEntries();
@@ -105,44 +110,46 @@ public class RunZurichScenario {
 					new StageActivityTypesImpl(
 						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
 
-		controler.addControlerListener(new VehicleInitializer());
+		if (GlobalTESFParameters.isSingYearScenario){
+			controler.addControlerListener(new VehicleInitializer());
+		} else {
+			
+		}
 		controler.addControlerListener(new WriteStatistics());
 		controler.addControlerListener(new EventHandlerAtStartupAdder(new TollsManager(controler)));
         controler.addControlerListener(new EventHandlerAtStartupAdder(new DistanceTravelledWithCar(controler.getScenario().getNetwork())));
 		//================ end custom code for EV scenario
 		
 		
+		return controler;
 		
-		controler.run();
 	}
-	
+
 	private static void connectFacilitiesWithNetwork(Controler controler) {
-        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
-		//log.warn("number of facilities: " +facilities.getFacilities().size());
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
-		//log.warn("number of links: " +network.getLinks().size());
+		ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
+		// log.warn("number of facilities: "
+		// +facilities.getFacilities().size());
+		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
+		// log.warn("number of links: " +network.getLinks().size());
 
 		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
 		wcl.connectFacilitiesWithLinks(facilities, network);
 	}
 
-	private static void initializeLocationChoice( final Controler controler ) {
+	private static void initializeLocationChoice(final Controler controler) {
 		final Scenario scenario = controler.getScenario();
-		final DestinationChoiceBestResponseContext lcContext =
-			new DestinationChoiceBestResponseContext( scenario );
+		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario);
 		lcContext.init();
 
-		controler.addControlerListener(
-				new DestinationChoiceInitializer(
-					lcContext));
+		controler.addControlerListener(new DestinationChoiceInitializer(lcContext));
 	}
 
 	private static void createEmptyDirectoryOrFailIfExists(final String directory) {
-		final File file = new File( directory +"/" );
-		if ( file.exists() && file.list().length > 0 ) {
-		//	throw new UncheckedIOException( "Directory "+directory+" exists and is not empty!" );
+		final File file = new File(directory + "/");
+		if (file.exists() && file.list().length > 0) {
+			// throw new UncheckedIOException(
+			// "Directory "+directory+" exists and is not empty!" );
 		}
 		file.mkdirs();
 	}
 }
-

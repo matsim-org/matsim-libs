@@ -6,6 +6,13 @@ import org.matsim.core.config.Config;
 
 public class GlobalTESFParameters {
 
+	// [start] parameters for multi year scenario
+	public static boolean isSingYearScenario=false;
+	public static int currentYear;
+	public static int tesfSeed=2321;
+	// [end] parameters for multi year scenario
+	
+	
 	public static double tollAreaRadius;
 	public static double tollPriceCV;
 	public static double tollPriceEV;
