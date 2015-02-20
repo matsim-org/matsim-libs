@@ -33,6 +33,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
+import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 
 
 /**
@@ -43,12 +44,12 @@ import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
-	private NoiseParameters noiseParameters;
 	private NoiseContext noiseContext;
 	private NoiseTimeTracker timeTracker;
+	private PersonActivityTracker actTracker;
 			
-	public NoiseCalculationOnline(NoiseParameters noiseParameters) {
-		this.noiseParameters = noiseParameters;
+	public NoiseCalculationOnline(NoiseContext noiseContext) {
+		this.noiseContext = noiseContext;
 	}
 
 	@Override
@@ -56,14 +57,16 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		
 		log.info("Initialization...");
 		
-		this.noiseContext = new NoiseContext(event.getControler().getScenario(), noiseParameters);
 		this.noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		log.info("Initialization... Done.");
-
-		timeTracker = new NoiseTimeTracker(noiseContext, event.getControler().getEvents(), event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/");			
-		event.getControler().getEvents().addHandler(timeTracker);
+	
+		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getControler().getEvents(), event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/");			
+		event.getControler().getEvents().addHandler(this.timeTracker);
+	
+		this.actTracker = new PersonActivityTracker(noiseContext);
+		event.getControler().getEvents().addHandler(this.actTracker);
 	}
 	
 	@Override
@@ -72,6 +75,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Resetting noise immissions, activity information and damages...");
 
 		this.noiseContext.getNoiseLinks().clear();
+		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
@@ -79,7 +83,6 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 			rp.setDamageCosts(0.);
 			rp.setDamageCostsPerAffectedAgentUnit(0.);
 		}
-		
 	}
 	
 	@Override

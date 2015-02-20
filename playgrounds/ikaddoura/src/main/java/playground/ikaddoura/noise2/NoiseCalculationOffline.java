@@ -98,6 +98,7 @@ public class NoiseCalculationOffline {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setReceiverPointGap(receiverPointGap);
 		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setInternalizeNoiseDamages(false);
 		
 //		 Berlin Tunnel Link IDs
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();

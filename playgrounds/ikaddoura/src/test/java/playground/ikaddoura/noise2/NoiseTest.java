@@ -59,6 +59,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.PersonActivityInfo;
@@ -68,6 +69,7 @@ import playground.ikaddoura.noise2.events.NoiseEventCaused;
 import playground.ikaddoura.noise2.handler.NoiseEquations;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
+import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author ikaddoura
@@ -142,18 +144,17 @@ public class NoiseTest {
 		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link0", immissionCorrection4, noiseContext.getReceiverPoints().get(Id.create("8", ReceiverPoint.class)).getLinkId2angleCorrection().get(Id.create("link0", Link.class)), MatsimTestUtils.EPSILON);
 	}
 	
-	// tests the noise emissions, immissions and exposures
+	// tests the noise emissions, immissions, considered agent units, damages (receiver points), damages (per link), damages (per vehicle) based on the *.csv output
 	@Test
 	public final void test2(){
 		
+		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
-
 		Controler controler = new Controler(configFile);
-		
 		controler.setOverwriteFiles(true);
 		controler.run();
 		
-		// +++++++++++++++++++++++++++++++++++++++++++++++++++
+		// run the noise analysis for the final iteration (offline)
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
 		
@@ -236,9 +237,9 @@ public class NoiseTest {
 
 		eventWriter.closeFile();
 		
-		// +++++++++++++++++++++++++++++++++++++++++++++++++++
-		
+		// ############################
 		// test considered agent units
+		// ############################
 		
 		double sevenOclock = 25200;
 		double endTime = 39600;
@@ -359,7 +360,7 @@ public class NoiseTest {
 					
 					if(activityEnded){
 						
-						//test code of getDurationInWithinInterval from actInfo
+						// test code of getDurationInWithinInterval from actInfo
 						
 						double durationInThisInterval = 0.;
 						double timeIntervalStart = currentTimeSlot - noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
@@ -438,10 +439,11 @@ public class NoiseTest {
 			index++;
 			
 		}
-		
-		// +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+		// #################################
 		// test emissions per link and time
-		
+		// #################################
+
 		line = null;
 		
 		String pathToEmissionsFile = runDirectory + "analysis_it.0/emissions/0.emission_" + Double.toString(endTime) + ".csv";
@@ -524,9 +526,10 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong amount of emission!", 0., noiseEmissionsPerLink.get(Id.create("link4", Link.class)), MatsimTestUtils.EPSILON);
 		
 		
-		// +++++++++++++++++++++++++++++++++++++++++++++++++++
-		// test immissions and damages per receiver point and time
-		
+		// ############################################
+		// test immissions per receiver point and time
+		// ############################################
+
 		line = null;
 		
 		String pathToImmissionsFile = runDirectory + "analysis_it.0/immissions/0.immission_" + Double.toString(endTime) + ".csv";
@@ -588,6 +591,10 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong amount of immission!", 67.9561670074151, immissionPerReceiverPointId.get(Id.create("31", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong amount of immission!", 0., immissionPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
+		// ############################################
+		// test damages per receiver point and time
+		// ############################################
+
 		line = null;
 		
 		String pathToDamagesFile = runDirectory + "analysis_it.0/damages_receiverPoint/0.damages_receiverPoint_" + Double.toString(endTime) + ".csv";
@@ -633,6 +640,10 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong damage!", 0.0664164095284536, damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
+		// ############################################
+		// test damages per link and time
+		// ############################################
+		
 		// noise level at receiver point '16': 69.65439464
 		
 		// relevant link IDs
@@ -677,7 +688,9 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong link's damage contribution!", 0., damagesPerlinkId.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 				
-		// two vehicles...
+		// ############################################
+		// test damages per car and time
+		// ############################################
 		
 		line = null;
 		
@@ -716,7 +729,9 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage per car per link!", 0., damagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		
-		// +++++++++++++++++++++++++++++++++++++++++++++++++++
+		// ############################################
+		// test the noise-specific events
+		// ############################################
 
 		boolean tested = false;
 		int counter = 0;
@@ -766,7 +781,7 @@ public class NoiseTest {
 		
 	 }
 	
-	//tests the static methods within class "noiseEquations"
+	// tests the static methods within class "noiseEquations"
 	@Test
 	public final void test3(){
 		
@@ -775,7 +790,7 @@ public class NoiseTest {
 		double vCar = 100;
 		double vHgv = vCar;
 		
-		//test speed correction term
+		// test speed correction term
 		double eCar = 27.7 + 10 * Math.log10( 1 + Math.pow((0.02 * vCar), 3) );
 		double eHgv = 23.1 + 12.5 * Math.log10( vHgv );
 				
@@ -789,7 +804,7 @@ public class NoiseTest {
 				
 		Assert.assertTrue("Error in deviation term for speed correction (eCar > eHgv)", eCar < eHgv);
 		
-		//test mittelungspegel and speed correction
+		// test mittelungspegel and speed correction
 		
 		for(double nHgvs = 0; nHgvs < 3; nHgvs++){
 			
@@ -802,7 +817,7 @@ public class NoiseTest {
 					pInPercent = 100 * p;
 				}
 				
-				//test computation of mittelungspegel
+				// test computation of mittelungspegel
 				double mittelungspegel = 37.3 + 10 * Math.log10( n * ( 1 + 0.082 * pInPercent ) );
 				
 				double expectedMittelungspegel = Double.NEGATIVE_INFINITY;
@@ -843,7 +858,7 @@ public class NoiseTest {
 			
 		}
 		
-		//test distance correction term
+		// test distance correction term
 		for(double distance = 5.; distance <= 140; distance += 45.){
 			
 			double distanceCorrection = 15.8 - 10 * Math.log10( distance ) - 0.0142 * Math.pow(distance, 0.9);
@@ -860,7 +875,7 @@ public class NoiseTest {
 			
 		}
 		
-		//test angle correction term
+		// test angle correction term
 		for(double angle = 45; angle <= 360; angle += 45){
 			
 			double angleCorrection = 10 * Math.log10( angle / 180 );
@@ -944,8 +959,34 @@ public class NoiseTest {
 		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, costsEvening, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 19.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, costsNight, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
-		
+		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);	
 	}
 	
+	@Test
+	public final void test4(){
+		
+		// start a noise internalization run
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config4.xml";
+		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setThrowNoiseEventsAffected(false);
+		noiseParameters.setThrowNoiseEventsCaused(false);
+		noiseParameters.setInternalizeNoiseDamages(false);
+		noiseParameters.setComputeCausingAgents(false);
+		
+		Controler controler = new Controler(configFile);
+
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
+		
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
+		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+				
+		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.setOverwriteFiles(true);
+		controler.run();
+		
+		// and test i.e. the routing relevant information... TODO
+	}
 }

@@ -96,5 +96,4 @@ public class NoiseLink {
 		this.emission = emission;
 	}
 	
-	
 }

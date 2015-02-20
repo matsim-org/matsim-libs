@@ -37,7 +37,6 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseLink;
-import playground.ikaddoura.noise2.data.NoiseVehicleType;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
@@ -138,7 +137,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathEmissions);
 		dir.mkdirs();
 		
-		String fileName = outputPathEmissions + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".emission_" + timeInterval + ".csv";
+		String fileName = outputPathEmissions + "emission_" + timeInterval + ".csv";
 		File file = new File(fileName);
 		
 		try {
@@ -193,7 +192,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathImmissions);
 		dir.mkdirs();
 		
-		String fileName = outputPathImmissions + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".immission_" + timeInterval + ".csv";
+		String fileName = outputPathImmissions + "immission_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -240,7 +239,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathActivityInfo);
 		dir.mkdirs();
 		
-		String fileName = outputPathActivityInfo + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".consideredAgentUnits_" + timeInterval + ".csv";
+		String fileName = outputPathActivityInfo + "consideredAgentUnits_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -286,7 +285,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_receiverPoint_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "damages_receiverPoint_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -332,7 +331,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "damages_link_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -378,7 +377,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_car_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "damages_link_car_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -424,7 +423,7 @@ public class NoiseWriter {
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + noiseContext.getScenario().getConfig().controler().getLastIteration() + ".damages_link_hgv_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "damages_link_hgv_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		

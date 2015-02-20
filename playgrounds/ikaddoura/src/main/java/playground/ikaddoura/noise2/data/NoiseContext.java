@@ -78,6 +78,9 @@ public class NoiseContext {
 	
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	
+	// optional for routing purposes
+	private Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
+	
 	// time interval specific information
 	private double currentTimeBinEndTime;
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
@@ -115,7 +118,12 @@ public class NoiseContext {
 						+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
 			}
 		}
-	}	
+	}
+	
+	// for routing purposes
+	public void storeTimeInterval() {
+		this.timeInterval2linkId2noiseLinks.put(this.currentTimeBinEndTime, this.noiseLinks);				
+	}
 	
 	public void initialize() {
 		setActivityCoords();
@@ -639,6 +647,10 @@ public class NoiseContext {
 
 	public Map<Id<Link>, NoiseLink> getNoiseLinks() {
 		return noiseLinks;
+	}
+
+	public Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
+		return timeInterval2linkId2noiseLinks;
 	}
 
 }

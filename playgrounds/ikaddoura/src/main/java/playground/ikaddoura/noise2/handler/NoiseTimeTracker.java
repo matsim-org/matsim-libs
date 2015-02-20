@@ -60,9 +60,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	
 	private final NoiseContext noiseContext;
-	private final String outputDirectory;
+	private final String outputDirectoryGeneral;
 	private final EventsManager events;
-		
+
+	private String outputDirectory;
+	
 	private boolean collectNoiseEvents = true;
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
@@ -71,19 +73,25 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	public NoiseTimeTracker(NoiseContext noiseContext, EventsManager events, String outputDirectory) {
 		this.noiseContext = noiseContext;
+		this.outputDirectoryGeneral = outputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.events = events;	
 	}
 
 	@Override
 	public void reset(int iteration) {
-				
+		
+		this.outputDirectory = this.outputDirectoryGeneral + "it." + iteration + "/";
+		log.info("Setting the output directory to " + outputDirectory);
+		
 		this.totalCausedNoiseCost = 0.;
 		this.totalAffectedNoiseCost = 0.;
 		this.noiseEventsCaused.clear();
 		this.noiseEventsAffected.clear();
 		
 		this.noiseContext.getNoiseLinks().clear();
+		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
+		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 		
 		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
@@ -128,7 +136,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		log.info("##############################################");
 
 		updateActivityInformation(); // Remove activities that were completed in the previous time interval.
-		computeNoiseForCurrentTimeInterval(); // Compute noise emissions, immissions, affected agent units and damages for the current time interval	.			
+		computeNoiseForCurrentTimeInterval(); // Compute noise emissions, immissions, affected agent units and damages for the current time interval.			
 		updateCurrentTimeInterval(); // Set the current time bin to the next one ( current time bin = current time bin + time bin size ).
 		resetCurrentTimeIntervalInfo(); // Reset all time-specific information from the previous time interval.
 	}
@@ -196,7 +204,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		
+				
 		checkTime(event.getTime());
 		
 		if (!(noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId()))) {
@@ -248,7 +256,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			log.info("Throwing noise events for the affected agents... Done.");
 		}
 		
-		if (this.noiseContext.getNoiseParams().isComputeCausingAgents() || this.noiseContext.getNoiseParams().isThrowNowiseEventsCaused()) {
+		if (this.noiseContext.getNoiseParams().isComputeCausingAgents() || this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused() || this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
 			log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 			calculateCostSharesPerLinkPerTimeInterval();
 			NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
@@ -259,12 +267,17 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
 			NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
 			log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
-			
-			if (this.noiseContext.getNoiseParams().isThrowNowiseEventsCaused()) {
+						
+			if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused() || this.noiseContext.getNoiseParams().isInternalizeNoiseDamages() ) {
 				log.info("Throwing noise events for the causing agents...");
 				throwNoiseEventsCaused();
 				log.info("Throwing noise events for the causing agents... Done.");
+			
+				if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
+					this.noiseContext.storeTimeInterval();
+				}
 			}
+			
 		}
 		
 	}

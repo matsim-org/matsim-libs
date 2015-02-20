@@ -60,8 +60,9 @@ public class NoiseParameters {
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
 	private boolean throwNoiseEventsAffected = true;
-	private boolean throwNowiseEventsCaused = true;
+	private boolean throwNoiseEventsCaused = true;
 	private boolean computeCausingAgents = true;
+	private boolean internalizeNoiseDamages = true;
 	
 	// ########################################################################################################
 			
@@ -75,13 +76,13 @@ public class NoiseParameters {
 		this.throwNoiseEventsAffected = throwNoiseEventsAffected;
 	}
 
-	public boolean isThrowNowiseEventsCaused() {
-		return throwNowiseEventsCaused;
+	public boolean isThrowNoiseEventsCaused() {
+		return throwNoiseEventsCaused;
 	}
 
-	public void setThrowNowiseEventsCaused(boolean throwNowiseEventsCaused) {
-		log.info("Throwing noise events for the causing agents: " + throwNowiseEventsCaused);
-		this.throwNowiseEventsCaused = throwNowiseEventsCaused;
+	public void setThrowNoiseEventsCaused(boolean throwNoiseEventsCaused) {
+		log.info("Throwing noise events for the causing agents: " + throwNoiseEventsCaused);
+		this.throwNoiseEventsCaused = throwNoiseEventsCaused;
 	}
 
 	public boolean isComputeCausingAgents() {
@@ -219,6 +220,15 @@ public class NoiseParameters {
 	public void setConsideredActivitiesForReceiverPointGrid(
 			String[] consideredActivitiesForReceiverPointGrid) {
 		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;
+	}
+
+	public boolean isInternalizeNoiseDamages() {
+		return internalizeNoiseDamages;
+	}
+
+	public void setInternalizeNoiseDamages(boolean internalizeNoiseDamages) {
+		log.info("Internalizing noise damages: " + internalizeNoiseDamages);
+		this.internalizeNoiseDamages = internalizeNoiseDamages;
 	}
 	
 }

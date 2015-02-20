@@ -28,6 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
+
 /**
  * 
  * @author lkroeger, ikaddoura
@@ -72,8 +75,13 @@ public class NoiseOnlineControler {
 		noiseParameters.setScaleFactor(scaleFactor);
 		
 		Controler controler = new Controler(configFile);
+
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
 		
-		controler.addControlerListener(new NoiseCalculationOnline(noiseParameters));
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
+		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+				
+		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.setOverwriteFiles(true);
