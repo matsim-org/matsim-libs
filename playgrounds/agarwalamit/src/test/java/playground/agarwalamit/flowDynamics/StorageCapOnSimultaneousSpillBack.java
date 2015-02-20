@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,6 +55,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -67,25 +69,38 @@ public class StorageCapOnSimultaneousSpillBack {
 
 	@Test
 	public void storageCapTest4BottleneckLink (){
-		// agent 1 and 3 are departing on link 4 and agent 2 and 4 are departing on link 1. Agent 1, 2, 3, 4 are departing at an interval of 1 sec.
-		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4));
+		/*
+		 * agent 1 and 3 are departing on link 4 and agent 2 and 4 are departing on link 1. Agent 1, 2, 3, 4 are departing at an interval of 1 sec.
+		 * The bottleneck link is 5 m long and thus can accomodate only one vehicle, flow cap allow one car/ 10 sec
+		 * Thus, spill back occurs on both upstream links and when storage cap is available, one of the link is randomly chosen and one vehicle move to bottleneck link
+		 * Importantly, if delay of the other vehicle on spill back upstream link is equal to (or more than) stuck time, irrespective of the space on bottleneck link
+		 * second will also be forced to move on next link. 
+		 * 
+		 */
+		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
 		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
-		System.out.println("Link 2 is 5 m long, i.e. only one vehicle can be stored.");
-		System.out.println("Link 2 has flow capacity 360 veh/h, i.e. only one vehicle can leave every 10 sec.");
+		Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		
 
 		for(Id<Person> personId : person2EnterTime.keySet()){
 			System.out.println("Person "+personId+ " is entering link 2 at time "+person2EnterTime.get(personId).getFirst() +" and leaving at time "+person2EnterTime.get(personId).getSecond());
 		}
 
-		//change the order of links
+		//changing the links order such that agent 2,4 depart on link 4
 		startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(4), Id.createLinkId(1));
 		person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
-		for(Id<Person> personId : person2EnterTime.keySet()){
-			System.out.println("Person "+personId+ " is entering link 2 at time "+person2EnterTime.get(personId).getFirst() +" and leaving at time "+person2EnterTime.get(personId).getSecond());
-		}
-
+		Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		
 	}
 
 	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(Tuple<Id<Link>, Id<Link>> startLinkIds){
@@ -185,6 +200,7 @@ public class StorageCapOnSimultaneousSpillBack {
 
 		private MergingNetworkAndPlans(){
 			config=ConfigUtils.createConfig();
+			config.qsim().setStuckTime(3600.);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (NetworkImpl) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
