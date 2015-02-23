@@ -22,7 +22,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dhosse.qgis.layerTemplates.networkSimple.SingleSymbolRenderer;
+import playground.dhosse.qgis.layerTemplates.SingleSymbolRenderer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -79,6 +79,11 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		} else if(crs.equals(TransformationFactory.WGS84)){
 			this.srs = new SRS("+proj=longlat +datum=WGS84 +no_defs",
 					"3452", "4326", "EPSG:4326", "WGS 84", "longlat", "WGS84");
+		} else if(crs.equals(TransformationFactory.WGS84_SA_Albers)){
+			this.srs = new SRS("+proj=aea +lat_1=-18 +lat_2=-32 +lat_0=0 +lon_0=24 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+					"100000", "0", "USER:100000", "WGS84_SA_Albers", "aea", "");
+		} else {
+			throw new RuntimeException("Unsupported coordinate system.");
 		}
 		
 	}

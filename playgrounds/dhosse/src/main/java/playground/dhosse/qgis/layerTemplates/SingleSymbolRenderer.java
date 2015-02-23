@@ -1,4 +1,4 @@
-package playground.dhosse.qgis.layerTemplates.networkSimple;
+package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
@@ -23,6 +23,8 @@ public class SingleSymbolRenderer extends QGisRenderer {
 			
 			QGisPointSymbolLayer psl = new QGisPointSymbolLayer();
 			
+			psl.setPenStyle(QGisConstants.penstyle.solid);
+			psl.setSizeUnits(QGisConstants.sizeUnits.MM);
 			psl.setColor(new Color(0,0,0,255));
 			psl.setLayerTransparency(0);
 			psl.setColorBorder(new Color(0,0,0,255));
@@ -34,7 +36,9 @@ public class SingleSymbolRenderer extends QGisRenderer {
 		} else if(gType.equals(QGisConstants.geometryType.Line)){
 			
 			QGisLineSymbolLayer lsl = new QGisLineSymbolLayer();
-			
+
+			lsl.setPenStyle(QGisConstants.penstyle.solid);
+			lsl.setSizeUnits(QGisConstants.sizeUnits.MM);
 			lsl.setColor(new Color(0,0,0,255));
 			lsl.setLayerTransparency(0);
 			lsl.setWidth(0.25);

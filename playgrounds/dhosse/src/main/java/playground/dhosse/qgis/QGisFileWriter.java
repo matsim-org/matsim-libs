@@ -6,9 +6,9 @@ import java.io.IOException;
 
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.dhosse.qgis.layerTemplates.noise.GraduatedSymbolNoiseRenderer;
-import playground.dhosse.qgis.layerTemplates.noise.GraduatedSymbolNoiseRenderer.ColorRamp;
-import playground.dhosse.qgis.layerTemplates.noise.GraduatedSymbolNoiseRenderer.Range;
+import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer;
+import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer.ColorRamp;
+import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer.Range;
 
 public class QGisFileWriter {
 	
@@ -65,7 +65,7 @@ public class QGisFileWriter {
 		
 		out.write("\t<mapcanvas>\n");
 		
-		out.write("\t\t<units>degrees</units>\n");
+		out.write("\t\t<units>meters</units>\n");
 		out.write("\t\t<extent>\n");
 		
 		out.write("\t\t\t<xmin>" + this.writer.getExtent()[0] + "</xmin>\n");
@@ -189,6 +189,8 @@ public class QGisFileWriter {
 		
 		if(layer.getInputType().equals(QGisConstants.inputType.csv) && !layer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
 
+//			layer.getAttributes().
+			
 			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=;&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
 			
 		} else{

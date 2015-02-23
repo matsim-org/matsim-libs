@@ -1,4 +1,4 @@
-package playground.dhosse.qgis.layerTemplates.noise;
+package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
