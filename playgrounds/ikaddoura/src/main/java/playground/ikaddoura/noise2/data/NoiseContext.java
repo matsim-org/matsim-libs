@@ -85,6 +85,7 @@ public class NoiseContext {
 	private double currentTimeBinEndTime;
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	private final Map<Id<Link>, NoiseLink> noiseLinks;
+	private double eventTime = Double.MIN_VALUE;
 					
 	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
 		this.scenario = scenario;
@@ -651,6 +652,14 @@ public class NoiseContext {
 
 	public Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
 		return timeInterval2linkId2noiseLinks;
+	}
+
+	public void setEventTime(double time) {
+		this.eventTime = time;
+	}
+
+	public double getEventTime() {
+		return eventTime;
 	}
 
 }

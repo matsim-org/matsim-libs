@@ -41,7 +41,6 @@ import org.matsim.vehicles.Vehicle;
 import playground.ikaddoura.noise2.NoiseWriter;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseLink;
-import playground.ikaddoura.noise2.data.NoiseVehicleType;
 import playground.ikaddoura.noise2.data.PersonActivityInfo;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
@@ -124,6 +123,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			// All events of the current time bin are processed.
 
 			while (time > this.noiseContext.getCurrentTimeBinEndTime()) {
+				this.noiseContext.setEventTime(time);
 				processTimeBin();
 			}
 		}
@@ -408,23 +408,17 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				for(Id<Vehicle> vehicleId : this.noiseContext.getNoiseLinks().get(linkId).getEnteringVehicleIds()) {
 					
 					double amount = 0.;
-					boolean isHdv = false;
 					
 					if(!(vehicleId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix()))) {
 						amount = amountCar;
 					} else {
 						amount = amountHdv;
-						isHdv = true;
 					}
 					
 					if (amount != 0.) {
-						NoiseVehicleType carOrHdv = NoiseVehicleType.car;
-						if (isHdv == true) {
-							carOrHdv = NoiseVehicleType.hgv;
-						}
 						
 						// The person Id is assumed to be equal to the vehicle Id.
-						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getCurrentTimeBinEndTime(), Id.create(vehicleId, Person.class), vehicleId, amount, linkId, carOrHdv);
+						NoiseEventCaused noiseEvent = new NoiseEventCaused(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), Id.create(vehicleId, Person.class), vehicleId, amount, linkId);
 						events.processEvent(noiseEvent);
 						
 						if (this.collectNoiseEvents) {
@@ -452,7 +446,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 						double amount = factor * rp.getDamageCostsPerAffectedAgentUnit();
 						
 						if (amount != 0.) {
-							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(this.noiseContext.getCurrentTimeBinEndTime(), personId, amount, rp.getId(), actInfo.getActivityType());
+							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(this.noiseContext.getEventTime(), this.noiseContext.getCurrentTimeBinEndTime(), personId, amount, rp.getId(), actInfo.getActivityType());
 							events.processEvent(noiseEventAffected);
 							
 							if (this.collectNoiseEvents) {
