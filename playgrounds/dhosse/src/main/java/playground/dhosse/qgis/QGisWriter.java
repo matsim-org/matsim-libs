@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -38,76 +39,62 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 
 	private static final Logger log = Logger.getLogger( QGisWriter.class );
 	
-	private QGisWriterHandler handler;
+	private QGisFileWriter handler;
 	
 	protected Network network;
 	
-	protected String nodesFileName;
-	protected String linksFileName;
 	protected String today;
-	
-	private QGisConstants.inputType source;
 	
 	protected Map<String,QGisLayer> layers = new HashMap<String,QGisLayer>();
 	
-	protected String crs = null;
+	private String workingDirectory;
+	
+	protected SRS srs = null;
 	
 	private double[] extent;
 	
 	/**
-	 * Creates a new instance of a QGis project file writer. Layers for network links and nodes are added automatically.
+	 * Creates a new instance of a QGis project file (*.qgs) writer.
 	 * 
-	 * @param network matsim network
 	 * @param crs coordinate reference system of the network
+	 * @param workingDir the directory in which all generated files (shapefiles, qgs file) are put. 
+	 * 
 	 */
-	public QGisWriter(String crs){
+	public QGisWriter(String crs, String workingDir){
 		
-		this.crs = crs;
-		this.handler = new QGisWriterHandler(this);
+		setCrs(crs);
+		this.workingDirectory = workingDir;
+		this.handler = new QGisFileWriter(this);
 		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
 		this.today = formatter.format(new Date());
 		
 	}
 	
-//	public QGisWriter(final String nodesFile, final String linksFile, final String crs){
-//		
-//		this.network = null;
-//		this.crs = crs != null ? crs : "WGS84";
-//		this.source = QGisConstants.inputType.shp;
-//		this.linksFileName = linksFile;
-//		this.nodesFileName = nodesFile;
-//		this.handler = new QGisWriterHandler(this);
-//		
-//		this.init();
-//		
-//	}
+	private void setCrs(String crs){
+		
+		if(crs.equals(TransformationFactory.DHDN_GK4)){
+			this.srs = new SRS("+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
+					"2648", "31468", "EPSG:31468", "DHDN / Gauss-Kruger zone 4", "tmerc", "bessel");
+		} else if(crs.equals(TransformationFactory.WGS84)){
+			this.srs = new SRS("+proj=longlat +datum=WGS84 +no_defs",
+					"3452", "4326", "EPSG:4326", "WGS 84", "longlat", "WGS84");
+		}
+		
+	}
 	
-	public void addNetworkLayer(Network network){
+	public void addLayer(QGisLayer layer){
 		
-		this.network = network;
-		this.source = QGisConstants.inputType.xml;
-		
-		this.extent = NetworkUtils.getBoundingBox(this.network.getNodes().values());
-		
-		QGisLayer nodesLayer = new QGisLayer("nodes", this.nodesFileName, QGisConstants.geometryType.Point);
-		nodesLayer.setRenderer(new SingleSymbolRenderer(nodesLayer.getGeometryType()));
-		this.layers.put(nodesLayer.getName(),nodesLayer);
-		
-		QGisLayer linksLayer = new QGisLayer("links", this.linksFileName, QGisConstants.geometryType.Line);
-		linksLayer.setRenderer(new SingleSymbolRenderer(linksLayer.getGeometryType()));
-		this.layers.put(linksLayer.getName(),linksLayer);
-		
-		writeLinkAndNodeShapeFiles();
+		this.layers.put(layer.getName(), layer);
 		
 	}
 	
 	@Override
 	public void write(String filename) {
 		
-		log.info("writing QuantumGIS project file (*.qgs) to " + filename + "...");
+		log.info("Writing QuantumGIS project file (*.qgs) to " + this.workingDirectory + filename + "...");
 		
-		this.openFile(filename);
+		this.openFile(this.workingDirectory + filename);
 		
 		try {
 			
@@ -140,87 +127,78 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		
 	}
 
-	private void writeLinkAndNodeShapeFiles() {
-		
-		log.info("Writing link and node shape files...");
-		
-		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("shape");
-		typeBuilder.add("link",LineString.class);
-		typeBuilder.add("id",String.class);
-		typeBuilder.add("length",Double.class);
-		typeBuilder.add("freespeed",Double.class);
-		typeBuilder.add("capacity",Double.class);
-		typeBuilder.add("nlanes", String.class);
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-		
-		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		for(Link link : this.network.getLinks().values()){
-			
-			SimpleFeature feature = builder.buildFeature(null, new Object[]{
-					new GeometryFactory().createLineString(new Coordinate[]{
-								new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY()),
-								new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY())
-					}),
-					link.getId(),
-					link.getLength(),
-					link.getFreespeed(),
-					link.getCapacity(),
-					link.getNumberOfLanes()
-					
-				});
-			
-			features.add(feature);
-			
-		}
-		
-		this.linksFileName = "C:/Users/Daniel/Desktop/MATSimQGisIntegration/links.shp";
-		
-		ShapeFileWriter.writeGeometries(features, this.linksFileName);
-		
-		typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("shape");
-		typeBuilder.add("link",Point.class);
-		typeBuilder.add("ID",String.class);
-		builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
-		
-		features = new ArrayList<SimpleFeature>();
-		
-		for(Node node : this.network.getNodes().values()){
-			
-			SimpleFeature feature = builder.buildFeature(null, new Object[]{
-					new GeometryFactory().createPoint(MGC.coord2Coordinate(node.getCoord())),
-					node.getId(),
-					
-				});
-			
-			features.add(feature);
-			
-		}
-		
-		this.nodesFileName = "C:/Users/Daniel/Desktop/MATSimQGisIntegration/nodes.shp";
-		
-		ShapeFileWriter.writeGeometries(features, this.nodesFileName);
-		
+	public void changeWorkingDirectory(String workingDir){
+		this.workingDirectory = workingDir;
 	}
 	
-	public void addLayer(String name, QGisLayer layer, QGisConstants.renderingType renderingType){
-		
-		this.layers.put(name,layer);
-		
-	}
-	
-	/**
-	 * 
-	 * @return the map of the map layers inside this *.qgs file. for default access on nodes / links use .get("nodes")/.get("link")
-	 */
 	public Map<String,QGisLayer> getLayers(){
 		return this.layers;
 	}
 	
 	public double[] getExtent(){
 		return this.extent;
+	}
+	
+	public String getWorkingDir(){
+		return this.workingDirectory;
+	}
+	
+	public void setExtent(double[] extent){
+		this.extent = extent;
+	}
+	
+	public SRS getSRS(){
+		return this.srs;
+	}
+	
+	public static class SRS{
+		
+		private String proj4;
+		private String srsid;
+		private String srid;
+		private String authid;
+		private String description;
+		private String projectionacronym;
+		private String ellipsoidacronym;
+
+		public SRS(String proj4, String srsid, String srid, String authid, String description, String projectionacronym, String ellipsoidacronym){
+			this.proj4 = proj4;
+			this.srsid = srsid;
+			this.srid = srid;
+			this.authid = authid;
+			this.description = description;
+			this.projectionacronym = projectionacronym;
+			this.ellipsoidacronym = ellipsoidacronym;
+		}
+		
+		public String getProj4() {
+			return proj4;
+		}
+
+		public String getSrsid() {
+			return srsid;
+		}
+
+		public String getSrid() {
+			return srid;
+		}
+
+		public String getAuthid() {
+			return authid;
+		}
+
+		public String getDescription() {
+			return description;
+		}
+
+		public String getProjectionacronym() {
+			return projectionacronym;
+		}
+
+		public String getEllipsoidacronym() {
+			return ellipsoidacronym;
+		}
+		
 	}
 	
 }

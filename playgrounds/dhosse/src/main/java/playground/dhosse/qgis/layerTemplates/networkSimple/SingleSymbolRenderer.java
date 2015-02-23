@@ -10,6 +10,7 @@ import playground.dhosse.qgis.QGisRenderer;
 public class SingleSymbolRenderer extends QGisRenderer {
 
 	public SingleSymbolRenderer(QGisConstants.geometryType gType) {
+		
 		super(QGisConstants.renderingType.singleSymbol);
 		
 		init(gType);

@@ -8,12 +8,26 @@ public abstract class QGisSymbolLayer {
 	
 	private Color color;
 	
+	private int id;
+	
 	private int layerTransparency = 0;
 	private double[] offset = {0,0};
 	private double[] offsetMapUnitScale = {1,1};
 	
+	private QGisConstants.sizeUnits sizeUnits;
+	
+	private QGisConstants.penstyle penStyle;
+	
 	public QGisConstants.symbolType getSymbolType() {
 		return symbolType;
+	}
+	
+	public int getId(){
+		return this.id;
+	}
+	
+	public void setId(int id){
+		this.id = id;
 	}
 	
 	protected void setSymbolType(QGisConstants.symbolType symbolType) {
@@ -50,6 +64,22 @@ public abstract class QGisSymbolLayer {
 	
 	protected void setOffsetMapUnitScale(double[] offsetMapUnitScale) {
 		this.offsetMapUnitScale = offsetMapUnitScale;
+	}
+
+	public QGisConstants.sizeUnits getSizeUnits() {
+		return sizeUnits;
+	}
+
+	public void setSizeUnits(QGisConstants.sizeUnits sizeUnits) {
+		this.sizeUnits = sizeUnits;
+	}
+	
+	public void setPenStyle(QGisConstants.penstyle penstyle){
+		this.penStyle = penstyle;
+	}
+	
+	public QGisConstants.penstyle getPenStyle(){
+		return this.penStyle;
 	}
 	
 }
