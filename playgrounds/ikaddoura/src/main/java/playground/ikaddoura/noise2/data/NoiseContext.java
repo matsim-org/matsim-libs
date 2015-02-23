@@ -78,7 +78,7 @@ public class NoiseContext {
 	
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	
-	// optional for routing purposes
+	// only required for routing purposes
 	private Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
 	
 	// time interval specific information
@@ -123,7 +123,14 @@ public class NoiseContext {
 	
 	// for routing purposes
 	public void storeTimeInterval() {
-		this.timeInterval2linkId2noiseLinks.put(this.currentTimeBinEndTime, this.noiseLinks);				
+		
+		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>();
+		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);		
+		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
+		this.timeInterval2linkId2noiseLinks.put(currentTimeIntervalCopy, noiseLinksThisTimeBinCopy);
+		
+		log.warn("Adding for linkA5 at interval " + this.currentTimeBinEndTime + ": " + this.noiseLinks.get(Id.createLinkId("linkA5")).getDamageCostPerCar());
+		log.warn("Adding for linkA5 at interval " + currentTimeIntervalCopy + ": " + noiseLinksThisTimeBinCopy.get(Id.createLinkId("linkA5")).getDamageCostPerCar());
 	}
 	
 	public void initialize() {

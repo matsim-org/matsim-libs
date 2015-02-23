@@ -969,10 +969,6 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config4.xml";
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setThrowNoiseEventsAffected(false);
-		noiseParameters.setThrowNoiseEventsCaused(false);
-		noiseParameters.setInternalizeNoiseDamages(false);
-		noiseParameters.setComputeCausingAgents(false);
 		
 		Controler controler = new Controler(configFile);
 

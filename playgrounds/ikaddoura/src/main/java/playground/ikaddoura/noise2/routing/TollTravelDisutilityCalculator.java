@@ -73,7 +73,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 	}
 
 	private double calculateExpectedTollDisutility(Link link, double time, Id<Person> personId) {
-
+	
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 */
 		
