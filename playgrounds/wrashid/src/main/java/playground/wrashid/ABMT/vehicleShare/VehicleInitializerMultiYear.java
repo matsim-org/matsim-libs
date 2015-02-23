@@ -59,7 +59,7 @@ public class VehicleInitializerMultiYear implements IterationStartsListener, Sta
 			Random random = new Random(GlobalTESFParameters.tesfSeed);
 			for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
 				if (VehicleInitializer.hasCarLeg(person.getSelectedPlan())) {
-					vehicleExpiryYear.set(person.getId(), random.nextInt(8));
+					vehicleExpiryYear.set(person.getId(), getVehicleExpiryInYears());
 				}
 			}
 		}
