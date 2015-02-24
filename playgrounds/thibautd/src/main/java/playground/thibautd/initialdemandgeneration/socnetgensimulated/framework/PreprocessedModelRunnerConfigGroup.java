@@ -36,7 +36,7 @@ public class PreprocessedModelRunnerConfigGroup extends ReflectiveConfigGroup {
 	private double secondarySampleRate = 0.1;
 
 	private int maxSizePrimary = 200;
-	private int maxSizeSecondary = Integer.MAX_VALUE;
+	private int maxSizeSecondary = 500;
 
 	private int nThreads = 1;
 
