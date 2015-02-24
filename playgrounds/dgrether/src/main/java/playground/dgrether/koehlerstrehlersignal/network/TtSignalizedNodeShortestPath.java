@@ -82,8 +82,9 @@ public class TtSignalizedNodeShortestPath {
 		
 		Set<Id<Link>> linkIds = new HashSet<>();
 		for (Path path : shortestPaths){
-			for (Link link : path.links)
-				linkIds.add(link.getId());
+			if (path != null)
+				for (Link link : path.links)
+					linkIds.add(link.getId());
 		}
 		return linkIds;
 	}
