@@ -49,7 +49,7 @@ public class DoublyWeightedSocialNetwork {
 			final int populationSize,
 			final int maxSize ) {
 		this.initialSize  = initialSize;
-		this.maxSize = (short) maxSize;
+		this.maxSize = maxSize < Short.MAX_VALUE ? (short) maxSize : Short.MAX_VALUE;
 		this.lowestAllowedFirstWeight = lowestWeight;
 		this.lowestAllowedSecondWeight = lowestWeight;
 		this.alters = new DoublyWeightedFriends[ populationSize ];
