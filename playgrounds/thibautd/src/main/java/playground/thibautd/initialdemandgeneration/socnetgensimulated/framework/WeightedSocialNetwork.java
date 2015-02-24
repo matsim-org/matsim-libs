@@ -88,8 +88,8 @@ public class WeightedSocialNetwork {
 		if ( ego == alter ) throw new IllegalArgumentException( "cannot create ties from one ego to himself!" );
 		final int removed = alters[ ego ].add( alter , weight );
 		if ( removed >= 0 ) alters[ removed ].remove( ego );
-		// Not very nice: index -2 indicates no addition
-		return removed != -2;
+		// Not very nice: index -2 or lower indicates no addition
+		return removed > -2;
 	}
 
 	/**
@@ -245,7 +245,27 @@ public class WeightedSocialNetwork {
 
 			if ( size == maximalSize && insertionPoint == 0 ) {
 				// full: do not add a low utility friend
+				if ( log.isTraceEnabled() ) log.trace( "no space left and value too bad. nothing done" );
 				return -2;
+			}
+
+			// is the friend already in the array?
+			for ( int i = insertionPoint - 1; i >= 0 && weights[ i ] == weight; i-- ) {
+				if ( friends[ i ] == friend ) {
+					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
+					return -3;
+				}
+			}
+			for ( int i = insertionPoint - 1; i >= 0 && i < size && weights[ i ] <= weight; i++ ) {
+				if ( friends[ i ] == friend ) {
+					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
+					return -4;
+				}
+			}
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "actually adding entry. State before addition:" );
+				traceState();
 			}
 
 			int removed = -1;
@@ -277,7 +297,19 @@ public class WeightedSocialNetwork {
 			friends[ insertionPoint ] = friend;
 			weights[ insertionPoint ] = weight;
 
+			if ( log.isTraceEnabled() ) {
+				log.trace( "entry added. State after addition:" );
+				traceState();
+			}
+
 			return removed;
+		}
+
+		private void traceState() {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "friends: "+Arrays.toString( Arrays.copyOf( friends , size ) ) );
+				log.trace( "weights: "+Arrays.toString( Arrays.copyOf( weights , size ) ) );
+			}
 		}
 
 		public synchronized void trim() {

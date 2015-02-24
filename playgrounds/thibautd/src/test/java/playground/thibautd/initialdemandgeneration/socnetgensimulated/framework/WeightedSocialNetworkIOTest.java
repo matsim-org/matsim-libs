@@ -23,6 +23,9 @@ import java.util.Random;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -33,6 +36,11 @@ import org.matsim.testcases.MatsimTestUtils;
 public class WeightedSocialNetworkIOTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Before
+	public void setupLogging() {
+		if ( false ) Logger.getLogger( WeightedSocialNetwork.class ).setLevel( Level.TRACE );
+	}
 
 	@Test
 	public void testStableThroughIO() {
