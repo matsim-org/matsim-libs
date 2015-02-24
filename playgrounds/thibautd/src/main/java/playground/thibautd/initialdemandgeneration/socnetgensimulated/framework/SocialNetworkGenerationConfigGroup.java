@@ -47,8 +47,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private double samplingRateForClusteringEstimation = 0.1;
 
-	private int stagnationLimit = 10;
-	private int maxIterations = 500;
+	private int stagnationLimit = 100;
+	private int maxIterations = 10000;
 
 	public SocialNetworkGenerationConfigGroup( ) {
 		super( GROUP_NAME );
