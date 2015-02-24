@@ -201,6 +201,8 @@ public class ModelIterator {
 
 		private Thresholds initial;
 
+		private static final double EPSILON = 1E-9;
+
 		public ThresholdMemory( final Thresholds initial ) {
 			this.initial = initial;
 		}
@@ -218,6 +220,11 @@ public class ModelIterator {
 			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.stepSizePrimary;
 			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.stepSizeSecondary;
 
+			if ( primaryStepSize < EPSILON || secondaryStepSize < EPSILON ) {
+				log.warn( "step size almost null. stop iterations there." );
+				return isBetter( t ) ? t : lastMove.getParent();
+			}
+
 			log.info( "New step Sizes:" );
 			log.info( "primary : "+primaryStepSize );
 			log.info( "secondary : "+secondaryStepSize );
@@ -229,9 +236,9 @@ public class ModelIterator {
 				fillQueueWithChildren(
 						0,
 						t,
-						// TODO: expand only in non-null direction?
-						primaryStepSize * expansionFactor,
-						secondaryStepSize * expansionFactor );
+						// expand only in non-null direction
+						lastMove != null && Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize * expansionFactor : primaryStepSize,
+						lastMove != null && Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize * expansionFactor : secondaryStepSize );
 
 				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
 
@@ -249,8 +256,9 @@ public class ModelIterator {
 							t,
 							lastMove.getStepPrimary() * flatExpansionFactor,
 							lastMove.getStepSecondary() * flatExpansionFactor,
-							primaryStepSize * flatExpansionFactor,
-							secondaryStepSize * flatExpansionFactor ) );
+							// only expand non-null direction
+							Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize * flatExpansionFactor : primaryStepSize,
+							Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize * flatExpansionFactor : secondaryStepSize ) );
 			}
 			else {
 				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
@@ -260,9 +268,9 @@ public class ModelIterator {
 							lastMove.getParent(),
 							lastMove.getStepPrimary() / contractionFactor,
 							lastMove.getStepSecondary() / contractionFactor,
-							// TODO: only contract non-null direction?
-							primaryStepSize / contractionFactor,
-							secondaryStepSize / contractionFactor ) );
+							// only contract non-null direction
+							Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize / contractionFactor : primaryStepSize,
+							Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize / contractionFactor : secondaryStepSize ) );
 			}
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
@@ -273,8 +281,8 @@ public class ModelIterator {
 		private boolean equivalent(
 				final Thresholds t,
 				final Thresholds parent ) {
-			return Math.abs( t.getResultingAverageDegree() - parent.getResultingAverageDegree() ) < 1E-9 &&
-					Math.abs( t.getResultingClustering() - parent.getResultingClustering() ) < 1E-9;
+			return Math.abs( t.getResultingAverageDegree() - parent.getResultingAverageDegree() ) < EPSILON &&
+					Math.abs( t.getResultingClustering() - parent.getResultingClustering() ) < EPSILON;
 		}
 
 		private boolean isBetter( Thresholds t ) {
