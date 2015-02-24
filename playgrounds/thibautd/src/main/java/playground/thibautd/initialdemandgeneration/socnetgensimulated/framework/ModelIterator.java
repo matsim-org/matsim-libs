@@ -163,6 +163,11 @@ public class ModelIterator {
 									return Double.compare( function( o1.getParent() ) , function( o2.getParent() ) );
 								}
 
+								if ( o1.age != o2.age ) {
+									// lowest age is better.
+									return o1.age - o2.age;
+								}
+
 								final double parentDegree = o1.getParent().getResultingAverageDegree();
 								final double parentClustering = o1.getParent().getResultingClustering();
 
@@ -222,7 +227,9 @@ public class ModelIterator {
 				log.info( "improvement with "+t+" compared to "+( lastMove == null ? null : lastMove.getParent() ) );
 				log.info( "new value "+function( t ) );
 				fillQueueWithChildren(
+						0,
 						t,
+						// TODO: expand only in non-null direction?
 						primaryStepSize * expansionFactor,
 						secondaryStepSize * expansionFactor );
 
@@ -238,6 +245,7 @@ public class ModelIterator {
 				log.info( "exactly same value as parent: probably in a flat area --- step and expand" );
 				addToStack(
 						new Move(
+							lastMove.age + 1,
 							t,
 							lastMove.getStepPrimary() * flatExpansionFactor,
 							lastMove.getStepSecondary() * flatExpansionFactor,
@@ -246,10 +254,15 @@ public class ModelIterator {
 			}
 			else {
 				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
-				fillQueueWithChildren(
-						lastMove.getParent(),
-						primaryStepSize / contractionFactor,
-						secondaryStepSize / contractionFactor );
+				addToStack(
+						new Move(
+							lastMove.age + 1,
+							lastMove.getParent(),
+							lastMove.getStepPrimary() / contractionFactor,
+							lastMove.getStepSecondary() / contractionFactor,
+							// TODO: only contract non-null direction?
+							primaryStepSize / contractionFactor,
+							secondaryStepSize / contractionFactor ) );
 			}
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
@@ -284,14 +297,18 @@ public class ModelIterator {
 			return lastMove.getChild();
 		}
 
-		private boolean fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
+		private boolean fillQueueWithChildren(
+				final int age,
+				final Thresholds point,
+				final double stepDegree,
+				final double stepSecondary ) {
 			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
 			boolean smth = false;
 
-			smth = smth | addToStack( new Move( point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( point , stepDegree , 0 , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( age , point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( age , point , stepDegree , 0 , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( age , point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( age , point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
 
 			return smth;
 		}
@@ -303,6 +320,7 @@ public class ModelIterator {
 	}
 
 	public static class Move {
+		private final int age;
 		private final Thresholds parent;
 		private final double stepPrimary;
 		private final double stepSecondary;
@@ -312,11 +330,13 @@ public class ModelIterator {
 		private final double stepSizeSecondary;
 
 		private Move(
+				final int iterSameParent,
 				final Thresholds parent,
 				final double stepPrimary,
 				final double stepSecondary,
 				final double stepSizePrimary,
 				final double stepSizeSecondary ) {
+			this.age = iterSameParent;
 			this.parent = parent;
 			this.stepPrimary = stepPrimary;
 			this.stepSecondary = stepSecondary;
