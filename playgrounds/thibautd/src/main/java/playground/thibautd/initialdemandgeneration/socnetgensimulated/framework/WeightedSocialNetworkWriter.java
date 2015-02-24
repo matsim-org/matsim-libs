@@ -52,7 +52,7 @@ public class WeightedSocialNetworkWriter extends MatsimXmlWriter {
 			writeStartTag( "ego" , Collections.singletonList( createTuple( "index" , i ) ) );
 			for ( WeightedAlter a : sn.getAlters( i ) ) {
 				// only write upper half of matrix (reflective)
-				//if ( a.alter < i ) continue;
+				if ( a.alter < i ) continue;
 
 				writeStartTag(
 						"alter",
