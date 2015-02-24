@@ -51,7 +51,6 @@ import org.xml.sax.Attributes;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.FileWriterEvolutionListener;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunner;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
