@@ -140,7 +140,7 @@ public class RunArentzeModel {
 		// TODO: add initial points from config?
 		distr = null; // dirty! should be in a subfunction
 
-		final ModelIterator modelIterator = new ModelIterator( config );
+		final ModelIterator modelIterator = new ModelIterator( runnerConfig.getNThreads() , config );
 
 		final FileWriterEvolutionListener fileListener = new FileWriterEvolutionListener( config.getOutputDirectory() + "/threshold-evolution.dat" );
 		modelIterator.addListener( fileListener );

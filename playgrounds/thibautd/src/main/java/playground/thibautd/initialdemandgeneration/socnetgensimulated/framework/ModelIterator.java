@@ -52,18 +52,20 @@ public class ModelIterator {
 	private final int stagnationLimit;
 	private final int maxIterations;
 
-	// TODO: make adaptive (the closer to the target value,
-	// the more precise is should get)
-	private double samplingRateClustering = 1;
+	private final double probabilityPrecisionClustering;
+
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
-	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
+	private final int nThreadsClustering;
+
+	public ModelIterator(
+			final int nThreadsClusteringEstimation,
+			final SocialNetworkGenerationConfigGroup config ) {
 		this.targetClustering = config.getTargetClustering();
 		this.targetDegree = config.getTargetDegree();
 
 		listeners.add( new EvolutionLogger() );
 
-		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
 		this.precisionClustering = config.getPrecisionClustering();
 		this.precisionDegree = config.getPrecisionDegree();
 
@@ -72,6 +74,9 @@ public class ModelIterator {
 
 		this.stagnationLimit = config.getStagnationLimit();
 		this.maxIterations = config.getMaxIterations();
+
+		this.probabilityPrecisionClustering = config.getProbabilityPrecisionClusteringForEstimation();
+		this.nThreadsClustering = nThreadsClusteringEstimation;
 	}
 
 	public SocialNetwork iterateModelToTarget(
@@ -119,18 +124,16 @@ public class ModelIterator {
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
-		final double estimate = SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn );
-
-		return Math.abs( targetClustering - estimate ) > 10 * precisionClustering ? estimate : SnaUtils.calcClusteringCoefficient( sn );
+		return SnaUtils.estimateClusteringCoefficient(
+				234,
+				nThreadsClustering,
+				precisionClustering,
+				probabilityPrecisionClustering,
+				sn );
 	}
 
 	public void addListener( final EvolutionListener l ) {
 		listeners.add( l );
-	}
-
-	public void setSamplingRateClustering( final double rate ) {
-		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
-		this.samplingRateClustering = rate;
 	}
 
 	private boolean isAcceptable(

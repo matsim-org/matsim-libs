@@ -45,7 +45,7 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private double targetDegree = 22.0;
 	private double targetClustering = 0.206;
 
-	private double samplingRateForClusteringEstimation = 0.1;
+	private double probabilityPrecisionClusteringForEstimation = 0.9;
 
 	private int stagnationLimit = 100;
 	private int maxIterations = 10000;
@@ -94,15 +94,15 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.targetClustering = targetClustering;
 	}
 
-	@StringGetter( "samplingRateForClusteringEstimation" )
-	public double getSamplingRateForClusteringEstimation() {
-		return samplingRateForClusteringEstimation;
+	@StringGetter( "probabilityPrecisionClusteringForEstimation" )
+	public double getProbabilityPrecisionClusteringForEstimation() {
+		return probabilityPrecisionClusteringForEstimation;
 	}
 
-	@StringSetter( "samplingRateForClusteringEstimation" )
-	public void setSamplingRateForClusteringEstimation( double rate ) {
+	@StringSetter( "probabilityPrecisionClusteringForEstimation" )
+	public void setProbabilityPrecisionClusteringForEstimation( double rate ) {
 		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
-		this.samplingRateForClusteringEstimation = rate;
+		this.probabilityPrecisionClusteringForEstimation = rate;
 	}
 
 	@Override

@@ -25,10 +25,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,6 +54,85 @@ public class SnaUtils {
 
 	private SnaUtils() {}
 
+	/**
+	 * Uses wedge-sampling to estimate clustering coefficient.
+	 * Could  be parallelized for even better performance.
+	 * see http://onlinelibrary.wiley.com/doi/10.1002/sam.11224/full
+	 *
+	 * @param precision the result is guaranteed to fall at least so close to the exact value
+	 * with probability probabilityPrecision
+	 * @param probabilityPrecision the probability with which the precision criterion is fulfilled
+	 */
+	public static double estimateClusteringCoefficient(
+			final long randomSeed,
+			final int nThreads,
+			final double precision,
+			final double probabilityPrecision,
+			final SocialNetwork socialNetwork) {
+		if ( probabilityPrecision < 0 || probabilityPrecision > 1 ) throw new IllegalArgumentException( "illegal probability "+probabilityPrecision );
+		if ( !socialNetwork.isReflective() ) throw new IllegalArgumentException( "cannot estimate clustering on non reflective network" );
+
+		final int k = (int) Math.ceil( 0.5d * Math.pow( precision , -2 ) * Math.log( 2d / (1 - probabilityPrecision) ) );
+		final List<Id<Person>> egos = new ArrayList< >( socialNetwork.getEgos() );
+		log.info( "estimating clustering for precision "+precision+" with probability "+probabilityPrecision+":" );
+		log.info( "sampling "+k+" wedges for social network with "+socialNetwork.getEgos().size()+" egos" );
+		final Counter counter = new Counter( "consider wedge # " );
+
+		final ExecutorService executor = Executors.newFixedThreadPool( nThreads );
+
+		final List<Future<Integer>> results = new ArrayList< >();
+
+		final int nCallables = nThreads * 4;
+		for ( int call=0; call < nCallables; call++ ) {
+			final int nSamples =
+				(call + 2) * ( k / nCallables ) < k ?
+					k / nCallables :
+					k - ( nCallables - 1 ) * ( k / nCallables );
+
+			final Random random = new Random( randomSeed + call );
+			results.add(
+					executor.submit(
+					new Callable<Integer>() {
+						@Override
+						public Integer call() {
+							final List<Id<Person>> alters = new ArrayList< >( );
+							int nTriangles = 0;
+
+							for ( int i=0; i < nSamples; ) {
+								final Id<Person> ego = egos.get( random.nextInt( egos.size() ) );
+
+								alters.clear();
+								alters.addAll( socialNetwork.getAlters( ego ) );
+
+								if ( alters.size() < 2 ) continue;
+								i++;
+								counter.incCounter();
+
+								final Id<Person> alters1 = alters.remove( random.nextInt( alters.size() ) );
+								final Id<Person> alters2 = alters.remove( random.nextInt( alters.size() ) );
+
+								if ( socialNetwork.getAlters( alters1 ).contains( alters2 ) ) nTriangles++;
+							}
+
+							return nTriangles;
+						}
+					} ) );
+		}
+
+		int nTriangles = 0;
+		try {
+			for ( Future<Integer> result : results ) {
+				nTriangles += result.get();
+			}
+		}
+		catch ( InterruptedException | ExecutionException e ) {
+			throw new RuntimeException( e );
+		}
+		counter.printCounter();
+
+		return ((double) nTriangles) / k;
+	}
+		
 	public static double estimateClusteringCoefficient(
 			final double samplingRate,
 			final SocialNetwork socialNetwork) {
