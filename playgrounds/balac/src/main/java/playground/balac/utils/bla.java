@@ -29,39 +29,47 @@ public class bla {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/outputStatistics_car_new.txt");
+final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/outputStatistics_car_fucker.txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {
-			double time = 0.0;
-			double routeDistance = 0.0;
+			double time1 = 0.0;
+			double routeDistance1 = 0.0;
+			double time2 = 0.0;
+			double routeDistance2 = 0.0;
 			Plan p = per.getPlans().get(0);
-			Id<Link> linkId = null;
-			Id<Link> linkId2 = null;
-			Activity a = null;
+			
+			boolean ind = false;
 			for(PlanElement pe: p.getPlanElements()) {
 				
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().equals("leisure")) {
-						a = (Activity) pe;
-						break;
+				if (pe instanceof Leg) {
+					if (!ind) {
+						time1 += ((Leg) pe).getTravelTime();
+										
+						routeDistance1 += ((LinkNetworkRouteImpl) ((Leg) pe).getRoute()).getDistance();
+						
+						ind = true;
 					}
-				}
-				else if (pe instanceof Leg) {
-					
-					time += ((Leg) pe).getTravelTime();
-					linkId = ((Leg) pe).getRoute().getStartLinkId();
-					linkId2 = ((Leg) pe).getRoute().getEndLinkId();
-					
-					routeDistance += ((LinkNetworkRouteImpl) ((Leg) pe).getRoute()).getDistance();
-					
+					else {
+						time2 += ((Leg) pe).getTravelTime();
+						
+						routeDistance2 += ((LinkNetworkRouteImpl) ((Leg) pe).getRoute()).getDistance();
+						
+					}
 				}
 				
 			}
 			
 			outLink.write(per.getId() + ";");
-			outLink.write(Double.toString(time) + ";");
-			outLink.write(Double.toString(routeDistance) + ";");
+			if (time1 < time2 + 300) {
+				outLink.write(Double.toString(time1) + ";");
+				outLink.write(Double.toString(routeDistance1) + ";");
+			}
+			else {
+				outLink.write(Double.toString(time2) + ";");
+				outLink.write(Double.toString(routeDistance2) + ";");
+				
+			}
 		//	outLink.write(String.valueOf(CoordUtils.calcDistance(((Activity)p.getPlanElements().get(0)).getCoord(), sc.getNetwork().getLinks().get(linkId).getCoord())) + " ");
 		//	outLink.write(String.valueOf(CoordUtils.calcDistance(a.getCoord(), sc.getNetwork().getLinks().get(linkId2).getCoord())));
 			outLink.newLine();

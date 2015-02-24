@@ -9,13 +9,12 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.balac.allcsmodestest.controler.listener.FFEventsHandler;
-import playground.balac.allcsmodestest.controler.listener.FFEventsHandler.RentalInfoFF;
 import playground.balac.allcsmodestest.controler.listener.NoParkingEventHandler;
 import playground.balac.allcsmodestest.controler.listener.NoParkingEventHandler.NoParkingInfo;
 import playground.balac.allcsmodestest.controler.listener.NoVehicleEventHandler;
 import playground.balac.allcsmodestest.controler.listener.NoVehicleEventHandler.NoVehicleInfo;
-import playground.balac.allcsmodestest.controler.listener.OWEventsHandler;
+import playground.balac.allcsmodestest.controler.listeneronlymembers.FFEventsHandler.RentalInfoFF;
+import playground.balac.allcsmodestest.controler.listeneronlymembers.OWEventsHandler.RentalInfoOW;
 import playground.balac.allcsmodestest.controler.listeneronlymembers.RTEventsHandler.RentalInfo;
 
 import java.io.BufferedWriter;
@@ -84,13 +83,13 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 			e.printStackTrace();
 		}
 		
-		ArrayList<playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoOW> infoow = owhandler.rentals();
+		ArrayList<RentalInfoOW> infoow = owhandler.rentals();
 		
 		final BufferedWriter outLinkow = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "OW_CS"));
 		try {
 			outLinkow.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime   egressTime	vehicleID");
 			outLinkow.newLine();
-		for(playground.balac.allcsmodestest.controler.listener.OWEventsHandler.RentalInfoOW i: infoow) {
+		for(RentalInfoOW i: infoow) {
 			
 			
 			outLinkow.write(i.toString());
@@ -158,9 +157,9 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 
         this.cshandler = new RTEventsHandler();
 
-        this.ffhandler = new FFEventsHandler(event.getControler().getScenario().getNetwork());
+        this.ffhandler = new FFEventsHandler();
 
-        this.owhandler = new OWEventsHandler(event.getControler().getScenario().getNetwork());
+        this.owhandler = new OWEventsHandler();
 		
 		this.noVehicleHandler = new NoVehicleEventHandler();	
 		

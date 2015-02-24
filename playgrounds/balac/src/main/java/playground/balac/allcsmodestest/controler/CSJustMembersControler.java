@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,7 +45,7 @@ import playground.balac.utils.Events2TTCalculator;
 public class CSJustMembersControler {
 
 	public static void main(final String[] args) {
-		//Logger.getLogger( "org.matsim.core.reader..." ).setLevel( Level.OFF );
+		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();
@@ -85,7 +87,7 @@ public class CSJustMembersControler {
 									travelTimeCalculator.getLinkTravelTimes() );
 							
 							
-							final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+							final TripRouter router = delegate.instantiateAndConfigureTripRouter(rContext);
 							
 							// add our module to the instance
 							router.setRoutingModule(

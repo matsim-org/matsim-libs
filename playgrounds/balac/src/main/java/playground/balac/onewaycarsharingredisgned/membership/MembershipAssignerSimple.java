@@ -29,7 +29,7 @@ final private int numMembers = 20850;
 	private static double menShare = 0.44;
 	public void run (String[] args) {
 		
-ObjectAttributes bla = new ObjectAttributes();
+		ObjectAttributes bla = new ObjectAttributes();
 		
 		new ObjectAttributesXmlReader(bla).parse(args[0]);		
 		

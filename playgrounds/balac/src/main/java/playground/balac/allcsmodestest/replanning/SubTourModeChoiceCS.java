@@ -50,7 +50,7 @@ public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
 				new CharyparNagelScoringParameters(config.planCalcScore()),
 				((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getBeelineDistanceFactors().get("walk"),
 				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk")),
-				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeFreespeedFactors().get("pt"))
+				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("pt"))
 		);
 	}
 

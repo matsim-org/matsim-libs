@@ -16,9 +16,9 @@ public class GeoCoding {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		 BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/SC_pretest_referencevalues_new.csv");
+		 BufferedReader readLink = IOUtils.getBufferedReader("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/fucker.csv");
 		 
-		BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/geo_coded_pretest_referencevalues_new.txt");
+		BufferedWriter outLink = IOUtils.getBufferedWriter("P:/Projekte/SNF/SNF Post-Car World/STATEDCHOICE/geo_coded_fucker.txt");
 
 		WGS84toCH1903LV03 transformation = new WGS84toCH1903LV03();
 		
@@ -30,12 +30,15 @@ public class GeoCoding {
 			 String[] arr = s.split(";");
 			 
 			 
-			String addressStart = arr[8];
-			String addressEnd = arr[13];
-			String streetNumberStart = arr[9];
-			String streetNumberEnd = arr[14];
-			String cityStart = arr[11];
-			String cityEnd = arr[16];
+			String addressStart = arr[9];
+			String addressEnd = arr[14];
+			String streetNumberStart = arr[10];
+			String streetNumberEnd = arr[15];
+			String cityStart = arr[12];
+			String cityEnd = arr[17];
+			String zipCodeStart = arr[11];
+			String zipCodeEnd = arr[16];
+			
 			
 			GeoApiContext context = new GeoApiContext().setApiKey("AIzaSyBEkVBy4u7UVyvavAfzoeQmczD_CdGw7pA");
 			GeocodingResult[] results =  GeocodingApi.geocode(context,
@@ -80,9 +83,14 @@ public class GeoCoding {
 			
 			outLink.write(Integer.toString(i) + ";" + results[0].geometry.location.lat + ";" + results[0].geometry.location.lng 
 					+ ";" + results1[0].geometry.location.lat + ";" + results1[0].geometry.location.lng);
-			
+			String sex;
+			if (arr[22].equals("0"))
+				sex = "f";
+			else 
+				sex = "m";
 			outLink.write(";" + Double.toString(coordStart.getX()) + ";" + Double.toString(coordStart.getY()) 
-					+ ";" + Double.toString(coordEnd.getX()) + ";" + Double.toString(coordEnd.getY()) + ";" + Double.toString(distance) + ";" + arr[20]);
+					+ ";" + Double.toString(coordEnd.getX()) + ";" + Double.toString(coordEnd.getY()) 
+					+ ";" + Double.toString(distance) + ";" + arr[21] + ";" + sex + ";" + arr[23]);
 			outLink.newLine();
 			i++;
 			s = readLink.readLine();

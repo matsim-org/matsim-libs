@@ -41,7 +41,7 @@ public class OWEventsHandler implements StartRentalEventHandler, EndRentalEventH
 	public void handleEvent(PersonArrivalEvent event) {
 		// TODO Auto-generated method stub
 		
-		if (event.getLegMode().equals("walk_ow")) {
+		if (event.getLegMode().equals("walk_ow_sb")) {
 			
 			if (currentRentals.contains(event.getPersonId())) {
 				
@@ -71,7 +71,7 @@ public class OWEventsHandler implements StartRentalEventHandler, EndRentalEventH
 	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
 		
-		if (event.getLegMode().equals("walk_ow")) {
+		if (event.getLegMode().equals("walk_ow_sb")) {
 			
 			if (currentRentals.contains(event.getPersonId())) {
 				

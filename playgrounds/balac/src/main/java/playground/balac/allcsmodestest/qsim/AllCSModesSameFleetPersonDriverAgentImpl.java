@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -30,6 +31,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
@@ -38,6 +40,7 @@ import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 import javax.inject.Provider;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -134,8 +137,8 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
 		
-		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
-		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));
+		beelineFactor = ((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
+		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		mapTW = new HashMap<Link, Link>();
 		mapOW = new HashMap<Link, Link>();

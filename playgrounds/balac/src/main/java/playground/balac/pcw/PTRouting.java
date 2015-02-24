@@ -27,6 +27,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -141,11 +142,11 @@ public class PTRouting {
 		config.global().setNumberOfThreads(16);	// for parallel population reading
 	
 		
-		config.network().setInputFile("./network_multimodal.xml.gz");
+		config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/network_multimodal.xml.gz");
 
-	    config.facilities().setInputFile("./facilities.xml.gz");
-	    config.transit().setTransitScheduleFile("./schedule.20120117.ch-edited.xml.gz");
-	    config.transit().setVehiclesFile("./transitVehicles.ch.xml.gz");
+	    config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/facilities.xml.gz");
+	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/schedule.20120117.ch-edited.xml.gz");
+	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/transitVehicles.ch.xml.gz");
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
@@ -154,23 +155,26 @@ public class PTRouting {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
-	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/transitRouterNetwork_thinned.xml.gz");
 
+	    ((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getModeRoutingParams().get("walk").setTeleportedModeSpeed(1.34);
+	    
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("./coord_"+args[0] +".txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/coord_"+args[0] +".txt");
 
 //		    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
-			final BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0]+".txt");
-			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("./travelTimesPTFr_"+args[0]+".txt");
+			final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPT_"+args[0]+".txt");
+			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPTFr_"+args[0]+".txt");
 
-			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("./frequency_"+args[0]+".txt");
-
-		
+			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/frequency_"+args[0]+".txt");
+			
+		((TransitRouterConfigGroup) config.getModule("transitRouter")).setSearchRadius(2000.0);
+			
 		String s = readLink.readLine();
 		
 		NetworkLinkUtils lUtils = new NetworkLinkUtils(scenario.getNetwork());
@@ -189,7 +193,9 @@ public class PTRouting {
                                 routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
                                 routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor())));
 		
-		int i =1;
+		
+		
+		
 		System.out.println("starting to parse the input file");
 		
 		WGS84toCH1903LV03 transformation = new WGS84toCH1903LV03();
@@ -321,7 +327,7 @@ public class PTRouting {
 					
 					else
 						
-					transferTime += transfertTimePart;
+						transferTime += transfertTimePart;
 						
 					lastArrival +=  ((Leg) pe1).getTravelTime();
 				}

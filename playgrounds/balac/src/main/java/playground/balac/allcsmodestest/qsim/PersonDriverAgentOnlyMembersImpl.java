@@ -1,5 +1,10 @@
 package playground.balac.allcsmodestest.qsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -8,13 +13,22 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -23,10 +37,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,11 +63,6 @@ import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRD
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
 
 /**
@@ -206,35 +213,36 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 			
-			 if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
+			 if (currentLeg.getMode().equals("twowaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 				 this.simulation.getEventsManager().processEvent(
 							new EndRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("TW_"+(this.twVehId), Vehicle.class)));
-			 
+				 parkCSVehicle(this.currentLeg, this.plan);
+			 }
 			 else if (currentLeg.getMode().equals("walk_rb") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
 				 this.simulation.getEventsManager().processEvent(
 							new StartRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("TW_"+(this.twVehId), Vehicle.class)));
-			 else if (currentLeg.getMode().equals("freefloating") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
+			 else if (currentLeg.getMode().equals("freefloating") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
 				
 				 this.simulation.getEventsManager().processEvent(
 							new EndRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("FF_"+(this.ffVehId), Vehicle.class)));
+				 parkCSVehicle(this.currentLeg, this.plan);
+			 }
 			 
 			 else if (currentLeg.getMode().equals("walk_ff") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
 				 this.simulation.getEventsManager().processEvent(
 							new StartRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("FF_"+(this.ffVehId), Vehicle.class)));
-			 else if (currentLeg.getMode().equals("onewaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
-			 this.simulation.getEventsManager().processEvent(
+			 
+			 else if (currentLeg.getMode().equals("onewaycarsharing") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg) {
+				 this.simulation.getEventsManager().processEvent(
 						new EndRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("OW_"+(this.owVehId), Vehicle.class)));
+				 parkCSVehicle(this.currentLeg, this.plan);
+			 }
 		 
-		 else if (currentLeg.getMode().equals("walk_rb") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
+		 else if (currentLeg.getMode().equals("walk_ow_sb") && plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg)
 			 this.simulation.getEventsManager().processEvent(
 						new StartRentalEvent(now, this.cachedDestinationLinkId, this.getPerson().getId(), Id.create("OW_"+(this.owVehId), Vehicle.class)));
 			 
-			if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
-			this.getVehicle().getId().toString().startsWith("OW") || 
-			this.getVehicle().getId().toString().startsWith("FF")))
-				
-				parkCSVehicle(this.currentLeg, this.plan);			
-				
+							
 			advancePlan(now) ;
 		}
 	}	

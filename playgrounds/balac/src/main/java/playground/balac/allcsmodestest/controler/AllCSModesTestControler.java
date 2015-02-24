@@ -111,6 +111,7 @@ public class AllCSModesTestControler {
 				});
 		
 
+			//setting up the scoring function factory, inside different scoring functions are set-up
 			AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
 				      config, 
 				      sc.getNetwork(), sc);
