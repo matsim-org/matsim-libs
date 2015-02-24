@@ -22,6 +22,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -94,6 +95,30 @@ public class WeightedSocialNetworkTest {
 					"unexpected number of elements over "+score,
 					popSize - score,
 					testee.getAltersOverWeight( ego , score ).length );
+		}
+	}
+
+	@Test
+	public void testReflectivity() {
+		final int maxSize = 5;
+		final int popSize = 100;
+
+		final WeightedSocialNetwork testee = new WeightedSocialNetwork( maxSize , Double.NEGATIVE_INFINITY , popSize );
+
+		final Random r = new Random( 1234 );
+		for ( int ego = 0; ego < popSize; ego++ ) {
+			for ( int alter=0; alter < ego; alter++ ) {
+				testee.addBidirectionalTie( ego , alter , r.nextDouble() );
+			}
+		}
+
+		for ( int ego = 0; ego < popSize; ego++ ) {
+			for ( int alter = 0; alter < ego; alter++ ) {
+				Assert.assertEquals(
+						"found non reflective tie!",
+						testee.contains( ego , alter ),
+						testee.contains( alter , ego ) );
+			}
 		}
 	}
 }

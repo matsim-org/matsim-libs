@@ -22,6 +22,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import gnu.trove.set.TIntSet;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -69,8 +70,26 @@ public class WeightedSocialNetwork {
 			final int alter,
 			final double weight ) {
 		if ( weight < lowestAllowedWeight ) return;
-		alters[ ego ].add( alter , weight );
-		alters[ alter ].add( ego , weight );
+
+		// only add if both alters want it
+		if ( !alters[ ego ].isAcceptable( weight ) || !alters[ alter ].isAcceptable( weight ) ) return;
+
+		final boolean added1 = addMonodirectionalTie( ego , alter , weight );
+		final boolean added2 = addMonodirectionalTie( alter , ego , weight );
+
+		assert added1;
+		assert added2;
+	}
+
+	private boolean addMonodirectionalTie(
+			final int ego,
+			final int alter,
+			final double weight ) {
+		if ( ego == alter ) throw new IllegalArgumentException( "cannot create ties from one ego to himself!" );
+		final int removed = alters[ ego ].add( alter , weight );
+		if ( removed >= 0 ) alters[ removed ].remove( ego );
+		// Not very nice: index -2 indicates no addition
+		return removed != -2;
 	}
 
 	/**
@@ -78,7 +97,23 @@ public class WeightedSocialNetwork {
 	 * unused slots.
 	 */
 	public void trim( final int ego ) {
-		this.alters[ ego ].trim();
+		this.alters[ego].trim();
+	}
+
+	public double getLowestAllowedWeight() {
+		return lowestAllowedWeight;
+	}
+
+	public int getMaximalSize() {
+		return maximalSize;
+	}
+
+	public int getNEgos() {
+		return alters.length;
+	}
+
+	public Iterable<WeightedAlter> getAlters( final int ego ) {
+		return new AlterIterable( alters[ego] );
 	}
 
 	public void trimAll() {
@@ -87,32 +122,28 @@ public class WeightedSocialNetwork {
 		}
 	}
 
-	public Set<Id<Person>> getAltersOverWeight(
-			final int ego,
-			final double weight,
-			final IndexedPopulation population) {
-		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
-		return alters[ ego ].getAltersOverWeight( weight , population );
+	/*for tests*/ boolean contains( int ego , int alter ) {
+		return alters[ ego ].indexOfAlter( alter ) >= 0;
 	}
 
-	public int[] getAltersOverWeight(
-			final int ego,
-			final double weight ) {
-		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
-		return alters[ ego ].getAltersOverWeight( weight );
+	public Set<Id<Person>> getAltersOverWeight( final int ego , final double weight , final IndexedPopulation population ) {
+		// if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
+		return alters[ego].getAltersOverWeight( weight, population );
 	}
 
-	public void fillWithAltersOverWeight(
-			final TIntSet set,
-			final int ego,
-			final double weight ) {
-		if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
-		alters[ ego ].fillWithAltersOverWeight( set , weight );
+	public int[] getAltersOverWeight( final int ego , final double weight ) {
+		// if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
+		return alters[ego].getAltersOverWeight( weight );
+	}
+
+	public void fillWithAltersOverWeight( final TIntSet set , final int ego , final double weight ) {
+		// if ( weight < lowestAllowedWeight ) throw new IllegalArgumentException( "weight "+weight+" is lower than lowest stored weight "+lowestAllowedWeight );
+		alters[ego].fillWithAltersOverWeight( set, weight );
 	}
 
 	// for tests
-	/*package*/ int getSize( final int ego ) {
-		return alters[ ego ].size;
+	/*package*/int getSize( final int ego ) {
+		return alters[ego].size;
 	}
 
 	private static final class WeightedFriends {
@@ -126,17 +157,38 @@ public class WeightedSocialNetwork {
 
 		public WeightedFriends( final int initialSize , final int maximalSize ) {
 			this.maximalSize = maximalSize;
-			this.friends = new int[ initialSize ];
-			this.weights = new float[ initialSize ];
-			Arrays.fill( weights , Float.POSITIVE_INFINITY  );
+			this.friends = new int[initialSize];
+			this.weights = new float[initialSize];
+			Arrays.fill( weights, Float.POSITIVE_INFINITY );
 		}
 
-		public synchronized void add( final int friend , final double weight ) {
+		public void remove( int alter ) {
+			final int index = indexOfAlter( alter );
+			if ( index < 0 ) throw new IllegalStateException( "no alter "+alter );
+			
+			size--;
+			for ( int i = index; i < size; i++ ) {
+				friends[ i ] = friends[ i + 1 ];
+				weights[ i ] = weights[ i + 1 ];
+			}
+		}
+
+		private int indexOfAlter( final int alter ) {
+			for ( int i=0; i < size; i++ ) {
+				if ( friends[ i ] == alter ) return i;
+			}
+			return -1;
+		}
+
+		public synchronized int add( final int friend , final double weight ) {
 			final float fweight = (float) weight; // TODO check overflow?
 			final int insertionPoint = getInsertionPoint( fweight );
-			insert( friend, fweight , insertionPoint );
+			final int removed = insert( friend, fweight , insertionPoint );
+
 			assert size <= friends.length;
 			assert weights.length == friends.length;
+
+			return removed;
 		}
 
 		public Set<Id<Person>> getAltersOverWeight(
@@ -179,7 +231,11 @@ public class WeightedSocialNetwork {
 			return index >= 0 ? index : - 1 - index;
 		}
 
-		private synchronized void insert(
+		private boolean isAcceptable( final double weight ) {
+			return size < maximalSize || weight > weights[ 0 ];
+		}
+
+		private synchronized int insert(
 				final int friend,
 				final float weight,
 				int insertionPoint ) {
@@ -189,11 +245,13 @@ public class WeightedSocialNetwork {
 
 			if ( size == maximalSize && insertionPoint == 0 ) {
 				// full: do not add a low utility friend
-				return;
+				return -2;
 			}
 
+			int removed = -1;
 			if ( size == maximalSize ) {
 				// delete lowest entry
+				removed = friends[ 0 ];
 				for ( int i=0; i < size - 1; i++ ) {
 					friends[ i ] = friends[ i + 1 ];
 					weights[ i ] = weights[ i + 1 ];
@@ -218,12 +276,95 @@ public class WeightedSocialNetwork {
 
 			friends[ insertionPoint ] = friend;
 			weights[ insertionPoint ] = weight;
+
+			return removed;
 		}
 
 		public synchronized void trim() {
 			final int newSize = Math.max( 1 , size );
 			friends = Arrays.copyOf( friends , newSize );
 			weights = Arrays.copyOf( weights , newSize );
+		}
+
+		@Override
+		public boolean equals( final Object other ) {
+			if ( !(other instanceof WeightedFriends) ) return false;
+
+			return size == ((WeightedFriends) other).size &&
+				Arrays.equals( Arrays.copyOf( friends , size ) , Arrays.copyOf( ((WeightedFriends) other).friends , size ) ) &&
+				Arrays.equals( Arrays.copyOf( weights , size ) , Arrays.copyOf( ((WeightedFriends) other).weights , size ) );
+		}
+
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode( Arrays.copyOf( friends , size ) ) +
+				Arrays.hashCode( Arrays.copyOf( weights , size ) );
+		}
+
+		@Override
+		public String toString() {
+			return "[WeightedFriends: size="+size+"; friends="+
+				Arrays.toString( Arrays.copyOf( friends , size ) )+"; weights="+
+				Arrays.toString( Arrays.copyOf( weights , size ) )+"]";
+		}
+	}
+
+	private static final class AlterIterable implements Iterable<WeightedAlter> {
+		private final WeightedFriends alters;
+
+		private AlterIterable( final WeightedFriends alters ) {
+			this.alters = alters;
+		}
+
+		@Override
+		public Iterator<WeightedAlter> iterator() {
+			return new Iterator<WeightedAlter>() {
+				int index=0;
+
+				@Override
+				public boolean hasNext() {
+					return index < alters.size;
+				}
+
+				@Override
+				public WeightedAlter next() {
+					return new WeightedAlter(
+							alters.friends[ index ],
+							alters.weights[ index++ ] );
+				}
+
+				@Override
+				public void remove() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+
+		@Override
+		public boolean equals( final Object other ) {
+			if ( !(other instanceof AlterIterable) ) return false;
+
+			return alters.equals( ((AlterIterable) other).alters );
+		}
+
+		@Override
+		public int hashCode() {
+			return alters.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return "Iter->"+alters;
+		}
+	}
+
+	public static class WeightedAlter {
+		public final int alter;
+		public final double weight;
+
+		private WeightedAlter(final int alter, final double weight) {
+			this.alter = alter;
+			this.weight = weight;
 		}
 	}
 }
