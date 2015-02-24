@@ -34,6 +34,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.*;
 
 import java.util.*;
@@ -389,7 +390,7 @@ public class PTLineRouterDefaultV2 extends PTLineRouter {
 		} else {
 			link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
-		link.setFreespeed(50.0 / 3.6);
+		link.setFreespeed(80.0 / 3.6);
 		link.setCapacity(500);
 		link.setNumberOfLanes(1);
 		link.setAllowedModes(this.transitModes);
@@ -424,7 +425,27 @@ public class PTLineRouterDefaultV2 extends PTLineRouter {
 		cleanSchedule();
 		prepareNetwork();
 		removeNonUsedStopFacilities();
+		setConnectedStopFacilitiesToIsBlocking();
 		log.info("Clean Stations and Network... done.");
+	}
+
+	private void setConnectedStopFacilitiesToIsBlocking() {
+		Set<TransitStopFacility> facilitiesToExchange = new HashSet<>();
+		for (TransitStopFacility oldFacility : this.schedule.getFacilities().values()) {
+			if (this.network.getLinks().get(oldFacility.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
+				TransitStopFacility newFacility = this.scheduleFactory.createTransitStopFacility(
+						oldFacility.getId(), oldFacility.getCoord(), true);
+				newFacility.setName(oldFacility.getName());
+				newFacility.setLinkId(oldFacility.getLinkId());
+				newFacility.setStopPostAreaId(oldFacility.getStopPostAreaId());
+				facilitiesToExchange.add(newFacility);
+			}
+		}
+		for (TransitStopFacility facility : facilitiesToExchange) {
+			TransitStopFacility facilityToRemove = this.schedule.getFacilities().get(facility.getId());
+			this.schedule.removeStopFacility(facilityToRemove);
+			this.schedule.addStopFacility(facility);
+		}
 	}
 
 	private void cleanSchedule() {

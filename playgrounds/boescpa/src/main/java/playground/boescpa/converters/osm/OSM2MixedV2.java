@@ -29,15 +29,18 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.TransitScheduleValidator;
+import org.matsim.run.NetworkCleaner;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorSimple;
 import playground.boescpa.converters.osm.ptRouter.PTLineRouterDefaultV2;
+import playground.boescpa.converters.osm.ptRouter.PseudoNetworkCreatorV2;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
 import playground.boescpa.lib.tools.cutter.ScheduleCutter;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
@@ -53,7 +56,7 @@ import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
  */
 public class OSM2MixedV2 {
 
-	private final static int maxBeelineWalkConnectingDistance = 1; // new TransitRouterConfig(ConfigUtils.createConfig()).beelineWalkConnectionDistance // = 100
+	private final static double maxBeelineWalkConnectingDistance = new TransitRouterConfig(ConfigUtils.createConfig()).beelineWalkConnectionDistance; // = 100
 
 	private static int cutRadius = 0;
 	private static Coord cutCenter = null;
@@ -92,6 +95,7 @@ public class OSM2MixedV2 {
 		final Network mergedNetwork = NetworkMerger.mergeNetworks(mixedScenario.getNetwork(), onlyPTScenario.getNetwork());
 		final TransitSchedule mergedSchedule = ScheduleMerger.mergeSchedules(mixedScenario.getTransitSchedule(), onlyPTScenario.getTransitSchedule());
 		final Vehicles mergedVehicles = VehicleMerger.mergeVehicles(mixedScenario.getVehicles(), onlyPTScenario.getVehicles());
+
 
 		// **************** Write final scenario ****************
 		final String path_FinalNetwork = outbase + "FinalNetwork.xml.gz";
@@ -160,7 +164,7 @@ public class OSM2MixedV2 {
 
 		// **************** Route Schedule ****************
 		final Network onlyPTNetwork = onlyPTScenario.getNetwork();
-		new CreatePseudoNetwork(onlyPTSchedule, onlyPTNetwork, "pt_").createNetwork();
+		new PseudoNetworkCreatorV2(onlyPTSchedule, onlyPTNetwork, "pt_").createNetwork();
 		final String path_OnlyPTSchedule = outbase + "OnlyPTSchedule.xml.gz";
 		final String path_OnlyPTNetwork = outbase + "OnlyPTNetwork.xml.gz";
 		new TransitScheduleWriter(onlyPTSchedule).writeFile(path_OnlyPTSchedule);
@@ -202,6 +206,7 @@ public class OSM2MixedV2 {
 		final Network network = getEmptyScenario().getNetwork();
 		new MultimodalNetworkCreatorSimple(network).createMultimodalNetwork(osmFile);
 		new NetworkWriter(network).write(networkPath);
+		new NetworkCleaner().run(networkPath, networkPath);
 	}
 
 	protected static Scenario getEmptyScenario() {

@@ -98,4 +98,56 @@ public class NetworkMerger {
 		log.info("Merging networks... done.");
 		return mergedNetwork;
 	}
+
+	/**
+	 * Integrates network B into network A so that after the method network A contains all links and nodes of both networks.
+	 *
+	 * @param networkA
+	 * @param networkB
+	 */
+	public static void integrateNetwork(final Network networkA, final Network networkB, final String prefixNodesNetworkB, final String prefixLinksNetworkB) {
+		final NetworkFactory factory = networkA.getFactory();
+
+		log.info("Merging networks...");
+		final int numberOfLinksNetworkA = networkA.getLinks().size();
+		final int numberOfNodesNetworkA = networkA.getNodes().size();
+
+		// Nodes
+		for (Node node : networkB.getNodes().values()) {
+			Id<Node> nodeId = Id.create(prefixNodesNetworkB + node.getId().toString(), Node.class);
+			if (!networkA.getNodes().containsKey(nodeId)) {
+				Node newNode = factory.createNode(nodeId, node.getCoord());
+				networkA.addNode(newNode);
+			}
+		}
+
+		// Links
+		double capacityFactor = networkA.getCapacityPeriod() / networkB.getCapacityPeriod();
+		for (Link link : networkB.getLinks().values()) {
+			Id<Link> linkId = Id.create(prefixLinksNetworkB + link.getId().toString(), Link.class);
+			if (!networkA.getLinks().containsKey(linkId)) {
+				Id<Node> fromNodeId = Id.create(prefixNodesNetworkB + link.getFromNode().getId().toString(), Node.class);
+				Id<Node> toNodeId = Id.create(prefixNodesNetworkB + link.getToNode().getId().toString(), Node.class);
+				Link newLink = factory.createLink(linkId, networkA.getNodes().get(fromNodeId), networkA.getNodes().get(toNodeId));
+				newLink.setAllowedModes(link.getAllowedModes());
+				newLink.setCapacity(link.getCapacity() * capacityFactor);
+				newLink.setFreespeed(link.getFreespeed());
+				newLink.setLength(link.getLength());
+				newLink.setNumberOfLanes(link.getNumberOfLanes());
+				networkA.addLink(newLink);
+			}
+		}
+
+		log.info(" Merging Stats:");
+		log.info("  Number of links network A: " + numberOfLinksNetworkA);
+		log.info("  Number of nodes network A: " + numberOfNodesNetworkA);
+		log.info("  Number of links network B: " + networkB.getLinks().size());
+		log.info("  Number of nodes network B: " + networkB.getNodes().size());
+		log.info("  Sum of links: " + (numberOfLinksNetworkA + networkB.getLinks().size()));
+		log.info("  Sum of nodes: " + (numberOfNodesNetworkA + networkB.getNodes().size()));
+		log.info("  Number of links merged: " + networkA.getLinks().size());
+		log.info("  Number of nodes merged: " + networkA.getNodes().size());
+
+		log.info("Merging networks... done.");
+	}
 }

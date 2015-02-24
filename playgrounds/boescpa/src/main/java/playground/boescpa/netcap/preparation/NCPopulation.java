@@ -107,7 +107,7 @@ public class NCPopulation {
 			if (planElement instanceof Activity) {
 				final Activity oldActivity = (Activity) planElement;
 				if (oldActivity.getType().equals("pt interaction")) {
-					continue;
+					//continue;
 				}
 				final Coord actCoord = new CoordImpl(oldActivity.getCoord().getX(), oldActivity.getCoord().getY());
 				final Activity activity = popFactory.createActivityFromCoord(oldActivity.getType(), actCoord);
@@ -123,7 +123,7 @@ public class NCPopulation {
 			} else if (planElement instanceof Leg && !lastWasLeg) {
 				final Leg oldLeg = (Leg) planElement;
 				if (oldLeg.getMode().equals("transit_walk")) {
-					continue;
+					//continue;
 				}
 				plan.addLeg(popFactory.createLeg(oldLeg.getMode()));
 				lastWasLeg = true;

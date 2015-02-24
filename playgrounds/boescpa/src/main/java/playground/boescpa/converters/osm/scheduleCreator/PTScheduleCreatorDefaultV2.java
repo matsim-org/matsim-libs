@@ -151,7 +151,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 	}
 
 	private void createStop(Id<TransitStopFacility> stopId, Coord coord, String stopName) {
-		TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(stopId, coord, true);
+		TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(stopId, coord, false);
 		stopFacility.setName(stopName);
 		this.schedule.addStopFacility(stopFacility);
 		//log.info("Added " + schedule.getFacilities().get(stopId).toString());
@@ -378,9 +378,10 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 			// Collect all route profiles
 			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
 			for (TransitRoute route : line.getRoutes().values()) {
-				String routeProfile = route.getStops().get(0).toString();
+				String routeProfile = route.getStops().get(0).getStopFacility().getId().toString();
 				for (int i = 1; i < route.getStops().size(); i++) {
-					routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
+					//routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
+					routeProfile = routeProfile + "-" + route.getStops().get(i).getStopFacility().getId().toString();
 				}
 				List profiles = routeProfiles.get(routeProfile);
 				if (profiles == null) {
