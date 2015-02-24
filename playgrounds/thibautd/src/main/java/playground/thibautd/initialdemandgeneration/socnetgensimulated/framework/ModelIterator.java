@@ -20,10 +20,7 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
@@ -54,9 +51,9 @@ public class ModelIterator {
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
-	private final double exponent = 5;
+	private final double exponent = 1;
 	private final double contractionFactor = 2;
-	private final double expansionFactor = 1.5;
+	private final double expansionFactor = 3;
 
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
 		this.targetClustering = config.getTargetClustering();
@@ -91,63 +88,57 @@ public class ModelIterator {
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
+		// Rosenbrock 1960
 		generate( runner , initialThresholds );
+
 		Thresholds currentParent = initialThresholds;
 
-		double stepPrimary = initialPrimaryStep;
-		double stepSecondary = initialSecondaryStep;
+		Direction d1 = new Direction( 1 , 0 , initialPrimaryStep );
+		Direction d2 = new Direction( 0 , 1 , initialSecondaryStep );
 
-		final Set<Thresholds> tabu = new HashSet< >();
 		for ( int iter=1, stagnationCount=0;
 				iter < maxIterations && stagnationCount < stagnationLimit;
 				iter++, stagnationCount++ ) {
 			log.info( "Iteration # "+iter );
 
-			final List<Move> moves = new ArrayList<Move>( 4 );
+			final Direction d = iter % 2 == 0 ? d1 : d2;
+			final Move move = new Move( currentParent , d.getXStep() , d.getYStep() );
 
-			log.info( "Parent: "+currentParent );
-			log.info( "primary : "+stepPrimary );
-			log.info( "secondary : "+stepSecondary );
+			final SocialNetwork sn = generate( runner , move.getChild() );
 
-			moves.add( new Move( currentParent , 0 , stepSecondary ) );
-			moves.add( new Move( currentParent , stepPrimary , 0 ) );
-			moves.add( new Move( currentParent , 0 , -stepSecondary ) );
-			moves.add( new Move( currentParent , -stepPrimary , 0 ) );
-
-			Move bestChild = null;
-			SocialNetwork bestChildResultingNetwork = null;
-
-			for ( Move move : moves ) {
-				final Thresholds thresholds = move.getChild();
-				if ( !tabu.add( thresholds ) ) continue;
-				final SocialNetwork sn = generate( runner , thresholds );
-
-				if ( bestChild == null || function( thresholds ) < function( bestChild.getChild() ) ) {
-					bestChild = move;
-					bestChildResultingNetwork = sn;
-				}
-
-				for ( EvolutionListener l : listeners ) l.handleMove( move , false );
-			}
-
-			if ( isAcceptable( bestChild.getChild() ) ) {
-				log.info( "END - "+bestChild+" fulfills the precision criteria!" );
-				return bestChildResultingNetwork;
-			}
-
-			if ( function( bestChild.getChild() ) < function( bestChild.getParent() ) ) {
+			final boolean isImproving =  function( move.getChild() ) < function( move.getParent() );
+			if ( isImproving ) {
+				d.gotSucess = true;
+				d.totalMovement += d.stepSize;
+				d.stepSize *= expansionFactor;
+				currentParent = move.getChild();
 				stagnationCount = 0;
-				log.info( "improvement with "+bestChild.getChild()+" compared to "+bestChild.getParent() );
-				log.info( "new value "+function( bestChild.getChild() ) );
-				currentParent = bestChild.getChild();
-				stepPrimary *= expansionFactor;
-				stepSecondary *= expansionFactor;
 			}
 			else {
-				log.info( "no improvement with "+bestChild.getChild()+" compared to "+bestChild.getParent() );
-				log.info( "new value "+function( bestChild.getChild() ) );
-				stepPrimary /= contractionFactor;
-				stepSecondary /= contractionFactor;
+				d.gotFail = true;
+				d.stepSize /= -contractionFactor;
+			}
+
+			for ( EvolutionListener l : listeners ) l.handleMove( move , isImproving );
+
+			if ( isAcceptable( move.getChild() ) ) {
+				log.info( "END - "+move.getChild()+" fulfills the precision criteria!" );
+				return sn;
+			}
+
+			if ( d1.gotFail && d1.gotSucess && d2.gotFail && d2.gotSucess ) {
+				// update directions
+				final double xMov = d1.getXTotalMovement() + d2.getXTotalMovement();
+				final double yMov = d1.getYTotalMovement() + d2.getYTotalMovement();
+				final double newStepSize = (initialPrimaryStep + initialSecondaryStep) / 2;
+				d1 = new Direction(
+						xMov,
+						yMov,
+						newStepSize );
+				d2 = new Direction(
+						-(d2.getYTotalMovement() * yMov) / xMov,
+						d2.getYTotalMovement(),
+						newStepSize );
 			}
 		}
 
@@ -222,6 +213,40 @@ public class ModelIterator {
 
 		public Thresholds getChild() {
 			return child;
+		}
+	}
+
+	private static class Direction {
+		public final double x;
+		public final double y;
+
+		public boolean gotFail = false;
+		public boolean gotSucess = false;
+
+		public double stepSize = 1;
+		public double totalMovement = 0;
+
+		public Direction( final double x, final double y , final double initialStep ) {
+			final double norm = Math.sqrt( x * x + y * y );
+			this.x = x / norm;
+			this.y = y / norm;
+			this.stepSize = initialStep;
+		}
+
+		public double getXStep() {
+			return x * stepSize;
+		}
+
+		public double getXTotalMovement() {
+			return x * totalMovement;
+		}
+
+		public double getYTotalMovement() {
+			return y * totalMovement;
+		}
+
+		public double getYStep() {
+			return y * stepSize;
 		}
 	}
 
