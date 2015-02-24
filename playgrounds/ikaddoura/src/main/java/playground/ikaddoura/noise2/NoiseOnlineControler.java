@@ -121,14 +121,14 @@ public class NoiseOnlineControler {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
 		
-		if (setup == "berlin1a") {
+		if (setup.equals("berlin1a")) {
 			
 			noiseParameters.setReceiverPointGap(100.);
 			
 			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
 		
-		} else if (setup == "berlin1b") {
+		} else if (setup.equals("berlin1b")) {
 			
 			noiseParameters.setReceiverPointGap(250.);
 			noiseParameters.setThrowNoiseEventsAffected(false);
@@ -136,14 +136,14 @@ public class NoiseOnlineControler {
 			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
 		
-		} else if (setup == "berlin2a") {
+		} else if (setup.equals("berlin2a")) {
 		
 			noiseParameters.setReceiverPointGap(100.);
 	
 			String[] consideredActivitiesForDamages = {"home"};
 			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
 			
-		} else if (setup == "berlin2b") {
+		} else if (setup.equals("berlin2b")) {
 		
 			noiseParameters.setReceiverPointGap(250.);
 			noiseParameters.setThrowNoiseEventsAffected(false);
