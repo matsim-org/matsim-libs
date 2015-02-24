@@ -77,8 +77,13 @@ public class DoublyWeightedSocialNetworkTest {
 		final TIntSet result = testee.getAltersOverWeights( ego , 10 , 50 );
 		Assert.assertEquals(
 				"unexpected nuber of returned elements: "+result,
-				result.size(),
-				25 );
+				25,
+				result.size() );
+
+		Assert.assertEquals(
+				"unexpected nuber of returned elements ",
+				0,
+				testee.getAltersOverWeights( ego , 501 , 501 ).size() );
 	}
 
 	@Test

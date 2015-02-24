@@ -63,8 +63,13 @@ public class WeightedSocialNetworkTest {
 		final int[] result = testee.getAltersOverWeight( ego , 10 );
 		Assert.assertEquals(
 				"unexpected nuber of returned elements: "+result,
-				result.length,
-				5 );
+				5,
+				result.length);
+
+		Assert.assertEquals(
+				"unexpected nuber of returned elements",
+				0,
+				testee.getAltersOverWeight( ego , 501 ).length );
 	}
 
 	@Test
