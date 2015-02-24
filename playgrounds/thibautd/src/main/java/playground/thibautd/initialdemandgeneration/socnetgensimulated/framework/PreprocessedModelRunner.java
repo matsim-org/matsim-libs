@@ -95,7 +95,17 @@ public class PreprocessedModelRunner implements ModelRunner {
 		this.maxSizeSecondary = config.getMaxSizeSecondary();
 		this.randomSeed = config.getRandomSeed();
 
-		this.updatePrimaryPreprocess( distributionToFill );
+		if ( config.getInputPreprocessedNetwork() == null ) {
+			this.updatePrimaryPreprocess( distributionToFill );
+
+		}
+		else {
+			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
+		}
+	}
+
+	public void writePreprocessedNetwork( final String file ) {
+		new WeightedSocialNetworkWriter( ).write( preprocess , file );
 	}
 
 	private void updatePrimaryPreprocess( final TiesWeightDistribution distributionToFill ) {

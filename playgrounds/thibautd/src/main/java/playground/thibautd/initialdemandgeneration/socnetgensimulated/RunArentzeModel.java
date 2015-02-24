@@ -123,12 +123,15 @@ public class RunArentzeModel {
 					new GumbelErrorTerm(),
 					false ); // cache
 		TiesWeightDistribution distr = new TiesWeightDistribution( 1 );
-		final ModelRunner runner =
+		final PreprocessedModelRunner runner =
 			new PreprocessedModelRunner(
 					runnerConfig,
 					population,
 					utility,
 					distr );
+		if ( runnerConfig.getInputPreprocessedNetwork() == null ) {
+			runner.writePreprocessedNetwork( config.getOutputDirectory()+"/preprocessed-network.xml.gz" );
+		}
 		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
 		final Thresholds initialPoint =
 			!config.getInitialPoints().isEmpty() ?

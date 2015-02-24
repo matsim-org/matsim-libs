@@ -32,6 +32,8 @@ public class PreprocessedModelRunnerConfigGroup extends ReflectiveConfigGroup {
 
 	private int randomSeed = 20150116;
 
+	private String inputPreprocessedNetwork = null;
+
 	private double primarySampleRate = 0.1;
 	private double secondarySampleRate = 0.1;
 
@@ -72,6 +74,16 @@ public class PreprocessedModelRunnerConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "randomSeed" )
 	public void setRandomSeed( int randomSeed ) {
 		this.randomSeed = randomSeed;
+	}
+
+	@StringGetter( "inputPreprocessedNetwork" )
+	public String getInputPreprocessedNetwork() {
+		return inputPreprocessedNetwork;
+	}
+
+	@StringSetter( "inputPreprocessedNetwork" )
+	public void setInputPreprocessedNetwork( String inputPreprocessedNetwork ) {
+		this.inputPreprocessedNetwork = inputPreprocessedNetwork;
 	}
 
 	@StringGetter( "primarySamplingRate" )

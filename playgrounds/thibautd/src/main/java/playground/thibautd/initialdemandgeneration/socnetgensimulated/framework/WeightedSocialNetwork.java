@@ -65,7 +65,7 @@ public class WeightedSocialNetwork {
 		}
 	}
 
-	public void addBidirectionalTie(
+	public synchronized void addBidirectionalTie(
 			final int ego,
 			final int alter,
 			final double weight ) {
