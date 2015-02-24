@@ -59,10 +59,8 @@ public class NoiseParameters {
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
 	private boolean throwNoiseEventsAffected = true;
-
 	private boolean computeNoiseDamages = true;
 	private boolean internalizeNoiseDamages = true;
-	
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
 		
