@@ -131,10 +131,12 @@ public class RunArentzeModel {
 					distr );
 		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
 		final Thresholds initialPoint =
-			generateInitialPoint(
-					distr,
-					population.size(),
-					config.getTargetDegree() );
+			!config.getInitialPoints().isEmpty() ?
+				getInitialPoint( config ) :
+				generateInitialPoint(
+						distr,
+						population.size(),
+						config.getTargetDegree() );
 		// TODO: add initial points from config?
 		distr = null; // dirty! should be in a subfunction
 
@@ -149,6 +151,12 @@ public class RunArentzeModel {
 		new SocialNetworkWriter( network ).write( config.getOutputDirectory() + "/social-network.xml.gz" );
 
 		MoreIOUtils.closeOutputDirLogging();
+	}
+
+	private static Thresholds getInitialPoint(
+			final SocialNetworkGenerationConfigGroup config ) {
+		if ( config.getInitialPoints().size() > 1 ) log.warn( "only one intial point from the "+config.getInitialPoints().size()+" defined in the config will be used!" );
+		return config.getInitialPoints().iterator().next();
 	}
 
 	private static Thresholds generateInitialPoint(

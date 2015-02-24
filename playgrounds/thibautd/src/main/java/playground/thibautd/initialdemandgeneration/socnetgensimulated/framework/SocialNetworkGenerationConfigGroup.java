@@ -206,7 +206,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 		@StringSetter( "initialSecondaryReduction" )
 		public void setInitialSecondaryReduction( double initialSecondaryReduction ) {
-			if ( initialSecondaryReduction < 0 ) throw new IllegalArgumentException( "secondary reduction must be positive, got "+initialSecondaryReduction );
 			this.initialSecondaryReduction = initialSecondaryReduction;
 		}
 
