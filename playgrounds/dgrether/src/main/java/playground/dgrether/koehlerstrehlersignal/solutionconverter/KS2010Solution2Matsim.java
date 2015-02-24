@@ -82,7 +82,7 @@ public class KS2010Solution2Matsim {
 		
 		// overwrite zero offsets with the ones from solutionCrossings
 		for (KS2010CrossingSolution solution : solutionCrossings) {
-			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
+//			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
 				Id<DgProgram> programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
 				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(programId)) {
 					throw new IllegalStateException(" something's wrong");
@@ -96,7 +96,7 @@ public class KS2010Solution2Matsim {
 				offset = offset * scale;
 				plan.setOffset(offset);
 				log.info("SignalSystem Id " + controllerData.getSignalSystemId() + " Offset: " + offset);
-			}
+//			}
 		}
 	}
 

@@ -77,7 +77,7 @@ public class M2KS2010NetworkConverter {
 	private static final Logger log = Logger.getLogger(M2KS2010NetworkConverter.class);
 	
 	private Integer cycle = null;
-	public static final String DEFAULT_PROGRAM_ID = "4711";
+//	public static final String DEFAULT_PROGRAM_ID = "4711";
 
 	private DgKSNetwork dgNetwork;
 	private double timeInterval;
@@ -206,10 +206,10 @@ public class M2KS2010NetworkConverter {
 				for (Link link : node.getInLinks().values()){
 					if (signalizedLinks.contains(link.getId())){ // node is signalized
 						crossing.setType(TtCrossingType.FIXED);
-						// create default program for signalized crossing
-						DgProgram program = new DgProgram(Id.create(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID, DgProgram.class));
-						program.setCycle(this.cycle);
-						crossing.addProgram(program);
+//						// create default program for signalized crossing
+//						DgProgram program = new DgProgram(Id.create(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID, DgProgram.class));
+//						program.setCycle(this.cycle);
+//						crossing.addProgram(program);
 					} 
 				}
 				if (crossing.getType() == null){ // node isn't signalized, but within the signals bounding box
@@ -397,10 +397,10 @@ public class M2KS2010NetworkConverter {
 	 */
 	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id<Link> backLinkId, 
 			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
-		//remove default program
-		if ( crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)) {
-			crossing.getPrograms().remove(this.DEFAULT_PROGRAM_ID);
-		}
+//		//remove default program
+//		if ( crossing.getPrograms().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
+//			crossing.getPrograms().remove(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID);
+//		}
 		//create program if not existing...
 		DgProgram program = null;
 		if (! crossing.getPrograms().containsKey(system.getId())){
