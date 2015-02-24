@@ -144,6 +144,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 										alter,
 										score );
 
+								if ( log.isTraceEnabled() ) {
+									log.trace( "Primary preprocessing: added tie "+ego+"<->"+alter+" with weight "+score );
+								}
+
 								if ( threadDistribution != null ) threadDistribution.addValue( score );
 							}
 						}
@@ -203,12 +207,20 @@ public class PreprocessedModelRunner implements ModelRunner {
 									thresholds.getPrimaryThreshold(),
 									population ) );
 
-								friendsOfFriends.clear();
-								preprocessFriendsOfFriends.fillWithAltersOverWeights(
-									friendsOfFriends,
-									ego,
-									thresholds.getPrimaryThreshold(),
-									thresholds.getSecondaryThreshold() );
+							if ( log.isTraceEnabled() ) {
+								log.trace( "ego "+population.getId( ego )+": add primary alters "+sn.get( population.getId( ego ) ) );
+							}
+
+							friendsOfFriends.clear();
+							preprocessFriendsOfFriends.fillWithAltersOverWeights(
+								friendsOfFriends,
+								ego,
+								thresholds.getPrimaryThreshold(),
+								thresholds.getSecondaryThreshold() );
+
+							if ( log.isTraceEnabled() ) {
+								log.trace( "ego "+population.getId( ego )+": add secondary alters "+friendsOfFriends );
+							}
 
 							// sampling already done
 							final Set<Id<Person>> newAlters = sn.get( population.getId( ego ) );
@@ -232,6 +244,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 		for ( Map.Entry<Id<Person>, Set<Id<Person>>> e : sn.entrySet() ) {
 			for ( Id<Person> alter : e.getValue() ) {
+				if ( log.isTraceEnabled() ) log.trace( "add bidirectional tie "+e.getKey()+" -> "+alter );
 				net.addBidirectionalTie( e.getKey(), alter );
 			}
 		}
@@ -328,13 +341,20 @@ public class PreprocessedModelRunner implements ModelRunner {
 									public boolean execute(
 											final int alterOfAlter,
 											final double lowestUtilityOfAlter ) {
+										final double w2 =
+												utility.getTieUtility(
+													ego,
+													alterOfAlter );
 										preprocessFriendsOfFriends.addMonodirectionalTie(
 												ego,
 												alterOfAlter,
 												lowestUtilityOfAlter,
-												utility.getTieUtility(
-													ego,
-													alterOfAlter ) );
+												w2 );
+
+										if ( log.isTraceEnabled() ) {
+											log.trace( "secondary preprocessing: added tie "+ego+"<->"+alterOfAlter+" with weights "+lowestUtilityOfAlter+" and "+w2 );
+										}
+
 										return true;
 									}
 								} );

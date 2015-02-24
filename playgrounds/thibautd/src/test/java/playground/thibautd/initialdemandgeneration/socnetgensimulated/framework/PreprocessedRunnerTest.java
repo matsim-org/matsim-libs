@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -39,6 +41,12 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 public class PreprocessedRunnerTest {
 	private static final Logger log =
 		Logger.getLogger(PreprocessedRunnerTest.class);
+
+	@Before
+	public void logLevel() {
+		Logger.getLogger( PreprocessedModelRunner.class ).setLevel( Level.TRACE );
+	}
+
 
 	@Test
 	public void testNone() {

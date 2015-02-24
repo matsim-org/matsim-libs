@@ -475,16 +475,18 @@ public class DoublyWeightedSocialNetwork {
 				final TIntSet alters,
 				final double firstWeight,
 				final double secondWeight ) {
+			if ( size == 0) return; // unfortunately a special case... Because there is no head to speak of.
 			if ( head == -1 ) return; // we fell of the tree!
+			assert head < size : head +" > "+ size;
 
-			if ( weights1[ head ] > firstWeight && weights2[ head ] > secondWeight ) {
+			if ( weights1[ head ] >= firstWeight && weights2[ head ] >= secondWeight ) {
 				alters.add( friends[ head ] );
 				fillWithGreaterPoints( childSW[ head ] , alters , firstWeight , secondWeight );
 			}
-			if ( weights1[ head ] > firstWeight ) {
+			if ( weights1[ head ] >= firstWeight ) {
 				fillWithGreaterPoints( childNW[ head ] , alters , firstWeight , secondWeight );
 			}
-			if ( weights2[ head ] > secondWeight ) {
+			if ( weights2[ head ] >= secondWeight ) {
 				fillWithGreaterPoints( childSE[ head ] , alters , firstWeight , secondWeight );
 			}
 			// always look to the NW
