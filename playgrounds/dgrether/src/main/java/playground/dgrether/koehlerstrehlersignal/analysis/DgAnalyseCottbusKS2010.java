@@ -593,8 +593,9 @@ public class DgAnalyseCottbusKS2010 {
 //		CottbusRuns.add1972BaseCaseRoutesOnlyRandomRuns(l);
 //		CottbusRuns.add1973BaseCaseRoutesTimesRandomRuns(l);
 		
-//		CottbusRuns.add2026BaseCaseRoutesTimesRandomRuns(l);
-		CottbusRuns.add2032BaseCaseRoutesTimesRandomRuns(l);
+//		CottbusRuns.addBaseCaseOptAndRandomIt1400Runs(l, 2026, 2027, 2028, 2029, 2030, 2031);
+//		CottbusRuns.addBaseCaseOptAndRandomIt1400Runs(l, 2032, 2033, 2034, 2035, 2036, 2037);
+		CottbusRuns.addBaseCaseOptAndRandomAndAnotherIt1400Runs(l, 2032, 2033, 2034, 2035, 2036, 2037, 2038);
 		
 		return l;
 	}
@@ -609,7 +610,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2015-02-19_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2015-02-24_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);

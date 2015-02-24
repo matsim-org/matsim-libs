@@ -23,14 +23,13 @@ import java.util.List;
 
 import playground.dgrether.koehlerstrehlersignal.analysis.DgAnalyseCottbusKS2010.RunInfo;
 
-
 /**
  * @author dgrether
- *
+ * 
  */
 public class CottbusRuns {
 
-	static void add1712BaseCaseAnalysis(List<RunInfo> l){
+	static void add1712BaseCaseAnalysis(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1712";
@@ -40,12 +39,12 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1712";
 		ri.remark = "base case";
-		ri.baseCase  = true;
+		ri.baseCase = true;
 		ri.iteration = 1000;
 		l.add(ri);
 	}
 
-	static void add1722BaseCaseAnalysis(List<RunInfo> l){
+	static void add1722BaseCaseAnalysis(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1722";
@@ -60,26 +59,25 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1740";
 		ri.remark = "base case it 2000";
-		ri.baseCase  = true;
+		ri.baseCase = true;
 		ri.iteration = 2000;
 		l.add(ri);
 	}
 
-	
-	static void add1712BaseCaseRoutesTimesRuns(List<RunInfo> l){
+	static void add1712BaseCaseRoutesTimesRuns(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1712";
-//		ri.remark = "base case";
-//		ri.baseCase  = true;
-//		ri.iteration = 1000;
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1712";
+		// ri.remark = "base case";
+		// ri.baseCase = true;
+		// ri.iteration = 1000;
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1745";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000";
+		ri.remark = "base case 1712 it 2000";
 		ri.remark = "base case";
 		l.add(ri);
 		//
@@ -93,26 +91,26 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1747";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1712, com > 50";
+		ri.remark = "continue 1712, com > 50";
 		ri.remark = "optimization, commodities > 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1748";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1712, sylvia";
+		ri.remark = "continue 1712, sylvia";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-	static void add1712BaseCaseRoutesOnlyHighStorageCapRuns(List<RunInfo> l){
+	static void add1712BaseCaseRoutesOnlyHighStorageCapRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 
 		ri = new RunInfo();
 		ri.runId = "1926";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "base case 1712 it 2000, routes only";
 		ri.remark = "base case high storage cap";
 		l.add(ri);
 		//
@@ -126,19 +124,20 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1928";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities > 50 high storage cap";
 		l.add(ri);
 	}
 
-	static void add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(List<RunInfo> l){
+	static void add1712BaseCaseRoutesOnlyHighStorageCapRunsOnSimplifiedNetwork(
+			List<RunInfo> l) {
 		RunInfo ri = null;
 
 		ri = new RunInfo();
 		ri.runId = "1933";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, routes only, btu network and population";
+		ri.remark = "base case 1712 it 2000, routes only, btu network and population";
 		ri.remark = "base case high storage cap, simplified network and population";
 		l.add(ri);
 		//
@@ -149,15 +148,16 @@ public class CottbusRuns {
 		ri.remark = "optimization, commodities > 10 high storage cap, simplified network and population";
 		l.add(ri);
 	}
-	
-	static void add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(List<RunInfo> l){
+
+	static void add1712BaseCaseRoutesTimesHighStorageCapRunsOnSimplifiedNetwork(
+			List<RunInfo> l) {
 		RunInfo ri = null;
 
 		ri = new RunInfo();
 		ri.runId = "1935";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, route and time choice, btu network and population";
+		ri.remark = "base case 1712 it 2000, route and time choice, btu network and population";
 		ri.remark = "base case high storage cap, routes and times, simplified network and population";
 		l.add(ri);
 		//
@@ -168,21 +168,21 @@ public class CottbusRuns {
 		ri.remark = "optimization, commodities > 10 high storage cap, routes and times, simplified network and population";
 		l.add(ri);
 	}
-	
-	static void add1712BaseCaseRoutesOnlyRuns(List<RunInfo> l){
+
+	static void add1712BaseCaseRoutesOnlyRuns(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1712";
-//		ri.remark = "base case";
-////		ri.baseCase  = true;
-//		ri.iteration = 1000;
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1712";
+		// ri.remark = "base case";
+		// // ri.baseCase = true;
+		// ri.iteration = 1000;
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1910";
 		ri.iteration = 1900;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "base case 1712 it 2000, routes only";
 		ri.remark = "base case";
 		l.add(ri);
 		//
@@ -196,20 +196,19 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1912";
 		ri.iteration = 1900;
-		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities > 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1913";
 		ri.iteration = 1900;
-		ri.remark  = "continue 1712, sylvia, routes only";
+		ri.remark = "continue 1712, sylvia, routes only";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-	
-	static void add1712BaseCaseRoutesOnlyRandomRuns(List<RunInfo> l){
+	static void add1712BaseCaseRoutesOnlyRandomRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1910";
@@ -221,7 +220,7 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1912";
 		ri.iteration = 1900;
-		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities > 50";
 		l.add(ri);
 		//
@@ -250,20 +249,20 @@ public class CottbusRuns {
 		l.add(ri);
 	}
 
-	static void add1712BaseCaseRoutesOnlyRuns5Percent(List<RunInfo> l){
+	static void add1712BaseCaseRoutesOnlyRuns5Percent(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1712";
-//		ri.remark = "base case";
-////		ri.baseCase  = true;
-//		ri.iteration = 1000;
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1712";
+		// ri.remark = "base case";
+		// // ri.baseCase = true;
+		// ri.iteration = 1000;
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1918";
 		ri.iteration = 1900;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "base case 1712 it 2000, routes only";
 		ri.remark = "no change";
 		l.add(ri);
 		//
@@ -277,27 +276,26 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1920";
 		ri.iteration = 1900;
-		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities $\\geq$ 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1921";
 		ri.iteration = 1900;
-		ri.remark  = "continue 1712, sylvia, routes only";
+		ri.remark = "continue 1712, sylvia, routes only";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-	
-	static void add1930BaseCase(List<RunInfo> l){
+	static void add1930BaseCase(List<RunInfo> l) {
 		RunInfo ri = null;
 
 		ri = new RunInfo();
 		ri.runId = "1722";
 		ri.iteration = 1000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1722 it 2000, routes only";
+		ri.remark = "base case 1722 it 2000, routes only";
 		ri.remark = "no change";
 		l.add(ri);
 		//
@@ -308,21 +306,20 @@ public class CottbusRuns {
 		l.add(ri);
 	}
 
-	
-	static void add1712BaseCaseRoutesOnlyRunsBeta20(List<RunInfo> l){
+	static void add1712BaseCaseRoutesOnlyRunsBeta20(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1712";
-//		ri.remark = "base case";
-////		ri.baseCase  = true;
-//		ri.iteration = 1000;
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1712";
+		// ri.remark = "base case";
+		// // ri.baseCase = true;
+		// ri.iteration = 1000;
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1914";
 		ri.iteration = 1500;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000, routes only";
+		ri.remark = "base case 1712 it 2000, routes only";
 		ri.remark = "base case";
 		l.add(ri);
 		//
@@ -336,33 +333,32 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1916";
 		ri.iteration = 1500;
-		ri.remark  = "continue 1712, com > 50, routes only";
+		ri.remark = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities $\\geq$ 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1917";
 		ri.iteration = 1500;
-		ri.remark  = "continue 1712, sylvia, routes only";
+		ri.remark = "continue 1712, sylvia, routes only";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-	
-	static void add1712BaseCaseNoChoice(List<RunInfo> l){
+	static void add1712BaseCaseNoChoice(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1712";
-//		ri.remark = "base case";
-////		ri.baseCase  = true;
-//		ri.iteration = 1000;
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1712";
+		// ri.remark = "base case";
+		// // ri.baseCase = true;
+		// ri.iteration = 1000;
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1910";
 		ri.iteration = 1000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 1000, no choice";
+		ri.remark = "base case 1712 it 1000, no choice";
 		ri.remark = "base case";
 		l.add(ri);
 		//
@@ -376,38 +372,37 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1912";
 		ri.iteration = 1000;
-		ri.remark  = "continue 1712, com > 50, no choice";
+		ri.remark = "continue 1712, com > 50, no choice";
 		ri.remark = "optimization, commodities > 50";
 		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1913";
 		ri.iteration = 1000;
-		ri.remark  = "continue 1712, sylvia, no choice";
+		ri.remark = "continue 1712, sylvia, no choice";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-
-	static void add1722BaseCaseRoutesTimesRuns(List<RunInfo> l){
+	static void add1722BaseCaseRoutesTimesRuns(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1722";
-//		ri.iteration = 1000;
-//		ri.remark  = "base case, 0.7 cap";
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1722";
+		// ri.iteration = 1000;
+		// ri.remark = "base case, 0.7 cap";
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1740";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1722 it 2000";
+		ri.remark = "base case 1722 it 2000";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1737";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1722, com > 10, new";
+		ri.remark = "continue 1722, com > 10, new";
 		ri.remark = "optimization, commodities > 10";
 		l.add(ri);
 
@@ -415,155 +410,153 @@ public class CottbusRuns {
 		ri.runId = "1741";
 		ri.iteration = 2000;
 		ri.runId = "1741";
-		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations";
+		ri.remark = "sylvia: continue base case 1722 for 1000 iterations";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 
-//		ri = new RunInfo();
-//		ri.runId = "1742";
-//		ri.iteration = 1000;
-//		ri.remark  = "start it 0: continue base case 1722 for 1000 iterations";
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1742";
+		// ri.iteration = 1000;
+		// ri.remark =
+		// "start it 0: continue base case 1722 for 1000 iterations";
+		// l.add(ri);
 	}
 
-	static void add1722BaseCaseRoutesOnlyRuns(List<RunInfo> l){
+	static void add1722BaseCaseRoutesOnlyRuns(List<RunInfo> l) {
 		RunInfo ri = null;
-//		ri = new RunInfo();
-//		ri.runId = "1722";
-//		ri.iteration = 1000;
-//		ri.remark  = "base case";
-//		l.add(ri);
+		// ri = new RunInfo();
+		// ri.runId = "1722";
+		// ri.iteration = 1000;
+		// ri.remark = "base case";
+		// l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1900";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1722 it 2000, no time choice";
+		ri.remark = "base case 1722 it 2000, no time choice";
 		ri.remark = "base case";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1901";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1722, com > 10, new, no time choice";
+		ri.remark = "continue 1722, com > 10, new, no time choice";
 		ri.remark = "optimization, commodities > 10";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1902";
 		ri.iteration = 2000;
-		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations, no time choice";
+		ri.remark = "sylvia: continue base case 1722 for 1000 iterations, no time choice";
 		ri.remark = "traffic-actuated control";
 		l.add(ri);
 	}
 
-	static void addReduceFlowCapacityRunsNoIterations(List<RunInfo> l){
+	static void addReduceFlowCapacityRunsNoIterations(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1940";
 		ri.iteration = 1000;
 		ri.baseCase = true;
-		ri.remark  = "one it, base case, 0.5 cap";
+		ri.remark = "one it, base case, 0.5 cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1941";
 		ri.iteration = 1000;
-		ri.remark  = "one it, base case, 0.3 cap";
+		ri.remark = "one it, base case, 0.3 cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1942";
 		ri.iteration = 1000;
-		ri.remark  = "one it, base case, 0.1 cap";
+		ri.remark = "one it, base case, 0.1 cap";
 		l.add(ri);
 	}
-	
-	static void addStorageCapacityRuns(List<RunInfo> l){
+
+	static void addStorageCapacityRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1722";
 		ri.iteration = 1000;
 		ri.baseCase = true;
-		ri.remark  = "one it, base case, 0.7 storage cap";
+		ri.remark = "one it, base case, 0.7 storage cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1945";
 		ri.iteration = 1000;
-		ri.remark  = "one it, base case, 0.5 storage cap";
+		ri.remark = "one it, base case, 0.5 storage cap";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1946";
 		ri.iteration = 1000;
-		ri.remark  = "one it, base case, 0.3 storage cap";
+		ri.remark = "one it, base case, 0.3 storage cap";
 		l.add(ri);
-		
-}
-	
-	static void addFlowStorageCapacityRuns(List<RunInfo> l){
+
+	}
+
+	static void addFlowStorageCapacityRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1722";
 		ri.iteration = 1000;
 		ri.baseCase = true;
-		ri.remark  = "one it, base case, 0.7 flow storage cap";
+		ri.remark = "one it, base case, 0.7 flow storage cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1947";
 		ri.iteration = 1000;
-		ri.remark  = "one it, base case, 0.3 flow storage cap";
-//		l.add(ri);
-		
+		ri.remark = "one it, base case, 0.3 flow storage cap";
+		// l.add(ri);
+
 		ri = new RunInfo();
 		ri.runId = "1950";
 		ri.iteration = 1000;
-		ri.remark  = "iterated base case, 0.5 flow storage cap";
+		ri.remark = "iterated base case, 0.5 flow storage cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1951";
 		ri.iteration = 1000;
-		ri.remark  = "iterated base case, 0.4 flow storage cap";
+		ri.remark = "iterated base case, 0.4 flow storage cap";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1952";
 		ri.iteration = 1000;
-		ri.remark  = "iterated base case, 0.3 flow storage cap";
+		ri.remark = "iterated base case, 0.3 flow storage cap";
 		l.add(ri);
-		
-}
-	
-	
 
-	static void addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(List<RunInfo> l){
+	}
+
+	static void addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(
+			List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1900";
 		ri.baseCase = true;
 		ri.iteration = 2000;
-		ri.remark  = "0.7 flow cap, routes only, base case, it 2000";
+		ri.remark = "0.7 flow cap, routes only, base case, it 2000";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1943";
 		ri.iteration = 2000;
-		ri.remark  = "0.5 flow cap, routes only, base case, it 2000";
+		ri.remark = "0.5 flow cap, routes only, base case, it 2000";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1944";
 		ri.iteration = 2000;
-		ri.remark  = "0.3 flow cap, routes only, base case, it 2000";
+		ri.remark = "0.3 flow cap, routes only, base case, it 2000";
 		l.add(ri);
 	}
 
-	
-
-	static void add1726BaseCaseLongRerouteRuns(List<RunInfo> l){
+	static void add1726BaseCaseLongRerouteRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1726";
@@ -575,18 +568,18 @@ public class CottbusRuns {
 		ri.runId = "1743";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "continue base case 1726 for 1000 iterations";
+		ri.remark = "continue base case 1726 for 1000 iterations";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1744";
 		ri.iteration = 1000;
-		ri.remark  = "start it 0: continue base case 1726 for 1000 iterations";
+		ri.remark = "start it 0: continue base case 1726 for 1000 iterations";
 		l.add(ri);
 
-	}	
+	}
 
-	static void add1722BaseCaseButKsModelBasedOn1712Runs(List<RunInfo> l){
+	static void add1722BaseCaseButKsModelBasedOn1712Runs(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1735";
@@ -597,17 +590,17 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1736";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1722, com > 10";
+		ri.remark = "continue 1722, com > 10";
 		l.add(ri);
 		ri = new RunInfo();
 		ri.runId = "1740";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1722 it 2000";
+		ri.remark = "base case 1722 it 2000";
 		l.add(ri);
 	}
 
-	static void addReduceFlowCapacityRunsIterationsFromScratch(List<RunInfo> l){
+	static void addReduceFlowCapacityRunsIterationsFromScratch(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1722";
@@ -615,7 +608,7 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.iteration = 1000;
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1724";
 		ri.remark = "base case, it 1000, 0.5 flow cap";
@@ -628,7 +621,6 @@ public class CottbusRuns {
 		ri.iteration = 1000;
 		l.add(ri);
 	}
-
 
 	static void add1740vs1745BaseCaseAnalysis(List<RunInfo> l) {
 		RunInfo ri = null;
@@ -658,7 +650,7 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = "1934";
 		ri.iteration = 2000;
-		ri.remark  = "optimization scenario, com > 10, routes only";
+		ri.remark = "optimization scenario, com > 10, routes only";
 		ri.remark = "optimization, commodities > 10";
 		l.add(ri);
 		//
@@ -696,38 +688,38 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.remark = "base case";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1968";
 		ri.iteration = 1400;
-		ri.remark = "best random"; //tt SP, min speed 15
+		ri.remark = "best random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1969";
 		ri.iteration = 1400;
-		ri.remark = "worst random"; //tt SP, min speed 15
+		ri.remark = "worst random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1976";
 		ri.iteration = 1400;
-		ri.remark = "avg random"; //tt SP, min speed 15
+		ri.remark = "avg random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1977";
 		ri.iteration = 1400;
-		ri.remark = "median random"; //tt SP, min speed 15
+		ri.remark = "median random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1974";
 		ri.iteration = 1400;
-		ri.remark = "optimized"; //tt SP, min speed 15
+		ri.remark = "optimized"; // tt SP, min speed 15
 		l.add(ri);
 	}
-	
+
 	public static void add1973BaseCaseRoutesTimesRandomRuns(List<RunInfo> l) {
 		RunInfo ri = null;
 		ri = new RunInfo();
@@ -736,115 +728,35 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.remark = "base case";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1970";
 		ri.iteration = 1400;
-		ri.remark = "best random"; //tt SP, min speed 15
+		ri.remark = "best random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1971";
 		ri.iteration = 1400;
-		ri.remark = "worst random"; //tt SP, min speed 15
+		ri.remark = "worst random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1978";
 		ri.iteration = 1400;
-		ri.remark = "avg random"; //tt SP, min speed 15
+		ri.remark = "avg random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1979";
 		ri.iteration = 1400;
-		ri.remark = "median random"; //tt SP, min speed 15
+		ri.remark = "median random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1975";
 		ri.iteration = 1400;
-		ri.remark = "optimized"; //tt SP, min speed 15
-		l.add(ri);
-	}
-	
-	public static void add2026BaseCaseRoutesTimesRandomRuns(List<RunInfo> l) {
-		RunInfo ri = null;
-		ri = new RunInfo();
-		ri.runId = "2026";
-		ri.iteration = 1400;
-		ri.baseCase = true;
-		ri.remark = "base case";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2028";
-		ri.iteration = 1400;
-		ri.remark = "best random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2029";
-		ri.iteration = 1400;
-		ri.remark = "worst random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2030";
-		ri.iteration = 1400;
-		ri.remark = "avg random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2031";
-		ri.iteration = 1400;
-		ri.remark = "median random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2027";
-		ri.iteration = 1400;
-		ri.remark = "optimized";
-		l.add(ri);
-	}
-	
-	public static void add2032BaseCaseRoutesTimesRandomRuns(List<RunInfo> l) {
-		RunInfo ri = null;
-		ri = new RunInfo();
-		ri.runId = "2032";
-		ri.iteration = 1400;
-		ri.baseCase = true;
-		ri.remark = "base case";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2034";
-		ri.iteration = 1400;
-		ri.remark = "best random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2035";
-		ri.iteration = 1400;
-		ri.remark = "worst random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2036";
-		ri.iteration = 1400;
-		ri.remark = "avg random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2037";
-		ri.iteration = 1400;
-		ri.remark = "median random";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "2033";
-		ri.iteration = 1400;
-		ri.remark = "optimized";
+		ri.remark = "optimized"; // tt SP, min speed 15
 		l.add(ri);
 	}
 
@@ -856,39 +768,40 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.remark = "base case";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1983";
 		ri.iteration = 1400;
-		ri.remark = "best random"; //tt SP, min speed 15
+		ri.remark = "best random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1984";
 		ri.iteration = 1400;
-		ri.remark = "worst random"; //tt SP, min speed 15
+		ri.remark = "worst random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1985";
 		ri.iteration = 1400;
-		ri.remark = "avg random"; //tt SP, min speed 15
+		ri.remark = "avg random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1986";
 		ri.iteration = 1400;
-		ri.remark = "median random"; //tt SP, min speed 15
+		ri.remark = "median random"; // tt SP, min speed 15
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = "1980";
 		ri.iteration = 1400;
-		ri.remark = "optimized"; //tt SP, min speed 15
+		ri.remark = "optimized"; // tt SP, min speed 15
 		l.add(ri);
 	}
 
-	public static void addBaseCaseAndOptIt1400Runs(List<RunInfo> l, int baseCaseRunId, int optRunId) {
+	public static void addBaseCaseAndOptIt1400Runs(List<RunInfo> l,
+			int baseCaseRunId, int optRunId) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = Integer.toString(baseCaseRunId);
@@ -896,15 +809,17 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.remark = "base case";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(optRunId);
 		ri.iteration = 1400;
 		ri.remark = "optimized";
 		l.add(ri);
 	}
-	
-	public static void addBaseCaseOptAndRandomIt1400Runs(List<RunInfo> l, int baseCaseRunId, int optRunId, int bestRandomId, int worstRandomId, int avgRandomId, int medRandomId) {
+
+	public static void addBaseCaseOptAndRandomIt1400Runs(List<RunInfo> l,
+			int baseCaseRunId, int optRunId, int bestRandomId,
+			int worstRandomId, int avgRandomId, int medRandomId) {
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = Integer.toString(baseCaseRunId);
@@ -912,37 +827,49 @@ public class CottbusRuns {
 		ri.baseCase = true;
 		ri.remark = "base case";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(optRunId);
 		ri.iteration = 1400;
 		ri.remark = "optimized";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(bestRandomId);
 		ri.iteration = 1400;
 		ri.remark = "best random";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(worstRandomId);
 		ri.iteration = 1400;
 		ri.remark = "worst random";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(avgRandomId);
 		ri.iteration = 1400;
 		ri.remark = "avg random";
 		l.add(ri);
-		
+
 		ri = new RunInfo();
 		ri.runId = Integer.toString(medRandomId);
 		ri.iteration = 1400;
 		ri.remark = "median random";
 		l.add(ri);
 	}
-	
-	
+
+	public static void addBaseCaseOptAndRandomAndAnotherIt1400Runs(
+			List<RunInfo> l, int baseCaseRunId, int optRunId, int bestRandomId,
+			int worstRandomId, int avgRandomId, int medRandomId, int anotherRunId) {
+		
+		addBaseCaseOptAndRandomIt1400Runs(l, baseCaseRunId, optRunId, bestRandomId, worstRandomId, avgRandomId, medRandomId);
+		
+		RunInfo ri = new RunInfo();
+		ri.runId = Integer.toString(anotherRunId);
+		ri.iteration = 1400;
+		ri.remark = "another opt";
+		l.add(ri);
+	}
+
 }
