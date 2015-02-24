@@ -21,11 +21,9 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -149,7 +147,7 @@ public class ModelIterator {
 
 	// TODO: write moves to file, to be able to plot tree
 	private class ThresholdMemory {
-		private final Set<Thresholds> tabu = new HashSet< >();
+
 		private final Queue<Move> queue =
 			new PriorityQueue< >(
 					10,
@@ -223,14 +221,10 @@ public class ModelIterator {
 
 				log.info( "improvement with "+t+" compared to "+( lastMove == null ? null : lastMove.getParent() ) );
 				log.info( "new value "+function( t ) );
-				for ( int i = 1;
-						!fillQueueWithChildren(
-								t,
-								primaryStepSize * i * expansionFactor,
-								secondaryStepSize * i * expansionFactor );
-						i++ ) {
-					log.warn( "no non-tabu child for expansion factor "+(i * expansionFactor) );
-				}
+				fillQueueWithChildren(
+						t,
+						primaryStepSize * expansionFactor,
+						secondaryStepSize * expansionFactor );
 
 				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
 
@@ -242,33 +236,20 @@ public class ModelIterator {
 
 			if ( equivalent( t, lastMove.getParent() ) ) {
 				log.info( "exactly same value as parent: probably in a flat area --- step and expand" );
-				for ( int i=1;
-						!addToStack(
-								new Move(
-									t,
-									lastMove.getStepPrimary() * flatExpansionFactor / i,
-									lastMove.getStepSecondary() * flatExpansionFactor / i,
-									primaryStepSize * flatExpansionFactor / i,
-									secondaryStepSize * flatExpansionFactor / i ) );
-						i++ ) {
-					// if expansion does not succeed, contraction. If contraction leads to equivalent,
-					// expansion again --- which might be tabu. Recognize that this would happen and
-					// decrease expansion to emulate foreseen contraction
-					// (another, "nicer" solution, would be not to use a tabu list,
-					// in which case the process would be happy without special handling)
-					log.warn( "no non-tabu child for flat expansion factor "+( flatExpansionFactor / i ) );
-				}
+				addToStack(
+						new Move(
+							t,
+							lastMove.getStepPrimary() * flatExpansionFactor,
+							lastMove.getStepSecondary() * flatExpansionFactor,
+							primaryStepSize * flatExpansionFactor,
+							secondaryStepSize * flatExpansionFactor ) );
 			}
 			else {
 				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
-				for ( int i = 1;
-						!fillQueueWithChildren(
-								lastMove.getParent(),
-								primaryStepSize / ( i * contractionFactor ),
-								secondaryStepSize / ( i * contractionFactor ) );
-						i++ ) {
-					log.warn( "no non-tabu child for contraction factor "+(i * contractionFactor) );
-				}
+				fillQueueWithChildren(
+						lastMove.getParent(),
+						primaryStepSize / contractionFactor,
+						secondaryStepSize / contractionFactor );
 			}
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
@@ -295,7 +276,6 @@ public class ModelIterator {
 		public Thresholds createNewThresholds() {
 			if ( initial != null ) {
 				final Thresholds v = initial;
-				tabu.add( initial );
 				initial = null;
 				return v;
 			}
@@ -317,7 +297,6 @@ public class ModelIterator {
 		}
 		
 		private boolean addToStack( final Move move  ) {
-			if ( !tabu.add( move.getChild() ) ) return false;
 			queue.add( move );
 			return true;
 		}
