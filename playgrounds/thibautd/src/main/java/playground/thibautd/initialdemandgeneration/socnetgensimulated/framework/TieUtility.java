@@ -75,6 +75,13 @@ public class TieUtility {
 		public double calcError( final int seed );
 	}
 
+	public static class NoErrorTerm implements ErrorTerm {
+		@Override
+		public double calcError( int seed ) {
+			return 0;
+		}
+	}
+
 	public static class GumbelErrorTerm implements ErrorTerm {
 		private static final int N_THROWN_DRAWS = 2;
 
