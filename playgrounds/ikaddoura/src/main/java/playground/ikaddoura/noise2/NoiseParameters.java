@@ -49,24 +49,100 @@ public class NoiseParameters {
 	private String[] consideredActivitiesForDamages = {"home", "work"};
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
-	// Setting MinX/MaxX/MinY/MaxY coordinates to 0.0 means the receiver points are computed for the entire area for which any of the following activities are found.
+	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
-
 	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
 
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
 	private boolean throwNoiseEventsAffected = true;
-	private boolean throwNoiseEventsCaused = true;
-	private boolean computeCausingAgents = true;
+
+	private boolean computeNoiseDamages = true;
 	private boolean internalizeNoiseDamages = true;
 	
+	private boolean computeCausingAgents = true; 
+	private boolean throwNoiseEventsCaused = true;
+		
 	// ########################################################################################################
 			
+	public void checkForConsistency() {
+		
+		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
+		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
+
+		for (int i = 0; i < consideredActivitiesForDamages.length; i++) {
+			consideredActivitiesForDamagesList.add(consideredActivitiesForDamages[i]);
+		}
+		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
+			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
+		}
+		
+		if (this.internalizeNoiseDamages) {
+			
+			// required for internalization
+			if (this.computeCausingAgents == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputeCausingAgents(true);
+			}
+			
+			// required for internalization, i.e. the scoring
+			if (this.throwNoiseEventsCaused == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setThrowNoiseEventsCaused(true);
+			}
+			
+		}
+		
+		if (this.computeCausingAgents 
+				|| this.internalizeNoiseDamages 
+				|| this.throwNoiseEventsAffected
+				|| this.throwNoiseEventsCaused
+				) {
+			
+			// required
+			if (this.computeNoiseDamages == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputeNoiseDamages(true);
+			}
+		}
+		
+		if (this.throwNoiseEventsCaused) {
+			
+			// required
+			if (this.computeCausingAgents == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputeCausingAgents(true);
+			}
+		}
+		
+		if (this.computeNoiseDamages) {
+						
+			if (consideredActivitiesForDamagesList.size() == 0) {
+				log.warn("Not considering any activity type for the noise damage computation."
+						+ "The computation of noise damages should be disabled.");
+			}
+						
+			if (this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
+				for (String type : consideredActivitiesForDamagesList) {
+					if (!consideredActivitiesForReceiverPointGridList.contains(type)) {
+						throw new RuntimeException("An activity type which is considered for the damage calculation (" + type
+								+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
+					}
+				}
+			}
+		}
+		
+		if (consideredActivitiesForReceiverPointGridList.size() == 0 && this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
+			throw new RuntimeException("NEITHER providing a considered activity type for the minimum and maximum coordinates of the receiver point grid area "
+					+ "NOR providing receiver point grid minimum and maximum coordinates. Aborting...");
+		}
+	}
 	
+	// ########################################################################################################
+
 	public boolean isThrowNoiseEventsAffected() {
 		return throwNoiseEventsAffected;
 	}
@@ -229,6 +305,15 @@ public class NoiseParameters {
 	public void setInternalizeNoiseDamages(boolean internalizeNoiseDamages) {
 		log.info("Internalizing noise damages: " + internalizeNoiseDamages);
 		this.internalizeNoiseDamages = internalizeNoiseDamages;
+	}
+
+	public boolean isComputeNoiseDamages() {
+		return computeNoiseDamages;
+	}
+
+	public void setComputeNoiseDamages(boolean computeNoiseDamages) {
+		log.info("Computing noise damages: " + computeNoiseDamages);
+		this.computeNoiseDamages = computeNoiseDamages;
 	}
 	
 }

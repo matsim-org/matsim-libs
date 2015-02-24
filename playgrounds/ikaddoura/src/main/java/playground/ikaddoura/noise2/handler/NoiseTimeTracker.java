@@ -167,14 +167,17 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 		log.info("Calculating noise immissions... Done.");
 		
-		log.info("Calculating the number of affected agent units...");
-		calculateAffectedAgentUnits();
-		NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
-		log.info("Calculating the number of affected agent units... Done.");
-
-		log.info("Calculating noise damage costs...");
-		calculateNoiseDamageCosts();
-		log.info("Calculating noise damage costs... Done.");
+		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+			
+			log.info("Calculating the number of affected agent units...");
+			calculateAffectedAgentUnits();
+			NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
+			log.info("Calculating the number of affected agent units... Done.");
+		
+			log.info("Calculating noise damage costs...");
+			calculateNoiseDamageCosts();
+			log.info("Calculating noise damage costs... Done.");
+		}
 			
 	}
 		
@@ -251,12 +254,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		log.info("Calculating noise damage costs for each receiver point... Done.");
 
 		if (this.noiseContext.getNoiseParams().isThrowNoiseEventsAffected()) {
+			
 			log.info("Throwing noise events for the affected agents...");
 			throwNoiseEventsAffected();
 			log.info("Throwing noise events for the affected agents... Done.");
 		}
 		
-		if (this.noiseContext.getNoiseParams().isComputeCausingAgents() || this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused() || this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
+		if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
+			
 			log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 			calculateCostSharesPerLinkPerTimeInterval();
 			NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
@@ -268,7 +273,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
 			log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
 						
-			if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused() || this.noiseContext.getNoiseParams().isInternalizeNoiseDamages() ) {
+			if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 				log.info("Throwing noise events for the causing agents...");
 				throwNoiseEventsCaused();
 				log.info("Throwing noise events for the causing agents... Done.");
@@ -277,7 +282,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					this.noiseContext.storeTimeInterval();
 				}
 			}
-			
 		}
 		
 	}

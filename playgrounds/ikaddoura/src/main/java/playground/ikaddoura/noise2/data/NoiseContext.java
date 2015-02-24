@@ -88,8 +88,12 @@ public class NoiseContext {
 	private double eventTime = Double.MIN_VALUE;
 					
 	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
+		
 		this.scenario = scenario;
+		
 		this.noiseParams = noiseParams;
+		this.noiseParams.checkForConsistency();
+		
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
@@ -104,33 +108,17 @@ public class NoiseContext {
 		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
 			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
 		}
-		
-		if (this.consideredActivitiesForDamages.size() == 0) {
-			log.warn("Not considering any activity type for the noise damage computation.");
-		}
-		
-		if (this.consideredActivitiesForReceiverPointGrid.size() == 0) {
-			log.warn("Not considering any activity type for the minimum and maximum coordinates of the receiver point grid area.");
-		}
-		
-		for (String type : this.consideredActivitiesForDamages) {
-			if (!this.consideredActivitiesForReceiverPointGrid.contains(type)) {
-				throw new RuntimeException("An activity type which is considered for the damage calculation (" + type
-						+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
-			}
-		}
 	}
 	
 	// for routing purposes
 	public void storeTimeInterval() {
 		
 		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>();
-		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);		
-		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
-		this.timeInterval2linkId2noiseLinks.put(currentTimeIntervalCopy, noiseLinksThisTimeBinCopy);
+		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);
 		
-		log.warn("Adding for linkA5 at interval " + this.currentTimeBinEndTime + ": " + this.noiseLinks.get(Id.createLinkId("linkA5")).getDamageCostPerCar());
-		log.warn("Adding for linkA5 at interval " + currentTimeIntervalCopy + ": " + noiseLinksThisTimeBinCopy.get(Id.createLinkId("linkA5")).getDamageCostPerCar());
+		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
+		
+		this.timeInterval2linkId2noiseLinks.put(currentTimeIntervalCopy, noiseLinksThisTimeBinCopy);
 	}
 	
 	public void initialize() {
@@ -180,7 +168,7 @@ public class NoiseContext {
 	
 	private void createGrid() {
 		
-		if (this.noiseParams.getReceiverPointsGridMinX() == 0. || this.noiseParams.getReceiverPointsGridMinY() == 0. || this.noiseParams.getReceiverPointsGridMaxX() == 0. || this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
+		if (this.noiseParams.getReceiverPointsGridMinX() == 0. && this.noiseParams.getReceiverPointsGridMinY() == 0. && this.noiseParams.getReceiverPointsGridMaxX() == 0. && this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
 			
 			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates of all activity locations.");
 						

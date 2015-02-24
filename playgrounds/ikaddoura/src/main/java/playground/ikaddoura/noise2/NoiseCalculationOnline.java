@@ -32,6 +32,7 @@ import org.matsim.core.controler.listener.StartupListener;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
+import playground.ikaddoura.noise2.handler.NoisePricingHandler;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 
@@ -47,6 +48,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private NoiseContext noiseContext;
 	private NoiseTimeTracker timeTracker;
 	private PersonActivityTracker actTracker;
+	private NoisePricingHandler pricing;
 			
 	public NoiseCalculationOnline(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
@@ -65,8 +67,15 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getControler().getEvents(), event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/");			
 		event.getControler().getEvents().addHandler(this.timeTracker);
 	
-		this.actTracker = new PersonActivityTracker(noiseContext);
-		event.getControler().getEvents().addHandler(this.actTracker);
+		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+			this.actTracker = new PersonActivityTracker(noiseContext);
+			event.getControler().getEvents().addHandler(this.actTracker);
+		}
+			
+		if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
+			this.pricing = new NoisePricingHandler(event.getControler().getEvents());
+			event.getControler().getEvents().addHandler(this.pricing);
+		}		
 	}
 	
 	@Override

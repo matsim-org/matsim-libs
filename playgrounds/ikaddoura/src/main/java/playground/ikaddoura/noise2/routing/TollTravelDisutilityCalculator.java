@@ -53,6 +53,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
 		this.marginalUtlOfTravelTime = (- cnScoringGroup.getTraveling_utils_hr() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.noiseContext = noiseContext;		
+		log.info("The link travel disutility is calculated based on the travel time, the distance and the expected toll (monetized noise damage costs) of each link.");
 	}
 
 	@Override
@@ -93,7 +94,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 
 		}
 
-		log.warn("Expected toll on link " + link.getId() + " at time " + time + " in time interval " + timeIntervalEndTime + ": " + linkExpectedToll);
+//		log.warn("Expected toll on link " + link.getId() + " at time " + time + " in time interval " + timeIntervalEndTime + ": " + linkExpectedToll);
 				
 		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * linkExpectedToll;			
 		return linkExpectedTollDisutility;

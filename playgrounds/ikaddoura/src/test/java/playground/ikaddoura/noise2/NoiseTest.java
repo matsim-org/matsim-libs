@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -962,6 +963,7 @@ public class NoiseTest {
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);	
 	}
 	
+	@Ignore
 	@Test
 	public final void test4(){
 		
