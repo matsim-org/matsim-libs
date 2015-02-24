@@ -48,6 +48,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -80,6 +82,9 @@ public class DgAnalyseCottbusKS2010 {
 
 	private static final Logger log = Logger.getLogger(DgAnalyseCottbusKS2010.class);
 
+	private static final CoordinateReferenceSystem crs = MGC
+			.getCRS(TransformationFactory.WGS84_UTM33N);
+	
 	static class TimeConfig {
 		String name;
 		double startTime; 
@@ -265,12 +270,12 @@ public class DgAnalyseCottbusKS2010 {
 		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/diffs/";
 		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonsIds);
-		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, Cottbus2KS2010.CRS, out.getAbsolutePath());
+		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_disattracted_acts");
 
 		out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_attracted/");
 		newPop = this.getFilteredPopulation(pop, attractedPersonsIds);
-		sps = new DgSelectedPlans2ESRIShape(newPop, n, Cottbus2KS2010.CRS, out.getAbsolutePath());
+		sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
 		sps.writeActs(baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_attracted_acts");
 	}
 	
@@ -310,7 +315,7 @@ public class DgAnalyseCottbusKS2010 {
 
 		shapefile = shapeBase + "_simsimcomparison";
 		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
-		new SimSimShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
+		new SimSimShapefileWriter(result.network, DgAnalyseCottbusKS2010.crs).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
 	}
 
 
@@ -446,7 +451,7 @@ public class DgAnalyseCottbusKS2010 {
 	private static Envelope getTransformedEnvelope(Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple) {
 		BoundingBox bounds = featureTuple.getSecond().getBounds();
 		Envelope env = new Envelope(bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY());
-		env = transform(env, featureTuple.getFirst(), Cottbus2KS2010.CRS);
+		env = transform(env, featureTuple.getFirst(), DgAnalyseCottbusKS2010.crs);
 		return env;
 	}
 
