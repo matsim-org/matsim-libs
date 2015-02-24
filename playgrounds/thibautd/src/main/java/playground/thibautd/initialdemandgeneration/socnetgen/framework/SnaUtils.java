@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.population.SocialNetworkImpl;
 import playground.thibautd.utils.CollectionUtils;
 
 /**
@@ -72,7 +73,14 @@ public class SnaUtils {
 		if ( probabilityPrecision < 0 || probabilityPrecision > 1 ) throw new IllegalArgumentException( "illegal probability "+probabilityPrecision );
 		if ( !socialNetwork.isReflective() ) throw new IllegalArgumentException( "cannot estimate clustering on non reflective network" );
 
+
 		final int k = (int) Math.ceil( 0.5d * Math.pow( precision , -2 ) * Math.log( 2d / (1 - probabilityPrecision) ) );
+
+		if ( socialNetwork instanceof SocialNetworkImpl && ((SocialNetworkImpl) socialNetwork).nTies() < k ) {
+			log.info( "social network has less ties than required sample size for approximation: use exact calculation" );
+			return calcClusteringCoefficient( socialNetwork );
+		}
+
 		final List<Id<Person>> egos = new ArrayList< >( socialNetwork.getEgos() );
 		log.info( "estimating clustering for precision "+precision+" with probability "+probabilityPrecision+":" );
 		log.info( "sampling "+k+" wedges for social network with "+socialNetwork.getEgos().size()+" egos" );

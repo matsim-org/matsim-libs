@@ -44,6 +44,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	private final boolean isReflective;
 
 	private final Map<String, String> metadata = new LinkedHashMap<String, String>();
+	private long nTies = 0;
 
 	public SocialNetworkImpl() {
 		this( true );
@@ -119,6 +120,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean added = alters.add( alter );
 		if ( added ) tieCounter.incCounter();
+		nTies++;
 	}
 
 	private void removeTieInternal(
@@ -128,6 +130,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean rem = alters.remove( alter );
 		if ( !rem ) throw new RuntimeException( alter+" not alter of ego "+ego );
+		nTies--;
 	}
 
 	@Override
@@ -170,12 +173,17 @@ public class SocialNetworkImpl implements SocialNetwork {
 		if ( !isReflective() ) throw new IllegalStateException( "Cannot remove an ego in a non reflective network." );
 
 		final Set<Id<Person>> alters = map.remove( ego );
+		nTies -= alters.size();
 
 		// this requires the network to be reflective to be correct.
 		for ( Id<Person> alter : alters ) {
 			final Set<Id<Person>> altersOfAlter = map.get( alter );
-			altersOfAlter.remove( ego );
+			if ( altersOfAlter.remove( ego ) ) nTies--;
 		}
+	}
+
+	public long nTies() {
+		return nTies;
 	}
 }
 
