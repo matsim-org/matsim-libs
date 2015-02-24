@@ -194,7 +194,7 @@ public class SnaUtils {
 
 	public static double calcAveragePersonalNetworkSize(final SocialNetwork socialNetwork) {
 		int count = 0;
-		int sum = 0;
+		long sum = 0;
 		for ( Id ego : socialNetwork.getEgos() ) {
 			count++;
 			sum += socialNetwork.getAlters( ego ).size();
