@@ -223,10 +223,14 @@ public class ModelIterator {
 
 				log.info( "improvement with "+t+" compared to "+( lastMove == null ? null : lastMove.getParent() ) );
 				log.info( "new value "+function( t ) );
-				fillQueueWithChildren(
-						t,
-						primaryStepSize * expansionFactor,
-						secondaryStepSize * expansionFactor );
+				for ( int i = 1;
+						!fillQueueWithChildren(
+								t,
+								primaryStepSize * i * expansionFactor,
+								secondaryStepSize * i * expansionFactor );
+						i++ ) {
+					log.warn( "no non-tabu child for expansion factor "+(i * expansionFactor) );
+				}
 
 				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
 
@@ -238,20 +242,33 @@ public class ModelIterator {
 
 			if ( equivalent( t, lastMove.getParent() ) ) {
 				log.info( "exactly same value as parent: probably in a flat area --- step and expand" );
-				addToStack(
-						new Move(
-							t,
-							lastMove.getStepPrimary() * flatExpansionFactor,
-							lastMove.getStepSecondary() * flatExpansionFactor,
-							primaryStepSize * flatExpansionFactor,
-							secondaryStepSize * flatExpansionFactor ) );
+				for ( int i=1;
+						!addToStack(
+								new Move(
+									t,
+									lastMove.getStepPrimary() * flatExpansionFactor / i,
+									lastMove.getStepSecondary() * flatExpansionFactor / i,
+									primaryStepSize * flatExpansionFactor / i,
+									secondaryStepSize * flatExpansionFactor / i ) );
+						i++ ) {
+					// if expansion does not succeed, contraction. If contraction leads to equivalent,
+					// expansion again --- which might be tabu. Recognize that this would happen and
+					// decrease expansion to emulate foreseen contraction
+					// (another, "nicer" solution, would be not to use a tabu list,
+					// in which case the process would be happy without special handling)
+					log.warn( "no non-tabu child for flat expansion factor "+( flatExpansionFactor / i ) );
+				}
 			}
 			else {
 				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
-				fillQueueWithChildren(
-						lastMove.getParent(),
-						primaryStepSize / contractionFactor,
-						secondaryStepSize / contractionFactor );
+				for ( int i = 1;
+						!fillQueueWithChildren(
+								lastMove.getParent(),
+								primaryStepSize / ( i * contractionFactor ),
+								secondaryStepSize / ( i * contractionFactor ) );
+						i++ ) {
+					log.warn( "no non-tabu child for contraction factor "+(i * contractionFactor) );
+				}
 			}
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
