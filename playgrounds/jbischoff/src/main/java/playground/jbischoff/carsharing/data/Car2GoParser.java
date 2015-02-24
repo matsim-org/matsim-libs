@@ -37,7 +37,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
+/**
+ * @author jbischoff
+ *
+ */
 public class Car2GoParser
 {
 

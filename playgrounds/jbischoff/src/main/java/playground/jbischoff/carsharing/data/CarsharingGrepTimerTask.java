@@ -36,8 +36,11 @@ import java.util.TimerTask;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-
-public class DriveNowGrepTimerTask
+/**
+ * @author jbischoff
+ *
+ */
+public class CarsharingGrepTimerTask
     extends TimerTask
     
 	
@@ -51,7 +54,7 @@ public class DriveNowGrepTimerTask
     
     public static void main(String[] args)
     {
-        DriveNowGrepTimerTask dngt = new DriveNowGrepTimerTask();
+        CarsharingGrepTimerTask dngt = new CarsharingGrepTimerTask();
         Timer t = new Timer();
         t.scheduleAtFixedRate(dngt, 0, 60*1000);
     }
@@ -117,7 +120,9 @@ public class DriveNowGrepTimerTask
 			
 			if (!currentVehicle.getPosition().equals(entry.getValue().getLocation())){
 				
-				CarsharingRide ride = new CarsharingRide(currentVehicle.getPosition(), entry.getValue().getLocation(), currentVehicle.getTime(), time, currentVehicle.getFuel(), entry.getValue().getFuel(), currentVehicle.getMileage(), entry.getValue().getMileage(), 0, 0, 0, 0);
+				HereMapsRouteGrepper rg = new HereMapsRouteGrepper(currentVehicle.getPosition(), entry.getValue().getLocation());
+				VBBRouteCatcher vbb = new VBBRouteCatcher(currentVehicle.getPosition(), entry.getValue().getLocation(), time);
+				CarsharingRide ride = new CarsharingRide(currentVehicle.getPosition(), entry.getValue().getLocation(), currentVehicle.getTime(), time, currentVehicle.getFuel(), entry.getValue().getFuel(), currentVehicle.getMileage(), entry.getValue().getMileage(), rg.getDistance(), rg.getBaseTime(), rg.getTravelTime(), vbb.getBestTransfers(), vbb.getBestRideTime());
 				currentVehicle.addRide(ride);
 				
 				currentVehicle.setFuel(entry.getValue().getFuel());
@@ -239,15 +244,16 @@ class CarsharingRide implements Comparable<CarsharingRide>
 		
 		private double roadAlternativeKM;
 		private double roadAlternativeTime;
+		private double roadAlternativeCongestedTime;
 		
-		private double ptAlternativeKM;
+		private double ptAlternativeTransfers;
 		private double ptAlternativeTime;
 		
 		
 		public CarsharingRide(Coord from, Coord to, long start, long end,
 				double fuelBefore, double fuelAfter, double mileageBefore,
 				double mileageAfter, double roadAlternativeKM,
-				double roadAlternativeTime, double ptAlternativeKM,
+				double roadAlternativeTime, double roadAlternativeCongestedTime ,double ptAlternativeTransfers,
 				double ptAlternativeTime) {
 			super();
 			this.from = from;
@@ -260,7 +266,8 @@ class CarsharingRide implements Comparable<CarsharingRide>
 			this.mileageAfter = mileageAfter;
 			this.roadAlternativeKM = roadAlternativeKM;
 			this.roadAlternativeTime = roadAlternativeTime;
-			this.ptAlternativeKM = ptAlternativeKM;
+			this.roadAlternativeCongestedTime = roadAlternativeCongestedTime;
+			this.ptAlternativeTransfers = ptAlternativeTransfers;
 			this.ptAlternativeTime = ptAlternativeTime;
 		}
 		
@@ -273,12 +280,12 @@ class CarsharingRide implements Comparable<CarsharingRide>
 					+ mileageBefore + ", mileageAfter=" + mileageAfter
 					+ ", roadAlternativeKM=" + roadAlternativeKM
 					+ ", roadAlternativeTime=" + roadAlternativeTime
-					+ ", ptAlternativeKM=" + ptAlternativeKM
+					+ ", ptAlternativeKM=" + ptAlternativeTransfers
 					+ ", ptAlternativeTime=" + ptAlternativeTime + "]";
 		}
 		
 		public String toLine() {
-			return   from.getY() + "," +from.getX()+ "\t" + to.getY() + ","+to.getX() +"\t" + DriveNowGrepTimerTask.MIN.format(start) + "\t" + DriveNowGrepTimerTask.MIN.format(end) + "\t" + fuelBefore + "\t" + fuelAfter+ "\t" + mileageBefore + "\t" + mileageAfter + "\t" + roadAlternativeKM + "\t" + roadAlternativeTime+ "\t" + ptAlternativeKM + "\t" + ptAlternativeTime;
+			return   from.getX() + "," +from.getY()+ "\t" + to.getX() + ","+to.getY() +"\t" + CarsharingGrepTimerTask.MIN.format(start) + "\t" + CarsharingGrepTimerTask.MIN.format(end) + "\t" + Math.round(fuelBefore) + "\t" + Math.round(fuelAfter) + "\t" + Math.round(mileageBefore) + "\t" + Math.round(mileageAfter) + "\t" + Math.round(roadAlternativeKM) + "\t" + Math.round(roadAlternativeTime) + "\t" +Math.round(roadAlternativeCongestedTime) + "\t" + Math.round(ptAlternativeTransfers) + "\t" + Math.round(ptAlternativeTime);
 					
 		}
 
@@ -314,7 +321,7 @@ class CarsharingRide implements Comparable<CarsharingRide>
 			return roadAlternativeTime;
 		}
 		public double getPtAlternativeKM() {
-			return ptAlternativeKM;
+			return ptAlternativeTransfers;
 		}
 		public double getPtAlternativeTime() {
 			return ptAlternativeTime;

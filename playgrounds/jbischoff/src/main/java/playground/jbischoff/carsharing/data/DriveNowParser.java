@@ -37,7 +37,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
+/**
+ * @author jbischoff
+ *
+ */
 public class DriveNowParser
 {
 
@@ -118,7 +121,7 @@ class CarsharingVehicleData {
     CarsharingVehicleData(Id<CarsharingVehicleData> vid, String license, String lati, String longi, String mileage, String fuel, String provider){
         this.vid = vid;
         this.license = license;
-        this.location = new CoordImpl(longi,lati);
+        this.location = new CoordImpl(lati,longi);
         this.mileage = Long.parseLong(mileage);
         this.fuel = Double.parseDouble(fuel);
         this.time = System.currentTimeMillis();
