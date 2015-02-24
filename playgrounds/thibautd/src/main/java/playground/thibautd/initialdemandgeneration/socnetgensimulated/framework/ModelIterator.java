@@ -20,10 +20,9 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -55,6 +54,10 @@ public class ModelIterator {
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
+	private final double exponent = 5;
+	private final double contractionFactor = 2;
+	private final double expansionFactor = 1.5;
+
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
 		this.targetClustering = config.getTargetClustering();
 		this.targetDegree = config.getTargetDegree();
@@ -72,48 +75,85 @@ public class ModelIterator {
 		this.maxIterations = config.getMaxIterations();
 	}
 
+	private SocialNetwork generate( final ModelRunner runner , final Thresholds thresholds ) {
+		log.info( "generate network for "+thresholds );
+		final long start = System.currentTimeMillis();
+		final SocialNetwork sn = runner.runModel( thresholds );
+
+		thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
+		thresholds.setResultingClustering( estimateClustering( sn ) );
+
+		log.info( "generation took "+(System.currentTimeMillis() - start)+" ms" );
+		return sn;
+	}
+
+
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
-		final ThresholdMemory memory = new ThresholdMemory( initialThresholds );
+		generate( runner , initialThresholds );
+		Thresholds currentParent = initialThresholds;
 
-		int stagnationCount = 0;
-		Thresholds currentBest = initialThresholds;
+		double stepPrimary = initialPrimaryStep;
+		double stepSecondary = initialSecondaryStep;
 
-		for ( int iter=1; iter < maxIterations; iter++ ) {
+		final Set<Thresholds> tabu = new HashSet< >();
+		for ( int iter=1, stagnationCount=0;
+				iter < maxIterations && stagnationCount < stagnationLimit;
+				iter++, stagnationCount++ ) {
 			log.info( "Iteration # "+iter );
-			final long start = System.currentTimeMillis();
-			final Thresholds thresholds =
-					memory.createNewThresholds( );
 
-			log.info( "generate network for "+thresholds );
-			final SocialNetwork sn = runner.runModel( thresholds );
+			final List<Move> moves = new ArrayList<Move>( 4 );
 
-			thresholds.setResultingAverageDegree( SnaUtils.calcAveragePersonalNetworkSize( sn ) );
-			thresholds.setResultingClustering( estimateClustering( sn ) );
+			log.info( "Parent: "+currentParent );
+			log.info( "primary : "+stepPrimary );
+			log.info( "secondary : "+stepSecondary );
 
-			final Thresholds newBest = memory.add( thresholds );
+			moves.add( new Move( currentParent , 0 , stepSecondary ) );
+			moves.add( new Move( currentParent , stepPrimary , 0 ) );
+			moves.add( new Move( currentParent , 0 , -stepSecondary ) );
+			moves.add( new Move( currentParent , -stepPrimary , 0 ) );
 
-			log.info( "Iteration # "+iter+" took "+(System.currentTimeMillis() - start)+" ms" );
-			if ( isAcceptable( thresholds ) ) {
-				log.info( "END - "+thresholds+" fulfills the precision criteria!" );
-				return sn;
+			Move bestChild = null;
+			SocialNetwork bestChildResultingNetwork = null;
+
+			for ( Move move : moves ) {
+				final Thresholds thresholds = move.getChild();
+				if ( !tabu.add( thresholds ) ) continue;
+				final SocialNetwork sn = generate( runner , thresholds );
+
+				if ( bestChild == null || function( thresholds ) < function( bestChild.getChild() ) ) {
+					bestChild = move;
+					bestChildResultingNetwork = sn;
+				}
+
+				for ( EvolutionListener l : listeners ) l.handleMove( move , false );
 			}
 
-			if ( newBest == currentBest && stagnationCount++ > stagnationLimit ) {
-				log.warn( "stop iterations before reaching the required precision level!" );
-				log.info( "END - stagnating on "+currentBest+" since "+stagnationCount+" iterations." );
-				return runner.runModel( currentBest );
+			if ( isAcceptable( bestChild.getChild() ) ) {
+				log.info( "END - "+bestChild+" fulfills the precision criteria!" );
+				return bestChildResultingNetwork;
+			}
+
+			if ( function( bestChild.getChild() ) < function( bestChild.getParent() ) ) {
+				stagnationCount = 0;
+				log.info( "improvement with "+bestChild.getChild()+" compared to "+bestChild.getParent() );
+				log.info( "new value "+function( bestChild.getChild() ) );
+				currentParent = bestChild.getChild();
+				stepPrimary *= expansionFactor;
+				stepSecondary *= expansionFactor;
 			}
 			else {
-				stagnationCount = 0;
-				currentBest = newBest;
+				log.info( "no improvement with "+bestChild.getChild()+" compared to "+bestChild.getParent() );
+				log.info( "new value "+function( bestChild.getChild() ) );
+				stepPrimary /= contractionFactor;
+				stepSecondary /= contractionFactor;
 			}
 		}
 
 		log.warn( "stop iterations before reaching the required precision level!" );
-		log.info( "END - Maximum number of iterations reached. Best so far: "+currentBest );
-		return runner.runModel( currentBest );
+		log.info( "END - Maximum number of iterations or stagnation reached. Best so far: "+currentParent );
+		return runner.runModel( currentParent );
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
@@ -145,214 +185,27 @@ public class ModelIterator {
 		return Math.abs( targetDegree -  thresholds.getResultingAverageDegree() );
 	}
 
-	// TODO: write moves to file, to be able to plot tree
-	private class ThresholdMemory {
-
-		private final Queue<Move> queue =
-			new PriorityQueue< >(
-					10,
-					 new Comparator<Move>() {
-							@Override
-							public int compare( Move o1 , Move o2 ) {
-								// Note: priority queue returns the LOWEST
-								// element (which is awfully confusing
-								// when one thinks in terms of comparing
-								// PRIORITY...)
-								if ( !equivalent( o1.getParent() , o2.getParent() ) ) {
-									// if not same parent, starting from lower function is better (try to minimize)
-									return Double.compare( function( o1.getParent() ) , function( o2.getParent() ) );
-								}
-
-								if ( o1.age != o2.age ) {
-									// lowest age is better.
-									return o1.age - o2.age;
-								}
-
-								final double parentDegree = o1.getParent().getResultingAverageDegree();
-								final double parentClustering = o1.getParent().getResultingClustering();
-
-								final int primaryCompare = Double.compare( o1.getChild().getPrimaryThreshold() , o2.getChild().getPrimaryThreshold() );
-								final int secondaryCompare = Double.compare(o1.getChild().getSecondaryReduction() , o2.getChild().getSecondaryReduction() );
-
-								if ( primaryCompare != 0 ) {
-									// if degree too high, bigger threshold increase move is better
-									return parentDegree > targetDegree ? -primaryCompare : primaryCompare;
-								}
-
-								if ( secondaryCompare != 0 ) {
-									// if clustering too low, bigger reduction is better
-									return parentClustering < targetClustering ? -secondaryCompare : secondaryCompare;
-								}
-
-								return 0;
-							}
-						} );
-
-		// we want an improvement of one precision unit to result in the same effect
-		// on mono-objective version.
-		private final double factorClustering = precisionDegree / precisionClustering;
-
-		private final double exponent = 1;
-		private final double contractionFactor = 2;
-		private final double expansionFactor = 1;
-		private final double flatExpansionFactor = 2;
-
-		private Move lastMove = null;
-
-		private Thresholds initial;
-
-		private static final double EPSILON = 1E-9;
-
-		public ThresholdMemory( final Thresholds initial ) {
-			this.initial = initial;
-		}
-
-		/**
-		 * @return the current best thresholds
-		 */
-		public Thresholds add( final Thresholds t ) {
-			if ( lastMove != null && t != lastMove.getChild() ) throw new IllegalArgumentException();
-
-			//final boolean hadDegreeImprovement = lastMove == null || distDegree( t ) < distDegree( lastMove.parent );
-			//final boolean hadClusteringImprovement = lastMove == null || distClustering( t ) < distClustering( lastMove.parent );
-
-			// no improvement means "overshooting": decrease step sizes
-			final double primaryStepSize = lastMove == null ? initialPrimaryStep : lastMove.stepSizePrimary;
-			final double secondaryStepSize = lastMove == null ? initialSecondaryStep : lastMove.stepSizeSecondary;
-
-			if ( primaryStepSize < EPSILON || secondaryStepSize < EPSILON ) {
-				log.warn( "step size almost null. stop iterations there." );
-				return isBetter( t ) ? t : lastMove.getParent();
-			}
-
-			log.info( "New step Sizes:" );
-			log.info( "primary : "+primaryStepSize );
-			log.info( "secondary : "+secondaryStepSize );
-
-			if ( lastMove == null || isBetter( t ) ) {
-
-				log.info( "improvement with "+t+" compared to "+( lastMove == null ? null : lastMove.getParent() ) );
-				log.info( "new value "+function( t ) );
-				fillQueueWithChildren(
-						0,
-						t,
-						// expand only in non-null direction
-						lastMove != null && Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize * expansionFactor : primaryStepSize,
-						lastMove != null && Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize * expansionFactor : secondaryStepSize );
-
-				if (lastMove != null) for ( EvolutionListener l : listeners ) l.handleMove( lastMove , true );
-
-				return t;
-			}
-
-			// TODO: if exactly the same value, search *further*
-			log.info( "new value "+function( t ) );
-
-			if ( equivalent( t, lastMove.getParent() ) ) {
-				log.info( "exactly same value as parent: probably in a flat area --- step and expand" );
-				addToStack(
-						new Move(
-							lastMove.age + 1,
-							t,
-							lastMove.getStepPrimary() * flatExpansionFactor,
-							lastMove.getStepSecondary() * flatExpansionFactor,
-							// only expand non-null direction
-							Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize * flatExpansionFactor : primaryStepSize,
-							Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize * flatExpansionFactor : secondaryStepSize ) );
-			}
-			else {
-				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
-				addToStack(
-						new Move(
-							lastMove.age + 1,
-							lastMove.getParent(),
-							lastMove.getStepPrimary() / contractionFactor,
-							lastMove.getStepSecondary() / contractionFactor,
-							// only contract non-null direction
-							Math.abs( lastMove.stepPrimary ) > EPSILON ? primaryStepSize / contractionFactor : primaryStepSize,
-							Math.abs( lastMove.stepSecondary ) > EPSILON ? secondaryStepSize / contractionFactor : secondaryStepSize ) );
-			}
-
-			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
-
-			return lastMove.getParent();
-		}
-
-		private boolean equivalent(
-				final Thresholds t,
-				final Thresholds parent ) {
-			return Math.abs( t.getResultingAverageDegree() - parent.getResultingAverageDegree() ) < EPSILON &&
-					Math.abs( t.getResultingClustering() - parent.getResultingClustering() ) < EPSILON;
-		}
-
-		private boolean isBetter( Thresholds t ) {
-			return function( t ) < function( lastMove.getParent() );
-		}
-
-		private double function( Thresholds t ) {
-			return Math.pow( distDegree( t ) , exponent ) +
-				Math.pow( factorClustering * distClustering( t ) , exponent );
-		}
-
-		public Thresholds createNewThresholds() {
-			if ( initial != null ) {
-				final Thresholds v = initial;
-				initial = null;
-				return v;
-			}
-
-			lastMove = queue.remove();
-			return lastMove.getChild();
-		}
-
-		private boolean fillQueueWithChildren(
-				final int age,
-				final Thresholds point,
-				final double stepDegree,
-				final double stepSecondary ) {
-			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
-			boolean smth = false;
-
-			smth = smth | addToStack( new Move( age , point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( age , point , stepDegree , 0 , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( age , point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
-			smth = smth | addToStack( new Move( age , point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
-
-			return smth;
-		}
-		
-		private boolean addToStack( final Move move  ) {
-			queue.add( move );
-			return true;
-		}
+	private double function( Thresholds t ) {
+		return Math.pow( distDegree( t ) , exponent ) +
+			Math.pow( (precisionDegree / precisionClustering) * distClustering( t ) , exponent );
 	}
 
 	public static class Move {
-		private final int age;
 		private final Thresholds parent;
 		private final double stepPrimary;
 		private final double stepSecondary;
 		private final Thresholds child;
 
-		private final double stepSizePrimary;
-		private final double stepSizeSecondary;
-
 		private Move(
-				final int iterSameParent,
 				final Thresholds parent,
 				final double stepPrimary,
-				final double stepSecondary,
-				final double stepSizePrimary,
-				final double stepSizeSecondary ) {
-			this.age = iterSameParent;
+				final double stepSecondary ) {
 			this.parent = parent;
 			this.stepPrimary = stepPrimary;
 			this.stepSecondary = stepSecondary;
 			this.child = new Thresholds(
 					parent.getPrimaryThreshold() + stepPrimary,
 					parent.getSecondaryReduction() + stepSecondary );
-			this.stepSizePrimary = stepSizePrimary;
-			this.stepSizeSecondary = stepSizeSecondary;
 		}
 
 		public Thresholds getParent() {
