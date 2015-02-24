@@ -98,13 +98,13 @@ public class ModelIterator {
 
 			log.info( "Iteration # "+iter+" took "+(System.currentTimeMillis() - start)+" ms" );
 			if ( isAcceptable( thresholds ) ) {
-				log.info( thresholds+" fulfills the precision criteria!" );
+				log.info( "END - "+thresholds+" fulfills the precision criteria!" );
 				return sn;
 			}
 
 			if ( newBest == currentBest && stagnationCount++ > stagnationLimit ) {
-				log.info( "stagnating on "+currentBest+" since "+stagnationCount+" iterations." );
 				log.warn( "stop iterations before reaching the required precision level!" );
+				log.info( "END - stagnating on "+currentBest+" since "+stagnationCount+" iterations." );
 				return runner.runModel( currentBest );
 			}
 			else {
@@ -113,8 +113,8 @@ public class ModelIterator {
 			}
 		}
 
-		log.warn( "Maximum number of iterations reached." );
 		log.warn( "stop iterations before reaching the required precision level!" );
+		log.info( "END - Maximum number of iterations reached. Best so far: "+currentBest );
 		return runner.runModel( currentBest );
 	}
 
@@ -160,7 +160,7 @@ public class ModelIterator {
 								// element (which is awfully confusing
 								// when one thinks in terms of comparing
 								// PRIORITY...)
-								if ( o1.getParent() != o2.getParent() ) {
+								if ( !equivalent( o1.getParent() , o2.getParent() ) ) {
 									// if not same parent, starting from lower function is better (try to minimize)
 									return Double.compare( function( o1.getParent() ) , function( o2.getParent() ) );
 								}
@@ -168,17 +168,17 @@ public class ModelIterator {
 								final double parentDegree = o1.getParent().getResultingAverageDegree();
 								final double parentClustering = o1.getParent().getResultingClustering();
 
-								final int primaryCompare = Double.compare( o2.getStepPrimary() , o1.getStepPrimary() );
-								final int secondaryCompare = Double.compare(o2.getStepSecondary() , o1.getStepSecondary() );
+								final int primaryCompare = Double.compare( o1.getChild().getPrimaryThreshold() , o2.getChild().getPrimaryThreshold() );
+								final int secondaryCompare = Double.compare(o1.getChild().getSecondaryReduction() , o2.getChild().getSecondaryReduction() );
 
 								if ( primaryCompare != 0 ) {
 									// if degree too high, bigger threshold increase move is better
-									return parentDegree > targetDegree ? primaryCompare : - primaryCompare;
+									return parentDegree > targetDegree ? -primaryCompare : primaryCompare;
 								}
 
 								if ( secondaryCompare != 0 ) {
-									// if clustering too low, bigger increase in reduction is better
-									return parentClustering < targetClustering ? secondaryCompare : - secondaryCompare;
+									// if clustering too low, bigger reduction is better
+									return parentClustering < targetClustering ? -secondaryCompare : secondaryCompare;
 								}
 
 								return 0;
@@ -189,9 +189,10 @@ public class ModelIterator {
 		// on mono-objective version.
 		private final double factorClustering = precisionDegree / precisionClustering;
 
-		private final double exponent = 4;
+		private final double exponent = 1;
 		private final double contractionFactor = 2;
 		private final double expansionFactor = 1;
+		private final double flatExpansionFactor = 2;
 
 		private Move lastMove = null;
 
@@ -220,7 +221,7 @@ public class ModelIterator {
 
 			if ( lastMove == null || isBetter( t ) ) {
 
-				log.info( "improvement with "+t );
+				log.info( "improvement with "+t+" compared to "+( lastMove == null ? null : lastMove.getParent() ) );
 				log.info( "new value "+function( t ) );
 				fillQueueWithChildren(
 						t,
@@ -232,16 +233,37 @@ public class ModelIterator {
 				return t;
 			}
 
-			log.info( "no improvement with "+t );
+			// TODO: if exactly the same value, search *further*
 			log.info( "new value "+function( t ) );
-			fillQueueWithChildren(
-					lastMove.getParent(),
-					primaryStepSize / contractionFactor,
-					secondaryStepSize / contractionFactor );
+
+			if ( equivalent( t, lastMove.getParent() ) ) {
+				log.info( "exactly same value as parent: probably in a flat area --- step and expand" );
+				addToStack(
+						new Move(
+							t,
+							lastMove.getStepPrimary() * flatExpansionFactor,
+							lastMove.getStepSecondary() * flatExpansionFactor,
+							primaryStepSize * flatExpansionFactor,
+							secondaryStepSize * flatExpansionFactor ) );
+			}
+			else {
+				log.info( "no improvement with " + t + " compared to " + lastMove.getParent() + ": contract steps" );
+				fillQueueWithChildren(
+						lastMove.getParent(),
+						primaryStepSize / contractionFactor,
+						secondaryStepSize / contractionFactor );
+			}
 
 			for ( EvolutionListener l : listeners ) l.handleMove( lastMove , false );
 
 			return lastMove.getParent();
+		}
+
+		private boolean equivalent(
+				final Thresholds t,
+				final Thresholds parent ) {
+			return Math.abs( t.getResultingAverageDegree() - parent.getResultingAverageDegree() ) < 1E-9 &&
+					Math.abs( t.getResultingClustering() - parent.getResultingClustering() ) < 1E-9;
 		}
 
 		private boolean isBetter( Thresholds t ) {
@@ -265,17 +287,22 @@ public class ModelIterator {
 			return lastMove.getChild();
 		}
 
-		private void fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
+		private boolean fillQueueWithChildren( final Thresholds point , final double stepDegree , final double stepSecondary ) {
 			//addToStack( moveByStep( point , stepDegree , stepSecondary ) );
-			addToStack( new Move( point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
-			addToStack( new Move( point , stepDegree , 0 , stepDegree ,stepSecondary ) );
-			addToStack( new Move( point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
-			addToStack( new Move( point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
+			boolean smth = false;
+
+			smth = smth | addToStack( new Move( point , 0 , stepSecondary , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( point , stepDegree , 0 , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( point , 0 , -stepSecondary , stepDegree ,stepSecondary ) );
+			smth = smth | addToStack( new Move( point , -stepDegree , 0 , stepDegree ,stepSecondary ) );
+
+			return smth;
 		}
 		
-		private void addToStack( final Move move  ) {
-			if ( !tabu.add( move.getChild() ) ) return;
+		private boolean addToStack( final Move move  ) {
+			if ( !tabu.add( move.getChild() ) ) return false;
 			queue.add( move );
+			return true;
 		}
 	}
 
