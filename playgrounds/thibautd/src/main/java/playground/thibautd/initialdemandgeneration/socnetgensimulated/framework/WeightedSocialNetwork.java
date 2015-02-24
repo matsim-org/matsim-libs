@@ -70,26 +70,28 @@ public class WeightedSocialNetwork {
 			final int alter,
 			final double weight ) {
 		if ( weight < lowestAllowedWeight ) return;
+		if ( ego == alter ) throw new IllegalArgumentException( "cannot create ties from one ego to himself!" );
+
+		final float fweight = (float) weight; // TODO check overflow?
+		final int insertionPointE = alters[ ego ].getInsertionPoint( fweight );
+		final int insertionPointA = alters[ alter ].getInsertionPoint( fweight );
 
 		// only add if both alters want it
-		if ( !alters[ ego ].isAcceptable( weight ) || !alters[ alter ].isAcceptable( weight ) ) return;
+		if ( !alters[ ego ].acceptInsertion( alter , fweight , insertionPointE ) ||
+				!alters[ alter ].acceptInsertion( ego , fweight , insertionPointA ) ) return;
 
-		final boolean added1 = addMonodirectionalTie( ego , alter , weight );
-		final boolean added2 = addMonodirectionalTie( alter , ego , weight );
-
-		assert added1;
-		assert added2;
+		addMonodirectionalTie( ego , alter , fweight , insertionPointE );
+		addMonodirectionalTie( alter , ego , fweight , insertionPointA );
 	}
 
-	private boolean addMonodirectionalTie(
+	private void addMonodirectionalTie(
 			final int ego,
 			final int alter,
-			final double weight ) {
-		if ( ego == alter ) throw new IllegalArgumentException( "cannot create ties from one ego to himself!" );
-		final int removed = alters[ ego ].add( alter , weight );
+			final float fweight,
+			final int insertionPoint ) {
+		final int removed = alters[ ego ].insert( alter , fweight , insertionPoint );
+		assert removed != alter; // addition not accepted in this case
 		if ( removed >= 0 ) alters[ removed ].remove( ego );
-		// Not very nice: index -2 or lower indicates no addition
-		return removed > -2;
 	}
 
 	/**
@@ -180,17 +182,6 @@ public class WeightedSocialNetwork {
 			return -1;
 		}
 
-		public synchronized int add( final int friend , final double weight ) {
-			final float fweight = (float) weight; // TODO check overflow?
-			final int insertionPoint = getInsertionPoint( fweight );
-			final int removed = insert( friend, fweight , insertionPoint );
-
-			assert size <= friends.length;
-			assert weights.length == friends.length;
-
-			return removed;
-		}
-
 		public Set<Id<Person>> getAltersOverWeight(
 				final double weight,
 				final IndexedPopulation population ) {
@@ -231,9 +222,42 @@ public class WeightedSocialNetwork {
 			return index >= 0 ? index : - 1 - index;
 		}
 
-		private boolean isAcceptable( final double weight ) {
-			return size < maximalSize || weight > weights[ 0 ];
+		private synchronized boolean acceptInsertion(
+				final int friend,
+				final float weight,
+				int insertionPoint ) {
+			if ( log.isTraceEnabled() ) {
+				log.trace( "check if inserting "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
+			}
+
+			if ( size == maximalSize && insertionPoint == 0 ) {
+				// full: do not add a low utility friend
+				if ( log.isTraceEnabled() ) log.trace( "no space left and value too bad. nothing done" );
+				return false;
+			}
+
+			// is the friend already in the array?
+			for ( int i = insertionPoint - 1; i >= 0 && weights[ i ] == weight; i-- ) {
+				if ( friends[ i ] == friend ) {
+					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
+					return false;
+				}
+			}
+			for ( int i = insertionPoint; i >= 0 && i < size && weights[ i ] <= weight; i++ ) {
+				if ( friends[ i ] == friend ) {
+					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
+					return false;
+				}
+			}
+
+			if ( log.isTraceEnabled() ) {
+				log.trace( "accept addition. State before addition:" );
+				traceState();
+			}
+
+			return true;
 		}
+
 
 		private synchronized int insert(
 				final int friend,
@@ -241,30 +265,7 @@ public class WeightedSocialNetwork {
 				int insertionPoint ) {
 			if ( log.isTraceEnabled() ) {
 				log.trace( "insert "+friend+" at "+insertionPoint+" in array of size "+friends.length+" with data size "+size );
-			}
-
-			if ( size == maximalSize && insertionPoint == 0 ) {
-				// full: do not add a low utility friend
-				if ( log.isTraceEnabled() ) log.trace( "no space left and value too bad. nothing done" );
-				return -2;
-			}
-
-			// is the friend already in the array?
-			for ( int i = insertionPoint - 1; i >= 0 && weights[ i ] == weight; i-- ) {
-				if ( friends[ i ] == friend ) {
-					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
-					return -3;
-				}
-			}
-			for ( int i = insertionPoint - 1; i >= 0 && i < size && weights[ i ] <= weight; i++ ) {
-				if ( friends[ i ] == friend ) {
-					if ( log.isTraceEnabled() ) log.trace( "friend already present. nothing done" );
-					return -4;
-				}
-			}
-
-			if ( log.isTraceEnabled() ) {
-				log.trace( "actually adding entry. State before addition:" );
+				log.trace( "State before addition:" );
 				traceState();
 			}
 
