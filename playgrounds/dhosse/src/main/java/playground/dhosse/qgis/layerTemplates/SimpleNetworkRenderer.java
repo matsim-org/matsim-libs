@@ -2,14 +2,16 @@ package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
+import playground.dhosse.qgis.ColorRamp;
 import playground.dhosse.qgis.QGisConstants;
 import playground.dhosse.qgis.QGisLineSymbolLayer;
 import playground.dhosse.qgis.QGisPointSymbolLayer;
 import playground.dhosse.qgis.QGisRenderer;
+import playground.dhosse.qgis.Range;
 
-public class SingleSymbolRenderer extends QGisRenderer {
+public class SimpleNetworkRenderer extends QGisRenderer {
 
-	public SingleSymbolRenderer(QGisConstants.geometryType gType) {
+	public SimpleNetworkRenderer(QGisConstants.geometryType gType) {
 		
 		super(QGisConstants.renderingType.singleSymbol);
 		
@@ -46,6 +48,31 @@ public class SingleSymbolRenderer extends QGisRenderer {
 			this.addSymbolLayer(lsl);
 			
 		}
+		
+	}
+
+	@Override
+	public Range[] getRanges() {
+		return null;
+	}
+
+	@Override
+	public String getRenderingAttribute() {
+		return null;
+	}
+
+	@Override
+	public void setRenderingAttribute(String attr) {
+		
+	}
+
+	@Override
+	public ColorRamp getColorRamp() {
+		return null;
+	}
+
+	@Override
+	public void setColorRamp(ColorRamp colorRamp) {
 		
 	}
 

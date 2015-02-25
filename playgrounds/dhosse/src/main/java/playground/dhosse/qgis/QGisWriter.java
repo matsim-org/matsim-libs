@@ -22,7 +22,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.dhosse.qgis.layerTemplates.SingleSymbolRenderer;
+import playground.dhosse.qgis.layerTemplates.SimpleNetworkRenderer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;

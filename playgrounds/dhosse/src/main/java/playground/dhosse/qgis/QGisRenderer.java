@@ -29,5 +29,15 @@ public abstract class QGisRenderer {
 	public void addSymbolLayer(QGisSymbolLayer sl){
 		this.symbolLayers.add(sl);
 	}
+	
+	public abstract Range[] getRanges();
+	
+	public abstract String getRenderingAttribute();
+	
+	public abstract void setRenderingAttribute(String attr);
+	
+	public abstract ColorRamp getColorRamp();
+
+	public abstract void setColorRamp(ColorRamp colorRamp);
 
 }

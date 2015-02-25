@@ -22,10 +22,24 @@ public class QGisLayer {
 	
 	private int layerTransparency;
 	
-	private Set<String> attributes;
-	
 	private Set<VectorJoin> vectorJoins;
 	
+	//these members are csv specific and needed for text files with geometry
+	private String delimiter;
+	private String xField;
+	private String yField;
+	
+	/**
+	 * Creates a new instance of a qgis layer.
+	 * For each layer, a {@code QGisRenderer} must be created (for use cases look at package layerTemplates).
+	 * 
+	 * If the layer input is a csv file, you also need to specify a delimiter (e.g. , or ;) and the header names
+	 * of the columns that contain the x and y coordinates. 
+	 * 
+	 * @param name a unique name for the layer (as it is displayed in qgis later)
+	 * @param path the path to the input file
+	 * @param geometryType the type of geometry (none, point, line, polygon)
+	 */
 	public QGisLayer(String name, String path, QGisConstants.geometryType geometryType){
 		
 		this.name = name;
@@ -33,7 +47,6 @@ public class QGisLayer {
 		this.id = Id.create(name + new SimpleDateFormat("yyyyMMdd").format(new Date()), QGisLayer.class);
 		this.setGeometryType(geometryType);
 		this.layerTransparency = 0;
-		this.attributes = new HashSet<String>();
 		this.vectorJoins = new HashSet<VectorJoin>();
 		
 		this.build();
@@ -112,16 +125,32 @@ public class QGisLayer {
 		this.layerTransparency = transparency;
 	}
 	
-	public void addAttribute(String att){
-		this.attributes.add(att);
-	}
-	
-	public Set<String> getAttributes(){
-		return this.attributes;
-	}
-	
 	public Set<VectorJoin> getVectorJoins(){
 		return this.vectorJoins;
+	}
+	
+	public void setDelimiter(String delimiter){
+		this.delimiter = delimiter;
+	}
+	
+	public String getDelimiter(){
+		return this.delimiter;
+	}
+	
+	public void setXField(String xField){
+		this.xField = xField;
+	}
+	
+	public String getXField(){
+		return this.xField;
+	}
+	
+	public void setYField(String yField){
+		this.yField = yField;
+	}
+	
+	public String getYField(){
+		return this.yField;
 	}
 	
 	/**
@@ -131,16 +160,7 @@ public class QGisLayer {
 	 * @param targetFieldName
 	 */
 	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName ){
-		if(this.getAttributes().contains(targetFieldName) && layer.getAttributes().contains(joinFieldName)){
-			this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
-			for(String att : layer.getAttributes()){
-				if(!att.equals(joinFieldName)){
-					this.attributes.add(layer.getName() + "_" + att);
-				}
-			}
-		} else{
-			System.err.println("One or both attribute fields for the vector join do not exit...");
-		}
+		this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
 	}
 	
 	public QGisConstants.inputType getInputType(){

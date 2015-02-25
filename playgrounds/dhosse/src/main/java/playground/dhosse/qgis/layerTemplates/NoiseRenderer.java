@@ -2,19 +2,18 @@ package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
+import playground.dhosse.qgis.ColorRamp;
 import playground.dhosse.qgis.QGisConstants;
 import playground.dhosse.qgis.QGisPointSymbolLayer;
 import playground.dhosse.qgis.QGisRenderer;
+import playground.dhosse.qgis.Range;
 
-public class GraduatedSymbolNoiseRenderer extends QGisRenderer {
+public class NoiseRenderer extends QGisRenderer {
 	
 	private String renderingAttribute;
 	private Range[] ranges;
-	private ColorRamp colorRamp = new ColorRamp();
 	
-	private QGisPointSymbolLayer source;
-
-	public GraduatedSymbolNoiseRenderer() {
+	public NoiseRenderer() {
 
 		super(QGisConstants.renderingType.graduatedSymbol);
 		
@@ -36,16 +35,6 @@ public class GraduatedSymbolNoiseRenderer extends QGisRenderer {
 
 		double sizeMapUnitScale[] = {0,0};
 		int size = 35;
-		
-		this.source = new QGisPointSymbolLayer();
-		this.source.setId(0);
-		this.source.setColor(new Color(37,157,85,255));
-		this.source.setColorBorder(new Color(0,0,0,255));
-		this.source.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
-		this.source.setSize(size);
-		this.source.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
-		this.source.setSizeMapUnitScale(sizeMapUnitScale);
-		this.source.setPenStyle(QGisConstants.penstyle.no);
 		
 		QGisPointSymbolLayer psl = new QGisPointSymbolLayer();
 		psl.setId(0);
@@ -137,102 +126,28 @@ public class GraduatedSymbolNoiseRenderer extends QGisRenderer {
 		
 	}
 	
+	@Override
 	public Range[] getRanges(){
 		return this.ranges;
 	}
 	
+	@Override
 	public String getRenderingAttribute(){
 		return this.renderingAttribute;
 	}
 	
+	@Override
 	public void setRenderingAttribute(String attr){
 		this.renderingAttribute = attr;
 	}
 	
+	@Override
 	public ColorRamp getColorRamp() {
-		return colorRamp;
+		return null;
 	}
 
+	@Override
 	public void setColorRamp(ColorRamp colorRamp) {
-		this.colorRamp = colorRamp;
-	}
-	
-	public QGisPointSymbolLayer getSourceSymbol(){
-		return this.source;
-	}
-
-	public static class Range{
-		
-		private double lowerBound;
-		private double upperBound;
-		private String label;
-		
-		public Range(double lowerBound, double upperBound, String label){
-			
-			this.lowerBound = lowerBound;
-			this.upperBound = upperBound;
-			this.label = label;
-			
-		}
-
-		public double getLowerBound() {
-			return lowerBound;
-		}
-
-		public double getUpperBound() {
-			return upperBound;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-		
-	}
-	
-	public static class ColorRamp{
-	
-		private String type = "gradient";
-		private String name = "[source]";
-		private Color color1 = new Color(215,25,28,255);
-		private Color color2 = new Color(26,150,65,255);
-		private int discrete = 0;
-		private int inverted = 1;
-		private String mode = "equal";
-		
-		private String[] stops = {"0.25;253,174,97,255:","0.5;255,255,192,255:","0.75;166,217,106,255"};
-
-		public String getType() {
-			return type;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public Color getColor1() {
-			return color1;
-		}
-
-		public Color getColor2() {
-			return color2;
-		}
-
-		public int getDiscrete() {
-			return discrete;
-		}
-
-		public String[] getStops() {
-			return stops;
-		}
-		
-		public int isInverted(){
-			return this.inverted;
-		}
-		
-		public String getMode(){
-			return this.mode;
-		}
-		
 	}
 
 }

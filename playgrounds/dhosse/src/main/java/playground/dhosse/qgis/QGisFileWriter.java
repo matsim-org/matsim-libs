@@ -4,11 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.core.utils.io.IOUtils;
-
-import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer;
-import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer.ColorRamp;
-import playground.dhosse.qgis.layerTemplates.GraduatedSymbolNoiseRenderer.Range;
+import playground.dhosse.qgis.layerTemplates.NoiseRenderer;
 
 public class QGisFileWriter {
 	
@@ -189,9 +185,9 @@ public class QGisFileWriter {
 		
 		if(layer.getInputType().equals(QGisConstants.inputType.csv) && !layer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
 
-//			layer.getAttributes().
-			
-			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=;&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=xCoord&amp;yField=yCoord&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
+			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=" + layer.getDelimiter() +
+					"&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + layer.getXField() +
+					"&amp;yField=" + layer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
 			
 		} else{
 			
@@ -446,17 +442,6 @@ public class QGisFileWriter {
 			
 		}
 		
-		out.write("\t\t\t<edittypes>\n");
-		
-		for(String attribute : layer.getAttributes()){
-			
-			out.write("\t\t\t\t<edittype labelontop=\"0\" editable=\"0\" widgetv2type=\"TextEdit\" name=\"" + attribute + "\">\n");
-			out.write("\t\t\t\t\t<widgetv2config IsMultiline=\"0\" fieldEditable=\"1\" UseHtml=\"0\" labelOnTop=\"0\"/>\n");
-			out.write("\t\t\t\t</edittype>\n");
-			
-		}
-		
-		out.write("\t\t\t</edittypes>\n");
 		out.write("\t\t\t<editform></editform>\n");
 		out.write("\t\t\t<editforminit></editforminit>\n");
 		out.write("\t\t\t<featformsuppress>0</featformsuppress>\n");
@@ -472,11 +457,11 @@ public class QGisFileWriter {
 	
 	private void writeGeometryLayer(BufferedWriter out, QGisLayer layer) throws IOException {
 	
-		if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
+		QGisRenderer renderer = layer.getRenderer();
+		
+		if(renderer.getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
 			
-		} else if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
-			
-			GraduatedSymbolNoiseRenderer renderer = (GraduatedSymbolNoiseRenderer) layer.getRenderer();
+		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
 			
 			out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
 			
@@ -490,68 +475,17 @@ public class QGisFileWriter {
 			
 			out.write("\t\t\t\t</ranges>\n");
 			
-			ColorRamp cr = renderer.getColorRamp();
-			String stops = "";
+		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
 			
-			for(String s : cr.getStops()){
-				stops += s;
-			}
+		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
 			
-			out.write("\t\t\t\t<colorramp type=\"" + cr.getType() + "\" name=\"" + cr.getName() + "\">\n");
-			
-			out.write("\t\t\t\t\t<prop k=\"color1\" v=\"" + cr.getColor1().getRed() + "," + cr.getColor1().getGreen() + "," + cr.getColor1().getBlue() + "," + cr.getColor1().getAlpha() + "\"/>\n");
-			out.write("\t\t\t\t\t<prop k=\"color2\" v=\"" + cr.getColor2().getRed() + "," + cr.getColor2().getGreen() + "," + cr.getColor2().getBlue() + "," + cr.getColor2().getAlpha() + "\"/>\n");
-			out.write("\t\t\t\t\t<prop k=\"discrete\" v=\"" + cr.getDiscrete() + "\"/>\n");
-			out.write("\t\t\t\t\t<prop k=\"stops\" v=\"" + stops + "\"/>\n");
-			
-			out.write("\t\t\t\t</colorramp>\n");
-			
-			out.write("\t\t\t\t<invertedcolorramp value=\"" + cr.isInverted() + "\"/>\n");
-			out.write("\t\t\t\t<mode name=\"" + cr.getMode() + "\"/>\n");
-			
-			out.write("\t\t\t\t<source-symbol>\n");
-			
-			QGisPointSymbolLayer source = renderer.getSourceSymbol();
-			
-			out.write("\t\t\t\t\t<symbol alpha=\"1\" type=\"" + source.getSymbolType().toString().toLowerCase() + "\" name=\"" + source.getId() + "\">\n");
-			
-			out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"" + layer.getLayerClass().toString() + "\" locked=\"0\">\n");
-			
-			out.write("\t\t\t\t\t\t\t<prop k=\"angle\" v=\"0\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"color\" v=\"" + source.getColor().getRed() + "," + source.getColor().getGreen() + "," + source.getColor().getBlue() + "," + source.getColor().getAlpha() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"color_border\" v=\"" + source.getColorBorder().getRed() + "," + source.getColorBorder().getGreen() + "," + source.getColorBorder().getBlue() + "," + source.getColorBorder().getAlpha() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"horizontal_anchor_point\" v=\"1\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"name\" v=\"" + source.getPointLayerSymbol().toString() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"offset\" v=\"" + source.getOffset()[0] + "," + source.getOffset()[1] + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"offset_map_unit_scale\" v=\"" + source.getOffsetMapUnitScale()[0] + "," + source.getOffsetMapUnitScale()[1] + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"offset_unit\" v=\"" + source.getSizeUnits().toString() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"outline_style\" v=\"" + source.getPenStyle().toString() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"outline_width\" v=\"0\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_map_unit_scale\" v=\"0,0\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"outline_width_unit\" v=\"" + source.getSizeUnits().toString() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"scale_method\" v=\"area\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"size\" v=\"" + Double.toString(source.getSize()) + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"size_map_unit_scale\" v=\"0,0\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"size_unit\" v=\"" + source.getSizeUnits().toString() + "\"/>\n");
-			out.write("\t\t\t\t\t\t\t<prop k=\"vertical_anchor_point\" v=\"1\"/>\n");
-			
-			out.write("\t\t\t\t\t\t</layer>\n");
-			
-			out.write("\t\t\t\t\t</symbol>\n");
-			
-			out.write("\t\t\t\t</source-symbol>\n");
-			
-		} else if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
-			
-		} else if(layer.getRenderer().getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
-			
-			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + layer.getRenderer().getRenderingType().toString() + "\">\n");
+			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
 			
 		}
 		
 		out.write("\t\t\t\t<symbols>\n");
 		
-		for(int i = 0; i < layer.getRenderer().getSymbolLayers().size(); i++){
+		for(int i = 0; i < renderer.getSymbolLayers().size(); i++){
 			
 			if(layer.getGeometryType().equals(QGisConstants.geometryType.Line)){
 				
