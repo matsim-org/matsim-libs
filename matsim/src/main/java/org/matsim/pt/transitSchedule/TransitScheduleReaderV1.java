@@ -20,12 +20,6 @@
 
 package org.matsim.pt.transitSchedule;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,14 +33,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
+
+import java.util.*;
 
 /**
  * Reads a transit schedule from a XML file in the format described by <code>transitSchedule_v1.dtd</code>.
@@ -102,7 +93,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			this.schedule.addStopFacility(stop);
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
 			Id<TransitLine> id = Id.create(atts.getValue(Constants.ID), TransitLine.class);
-			this.currentTransitLine = new TransitLineImpl(id);
+			this.currentTransitLine = schedule.getFactory().createTransitLine(id);
 			if (atts.getValue(Constants.NAME) != null) {
 				this.currentTransitLine.setName(atts.getValue(Constants.NAME));
 			}
@@ -171,7 +162,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 				route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
 				route.setLinkIds(this.currentRouteProfile.firstLinkId, this.currentRouteProfile.linkIds, this.currentRouteProfile.lastLinkId);
 			}
-			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
+			TransitRoute transitRoute = this.schedule.getFactory().createTransitRoute(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);
 			transitRoute.setDescription(this.currentTransitRoute.description);
 			for (Departure departure : this.currentTransitRoute.departures.values()) {
 				transitRoute.addDeparture(departure);

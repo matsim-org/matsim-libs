@@ -22,7 +22,6 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -35,10 +34,10 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
  */
 public class TransitScheduleReader implements MatsimSomeReader {
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 
 	public TransitScheduleReader(final Scenario scenario) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = scenario;
 	}
 
 	public void readFile(final String filename) throws UncheckedIOException {
