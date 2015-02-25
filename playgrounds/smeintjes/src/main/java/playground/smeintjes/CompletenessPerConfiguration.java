@@ -129,13 +129,13 @@ public class CompletenessPerConfiguration {
 		double completeness = 1000.0; //initialise to a large value 
 //		boolean activityInList = false;
 //		Run for all combinations once code has been tested and is confirmed to work
-//		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
-//		int[] pmins = {1, 5, 10, 15, 20, 25};
-		
-		//For testing purposes
-		double[] radii = {1};
+		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
 		int[] pmins = {1, 5, 10, 15, 20, 25};
 		
+		//For testing purposes
+//		double[] radii = {1};
+//		int[] pmins = {1, 5, 10, 15, 20, 25};
+//		
 		DigicoreVehicleReader dvr = new DigicoreVehicleReader();
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
