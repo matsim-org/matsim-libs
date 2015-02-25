@@ -24,6 +24,7 @@ package playground.boescpa.converters.osm.scheduleCreator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -43,6 +44,8 @@ import java.util.*;
  * @author boescpa
  */
 public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
+
+	private static final double MINIMALOFFSETDEPARTURES = 8.0 * 60; // seconds
 
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
@@ -206,6 +209,14 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 					} else if (newLine.charAt(1) == 'T') {
 						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
 						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
+					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V') {
+						if (currentRouteFPLAN != null) {
+							if (newLine.substring(22, 28).trim().length() > 0) {
+								// Linie gefunden, die nicht täglich verkehrt... => Ignorieren wir...
+								/*linesFPLAN.get(currentRouteFPLAN.getLineId()).removePtRouteFPLAN(currentRouteFPLAN);
+								currentRouteFPLAN = null;*/
+							}
+						}
 					} else if (newLine.charAt(1) == 'G') {
 						// Verkehrsmittelzeile
 						/*Spalte Typ Bedeutung
@@ -392,35 +403,34 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 			}
 			// Check profiles and if the same, add latter to former.
 			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
-				TransitRoute finalRoute = routesToUnite.get(0);
-				for (int i = 1; i < routesToUnite.size(); i++) {
-					TransitRoute routeToAdd = routesToUnite.get(i);
-					for (Departure departure : routeToAdd.getDepartures().values()) {
-						finalRoute.addDeparture(departure);
+				// Preparation
+				List<TransitRoute> routesOrderedInDecreasingOrderOfDepartures = orderRoutesInDecreasingOrderOfDepartures(routesToUnite);
+				Set<Tuple<Double, Double>> blockedTimeWindows = new HashSet<>();
+				// First take the route with the most departures and block the time window covered by this route for any other departures.
+				TransitRoute finalRoute = routesOrderedInDecreasingOrderOfDepartures.get(0);
+				blockedTimeWindows.add(new Tuple<>(getEarliestDepartureTime(finalRoute), getLatestDepartureTime(finalRoute)));
+				// Then go through all routes in decreasing order of departures and if the time window isn't blocked by any previously selected route, select this route, block it's time window and add its departures.
+				for (int i = 1; i < routesOrderedInDecreasingOrderOfDepartures.size(); i++) {
+					TransitRoute routeToAdd = routesOrderedInDecreasingOrderOfDepartures.get(i);
+					double earliestDepartureToCheck = getEarliestDepartureTime(routeToAdd);
+					double latestDepartureToCheck = getLatestDepartureTime(routeToAdd);
+					for (Tuple<Double,Double> timeWindow : blockedTimeWindows) {
+						if (!(latestDepartureToCheck <= timeWindow.getFirst() || earliestDepartureToCheck >= timeWindow.getSecond())) {
+							routeToAdd = null;
+						}
 					}
-					line.removeRoute(routeToAdd);
+					if (routeToAdd != null) {
+						blockedTimeWindows.add(new Tuple<>(getEarliestDepartureTime(routeToAdd), getLatestDepartureTime(routeToAdd)));
+						for (Departure departure : routeToAdd.getDepartures().values()) {
+							finalRoute.addDeparture(departure);
+						}
+					}
+					line.removeRoute(routesOrderedInDecreasingOrderOfDepartures.get(i));
 				}
 			}
 
-			/*// Collect all route profiles
-			final Map<TransitRoute, String> routesProfiled = new HashMap<>();
-			final Set<String> routeProfiles = new HashSet<>();
-			for (TransitRoute route : line.getRoutes().values()) {
-				String routeProfile = route.getStops().get(0).toString();
-				for (int i = 1; i < route.getStops().size(); i++) {
-					routeProfile = routeProfile + "-" + route.getStops().get(i).toString();
-				}
-				routesProfiled.put(route, routeProfile);
-				routeProfiles.add(routeProfile);
-			}
-			// Check profiles and if the same, add latter to former.
-			for (String currentProfile : routeProfiles) {
-				final List<TransitRoute> routesToUnite = new ArrayList<>();
-				for (TransitRoute route : routesProfiled.keySet()) {
-					if (routesProfiled.get(route).equals(currentProfile)) {
-						routesToUnite.add(route);
-					}
-				}
+			/*// Check profiles and if the same, add latter to former.
+			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
 				TransitRoute finalRoute = routesToUnite.get(0);
 				for (int i = 1; i < routesToUnite.size(); i++) {
 					TransitRoute routeToAdd = routesToUnite.get(i);
@@ -431,5 +441,44 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				}
 			}*/
 		}
+	}
+
+	private Double getEarliestDepartureTime(TransitRoute route) {
+		double earliestDeparture = Double.MAX_VALUE;
+		for (Departure departure : route.getDepartures().values()) {
+			if (departure.getDepartureTime() < earliestDeparture) {
+				earliestDeparture = departure.getDepartureTime();
+			}
+		}
+		return earliestDeparture - (0.5 * MINIMALOFFSETDEPARTURES);
+	}
+
+	private Double getLatestDepartureTime(TransitRoute route) {
+		double latestDeparture = Double.MIN_VALUE;
+		for (Departure departure : route.getDepartures().values()) {
+			if (departure.getDepartureTime() > latestDeparture) {
+				latestDeparture = departure.getDepartureTime();
+			}
+		}
+		return latestDeparture + (0.5 * MINIMALOFFSETDEPARTURES);
+	}
+
+	private List<TransitRoute> orderRoutesInDecreasingOrderOfDepartures(final List<TransitRoute> routes) {
+		final List<TransitRoute> orderedRoutes = new ArrayList<>();
+		final List<TransitRoute> routesToOrder = new ArrayList<>();
+		routesToOrder.addAll(routes);
+
+		for (int i = 0; i < routes.size(); i++) {
+			TransitRoute routeWithMostDepartures = null;
+			for (TransitRoute route : routesToOrder) {
+				if (routeWithMostDepartures == null || route.getDepartures().size() > routeWithMostDepartures.getDepartures().size()) {
+					routeWithMostDepartures = route;
+				}
+			}
+			routesToOrder.remove(routeWithMostDepartures);
+			orderedRoutes.add(routeWithMostDepartures);
+		}
+
+		return orderedRoutes;
 	}
 }
