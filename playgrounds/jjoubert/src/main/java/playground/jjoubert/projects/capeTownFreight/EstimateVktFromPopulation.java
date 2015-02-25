@@ -50,7 +50,6 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  */
 public class EstimateVktFromPopulation {
 	private final static Logger LOG = Logger.getLogger(EstimateVktFromPopulation.class);
-	private final static Double DISTANCE_MULTIPLIER = 1.3;
 
 	/**
 	 * @param args
