@@ -20,6 +20,7 @@
 package playground.dgrether.koehlerstrehlersignal.run;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 
 /**
  * @author dgrether
@@ -47,7 +48,7 @@ public class Cottbus2KS2010 {
 		// output files
 		String outputDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/cb2ks2010/";
-		String dateFormat = "2015-02-24";
+		String dateFormat = "2015-02-25";
 
 		/* parameters for the time interval */
 		double startTime = 5.5 * 3600.0;

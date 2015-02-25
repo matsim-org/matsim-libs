@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.data;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -15,6 +15,9 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
+import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 
 /**
  * @author tthunig

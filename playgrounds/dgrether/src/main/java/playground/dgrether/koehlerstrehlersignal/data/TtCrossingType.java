@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.conversion;
+package playground.dgrether.koehlerstrehlersignal.data;
 
 /**
  * @author tthunig

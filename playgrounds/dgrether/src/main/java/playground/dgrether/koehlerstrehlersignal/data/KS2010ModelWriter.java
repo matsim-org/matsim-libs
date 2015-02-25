@@ -33,8 +33,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import playground.dgrether.koehlerstrehlersignal.conversion.TtCrossingType;
-
 /**
  * 
  * @author dgrether

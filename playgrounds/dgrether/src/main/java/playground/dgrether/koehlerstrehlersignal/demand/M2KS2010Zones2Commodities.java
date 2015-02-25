@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.dgrether.koehlerstrehlersignal.conversion.TtCrossingType;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.TtCrossingType;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.utils.zones.DgZone;

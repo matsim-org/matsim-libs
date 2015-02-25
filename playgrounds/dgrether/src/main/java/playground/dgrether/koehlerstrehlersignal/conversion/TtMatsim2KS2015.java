@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.run;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.io.File;
 
@@ -13,10 +13,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010Converter;
 import playground.dgrether.koehlerstrehlersignal.demand.PopulationToOd;
 import playground.dgrether.koehlerstrehlersignal.demand.ZoneBuilder;
 import playground.dgrether.koehlerstrehlersignal.network.NetLanesSignalsShrinker;
+import playground.dgrether.koehlerstrehlersignal.run.Cottbus2KS2010;
 import playground.dgrether.signalsystems.utils.DgScenarioUtils;
 import playground.dgrether.utils.zones.DgZones;
 
