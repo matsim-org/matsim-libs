@@ -83,7 +83,8 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		
 		if (this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime) == null ||
 				this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(link.getId()) == null) {
-	
+			// expected toll on that link should be zero
+			
 		} else {
 
 			if (personId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {

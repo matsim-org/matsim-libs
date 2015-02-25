@@ -75,13 +75,6 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 		
 		setFirstActivities();
 		
-		if (this.noiseContext.getNoiseParams().getReceiverPointsGridMaxX() != 0.
-				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMinX() != 0.
-				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMaxY() != 0.
-				|| this.noiseContext.getNoiseParams().getReceiverPointsGridMinY() != 0.) {
-			throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
-					+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
-		}
 	}
 
 	@Override

@@ -150,12 +150,12 @@ public class NoiseWriter {
 				
 				int cars = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					cars = noiseContext.getNoiseLinks().get(linkId).getCars();
+					cars = noiseContext.getNoiseLinks().get(linkId).getCarAgents();
 				}
 				
 				int hgv = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					hgv = noiseContext.getNoiseLinks().get(linkId).getHgv();
+					hgv = noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
 				}
 				
 				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + noiseContext.getNoiseLinks().get(linkId).getEmission());

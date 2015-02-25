@@ -122,6 +122,14 @@ public class NoiseParameters {
 				log.warn("Not considering any activity type for the noise damage computation."
 						+ "The computation of noise damages should be disabled.");
 			}
+			
+			if (this.receiverPointsGridMaxX != 0.
+					|| receiverPointsGridMinX != 0.
+					|| receiverPointsGridMaxY != 0.
+					|| receiverPointsGridMinY != 0.) {
+				throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
+						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
+			}
 						
 			if (this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
 				for (String type : consideredActivitiesForDamagesList) {

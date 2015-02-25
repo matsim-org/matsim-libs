@@ -232,16 +232,16 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			if (event.getVehicleId().toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
 				// HGV
 				
-				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgv();
+				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgents();
 				hgv++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgv(hgv);
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgvAgents(hgv);
 				
 			} else {
 				// Car
 				
-				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCars();
+				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgents();
 				cars++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCars(cars);			
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgents(cars);			
 			}
 		}
 	}
@@ -354,14 +354,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				damageCostSum = this.noiseContext.getNoiseLinks().get(linkId).getDamageCost();
 			}
 				
-			int nCar = 0;
+			int nCarAgents = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				nCar = this.noiseContext.getNoiseLinks().get(linkId).getCars();
+				nCarAgents = this.noiseContext.getNoiseLinks().get(linkId).getCarAgents();
 			}
 			
-			int nHdv = 0;
+			int nHdvAgents = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				nHdv = this.noiseContext.getNoiseLinks().get(linkId).getHgv();
+				nHdvAgents = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
 			}
 			
 			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -376,20 +376,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			double shareCar = 0.;
 			double shareHdv = 0.;
 				
-			if ((nCar > 0) || (nHdv > 0)) {
-				shareCar = NoiseEquations.calculateShare(nCar, lCar, nHdv, lHdv);
-				shareHdv = NoiseEquations.calculateShare(nHdv, lHdv, nCar, lCar);
+			if ((nCarAgents > 0) || (nHdvAgents > 0)) {
+				shareCar = NoiseEquations.calculateShare(nCarAgents, lCar, nHdvAgents, lHdv);
+				shareHdv = NoiseEquations.calculateShare(nHdvAgents, lHdv, nCarAgents, lCar);
 			}
 			
 			double damageCostSumCar = shareCar * damageCostSum;
 			double damageCostSumHdv = shareHdv * damageCostSum;
 				
-			if (!(nCar == 0)) {
-				damageCostPerCar = damageCostSumCar/nCar;
+			if (!(nCarAgents == 0)) {
+				damageCostPerCar = damageCostSumCar / (nCarAgents * this.noiseContext.getNoiseParams().getScaleFactor());
 			}
 				
-			if (!(nHdv == 0)) {
-				damageCostPerHgv = damageCostSumHdv/nHdv;
+			if (!(nHdvAgents == 0)) {
+				damageCostPerHgv = damageCostSumHdv / (nHdvAgents * this.noiseContext.getNoiseParams().getScaleFactor());
 			}
 			
 			if (damageCostPerCar > 0.) {
@@ -406,8 +406,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
 											
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)){
-				double amountCar = (this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerCar()) / (this.noiseContext.getNoiseParams().getScaleFactor());
-				double amountHdv = (this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerHgv()) / (this.noiseContext.getNoiseParams().getScaleFactor());
+				double amountCar = this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerCar();
+				double amountHdv = this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerHgv();
 				
 				for(Id<Vehicle> vehicleId : this.noiseContext.getNoiseLinks().get(linkId).getEnteringVehicleIds()) {
 					
@@ -517,12 +517,12 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 
 			int n_car = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCars();
+				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCarAgents();
 			}
 			
 			int n_hgv = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgv();
+				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
 			}
 			int n = n_car + n_hgv;
 			double p = 0.;

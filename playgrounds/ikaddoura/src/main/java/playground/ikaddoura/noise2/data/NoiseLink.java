@@ -40,12 +40,12 @@ public class NoiseLink {
 
 	private final Id<Link> id;	
 	private List<Id<Vehicle>> enteringVehicleIds = new ArrayList<Id<Vehicle>>();
-	private int cars = 0;
-	private int hgv = 0;
+	private int carAgents = 0; // carAgents x scaleFactor = cars
+	private int hgvAgents = 0; // hgvAgents x scaleFactor = hgv
 	private double emission = 0.;
-	private double damageCost = 0.;
-	private double damageCostPerCar = 0.;
-	private double damageCostPerHgv = 0.;
+	private double damageCost = 0.; 
+	private double damageCostPerCar = 0.; 
+	private double damageCostPerHgv = 0.; 
 	
 	public NoiseLink(Id<Link> linkId) {
 		this.id = linkId;
@@ -59,17 +59,17 @@ public class NoiseLink {
 	public void setEnteringVehicleIds(List<Id<Vehicle>> enteringVehicleIds) {
 		this.enteringVehicleIds = enteringVehicleIds;
 	}
-	public int getCars() {
-		return cars;
+	public int getCarAgents() {
+		return carAgents;
 	}
-	public void setCars(int cars) {
-		this.cars = cars;
+	public void setCarAgents(int cars) {
+		this.carAgents = cars;
 	}
-	public int getHgv() {
-		return hgv;
+	public int getHgvAgents() {
+		return hgvAgents;
 	}
-	public void setHgv(int hgv) {
-		this.hgv = hgv;
+	public void setHgvAgents(int hgv) {
+		this.hgvAgents = hgv;
 	}
 	public double getDamageCost() {
 		return damageCost;

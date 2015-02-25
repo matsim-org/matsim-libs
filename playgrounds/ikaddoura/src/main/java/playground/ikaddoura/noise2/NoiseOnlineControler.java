@@ -59,7 +59,7 @@ public class NoiseOnlineControler {
 			
 		} else {
 			
-			configFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/noiseTestScenario/input/config.xml";
+			configFile = "/Users/ihab/Desktop/test/config.xml";
 			setup = "berlin1a";
 		}
 				
