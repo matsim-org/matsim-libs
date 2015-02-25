@@ -75,4 +75,13 @@ public class PtLineFPLAN {
 		routesFPLAN.add(route);
 		idRoutesFPLAN.add(route.getRouteId());
 	}
+
+	public boolean removePtRouteFPLAN(PtRouteFPLAN route) {
+		if (idRoutesFPLAN.contains(route.getRouteId())) {
+			routesFPLAN.remove(route);
+			idRoutesFPLAN.remove(route.getRouteId());
+			return true;
+		}
+		return false;
+	}
 }

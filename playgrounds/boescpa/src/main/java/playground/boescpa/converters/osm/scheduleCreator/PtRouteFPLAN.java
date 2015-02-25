@@ -62,6 +62,10 @@ public class PtRouteFPLAN {
 	private final int cycleTime; // [sec]
 	private final List<TransitRouteStop> stops = new ArrayList<>();
 
+	public Id<TransitLine> getLineId() {
+		return Id.create(idOwnerLine.toString(), TransitLine.class);
+	}
+
 	public Id<TransitRoute> getRouteId() {
 		return Id.create(routeId.toString(), TransitRoute.class);
 	}
