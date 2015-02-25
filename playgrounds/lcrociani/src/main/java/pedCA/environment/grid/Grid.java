@@ -1,5 +1,6 @@
 package pedCA.environment.grid;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -10,6 +11,11 @@ public abstract class Grid <T>{
 	
 	public Grid (int rows,int cols){
 		initGrid(rows, cols);
+	}
+	
+	public Grid(File file) throws IOException{
+		initEmptyGrid();
+		loadFromCSV(file);
 	}
 	
 	public Grid(String fileName) throws IOException{
@@ -97,7 +103,12 @@ public abstract class Grid <T>{
 		return row>=0 && col>=0 && col<getColumns() && row<getRows();
 	}
 	
-	protected abstract void loadFromCSV(String fileName) throws IOException;
+	protected abstract void loadFromCSV(File file) throws IOException;
+	
+	protected void loadFromCSV(String fileName) throws IOException{
+		File environmentFile = new File(fileName);
+		loadFromCSV(environmentFile);
+	}
 	
 	public abstract void saveCSV(String path) throws IOException;
 

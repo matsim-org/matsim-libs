@@ -31,6 +31,9 @@ public class CASimulationRunner implements IterationStartsListener{
 		String inputPath= Constants.INPUT_PATH;
 		if (args.length>0){
 			 inputPath = Constants.FD_TEST_PATH+args[0]+"/input";
+			 Constants.SIMULATION_ITERATIONS = 1;
+			 Constants.CA_TEST_END_TIME = 1800.;
+			 Constants.SIMULATION_DURATION = 2000.;
 		}
 		Config c = ConfigUtils.loadConfig(inputPath+"/config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(c);
@@ -74,7 +77,8 @@ public class CASimulationRunner implements IterationStartsListener{
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		dbg.startIteration(event.getIteration()); 
+		if (dbg != null)
+			dbg.startIteration(event.getIteration()); 
 	}
 
 }

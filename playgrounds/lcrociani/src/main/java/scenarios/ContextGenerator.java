@@ -1,19 +1,23 @@
 package scenarios;
 
+import java.io.File;
 import java.io.IOException;
 
+import matsimConnector.utility.Constants;
 import pedCA.context.Context;
 import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.markers.MarkerConfiguration;
 import pedCA.environment.markers.Start;
 
+
 public class ContextGenerator {
 	
-	public static Context loadEnvironmentAndSaveContext(String path){
+	public static Context createContextWithResourceEnvironmentFile(String path){
 		EnvironmentGrid environmentGrid = null;
 		MarkerConfiguration markerConfiguration = null;
 		try {
-			environmentGrid = new EnvironmentGrid(path);
+			File environmentFile = new File(Constants.RESOURCE_PATH+"/environmentGrid.csv");
+			environmentGrid = new EnvironmentGrid(environmentFile);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -39,7 +43,7 @@ public class ContextGenerator {
 	
 	private static Context getBidCorridorContext(int rows, int cols, int populationSize) {
 		EnvironmentGrid environmentGrid = new EnvironmentGrid(rows, cols);
-		EnvironmentGenerator.initCorridorWithObstacles(environmentGrid);
+		EnvironmentGenerator.initCorridorWithWalls(environmentGrid);
 		MarkerConfiguration markerConfiguration = new MarkerConfiguration();
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorEastDestination(environmentGrid));
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorWestDestination(environmentGrid));

@@ -15,6 +15,10 @@ public class EnvironmentGrid extends Grid<Integer>{
 	public EnvironmentGrid(int rows, int cols) {
 		super(rows, cols);
 	}
+		
+	public EnvironmentGrid(File environmentFile) throws IOException{
+		super(environmentFile);
+	}
 	
 	public EnvironmentGrid(String path) throws IOException{
 		super(path+"/input/environment/environmentGrid.csv");
@@ -48,8 +52,8 @@ public class EnvironmentGrid extends Grid<Integer>{
 	}
 	
 	@Override
-	protected void loadFromCSV(String fileName) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
+	protected void loadFromCSV(File environmentFile) throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader(environmentFile));
 		String line = br.readLine();
 		for (int row = 0;line!=null;row++){
 			addRow();
@@ -68,6 +72,8 @@ public class EnvironmentGrid extends Grid<Integer>{
 		}
 		br.close();
 	}
+	
+	
 	
 	@Override
 	public void saveCSV(String path) throws IOException {

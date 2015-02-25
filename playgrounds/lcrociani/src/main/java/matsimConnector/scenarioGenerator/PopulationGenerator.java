@@ -31,8 +31,8 @@ public class PopulationGenerator {
 		double t = 0;
 		double flowProportion = 1./initLinks.size();
 		for (Link link : initLinks){			
-			int limit = (int)(populationSize*flowProportion);
-			for (int i = 0; i < limit; i++) {
+			int linkLimit = (int)(populationSize*flowProportion);
+			for (int i = 0; i < linkLimit; i++) {
 				Person pers = factory.createPerson(Id.create("p"+population.getPersons().size(),Person.class));
 				Plan plan = factory.createPlan();
 				pers.addPlan(plan);
@@ -79,7 +79,7 @@ public class PopulationGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		double leftFlowProportion = .5;
+		double leftFlowProportion = 1.;
 		int limit = (int)(populationSize*leftFlowProportion);
 		for (int i = 0; i < limit; i++) {
 			Person pers = factory.createPerson(Id.create("b"+i,Person.class));

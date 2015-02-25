@@ -26,14 +26,17 @@ public class ScenarioGenerator {
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
 	private static Double TOTAL_DENSITY = 4.;
-	private static int POPULATION_SIZE = 1000;//(int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+	private static int POPULATION_SIZE = 300;//(int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+
 	
 	public static void main(String [] args) {
 		if (args.length>0){
 			TOTAL_DENSITY = Double.parseDouble(args[0]);
 			inputDir = Constants.FD_TEST_PATH+args[0]+"/input";
 			outputDir = Constants.FD_TEST_PATH+args[0]+"/output";
-			POPULATION_SIZE = (int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+
+			//(CA_ROWS - 2) is due to the 2 rows of obstacles needed to build a corridor environment
+			POPULATION_SIZE = (int)(((CA_ROWS-2)*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
 		}
 		
 		Config c = ConfigUtils.createConfig();
@@ -88,7 +91,7 @@ public class ScenarioGenerator {
 		c.qsim().setEndTime(60*10);
 
 		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
-
+		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(c.plans().getInputFile());
@@ -97,6 +100,6 @@ public class ScenarioGenerator {
 	private static Context createCAScenario() {
 		Log.log("CA Scenario generation");
 		//ContextGenerator.createAndSaveBidCorridorContext(inputDir+"/CAScenario", CA_ROWS, CA_COLS, 2);
-		return ContextGenerator.loadEnvironmentAndSaveContext(inputDir+"/CAScenario");
+		return ContextGenerator.createContextWithResourceEnvironmentFile(inputDir+"/CAScenario");
 	}
 }

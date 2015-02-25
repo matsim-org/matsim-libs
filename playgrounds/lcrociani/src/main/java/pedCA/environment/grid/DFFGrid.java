@@ -1,5 +1,6 @@
 package pedCA.environment.grid;
 
+import java.io.File;
 import java.io.IOException;
 
 import pedCA.environment.grid.neighbourhood.Neighbourhood;
@@ -42,7 +43,7 @@ public class DFFGrid extends Grid <Double>{
 	} 
 	
 	@Override
-	protected void loadFromCSV(String fileName) throws IOException {
+	protected void loadFromCSV(File file) throws IOException {
 		// TODO Auto-generated method stub
 
 	}

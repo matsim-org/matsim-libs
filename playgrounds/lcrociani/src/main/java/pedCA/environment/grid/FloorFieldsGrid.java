@@ -110,7 +110,7 @@ public class FloorFieldsGrid extends Grid <Double>{
 	}
 
 	@Override
-	protected void loadFromCSV(String fileName) {
+	protected void loadFromCSV(File file) {
 		// TODO Auto-generated method stub
 		
 	}	

@@ -12,9 +12,12 @@ public class Constants {
 	public static final double CA_CELL_SIDE = 0.4;
 	public static final double CA_STEP_DURATION = .3;
 	public static final Double PEDESTRIAN_SPEED = CA_CELL_SIDE/CA_STEP_DURATION;
-	public static final Double CA_TEST_END_TIME = 0.; //1200
-	public static final double SIMULATION_DURATION = 2000;
-	public static final int SIMULATION_ITERATIONS = 10;
+	
+	/** this is for the generation of the fundamental diagram of the CA: pedestrian will be kept inside the
+	 * CAEnvironment until this time (in seconds). Keep to 0 if you want to run normal simulation.**/
+	public static Double CA_TEST_END_TIME = 0.; //1200.;
+	public static double SIMULATION_DURATION = 2000;
+	public static int SIMULATION_ITERATIONS = 10;
 	public static boolean SAVE_FRAMES = false;
 	
 	/** name to use to add CAScenario to a matsim scenario as a scenario element **/ 
@@ -23,8 +26,8 @@ public class Constants {
 	public static final Double FLOPW_CAP_PER_METER_WIDTH = 1.2;
 	
 	public static final Double TRANSITION_AREA_LENGTH = CA_CELL_SIDE*5;
-	public static final Double FAKE_LINK_WIDTH = 0.8;
-	public static final Double CA_LINK_LENGTH = 10.;
+	public static final Double FAKE_LINK_WIDTH = 1.2;
+	public static final Double CA_LINK_LENGTH = 20.;
 	public static final Double TRANSITION_LINK_LENGTH = TRANSITION_AREA_LENGTH/2.;
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);
 	
@@ -36,6 +39,7 @@ public class Constants {
 		else
 			PATH = "/tmp/TestCA";
 	}
+	public static final String RESOURCE_PATH = "src/main/resources";
 	public static final String DEBUG_TEST_PATH = PATH+"/debug";
 	public static final String FD_TEST_PATH = PATH+"/FD/";
 	public static final String INPUT_PATH = DEBUG_TEST_PATH+"/input";

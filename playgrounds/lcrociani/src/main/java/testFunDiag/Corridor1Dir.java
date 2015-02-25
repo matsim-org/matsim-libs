@@ -26,6 +26,7 @@ public class Corridor1Dir {
 		ArrayList<String> inputs = new ArrayList<String>();
 		for (int i=1; i*tic<=maxDensity;i++)
 			inputs.add(""+i*tic);
+		//inputs.add("6");
 		for(String input : inputs){
 			String [] singleArg = {input};
 			ScenarioGenerator.main(singleArg);

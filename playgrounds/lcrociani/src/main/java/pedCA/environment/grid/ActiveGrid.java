@@ -1,5 +1,6 @@
 package pedCA.environment.grid;
 
+import java.io.File;
 import java.io.IOException;
 
 
@@ -25,7 +26,7 @@ public abstract class ActiveGrid<T> extends Grid<T> {
 	}
 
 	@Override
-	protected void loadFromCSV(String fileName) throws IOException {
+	protected void loadFromCSV(File file) throws IOException {
 		// TODO Auto-generated method stub
 
 	}

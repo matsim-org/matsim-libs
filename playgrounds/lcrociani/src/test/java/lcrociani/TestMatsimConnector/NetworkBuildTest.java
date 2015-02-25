@@ -5,7 +5,7 @@ import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
 
-import org.junit.Test;
+import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -17,7 +17,7 @@ import pedCA.output.Log;
 
 public class NetworkBuildTest {
 	
-	@Test
+	@Ignore
 	public void TestNetworkBuild(){
 		try{
 			String PATH = Constants.INPUT_PATH;
