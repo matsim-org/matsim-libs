@@ -17,18 +17,18 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String outputFolderRunA = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
-		String outputFolderRunB = "f:/data/experiments/parkingSearchOct2013/runs/run135/output/";
-		int startIteration = 11;
+		String outputFolderRunA = "h:/data/experiments/parkingSearchOct2013/runs/run403/output/";
+		String outputFolderRunB = "h:/data/experiments/parkingSearchOct2013/runs/run404/output/";
+		int startIteration = 480;
 		int endIteration = startIteration+5;
 		int iterationStep = 10;
 		boolean ignoreCasesWithBothPPUse = true;
-		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/comparison different strategy groups/comparisonRun135ToItSelfIt11And499/";
+		String outputFolder = "C:/data/Dropbox/ETH/Projekte/STRC2014/experiments/comparison different strategy groups/comparisonRun403And404-It480/";
 		double cutPctAccumulationFreq=0.95;
 		
 		int runNumber=199;
 		int offSet=488;
-		boolean compareIterationsOfSameRun=true; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
+		boolean compareIterationsOfSameRun=false; // in this case only 'outputFolderRunA' needs to be provided ('outputFolderRunB' one is ignored)
 
 		
 		if (compareIterationsOfSameRun){
