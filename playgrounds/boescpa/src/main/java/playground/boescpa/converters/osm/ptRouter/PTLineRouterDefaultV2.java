@@ -391,7 +391,7 @@ public class PTLineRouterDefaultV2 extends PTLineRouter {
 			link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
 		link.setFreespeed(80.0 / 3.6);
-		link.setCapacity(500);
+		link.setCapacity(10000);
 		link.setNumberOfLanes(1);
 		link.setAllowedModes(this.transitModes);
 		return link;

@@ -158,7 +158,7 @@ public class PseudoNetworkCreatorV2 {
 			link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
 		link.setFreespeed(150.0 / 3.6);
-		link.setCapacity(500);
+		link.setCapacity(10000);
 		link.setNumberOfLanes(1);
 		this.network.addLink(link);
 		link.setAllowedModes(this.transitModes);
