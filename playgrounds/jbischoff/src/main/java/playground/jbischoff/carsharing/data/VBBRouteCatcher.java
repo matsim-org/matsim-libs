@@ -21,6 +21,8 @@ package playground.jbischoff.carsharing.data;
 
 
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -30,12 +32,19 @@ import java.util.Locale;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.dom4j.io.XMLWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -54,7 +63,32 @@ public class VBBRouteCatcher {
 			private int bestRideTime = Integer.MAX_VALUE;
 			private int bestTransfers = Integer.MAX_VALUE;
 			
+			private boolean writeOutput = true;
+			private String filename;
+			
 			public VBBRouteCatcher(Coord from, Coord to, long departureTime)  {
+			this.writeOutput = false;
+			initiate();
+			
+			}
+			private void initiate() {
+				//httpclient is extremely noisy by default
+				java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
+				java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
+				System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+				System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+				System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire", "ERROR");
+				System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "ERROR");
+				System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "ERROR");				
+			}
+			
+			
+			
+			public VBBRouteCatcher(Coord from, Coord to , long departureTime,
+					String fileName) {
+				this.writeOutput = true;
+				this.filename = fileName;
+				initiate();
 				run (from,to,departureTime);
 			}
 			public static void main(String[] args) throws IOException, Exception {
@@ -65,7 +99,7 @@ public class VBBRouteCatcher {
 				//Salzufer-Hoenow
 				Coord c = new CoordImpl(52.5188,13.32183);
 				Coord d = new CoordImpl(52.5307913,13.6303349);
-				VBBRouteCatcher rc = new VBBRouteCatcher(c,d,System.currentTimeMillis());
+				VBBRouteCatcher rc = new VBBRouteCatcher(c,d,System.currentTimeMillis(),"vbbTest.xml.gz");
 			}
 			private void run(Coord from, Coord to, long departureTime)  {
 		          
@@ -117,6 +151,20 @@ public class VBBRouteCatcher {
 			            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			            DocumentBuilder builder = factory.newDocumentBuilder();
 			            Document document = builder.parse(post.getResponseBodyAsStream());
+			            
+			            if (writeOutput){
+			            	BufferedWriter writer =	IOUtils.getBufferedWriter(filename);
+			            	Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			            	transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			            	//initialize StreamResult with File object to save to file
+			            	StreamResult res = new StreamResult(writer);
+			            	DOMSource source = new DOMSource(document);
+			            	transformer.transform(source, res);
+			            	writer.flush();
+			            	writer.close();
+			        		
+			            }
+			            
 			            Node connectionList = document.getFirstChild().getFirstChild().getFirstChild();
 			            NodeList connections =  connectionList.getChildNodes();
 			            int amount = connections.getLength();
@@ -151,6 +199,8 @@ public class VBBRouteCatcher {
 			            // Release current connection to the connection pool 
 			            // once you are done
 			            post.releaseConnection();
+			            post.abort();
+			         
 			        }
 			    
 			        

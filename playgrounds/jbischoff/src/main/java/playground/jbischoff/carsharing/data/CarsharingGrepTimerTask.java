@@ -49,7 +49,8 @@ public class CarsharingGrepTimerTask
     DriveNowParser dnp = new DriveNowParser();
     Car2GoParser cp = new Car2GoParser(); 
     static SimpleDateFormat MIN = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-    int run = 0;
+    private int run = 0;
+    private long rideCount = 0;
     
     
     public static void main(String[] args)
@@ -69,12 +70,33 @@ public class CarsharingGrepTimerTask
 
     	File drivenow = new File(folder+"drivenow");
     	drivenow.mkdirs();
+    	
+    	File here = new File(folder+"here");
+    	here.mkdirs();
+    	
+    	File vbb = new File(folder+"vbb");
+    	vbb.mkdirs();
+    	
+    	
     	Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentvehicles = new HashMap<Id<CarsharingVehicleData>, CarsharingVehicleData>();
     	
     	currentvehicles.putAll(dnp.grepAndDumpOnlineDatabase(drivenow.getAbsolutePath()+"/"));
+    	int dncars = currentvehicles.size();
     	currentvehicles.putAll(cp.grepAndDumpOnlineDatabase(car2go.getAbsolutePath()+"/"));
-    	System.out.println(MIN.format(System.currentTimeMillis())+": "+currentvehicles.size());
-    	syncVehiclesAndGenerateTrips(currentvehicles);
+    	int allcars = currentvehicles.size();
+    	String minuteString = run+"\t"+MIN.format(System.currentTimeMillis())+"\t"+dncars+"\t"+(allcars-dncars)+"\t"+allcars;
+		System.out.println(minuteString);
+		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(folder+"availablevehicles.txt", true)))) {
+			if (run == 0){
+				out.println("run\tTime\tDrivenow\tcar2go\tsum");
+			}
+			out.println((minuteString));
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+    	syncVehiclesAndGenerateTrips(currentvehicles, folder);
     	if (run % 30 == 0){
     		generateTripFiles(folder);
     	}
@@ -100,7 +122,7 @@ public class CarsharingGrepTimerTask
 	}
 
 	private void syncVehiclesAndGenerateTrips(
-			Map<Id<CarsharingVehicleData>, CarsharingVehicleData> currentvehicles) {
+			Map<Id<CarsharingVehicleData>, CarsharingVehicleData> currentvehicles, String folder) {
 		
 		long time = System.currentTimeMillis();
 		for (Entry<Id<CarsharingVehicleData>,CarsharingVehicleData> entry : currentvehicles.entrySet()){
@@ -119,16 +141,18 @@ public class CarsharingGrepTimerTask
 			CarsharingVehicle currentVehicle = this.vehicleRegister.get(vin);
 			
 			if (!currentVehicle.getPosition().equals(entry.getValue().getLocation())){
+				String rideCountString = String.format("%09d", rideCount); 
+				HereMapsRouteGrepper rg = new HereMapsRouteGrepper(currentVehicle.getPosition(), entry.getValue().getLocation(),folder+"/here/"+rideCountString+"json.gz");
+				VBBRouteCatcher vbb = new VBBRouteCatcher(currentVehicle.getPosition(), entry.getValue().getLocation(), time, folder+"/vbb/"+rideCountString+"xml.gz");
 				
-				HereMapsRouteGrepper rg = new HereMapsRouteGrepper(currentVehicle.getPosition(), entry.getValue().getLocation());
-				VBBRouteCatcher vbb = new VBBRouteCatcher(currentVehicle.getPosition(), entry.getValue().getLocation(), time);
-				CarsharingRide ride = new CarsharingRide(currentVehicle.getPosition(), entry.getValue().getLocation(), currentVehicle.getTime(), time, currentVehicle.getFuel(), entry.getValue().getFuel(), currentVehicle.getMileage(), entry.getValue().getMileage(), rg.getDistance(), rg.getBaseTime(), rg.getTravelTime(), vbb.getBestTransfers(), vbb.getBestRideTime());
+				CarsharingRide ride = new CarsharingRide(currentVehicle.getPosition(), entry.getValue().getLocation(), currentVehicle.getTime(), time, currentVehicle.getFuel(), entry.getValue().getFuel(), currentVehicle.getMileage(), entry.getValue().getMileage(), rg.getDistance(), rg.getBaseTime(), rg.getTravelTime(), vbb.getBestTransfers(), vbb.getBestRideTime(), rideCountString);
 				currentVehicle.addRide(ride);
 				
 				currentVehicle.setFuel(entry.getValue().getFuel());
 				currentVehicle.setMileage(entry.getValue().getMileage());
 				currentVehicle.setPosition(entry.getValue().getLocation());
 				currentVehicle.setTime(time);
+				rideCount++;
 				System.out.println("ride registered. "+currentVehicle.getLicensePlate());
 			}
 			else {
@@ -249,12 +273,14 @@ class CarsharingRide implements Comparable<CarsharingRide>
 		private double ptAlternativeTransfers;
 		private double ptAlternativeTime;
 		
+		private String id;
+		
 		
 		public CarsharingRide(Coord from, Coord to, long start, long end,
 				double fuelBefore, double fuelAfter, double mileageBefore,
 				double mileageAfter, double roadAlternativeKM,
 				double roadAlternativeTime, double roadAlternativeCongestedTime ,double ptAlternativeTransfers,
-				double ptAlternativeTime) {
+				double ptAlternativeTime, String id) {
 			super();
 			this.from = from;
 			this.to = to;
@@ -269,6 +295,7 @@ class CarsharingRide implements Comparable<CarsharingRide>
 			this.roadAlternativeCongestedTime = roadAlternativeCongestedTime;
 			this.ptAlternativeTransfers = ptAlternativeTransfers;
 			this.ptAlternativeTime = ptAlternativeTime;
+			this.id = id;
 		}
 		
 		
@@ -285,7 +312,7 @@ class CarsharingRide implements Comparable<CarsharingRide>
 		}
 		
 		public String toLine() {
-			return   from.getX() + "," +from.getY()+ "\t" + to.getX() + ","+to.getY() +"\t" + CarsharingGrepTimerTask.MIN.format(start) + "\t" + CarsharingGrepTimerTask.MIN.format(end) + "\t" + Math.round(fuelBefore) + "\t" + Math.round(fuelAfter) + "\t" + Math.round(mileageBefore) + "\t" + Math.round(mileageAfter) + "\t" + Math.round(roadAlternativeKM) + "\t" + Math.round(roadAlternativeTime) + "\t" +Math.round(roadAlternativeCongestedTime) + "\t" + Math.round(ptAlternativeTransfers) + "\t" + Math.round(ptAlternativeTime);
+			return   id+"\t"+from.getX() + "," +from.getY()+ "\t" + to.getX() + ","+to.getY() +"\t" + CarsharingGrepTimerTask.MIN.format(start) + "\t" + CarsharingGrepTimerTask.MIN.format(end) + "\t" + Math.round(fuelBefore) + "\t" + Math.round(fuelAfter) + "\t" + Math.round(mileageBefore) + "\t" + Math.round(mileageAfter) + "\t" + Math.round(roadAlternativeKM) + "\t" + Math.round(roadAlternativeTime) + "\t" +Math.round(roadAlternativeCongestedTime) + "\t" + Math.round(ptAlternativeTransfers) + "\t" + Math.round(ptAlternativeTime);
 					
 		}
 

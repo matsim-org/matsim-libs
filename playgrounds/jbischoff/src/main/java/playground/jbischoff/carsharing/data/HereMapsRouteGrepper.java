@@ -19,6 +19,7 @@
 package playground.jbischoff.carsharing.data;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -33,6 +34,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 /**
  * @author jbischoff
  * this class requests travel times and distances between two coordinates from HERE Maps. 
@@ -47,19 +49,21 @@ public class HereMapsRouteGrepper {
 	private Coord from;
 	private Coord to;
 	private boolean secondround = false;
+	private String filename;
 	
 public static void main(String[] args)  {
 	// main class exists for testing purposes only
 	Coord c = new CoordImpl(52.519580833333,13.359681944444);
 	Coord d = new CoordImpl(52.470137777778,13.335396944444);
 	System.out.println(System.currentTimeMillis());
-	HereMapsRouteGrepper gr = new HereMapsRouteGrepper(c, d);
+	HereMapsRouteGrepper gr = new HereMapsRouteGrepper(c, d,"testHere.json.gz");
 
 }	
 
-public HereMapsRouteGrepper(Coord from, Coord to)  {
+public HereMapsRouteGrepper(Coord from, Coord to, String filename)  {
 	this.from = from;
 	this.to = to;
+	this.filename = filename;
 	calculate();
 }
 
@@ -91,6 +95,10 @@ private void calculate(){
         
         System.out.println(travelTime + " "+ baseTime + " "+distance);
         
+        BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+        bw.write(jsonObject.toString());
+        bw.flush();
+        bw.close();
 	} catch (MalformedURLException e) {
 		exceptionHandler(e);
 	} catch (IOException e) {

@@ -29,6 +29,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -63,11 +70,14 @@ public class Car2GoParser
     
     
     try {
+    	Car2GoParser.disableCertificates();
+    	//watch out: disables certificate validation 
+    	
     	System.setProperty("https.protocols", "TLSv1");
 //    	url = new URL("https", "www.car2go.com", 443, "/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
         url = new URL("https://www.car2go.com/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
-        
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+
         JSONObject jsonObject = (JSONObject)jp.parse(in);
  
         
@@ -105,6 +115,35 @@ public class Car2GoParser
     return currentGrep;
     
 }
+    static public void disableCertificates() {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+
+                @Override
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                @Override
+                public void checkClientTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                @Override
+                public void checkServerTrusted(
+                        java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+        }
+    }
 
 
 

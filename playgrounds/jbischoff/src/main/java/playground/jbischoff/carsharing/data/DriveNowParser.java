@@ -43,7 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class DriveNowParser
 {
-
+	private boolean secondRound = false;
     public static void main(String[] args)
     {
         DriveNowParser dnp = new DriveNowParser();
@@ -63,6 +63,7 @@ public class DriveNowParser
     
     
     try {
+    	Car2GoParser.disableCertificates();
         url = new URL("https://www.drive-now.com/php/metropolis/json.vehicle_filter?cit=6099");
         BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
         JSONObject jsonObject = (JSONObject)jp.parse(in);
@@ -93,8 +94,14 @@ public class DriveNowParser
         
     }
     catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+//    	if(!secondRound){
+//    	System.err.println("Caught IOException. doing second round");
+//    	this.secondRound = true;
+//    	return grepAndDumpOnlineDatabase(outputfolder);
+//    	}
+//    	else {
+    		e.printStackTrace();
+//    	}
     }
     catch (ParseException e) {
         // TODO Auto-generated catch block
