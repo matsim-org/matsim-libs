@@ -97,7 +97,7 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 
 //		log.warn("Expected toll on link " + link.getId() + " at time " + time + " in time interval " + timeIntervalEndTime + ": " + linkExpectedToll);
 				
-		double linkExpectedTollDisutility = -1 * this.marginalUtlOfMoney * linkExpectedToll;			
+		double linkExpectedTollDisutility = this.marginalUtlOfMoney * linkExpectedToll;			
 		return linkExpectedTollDisutility;
 	}
 
