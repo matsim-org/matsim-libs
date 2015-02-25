@@ -1,5 +1,7 @@
 package playground.balac.allcsmodestest.controler;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -8,6 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
 import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
@@ -29,7 +32,7 @@ public class AllCSModesTestControler {
 	
 	
 	public static void main(final String[] args) {
-		//Logger.getLogger( "org.matsim.core.reader..." ).setLevel( Level.OFF );
+		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();
