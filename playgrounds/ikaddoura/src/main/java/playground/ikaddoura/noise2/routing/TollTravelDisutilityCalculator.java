@@ -66,14 +66,14 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		double distanceCost = - this.distanceCostRateCar * distance;
 		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
 
-		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person.getId());
+		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link.getId(), time, person.getId());
 		
 		double linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
 
 		return linkTravelDisutility;
 	}
 
-	private double calculateExpectedTollDisutility(Link link, double time, Id<Person> personId) {
+	private double calculateExpectedTollDisutility(Id<Link> linkId, double time, Id<Person> personId) {
 	
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 */
@@ -82,15 +82,15 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 		double timeIntervalEndTime = ((int) (time / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) + 1) * this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 		
 		if (this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime) == null ||
-				this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(link.getId()) == null) {
+				this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId) == null) {
 			// expected toll on that link should be zero
 			
 		} else {
 
 			if (personId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
-				linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(link.getId()).getDamageCostPerHgv();
+				linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getDamageCostPerHgv();
 			} else {
-				linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(link.getId()).getDamageCostPerCar();
+				linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getDamageCostPerCar();
 			}
 
 		}
