@@ -49,6 +49,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
+	private final Set<Integer> bitfeldNummern = new HashSet<>();
 
 	public PTScheduleCreatorDefaultV2(TransitSchedule schedule, Vehicles vehicles) {
 		super(schedule, vehicles);
@@ -62,11 +63,13 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		readVehicles(vehicleFile);
 		// 2. Read all stops from HAFAS-BFKOORD_GEO
 		readStops(hafasFolder + "/BFKOORD_GEO");
-		// 3. Create all lines from HAFAS-Schedule
+		// 3. Read all ids for work-day-routes from HAFAS-BITFELD
+		readDays(hafasFolder + "/BITFELD");
+		// 4. Create all lines from HAFAS-Schedule
 		readLines(hafasFolder + "/FPLAN");
-		// 4. Print undefined vehicles
+		// 5. Print undefined vehicles
 		printVehiclesUndefined();
-		// 5. Clean schedule
+		// 6. Clean schedule
 		removeNonUsedStopFacilities();
 		uniteSameRoutesWithJustDifferentDepartures();
 		cleanDepartures();
@@ -160,6 +163,41 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		//log.info("Added " + schedule.getFacilities().get(stopId).toString());
 	}
 
+	protected void readDays(String BITFELD) {
+		log.info("  Read bitfeld numbers...");
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BITFELD), "latin1"));
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				/*Spalte Typ Bedeutung
+				1−6 INT32 Bitfeldnummer
+				8−103 CHAR Bitfeld (Binärkodierung der Tage, an welchen Fahrt, in Hexadezimalzahlen notiert.)*/
+				int bitfeldnummer = Integer.parseInt(newLine.substring(0, 6));
+				String bitfeld = newLine.substring(7, 103);
+				// The following char positions are only valuable for HAFAS CH_2014_140413_1341 and must be changed to the new "only work weeks" for new HAFAS-Sets...
+				int matches = (bitfeld.charAt(1) == 'F')? 1 : 0;
+				matches += (bitfeld.charAt(6) == 'F')? 1 : 0;
+				matches += (bitfeld.charAt(8) == 'F')? 1 : 0;
+				matches += (bitfeld.charAt(13) == 'F')? 1 : 0;
+				matches += (bitfeld.charAt(15) == 'F')? 1 : 0;
+				if (matches >= 4) { // if driven in at least four of the selected five work weeks, the bitfeld is selected...
+				/*if (bitfeld.charAt(1) == 'F'
+						&& bitfeld.charAt(6) == 'F'
+						&& bitfeld.charAt(8) == 'F'
+						&& bitfeld.charAt(13) == 'F'
+						&& bitfeld.charAt(15) == 'F') {*/
+					this.bitfeldNummern.add(bitfeldnummer);
+				}
+				newLine = readsLines.readLine();
+			}
+			readsLines.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		this.bitfeldNummern.add(0);
+		log.info("  Read bitfeld numbers... done.");
+	}
+
 	protected void readLines(String FPLAN) {
 		log.info("  Read transit lines...");
 		try {
@@ -211,10 +249,14 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
 					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V') {
 						if (currentRouteFPLAN != null) {
+							int localBitfeldnr = 0;
 							if (newLine.substring(22, 28).trim().length() > 0) {
-								// Linie gefunden, die nicht täglich verkehrt... => Ignorieren wir...
-								/*linesFPLAN.get(currentRouteFPLAN.getLineId()).removePtRouteFPLAN(currentRouteFPLAN);
-								currentRouteFPLAN = null;*/
+								localBitfeldnr = Integer.parseInt(newLine.substring(22, 28));
+							}
+							if (!this.bitfeldNummern.contains(localBitfeldnr)) {
+								// Linie gefunden, die nicht werk-täglich verkehrt... => Ignorieren wir...
+								linesFPLAN.get(currentRouteFPLAN.getLineId()).removePtRouteFPLAN(currentRouteFPLAN);
+								currentRouteFPLAN = null;
 							}
 						}
 					} else if (newLine.charAt(1) == 'G') {
@@ -247,9 +289,9 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 							int hourFirstDeparture = Integer.parseInt(newLine.substring(25, 27));
 							int minuteFirstDeparture = Integer.parseInt(newLine.substring(27, 29));
 							currentRouteFPLAN.setFirstDepartureTime(hourFirstDeparture, minuteFirstDeparture);
-						} else {
+						} /*else {
 							log.error("*G-Line before appropriate *Z-Line.");
-						}
+						}*/
 					}
 				} else if (newLine.charAt(0) == '+') { // Regionszeile (Bedarfsfahrten)
 					// We don't have this transport mode in  MATSim (yet). => Delete Route and if Line now empty, delete Line.
@@ -280,9 +322,9 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 						TransitStopFacility stopFacility = schedule.getFacilities().get(stopId);
 						currentRouteFPLAN.addStop(stopId, stopFacility, arrivalTime, departureTime);
-					} else {
+					} /*else {
 						log.error("Laufweg-Line before appropriate *Z-Line.");
-					}
+					}*/
 				}
 				newLine = readsLines.readLine();
 				counter.incCounter();
@@ -401,7 +443,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				}
 				profiles.add(route);
 			}
-			// Check profiles and if the same, add latter to former.
+			/*// Check profiles and if the same, add latter to former.
 			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
 				// Preparation
 				List<TransitRoute> routesOrderedInDecreasingOrderOfDepartures = orderRoutesInDecreasingOrderOfDepartures(routesToUnite);
@@ -427,9 +469,8 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 					}
 					line.removeRoute(routesOrderedInDecreasingOrderOfDepartures.get(i));
 				}
-			}
-
-			/*// Check profiles and if the same, add latter to former.
+			}*/
+			// Check profiles and if the same, add latter to former.
 			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
 				TransitRoute finalRoute = routesToUnite.get(0);
 				for (int i = 1; i < routesToUnite.size(); i++) {
@@ -439,7 +480,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 					}
 					line.removeRoute(routeToAdd);
 				}
-			}*/
+			}
 		}
 	}
 
