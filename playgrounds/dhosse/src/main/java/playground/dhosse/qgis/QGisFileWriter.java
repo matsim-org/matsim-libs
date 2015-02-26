@@ -178,9 +178,15 @@ public class QGisFileWriter {
 		
 		if(vlayer.getInputType().equals(QGisConstants.inputType.csv) && !vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
 
-			out.write("\t\t\t<datasource>file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.getUseHeader() + "&amp;delimiter=" + vlayer.getDelimiter() +
-					"&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + vlayer.getXField() +
-					"&amp;yField=" + vlayer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
+			String datasource = "file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.getUseHeader() + "&amp;";
+			if(vlayer.getDelimiter() != null){
+				datasource += "delimiter=" + vlayer.getDelimiter() + "&amp;";
+			}
+			
+			datasource += "quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + vlayer.getXField() +
+					"&amp;yField=" + vlayer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no\n";
+			
+			out.write("\t\t\t<datasource>" + datasource + "</datasource>\n");
 			
 		} else{
 			
