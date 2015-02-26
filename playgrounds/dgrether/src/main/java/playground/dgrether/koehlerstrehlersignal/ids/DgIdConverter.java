@@ -84,28 +84,14 @@ public class DgIdConverter {
 	 * @return the id of the matsim link corresponding to the street ending in this crossing node
 	 */
 	public Id<Link> convertToCrossingNodeId2LinkId(Id<DgCrossingNode> toCrossingNodeId){
-		String sid = toCrossingNodeId.toString();
-		if (sid.endsWith("99")){
-			Id<Link> id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
+		Integer ksIntToCrossingNodeId = Integer.parseInt(toCrossingNodeId.toString());
+		String matsimStringLinkId = this.idPool.getStringId(ksIntToCrossingNodeId);
+		if (matsimStringLinkId.endsWith("99")){
+			Id<Link> id = Id.create(matsimStringLinkId.substring(0, matsimStringLinkId.length() - 2), Link.class);
 			return id;
 		}
-		throw new IllegalStateException("Can not convert " + sid + " to link id");
+		throw new IllegalStateException("Can not convert " + matsimStringLinkId + " to link id");
 	}
-	
-	/**
-	 * converts back. see convertLinkId2FromCrossingNodeId(...)
-	 * 
-	 * @param fromCrossingNodeId the id of a crossing node in the ks-model network
-	 * @return the id of the matsim link corresponding to the street starting in this crossing node
-	 */
-//	public Id<Link> convertFromCrossingNodeId2LinkId(Id<DgCrossingNode> fromCrossingNodeId){
-//		String sid = fromCrossingNodeId.toString();
-//		if (sid.endsWith("11")){
-//			Id<Link> id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
-//			return id;
-//		}
-//		throw new IllegalStateException("Can not convert " + sid + " to link id");
-//	}
 	
 	/**
 	 * creates a light id for a link to link relationship
@@ -145,12 +131,13 @@ public class DgIdConverter {
 	 * @return the corresponding node id in the matsim network
 	 */
 	public Id<Node> convertCrossingId2NodeId(Id<DgCrossing> crossingId){
-		String sid = crossingId.toString();
-		if (sid.endsWith("77")){
-			Id<Node> id = Id.create(sid.substring(0, sid.length() - 2), Node.class);
+		Integer ksIntCrossingId = Integer.parseInt(crossingId.toString());
+		String matsimStringNodeId = this.idPool.getStringId(ksIntCrossingId);
+		if (matsimStringNodeId.endsWith("77")){
+			Id<Node> id = Id.create(matsimStringNodeId.substring(0, matsimStringNodeId.length() - 2), Node.class);
 			return id;
 		}
-		throw new IllegalStateException("Can not convert " + sid + " to node id");
+		throw new IllegalStateException("Can not convert " + matsimStringNodeId + " to node id");
 	}
 	
 	/**
@@ -197,19 +184,14 @@ public class DgIdConverter {
 	 * @return the corresponding link id in the matsim network
 	 */
 	public Id<Link> convertStreetId2LinkId(Id<DgStreet> streetId){
-		String sid = streetId.toString();
-		if (sid.endsWith("88")){
-			Id<Link>  id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
+		Integer ksIntStreetId = Integer.parseInt(streetId.toString());
+		String matsimStringStreetId = this.idPool.getStringId(ksIntStreetId);
+		if (matsimStringStreetId.endsWith("88")){
+			Id<Link>  id = Id.create(matsimStringStreetId.substring(0, matsimStringStreetId.length() - 2), Link.class);
 			return id;
 		}
-		throw new IllegalStateException("Can not convert " + sid + " to link id");
+		throw new IllegalStateException("Can not convert " + matsimStringStreetId + " to link id");
 	}
-
-//	
-//	public Id createFromZone2ToZoneId(Id from, Id to){
-//		String idString = from + "22" + to;
-//		return idPool.createId(idString);
-//	}
 
 	/**
 	 * create a commodity id for the FromLink - ToLink pair
@@ -221,19 +203,6 @@ public class DgIdConverter {
 	public Id<DgCommodity> createCommodityId4LinkToLinkPair(Id<Link> fromLinkId, Id<Link> toLinkId){
 		String idString = fromLinkId + "33" + toLinkId;
 		return idPool.createId(idString, DgCommodity.class);
-	}
-//	
-//	public Id createFrom2ToId(Id from, Id to){
-//		String idString = from + "44" + to;
-//		return idPool.createId(idString);
-//	}
-
-	public Id<DgCrossing> getSymbolicId(Integer crossingId) {
-		String idString = idPool.getStringId(crossingId);
-		log.debug("Matched " + Integer.toString(crossingId) + " -> " + idString);
-		return Id.create(idString, DgCrossing.class);
-	}
-
-	
+	}	
 	
 }

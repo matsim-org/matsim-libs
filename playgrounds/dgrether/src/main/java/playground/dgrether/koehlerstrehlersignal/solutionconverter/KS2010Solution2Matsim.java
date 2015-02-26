@@ -57,8 +57,7 @@ public class KS2010Solution2Matsim {
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		Map<Id<Node>, KS2010CrossingSolution> newMap = new HashMap<>();
 		for (KS2010CrossingSolution sol : solutionCrossings){
-			Id<DgCrossing> mId = idConverter.getSymbolicId(Integer.valueOf(sol.getCrossingId().toString()));
-			Id<Node> nodeId = idConverter.convertCrossingId2NodeId(mId);
+			Id<Node> nodeId = idConverter.convertCrossingId2NodeId(sol.getCrossingId());
 			sol.setCrossingId(Id.create(nodeId, DgCrossing.class));
 			newMap.put(nodeId, sol);
 		}
