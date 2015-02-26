@@ -75,7 +75,7 @@ public class MainForQGisWriter {
 		double[] extent = {100000,-3720000,180000,-3675000};
 		writer.setExtent(extent);
 		
-		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities_header.csv",
+		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
 				QGisConstants.geometryType.Point);
 		accessibilityLayer.setDelimiter(",");
 		//there are two ways to set x and y fields for csv geometry files
@@ -84,11 +84,11 @@ public class MainForQGisWriter {
 		accessibilityLayer.setXField("field_1");
 		accessibilityLayer.setYField("field_2");
 		AccessibilityRenderer renderer = new AccessibilityRenderer();
-		renderer.setRenderingAttribute("accessibility"); // choose column/header to visualize
+		renderer.setRenderingAttribute("field_3"); // choose column/header to visualize
 		accessibilityLayer.setRenderer(renderer);
 		writer.addLayer(accessibilityLayer);
 		
-		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities_header.csv", QGisConstants.geometryType.Point);
+		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
 		densityLayer.setDelimiter(",");
 		densityLayer.setXField("field_1");
 		densityLayer.setYField("field_2");

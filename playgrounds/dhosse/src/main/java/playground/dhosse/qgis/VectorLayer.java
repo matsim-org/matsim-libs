@@ -15,6 +15,7 @@ public class VectorLayer extends QGisLayer {
 	private String delimiter;
 	private String xField;
 	private String yField;
+	private boolean useHeader;
 	
 	public VectorLayer(String name, String path, playground.dhosse.qgis.QGisConstants.geometryType geometryType) {
 		
@@ -98,6 +99,18 @@ public class VectorLayer extends QGisLayer {
 	 */
 	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName ){
 		this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
+	}
+	
+	public void setUseHeader(boolean useHeader){
+		this.useHeader = useHeader;
+	}
+	
+	public String getUseHeader(){
+		if(this.useHeader){
+			return "Yes";
+		} else{
+			return "No";
+		}
 	}
 
 }

@@ -178,13 +178,13 @@ public class QGisFileWriter {
 		
 		if(vlayer.getInputType().equals(QGisConstants.inputType.csv) && !vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
 
-			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=" + vlayer.getDelimiter() +
+			out.write("\t\t\t<datasource>file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.getUseHeader() + "&amp;delimiter=" + vlayer.getDelimiter() +
 					"&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + vlayer.getXField() +
 					"&amp;yField=" + vlayer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
 			
 		} else{
 			
-			relP.replace("file:/", "");
+			relP.replace("file:/", "./");
 			
 			out.write("\t\t\t<datasource>" + relP + "</datasource>\n");
 			
@@ -416,7 +416,7 @@ public class QGisFileWriter {
 				Double.toString(psl.getOffsetMapUnitScale()[1]); 
 		
 		//different to line layer
-		out.write("\t\t\t\t\t<symbol alpha=\"1\" type=\"" + psl.getSymbolType().toString().toLowerCase() + "\" name=\"" + idx + "\">\n");
+		out.write("\t\t\t\t\t<symbol alpha=\"" + psl.getLayerTransparency() + "\" type=\"" + psl.getSymbolType().toString().toLowerCase() + "\" name=\"" + idx + "\">\n");
 		
 		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"" + layer.getLayerClass().toString() + "\" locked=\"0\">\n");
 		

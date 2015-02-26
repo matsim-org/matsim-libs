@@ -42,6 +42,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level0.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level0.setSizeMapUnitScale(sizeMapUnitScale);
 		level0.setPenStyle(QGisConstants.penstyle.no);
+		level0.setLayerTransparency(1);
 		this.addSymbolLayer(level0);
 		
 		QGisPointSymbolLayer level1 = new QGisPointSymbolLayer();
@@ -53,6 +54,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level1.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level1.setSizeMapUnitScale(sizeMapUnitScale);
 		level1.setPenStyle(QGisConstants.penstyle.no);
+		level1.setLayerTransparency(1);
 		this.addSymbolLayer(level1);
 		
 		QGisPointSymbolLayer level2 = new QGisPointSymbolLayer();
@@ -64,6 +66,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level2.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level2.setSizeMapUnitScale(sizeMapUnitScale);
 		level2.setPenStyle(QGisConstants.penstyle.no);
+		level2.setLayerTransparency(1);
 		this.addSymbolLayer(level2);
 		
 		QGisPointSymbolLayer level3 = new QGisPointSymbolLayer();
@@ -75,6 +78,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level3.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level3.setSizeMapUnitScale(sizeMapUnitScale);
 		level3.setPenStyle(QGisConstants.penstyle.no);
+		level3.setLayerTransparency(1);
 		this.addSymbolLayer(level3);
 		
 		QGisPointSymbolLayer level4 = new QGisPointSymbolLayer();
@@ -86,6 +90,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level4.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level4.setSizeMapUnitScale(sizeMapUnitScale);
 		level4.setPenStyle(QGisConstants.penstyle.no);
+		level4.setLayerTransparency(1);
 		this.addSymbolLayer(level4);
 		
 		QGisPointSymbolLayer level5 = new QGisPointSymbolLayer();
@@ -97,6 +102,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level5.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level5.setSizeMapUnitScale(sizeMapUnitScale);
 		level5.setPenStyle(QGisConstants.penstyle.no);
+		level5.setLayerTransparency(1);
 		this.addSymbolLayer(level5);
 		
 		QGisPointSymbolLayer level6 = new QGisPointSymbolLayer();
@@ -108,6 +114,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level6.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level6.setSizeMapUnitScale(sizeMapUnitScale);
 		level6.setPenStyle(QGisConstants.penstyle.no);
+		level6.setLayerTransparency(1);
 		this.addSymbolLayer(level6);
 		
 		QGisPointSymbolLayer level7 = new QGisPointSymbolLayer();
@@ -119,6 +126,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level7.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level7.setSizeMapUnitScale(sizeMapUnitScale);
 		level7.setPenStyle(QGisConstants.penstyle.no);
+		level7.setLayerTransparency(1);
 		this.addSymbolLayer(level7);
 		
 		QGisPointSymbolLayer level8 = new QGisPointSymbolLayer();
@@ -130,6 +138,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		level8.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		level8.setSizeMapUnitScale(sizeMapUnitScale);
 		level8.setPenStyle(QGisConstants.penstyle.no);
+		level8.setLayerTransparency(1);
 		this.addSymbolLayer(level8);
 		
 	}

@@ -30,7 +30,7 @@ public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 		
 		QGisPointSymbolLayer level0 = new QGisPointSymbolLayer();
 		level0.setId(0);
-		level0.setLayerTransparency(1);
+		level0.setLayerTransparency(1.);
 		level0.setColor(new Color(255,255,255,255));
 		level0.setColorBorder(new Color(0,0,0,255));
 		level0.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
@@ -42,7 +42,7 @@ public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 		
 		QGisPointSymbolLayer level1 = new QGisPointSymbolLayer();
 		level1.setId(1);
-		level1.setLayerTransparency(2/3);
+		level1.setLayerTransparency(2./3);
 		level1.setColor(new Color(255,255,255,255));
 		level1.setColorBorder(new Color(0,0,0,255));
 		level1.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
@@ -54,7 +54,7 @@ public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 		
 		QGisPointSymbolLayer level2 = new QGisPointSymbolLayer();
 		level2.setId(2);
-		level2.setLayerTransparency(1/3);
+		level2.setLayerTransparency(1./3);
 		level2.setColor(new Color(255,255,255,255));
 		level2.setColorBorder(new Color(0,0,0,255));
 		level2.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
@@ -66,7 +66,7 @@ public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 		
 		QGisPointSymbolLayer level3 = new QGisPointSymbolLayer();
 		level3.setId(3);
-		level3.setLayerTransparency(0);
+		level3.setLayerTransparency(0.);
 		level3.setColor(new Color(255,255,255,255));
 		level3.setColorBorder(new Color(0,0,0,255));
 		level3.setPointLayerSymbol(QGisConstants.pointLayerSymbol.rectangle);
