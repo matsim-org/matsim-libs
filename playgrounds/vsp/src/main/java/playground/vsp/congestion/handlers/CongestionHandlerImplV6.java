@@ -222,8 +222,7 @@ PersonStuckEventHandler
 				linkIds.addAll(nRoute.getLinkIds());  
 				linkIds.add(nRoute.getEndLinkId());
 				nRoutesAndLinkIds.put(nRoute, linkIds);
-			}
-			if(pe instanceof Activity){
+			} else if(pe instanceof Activity){
 				double actEndTime = ((Activity)pe).getEndTime();
 				activityEndTimes.add(actEndTime);
 			}

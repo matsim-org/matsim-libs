@@ -26,7 +26,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.agarwalamit.siouxFalls.simulationInputs.LinkCapacityModifier;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -46,25 +45,16 @@ public class PricingControler {
 		String configFile = args[0];
 		String outputDir = args[1];
 		String congestionPricing = args[2];
-		String reduceLinkCapBy = args [3];
 		
 		Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
-//		String configFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/config_congestionPricing.xml";//args[0];
-//		String outputDir = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run205/";//args[1];
-//		String congestionPricing = "implV6";//args[2];
-//		String networkFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/SiouxFalls_networkWithRoadType.xml.gz";
-//		String plansFIle = "/Users/amit/Documents/repos/runs-svn/siouxFalls/input/selectedPlansOnly_plans.xml";
+//		String configFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run204/baseCase/config_congestionPricing_baseCaseCtd.xml";//args[0];
+//		String outputDir = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run204/policies/v4/";//args[1];
+//		String congestionPricing = "implV4";//args[2];
+//		String networkFile = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run204/baseCase/output_network.xml.gz";
+//		String plansFIle = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run204/baseCase/output_plans.xml.gz";
 //		
 //		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFIle, networkFile, configFile);
-		
-		String newNetworkFile = outputDir+"network_linkCap"+reduceLinkCapBy+"times.xml.gz";
-		
-		LinkCapacityModifier modifyLinkCap = new LinkCapacityModifier(sc.getNetwork());
-		modifyLinkCap.processNetwork(Double.valueOf(reduceLinkCapBy));
-		modifyLinkCap.writeNetwork(newNetworkFile);
-		
-		sc.getConfig().network().setInputFile(newNetworkFile);
 		
 		sc.getConfig().controler().setOutputDirectory(outputDir);
 		sc.getConfig().controler().setWriteEventsInterval(100);

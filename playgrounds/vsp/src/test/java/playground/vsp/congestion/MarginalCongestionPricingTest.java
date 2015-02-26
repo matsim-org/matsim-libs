@@ -19,7 +19,6 @@
 package playground.vsp.congestion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -414,9 +413,7 @@ public class MarginalCongestionPricingTest {
 		}
 
 		private void createNetwork(){
-			final Set<String> allModesAllowed = new HashSet<String>();
-			allModesAllowed.addAll(Arrays.asList("car","motorbike","pt", "bike", "walk"));
-
+			
 			Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
 			Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 100));
 			Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, 90));
@@ -426,17 +423,11 @@ public class MarginalCongestionPricingTest {
 			Node node7 = network.createAndAddNode(Id.createNodeId("7"), this.scenario.createCoord(700, 100));
 
 			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600,1,null,"7");
-			link1.setAllowedModes(allModesAllowed);
 			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,1000.0,20.0,3600,1,null,"7");
-			link2.setAllowedModes(allModesAllowed);
 			link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,10.0,20.0,360,1,null,"7");
-			link3.setAllowedModes(allModesAllowed);
 			link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node4, node5,1000.0,20.0,3600,1,null,"7");
-			link4.setAllowedModes(allModesAllowed);
 			link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node3, node6,1000.0,20.0,3600,1,null,"7");
-			link5.setAllowedModes(allModesAllowed);
 			link6 = network.createAndAddLink(Id.createLinkId(String.valueOf("6")), node6, node7,1000.0,20.0,3600,1,null,"7");
-			link6.setAllowedModes(allModesAllowed);
 		}
 
 		private void createPopulation(int numberOfPersons){

@@ -57,8 +57,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
+import org.opengis.filter.expression.Add;
 
 import playground.vsp.congestion.LinkCongestionInfo;
 import playground.vsp.congestion.events.CongestionEvent;
@@ -273,7 +275,12 @@ PersonStuckEventHandler
 				Id<Person> personInFrontOfQ = Id.createPersonId(event.getVehicleId().toString());
 				Id<Link> personOnThisLink = event.getLinkId();
 
-				processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
+				do {
+					Tuple<Id<Person>,Id<Link>> firstPersonOnCausingLink =  processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
+					delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(Id.createPersonId(event.getVehicleId()));
+					personInFrontOfQ = firstPersonOnCausingLink.getFirst();
+					personOnThisLink = firstPersonOnCausingLink.getSecond();
+				} while(delayToPayFor > 0.);
 			}
 		}
 	}
@@ -285,7 +292,7 @@ PersonStuckEventHandler
 	 * @return an array of size two; first element is person who is in front of the Q(link) 
 	 * and other is spill back causing link
 	 */
-	private void processSpillBackDelays(LinkLeaveEvent event, Id<Person> personInFrontOfQ, Id<Link> personOnThisLink){
+	private Tuple<Id<Person>,Id<Link>> processSpillBackDelays(LinkLeaveEvent event, Id<Person> personInFrontOfQ, Id<Link> personOnThisLink){
 
 		Id<Person> delayedPerson = Id.createPersonId(event.getVehicleId().toString());
 		Id<Link> personDelayedOnLink = event.getLinkId();
@@ -296,6 +303,7 @@ PersonStuckEventHandler
 		LinkCongestionInfo spillBackCausingLinkInfo = this.linkId2congestionInfo.get(spillBackCausingLink);
 
 		List<Id<Person>> personsEnteredOnSpillBackCausingLink = new ArrayList<Id<Person>>(spillBackCausingLinkInfo.getEnteringAgents()); 
+		
 		Collections.reverse(personsEnteredOnSpillBackCausingLink);
 
 		double delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
@@ -310,8 +318,9 @@ PersonStuckEventHandler
 			delayToPayFor = this.linkId2congestionInfo.get(personDelayedOnLink).getPersonId2DelaysToPayFor().get(delayedPerson);
 		}
 
+		List<Id<Person>> personsLeftSpillBackCausingLink = new ArrayList<Id<Person>>();
 		if(delayToPayFor>0){
-			List<Id<Person>> personsLeftSpillBackCausingLink = new ArrayList<Id<Person>>(spillBackCausingLinkInfo.getLeavingAgents());
+			personsLeftSpillBackCausingLink.addAll(spillBackCausingLinkInfo.getLeavingAgents());
 			Collections.reverse(personsLeftSpillBackCausingLink);
 			Iterator<Id<Person>> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
 
@@ -325,13 +334,18 @@ PersonStuckEventHandler
 		}
 
 		delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
-
-		while (delayToPayFor>0){
-			processSpillBackDelays(event,personInFrontOfQ,personOnThisLink);
-			delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(delayedPerson);
-			personInFrontOfQ = personsEnteredOnSpillBackCausingLink.get(0);
-			personOnThisLink = spillBackCausingLink;;
-		};
+		
+		Tuple<Id<Person>,Id<Link>> firstPersonOnCausingLink = new Tuple<Id<Person>, Id<Link>>(Id.createPersonId("NA"), Id.createLinkId("NONE"));
+		if(delayToPayFor == 0) ;
+		else if(personsEnteredOnSpillBackCausingLink.size()==0) {
+			// only happens if some other event happens in same time step affect the spill back causing links.
+				log.warn("There is no agent present on the link "+spillBackCausingLink+" and delay2Pay4 is "+delayToPayFor+". Situation happend during event "+event.toString());
+				log.warn("Thus assuming the last left agent as front of the queue. This happens very rare for very short links.");
+				firstPersonOnCausingLink = new Tuple<Id<Person>, Id<Link>>(personsLeftSpillBackCausingLink.get(0), spillBackCausingLink);
+		} else {
+			firstPersonOnCausingLink = new Tuple<Id<Person>, Id<Link>>(personsEnteredOnSpillBackCausingLink.get(personsEnteredOnSpillBackCausingLink.size()-1), spillBackCausingLink);
+		}
+		return firstPersonOnCausingLink;
 	}
 
 	/**
@@ -364,37 +378,31 @@ PersonStuckEventHandler
 
 		double marginalDelaysPerLeavingVehicle = this.linkId2congestionInfo.get(causingPersonOnLink).getMarginalDelayPerLeavingVehicle_sec();
 
-		if (delayToPayFor > marginalDelaysPerLeavingVehicle) {
-			if (delayedPerson.toString().equals(causingPerson.toString())) {
-				System.out.println("\n \n \t \t Error \n \n");
-				log.error("Causing agent and affected agents "+causingPerson.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
-				return;
-				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-			} else {
-				// using the time when the causing agent entered the link
-				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, marginalDelaysPerLeavingVehicle, causingPersonOnLink,
-						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-								System.out.println(congestionEvent.toString());
-				this.events.processEvent(congestionEvent);
-				this.congestionEventsList.add(congestionEvent);
-			}
+		// decide how much to charge
+		double personChargedFor =0;
+	
+		if(delayToPayFor > marginalDelaysPerLeavingVehicle) {
+			personChargedFor = marginalDelaysPerLeavingVehicle;
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
-		} else if(delayToPayFor > 0){
-			if (delayedPerson.toString().equals(causingPerson.toString())) {
-				System.out.println("\n \n \t \t Error \n \n");
-				log.error("Causing agent and affected agents "+causingPerson.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
-				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
-			} else {
-				// using the time when the causing agent entered the link
-				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
-				CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, delayToPayFor, causingPersonOnLink, 
-						this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
-								System.out.println(congestionEvent.toString());
-				this.events.processEvent(congestionEvent);	
-				this.congestionEventsList.add(congestionEvent);
-			}
-			delayToPayFor = 0.;
+		} else {
+			personChargedFor = delayToPayFor;
+			delayToPayFor = 0;
+		}
+		
+		//throw event
+		if (delayedPerson.toString().equals(causingPerson.toString())) {
+			System.out.println("\n \n \t \t Error \n \n");
+			log.error("Causing agent and affected agents "+causingPerson.toString()+" are same. Delays at this point is "+delayToPayFor+" sec.");
+			return;
+			//throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
+		} else {
+			// using the time when the causing agent entered the link
+			this.totalInternalizedDelay = this.totalInternalizedDelay + personChargedFor;
+			CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), "flowStorageCapacity", causingPerson, delayedPerson, personChargedFor, causingPersonOnLink,
+					this.linkId2congestionInfo.get(causingPersonOnLink).getPersonId2linkEnterTime().get(causingPerson) );
+			this.events.processEvent(congestionEvent);
+			this.congestionEventsList.add(congestionEvent);
+//			System.out.println(congestionEvent.toString());
 		}
 		linkInfo.getPersonId2DelaysToPayFor().put(delayedPerson, delayToPayFor);
 	}

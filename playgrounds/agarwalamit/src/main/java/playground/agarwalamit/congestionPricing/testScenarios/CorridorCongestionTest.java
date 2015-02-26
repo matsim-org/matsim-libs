@@ -55,7 +55,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.agarwalamit.utils.myTestScenarios.CorridorNetworkAndPlans;
 import playground.agarwalamit.utils.myTestScenarios.MergingNetworkAndPlans;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -71,15 +70,15 @@ public class CorridorCongestionTest {
 	
 	
 	private final int numberOfPersonInPlan = 4;
-	private final boolean useOTFVis = false;
+	private final boolean useOTFVis = true;
 	
 	public static void main(String[] args) {
 		new CorridorCongestionTest().compareV3AndV4();
 	}
 	
 	public void compareV3AndV4(){
-		 List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3");
 		 List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4");
+		 List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3");
 		 
 		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3);
 		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4);
@@ -124,6 +123,7 @@ public class CorridorCongestionTest {
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan);
 		Scenario sc = pseudoInputs.getDesiredScenario();
+		sc.getConfig().qsim().setStuckTime(3600);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new printAllEvents());
