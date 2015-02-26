@@ -110,7 +110,10 @@ public class NCFacilities {
 				if (planElement instanceof Activity) {
 					Activity activity = (Activity) planElement;
 					if (!usedActFacilities.getFacilities().containsKey(activity.getFacilityId())) {
-						usedActFacilities.addActivityFacility(activityFacilities.getFacilities().get(activity.getFacilityId()));
+						ActivityFacility usedFacility = activityFacilities.getFacilities().get(activity.getFacilityId());
+						if (usedFacility != null) {
+							usedActFacilities.addActivityFacility(activityFacilities.getFacilities().get(activity.getFacilityId()));
+						}
 					}
 				}
 			}
