@@ -180,7 +180,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				matches += (bitfeld.charAt(8) == 'F')? 1 : 0;
 				matches += (bitfeld.charAt(13) == 'F')? 1 : 0;
 				matches += (bitfeld.charAt(15) == 'F')? 1 : 0;
-				if (matches >= 4) { // if driven in at least four of the selected five work weeks, the bitfeld is selected...
+				if (matches >= 3) { // if driven in at least three of the selected five work weeks, the bitfeld is selected...
 				/*if (bitfeld.charAt(1) == 'F'
 						&& bitfeld.charAt(6) == 'F'
 						&& bitfeld.charAt(8) == 'F'
