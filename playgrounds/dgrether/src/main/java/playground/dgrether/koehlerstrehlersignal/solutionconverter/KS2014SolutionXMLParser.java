@@ -8,12 +8,12 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
+import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	private final static String TOTALFLOW = "totalFlow";
 	
 	private List<KS2010CrossingSolution> crossingSolutions = new ArrayList<KS2010CrossingSolution>();
-	private Map<Id<Link>, Double> streetFlow = new HashMap<>();
+	private Map<Id<DgStreet>, Double> streetFlow = new HashMap<>();
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
@@ -62,7 +62,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 		}
 		// read the flow per street
 		if (elementName.equals(EDGEFLOW)){
-			Id<Link> streetId = Id.create(atts.getValue(ORIG_ID), Link.class);
+			Id<DgStreet> streetId = Id.create(atts.getValue(ORIG_ID), DgStreet.class);
 			Double streetFlow = Double.parseDouble(atts.getValue(TOTALFLOW));
 			this.streetFlow.put(streetId, streetFlow);
 		}
@@ -72,7 +72,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 		return this.crossingSolutions;
 	}
 	
-	public Map<Id<Link>, Double> getStreetFlow(){
+	public Map<Id<DgStreet>, Double> getStreetFlow(){
 		return this.streetFlow;
 	}
 }

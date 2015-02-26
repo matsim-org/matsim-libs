@@ -26,20 +26,21 @@ import java.util.Map;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
@@ -62,7 +63,7 @@ public class KS2010VsMatimVolumes {
 				+ "id_conversions.txt");
 		DgIdConverter dgIdConverter = new DgIdConverter(idPool);
 
-		Map<Id<Link>, Double> ks2010StreetIdFlow = solutionParser
+		Map<Id<DgStreet>, Double> ks2010StreetIdFlow = solutionParser
 				.getStreetFlow();
 
 		Map<Id<Link>, Double> ks2010volumes = convertKS2010Volumes(idPool,
@@ -71,10 +72,10 @@ public class KS2010VsMatimVolumes {
 	}
 
 	private static Map<Id<Link>, Double> convertKS2010Volumes(DgIdPool idPool,
-			DgIdConverter dgIdConverter, Map<Id<Link>, Double> ks2010StreetIdFlow) {
+			DgIdConverter dgIdConverter, Map<Id<DgStreet>, Double> ks2010StreetIdFlow) {
 		// convert ks2010_id to matsim_id in the unsimplified network
 		Map<Id<Link>, Double> matsimLinkIdFlow = new HashMap<>();
-		for (Id<Link> streetId : ks2010StreetIdFlow.keySet()) {
+		for (Id<DgStreet> streetId : ks2010StreetIdFlow.keySet()) {
 			Integer ksIntStreetId = Integer.parseInt(streetId.toString());
 			String matsimStringStreetId = idPool.getStringId(ksIntStreetId);
 			Id<Link> linkId = dgIdConverter.convertStreetId2LinkId(Id.create(
@@ -128,13 +129,9 @@ public class KS2010VsMatimVolumes {
 	}
 
 	private static Network loadNetwork(String networkFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().network().setInputFile(networkFile);
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadNetwork();
-		Network network = scenario.getNetwork();
-		return network;
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+		(new MatsimNetworkReader(scenario)).readFile(networkFile);
+		return scenario.getNetwork();
 	}
 
 	private static void writeFlowVolumesShp(Network ks2010Network, String srs,
@@ -188,12 +185,9 @@ public class KS2010VsMatimVolumes {
 				runNumber = "1911"; //TODO
 			}
 			
-			String ksSolutionDirectory = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"
+			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"
 					+ i.getFirst() + "_" + i.getSecond() + "_peak/";
-			String matsimRunDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run" + runNumber + "/";
-//			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"
-//				+ i.getFirst() + "_" + i.getSecond() + "_peak/";
-//			String matsimRunDirectory = DgPaths.REPOS + "runs-svn/run" + runNumber + "/";
+			String matsimRunDirectory = DgPaths.REPOS + "runs-svn/cottbus/before2015/run" + runNumber + "/";
 			
 			// unsimplified networks
 			String matsimNetworkFile = matsimRunDirectory + runNumber + ".output_network.xml.gz";
