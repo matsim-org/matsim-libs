@@ -8,4 +8,11 @@
   <groupId>playground</groupId>
   <artifactId>hbecker</artifactId>
   <name>hbecker</name>
+    <dependencies>
+    <dependency>
+        <groupId>playground</groupId>
+        <artifactId>boescpa</artifactId>
+        <version>0.7.0-SNAPSHOT</version>
+    </dependency>
+    </dependencies>
 </project>
