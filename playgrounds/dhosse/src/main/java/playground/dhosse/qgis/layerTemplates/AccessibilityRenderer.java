@@ -2,19 +2,18 @@ package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
-import playground.dhosse.qgis.ColorRamp;
 import playground.dhosse.qgis.QGisConstants;
 import playground.dhosse.qgis.QGisPointSymbolLayer;
-import playground.dhosse.qgis.QGisRenderer;
 import playground.dhosse.qgis.Range;
+import playground.dhosse.qgis.rendering.GraduatedSymbolRenderer;
 
-public class AccessibilityRenderer extends QGisRenderer {
+public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
 	private String renderingAttribute;
 	private Range[] ranges;
 
 	public AccessibilityRenderer() {
-		super(QGisConstants.renderingType.graduatedSymbol);
+		super();
 		init();
 	}
 
@@ -148,15 +147,6 @@ public class AccessibilityRenderer extends QGisRenderer {
 	@Override
 	public void setRenderingAttribute(String attr){
 		this.renderingAttribute = attr;
-	}
-	
-	@Override
-	public ColorRamp getColorRamp() {
-		return null;
-	}
-
-	@Override
-	public void setColorRamp(ColorRamp colorRamp) {
 	}
 	
 }

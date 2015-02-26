@@ -2,32 +2,14 @@ package playground.dhosse.qgis;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.dhosse.qgis.layerTemplates.SimpleNetworkRenderer;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
@@ -71,21 +53,8 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		
 	}
 	
-	private void setCrs(String crs){
-		
-		if(crs.equals(TransformationFactory.DHDN_GK4)){
-			this.srs = new SRS("+proj=tmerc +lat_0=0 +lon_0=12 +k=1 +x_0=4500000 +y_0=0 +ellps=bessel +towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs",
-					"2648", "31468", "EPSG:31468", "DHDN / Gauss-Kruger zone 4", "tmerc", "bessel");
-		} else if(crs.equals(TransformationFactory.WGS84)){
-			this.srs = new SRS("+proj=longlat +datum=WGS84 +no_defs",
-					"3452", "4326", "EPSG:4326", "WGS 84", "longlat", "WGS84");
-		} else if(crs.equals(TransformationFactory.WGS84_SA_Albers)){
-			this.srs = new SRS("+proj=aea +lat_1=-18 +lat_2=-32 +lat_0=0 +lon_0=24 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-					"100000", "0", "USER:100000", "WGS84_SA_Albers", "aea", "");
-		} else {
-			throw new RuntimeException("Unsupported coordinate system.");
-		}
-		
+	private void setCrs(String srs){
+		this.srs = SRS.createSpatialRefSys(srs);
 	}
 	
 	public void addLayer(QGisLayer layer){
@@ -109,7 +78,6 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 			this.handler.writeRelations(this.writer);
 			this.handler.writeMapCanvas(this.writer);
 			this.handler.writeLayerTreeCanvas(this.writer);
-			this.handler.writeLegend(this.writer);
 			
 			if(this.layers.size() > 0){
 				
@@ -154,56 +122,6 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 	
 	public SRS getSRS(){
 		return this.srs;
-	}
-	
-	public static class SRS{
-		
-		private String proj4;
-		private String srsid;
-		private String srid;
-		private String authid;
-		private String description;
-		private String projectionacronym;
-		private String ellipsoidacronym;
-
-		public SRS(String proj4, String srsid, String srid, String authid, String description, String projectionacronym, String ellipsoidacronym){
-			this.proj4 = proj4;
-			this.srsid = srsid;
-			this.srid = srid;
-			this.authid = authid;
-			this.description = description;
-			this.projectionacronym = projectionacronym;
-			this.ellipsoidacronym = ellipsoidacronym;
-		}
-		
-		public String getProj4() {
-			return proj4;
-		}
-
-		public String getSrsid() {
-			return srsid;
-		}
-
-		public String getSrid() {
-			return srid;
-		}
-
-		public String getAuthid() {
-			return authid;
-		}
-
-		public String getDescription() {
-			return description;
-		}
-
-		public String getProjectionacronym() {
-			return projectionacronym;
-		}
-
-		public String getEllipsoidacronym() {
-			return ellipsoidacronym;
-		}
-		
 	}
 	
 }

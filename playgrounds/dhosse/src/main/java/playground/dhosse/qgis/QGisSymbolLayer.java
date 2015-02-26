@@ -10,7 +10,7 @@ public abstract class QGisSymbolLayer {
 	
 	private int id;
 	
-	private int layerTransparency = 0;
+	private double layerTransparency = 0;
 	private double[] offset = {0,0};
 	private double[] offsetMapUnitScale = {1,1};
 	
@@ -42,11 +42,11 @@ public abstract class QGisSymbolLayer {
 		this.color = color;
 	}
 	
-	public int getLayerTransparency() {
+	public double getLayerTransparency() {
 		return layerTransparency;
 	}
 	
-	public void setLayerTransparency(int layerTransparency) {
+	public void setLayerTransparency(double layerTransparency) {
 		this.layerTransparency = layerTransparency;
 	}
 	

@@ -2,20 +2,19 @@ package playground.dhosse.qgis.layerTemplates;
 
 import java.awt.Color;
 
-import playground.dhosse.qgis.ColorRamp;
 import playground.dhosse.qgis.QGisConstants;
 import playground.dhosse.qgis.QGisPointSymbolLayer;
-import playground.dhosse.qgis.QGisRenderer;
 import playground.dhosse.qgis.Range;
+import playground.dhosse.qgis.rendering.GraduatedSymbolRenderer;
 
-public class NoiseRenderer extends QGisRenderer {
+public class NoiseRenderer extends GraduatedSymbolRenderer {
 	
 	private String renderingAttribute;
 	private Range[] ranges;
 	
 	public NoiseRenderer() {
 
-		super(QGisConstants.renderingType.graduatedSymbol);
+		super();
 		
 		this.init();
 		
@@ -141,13 +140,4 @@ public class NoiseRenderer extends QGisRenderer {
 		this.renderingAttribute = attr;
 	}
 	
-	@Override
-	public ColorRamp getColorRamp() {
-		return null;
-	}
-
-	@Override
-	public void setColorRamp(ColorRamp colorRamp) {
-	}
-
 }

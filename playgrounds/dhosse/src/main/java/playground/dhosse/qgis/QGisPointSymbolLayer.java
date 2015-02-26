@@ -9,11 +9,9 @@ public class QGisPointSymbolLayer extends QGisSymbolLayer {
 	private double size;
 	private double[] sizeMapUnitScale;
 	private QGisConstants.symbolType symbolType;
-	private QGisConstants.penstyle penStyle;
 	
 	public QGisPointSymbolLayer(){
 		this.symbolType = QGisConstants.symbolType.Marker;
-		this.penStyle = QGisConstants.penstyle.solid;
 	}
 	
 	public Color getColorBorder() {

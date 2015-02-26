@@ -11,9 +11,13 @@ public class QGisConstants {
 	
 	public static enum layerClass{SimpleLine,SimpleMarker};
 	
+	public static enum layerType{raster,vector};
+	
 	public static enum penstyle{no,solid};
 	
 	public static enum pointLayerSymbol{circle,rectangle};
+	
+	public static enum rasterRendererType{multibandcolor};
 	
 	public static enum renderingType{singleSymbol,categorizedSymbol,graduatedSymbol,RuleRenderer};
 	

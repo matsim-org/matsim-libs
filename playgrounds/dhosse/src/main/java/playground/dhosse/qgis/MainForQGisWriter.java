@@ -7,9 +7,12 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.dhosse.qgis.layerTemplates.AccessibilityDensitiesRenderer;
 import playground.dhosse.qgis.layerTemplates.AccessibilityRenderer;
+import playground.dhosse.qgis.layerTemplates.AccessibilityXmlRenderer;
 import playground.dhosse.qgis.layerTemplates.NoiseRenderer;
 import playground.dhosse.qgis.layerTemplates.SimpleNetworkRenderer;
+import playground.dhosse.qgis.rendering.QGisRasterRenderer;
 
 public class MainForQGisWriter {
 	
@@ -23,7 +26,7 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 		// use case 1: nodes		
-//		QGisLayer nodesLayer = new QGisLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point);
+//		VecorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point);
 //		nodesLayer.setRenderer(new SingleSymbolRenderer(nodesLayer.getGeometryType()));
 //		nodesLayer.addAttribute("id");
 //		writer.addLayer(nodesLayer);
@@ -31,7 +34,7 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 //		// use case 2: links
-//		QGisLayer linksLayer = new QGisLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
+//		VectorLayer linksLayer = new VecorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
 //		linksLayer.setRenderer(new SingleSymbolRenderer(linksLayer.getGeometryType()));
 //		linksLayer.addAttribute("id");
 //		linksLayer.addAttribute("length");
@@ -46,11 +49,11 @@ public class MainForQGisWriter {
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
 //		writer.setExtent(extent);
 //		
-//		QGisLayer networkLayer = new QGisLayer("network", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/network_detail/network.shp", QGisConstants.geometryType.Line);
+//		VectorLayer networkLayer = new VectorLayer("network", workingDirectory + "testFiles/network_detail/network.shp", QGisConstants.geometryType.Line);
 //		networkLayer.setRenderer(new SimpleNetworkRenderer(networkLayer.getGeometryType()));
 //		writer.addLayer(networkLayer);
 //		
-//		QGisLayer noiseLayer = new QGisLayer("receiverPoints", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv",
+//		VectorLayer noiseLayer = new VectorLayer("receiverPoints", workingDirectory + "testFiles/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv",
 //				QGisConstants.geometryType.Point);
 //		noiseLayer.setDelimiter(";");
 //		noiseLayer.setXField("xCoord");
@@ -60,7 +63,7 @@ public class MainForQGisWriter {
 //		noiseLayer.setRenderer(renderer);
 //		writer.addLayer(noiseLayer);
 //		
-//		QGisLayer joinLayer = new QGisLayer("immissions_3600", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
+//		VectorLayer joinLayer = new VectorLayer("immissions_3600", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
 //				QGisConstants.geometryType.No_geometry);
 //		writer.addLayer(joinLayer);
 //
@@ -72,7 +75,7 @@ public class MainForQGisWriter {
 		double[] extent = {100000,-3720000,180000,-3675000};
 		writer.setExtent(extent);
 		
-		QGisLayer accessibilityLayer = new QGisLayer("accessibility", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/accessibility/accessibilities_header.csv",
+		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities_header.csv",
 				QGisConstants.geometryType.Point);
 		accessibilityLayer.setDelimiter(",");
 		//there are two ways to set x and y fields for csv geometry files
@@ -84,6 +87,21 @@ public class MainForQGisWriter {
 		renderer.setRenderingAttribute("accessibility"); // choose column/header to visualize
 		accessibilityLayer.setRenderer(renderer);
 		writer.addLayer(accessibilityLayer);
+		
+		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities_header.csv", QGisConstants.geometryType.Point);
+		densityLayer.setDelimiter(",");
+		densityLayer.setXField("field_1");
+		densityLayer.setYField("field_2");
+		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer();
+		dRenderer.setRenderingAttribute("field_8");
+		densityLayer.setRenderer(dRenderer);
+		writer.addLayer(densityLayer);
+		
+		//example for adding a raster layer
+		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
+		mapnikLayer.setRenderer(new AccessibilityXmlRenderer());
+		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+		writer.addLayer(mapnikLayer);
 
 		writer.write(qGisProjectFile);
 

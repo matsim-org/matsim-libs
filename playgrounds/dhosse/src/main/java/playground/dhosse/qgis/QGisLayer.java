@@ -2,10 +2,10 @@ package playground.dhosse.qgis;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+
+import playground.dhosse.qgis.rendering.QGisRenderer;
 
 public class QGisLayer {
 	
@@ -15,39 +15,30 @@ public class QGisLayer {
 	
 	private QGisConstants.inputType inputType;
 	
-	private QGisConstants.geometryType geometryType;
 	private QGisConstants.layerClass layerClass;
 	
 	private QGisRenderer renderer;
 	
-	private int layerTransparency;
+	private QGisConstants.layerType type;
 	
-	private Set<VectorJoin> vectorJoins;
-	
-	//these members are csv specific and needed for text files with geometry
-	private String delimiter;
-	private String xField;
-	private String yField;
+	private SRS srs;
 	
 	/**
 	 * Creates a new instance of a qgis layer.
 	 * For each layer, a {@code QGisRenderer} must be created (for use cases look at package layerTemplates).
 	 * 
 	 * If the layer input is a csv file, you also need to specify a delimiter (e.g. , or ;) and the header names
-	 * of the columns that contain the x and y coordinates. 
+	 * of the columns that contain the x and y coordinates (by setXField and setYField).
 	 * 
 	 * @param name a unique name for the layer (as it is displayed in qgis later)
 	 * @param path the path to the input file
 	 * @param geometryType the type of geometry (none, point, line, polygon)
 	 */
-	public QGisLayer(String name, String path, QGisConstants.geometryType geometryType){
+	public QGisLayer(String name, String path){
 		
 		this.name = name;
 		this.path = path;
 		this.id = Id.create(name + new SimpleDateFormat("yyyyMMdd").format(new Date()), QGisLayer.class);
-		this.setGeometryType(geometryType);
-		this.layerTransparency = 0;
-		this.vectorJoins = new HashSet<VectorJoin>();
 		
 		this.build();
 		
@@ -55,20 +46,18 @@ public class QGisLayer {
 	
 	private void build(){
 		
-		if(this.getGeometryType().equals(QGisConstants.geometryType.Line)){
+		if(this.path.contains(QGisConstants.inputType.csv.toString())){
 			
-			this.setLayerClass(QGisConstants.layerClass.SimpleLine);
-			
-		} else if(this.getGeometryType().equals(QGisConstants.geometryType.Point)){
-			
-			this.setLayerClass(QGisConstants.layerClass.SimpleMarker);
-			
-		}
-		
-		if(this.path.contains("csv")){
 			this.inputType = QGisConstants.inputType.csv;
-		} else if(this.path.contains("shp")){
+			
+		} else if(this.path.contains(QGisConstants.inputType.shp.toString())){
+			
 			this.inputType = QGisConstants.inputType.shp;
+			
+		} else if(this.path.contains(QGisConstants.inputType.xml.toString())){
+			
+			this.inputType = QGisConstants.inputType.xml;
+			
 		}
 		
 	}
@@ -97,14 +86,6 @@ public class QGisLayer {
 		this.renderer = renderer;
 	}
 
-	public QGisConstants.geometryType getGeometryType() {
-		return geometryType;
-	}
-
-	public void setGeometryType(QGisConstants.geometryType geometryType) {
-		this.geometryType = geometryType;
-	}
-
 	public QGisConstants.layerClass getLayerClass() {
 		return layerClass;
 	}
@@ -117,54 +98,24 @@ public class QGisLayer {
 		return this.path;
 	}
 	
-	public int getLayerTransparency(){
-		return this.layerTransparency;
-	}
-	
-	public void setLayerTransparency(int transparency){
-		this.layerTransparency = transparency;
-	}
-	
-	public Set<VectorJoin> getVectorJoins(){
-		return this.vectorJoins;
-	}
-	
-	public void setDelimiter(String delimiter){
-		this.delimiter = delimiter;
-	}
-	
-	public String getDelimiter(){
-		return this.delimiter;
-	}
-	
-	public void setXField(String xField){
-		this.xField = xField;
-	}
-	
-	public String getXField(){
-		return this.xField;
-	}
-	
-	public void setYField(String yField){
-		this.yField = yField;
-	}
-	
-	public String getYField(){
-		return this.yField;
-	}
-	
-	/**
-	 *
-	 * @param layer the layer that contains the data (not the geometry)
-	 * @param joinFieldName name of the attribute of the join layer
-	 * @param targetFieldName
-	 */
-	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName ){
-		this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
-	}
-	
 	public QGisConstants.inputType getInputType(){
 		return this.inputType;
+	}
+
+	public QGisConstants.layerType getType() {
+		return type;
+	}
+
+	public void setType(QGisConstants.layerType type) {
+		this.type = type;
+	}
+
+	public SRS getSrs() {
+		return srs;
+	}
+
+	public void setSrs(String srs) {
+		this.srs = SRS.createSpatialRefSys(srs);
 	}
 	
 }

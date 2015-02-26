@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 
-import playground.dhosse.qgis.layerTemplates.NoiseRenderer;
+import playground.dhosse.qgis.rendering.GraduatedSymbolRenderer;
+import playground.dhosse.qgis.rendering.QGisRasterRenderer;
+import playground.dhosse.qgis.rendering.QGisRenderer;
 
 public class QGisFileWriter {
 	
@@ -84,7 +86,6 @@ public class QGisFileWriter {
 		
 		out.write("\t\t\t<spatialrefsys>\n");
 		
-		
 		out.write("\t\t\t\t<proj4>" + this.writer.getSRS().getProj4() + "</proj4>\n");
 		out.write("\t\t\t\t<srsid>" + this.writer.getSRS().getSrsid() + "</srsid>\n");
 		out.write("\t\t\t\t<srid>" + this.writer.getSRS().getSrid() + "</srid>\n");
@@ -124,34 +125,6 @@ public class QGisFileWriter {
 		
 	}
 	
-	public void writeLegend(BufferedWriter out) throws IOException{
-		
-		out.write("\t<legend updateDrawingOrder=\"true\">\n");
-		
-		for(QGisLayer layer : this.writer.getLayers().values()){
-			
-			writeLegendLayer(out, layer);
-			
-		}
-		
-		out.write("\t</legend>\n");
-		
-	}
-	
-	private void writeLegendLayer(BufferedWriter out, QGisLayer layer) throws IOException{
-		
-		out.write("\t\t<legendlayer drawingOrder=\"-1\" open=\"true\" checked=\"Qt::Checked\" name=\"" + layer.getName() + "\" showFeatureCount=\"0\">\n");
-		
-		out.write("\t\t\t<filegroup open=\"true\" hidden=\"false\">\n");
-		
-		out.write("\t\t\t\t<legendlayerfile isInOverview=\"0\" layerid=\"" + layer.getId().toString()  + "\" visible=\"1\"/>\n");
-		
-		out.write("\t\t\t</filegroup>\n");
-		
-		out.write("\t\t</legendlayer>\n");
-		
-	}
-	
 	public void writeProjectLayers(BufferedWriter out) throws IOException{
 		
 		out.write("\t<projectlayers layercount=\"" + this.writer.layers.size() + "\">\n");
@@ -168,26 +141,46 @@ public class QGisFileWriter {
 	
 	private void writeMapLayer(BufferedWriter out, QGisLayer layer) throws IOException{
 		
-		if(layer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
+		if(layer.getType().equals(QGisConstants.layerType.vector)){
 			
-			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" geometry=\"" + layer.getGeometryType().toString().replace("_", " ") + "\" type=\"vector\" hasScaleBasedVisibilityFlag=\"0\">\n");
+			writeVectorLayer(out, layer);
+			
+		} else if(layer.getType().equals(QGisConstants.layerType.raster)){
+			
+			writeRasterLayer(out, layer);
+			
+		} else {
+			throw new RuntimeException("Cannot write map layer. Unknown format.");
+		}
+		
+		out.write("\t\t</maplayer>\n");
+		
+	}
+	
+	private void writeVectorLayer(BufferedWriter out, QGisLayer layer) throws IOException {
+		
+		VectorLayer vlayer = (VectorLayer) layer;
+		
+		if(vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
+			
+			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" geometry=\"" + vlayer.getGeometryType().toString().replace("_", " ") + "\" type=\"" + vlayer.getType() + "\" hasScaleBasedVisibilityFlag=\"0\">\n");
 			
 		} else{
 			
-			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" simplifyDrawingHints=\"1\" minLabelScale=\"0\" maxLabelScale=\"1e+08\" simplifyDrawingTol=\"1\" geometry=\"" + layer.getGeometryType().toString() + "\" simplifyMaxScale=\"1\" type=\"vector\" hasScaleBasedVisibilityFlag=\"0\" simplifyLocal=\"1\" scaleBasedLabelVisibilityFlag=\"0\">\n");
+			out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" simplifyDrawingHints=\"1\" minLabelScale=\"0\" maxLabelScale=\"1e+08\" simplifyDrawingTol=\"1\" geometry=\"" + vlayer.getGeometryType().toString() + "\" simplifyMaxScale=\"1\" type=\"vector\" hasScaleBasedVisibilityFlag=\"0\" simplifyLocal=\"1\" scaleBasedLabelVisibilityFlag=\"0\">\n");
 		
 		}
 
-		out.write("\t\t\t<id>" + layer.getId().toString() + "</id>\n");
+		out.write("\t\t\t<id>" + vlayer.getId().toString() + "</id>\n");
 		
-		String base = layer.getPath();
+		String base = vlayer.getPath();
 		String relP = new File(writer.getWorkingDir()).toURI().relativize(new File(base).toURI()).toString();
 		
-		if(layer.getInputType().equals(QGisConstants.inputType.csv) && !layer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
+		if(vlayer.getInputType().equals(QGisConstants.inputType.csv) && !vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
 
-			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=" + layer.getDelimiter() +
-					"&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + layer.getXField() +
-					"&amp;yField=" + layer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
+			out.write("\t\t\t<datasource>file:/" + relP + "?type=csv&amp;delimiter=" + vlayer.getDelimiter() +
+					"&amp;quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + vlayer.getXField() +
+					"&amp;yField=" + vlayer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no</datasource>\n");
 			
 		} else{
 			
@@ -204,25 +197,33 @@ public class QGisFileWriter {
 		out.write("\t\t\t\t<value></value>\n");
 		
 		out.write("\t\t\t</keywordList>\n");
-		out.write("\t\t\t<layername>" + layer.getName() + "</layername>\n");
+		out.write("\t\t\t<layername>" + vlayer.getName() + "</layername>\n");
 		out.write("\t\t\t<srs>\n");
 		
 		out.write("\t\t\t\t<spatialrefsys>\n");
 
-		out.write("\t\t\t\t\t<proj4>" + this.writer.getSRS().getProj4() + "</proj4>\n");
-		out.write("\t\t\t\t\t<srsid>" + this.writer.getSRS().getSrsid() + "</srsid>\n");
-		out.write("\t\t\t\t\t<srid>" + this.writer.getSRS().getSrid() + "</srid>\n");
-		out.write("\t\t\t\t\t<authid>" + this.writer.getSRS().getAuthid() + "</authid>\n");
-		out.write("\t\t\t\t\t<description>" + this.writer.getSRS().getDescription() + "</description>\n");
-		out.write("\t\t\t\t\t<projectionacronym>" + this.writer.getSRS().getProjectionacronym() + "</projectionacronym>\n");
-		out.write("\t\t\t\t\t<ellipsoidacronym>" + this.writer.getSRS().getEllipsoidacronym() + "</ellipsoidacronym>\n");
+		SRS srs = vlayer.getSrs();
+		
+		if(srs == null){
+			
+			srs = this.writer.getSRS();
+			
+		}
+		
+		out.write("\t\t\t\t\t<proj4>" + srs.getProj4() + "</proj4>\n");
+		out.write("\t\t\t\t\t<srsid>" + srs.getSrsid() + "</srsid>\n");
+		out.write("\t\t\t\t\t<srid>" + srs.getSrid() + "</srid>\n");
+		out.write("\t\t\t\t\t<authid>" + srs.getAuthid() + "</authid>\n");
+		out.write("\t\t\t\t\t<description>" + srs.getDescription() + "</description>\n");
+		out.write("\t\t\t\t\t<projectionacronym>" + srs.getProjectionacronym() + "</projectionacronym>\n");
+		out.write("\t\t\t\t\t<ellipsoidacronym>" + srs.getEllipsoidacronym() + "</ellipsoidacronym>\n");
 		out.write("\t\t\t\t\t<geographicflag>true</geographicflag>\n");
 		
 		out.write("\t\t\t\t</spatialrefsys>\n");
 		
 		out.write("\t\t\t</srs>\n");
 		
-		if(layer.getInputType().equals(QGisConstants.inputType.csv)&&layer.getRenderer() != null){
+		if(vlayer.getInputType().equals(QGisConstants.inputType.csv)&&vlayer.getRenderer() != null){
 			
 			out.write("\t\t\t<provider encoding=\"System\">delimitedtext</provider>\n");
 			
@@ -232,15 +233,15 @@ public class QGisFileWriter {
 			
 		}
 		
-		out.write("\t\t\t<previewExpression></previewExpression>\n");
-		
-		if(layer.getVectorJoins().isEmpty()){
+		if(vlayer.getVectorJoins().isEmpty()){
+			
 			out.write("\t\t\t<vectorjoins/>\n");
+			
 		} else{
 			
 			out.write("\t\t\t<vectorjoins>\n");
 			
-			for(VectorJoin vj : layer.getVectorJoins()){
+			for(VectorJoin vj : vlayer.getVectorJoins()){
 				
 				out.write("\t\t\t\t<join joinFieldName=\"" + vj.getJoinFieldName() +"\" targetFieldName=\"" + vj.getTargetFieldName() + "\""
 						+ " memoryCache=\"1\" joinLayerId=\"" + vj.getJoinLayerId().toString() + "\"/>\n");
@@ -251,195 +252,13 @@ public class QGisFileWriter {
 			
 		}
 		
-		if(layer.getRenderer() != null){
+		if(vlayer.getRenderer() != null){
 			
-			writeGeometryLayer(out,layer);
-			
-		}
-		
-		if(layer.getInputType().equals(QGisConstants.inputType.shp)||layer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
-			
-			out.write("\t\t\t<customproperties/>\n");
-			
-		} else if(layer.getInputType().equals(QGisConstants.inputType.csv)){
-			
-			out.write("\t\t\t<customproperties>\n");
-			
-			out.write("\t\t\t\t<property key=\"labeling\" value=\"pal\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/addDirectionSymbol\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/angleOffset\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/blendMode\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferBlendMode\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferColorA\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferColorB\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferColorG\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferColorR\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferDraw\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferJoinStyle\" value=\"64\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferNoFill\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferSize\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferSizeInMapUnits\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferSizeMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferSizeMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/bufferTransp\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/centroidInside\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/centroidWhole\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/decimals\" value=\"3\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/displayAll\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/dist\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/distInMapUnits\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/distMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/distMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/enabled\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fieldName\" value=\"\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontBold\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontCapitals\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontFamily\" value=\"MS Shell Dlg 2\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontItalic\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontLetterSpacing\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontLimitPixelSize\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontMaxPixelSize\" value=\"10000\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontMinPixelSize\" value=\"3\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontSize\" value=\"8.25\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontSizeInMapUnits\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontSizeMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontSizeMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontStrikeout\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontUnderline\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontWeight\" value=\"50\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/fontWordSpacing\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/formatNumbers\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/isExpression\" value=\"true\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/labelOffsetInMapUnits\" value=\"true\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/labelOffsetMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/labelOffsetMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/labelPerPart\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/leftDirectionSymbol\" value=\"&lt;\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/limitNumLabels\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/maxCurvedCharAngleIn\" value=\"20\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/maxCurvedCharAngleOut\" value=\"-20\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/maxNumLabels\" value=\"2000\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/mergeLines\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/minFeatureSize\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/multilineAlign\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/multilineHeight\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/namedStyle\" value=\"Normal\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/obstacle\" value=\"true\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/placeDirectionSymbol\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/placement\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/placementFlags\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/plussign\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/preserveRotation\" value=\"true\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/previewBkgrdColor\" value=\"#ffffff\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/priority\" value=\"5\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/quadOffset\" value=\"4\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/repeatDistance\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/repeatDistanceMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/repeatDistanceMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/repeatDistanceUnit\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/reverseDirectionSymbol\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/rightDirectionSymbol\" value=\">\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/scaleMax\" value=\"10000000\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/scaleMin\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/scaleVisibility\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowBlendMode\" value=\"6\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowColorB\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowColorG\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowColorR\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowDraw\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetAngle\" value=\"135\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetDist\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetGlobal\" value=\"true\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowOffsetUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowRadius\" value=\"1.5\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowRadiusAlphaOnly\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowRadiusMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowRadiusMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowRadiusUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowScale\" value=\"100\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowTransparency\" value=\"30\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shadowUnder\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBlendMode\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderColorA\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderColorB\" value=\"128\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderColorG\" value=\"128\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderColorR\" value=\"128\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderWidth\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderWidthMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderWidthMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeBorderWidthUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeDraw\" value=\"false\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeFillColorA\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeFillColorB\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeFillColorG\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeFillColorR\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeJoinStyle\" value=\"64\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeOffsetMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeOffsetMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeOffsetUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeOffsetX\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeOffsetY\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRadiiMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRadiiMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRadiiUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRadiiX\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRadiiY\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRotation\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeRotationType\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSVGFile\" value=\"\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeMapUnitMaxScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeMapUnitMinScale\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeType\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeUnits\" value=\"1\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeX\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeSizeY\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeTransparency\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/shapeType\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/textColorA\" value=\"255\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/textColorB\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/textColorG\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/textColorR\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/textTransp\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/upsidedownLabels\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/wrapChar\" value=\"\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/xOffset\" value=\"0\"/>\n");
-            out.write("\t\t\t\t<property key=\"labeling/yOffset\" value=\"0\"/>\n");
-			
-			out.write("\t\t\t</customproperties>\n");
-			
-		}
-		
-		if(layer.getRenderer() != null){
+			writeGeometryLayer(out,vlayer);
 			
 			out.write("\t\t\t<featureBlendMode>0</featureBlendMode>\n");
-			out.write("\t\t\t<layerTransparency>" + Integer.toString(layer.getLayerTransparency()) + "</layerTransparency>\n");
-			out.write("\t\t\t<displayfield>id</displayfield>\n");
-			out.write("\t\t\t<label>0</label>\n");
-			out.write("\t\t\t<labelattributes>\n");
-			
-			out.write("\t\t\t\t<label fieldname=\"\" text=\"Beschriftung\"/>\n");
-			out.write("\t\t\t\t<family fieldname=\"\" name=\"MS Shell Dlg 2\"/>\n");
-			out.write("\t\t\t\t<size fieldname=\"\" units=\"pt\" value=\"12\"/>\n");
-			out.write("\t\t\t\t<bold fieldname=\"\" on=\"0\"/>\n");
-			out.write("\t\t\t\t<italic fieldname=\"\" on=\"0\"/>\n");
-			out.write("\t\t\t\t<underline fieldname=\"\" on=\"0\"/>\n");
-			out.write("\t\t\t\t<strikeout fieldname=\"\" on=\"0\"/>\n");
-			out.write("\t\t\t\t<color fieldname=\"\" red=\"0\" blue=\"0\" green=\"0\"/>\n");
-			out.write("\t\t\t\t<x fieldname=\"\"/>\n");
-			out.write("\t\t\t\t<y fieldname=\"\"/>\n");
-			out.write("\t\t\t\t<offset x=\"0\" y=\"0\" units=\"pt\" yfieldname=\"\" xfieldname=\"\"/>\n");
-			out.write("\t\t\t\t<angle fieldname=\"\" value=\"0\" auto=\"0\"/>\n");
-			out.write("\t\t\t\t<alignment fieldname=\"\" value=\"center\"/>\n");
-			out.write("\t\t\t\t<buffercolor fieldname=\"\" red=\"255\" blue=\"255\" green=\"255\"/>\n");
-			out.write("\t\t\t\t<buffersize fieldname=\"\" units=\"pt\" value=\"1\"/>\n");
-			out.write("\t\t\t\t<bufferenabled fieldname=\"\" on=\"\"/>\n");
-			out.write("\t\t\t\t<multilineenabled fieldname=\"\" on=\"\"/>\n");
-			out.write("\t\t\t\t<selectedonly on=\"\"/>\n");
-			
-			out.write("\t\t\t</labelattributes>\n");
-			
+			out.write("\t\t\t<layerTransparency>" + Integer.toString(vlayer.getLayerTransparency()) + "</layerTransparency>\n");
+
 		}
 		
 		out.write("\t\t\t<editform></editform>\n");
@@ -451,17 +270,88 @@ public class QGisFileWriter {
 		out.write("\t\t\t<excludeAttributesWFS/>\n");
 		out.write("\t\t\t<attributeactions/>\n");
 		
-		out.write("\t\t</maplayer>\n");
+	}
+	
+	private void writeRasterLayer(BufferedWriter out, QGisLayer layer)throws IOException {
+		
+		RasterLayer rlayer = (RasterLayer) layer;
+		
+		out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" type=\"" + rlayer.getType() + "\" hasScaleBasedVisibilityFlag=\"0\">\n");
+		out.write("\t\t\t<id>" + rlayer.getId().toString() + "</id>\n");
+		
+		String base = rlayer.getPath();
+		String relP = new File(writer.getWorkingDir()).toURI().relativize(new File(base).toURI()).toString();
+		relP.replace("file:/", "");
+		
+		out.write("\t\t\t<datasource>" + relP + "</datasource>\n");
+		out.write("\t\t\t<layername>" + layer.getName() + "</layername>\n");
+		
+		out.write("\t\t\t<srs>\n");
+		
+		out.write("\t\t\t\t<spatialrefsys>\n");
+		
+		SRS srs = layer.getSrs();
+		
+		if(srs == null){
+			
+			srs = this.writer.getSRS();
+			
+		}
+		
+		out.write("\t\t\t\t\t<proj4>" + srs.getProj4() + "</proj4>\n");
+		out.write("\t\t\t\t\t<srsid>" + srs.getSrsid() + "</srsid>\n");
+		out.write("\t\t\t\t\t<srid>" + srs.getSrid() + "</srid>\n");
+		out.write("\t\t\t\t\t<authid>" + srs.getAuthid() + "</authid>\n");
+		out.write("\t\t\t\t\t<description>" + srs.getDescription() + "</description>\n");
+		out.write("\t\t\t\t\t<projectionacronym>" + srs.getProjectionacronym() + "</projectionacronym>\n");
+		out.write("\t\t\t\t\t<ellipsoidacronym>" + srs.getEllipsoidacronym() + "</ellipsoidacronym>\n");
+		out.write("\t\t\t\t\t<geographicflag>true</geographicflag>\n");
+		
+		out.write("\t\t\t\t</spatialrefsys>\n");
+		
+		out.write("\t\t\t</srs>\n");
+		out.write("\t\t\t<customproperties>\n");
+		
+		out.write("\t\t\t\t<property key=\"identify/format\" value=\"Value\"/>\n");
+		
+		out.write("\t\t\t</customproperties>\n");
+		out.write("\t\t\t<provider>gdal</provider>\n");
+		out.write("\t\t\t<noData>\n");
+		
+		out.write("\t\t\t\t<noDataList bandNo=\"1\" useSrcNoData=\"0\"/>\n");
+		out.write("\t\t\t\t<noDataList bandNo=\"2\" useSrcNoData=\"0\"/>\n");
+		out.write("\t\t\t\t<noDataList bandNo=\"3\" useSrcNoData=\"0\"/>\n");
+		
+		out.write("\t\t\t</noData>\n");
+		out.write("\t\t\t<pipe>\n");
+		
+		QGisRasterRenderer renderer = (QGisRasterRenderer)layer.getRenderer();
+		
+		out.write("\t\t\t\t<rasterrenderer opacity=\"" + renderer.getOpacity() + "\" alphaBand=\"" + renderer.getAlphaBand() +
+				"\" blueBand=\"" + renderer.getBlueBand() + "\" greenBand=\"" + renderer.getGreenBand() + "\" type=\"" + renderer.getType() +
+				"\" redBand=\"" + renderer.getRedBand() + "\">\n");
+		
+		out.write("\t\t\t\t\t<rasterTransparency/>\n");
+		
+		out.write("\t\t\t\t</rasterrenderer>\n");
+		out.write("\t\t\t\t<brightnesscontrast brightness=\"0\" contrast=\"0\"/>\n");
+		out.write("\t\t\t\t<huesaturation colorizeGreen=\"128\" colorizeOn=\"0\" colorizeRed=\"255\" colorizeBlue=\"128\" grayscaleMode=\"0\" saturation=\"0\" colorizeStrength=\"100\"/>\n");
+		out.write("\t\t\t\t<rasterresampler maxOversampling=\"2\"/>\n");
+		
+		out.write("\t\t\t</pipe>\n");
+		out.write("\t\t\t<blendMode>0</blendMode>\n");
 		
 	}
 	
-	private void writeGeometryLayer(BufferedWriter out, QGisLayer layer) throws IOException {
+	private void writeGeometryLayer(BufferedWriter out, VectorLayer layer) throws IOException {
 	
-		QGisRenderer renderer = layer.getRenderer();
+		QGisRenderer qRenderer = layer.getRenderer();
 		
-		if(renderer.getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
+		if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
 			
-		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
+		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
+			
+			GraduatedSymbolRenderer renderer = (GraduatedSymbolRenderer)qRenderer;
 			
 			out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
 			
@@ -475,17 +365,17 @@ public class QGisFileWriter {
 			
 			out.write("\t\t\t\t</ranges>\n");
 			
-		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
+		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
 			
-		} else if(renderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
+		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
 			
-			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
+			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + qRenderer.getRenderingType().toString() + "\">\n");
 			
 		}
 		
 		out.write("\t\t\t\t<symbols>\n");
 		
-		for(int i = 0; i < renderer.getSymbolLayers().size(); i++){
+		for(int i = 0; i < qRenderer.getSymbolLayers().size(); i++){
 			
 			if(layer.getGeometryType().equals(QGisConstants.geometryType.Line)){
 				

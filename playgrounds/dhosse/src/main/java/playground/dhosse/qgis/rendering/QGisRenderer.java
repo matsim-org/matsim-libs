@@ -1,8 +1,19 @@
-package playground.dhosse.qgis;
+package playground.dhosse.qgis.rendering;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import playground.dhosse.qgis.QGisConstants;
+import playground.dhosse.qgis.QGisSymbolLayer;
+
+/**
+ * 
+ * This class provides minimum functionality for rendering a qgis symbol layer.
+ * Can be extended by use cases that use a singleSymbolRenderer.
+ * 
+ * @author dhosse
+ *
+ */
 public abstract class QGisRenderer {
 	
 	private QGisConstants.renderingType renderingType;
@@ -30,14 +41,4 @@ public abstract class QGisRenderer {
 		this.symbolLayers.add(sl);
 	}
 	
-	public abstract Range[] getRanges();
-	
-	public abstract String getRenderingAttribute();
-	
-	public abstract void setRenderingAttribute(String attr);
-	
-	public abstract ColorRamp getColorRamp();
-
-	public abstract void setColorRamp(ColorRamp colorRamp);
-
 }
