@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.utils.myTestScenarios;
+package playground.agarwalamit.congestionPricing.testExamples;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +48,15 @@ public class CorridorNetworkAndPlans {
 	/**
 	 * generates network with 3 links. 
 	 *<p>			
-	 *<p>  o--1---o---2---o---3---o
+	 *<p>  o--0---o---1---o---2---o---3---o
 	 *<p>				  
 	 */
 	Scenario scenario;
 	Config config;
 	NetworkImpl network;
 	Population population;
+	
+	Link link0;
 	Link link1;
 	Link link2;
 	Link link3;
@@ -72,10 +74,12 @@ public class CorridorNetworkAndPlans {
 		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 10));
 		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, -10));
 		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 20));
+		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(700, 0));
 
-		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2, 1000.0, 20.0, 3600.,1,null,"7");
-		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3, 100.0,20.0, 1080.,1,null,"7");
-		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4, 1000.0, 20.0, 3600.,1,null,"7");
+		link0 = network.createAndAddLink(Id.createLinkId(String.valueOf("0")), node1, node2, 1000.0, 20.0, 3600.,1,null,"7");
+		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node2, node3, 100.0, 40.0, 3600.,1,null,"7");
+		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node3, node4, 10.0, 9.0, 900.,1,null,"7");
+		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node4, node5, 1000.0, 20.0, 3600.,1,null,"7");
 	}
 
 	public void createPopulation(int numberOfPersons){
@@ -85,18 +89,19 @@ public class CorridorNetworkAndPlans {
 			Person p = population.getFactory().createPerson(id);
 			Plan plan = population.getFactory().createPlan();
 			p.addPlan(plan);
-			Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-			a1.setEndTime(0*3600+i);
+			Activity a1 = population.getFactory().createActivityFromLinkId("h", link0.getId());
+			a1.setEndTime(0*3600+i-1);
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			plan.addActivity(a1);
 			plan.addLeg(leg);
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route;
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			route= (NetworkRoute) factory.createRoute(link1.getId(), link3.getId());
+			route= (NetworkRoute) factory.createRoute(link0.getId(), link3.getId());
+			linkIds.add(link1.getId());
 			linkIds.add(link2.getId());
 			linkIds.add(link3.getId());
-			route.setLinkIds(link1.getId(), linkIds, link3.getId());
+			route.setLinkIds(link0.getId(), linkIds, link3.getId());
 			leg.setRoute(route);
 			Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
 			plan.addActivity(a2);

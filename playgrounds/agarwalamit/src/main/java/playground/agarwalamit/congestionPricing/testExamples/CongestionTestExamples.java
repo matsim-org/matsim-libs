@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.congestionPricing.testScenarios;
+package playground.agarwalamit.congestionPricing.testExamples;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -55,7 +55,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.agarwalamit.utils.myTestScenarios.MergingNetworkAndPlans;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -66,24 +65,53 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
  * @author amit
  */
 
-public class CorridorCongestionTest {
+public class CongestionTestExamples {
 	
-	
-	private final int numberOfPersonInPlan = 4;
-	private final boolean useOTFVis = true;
+	private String testNetwork = "none";
+	private final boolean useOTFVis = false;
 	
 	public static void main(String[] args) {
-		new CorridorCongestionTest().compareV3AndV4();
+		new CongestionTestExamples().run();
 	}
 	
-	public void compareV3AndV4(){
-		 List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4");
-		 List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3");
+	private  void run() {
+//		// corridor network
+//		int numberOfPersonInPlan = 4;
+//		testNetwork = "corridor";
+//		CorridorNetworkAndPlans corridorInputs = new CorridorNetworkAndPlans();
+//		corridorInputs.createNetwork();
+//		corridorInputs.createPopulation(numberOfPersonInPlan);
+//		Scenario sc = corridorInputs.getDesiredScenario();
+//		new CongestionTestExamples().compareV3AndV4(sc);
+		
+		// merging network
+		int numberOfPersonInPlan = 5;
+		testNetwork = "merging";
+		MergingNetworkAndPlans mergeInputs = new MergingNetworkAndPlans();
+		mergeInputs.createNetwork();
+		mergeInputs.createPopulation(numberOfPersonInPlan);
+		Scenario sc=mergeInputs.getDesiredScenario();
+		new CongestionTestExamples().compareV3AndV4(sc);
+		
+//		//diverging network 
+//		numberOfPersonInPlan = 5;
+//		testNetwork = "diverging";
+//		DivergingNetworkAndPlans divergeInputs = new DivergingNetworkAndPlans();
+//		divergeInputs.createNetwork();
+//		divergeInputs.createPopulation(numberOfPersonInPlan);
+//		sc=divergeInputs.getDesiredScenario();
+//		new CongestionTestExamples().compareV3AndV4(sc);
+	}
+	
+	public void compareV3AndV4(Scenario sc){
+		 List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc);
+		 List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
 		 
-		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3);
-		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4);
+		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
+		 System.out.println("v4");
+		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
 		 
-		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/corridor_v3Vsv4.txt");
+		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/corridor_v3Vsv4_"+testNetwork+".txt");
 		 try {
 			 writer.write("personId \t delayCaused_v3 \t delayAffected_v3 \t delayCaused_v4 \t delayAffected_v4 \n");
 			 for(String personId : tab_v3.keySet()){
@@ -92,20 +120,20 @@ public class CorridorCongestionTest {
 			 }
 			writer.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
 	
-	private SortedMap<String,Tuple<Double, Double>> getId2CausedAndAffectedDelays(List<CongestionEvent> events){
+	private SortedMap<String,Tuple<Double, Double>> getId2CausedAndAffectedDelays(List<CongestionEvent> events, Scenario sc){
 		SortedMap<String,Tuple<Double, Double>> id2CausingAffectedDelays = new TreeMap<String, Tuple<Double,Double>>();
 		
-		for(int i=1;i<=numberOfPersonInPlan;i++){
+		for(int i=1;i<=sc.getPopulation().getPersons().size();i++){
 			Id<Person> id = Id.createPersonId(i);
 			id2CausingAffectedDelays.put(id.toString(), new Tuple<Double, Double>(0., 0.));
 		}
 		
 		for(CongestionEvent e : events){
+			System.out.println(e.toString());
 			String causingPerson = e.getCausingAgentId().toString();
 			Tuple<Double, Double> causingPerson_tup = id2CausingAffectedDelays.get(causingPerson);
 			causingPerson_tup = new Tuple<Double, Double>(causingPerson_tup.getFirst()+e.getDelay(), causingPerson_tup.getSecond());
@@ -118,11 +146,7 @@ public class CorridorCongestionTest {
 		return id2CausingAffectedDelays;
 	}
 
-	private List<CongestionEvent> getCongestionEvents (String congestionPricingImpl) {
-		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans();
-		pseudoInputs.createNetwork();
-		pseudoInputs.createPopulation(numberOfPersonInPlan);
-		Scenario sc = pseudoInputs.getDesiredScenario();
+	private List<CongestionEvent> getCongestionEvents (String congestionPricingImpl, Scenario sc) {
 		sc.getConfig().qsim().setStuckTime(3600);
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -196,7 +220,7 @@ public class CorridorCongestionTest {
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
+		car.setMaximumVelocity(Double.POSITIVE_INFINITY);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
 		agentSource.setModeVehicleTypes(modeVehicleTypes);

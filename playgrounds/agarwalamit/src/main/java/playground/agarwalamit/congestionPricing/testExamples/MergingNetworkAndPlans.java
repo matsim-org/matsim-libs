@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.utils.myTestScenarios;
+package playground.agarwalamit.congestionPricing.testExamples;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,50 +42,60 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit
  */
 
-public class MergingNetworkAndPlans {
+ class MergingNetworkAndPlans {
 
 
 	/**
 	 * generates network with 3 links. 
 	 *<p>			
-	 *<p>  o--1---o---2---o---3---o
-	 *<p> 		  |
-	 *<p> 		  4
-	 *<p> 		  |
-	 *<p> 		  o	
-	 *<p>				  
+	 *<p>  o---0---o---1----o---2---o---3---o
+	 *<p> 		  			|
+	 *<p>		   		    4
+	 *<p> 		  			|
+	 *<p> 		  			o	
+	 *<p>					|
+	 *<p>				    00
+	 *<p>					|
+	 *<p>					o
 	 */
 	Scenario scenario;
 	Config config;
 	NetworkImpl network;
 	Population population;
+	Link link0;
 	Link link1;
 	Link link2;
 	Link link3;
+	Link link00;
 	Link link4;
 
-	public MergingNetworkAndPlans(){
+	 MergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
 		network =  (NetworkImpl) this.scenario.getNetwork();
 		population = this.scenario.getPopulation();
 	}
 
-	public void createNetwork(){
+	 void createNetwork(){
 
 		Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
 		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 10));
 		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, -10));
 		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 20));
-		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(-10, -200));
+		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(700, 0));
+		Node node6 = network.createAndAddNode(Id.createNodeId("6"), this.scenario.createCoord(-10, -200));
+		Node node7 = network.createAndAddNode(Id.createNodeId("7"), this.scenario.createCoord(0, -400));
 
-		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,1000.0,20.0,3600.,1,null,"7");
-		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,5.0,20.0,360.,1,null,"7");
-		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,1000.0,20.0,3600.,1,null,"7");
-		link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node5, node2,1000.0,20.0,3600.,1,null,"7");
+		link0 = network.createAndAddLink(Id.createLinkId(String.valueOf("0")), node1, node2,1000.0,20.0,3600.,1,null,"7");
+		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node2, node3,100.0,40.0,3600.,1,null,"7");
+		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node3, node4,10.0,9.0,900.,1,null,"7");
+		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node4, node5,1000.0,20.0,3600.,1,null,"7");
+		link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node6, node3,100.0,40.0,3600.,1,null,"7");
+		link00 = network.createAndAddLink(Id.createLinkId(String.valueOf("00")), node7, node6,1000.0,20.0,3600.,1,null,"7");
+		
 	}
 
-	public void createPopulation(int numberOfPersons){
+	 void createPopulation(int numberOfPersons){
 
 		/*Alternative persons from different links*/
 
@@ -97,11 +107,19 @@ public class MergingNetworkAndPlans {
 			Activity a1;
 
 			Id<Link> startLink;
-			if (i%2==0) startLink = link1.getId();
-			else startLink = link4.getId();
+			Id<Link> next2StartLink;
+			
+			if (i%2==0) {
+				startLink = link00.getId();
+				next2StartLink = link4.getId();
+			}
+			else {
+				startLink = link0.getId();
+				next2StartLink = link1.getId();
+			}
 
 			a1 = population.getFactory().createActivityFromLinkId("h", startLink);
-			a1.setEndTime(0*3600+i);
+			a1.setEndTime(0*3600+i-1);
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
 			plan.addActivity(a1);
 			plan.addLeg(leg);
@@ -109,6 +127,7 @@ public class MergingNetworkAndPlans {
 			NetworkRoute route;
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 			route= (NetworkRoute) factory.createRoute(startLink, link3.getId());
+			linkIds.add(next2StartLink);
 			linkIds.add(link2.getId());
 			linkIds.add(link3.getId());
 			route.setLinkIds(startLink, linkIds, link3.getId());
@@ -120,7 +139,7 @@ public class MergingNetworkAndPlans {
 		}
 	}
 
-	public Scenario getDesiredScenario(){
+	 Scenario getDesiredScenario(){
 		return this.scenario;
 	}
 }

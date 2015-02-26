@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.utils.myTestScenarios;
+package playground.agarwalamit.congestionPricing.testExamples;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +59,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  *<p>				  |
  *<p>				  o----5----o
  */
-public class DivergingNetworkAndPlans {
+ class DivergingNetworkAndPlans {
 	Scenario scenario;
 	Config config;
 	NetworkImpl network;
@@ -71,14 +71,14 @@ public class DivergingNetworkAndPlans {
 	Link link5;
 	Link link6;
 
-	public DivergingNetworkAndPlans(){
+	 DivergingNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
 		network =  (NetworkImpl) this.scenario.getNetwork();
 		population = this.scenario.getPopulation();
 	}
 
-	void createNetwork(){
+	 void createNetwork(){
 		final Set<String> allModesAllowed = new HashSet<String>();
 		allModesAllowed.addAll(Arrays.asList("car","motorbike","pt", "bike", "walk"));
 
@@ -104,7 +104,7 @@ public class DivergingNetworkAndPlans {
 		link6.setAllowedModes(allModesAllowed);
 	}
 
-	void createPopulation(int numberOfPersons){
+	 void createPopulation(int numberOfPersons){
 
 		for(int i=0;i<numberOfPersons;i++){
 			Id<Person> id = Id.createPersonId(i);
@@ -139,4 +139,9 @@ public class DivergingNetworkAndPlans {
 			population.addPerson(p);
 		}
 	}
+
+	 Scenario getDesiredScenario() {
+		return this.scenario;
+	}
 }
+
