@@ -71,7 +71,7 @@ public class DgKS2010Router {
 
 	private Person fakePerson = new Person(){
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			return null;
 		}
 
@@ -117,7 +117,7 @@ public class DgKS2010Router {
 	
 	private Vehicle fakeVehicle = new Vehicle(){
 		@Override
-		public Id getId() {
+		public Id<Vehicle> getId() {
 			return null;
 		}
 		@Override
@@ -129,10 +129,10 @@ public class DgKS2010Router {
 	private static final Logger log = Logger.getLogger(DgKS2010Router.class);
 	
 	
-	public List<Id> routeCommodities(Network network, DgCommodities commodities) {
+	public List<Id<DgCommodity>> routeCommodities(Network network, DgCommodities commodities) {
 		SimpleTravelTimeDisutility travelTime = new SimpleTravelTimeDisutility();
 		Dijkstra dijkstra = new Dijkstra(network, travelTime, travelTime);
-		List<Id> invalidCommodities = new ArrayList<Id>();
+		List<Id<DgCommodity>> invalidCommodities = new ArrayList<>();
 		for (DgCommodity commodity : commodities.getCommodities().values()){
 			Node fromNode = network.getNodes().get(commodity.getSourceNodeId());
 			Node toNode = network.getNodes().get(commodity.getDrainNodeId());

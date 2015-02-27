@@ -27,14 +27,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
@@ -128,7 +123,7 @@ public class M2KS2010Converter {
 		this.scaleCommodities(commodities);
 		
 		Set<DgCommodity> removedCommodities = new HashSet<DgCommodity>();
-		Set<Id> commoditiesToRemove = new HashSet<Id>();
+		Set<Id<DgCommodity>> commoditiesToRemove = new HashSet<>();
 		double totalFlow = 0.0;
 		for (DgCommodity com : commodities.getCommodities().values()){
 			if (com.getSourceNodeId().equals(com.getDrainNodeId())) {
@@ -142,7 +137,7 @@ public class M2KS2010Converter {
 				commoditiesToRemove.add(com.getId());
 			}
 		}
-		for (Id id : commoditiesToRemove){
+		for (Id<DgCommodity> id : commoditiesToRemove){
 			removedCommodities.add(commodities.getCommodities().remove(id));
 			log.info("Removed commodity id " + id + " because flow is less than " + minCommodityFlow);
 		}
@@ -151,8 +146,8 @@ public class M2KS2010Converter {
 		// convert the KS2010 network back to the matsim format for debugging and visualization
 		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
 		DgKS2010Router router = new DgKS2010Router();
-		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
-		for (Id id : invalidCommodities) {
+		List<Id<DgCommodity>> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
+		for (Id<DgCommodity> id : invalidCommodities) {
 			removedCommodities.add(commodities.getCommodities().remove(id));
 			log.warn("removed commodity id : " + id + " because it can not be routed on the network.");
 		}
