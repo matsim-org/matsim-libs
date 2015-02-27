@@ -34,8 +34,8 @@ public class DgKSNetwork {
 
 	private static final Logger log = Logger.getLogger(DgKSNetwork.class);
 	
-	private Map<Id, DgCrossing> crossings = new HashMap<Id, DgCrossing>();
-	private Map<Id, DgStreet> streets = new HashMap<Id, DgStreet>();
+	private Map<Id<DgCrossing>, DgCrossing> crossings = new HashMap<>();
+	private Map<Id<DgStreet>, DgStreet> streets = new HashMap<>();
 
 	public void addCrossing(DgCrossing crossing) {
 		if (this.crossings.containsKey(crossing.getId())) {
@@ -44,7 +44,7 @@ public class DgKSNetwork {
 		this.crossings.put(crossing.getId(), crossing);
 	}
 	
-	public Map<Id, DgCrossing> getCrossings(){
+	public Map<Id<DgCrossing>, DgCrossing> getCrossings(){
 		return this.crossings;
 	}
 
@@ -56,18 +56,17 @@ public class DgKSNetwork {
 		this.streets.put(street.getId(), street);
 	}
 	
-	public Map<Id, DgStreet> getStreets(){
+	public Map<Id<DgStreet>, DgStreet> getStreets(){
 		return this.streets;
 	}
 	
 	
 	private void warnIfEdgeExists(DgStreet street){
-		Id fromNodeId = street.getFromNode().getId();
-		Id toNodeId = street.getToNode().getId();
+		Id<DgCrossingNode> fromNodeId = street.getFromNode().getId();
+		Id<DgCrossingNode> toNodeId = street.getToNode().getId();
 		for (DgStreet s : this.streets.values()){
 			if (s.getFromNode().getId().equals(fromNodeId) && s.getToNode().getId().equals(toNodeId)) {
 				log.warn("duplicated street " + street.getId() + " from node " + fromNodeId + " to node " + toNodeId);
-				
 			}
 		}
 	}
