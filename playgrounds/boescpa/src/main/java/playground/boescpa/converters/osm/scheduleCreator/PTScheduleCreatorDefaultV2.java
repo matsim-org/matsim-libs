@@ -24,7 +24,6 @@ package playground.boescpa.converters.osm.scheduleCreator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -64,7 +63,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		// 2. Read all stops from HAFAS-BFKOORD_GEO
 		readStops(hafasFolder + "/BFKOORD_GEO");
 		// 3. Read all ids for work-day-routes from HAFAS-BITFELD
-		readDays(hafasFolder + "/BITFELD");
+		readDays(hafasFolder + "/FPLAN", hafasFolder + "/BITFELD");
 		// 4. Create all lines from HAFAS-Schedule
 		readLines(hafasFolder + "/FPLAN");
 		// 5. Print undefined vehicles
@@ -163,8 +162,9 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		//log.info("Added " + schedule.getFacilities().get(stopId).toString());
 	}
 
-	protected void readDays(String BITFELD) {
+	protected void readDays(String FPLAN, String BITFELD) {
 		log.info("  Read bitfeld numbers...");
+		final int posMaxFVals = find4DayBlockWithMostFVals(FPLAN, BITFELD);
 		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BITFELD), "latin1"));
 			String newLine = readsLines.readLine();
@@ -174,18 +174,19 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				8−103 CHAR Bitfeld (Binärkodierung der Tage, an welchen Fahrt, in Hexadezimalzahlen notiert.)*/
 				int bitfeldnummer = Integer.parseInt(newLine.substring(0, 6));
 				String bitfeld = newLine.substring(7, 103);
-				// The following char positions are only valuable for HAFAS CH_2014_140413_1341 and must be changed to the new "only work weeks" for new HAFAS-Sets...
-				int matches = (bitfeld.charAt(1) == 'F')? 1 : 0;
-				matches += (bitfeld.charAt(6) == 'F')? 1 : 0;
-				matches += (bitfeld.charAt(8) == 'F')? 1 : 0;
-				matches += (bitfeld.charAt(13) == 'F')? 1 : 0;
-				matches += (bitfeld.charAt(15) == 'F')? 1 : 0;
-				if (matches >= 3) { // if driven in at least three of the selected five work weeks, the bitfeld is selected...
-				/*if (bitfeld.charAt(1) == 'F'
-						&& bitfeld.charAt(6) == 'F'
-						&& bitfeld.charAt(8) == 'F'
-						&& bitfeld.charAt(13) == 'F'
-						&& bitfeld.charAt(15) == 'F') {*/
+				/* As we assume that the posMaxFVals describes a 4-day block with either Monday-Tuesday-Wednesday-Thursday or
+				Tuesday-Wednesday-Thursday-Friday and because we don't want a Monday to be the reference day, we select those
+				lines which have the second bit on one. The second stands for the 4 in the hexadecimal calculation, else we
+				want all hexadecimal values which include a 4, that is 4, 5, 6, 7, 12 (C), 13 (D), 14 (E) and 15 (F).*/
+				int matches = (bitfeld.charAt(posMaxFVals) == '4')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == '5')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == '6')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == '7')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == 'C')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == 'D')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == 'E')? 1 : 0;
+				matches += (bitfeld.charAt(posMaxFVals) == 'F')? 1 : 0;
+				if (matches >= 1) {
 					this.bitfeldNummern.add(bitfeldnummer);
 				}
 				newLine = readsLines.readLine();
@@ -196,6 +197,82 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		}
 		this.bitfeldNummern.add(0);
 		log.info("  Read bitfeld numbers... done.");
+	}
+
+	/**
+	 * Returns the 4-day bitfeld block that has the most F-values. The assumption is that this block is either a
+	 * Monday-Tuesday-Wednesday-Thursday or a Tuesday-Wednesday-Thursday-Friday block because all other blocks have
+	 * at least one Weekend-Day and therefore are less like to produce an F (an F means traveling at all four days).
+	 *
+	 * @param BITFELD
+	 * @return
+	 */
+	private int find4DayBlockWithMostFVals(String FPLAN, String BITFELD) {
+		Map<Integer, Integer> departuresPerBitfeld = new HashMap<>();
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(FPLAN), "latin1"));
+			String newLine = readsLines.readLine();
+			int numberOfDepartures = 0;
+			while (newLine != null) {
+				if (newLine.charAt(0) == '*') {
+					if (newLine.charAt(1) == 'Z') {
+						try {
+							numberOfDepartures = Integer.parseInt(newLine.substring(22, 25)) + 1;
+						} catch (Exception e) {
+							numberOfDepartures = 1;
+						}
+					}
+					if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V') {
+						if (newLine.substring(22, 28).trim().length() > 0) {
+							int bitfeldNumber = Integer.parseInt(newLine.substring(22, 28));
+							int bitfeldValue = numberOfDepartures;
+							if (departuresPerBitfeld.containsKey(bitfeldNumber)) {
+								bitfeldValue += departuresPerBitfeld.get(bitfeldNumber);
+							}
+							departuresPerBitfeld.put(bitfeldNumber, bitfeldValue);
+						}
+					}
+				}
+				newLine = readsLines.readLine();
+			}
+			readsLines.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		int[] bitfeldStats = new int[96];
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BITFELD), "latin1"));
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				/*Spalte Typ Bedeutung
+				1−6 INT32 Bitfeldnummer
+				8−103 CHAR Bitfeld (Binärkodierung der Tage, an welchen Fahrt, in Hexadezimalzahlen notiert.)*/
+				int bitFeldValue = 1;
+				if (departuresPerBitfeld.containsKey(Integer.parseInt(newLine.substring(0, 6)))) {
+					bitFeldValue = departuresPerBitfeld.get(Integer.parseInt(newLine.substring(0, 6)));
+				}
+				String bitfeld = newLine.substring(7, 103);
+				for (int i = 0; i < bitfeld.length(); i++) {
+					if (bitfeld.charAt(i) == 'F') {
+						bitfeldStats[i] += bitFeldValue;
+					}
+				}
+				newLine = readsLines.readLine();
+			}
+			readsLines.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		int maxFNumber = 0;
+		int posMaxFNumber = -1;
+		for (int i = 0; i < bitfeldStats.length; i++) {
+			if (bitfeldStats[i] > maxFNumber) {
+				maxFNumber = bitfeldStats[i];
+				posMaxFNumber = i;
+			}
+		}
+		return posMaxFNumber;
 	}
 
 	protected void readLines(String FPLAN) {
@@ -248,6 +325,13 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
 						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
 					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V') {
+						/*Spalte Typ Bedeutung
+						1-5 CHAR *A VE
+						7-13 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten.
+						15-21 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten.
+						23-28 INT16 (optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000).
+						30-35 [#]INT32 (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
+						37-42 [#]INT32 (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.*/
 						if (currentRouteFPLAN != null) {
 							int localBitfeldnr = 0;
 							if (newLine.substring(22, 28).trim().length() > 0) {
@@ -443,33 +527,6 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				}
 				profiles.add(route);
 			}
-			/*// Check profiles and if the same, add latter to former.
-			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
-				// Preparation
-				List<TransitRoute> routesOrderedInDecreasingOrderOfDepartures = orderRoutesInDecreasingOrderOfDepartures(routesToUnite);
-				Set<Tuple<Double, Double>> blockedTimeWindows = new HashSet<>();
-				// First take the route with the most departures and block the time window covered by this route for any other departures.
-				TransitRoute finalRoute = routesOrderedInDecreasingOrderOfDepartures.get(0);
-				blockedTimeWindows.add(new Tuple<>(getEarliestDepartureTime(finalRoute), getLatestDepartureTime(finalRoute)));
-				// Then go through all routes in decreasing order of departures and if the time window isn't blocked by any previously selected route, select this route, block it's time window and add its departures.
-				for (int i = 1; i < routesOrderedInDecreasingOrderOfDepartures.size(); i++) {
-					TransitRoute routeToAdd = routesOrderedInDecreasingOrderOfDepartures.get(i);
-					double earliestDepartureToCheck = getEarliestDepartureTime(routeToAdd);
-					double latestDepartureToCheck = getLatestDepartureTime(routeToAdd);
-					for (Tuple<Double,Double> timeWindow : blockedTimeWindows) {
-						if (!(latestDepartureToCheck <= timeWindow.getFirst() || earliestDepartureToCheck >= timeWindow.getSecond())) {
-							routeToAdd = null;
-						}
-					}
-					if (routeToAdd != null) {
-						blockedTimeWindows.add(new Tuple<>(getEarliestDepartureTime(routeToAdd), getLatestDepartureTime(routeToAdd)));
-						for (Departure departure : routeToAdd.getDepartures().values()) {
-							finalRoute.addDeparture(departure);
-						}
-					}
-					line.removeRoute(routesOrderedInDecreasingOrderOfDepartures.get(i));
-				}
-			}*/
 			// Check profiles and if the same, add latter to former.
 			for (List<TransitRoute> routesToUnite : routeProfiles.values()) {
 				TransitRoute finalRoute = routesToUnite.get(0);
@@ -484,42 +541,4 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		}
 	}
 
-	private Double getEarliestDepartureTime(TransitRoute route) {
-		double earliestDeparture = Double.MAX_VALUE;
-		for (Departure departure : route.getDepartures().values()) {
-			if (departure.getDepartureTime() < earliestDeparture) {
-				earliestDeparture = departure.getDepartureTime();
-			}
-		}
-		return earliestDeparture - (0.5 * MINIMALOFFSETDEPARTURES);
-	}
-
-	private Double getLatestDepartureTime(TransitRoute route) {
-		double latestDeparture = Double.MIN_VALUE;
-		for (Departure departure : route.getDepartures().values()) {
-			if (departure.getDepartureTime() > latestDeparture) {
-				latestDeparture = departure.getDepartureTime();
-			}
-		}
-		return latestDeparture + (0.5 * MINIMALOFFSETDEPARTURES);
-	}
-
-	private List<TransitRoute> orderRoutesInDecreasingOrderOfDepartures(final List<TransitRoute> routes) {
-		final List<TransitRoute> orderedRoutes = new ArrayList<>();
-		final List<TransitRoute> routesToOrder = new ArrayList<>();
-		routesToOrder.addAll(routes);
-
-		for (int i = 0; i < routes.size(); i++) {
-			TransitRoute routeWithMostDepartures = null;
-			for (TransitRoute route : routesToOrder) {
-				if (routeWithMostDepartures == null || route.getDepartures().size() > routeWithMostDepartures.getDepartures().size()) {
-					routeWithMostDepartures = route;
-				}
-			}
-			routesToOrder.remove(routeWithMostDepartures);
-			orderedRoutes.add(routeWithMostDepartures);
-		}
-
-		return orderedRoutes;
-	}
 }
