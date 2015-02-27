@@ -67,55 +67,57 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 public class CongestionTestExamples {
 	
-	private String testNetwork = "none";
-	private final boolean useOTFVis = false;
+	private final boolean useOTFVis = true;
 	
 	public static void main(String[] args) {
 		new CongestionTestExamples().run();
 	}
 	
 	private  void run() {
-//		// corridor network
-//		int numberOfPersonInPlan = 4;
-//		testNetwork = "corridor";
-//		CorridorNetworkAndPlans corridorInputs = new CorridorNetworkAndPlans();
-//		corridorInputs.createNetwork();
-//		corridorInputs.createPopulation(numberOfPersonInPlan);
-//		Scenario sc = corridorInputs.getDesiredScenario();
-//		new CongestionTestExamples().compareV3AndV4(sc);
+		// corridor network
+		int numberOfPersonInPlan = 4;
+		String testNetwork = "corridor";
+		CorridorNetworkAndPlans corridorInputs = new CorridorNetworkAndPlans();
+		corridorInputs.createNetwork();
+		corridorInputs.createPopulation(numberOfPersonInPlan);
+		Scenario sc = corridorInputs.getDesiredScenario();
+		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
 		
 		// merging network
-		int numberOfPersonInPlan = 5;
+		numberOfPersonInPlan = 5;
 		testNetwork = "merging";
 		MergingNetworkAndPlans mergeInputs = new MergingNetworkAndPlans();
 		mergeInputs.createNetwork();
 		mergeInputs.createPopulation(numberOfPersonInPlan);
-		Scenario sc=mergeInputs.getDesiredScenario();
-		new CongestionTestExamples().compareV3AndV4(sc);
+		sc = mergeInputs.getDesiredScenario();
+		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
 		
-//		//diverging network 
-//		numberOfPersonInPlan = 5;
-//		testNetwork = "diverging";
-//		DivergingNetworkAndPlans divergeInputs = new DivergingNetworkAndPlans();
-//		divergeInputs.createNetwork();
-//		divergeInputs.createPopulation(numberOfPersonInPlan);
-//		sc=divergeInputs.getDesiredScenario();
-//		new CongestionTestExamples().compareV3AndV4(sc);
+		//diverging network 
+		numberOfPersonInPlan = 6;
+		testNetwork = "diverging";
+		DivergingNetworkAndPlans divergeInputs = new DivergingNetworkAndPlans();
+		divergeInputs.createNetwork();
+		divergeInputs.createPopulation(numberOfPersonInPlan);
+		sc=divergeInputs.getDesiredScenario();
+		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
 	}
 	
-	public void compareV3AndV4(Scenario sc){
-		 List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc);
-		 List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
+	public void compareV3AndV4(Scenario sc, String networkExampleName){
+		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc); 
+		List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
+		List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc); 
 		 
 		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
 		 System.out.println("v4");
 		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
+		 System.out.println("v6");
+		 SortedMap<String,Tuple<Double, Double>> tab_v6 = getId2CausedAndAffectedDelays(congestionEvents_v6, sc);
 		 
-		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/corridor_v3Vsv4_"+testNetwork+".txt");
+		 BufferedWriter writer = IOUtils.getBufferedWriter("./output/comparison_v3Vsv4_"+networkExampleName+".txt");
 		 try {
-			 writer.write("personId \t delayCaused_v3 \t delayAffected_v3 \t delayCaused_v4 \t delayAffected_v4 \n");
+			 writer.write("personId \t delayCaused_v6 \t delayAffected_v6 \t delayCaused_v3 \t delayAffected_v3 \t delayCaused_v4 \t delayAffected_v4  \n");
 			 for(String personId : tab_v3.keySet()){
-				 writer.write(personId+"\t"+tab_v3.get(personId).getFirst()+"\t"+tab_v3.get(personId).getSecond()+"\t"+
+				 writer.write(personId+"\t"+tab_v6.get(personId).getFirst()+"\t"+tab_v6.get(personId).getSecond()+"\t"+tab_v3.get(personId).getFirst()+"\t"+tab_v3.get(personId).getSecond()+"\t"+
 						 tab_v4.get(personId).getFirst()+"\t"+tab_v4.get(personId).getSecond()+"\n");
 			 }
 			writer.close();
