@@ -44,8 +44,6 @@ import java.util.*;
  */
 public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 
-	private static final double MINIMALOFFSETDEPARTURES = 8.0 * 60; // seconds
-
 	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private final Set<Integer> bitfeldNummern = new HashSet<>();
