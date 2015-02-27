@@ -34,7 +34,7 @@ public class DgCommodities {
 	
 	private static final Logger log = Logger.getLogger(DgCommodities.class);
 	
-	private Map<Id, DgCommodity> commodities = new HashMap<Id, DgCommodity>();
+	private Map<Id<DgCommodity>, DgCommodity> commodities = new HashMap<>();
 	
 	public DgCommodities(){
 	}
@@ -46,7 +46,7 @@ public class DgCommodities {
 		this.commodities.put(co.getId(), co);
 	}
 	
-	public Map<Id, DgCommodity> getCommodities(){
+	public Map<Id<DgCommodity>, DgCommodity> getCommodities(){
 		return this.commodities;
 	}
 
