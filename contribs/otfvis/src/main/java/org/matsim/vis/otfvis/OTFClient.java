@@ -185,8 +185,6 @@ public final class OTFClient extends JFrame {
 	public void addMapViewer(TileFactory tf) {
 		final JXMapViewer jMapViewer = new JXMapViewer();
 		jMapViewer.setTileFactory(tf);
-		jMapViewer.setPanEnabled(false);
-		jMapViewer.setZoomEnabled(false);
 		compositePanel.add(jMapViewer);
 		installCustomRepaintManager(compositePanel, jMapViewer);
 		OTFVisConfigGroup otfVisConfig = OTFClientControl.getInstance().getOTFVisConfig();
