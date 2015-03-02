@@ -29,10 +29,11 @@ public class PopulationGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		double flowProportion = 1./initLinks.size();
+		double flowProportion = 1.;///initLinks.size();
+		int generated = 0;
 		for (Link link : initLinks){			
 			int linkLimit = (int)(populationSize*flowProportion);
-			for (int i = 0; i < linkLimit; i++) {
+			for (int i = 0; i < linkLimit & generated<populationSize; i++) {
 				Person pers = factory.createPerson(Id.create("p"+population.getPersons().size(),Person.class));
 				Plan plan = factory.createPlan();
 				pers.addPlan(plan);
@@ -45,6 +46,7 @@ public class PopulationGenerator {
 				Activity act1 = factory.createActivityFromLinkId("destination", getDestinationLinkId(link,initLinks));
 				plan.addActivity(act1);
 				population.addPerson(pers);
+				++generated;
 			}
 		}
 	}

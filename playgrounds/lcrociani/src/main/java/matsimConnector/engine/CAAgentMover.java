@@ -34,7 +34,7 @@ public class CAAgentMover extends AgentMover {
 		for(int index=0; index<getPopulation().size(); index++){
 			Pedestrian pedestrian = (Pedestrian)getPopulation().getPedestrian(index);
 			if (pedestrian.isArrived()){
-				Log.log(pedestrian.toString()+" Exited.");
+				//Log.log(pedestrian.toString()+" Exited.");
 				delete(pedestrian);
 				index--;
 			}else{
@@ -72,7 +72,7 @@ public class CAAgentMover extends AgentMover {
 	}
 
 	private void moveToCA(Pedestrian pedestrian, double time) {
-		Log.log(pedestrian.toString() + " Moving inside Pedestrian Grid");
+		//Log.log(pedestrian.toString() + " Moving inside Pedestrian Grid");
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		engineCA.getQCALink(currentLinkId).notifyMoveOverBorderNode(pedestrian.getVehicle(), nextLinkId);
@@ -84,7 +84,7 @@ public class CAAgentMover extends AgentMover {
 	}
 
 	private void moveToQ(Pedestrian pedestrian, double time) {
-		Log.log(pedestrian.toString()+" Moving to CAQLink.");
+		//Log.log(pedestrian.toString()+" Moving to CAQLink.");
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		CAQLink lowResLink = engineCA.getCAQLink(nextLinkId);
@@ -99,7 +99,7 @@ public class CAAgentMover extends AgentMover {
 	}	
 	
 	private void changeLinkInsideEnvironment(Pedestrian pedestrian, double time) {
-		Log.log(pedestrian.toString()+" changing CALink.");
+		//Log.log(pedestrian.toString()+" changing CALink.");
 		Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
 		Id<Link> nextLinkId = pedestrian.getVehicle().getDriver().chooseNextLinkId();
 		CALink nextLinkCA = engineCA.getCALink(nextLinkId);

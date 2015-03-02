@@ -17,13 +17,13 @@ public class Constants {
 	 * CAEnvironment until this time (in seconds). Keep to 0 if you want to run normal simulation.**/
 	public static Double CA_TEST_END_TIME = 0.; //1200.;
 	public static double SIMULATION_DURATION = 2000;
-	public static int SIMULATION_ITERATIONS = 10;
+	public static int SIMULATION_ITERATIONS = 20;
 	public static boolean SAVE_FRAMES = false;
 	
 	/** name to use to add CAScenario to a matsim scenario as a scenario element **/ 
 	public static final String CASCENARIO_NAME = "CAScenario";
 	
-	public static final Double FLOPW_CAP_PER_METER_WIDTH = 1.2;
+	public static final Double FLOPW_CAP_PER_METER_WIDTH = 2.4;
 	
 	public static final Double TRANSITION_AREA_LENGTH = CA_CELL_SIDE*5;
 	public static final Double FAKE_LINK_WIDTH = 1.2;
