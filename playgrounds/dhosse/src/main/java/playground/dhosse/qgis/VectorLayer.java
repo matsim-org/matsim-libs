@@ -65,6 +65,12 @@ public class VectorLayer extends QGisLayer {
 	
 	public void setXField(String xField){
 		this.xField = xField;
+		
+		if (xField.startsWith("field_")) {
+			// uggly, please use column number instead (integer)
+		} else {
+			this.useHeader = true;
+		}
 	}
 	
 	public String getXField(){
@@ -73,6 +79,12 @@ public class VectorLayer extends QGisLayer {
 	
 	public void setYField(String yField){
 		this.yField = yField;
+		
+		if (yField.startsWith("field_")) {
+			// uggly, please use column number instead (integer)
+		} else {
+			this.useHeader = true;
+		}
 	}
 	
 	public String getYField(){
@@ -99,10 +111,6 @@ public class VectorLayer extends QGisLayer {
 	 */
 	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName ){
 		this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
-	}
-	
-	public void setUseHeader(boolean useHeader){
-		this.useHeader = useHeader;
 	}
 	
 	public String getUseHeader(){
