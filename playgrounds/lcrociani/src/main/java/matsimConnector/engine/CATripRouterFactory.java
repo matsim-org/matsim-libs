@@ -12,7 +12,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -50,11 +50,9 @@ public class CATripRouterFactory implements TripRouterFactory{
 		for (String mode : modes)
 			tr.setRoutingModule(
 					mode,
-					LegRouterWrapper.createLegRouterWrapper(mode, scenario.getPopulation()
-							.getFactory(), new NetworkLegRouter(scenario
-					.getNetwork(), routeAlgo,
-					((PopulationFactoryImpl) scenario.getPopulation()
-							.getFactory()).getModeRouteFactory())));
+					DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation()
+							.getFactory(), scenario
+					.getNetwork(), routeAlgo));
 		return tr;
 	}
 

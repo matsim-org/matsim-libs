@@ -25,7 +25,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -33,12 +32,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 
 /**
  * Class wrapping a {@link LegRouter} in a {@link RoutingModule}.
@@ -49,27 +45,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
  *
  * @author thibautd
  */
-public final class LegRouterWrapper implements RoutingModule {
-
-	public static RoutingModule createLegRouterWrapper(String mode, PopulationFactory populationFactory, LegRouter toWrap) {
-		return new LegRouterWrapper(mode, populationFactory, toWrap);
-	}
-	
-	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
-			ModeRoutingParams params ) {
-		LegRouter toWrap = new PseudoTransitLegRouter( net, routeAlgo, params.getTeleportedModeFreespeedFactor(), params.getBeelineDistanceFactor(), 
-				((PopulationFactoryImpl) popFac).getModeRouteFactory() ) ;
-		return new LegRouterWrapper( mode, popFac, toWrap ) ;
-	}
-
-	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, 
-			ModeRoutingParams params ) {
-		
-		LegRouter toWrap = new TeleportationLegRouter( ((PopulationFactoryImpl) popFac).getModeRouteFactory(), 
-				params.getTeleportedModeSpeed(), params.getBeelineDistanceFactor() 
-				 ) ;
-		return new LegRouterWrapper( mode, popFac, toWrap ) ;
-	}
+ final class LegRouterWrapper implements RoutingModule {
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -82,7 +58,7 @@ public final class LegRouterWrapper implements RoutingModule {
 	 * @param populationFactory the factory to use to create the return leg instance
 	 * @param toWrap the {@link LegRouter} to wrap
 	 */
-	private LegRouterWrapper(
+	 LegRouterWrapper(
 			final String mode,
 			final PopulationFactory populationFactory,
 			final LegRouter toWrap) {

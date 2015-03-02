@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.router;
+package org.matsim.core.router.old;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,8 +34,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -89,7 +95,10 @@ public class PlanRouterTest {
         RoutingModule routingModule = new RoutingModule() {
             @Override
             public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-                List<? extends PlanElement> trip = LegRouterWrapper.createLegRouterWrapper("car", scenario.getPopulation().getFactory(), new NetworkLegRouter(scenario.getNetwork(), leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime), new ModeRouteFactory())).calcRoute(fromFacility, toFacility, departureTime, person);
+                List<? extends PlanElement> trip = DefaultRoutingModules.createNetworkRouter("car", scenario.getPopulation().getFactory(), 
+                		scenario.getNetwork(), 
+                		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime)
+                		).calcRoute(fromFacility, toFacility, departureTime, person);
                 ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                 return trip;
             }

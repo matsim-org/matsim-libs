@@ -20,7 +20,12 @@
 
 package playground.christoph.parking;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,10 +47,12 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
-import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.old.LegRouterWrapper;
-import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -68,12 +75,7 @@ import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFa
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
-import javax.inject.Provider;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Inject;
 
 public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener, IterationEndsListener {
 
@@ -342,8 +344,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	        LeastCostPathCalculator leastCostPathCalculator = leastCostPathCalculatorFactory.createPathCalculator(
 	        		this.subNetwork, routingContext.getTravelDisutility(), routingContext.getTravelTime());
 
-	        LegRouter networkLegRouter = new NetworkLegRouter(this.subNetwork, leastCostPathCalculator, this.modeRouteFactory);
-			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(TransportMode.car, populationFactory, networkLegRouter); 
+	        RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(TransportMode.car, populationFactory, this.subNetwork, leastCostPathCalculator); 
 			tripRouter.setRoutingModule(TransportMode.car, legRouterWrapper);
 	        
 			return tripRouter;

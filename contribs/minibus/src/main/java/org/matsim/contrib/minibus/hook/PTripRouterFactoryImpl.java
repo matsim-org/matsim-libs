@@ -40,7 +40,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -142,7 +142,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 		for (String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createPseudoTransitRouter( mainMode, populationFactory,
+					DefaultRoutingModules.createPseudoTransitRouter( mainMode, populationFactory,
 					        network,
 						routeAlgoPtFreeFlow,
 						routeConfigGroup.getModeRoutingParams().get( mainMode ) ) ) ;
@@ -151,17 +151,16 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createTeleportationRouter(mainMode, populationFactory, 
+					DefaultRoutingModules.createTeleportationRouter(mainMode, populationFactory, 
 						routeConfigGroup.getModeRoutingParams().get( mainMode ) ));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createLegRouterWrapper(mainMode, populationFactory, new NetworkLegRouter(
+					DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory, 
 					        network,
-						routeAlgo,
-					        modeRouteFactory)));
+						routeAlgo));
 		}
 
 		if ( config.scenario().isUseTransit() ) {
@@ -175,7 +174,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 						// end of modification
 						
 						scenario.getNetwork(), // use a walk router in case no PT path is found
-						LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, populationFactory,
+						DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory,
 							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )));
 		}
 

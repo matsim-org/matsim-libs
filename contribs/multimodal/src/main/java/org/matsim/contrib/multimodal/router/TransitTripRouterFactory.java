@@ -35,7 +35,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 
@@ -76,7 +76,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 			if (simulatedModes.contains(TransportMode.transit_walk)) {
 				transitWalkRoutingModule = tripRouter.getRoutingModule(TransportMode.walk);
 			} else {
-				transitWalkRoutingModule = LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
+				transitWalkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
 						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk )
 						);
 			}

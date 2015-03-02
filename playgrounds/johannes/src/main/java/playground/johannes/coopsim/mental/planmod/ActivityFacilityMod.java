@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -39,7 +39,7 @@ public class ActivityFacilityMod implements PlanModifier {
 
 	private final PopulationFactoryImpl factory;
 
-	private final NetworkLegRouter router;
+	private final LegRouter router;
 	
 	private final ActivityFacilities facilities;
 	
@@ -51,7 +51,7 @@ public class ActivityFacilityMod implements PlanModifier {
 	
 //	private int count;
 
-	public ActivityFacilityMod(ActivityFacilities facilities, NetworkLegRouter router) {
+	public ActivityFacilityMod(ActivityFacilities facilities, LegRouter router) {
 		this.facilities = facilities;
 		this.router = router;
         this.factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();

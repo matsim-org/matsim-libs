@@ -44,7 +44,7 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -84,7 +84,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	}
 	
 	private RoutingModule createWalkRouter(PopulationFactory populationFactory, PlansCalcRouteConfigGroup routeConfigGroup){
-		return LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 
+		return DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 
 				routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) );
 	}
 

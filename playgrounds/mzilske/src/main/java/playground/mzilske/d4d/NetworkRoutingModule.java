@@ -16,7 +16,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelTime;
 
@@ -31,7 +31,7 @@ public class NetworkRoutingModule implements RoutingModule {
 	public NetworkRoutingModule(PopulationFactory pf, Network network, TravelTime ttc) {
 		super();
 		mrf.setRouteFactory("unknown", new GenericRouteFactory());
-		networkLegRouter = LegRouterWrapper.createLegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc), mrf));
+		networkLegRouter = DefaultRoutingModules.createNetworkRouter("unknown", pf, network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc) );
 	}
 
 	@Override

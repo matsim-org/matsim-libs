@@ -35,7 +35,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -135,7 +135,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		for (String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createPseudoTransitRouter( mainMode, populationFactory, 
+					DefaultRoutingModules.createPseudoTransitRouter( mainMode, populationFactory, 
 						network,
 						routeAlgoPtFreeFlow,
 					    routeConfigGroup.getModeRoutingParams().get( mainMode ) ) ) ;
@@ -144,17 +144,16 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createTeleportationRouter( mainMode, populationFactory, 
+					DefaultRoutingModules.createTeleportationRouter( mainMode, populationFactory, 
 					    routeConfigGroup.getModeRoutingParams().get( mainMode ) )) ;
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createLegRouterWrapper(mainMode, populationFactory, new NetworkLegRouter(
+					DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory,
 						network,
-						routeAlgo,
-						modeRouteFactory)));
+						routeAlgo ));
 		}
 
 		// add a Routing-Module for each Transit(sub)mode.
@@ -166,7 +165,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 							((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
 							transitSchedule,
 							network, // use a walk router in case no path is found
-							LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
+							DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
 									routeConfigGroup.getModeRoutingParams().get( TransportMode.walk )  ))) ;
 		}
 		// add pt as fallback-solution
@@ -176,7 +175,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 						((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
 						transitSchedule,
 						network, // use a walk router in case no PT path is found
-						LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 
+						DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 
 						        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) ))) ;
 		return tripRouter;
 		

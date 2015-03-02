@@ -42,7 +42,7 @@ import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -114,7 +114,7 @@ public class CreatePTLegs {
             		transitRouterFactory.createTransitRouter(),
                     scenario.getTransitSchedule(),
                     scenario.getNetwork(), // use a walk router in case no PT path is found
-                    LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
+                    DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
 					        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )) ;
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...

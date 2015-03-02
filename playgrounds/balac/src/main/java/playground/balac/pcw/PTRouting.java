@@ -19,7 +19,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -182,7 +182,7 @@ public class PTRouting {
         		transitRouterFactory.createTransitRouter(),
                 scenario.getTransitSchedule(),
                 scenario.getNetwork(), // use a walk router in case no PT path is found
-                LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
+                DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
 				        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) ));
 		
 		

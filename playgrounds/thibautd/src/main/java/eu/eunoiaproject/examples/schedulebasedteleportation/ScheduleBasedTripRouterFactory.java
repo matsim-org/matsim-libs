@@ -26,7 +26,7 @@ import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.pt.router.TransitRouterFactory;
 
 /**
@@ -70,7 +70,7 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 					transitRouterFactory.createTransitRouter(),
 					scenario.getTransitSchedule(),
 					scenario.getNetwork(), // use a walk router in case no PT path is found
-					LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
+					DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
 							scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ) ));
 
 		tripRouter.setRoutingModule(

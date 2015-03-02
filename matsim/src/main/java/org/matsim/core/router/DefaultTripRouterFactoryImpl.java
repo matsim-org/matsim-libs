@@ -13,7 +13,7 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.old.LegRouterWrapper;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -88,54 +88,45 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
         }
 
         for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
-            tripRouter.setRoutingModule(
-                    mode,
-                    LegRouterWrapper.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 
-					        scenario.getNetwork(),
-					        routeAlgoPtFreeFlow,
-					        routeConfigGroup.getModeRoutingParams().get( mode ) ) 
-            		) ;
+            final RoutingModule routingModule = DefaultRoutingModules.createPseudoTransitRouter(mode, scenario.getPopulation().getFactory(), 
+			        scenario.getNetwork(), routeAlgoPtFreeFlow, routeConfigGroup.getModeRoutingParams().get( mode ) );
+			tripRouter.setRoutingModule( mode, routingModule ) ;
         }
 
-        for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
-            final RoutingModule old =
-                    tripRouter.setRoutingModule(
-                            mainMode,
-                            LegRouterWrapper.createTeleportationRouter( mainMode, scenario.getPopulation().getFactory(), 
-							        routeConfigGroup.getModeRoutingParams().get( mainMode ) )) ;
-            if ( old != null ) {
-                log.error( "inconsistent router configuration for mode "+mainMode );
+        for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
+            final RoutingModule routingModule = DefaultRoutingModules.createTeleportationRouter( mode, scenario.getPopulation().getFactory(), 
+			        routeConfigGroup.getModeRoutingParams().get( mode ) );
+			final RoutingModule result = tripRouter.setRoutingModule( mode, routingModule) ;
+
+			if ( result != null ) {
+                log.error( "inconsistent router configuration for mode "+mode );
                 log.error( "One situation which triggers this warning: setting both speed and speedFactor for a mode (this used to be possible)." );
-                throw new RuntimeException( "there was already a module set when trying to set teleporting module for mode "+mainMode+
-                        ": "+old );
+                throw new RuntimeException( "there was already a module set when trying to set teleporting module for mode "+mode+
+                        ": "+result );
             }
         }
 
-        for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
-            final RoutingModule old =
-                    tripRouter.setRoutingModule(
-                            mainMode,
-                            LegRouterWrapper.createLegRouterWrapper(mainMode, scenario.getPopulation().getFactory(), new NetworkLegRouter(
-							        scenario.getNetwork(),
-							        routeAlgo,
-							        ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory())));
+        for ( String mode : routeConfigGroup.getNetworkModes() ) {
+            final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(), 
+			        scenario.getNetwork(), routeAlgo);
+			final RoutingModule result = tripRouter.setRoutingModule( mode, routingModule);
 
-            if ( old != null ) {
-                log.error( "inconsistent router configuration for mode "+mainMode );
-                throw new RuntimeException( "there was already a module set when trying to set network routing module for mode "+mainMode+
-                        ": "+old );
+			if ( result != null ) {
+                log.error( "inconsistent router configuration for mode "+mode );
+                throw new RuntimeException( "there was already a module set when trying to set network routing module for mode "+mode+
+                        ": "+result );
             }
             
             // The default router will always route on the car network.  A user may, however, have prepared a network with dedicated bicycle
             // links and then expect the router to route on that.  The following test tries to catch that.  If someone improves on this,
             // the test can be removed.  kai, feb'15
             if ( networkIsMultimodal ) {
-            	switch ( mainMode ) {
+            	switch ( mode ) {
             	case TransportMode.car :
             	case TransportMode.ride :
             		break ;
             	default:
-            		throw new RuntimeException("you have a multi-modal network and configured " + mainMode + " to be routed as a network mode.  "
+            		throw new RuntimeException("you have a multi-modal network and configured " + mode + " to be routed as a network mode.  "
             				+ "The present configuration will route this "
             				+ "mode on the car network.  This may be ok (e.g. with ``truck'' or ``motorbike''), or not (e.g. with ``bicycle''). "
             				+ "Throwing an exception anyways; please use a uni-modal network if you want to keep this configuration.") ;
@@ -148,7 +139,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                     transitRouterFactory.createTransitRouter(),
                     scenario.getTransitSchedule(),
                     scenario.getNetwork(), // use a walk router in case no PT path is found
-                    LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(),
+                    DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(),
 					        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )) ;
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...

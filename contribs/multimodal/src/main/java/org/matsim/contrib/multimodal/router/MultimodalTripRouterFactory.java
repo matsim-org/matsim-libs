@@ -31,8 +31,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -123,8 +123,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 			 */
 			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			LegRouter networkLegRouter = new NetworkLegRouter(subNetwork, routeAlgo, modeRouteFactory);
-			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(mode, populationFactory, networkLegRouter); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			instance.setRoutingModule(mode, legRouterWrapper);
 		}
 

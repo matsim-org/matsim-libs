@@ -1,5 +1,10 @@
 package playground.sergioo.passivePlanning2012.core.replanning;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -14,17 +19,11 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.core.population.EmptyTimeImpl;
-import playground.sergioo.passivePlanning2012.core.router.EmptyLegRouter;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class BasePlanModulesStrategy implements PlanStrategy {
 
@@ -54,7 +53,10 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		counter = new Counter("[BasePlanStrategy] handled person # ");
-		replanningContext.getTripRouter().setRoutingModule("empty", LegRouterWrapper.createLegRouterWrapper("empty", scenario.getPopulation().getFactory(), new EmptyLegRouter()));
+//		replanningContext.getTripRouter().setRoutingModule("empty", LegRouterWrapper.createLegRouterWrapper("empty", scenario.getPopulation().getFactory(), new EmptyLegRouter()));
+		Logger.getLogger(this.getClass()).fatal("the above line is no longer possible, sorry.  Should be rather easy to re-write this directly as an"
+				+ " instance of the TripRouter interface (I hope).  Kai, mar'15");
+		System.exit(-1) ;
 		this.replanningContext = replanningContext;
 	}
 	@Override

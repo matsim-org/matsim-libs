@@ -40,7 +40,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  *
  * @author mrieser
  */
-public class NetworkLegRouter implements LegRouter {
+ public final class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
 	private final ModeRouteFactory routeFactory;

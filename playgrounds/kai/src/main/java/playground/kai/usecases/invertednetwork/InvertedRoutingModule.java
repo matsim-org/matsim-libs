@@ -21,19 +21,14 @@ package playground.kai.usecases.invertednetwork;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouterWrapper;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -44,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  */
 class InvertedRoutingModule implements RoutingModule {
 
-	LegRouterWrapper router ;
+	RoutingModule router ;
 	
 	InvertedRoutingModule(Scenario sc, TravelDisutilityFactory tdf ) {
 		

@@ -40,8 +40,8 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -128,7 +128,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
     		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
     		LeastCostPathCalculator routeAlgoPtFreeFlow = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, ptTimeCostCalc, ptTimeCostCalc);
         	
-			RoutingModule legRouterWrapper = LegRouterWrapper.createPseudoTransitRouter(mode, populationFactory, 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createPseudoTransitRouter(mode, populationFactory, 
 					scenario.getNetwork(), routeAlgoPtFreeFlow, 
 					routeConfigGroup.getModeRoutingParams().get( mode ) ) ;
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
@@ -142,7 +142,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
         	 */
         	if (multiModalConfigGroup.getSimulatedModes().contains(mode)) continue;
         	
-			RoutingModule legRouterWrapper = LegRouterWrapper.createTeleportationRouter(mode, populationFactory, 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createTeleportationRouter(mode, populationFactory, 
 					routeConfigGroup.getModeRoutingParams().get( mode )
 					); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
@@ -172,8 +172,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 			}
 			
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			LegRouter networkLegRouter = new NetworkLegRouter(subNetwork, routeAlgo, modeRouteFactory);
-			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(mode, populationFactory, networkLegRouter); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {
