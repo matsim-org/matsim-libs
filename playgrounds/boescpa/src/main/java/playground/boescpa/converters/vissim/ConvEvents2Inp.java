@@ -93,7 +93,7 @@ public class ConvEvents2Inp extends ConvEvents {
 			boolean inRoutingDecision = false;
 			boolean inInput = false;
 
-			Map<Long, Integer> totalPerLinkRoutingDecision = new HashMap<Long, Integer>();
+			Map<Long, Integer> totalPerLinkRoutingDecision = new HashMap<>();
 
 			String line = in.readLine();
 			while (line != null) {
@@ -117,7 +117,7 @@ public class ConvEvents2Inp extends ConvEvents {
 					}
 					// FRACTION of route:
 					if (fracPattern.matcher(line).matches()) {
-						double demand = demandPerVissimTrip.get(currentRoutingDecision + "-" + currentRoute);
+						double demand = demandPerVissimTrip.get(Id.create(currentRoutingDecision + "-" + currentRoute, Trip.class));
 						String fraction = "0.0";
 						if (totalPerRoutingDecision > 0) {
 							fraction = String.valueOf(demand/totalPerRoutingDecision);
