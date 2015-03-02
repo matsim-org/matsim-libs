@@ -22,12 +22,12 @@ package playground.mrieser.svi.data;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.StringUtils;
 
 /**
  * @author mrieser / senozon
@@ -46,7 +46,7 @@ public class ActivityToZoneMappingReader {
 		try {
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				String[] parts = StringUtils.split(line, ' ');
+				String[] parts = StringUtils.explode(line, ' ');
 				if (parts.length >= 2) {
 					String id = parts[0];
 					String[] zones = new String[parts.length - 1];

@@ -23,7 +23,6 @@ import java.io.File;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.commons.lang.math.NumberUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -69,7 +68,12 @@ public class AnalysisLauncher {
 		//find out iteration number from events file name
 		File strObjEventFile  = new File(eventFileName);
 		String strIntNum= FacilityUtils.getStrUntilPoint(strObjEventFile.getName());
-		int itNum= NumberUtils.isNumber(strIntNum) ? Integer.valueOf (strIntNum) : 0;	
+		int itNum = 0;
+		try {
+			itNum = Integer.valueOf(strIntNum);
+		} catch (NumberFormatException e) {
+			// ignore
+		}
 		
 		//write kml file 
 		Controler controler = new Controler(config);
