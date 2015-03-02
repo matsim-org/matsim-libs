@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -56,10 +56,9 @@ class InvertedRoutingModule implements RoutingModule {
 		
 		Network invertedNetwork = null ;
 		
-		this.router = new LegRouterWrapper(TransportMode.car, sc.getPopulation().getFactory(), 
-				new NetworkLegRouter(invertedNetwork, new Dijkstra(invertedNetwork, travelDisutility, travelTime) , 
-						((PopulationFactoryImpl)sc.getPopulation().getFactory()).getModeRouteFactory() 
-		) ) ;
+//		this.router = LegRouterWrapper.createLegRouterWrapper(TransportMode.car, sc.getPopulation().getFactory(), new NetworkLegRouter(invertedNetwork, new Dijkstra(invertedNetwork, travelDisutility, travelTime) , 
+//				((PopulationFactoryImpl)sc.getPopulation().getFactory()).getModeRouteFactory() 
+//)) ;
 	}
 	
 	@Override

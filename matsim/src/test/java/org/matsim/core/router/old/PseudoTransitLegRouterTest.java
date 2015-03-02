@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.core.router.old;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,6 +38,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;

@@ -14,6 +14,7 @@ import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.TravelTime;
@@ -29,16 +30,16 @@ public class BushwhackingRoutingModule implements RoutingModule {
 	
 	ModeRouteFactory mrf = new ModeRouteFactory();
 	
-	private LegRouterWrapper teleportationLegRouter;
+	private RoutingModule teleportationLegRouter;
 
-	private LegRouterWrapper networkLegRouter;
+	private RoutingModule networkLegRouter;
 
 	public BushwhackingRoutingModule(PopulationFactory pf, NetworkImpl network) {
 		this.network = network;
 		mrf.setRouteFactory("unknown", new GenericRouteFactory());
-		teleportationLegRouter = new LegRouterWrapper("unknown", pf, new TeleportationLegRouter(mrf, 2.0, 1.7));
+		teleportationLegRouter = LegRouterWrapper.createLegRouterWrapper("unknown", pf, new TeleportationLegRouter(mrf, 2.0, 1.7));
 		TravelTime ttc = new FreeSpeedTravelTime();
-		networkLegRouter = new LegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc), mrf));
+		networkLegRouter = LegRouterWrapper.createLegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc), mrf));
 	}
 
 	@Override

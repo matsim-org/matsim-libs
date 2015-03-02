@@ -20,6 +20,11 @@
 
 package org.matsim.contrib.multimodal.router;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -30,21 +35,19 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Due to several reasons, the DefaultTripRouterFactoryImpl should not be used
@@ -126,11 +129,9 @@ public class DefaultDelegateFactory implements TripRouterFactory {
     		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
     		LeastCostPathCalculator routeAlgoPtFreeFlow = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, ptTimeCostCalc, ptTimeCostCalc);
         	
-			LegRouter pseudoTransitLegRouter = new PseudoTransitLegRouter(scenario.getNetwork(), routeAlgoPtFreeFlow, 
-					routeConfigGroup.getTeleportedModeFreespeedFactors().get(mode), 
-					routeConfigGroup.getModeRoutingParams().get( mode ).getBeelineDistanceFactor(), 
-					modeRouteFactory);
-			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, pseudoTransitLegRouter); 
+			RoutingModule legRouterWrapper = LegRouterWrapper.createPseudoTransitRouter(mode, populationFactory, 
+					scenario.getNetwork(), routeAlgoPtFreeFlow, 
+					routeConfigGroup.getModeRoutingParams().get( mode ) ) ;
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
        }
 
@@ -146,7 +147,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 					routeConfigGroup.getTeleportedModeSpeeds().get(mode),
 					routeConfigGroup.getModeRoutingParams().get( mode ).getBeelineDistanceFactor()
 					);
-			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, teleportationLegRouter); 
+			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(mode, populationFactory, teleportationLegRouter); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {
@@ -175,7 +176,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 			
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
 			LegRouter networkLegRouter = new NetworkLegRouter(subNetwork, routeAlgo, modeRouteFactory);
-			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, networkLegRouter); 
+			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(mode, populationFactory, networkLegRouter); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {

@@ -21,6 +21,7 @@
 package playground.christoph.parking;
 
 import com.google.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,6 +44,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -53,6 +55,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
+
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.InitialParkingSelector;
@@ -66,6 +69,7 @@ import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
 import javax.inject.Provider;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -339,7 +343,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	        		this.subNetwork, routingContext.getTravelDisutility(), routingContext.getTravelTime());
 
 	        LegRouter networkLegRouter = new NetworkLegRouter(this.subNetwork, leastCostPathCalculator, this.modeRouteFactory);
-			RoutingModule legRouterWrapper = new LegRouterWrapper(TransportMode.car, populationFactory, networkLegRouter); 
+			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(TransportMode.car, populationFactory, networkLegRouter); 
 			tripRouter.setRoutingModule(TransportMode.car, legRouterWrapper);
 	        
 			return tripRouter;

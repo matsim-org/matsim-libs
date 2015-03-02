@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -77,7 +78,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 						routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk), 
 						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()
 						);
-				transitWalkRoutingModule = new LegRouterWrapper(TransportMode.transit_walk, populationFactory, teleportationLegRouter);
+				transitWalkRoutingModule = LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, teleportationLegRouter);
 			}
 			
         	TransitRouterWrapper routingModule = new TransitRouterWrapper(transitRouterFactory.createTransitRouter(), scenario.getTransitSchedule(),

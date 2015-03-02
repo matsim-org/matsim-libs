@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -88,7 +89,7 @@ public class PlanRouterTest {
         RoutingModule routingModule = new RoutingModule() {
             @Override
             public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-                List<? extends PlanElement> trip = new LegRouterWrapper("car", scenario.getPopulation().getFactory(), new NetworkLegRouter(scenario.getNetwork(), leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime), new ModeRouteFactory())).calcRoute(fromFacility, toFacility, departureTime, person);
+                List<? extends PlanElement> trip = LegRouterWrapper.createLegRouterWrapper("car", scenario.getPopulation().getFactory(), new NetworkLegRouter(scenario.getNetwork(), leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime), new ModeRouteFactory())).calcRoute(fromFacility, toFacility, departureTime, person);
                 ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                 return trip;
             }

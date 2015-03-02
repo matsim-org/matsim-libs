@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.minibus.hook;
 
+import java.util.Collections;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,16 +33,25 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
-
-import java.util.Collections;
 
 /**
  * This class exists only to allow the transit schedule to be updated in each iteration
@@ -132,39 +143,28 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 		for (String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-                            populationFactory,
-						new PseudoTransitLegRouter(
-                                network,
-							routeAlgoPtFreeFlow,
-							routeConfigGroup.getTeleportedModeFreespeedFactors().get( mainMode ),
-							routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor(),
-                                modeRouteFactory)));
+					LegRouterWrapper.createPseudoTransitRouter( mainMode, populationFactory,
+					        network,
+						routeAlgoPtFreeFlow,
+						routeConfigGroup.getModeRoutingParams().get( mainMode ) ) ) ;
 		}
 
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-                            populationFactory,
-						new TeleportationLegRouter(
-                                modeRouteFactory,
-							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-							routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor())));
+					LegRouterWrapper.createLegRouterWrapper(mainMode, populationFactory, new TeleportationLegRouter(
+					        modeRouteFactory,
+						routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
+						routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor())));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					new LegRouterWrapper(
-						mainMode,
-                            populationFactory,
-						new NetworkLegRouter(
-                                network,
-							routeAlgo,
-                                modeRouteFactory)));
+					LegRouterWrapper.createLegRouterWrapper(mainMode, populationFactory, new NetworkLegRouter(
+					        network,
+						routeAlgo,
+					        modeRouteFactory)));
 		}
 
 		if ( config.scenario().isUseTransit() ) {
@@ -178,13 +178,10 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 						// end of modification
 						
 						scenario.getNetwork(), // use a walk router in case no PT path is found
-						new LegRouterWrapper(
-							TransportMode.transit_walk,
-                                populationFactory,
-							new TeleportationLegRouter(
-                                    modeRouteFactory,
-								routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-								routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()))));
+						LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, new TeleportationLegRouter(
+						        modeRouteFactory,
+							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
+							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()))));
 		}
 
 		return tripRouter;

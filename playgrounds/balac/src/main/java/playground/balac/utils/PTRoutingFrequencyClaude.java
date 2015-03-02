@@ -19,8 +19,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -226,13 +226,10 @@ public class PTRoutingFrequencyClaude {
         		transitRouterFactory.createTransitRouter(),
                 scenario.getTransitSchedule(),
                 scenario.getNetwork(), // use a walk router in case no PT path is found
-                new LegRouterWrapper(
-                        TransportMode.transit_walk,
-                        scenario.getPopulation().getFactory(),
-                        new TeleportationLegRouter(
-                                ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-                                routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() )));
+                LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, scenario.getPopulation().getFactory(), new TeleportationLegRouter(
+				        ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+				        routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
+				        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() )));
 //                                routeConfigGroup.getBeelineDistanceFactor())));
 		
 		int i =1;

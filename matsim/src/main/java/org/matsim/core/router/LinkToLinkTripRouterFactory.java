@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.InvertedNetworkLegRouter;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -72,10 +73,7 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 					travelTimes);
 		instance.setRoutingModule(
 				TransportMode.car,
-				new LegRouterWrapper(
-					TransportMode.car,
-					populationFactory,
-					invertedNetLegRouter));
+				LegRouterWrapper.createLegRouterWrapper(TransportMode.car, populationFactory, invertedNetLegRouter));
 		log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 
 		return instance;

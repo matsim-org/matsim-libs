@@ -42,7 +42,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  * @author mrieser
  */
-public class PseudoTransitLegRouter implements LegRouter {
+final class PseudoTransitLegRouter implements LegRouter {
 
 	private final Network network;
 	private final ModeRouteFactory routeFactory;
@@ -50,7 +50,7 @@ public class PseudoTransitLegRouter implements LegRouter {
 	private final double speedFactor;
 	private final double beelineDistanceFactor;
 
-	public PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final ModeRouteFactory routeFactory) {
+	 PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;

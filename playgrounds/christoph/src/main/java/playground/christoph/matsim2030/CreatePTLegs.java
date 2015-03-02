@@ -34,6 +34,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.*;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -44,6 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
+
 import playground.christoph.evacuation.pt.TransitRouterImplFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 
@@ -107,13 +109,10 @@ public class CreatePTLegs {
             		transitRouterFactory.createTransitRouter(),
                     scenario.getTransitSchedule(),
                     scenario.getNetwork(), // use a walk router in case no PT path is found
-                    new LegRouterWrapper(
-                            TransportMode.transit_walk,
-                            scenario.getPopulation().getFactory(),
-                            new TeleportationLegRouter(
-                                    ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-                                    routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                    routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
+                    LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, scenario.getPopulation().getFactory(), new TeleportationLegRouter(
+					        ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+					        routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
+					        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
 //                                    routeConfigGroup.getBeelineDistanceFactor())));
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...

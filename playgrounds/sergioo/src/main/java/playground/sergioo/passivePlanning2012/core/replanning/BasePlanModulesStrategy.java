@@ -14,7 +14,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.LegRouterWrapper;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -54,7 +54,7 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		counter = new Counter("[BasePlanStrategy] handled person # ");
-		replanningContext.getTripRouter().setRoutingModule("empty", new LegRouterWrapper("empty", scenario.getPopulation().getFactory(), new EmptyLegRouter()));
+		replanningContext.getTripRouter().setRoutingModule("empty", LegRouterWrapper.createLegRouterWrapper("empty", scenario.getPopulation().getFactory(), new EmptyLegRouter()));
 		this.replanningContext = replanningContext;
 	}
 	@Override

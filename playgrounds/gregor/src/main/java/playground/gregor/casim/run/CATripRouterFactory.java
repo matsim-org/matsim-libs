@@ -22,11 +22,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -61,11 +61,11 @@ public class CATripRouterFactory implements TripRouterFactory {
 
 		tr.setRoutingModule(
 				mainMode,
-				new LegRouterWrapper(mainMode, scenario.getPopulation()
+				LegRouterWrapper.createLegRouterWrapper(mainMode, scenario.getPopulation()
 						.getFactory(), new NetworkLegRouter(scenario
-						.getNetwork(), routeAlgo,
-						((PopulationFactoryImpl) scenario.getPopulation()
-								.getFactory()).getModeRouteFactory())));
+				.getNetwork(), routeAlgo,
+				((PopulationFactoryImpl) scenario.getPopulation()
+						.getFactory()).getModeRouteFactory())));
 		PlansCalcRouteConfigGroup routeConfigGroup = this.scenario.getConfig()
 				.plansCalcRoute();
 
@@ -73,13 +73,13 @@ public class CATripRouterFactory implements TripRouterFactory {
 				.keySet()) {
 			final RoutingModule old = tr.setRoutingModule(
 					mainMode,
-					new LegRouterWrapper(mainMode, scenario.getPopulation()
+					LegRouterWrapper.createLegRouterWrapper(mainMode, scenario.getPopulation()
 							.getFactory(), new TeleportationLegRouter(
-							((PopulationFactoryImpl) scenario.getPopulation()
-									.getFactory()).getModeRouteFactory(),
-							routeConfigGroup.getTeleportedModeSpeeds().get(
-									mainMode), 
-		                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+					((PopulationFactoryImpl) scenario.getPopulation()
+							.getFactory()).getModeRouteFactory(),
+					routeConfigGroup.getTeleportedModeSpeeds().get(
+							mainMode), 
+					        routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
 //									routeConfigGroup.getBeelineDistanceFactor())));
 			if (old != null) {
 				log.error("inconsistent router configuration for mode "

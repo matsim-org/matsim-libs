@@ -39,13 +39,13 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
@@ -64,7 +64,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	private static final Logger log = Logger
 			.getLogger(WagonSimTripRouterFactoryImpl.class);
 //	private TripRouterFactoryImpl delegate;
-	private LegRouterWrapper walkRouter;
+	private RoutingModule walkRouter;
 	private TransitSchedule transitSchedule;
 	private TransitRouterFactory routerFactory;
 	private Map<Id<TransitStopFacility>, Double> minShuntingTimes;
@@ -85,14 +85,11 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 		this.minShuntingTimes = minShuntingTimes;
 	}
 	
-	private LegRouterWrapper createWalkRouter(PopulationFactory populationFactory, PlansCalcRouteConfigGroup routeConfigGroup){
-		return new LegRouterWrapper(
-				TransportMode.transit_walk,
-				populationFactory,
-				new TeleportationLegRouter(
-						((PopulationFactoryImpl) populationFactory).getModeRouteFactory(),
-						routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()));
+	private RoutingModule createWalkRouter(PopulationFactory populationFactory, PlansCalcRouteConfigGroup routeConfigGroup){
+		return LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, new TeleportationLegRouter(
+				((PopulationFactoryImpl) populationFactory).getModeRouteFactory(),
+				routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
+				routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()));
 	}
 
 	@Override
