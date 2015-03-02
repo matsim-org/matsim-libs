@@ -1,5 +1,9 @@
 package playground.mzilske.d4d;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -8,21 +12,20 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class BushwhackingRoutingModule implements RoutingModule {
 
@@ -37,7 +40,11 @@ public class BushwhackingRoutingModule implements RoutingModule {
 	public BushwhackingRoutingModule(PopulationFactory pf, NetworkImpl network) {
 		this.network = network;
 		mrf.setRouteFactory("unknown", new GenericRouteFactory());
-		teleportationLegRouter = LegRouterWrapper.createLegRouterWrapper("unknown", pf, new TeleportationLegRouter(mrf, 2.0, 1.7));
+		ModeRoutingParams params = new ModeRoutingParams() ;
+		params.setMode("unknown");
+		params.setBeelineDistanceFactor(1.7);
+		params.setTeleportedModeSpeed(2.0);
+		teleportationLegRouter = LegRouterWrapper.createTeleportationRouter("unknown", pf, params ) ; 
 		TravelTime ttc = new FreeSpeedTravelTime();
 		networkLegRouter = LegRouterWrapper.createLegRouterWrapper("unknown", pf, new NetworkLegRouter(network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc), mrf));
 	}

@@ -21,14 +21,12 @@ package eu.eunoiaproject.examples.schedulebasedteleportation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.old.LegRouterWrapper;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.pt.router.TransitRouterFactory;
 
 /**
@@ -72,10 +70,8 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 					transitRouterFactory.createTransitRouter(),
 					scenario.getTransitSchedule(),
 					scenario.getNetwork(), // use a walk router in case no PT path is found
-					LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, scenario.getPopulation().getFactory(), new TeleportationLegRouter(
-							((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-							scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ),
-							scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor())));
+					LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
+							scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ) ));
 
 		tripRouter.setRoutingModule(
 				TransportMode.pt,

@@ -28,7 +28,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
@@ -73,14 +72,9 @@ public class CATripRouterFactory implements TripRouterFactory {
 				.keySet()) {
 			final RoutingModule old = tr.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createLegRouterWrapper(mainMode, scenario.getPopulation()
-							.getFactory(), new TeleportationLegRouter(
-					((PopulationFactoryImpl) scenario.getPopulation()
-							.getFactory()).getModeRouteFactory(),
-					routeConfigGroup.getTeleportedModeSpeeds().get(
-							mainMode), 
-					        routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
-//									routeConfigGroup.getBeelineDistanceFactor())));
+					LegRouterWrapper.createTeleportationRouter( mainMode, scenario.getPopulation()
+							.getFactory(), 
+					        routeConfigGroup.getModeRoutingParams().get( mainMode ) )) ;
 			if (old != null) {
 				log.error("inconsistent router configuration for mode "
 						+ mainMode);

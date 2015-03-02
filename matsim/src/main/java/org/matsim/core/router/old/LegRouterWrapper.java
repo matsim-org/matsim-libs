@@ -62,6 +62,15 @@ public final class LegRouterWrapper implements RoutingModule {
 		return new LegRouterWrapper( mode, popFac, toWrap ) ;
 	}
 
+	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, 
+			ModeRoutingParams params ) {
+		
+		LegRouter toWrap = new TeleportationLegRouter( ((PopulationFactoryImpl) popFac).getModeRouteFactory(), 
+				params.getTeleportedModeSpeed(), params.getBeelineDistanceFactor() 
+				 ) ;
+		return new LegRouterWrapper( mode, popFac, toWrap ) ;
+	}
+
 	private final String mode;
 	private final PopulationFactory populationFactory;
 	private final LegRouter wrapped;

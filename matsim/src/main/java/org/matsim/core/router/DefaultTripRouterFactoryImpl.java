@@ -15,7 +15,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -102,10 +101,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
             final RoutingModule old =
                     tripRouter.setRoutingModule(
                             mainMode,
-                            LegRouterWrapper.createLegRouterWrapper(mainMode, scenario.getPopulation().getFactory(), new TeleportationLegRouter(
-							        ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-							        routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-							        routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
+                            LegRouterWrapper.createTeleportationRouter( mainMode, scenario.getPopulation().getFactory(), 
+							        routeConfigGroup.getModeRoutingParams().get( mainMode ) )) ;
             if ( old != null ) {
                 log.error( "inconsistent router configuration for mode "+mainMode );
                 log.error( "One situation which triggers this warning: setting both speed and speedFactor for a mode (this used to be possible)." );
@@ -151,11 +148,8 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                     transitRouterFactory.createTransitRouter(),
                     scenario.getTransitSchedule(),
                     scenario.getNetwork(), // use a walk router in case no PT path is found
-                    LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, scenario.getPopulation().getFactory(), new TeleportationLegRouter(
-					        ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-					        routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-					        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ))) ;
-//                                    routeConfigGroup.getBeelineDistanceFactor())));
+                    LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(),
+					        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )) ;
             for (String mode : scenario.getConfig().transit().getTransitModes()) {
                 // XXX one can't check for inconsistent setting here...
                 // because the setting is inconsistent by default (defaults

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
@@ -46,7 +45,6 @@ import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.LegRouterWrapper;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -86,10 +84,8 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	}
 	
 	private RoutingModule createWalkRouter(PopulationFactory populationFactory, PlansCalcRouteConfigGroup routeConfigGroup){
-		return LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, new TeleportationLegRouter(
-				((PopulationFactoryImpl) populationFactory).getModeRouteFactory(),
-				routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-				routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()));
+		return LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 
+				routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) );
 	}
 
 	@Override

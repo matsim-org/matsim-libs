@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.multimodal.router;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -28,14 +30,14 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.*;
-import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.LegRouterWrapper;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
-
-import java.util.Set;
 
 /**
  * @author cdobler
@@ -74,11 +76,9 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 			if (simulatedModes.contains(TransportMode.transit_walk)) {
 				transitWalkRoutingModule = tripRouter.getRoutingModule(TransportMode.walk);
 			} else {
-				LegRouter teleportationLegRouter = new TeleportationLegRouter(modeRouteFactory, 
-						routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk), 
-						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()
+				transitWalkRoutingModule = LegRouterWrapper.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
+						routeConfigGroup.getModeRoutingParams().get( TransportMode.walk )
 						);
-				transitWalkRoutingModule = LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, teleportationLegRouter);
 			}
 			
         	TransitRouterWrapper routingModule = new TransitRouterWrapper(transitRouterFactory.createTransitRouter(), scenario.getTransitSchedule(),

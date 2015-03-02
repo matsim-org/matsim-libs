@@ -42,7 +42,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -152,10 +151,8 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					LegRouterWrapper.createLegRouterWrapper(mainMode, populationFactory, new TeleportationLegRouter(
-					        modeRouteFactory,
-						routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-						routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor())));
+					LegRouterWrapper.createTeleportationRouter(mainMode, populationFactory, 
+						routeConfigGroup.getModeRoutingParams().get( mainMode ) ));
 		}
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
@@ -178,10 +175,8 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 						// end of modification
 						
 						scenario.getNetwork(), // use a walk router in case no PT path is found
-						LegRouterWrapper.createLegRouterWrapper(TransportMode.transit_walk, populationFactory, new TeleportationLegRouter(
-						        modeRouteFactory,
-							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor()))));
+						LegRouterWrapper.createTeleportationRouter( TransportMode.transit_walk, populationFactory,
+							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) )));
 		}
 
 		return tripRouter;

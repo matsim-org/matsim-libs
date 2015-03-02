@@ -43,7 +43,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.LegRouterWrapper;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -143,11 +142,9 @@ public class DefaultDelegateFactory implements TripRouterFactory {
         	 */
         	if (multiModalConfigGroup.getSimulatedModes().contains(mode)) continue;
         	
-			LegRouter teleportationLegRouter = new TeleportationLegRouter(modeRouteFactory, 
-					routeConfigGroup.getTeleportedModeSpeeds().get(mode),
-					routeConfigGroup.getModeRoutingParams().get( mode ).getBeelineDistanceFactor()
-					);
-			RoutingModule legRouterWrapper = LegRouterWrapper.createLegRouterWrapper(mode, populationFactory, teleportationLegRouter); 
+			RoutingModule legRouterWrapper = LegRouterWrapper.createTeleportationRouter(mode, populationFactory, 
+					routeConfigGroup.getModeRoutingParams().get( mode )
+					); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {

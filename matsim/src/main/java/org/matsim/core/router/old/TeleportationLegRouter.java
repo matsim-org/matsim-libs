@@ -30,14 +30,14 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  * @author mrieser
  */
-public class TeleportationLegRouter implements LegRouter {
+class TeleportationLegRouter implements LegRouter {
 
 	private final ModeRouteFactory routeFactory;
 	
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
 	
-	public TeleportationLegRouter(final ModeRouteFactory routeFactory, final double networkTravelSpeed, final double beelineDistanceFactor) {
+	 TeleportationLegRouter(final ModeRouteFactory routeFactory, final double networkTravelSpeed, final double beelineDistanceFactor) {
 		this.routeFactory = routeFactory;
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;
