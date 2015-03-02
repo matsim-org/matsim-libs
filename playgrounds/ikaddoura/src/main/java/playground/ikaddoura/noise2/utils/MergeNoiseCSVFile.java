@@ -46,11 +46,10 @@ public class MergeNoiseCSVFile {
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
 	private double endTime = 30. * 3600.;
-	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/A_reducedSpeeds_rpGap25meters/immissions/";
-	private String receiverPointsFile = "/Users/ihab/Documents/workspace/shared-svn/projects/neukoellnNoise/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv"; // TODO receiver point coordinates in zweite und dritte Spalte einfügen.
+	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/ITERS/it.100/damages_receiverPoint/";
+	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
-	private int iteration = 100;
-	private String label = "immission";
+	private String label = "damages_receiverPoint";
 	
 	private String outputPath = pathToFilesToMerge;
 	
@@ -64,7 +63,7 @@ public class MergeNoiseCSVFile {
 	
 	private void run() {
 		
-		String outputFile = outputPath + Integer.toString(iteration) + "." + label + "_merged.csv";
+		String outputFile = outputPath + label + "_merged.csv";
 		
 		try {
 			
@@ -72,7 +71,7 @@ public class MergeNoiseCSVFile {
 				
 				System.out.println("Reading time bin: " + time);
 				
-				String fileName = pathToFilesToMerge + Integer.toString(iteration) + "." + label + "_" + Double.toString(time) + ".csv";
+				String fileName = pathToFilesToMerge + label + "_" + Double.toString(time) + ".csv";
 				BufferedReader br = IOUtils.getBufferedReader(fileName);
 				
 				String line = null;
