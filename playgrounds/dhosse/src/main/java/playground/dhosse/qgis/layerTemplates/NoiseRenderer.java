@@ -44,6 +44,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -55,6 +56,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -66,6 +68,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -77,6 +80,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -88,6 +92,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -99,6 +104,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -110,6 +116,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 		psl = new QGisPointSymbolLayer();
@@ -121,6 +128,7 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 		psl.setSizeUnits(QGisConstants.sizeUnits.MapUnit);
 		psl.setSizeMapUnitScale(sizeMapUnitScale);
 		psl.setPenStyle(QGisConstants.penstyle.no);
+		psl.setLayerTransparency(1);
 		this.addSymbolLayer(psl);
 		
 	}

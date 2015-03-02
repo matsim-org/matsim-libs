@@ -19,9 +19,9 @@ public class MainForQGisWriter {
 	public static void main(String args[]){
 		
 		String workingDirectory =  "C:/Users/Daniel/Desktop/MATSimQGisIntegration/";
-		String qGisProjectFile = "testWithAccessibility.qgs";
+		String qGisProjectFile = "testWithMergedImmissionsCSV.qgs";
 		
-		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 
 // ################################################################################################################################################
 		
@@ -36,11 +36,6 @@ public class MainForQGisWriter {
 //		// use case 2: links
 //		VectorLayer linksLayer = new VecorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
 //		linksLayer.setRenderer(new SingleSymbolRenderer(linksLayer.getGeometryType()));
-//		linksLayer.addAttribute("id");
-//		linksLayer.addAttribute("length");
-//		linksLayer.addAttribute("freespeed");
-//		linksLayer.addAttribute("capacity");
-//		linksLayer.addAttribute("nlanes");
 //		writer.addLayer(linksLayer);
 	
 // ################################################################################################################################################
@@ -72,37 +67,51 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 		//use case 4: accessibility
-		double[] extent = {100000,-3720000,180000,-3675000};
+//		double[] extent = {100000,-3720000,180000,-3675000};
+//		writer.setExtent(extent);
+//		
+//		//example for adding a raster layer
+//		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
+//		mapnikLayer.setRenderer(new AccessibilityXmlRenderer());
+//		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+//		writer.addLayer(0,mapnikLayer);
+//
+//		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
+//		densityLayer.setXField("field_1");
+//		densityLayer.setYField("field_2");
+//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer();
+//		dRenderer.setRenderingAttribute("field_8");
+//		densityLayer.setRenderer(dRenderer);
+//		writer.addLayer(1,densityLayer);
+//		
+//		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
+//				QGisConstants.geometryType.Point);
+//		//there are two ways to set x and y fields for csv geometry files
+//		//1) if there is a header, you can set the members xField and yField to the name of the column headers
+//		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+//		accessibilityLayer.setXField("field_1");
+//		accessibilityLayer.setYField("field_2");
+//		AccessibilityRenderer renderer = new AccessibilityRenderer();
+//		renderer.setRenderingAttribute("field_3"); // choose column/header to visualize
+//		accessibilityLayer.setRenderer(renderer);
+//		writer.addLayer(2,accessibilityLayer);
+
+// ################################################################################################################################################
+		
+		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
 		writer.setExtent(extent);
 		
-		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
+		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
 				QGisConstants.geometryType.Point);
-		accessibilityLayer.setDelimiter(",");
-		//there are two ways to set x and y fields for csv geometry files
-		//1) if there is a header, you can set the members xField and yField to the name of the column headers
-		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-		accessibilityLayer.setXField("field_1");
-		accessibilityLayer.setYField("field_2");
-		AccessibilityRenderer renderer = new AccessibilityRenderer();
-		renderer.setRenderingAttribute("field_3"); // choose column/header to visualize
-		accessibilityLayer.setRenderer(renderer);
-		writer.addLayer(accessibilityLayer);
+		layer.setXField("xCoord");
+		layer.setYField("yCoord");
+		layer.setDelimiter(",");
+		NoiseRenderer renderer = new NoiseRenderer();
+		renderer.setRenderingAttribute("immission_16:00:00");
+		layer.setRenderer(renderer);
 		
-		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
-		densityLayer.setDelimiter(",");
-		densityLayer.setXField("field_1");
-		densityLayer.setYField("field_2");
-		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer();
-		dRenderer.setRenderingAttribute("field_8");
-		densityLayer.setRenderer(dRenderer);
-		writer.addLayer(densityLayer);
+		writer.addLayer(layer);
 		
-		//example for adding a raster layer
-		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
-		mapnikLayer.setRenderer(new AccessibilityXmlRenderer());
-		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
-		writer.addLayer(mapnikLayer);
-
 		writer.write(qGisProjectFile);
 
 	}

@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 
 import playground.dhosse.qgis.rendering.QGisRenderer;
 
-public class QGisLayer {
+public abstract class QGisLayer {
 	
 	private Id<QGisLayer> id;
 	private String name;
@@ -17,6 +17,7 @@ public class QGisLayer {
 	
 	private QGisConstants.layerClass layerClass;
 	
+	// must be specified for all layers (except for data layers)
 	private QGisRenderer renderer;
 	
 	private QGisConstants.layerType type;
@@ -25,8 +26,8 @@ public class QGisLayer {
 	
 	/**
 	 * Creates a new instance of a qgis layer.
-	 * For each layer, a {@code QGisRenderer} must be created (for use cases look at package layerTemplates).
-	 * 
+	 * For each geometry layer, a {@code QGisRenderer} must be created (for use cases look at package layerTemplates).
+	 * </p>
 	 * If the layer input is a csv file, you also need to specify a delimiter (e.g. , or ;) and the header names
 	 * of the columns that contain the x and y coordinates (by setXField and setYField).
 	 * 
@@ -40,12 +41,6 @@ public class QGisLayer {
 		this.path = path;
 		this.id = Id.create(name + new SimpleDateFormat("yyyyMMdd").format(new Date()), QGisLayer.class);
 		
-		this.build();
-		
-	}
-	
-	private void build(){
-		
 		if(this.path.contains(QGisConstants.inputType.csv.toString())){
 			
 			this.inputType = QGisConstants.inputType.csv;
@@ -57,6 +52,10 @@ public class QGisLayer {
 		} else if(this.path.contains(QGisConstants.inputType.xml.toString())){
 			
 			this.inputType = QGisConstants.inputType.xml;
+			
+		} else{
+			
+			throw new RuntimeException("Invalid input type! Cannot create layer.");
 			
 		}
 		

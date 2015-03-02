@@ -8,6 +8,13 @@ import playground.dhosse.qgis.rendering.GraduatedSymbolRenderer;
 import playground.dhosse.qgis.rendering.QGisRasterRenderer;
 import playground.dhosse.qgis.rendering.QGisRenderer;
 
+/**
+ * This class does the actual "writing" of the qgis project file.
+ * 
+ * @author dhosse
+ *
+ */
+
 public class QGisFileWriter {
 	
 	private final QGisWriter writer;
@@ -19,13 +26,13 @@ public class QGisFileWriter {
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException{
 		
 		out.write("<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>\n");
-		out.write("<qgis projectname=\"\" version=\"" + QGisConstants.currentVersion + "\">\n");
+		out.write("<qgis projectname=\"" + this.writer.getProjectname() + "\" version=\"" + QGisConstants.currentVersion + "\">\n");
 		
 	}
 	
 	public void writeTitle(BufferedWriter out) throws IOException{
 		
-		out.write("\t<title></title>\n");
+		out.write("\t<title>" + this.writer.getTitle() + "</title>\n");
 		
 	}
 	
@@ -35,7 +42,7 @@ public class QGisFileWriter {
 		
 		out.write("\t\t<customproperties/>\n");
 		
-		for(QGisLayer layer : this.writer.getLayers().values()){
+		for(QGisLayer layer : this.writer.getLayers()){
 			
 			writeLayerTreeLayer(out, layer);
 			
@@ -53,17 +60,11 @@ public class QGisFileWriter {
 		
 	}
 	
-	public void writeRelations(BufferedWriter out) throws IOException{
-		
-		out.write("\t<relations/>\n");
-		
-	}
-	
 	public void writeMapCanvas(BufferedWriter out) throws IOException{
 		
 		out.write("\t<mapcanvas>\n");
 		
-		out.write("\t\t<units>meters</units>\n");
+		out.write("\t\t<units>" + this.writer.getUnit().toString() + "</units>\n");
 		out.write("\t\t<extent>\n");
 		
 		out.write("\t\t\t<xmin>" + this.writer.getExtent()[0] + "</xmin>\n");
@@ -73,7 +74,7 @@ public class QGisFileWriter {
 		
 		out.write("\t\t</extent>\n");
 		out.write("\t\t<projections>0</projections>\n");
-		writeDestinationSrs(out);
+		this.writeDestinationSrs(out);
 		out.write("\t\t<layer_coordinate_transform_info/>\n");
 		
 		out.write("\t</mapcanvas>\n");
@@ -107,7 +108,7 @@ public class QGisFileWriter {
 		
 		out.write("\t\t<custom-order enabled=\"0\">\n");
 		
-		for(QGisLayer layer : this.writer.layers.values()){
+		for(QGisLayer layer : this.writer.getLayers()){
 			
 			writeItem(out, layer);
 			
@@ -127,9 +128,9 @@ public class QGisFileWriter {
 	
 	public void writeProjectLayers(BufferedWriter out) throws IOException{
 		
-		out.write("\t<projectlayers layercount=\"" + this.writer.layers.size() + "\">\n");
+		out.write("\t<projectlayers layercount=\"" + this.writer.getLayers().size() + "\">\n");
 		
-		for(QGisLayer layer : this.writer.layers.values()){
+		for(QGisLayer layer : this.writer.getLayers()){
 			
 			writeMapLayer(out, layer);
 			
@@ -176,12 +177,15 @@ public class QGisFileWriter {
 		String base = vlayer.getPath();
 		String relP = new File(writer.getWorkingDir()).toURI().relativize(new File(base).toURI()).toString();
 		
-		if(vlayer.getInputType().equals(QGisConstants.inputType.csv) && !vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry)){
-
+		if(isCsvDataLayer(vlayer)){
+			
 			String datasource = "file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.getUseHeader() + "&amp;";
+			
 			if(vlayer.getDelimiter() != null){
+				
 				datasource += "delimiter=" + vlayer.getDelimiter() + "&amp;";
 			}
+			
 			
 			datasource += "quote='&amp;escape='&amp;skipEmptyField=Yes&amp;xField=" + vlayer.getXField() +
 					"&amp;yField=" + vlayer.getYField() + "&amp;spatialIndex=no&amp;subsetIndex=no&amp;watchFile=no\n";
@@ -278,6 +282,12 @@ public class QGisFileWriter {
 		
 	}
 	
+	private boolean isCsvDataLayer(VectorLayer vlayer) {
+		
+		return(vlayer.getInputType().equals(QGisConstants.inputType.csv) && !vlayer.getGeometryType().equals(QGisConstants.geometryType.No_geometry));
+	
+	}
+
 	private void writeRasterLayer(BufferedWriter out, QGisLayer layer)throws IOException {
 		
 		RasterLayer rlayer = (RasterLayer) layer;
@@ -354,6 +364,8 @@ public class QGisFileWriter {
 		QGisRenderer qRenderer = layer.getRenderer();
 		
 		if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.categorizedSymbol)){
+
+			//TODO no classes for categorized renderer created so far...
 			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.graduatedSymbol)){
 			
@@ -373,6 +385,8 @@ public class QGisFileWriter {
 			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
 			
+			//TODO no classes for rule renderer created so far...
+			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
 			
 			out.write("\t\t\t<renderer-v2 symbollevels=\"0\" type=\"" + qRenderer.getRenderingType().toString() + "\">\n");
@@ -391,6 +405,8 @@ public class QGisFileWriter {
 				
 				writePointLayer(out, layer, i);
 				
+			} else{
+				throw new RuntimeException("Unknown geometry type! Cannot write symbol layer!");
 			}
 			
 		}
@@ -421,7 +437,6 @@ public class QGisFileWriter {
 		String offsetMapUnitScale = Double.toString(psl.getOffsetMapUnitScale()[0]) + "," +
 				Double.toString(psl.getOffsetMapUnitScale()[1]); 
 		
-		//different to line layer
 		out.write("\t\t\t\t\t<symbol alpha=\"" + psl.getLayerTransparency() + "\" type=\"" + psl.getSymbolType().toString().toLowerCase() + "\" name=\"" + idx + "\">\n");
 		
 		out.write("\t\t\t\t\t\t<layer pass=\"0\" class=\"" + layer.getLayerClass().toString() + "\" locked=\"0\">\n");

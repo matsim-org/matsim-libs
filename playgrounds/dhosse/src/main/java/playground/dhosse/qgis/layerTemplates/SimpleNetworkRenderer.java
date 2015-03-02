@@ -9,6 +9,12 @@ import playground.dhosse.qgis.rendering.QGisRenderer;
 
 public class SimpleNetworkRenderer extends QGisRenderer {
 
+	/**
+	 * Instantiates a renderer for drawing a simple network (e.g. links).
+	 * The specifications for the symbol layer are made in the private method {@code init()}; 
+	 * 
+	 * @param gType The type of geometry that is to be drawn.
+	 */
 	public SimpleNetworkRenderer(QGisConstants.geometryType gType) {
 		
 		super(QGisConstants.renderingType.singleSymbol);

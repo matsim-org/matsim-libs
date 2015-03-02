@@ -2,7 +2,7 @@ package playground.dhosse.qgis;
 
 public class QGisLineSymbolLayer extends QGisSymbolLayer {
 	
-	private double width = 0.25;
+	private double width;
 	private QGisConstants.symbolType symbolType;
 	
 	public QGisLineSymbolLayer(){

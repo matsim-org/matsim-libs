@@ -2,6 +2,13 @@ package playground.dhosse.qgis.rendering;
 
 import playground.dhosse.qgis.QGisConstants;
 
+/**
+ * Renderer for QGis raster layers.
+ * So far, no project or use case specific settings exist, so this is the only class that renders raster data.
+ * 
+ * @author dhosse
+ *
+ */
 public class QGisRasterRenderer extends QGisRenderer {
 	
 	private double opacity;

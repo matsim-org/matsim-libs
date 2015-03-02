@@ -2,6 +2,13 @@ package playground.dhosse.qgis;
 
 import java.awt.Color;
 
+/**
+ * This class contains information about the symbols that are actually drawn in QGis (e.g. color,
+ * transparency).
+ * 
+ * @author dhosse
+ *
+ */
 public abstract class QGisSymbolLayer {
 	
 	private QGisConstants.symbolType symbolType;
