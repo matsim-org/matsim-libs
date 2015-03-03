@@ -50,4 +50,7 @@ public class DgCommodities {
 		return this.commodities;
 	}
 
+	public int getNumberOfCommodites(){
+		return this.commodities.size();
+	}
 }
