@@ -119,7 +119,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 					sumToll += userGroupToTotalPayment.get(ug);
 					excludeTollSum += userGrp2ExcludedToll.get(ug);
 				}
-				writer.write("total \t"+sumUtils+"\t"+sumUtils_money+"\n"+sumToll+"\t"+excludeTollSum+"\n");
+				writer.write("total \t"+sumUtils+"\t"+sumUtils_money+"\t"+sumToll+"\t"+excludeTollSum+"\n");
 				writer.close();
 			} catch (IOException e) {
 				throw new RuntimeException("Data is not written into a File. Reason : "+e);
