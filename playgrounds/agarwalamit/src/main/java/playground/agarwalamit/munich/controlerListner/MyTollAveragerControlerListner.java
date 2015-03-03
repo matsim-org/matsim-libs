@@ -136,7 +136,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 			for(Id<Person> pId : pId2Tolls.keySet()){
 				if(pf.isPersonIdFromUserGroup(pId, ug)){
 					double tollSoFar = userGrpToToll.get(ug);
-					userGrpToToll.put(ug, tollSoFar+pId2Tolls.get(pId));
+					userGrpToToll.put(ug, tollSoFar+pId2Tolls.get(pId)/counter);
 					totalToll = totalToll+pId2Tolls.get(pId);
 				}
 			}

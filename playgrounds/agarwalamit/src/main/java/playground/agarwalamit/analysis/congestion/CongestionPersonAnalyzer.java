@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
@@ -45,20 +43,18 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 	private final String eventsFile;
 	private CongestionPerPersonHandler congestionPerPersonHandler;
 	private final int noOfTimeBins;
-	private final String configFile;
 	private Map<Double, Map<Id<Person>, Double>> congestionPerPersonTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
 
-	public CongestionPersonAnalyzer(String configFile, String eventFile, int noOfTimeBins) {
+	public CongestionPersonAnalyzer(String eventFile, int noOfTimeBins) {
 		super(CongestionPersonAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
-		this.configFile = configFile;
 		this.noOfTimeBins = noOfTimeBins;
 	}
 	public void init(Scenario scenario){
 		this.scenario = scenario;
-		this.congestionPerPersonHandler = new CongestionPerPersonHandler(this.noOfTimeBins, getEndTime(this.configFile), this.scenario);
+		this.congestionPerPersonHandler = new CongestionPerPersonHandler(this.noOfTimeBins,  this.scenario);
 	}
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -82,16 +78,6 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 	@Override
 	public void writeResults(String outputFolder) {
 
-	}
-	private Double getEndTime(String configfile) {
-		Config config = new Config();
-		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		this.logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		this.logger.info("Aggregating delays for " + (int) (endTime / 3600 / this.noOfTimeBins) + " hour time bins.");
-		return endTime;
 	}
 
 	public double getTotalDelaysInHours (){

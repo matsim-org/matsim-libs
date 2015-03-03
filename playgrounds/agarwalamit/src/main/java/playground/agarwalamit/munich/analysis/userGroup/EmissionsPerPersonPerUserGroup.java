@@ -60,20 +60,20 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
-		String [] runCases = {"baseCaseCtd","ei","ci","eci","ei_10"};
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
+		String [] runCases = {"bau","ei","ci","eci","10ei"};
+		
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);
 	}
 	
 	private void init(String runCase){
-		String populationFile =outputDir+runCase+ "/output_plans.xml.gz";//"/network.xml";
-		String networkFile =outputDir+runCase+ "/output_network.xml.gz";//"/network.xml";
-		String configFile = outputDir+runCase+"/output_config.xml";
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile, configFile);
-		this.lastIteration = LoadMyScenarios.getLastIteration(configFile);
-		userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
-		emissionsPerPerson = new HashMap<>();
+		
+		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(this.outputDir+runCase);
+		this.lastIteration = this.scenario.getConfig().controler().getLastIteration();
+		
+		this.userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
+		this.emissionsPerPerson = new HashMap<>();
 		
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();

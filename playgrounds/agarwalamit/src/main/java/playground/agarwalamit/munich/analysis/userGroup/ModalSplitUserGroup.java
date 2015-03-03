@@ -44,12 +44,12 @@ public class ModalSplitUserGroup {
 
 	public static void main(String[] args) {
 		
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/";/*"./output/run2/";*/
-		String [] runCases = {"c0","c1","c2","c3","c4","c5","c6"};
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
+		String [] runCases = {"bau","ei","ci","eci","10ei"};
 		
 		for(String runCase :runCases){
 			ModalSplitUserGroup msUG = new ModalSplitUserGroup();
-			int it = 1000;
+			int it = 1500;
 			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz");
 			msUG.writeResults(outputDir+runCase+"/analysis/usrGrpToModalShare_it."+it+".txt");
 		}

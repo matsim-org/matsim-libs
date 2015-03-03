@@ -56,9 +56,9 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	 * @param simulationEndTime
 	 * @param scenario must have minimally network and plans file.
 	 */
-	public CongestionPerPersonHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
+	public CongestionPerPersonHandler(int noOfTimeBins, Scenario scenario){
 
-		this.timeBinSize = simulationEndTime / noOfTimeBins;
+		this.timeBinSize = scenario.getConfig().qsim().getEndTime() / noOfTimeBins;
 		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());

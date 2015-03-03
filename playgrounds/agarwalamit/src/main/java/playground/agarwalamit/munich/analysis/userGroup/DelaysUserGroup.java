@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
@@ -59,25 +61,23 @@ public class DelaysUserGroup {
 	private SortedMap<UserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
-	private String configFile;
 
 	public static void main(String[] args) throws IOException {
-		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";/*"./output/run2/";*/
-		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
+		String [] runCases = {"bau","ei","ci","eci","10ei"};
 
 		new DelaysUserGroup(outputDir).run(runCases);
 	}
 
 	private void init(String runCase){
-		String populationFile =outputDir+runCase+ "/output_plans.xml.gz";//"/network.xml";
-		String networkFile =outputDir+runCase +"/output_network.xml.gz";//"/network.xml";
-		this.configFile = outputDir+runCase+"/output_config.xml";//"/config.xml";//
 		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
 		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile, configFile);
+		
+		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+runCase);
+		
 		this.lastIteration = scenario.getConfig().controler().getLastIteration();
 
 		this.marginal_Utl_money = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
@@ -91,7 +91,7 @@ public class DelaysUserGroup {
 		for(String runCase:runCases){
 			init(runCase);
 			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
-			CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(configFile, eventFile,1);
+			CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(eventFile, 1);
 			personAnalyzer.init(this.scenario);
 			personAnalyzer.preProcessData();
 			personAnalyzer.postProcessData();

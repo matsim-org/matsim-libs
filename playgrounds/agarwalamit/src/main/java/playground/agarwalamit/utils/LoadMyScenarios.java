@@ -40,6 +40,7 @@ public class LoadMyScenarios {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(populationFile);
+		config.plans().setInputPersonAttributeFile(null);
 		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
@@ -79,6 +80,7 @@ public class LoadMyScenarios {
 		configReader.readFile(configFile);
 		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(null);
+		config.plans().setInputPersonAttributeFile(null);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}

@@ -154,7 +154,7 @@ public class DelaysAndEmissionCostsDiff {
 	}
 
 	private Map<Id<Person>, Double> getDelaysPerPerson(String configFile, String eventsFile, Scenario sc){
-		CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(configFile, eventsFile,1);
+		CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(eventsFile,1);
 		personAnalyzer.init(sc);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();

@@ -70,7 +70,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
-		this.congestionCostHandler = new CongestionPerPersonHandler(1, event.getControler().getConfig().qsim().getEndTime(), scenario);
+		this.congestionCostHandler = new CongestionPerPersonHandler(1, scenario);
 
 		event.getControler().getEvents().addHandler(congestionCostHandler);
 		event.getControler().getEvents().addHandler(moneyHandler);

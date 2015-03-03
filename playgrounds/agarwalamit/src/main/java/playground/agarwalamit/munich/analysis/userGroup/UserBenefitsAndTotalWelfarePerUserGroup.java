@@ -73,8 +73,8 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private final WelfareMeasure wm = WelfareMeasure.LOGSUM;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
+		String [] runCases = {"bau","ei","ci","eci","10ei"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
 
@@ -84,12 +84,8 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		personId2MonetaryPayments = new HashMap<>();
 		userGrp2ExcludedToll = new TreeMap<>();
 
-		String populationFile = this.outputDir+runCase + "/output_plans.xml.gz";
-		String networkFile = this.outputDir  +  runCase+"/output_network.xml.gz";
-		String configFile =  this.outputDir  + runCase+"/output_config.xml";
-
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile,configFile);
-		this.lastIteration = LoadMyScenarios.getLastIteration(configFile);
+		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(this.outputDir+runCase);
+		this.lastIteration = this.scenario.getConfig().controler().getLastIteration();
 	}
 
 	public void runAndWrite(String [] runCases){
@@ -138,7 +134,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 			outMap.put(ug, 0.0);
 		}
 
-		for(Id id:inputMap.keySet()){
+		for(Id<Person> id:inputMap.keySet()){
 			UserGroup ug = getUserGrpFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
@@ -155,17 +151,17 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 			userGrp2ExcludedToll.put(ug, 0.0);
 		}
 
-		for(Id id:inputMap.keySet()){
+		for(Id<Person> id:inputMap.keySet()){
 			UserGroup ug = getUserGrpFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
-			if(!this.considerAllPersonsInSumOfTolls && isPersonIncluded(id)){
 
-			} else {
+			if(!this.considerAllPersonsInSumOfTolls && !isPersonIncluded(id)){
 				double excludeValue = userGrp2ExcludedToll.get(ug);
 				userGrp2ExcludedToll.put(ug, excludeValue+value2add);
 				value2add = 0;
 			}
+
 			double newValue = value2add+valueSoFar;
 			outMap.put(ug, newValue);
 		}
@@ -206,7 +202,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		this.personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
 	}
 
-	private UserGroup getUserGrpFromPersonId(Id personId){
+	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
 		PersonFilter pf = new PersonFilter();
 		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){
@@ -218,9 +214,8 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		return outUG;
 	}
 
-	private boolean isPersonIncluded(Id personId){
-		Id<Person> id = Id.createPersonId(personId.toString());
-		double score = scenario.getPopulation().getPersons().get(id).getSelectedPlan().getScore();
+	private boolean isPersonIncluded(Id<Person> personId){
+		double score = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
 		if (score < 0 ) return false;
 		else return true;
 	}
