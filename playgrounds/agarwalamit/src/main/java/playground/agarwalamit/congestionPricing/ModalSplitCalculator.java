@@ -37,12 +37,12 @@ public class ModalSplitCalculator {
 
 	public static void main(String[] args) {
 		
-		String outputDir = "../../../repos/runs-svn/siouxFalls/run204/calibration/";
-		String [] runCases = {"c1","c2","c3","c4","c5","c7","c8","c9","c10"};
+		String outputDir = "../../../repos/runs-svn/siouxFalls/run203/policies/";
+		String [] runCases = {"bau","v3","v4","v6"};
 		
 		for(String runCase :runCases){
 			ModalSplitCalculator msUG = new ModalSplitCalculator();
-			int it = 500;
+			int it = 1000;
 			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz");
 			msUG.writeResults(outputDir+runCase+"/modalShare_it."+it+".txt");
 		}

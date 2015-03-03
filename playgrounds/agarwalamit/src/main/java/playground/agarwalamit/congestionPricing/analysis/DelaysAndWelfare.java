@@ -29,6 +29,7 @@ import playground.agarwalamit.analysis.userBenefits.UserBenefitsAndTotalWelfare;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * @author amit
@@ -36,8 +37,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 
 public class DelaysAndWelfare {
 
-	static String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/";
-	static String [] runCases =  {"implV3","implV4"};
+	static String clusterPathDesktop = "../../../repos/runs-svn/siouxFalls/run203/policies/";
+	static String [] runCases =  {"bau","v3","v4","v6"};
 
 	public static void main(String[] args) {
 		
@@ -57,34 +58,38 @@ public class DelaysAndWelfare {
 
 		String outputDir = null;
 
-		switch(runCase){
-		case "implV3" : outputDir = clusterPathDesktop+"implV3";
-		break;
-		case "implV4" : outputDir = clusterPathDesktop+"implV4";
-		break;
-		}
+		outputDir = clusterPathDesktop+runCase;
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromOutputDir(outputDir);
 		CongestionHandlerImplV3 impl3 = null ;
 		CongestionHandlerImplV4 implV4 = null ;
+		CongestionHandlerImplV6 implV6 = null ;
 		switch(runCase){
-		case "implV3" :
+		case "v3" :
 			impl3 = new CongestionHandlerImplV3(manager, (ScenarioImpl) sc);
 			manager.addHandler(impl3);
 			break;
-		case "implV4" : 
+		case "v4" : 
 			implV4 = new CongestionHandlerImplV4(manager, sc);
 			manager.addHandler(implV4);
+			break;
+		case "v6" : 
+			implV6 = new CongestionHandlerImplV6(manager, sc);
+			manager.addHandler(implV6);
 			break;
 		}
 
 		reader.readFile(outputDir+"/ITERS/it.1000/1000.events.xml.gz");
+
 		switch(runCase){
-		case "implV3" :
+		case "v3" :
 			impl3.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
 			break;
-		case "implV4":
+		case "v4":
 			implV4.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
+			break;
+		case "v6":
+			implV6.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
 			break;
 		}
 	}
