@@ -29,6 +29,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -80,6 +81,9 @@ public class KS2010ModelWriter {
 	private static final String SOURCES = "sources";
 	private static final String FLOW = "flow";
 	private static final String DRAINS = "drains";
+	private static final String PERMITTED_ROADS = "permitted_roads";
+	private static final String PERMIT = "permit";
+		
 
 	
 	public void write(DgKSNetwork network, String outFile) {
@@ -221,6 +225,21 @@ public class KS2010ModelWriter {
 			hd.endElement("", "", NODE);
 
 			hd.endElement("", "", DRAINS);
+			
+			if (co.hasRoute()){
+				atts.clear();
+				hd.startElement("", "", PERMITTED_ROADS, atts);
+
+				for (Id<DgStreet> street : co.getRoute()){
+					atts.clear();
+					atts.addAttribute("", "", ID, CDATA, street.toString());
+					hd.startElement("", "", PERMIT, atts);
+					hd.endElement("", "", PERMIT);
+				}
+				
+				hd.endElement("", "", PERMITTED_ROADS);				
+			}
+			
 			hd.endElement("", "", COMMODITY);
 		}
 		hd.endElement("", "", COMMODITIES);
