@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.data;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -35,18 +36,42 @@ public class DgCommodity {
 	private Id<DgCrossingNode> drainNode;
 	private Id<Link> sourceLink;
 	private Id<Link> drainLink;
-	private Double flow;
+	private double flow;
+	private List<Id<DgStreet>> route; 
 	
 	public DgCommodity(Id<DgCommodity> id){
 		this.id = id;
+	}
+
+	public DgCommodity(Id<DgCommodity> id, Id<DgCrossingNode> sourceNode,
+			Id<DgCrossingNode> drainNode, double flow) {
+		this.id = id;
+		this.sourceNode = sourceNode;
+		this.drainNode = drainNode;
+		this.flow = flow;
+	}
+	
+	public DgCommodity(Id<DgCommodity> id, Id<DgCrossingNode> sourceNode,
+			Id<DgCrossingNode> drainNode, double flow, List<Id<DgStreet>> route) {
+		this.id = id;
+		this.sourceNode = sourceNode;
+		this.drainNode = drainNode;
+		this.flow = flow;
+		this.route = route;
 	}
 
 	public Id<DgCommodity> getId() {
 		return this.id;
 	}
 
+	
+	public boolean hasRoute(){
+		if (this.route == null || this.route.isEmpty())
+			return false;
+		return true;
+	}
 
-	public void setSourceNode(Id<DgCrossingNode> fromNodeId, Id<Link> fromLinkId, Double flow) {
+	public void setSourceNode(Id<DgCrossingNode> fromNodeId, Id<Link> fromLinkId, double flow) {
 		this.sourceNode = fromNodeId;
 		this.sourceLink = fromLinkId;
 		this.flow = flow;
@@ -57,11 +82,22 @@ public class DgCommodity {
 		this.drainLink = toLinkId;
 	}
 	
-	public void setFlow(Double flow){
+	public void setFlow(double flow){
 		this.flow = flow;
 	}
 	
+	public void setRoute(List<Id<DgStreet>> route) {
+		this.route = route;
+	}
 	
+	public void addStreetToRoute(Id<DgStreet> street){
+		this.route.add(street);
+	}
+
+	public List<Id<DgStreet>> getRoute() {
+		return route;
+	}
+
 	public Id<DgCrossingNode> getDrainNodeId(){
 		return this.drainNode;
 	}
