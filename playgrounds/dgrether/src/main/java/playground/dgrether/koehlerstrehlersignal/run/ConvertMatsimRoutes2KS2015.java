@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.MatsimEventsReader;
 
@@ -20,10 +23,12 @@ import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.koehlerstrehlersignal.analysis.ReadRoutesFromEvents;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
+import playground.dgrether.koehlerstrehlersignal.data.TtCrossingType;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015NetworkXMLParser;
@@ -33,11 +38,16 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015Network
  */
 public class ConvertMatsimRoutes2KS2015 {
 
+	private static final Logger log = Logger.getLogger(ConvertMatsimRoutes2KS2015.class);
+	
 	private Map<Id<DgCommodity>, Integer> numberOfDifferentPathsPerCommodity = new HashMap<>();
 
 	private Map<Id<Person>, List<Id<Link>>> matsimRoutes = new HashMap<>();
 	private DgCommodities comsWithRoutes = new DgCommodities();
 
+	private Network matsimNet;
+	private DgKSNetwork ksNet;
+	
 	private void convertRoutes(String runNumber, Integer lastIteration,
 			String ksModelDirectory, String ksModelFile, String outputFile,
 			String description) {
@@ -47,6 +57,12 @@ public class ConvertMatsimRoutes2KS2015 {
 				+ runNumber + "/";
 		RunResultsLoader runDir = new RunResultsLoader(runsDirectory, runNumber);
 		String eventsFilename = runDir.getEventsFilename(lastIteration);
+		this.matsimNet = runDir.getNetwork();
+		
+		// read ks network with crossings and streets
+		KS2015NetworkXMLParser ksNetworkReader = new KS2015NetworkXMLParser();
+		ksNetworkReader.readFile(ksModelDirectory + ksModelFile);
+		this.ksNet = ksNetworkReader.getKsNet();
 		
 		// read matsim routes from events
 		EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -61,10 +77,6 @@ public class ConvertMatsimRoutes2KS2015 {
 		// create commodities for this routes
 		createCommodities(ksModelDirectory);
 
-		// read ks network with crossings and streets
-		KS2015NetworkXMLParser ksNetworkReader = new KS2015NetworkXMLParser();
-		ksNetworkReader.readFile(ksModelDirectory + ksModelFile);
-		DgKSNetwork ksNet = ksNetworkReader.getKsNet();
 		// write matsim routes together with ks network as ks model
 		new KS2010ModelWriter().write(ksNet, this.comsWithRoutes,
 				outputFile.split("/")[1], description, ksModelDirectory
@@ -86,16 +98,40 @@ public class ConvertMatsimRoutes2KS2015 {
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 
 		for (Id<Person> personId : matsimRoutes.keySet()) {
+			// id preparations
 			List<Id<Link>> matsimRoute = matsimRoutes.get(personId);
 			Id<Link> matsimFirstLink = matsimRoute.get(0);
-			Id<Link> matsimEndLink = matsimRoute.get(matsimRoute.size() - 1);
-			Id<DgCrossingNode> sourceNode = idConverter
-					.convertLinkId2ToCrossingNodeId(matsimFirstLink);
-			Id<DgCrossingNode> drainNode = idConverter
-					.convertLinkId2ToCrossingNodeId(matsimEndLink);
+			Id<Link> matsimLastLink = matsimRoute.get(matsimRoute.size() - 1);
+			Id<Node> matsimSourceNodeId = this.matsimNet.getLinks().get(matsimFirstLink).getToNode().getId();
+			Id<Node> matsimDrainNodeId = this.matsimNet.getLinks().get(matsimLastLink).getToNode().getId();
+			
 			Id<DgCommodity> comId = idConverter
-					.createCommodityId4LinkToLinkPair(matsimFirstLink,
-							matsimEndLink);
+					.convertLinkToLinkPair2CommodityId(matsimFirstLink,
+							matsimLastLink);
+			
+			Id<DgCrossing> ksSourceCrossingId = idConverter.convertNodeId2CrossingId(matsimSourceNodeId);
+			DgCrossing ksSourceCrossing = this.ksNet.getCrossings().get(ksSourceCrossingId);
+			Id<DgCrossingNode> ksSourceNodeId;
+			if (ksSourceCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
+				// source crossing isn't expanded and contains only one crossing node
+				ksSourceNodeId = idConverter.convertNodeId2NotExpandedCrossingNodeId(matsimSourceNodeId);
+			} 
+			else{ 
+				// source crossing is expanded and contains different crossing nodes
+				ksSourceNodeId = idConverter.convertLinkId2ToCrossingNodeId(matsimFirstLink);
+			}
+			
+			Id<DgCrossing> ksDrainCrossingId = idConverter.convertNodeId2CrossingId(matsimDrainNodeId);
+			DgCrossing ksDrainCrossing = this.ksNet.getCrossings().get(ksDrainCrossingId);
+			Id<DgCrossingNode> ksDrainNodeId;
+			if (ksDrainCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
+				// drain crossing isn't expanded and contains only one crossing node
+				ksDrainNodeId = idConverter.convertNodeId2NotExpandedCrossingNodeId(matsimDrainNodeId);
+			} 
+			else{ 
+				// drain crossing is expanded and contains different crossing nodes
+				ksDrainNodeId = idConverter.convertLinkId2ToCrossingNodeId(matsimLastLink);
+			}
 
 			// convert matsim route into ks format
 			List<Id<DgStreet>> ksRoute = new ArrayList<>();
@@ -108,7 +144,7 @@ public class ConvertMatsimRoutes2KS2015 {
 			// in ks format the route starts at the end node of the link
 			ksRoute.remove(0);
 
-			addNewCommodityOrIncreaseFlow(sourceNode, drainNode, comId, ksRoute);
+			addNewCommodityOrIncreaseFlow(ksSourceNodeId, ksDrainNodeId, comId, ksRoute);
 		}
 	}
 

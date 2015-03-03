@@ -201,9 +201,9 @@ public class DgIdConverter {
 	 * @param toLinkId
 	 * @return commodity id
 	 */
-	public Id<DgCommodity> createCommodityId4LinkToLinkPair(Id<Link> fromLinkId, Id<Link> toLinkId){
+	public Id<DgCommodity> convertLinkToLinkPair2CommodityId(Id<Link> fromLinkId, Id<Link> toLinkId){
 		String idString = fromLinkId + "33" + toLinkId;
 		return idPool.createId(idString, DgCommodity.class);
-	}	
+	}
 	
 }

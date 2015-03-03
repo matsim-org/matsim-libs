@@ -111,7 +111,9 @@ public class KS2015NetworkXMLParser extends MatsimXmlParser {
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		// nothing to do
+		if (name.equals(CROSSING)){
+			this.ksNet.addCrossing(this.currentCrossing);
+		}
 	}
 	
 	public DgKSNetwork getKsNet(){
