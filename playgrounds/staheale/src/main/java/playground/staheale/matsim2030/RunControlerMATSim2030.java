@@ -74,7 +74,7 @@ public class RunControlerMATSim2030 extends Controler {
 		 * add ScoringFunctionFactory to controler
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
-  		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.lcContext); 	
+  		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getScenario(), this.lcContext);
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
 		dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);		
 		

@@ -19,27 +19,14 @@
 
 package playground.balac.retailers;
 
-import org.matsim.contrib.locationchoice.DCControler;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.locationchoice.RunLocationChoiceBestResponse;
 
 
-public class RetailersControler extends DCControler {
-//public class RetailersControler extends KTIControler {
+public class RetailersControler {
 
-	public RetailersControler(String[] args) {
-		super(args);
-		//throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
-	}
-
-	@Override
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
-		this.addControlerListener(new RetailersLocationListener());
-	}
-	
-    public static void main (final String[] args) { 
-    	Controler controler = new RetailersControler(args);
-    	controler.run();
+    public static void main (final String[] args) {
+        RunLocationChoiceBestResponse.main(args);
     }
+
 }
 

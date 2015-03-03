@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.Random;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -60,7 +58,6 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -75,6 +72,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import java.util.Random;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
@@ -106,8 +105,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true) ;
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
-  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
+        computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
+        final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
 		// set scoring function factory:
 		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
@@ -179,11 +178,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true) ;
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
-  		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
-  		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
+        computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
+        final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
 
 		// set scoring function
-		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(config, controler, lcContext);
+		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
 		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);

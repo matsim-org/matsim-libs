@@ -24,9 +24,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.analysis.DistanceStats;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
@@ -52,8 +52,8 @@ public class DestinationChoiceInitializer implements StartupListener {
   		// compute or read maxDCScore but do not add it to the context:
   		// context can then be given to scoring classes both during regular scoring and in pre-processing 
   		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(dcContext);
-  		computer.readOrCreateMaxDCScore(controler, dcContext.kValsAreRead());
-  		this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
+        computer.readOrCreateMaxDCScore(controler.getConfig(), dcContext.kValsAreRead());
+        this.personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
   		
   		for (String actType : this.dcContext.getFlexibleTypes()) {
   			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.car));

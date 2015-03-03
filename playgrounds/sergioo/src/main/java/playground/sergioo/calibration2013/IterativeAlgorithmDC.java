@@ -40,7 +40,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
@@ -212,8 +211,8 @@ public class IterativeAlgorithmDC {
 					DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
 					dcContext.init();
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
-					rcms.readOrCreateMaxDCScore(new Controler(scenario), dcContext.kValsAreRead());
-					rcms.getPersonsMaxEpsUnscaled();
+                    rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
+                    rcms.getPersonsMaxEpsUnscaled();
 					BestReplyDestinationChoice module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();

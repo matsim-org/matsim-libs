@@ -19,21 +19,20 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
-import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.util.HashSet;
 
 public class ReadOrComputeMaxDCScore {	
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
@@ -51,12 +50,8 @@ public class ReadOrComputeMaxDCScore {
 		this.flexibleTypes = lcContext.getFlexibleTypes();
 		this.lcContext = lcContext;
 	}
-	
-	public void readOrCreateMaxDCScore(Controler controler, boolean arekValsRead) {
-		this.readOrCreateMaxDCScore(controler.getConfig(), arekValsRead);
-	}
-	
-	public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {		 		
+
+    public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {
   		String maxEpsValuesFileName = config.findParam("locationchoice", "maxDCScoreFile");
 		if (!maxEpsValuesFileName.equals("null") && arekValsRead) {			
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);

@@ -39,7 +39,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
@@ -329,8 +328,8 @@ public class GeneticAlgorithmDC {
 		DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
 		dcContext.init();
 		ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
-		rcms.readOrCreateMaxDCScore(new Controler(scenario), dcContext.kValsAreRead());
-		rcms.getPersonsMaxEpsUnscaled();
+        rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
+        rcms.getPersonsMaxEpsUnscaled();
 		module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
 		int numIterations = new Integer(args[4]);
 		avgDistance = new Double(args[5]);

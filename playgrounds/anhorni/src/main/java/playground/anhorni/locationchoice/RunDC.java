@@ -19,11 +19,11 @@ package playground.anhorni.locationchoice;
  * *********************************************************************** */
 
 
-import org.matsim.contrib.locationchoice.DCControler;
+import org.matsim.contrib.locationchoice.RunLocationChoiceBestResponse;
 
 public class RunDC  {
 						
 	public static void main (final String[] args) { 
-		DCControler.main(args);
+		RunLocationChoiceBestResponse.main(args);
     }  
 }

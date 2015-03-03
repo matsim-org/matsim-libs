@@ -19,27 +19,16 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.facilityload.ScoringPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -47,7 +36,9 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
+import java.util.*;
+
+// needs to be re-designed with delegation instead of inheritance. kai, oct'14
 public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
@@ -60,15 +51,9 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private ObjectAttributes prefs;
 	private DestinationChoiceBestResponseContext dcContext;
 	private List<ScoringPenalty> penalty = null;
-	
-	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
+
+	// needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	public DCActivityScoringFunction(Plan plan, DestinationChoiceBestResponseContext dcContext) {
-		this(plan, null, dcContext);
-	}
-	
-	// argument facilityPenalties is never used
-	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(dcContext);
 		this.facilities = dcContext.getScenario().getActivityFacilities();
@@ -82,8 +67,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	@Override
 	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-	public void finish() {				
-		super.finish();	
+	public void finish() {
+		super.finish();
 		int activityIndex = -1 ;
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof Activity) {
@@ -100,7 +85,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		}
 		this.penalty.clear();
 	}
-	
+
 	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	protected final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		

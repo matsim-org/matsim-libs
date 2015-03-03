@@ -67,9 +67,8 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring( this.lcContext.getParams() ) ) ;
 		} else {
 			scoringFunction = new DCActivityScoringFunction(
-					person.getSelectedPlan(), 
-					this.lcContext.getFacilityPenalties(), 
-					lcContext);
+					person.getSelectedPlan(),
+                    lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
         scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getScenario().getNetwork()));
