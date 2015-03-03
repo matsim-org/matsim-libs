@@ -861,15 +861,48 @@ public class CottbusRuns {
 
 	public static void addBaseCaseOptAndRandomAndAnotherIt1400Runs(
 			List<RunInfo> l, int baseCaseRunId, int optRunId, int bestRandomId,
-			int worstRandomId, int avgRandomId, int medRandomId, int anotherRunId) {
-		
-		addBaseCaseOptAndRandomIt1400Runs(l, baseCaseRunId, optRunId, bestRandomId, worstRandomId, avgRandomId, medRandomId);
-		
+			int worstRandomId, int avgRandomId, int medRandomId,
+			int anotherRunId) {
+
+		addBaseCaseOptAndRandomIt1400Runs(l, baseCaseRunId, optRunId,
+				bestRandomId, worstRandomId, avgRandomId, medRandomId);
+
 		RunInfo ri = new RunInfo();
 		ri.runId = Integer.toString(anotherRunId);
 		ri.iteration = 1400;
 		ri.remark = "another opt";
 		l.add(ri);
+	}
+
+	public static void addBaseCaseOptAndOptFixed(List<RunInfo> l,
+			int baseCaseRunId, int optRunId, int optFixedRoutesAndTimeId,
+			int optFixedRoutesId) {
+
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = Integer.toString(baseCaseRunId);
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "base case";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optRunId);
+		ri.iteration = 1400;
+		ri.remark = "optimized";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optFixedRoutesAndTimeId);
+		ri.iteration = 1001;
+		ri.remark = "optimized fixed routes and time";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optFixedRoutesId);
+		ri.iteration = 1400;
+		ri.remark = "optimized fixed routes";
+		l.add(ri);		
 	}
 
 }
