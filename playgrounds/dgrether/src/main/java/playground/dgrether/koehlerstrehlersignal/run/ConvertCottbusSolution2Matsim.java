@@ -219,8 +219,8 @@ public class ConvertCottbusSolution2Matsim {
 //		}
 		
 		new ConvertCottbusSolution2Matsim().convertOptimalSolution( DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/", 
-				"btu/new_optimum.xml");
+				+ "shared-svn/projects/cottbus/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/", 
+				"btu/opt.xml");
 //		new ConvertCottbusSolution2Matsim().convertRandomSolution(DgPaths.REPOS
 //				+ "shared-svn/projects/cottbus/cb2ks2010/2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/", 
 //				"btu/random_coordinations.xml");
