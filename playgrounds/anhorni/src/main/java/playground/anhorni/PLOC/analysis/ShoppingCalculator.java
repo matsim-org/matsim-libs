@@ -19,9 +19,6 @@
 
 package playground.anhorni.PLOC.analysis;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.ActivityImpl;
@@ -55,62 +52,62 @@ public class ShoppingCalculator implements ShutdownListener {
 	}
 	
 	private void evaluate(ShutdownEvent event) {
-        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
-			int shopLocIndex = -1;								
-			final List<? extends PlanElement> actslegs = p.getSelectedPlan().getPlanElements();
-			for (int j = 0; j < actslegs.size(); j=j+2) {
-				ActivityImpl act = (ActivityImpl)actslegs.get(j);
-				if (act.getType().equals("s")) {
-					shopLocIndex = ArrayUtils.indexOf(MultiplerunsControler.shoppingFacilities, Integer.parseInt(act.getFacilityId().toString()));
-					double expenditure = (Double) this.personAttributes.getAttribute(p.getId().toString(), "expenditure");
-					
-					if (temporalVar) {
-						expenditure *= MultiplerunsControler.dayExpenditureFactor[day];
-					}
-					double arrivalTime = ((LegImpl)actslegs.get(j-1)).getArrivalTime();
-					int startTime = (int) (((arrivalTime) / 3600.0) % 24);
-					this.totalExpenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;
-				}	
-			}
-		}
+//        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
+//			int shopLocIndex = -1;								
+//			final List<? extends PlanElement> actslegs = p.getSelectedPlan().getPlanElements();
+//			for (int j = 0; j < actslegs.size(); j=j+2) {
+//				ActivityImpl act = (ActivityImpl)actslegs.get(j);
+//				if (act.getType().equals("s")) {
+//					shopLocIndex = ArrayUtils.indexOf(MultiplerunsControler.shoppingFacilities, Integer.parseInt(act.getFacilityId().toString()));
+//					double expenditure = (Double) this.personAttributes.getAttribute(p.getId().toString(), "expenditure");
+//					
+//					if (temporalVar) {
+//						expenditure *= MultiplerunsControler.dayExpenditureFactor[day];
+//					}
+//					double arrivalTime = ((LegImpl)actslegs.get(j-1)).getArrivalTime();
+//					int startTime = (int) (((arrivalTime) / 3600.0) % 24);
+//					this.totalExpenditurePerFacilityPerHour[shopLocIndex][startTime] += expenditure;
+//				}	
+//			}
+//		}
 	}
 
 	private void printStatistics(ShutdownEvent event) {		
-		String runId = event.getControler().getConfig().findParam("controler", "runId");
-				
-		try {
-			String parts[] = runId.split("D");
-			String run = parts[0].substring(1);
-			String day = parts[1];
-			
-			String outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/run";
-			final BufferedWriter out =
-				IOUtils.getBufferedWriter(outputPath + run + "/day" + day + "/totalExpendituresPerRunDay.txt");
-			out.write("Hour\t");
-			for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
-				out.append("facility_" + MultiplerunsControler.shoppingFacilities[i] + "\t");
-			}
-			out.write("sum\n");
-			double sumPerFacility[] = new double[MultiplerunsControler.shoppingFacilities.length];
-			
-			for (int h = 0; h < 24; h++) {
-				out.write(h + "\t");
-				double sumPerHour = 0.0;
-				for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
-					out.write(String.valueOf(totalExpenditurePerFacilityPerHour[i][h]) + "\t");
-					sumPerHour += totalExpenditurePerFacilityPerHour[i][h];
-					sumPerFacility[i] += totalExpenditurePerFacilityPerHour[i][h];
-				}
-				out.write(sumPerHour + "\n");
-			}
-			out.write("sum\t");
-			for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
-				out.write(sumPerFacility[i] + "\t");
-			}
-			out.flush();
-			out.close();
-		} catch (final IOException e) {
-			throw new RuntimeException(e);
-		}
+//		String runId = event.getControler().getConfig().findParam("controler", "runId");
+//				
+//		try {
+//			String parts[] = runId.split("D");
+//			String run = parts[0].substring(1);
+//			String day = parts[1];
+//			
+//			String outputPath = "src/main/java/playground/anhorni/output/PLOC/3towns/run";
+//			final BufferedWriter out =
+//				IOUtils.getBufferedWriter(outputPath + run + "/day" + day + "/totalExpendituresPerRunDay.txt");
+//			out.write("Hour\t");
+//			for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
+//				out.append("facility_" + MultiplerunsControler.shoppingFacilities[i] + "\t");
+//			}
+//			out.write("sum\n");
+//			double sumPerFacility[] = new double[MultiplerunsControler.shoppingFacilities.length];
+//			
+//			for (int h = 0; h < 24; h++) {
+//				out.write(h + "\t");
+//				double sumPerHour = 0.0;
+//				for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
+//					out.write(String.valueOf(totalExpenditurePerFacilityPerHour[i][h]) + "\t");
+//					sumPerHour += totalExpenditurePerFacilityPerHour[i][h];
+//					sumPerFacility[i] += totalExpenditurePerFacilityPerHour[i][h];
+//				}
+//				out.write(sumPerHour + "\n");
+//			}
+//			out.write("sum\t");
+//			for (int i = 0; i < MultiplerunsControler.shoppingFacilities.length; i++) {
+//				out.write(sumPerFacility[i] + "\t");
+//			}
+//			out.flush();
+//			out.close();
+//		} catch (final IOException e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 }
