@@ -162,8 +162,9 @@ public class DgIdConverter {
 	 * in the ks-model containing this crossing node
 	 */
 	public Id<Node> convertNotExpandedCrossingNodeId2NodeId(Id<DgCrossingNode> crossingNodeId){
-		String sid = crossingNodeId.toString();
-		return Id.create(sid, Node.class);
+		Integer ksIntCrossingNodeId = Integer.parseInt(crossingNodeId.toString());
+		String matsimStringCrossingNodeId = this.idPool.getStringId(ksIntCrossingNodeId);
+		return Id.create(matsimStringCrossingNodeId, Node.class);
 	}
 	
 	/**

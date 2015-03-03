@@ -76,10 +76,8 @@ public class KS2010VsMatimVolumes {
 		// convert ks2010_id to matsim_id in the unsimplified network
 		Map<Id<Link>, Double> matsimLinkIdFlow = new HashMap<>();
 		for (Id<DgStreet> streetId : ks2010StreetIdFlow.keySet()) {
-			Integer ksIntStreetId = Integer.parseInt(streetId.toString());
-			String matsimStringStreetId = idPool.getStringId(ksIntStreetId);
 			Id<Link> linkId = dgIdConverter.convertStreetId2LinkId(Id.create(
-					matsimStringStreetId, DgStreet.class));
+					streetId, DgStreet.class));
 			// assign the flow to all links that belongs to the simplified link
 			String[] unsimplifiedLinks = linkId.toString().split("-");
 			for (int i = 0; i < unsimplifiedLinks.length; i++)
