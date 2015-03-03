@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +34,11 @@ import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
+import playground.anhorni.rc.TunnelLinksFilterFactory;
+
 public class CreateSignals {
+	
+	private static final Logger log = Logger.getLogger(CreateSignals.class);
 	
 	public static void main(String[] args) {
 		CreateSignals signalsCreator = new CreateSignals();
@@ -46,10 +52,12 @@ public class CreateSignals {
 	 */
 	
 	public void run(String configFile, String outfolder, String greentimesXMLFile, String signalgroupsFile) {
+		log.info("greentimesXMLFile: "  + greentimesXMLFile);
+		log.info("signalgroupsFile: "  + signalgroupsFile);
+		this.createSignals(signalgroupsFile, greentimesXMLFile);		
+		
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, configFile);
-		
-		this.createSignals(signalgroupsFile, greentimesXMLFile);		
 		this.writeSignals(config, outfolder);
 	}
 	
@@ -58,9 +66,15 @@ public class CreateSignals {
 		
 		// read file and 
 		List<Intersection> intersections = this.readIntersections(signalgroupsFile);
+		log.info(intersections.size() + " intersections created");
+		
 		this.createSignalSystemsAndGroups(signalsData, intersections);
 		
-		TreeMap<Id<Link>, LinkGTF> greentimefractions = this.readGTFS(greentimesXMLFile);		
+		TreeMap<Id<Link>, LinkGTF> greentimefractions = this.readGTFS(greentimesXMLFile);	
+		log.info(greentimefractions.size() + " link data read");
+//		for (Id<Link> link : greentimefractions.keySet()) {
+//			log.info(link.toString());
+//		}
 		
 		this.createSignalControl(signalsData, greentimefractions);
 	}
@@ -72,10 +86,14 @@ public class CreateSignals {
 	          String curr_line = in.readLine(); // Skip header
 	          while ((curr_line = in.readLine()) != null) {	
 		          String parts[] = curr_line.split(";");
-		          Intersection intersection = new Intersection();
+		          Intersection intersection = new Intersection(Id.createNodeId(parts[0]));
+		          int i = 0;
 		          for (String link : parts) {
-		        	  Id<Link> linkId = Id.create(link, Link.class);
-		        	  intersection.addLinkId(linkId);	        	  
+		        	  if (i>0) {
+		        		  Id<Link> linkId = Id.create(link, Link.class);
+		        		  intersection.addLinkId(linkId);
+		        	  }
+		        	  i++;
 		          }
 		          intersections.add(intersection);
 	          }
@@ -90,6 +108,7 @@ public class CreateSignals {
 	
 	private TreeMap<Id<Link>, LinkGTF> readGTFS(String greentimesXMLFile) {
 		GTFSReader reader = new GTFSReader();	
+		reader.parse(greentimesXMLFile);
 		TreeMap<Id<Link>, LinkGTF> greentimefractions = reader.getGreentimefractions();	
 		return greentimefractions;
 	}
@@ -116,6 +135,7 @@ public class CreateSignals {
 			}
 			cntSystems++;
 		}
+		log.info(cntSystems + " systems created");
 	}
 	
 	
@@ -144,10 +164,18 @@ public class CreateSignals {
 	private void addCycleValues2Plan(Map<Id<Signal>, SignalData> signals, TreeMap<Id<Link>, LinkGTF> greentimefractions, int h, SignalPlanData plan, SignalControlData control) {
 		List<Double> gtfsAllSignals = new Vector<Double>();
 		double sumGtfs = 0.0;
-		for (SignalData signal : signals.values()) {
-			double gtfs = greentimefractions.get(signal.getLinkId()).getHourlyGTFS().get(h);
+		for (SignalData signal : signals.values()) {	
+			double gtfs = 1.0;
+			if (!greentimefractions.containsKey(signal.getLinkId())) {
+				log.info("there is no signal data for link: " + signal.getLinkId());
+				gtfs = 1.0/(signals.size() + 1);
+			}
+			else {
+				gtfs = greentimefractions.get(signal.getLinkId()).getHourlyGTFS().get(h);
+			}
 			gtfsAllSignals.add(gtfs);
 			sumGtfs += gtfs;
+			
 		}
 		
 		int offset = 5 * gtfsAllSignals.size();

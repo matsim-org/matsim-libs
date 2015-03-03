@@ -23,6 +23,7 @@ package playground.anhorni.rc.signals;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -34,6 +35,7 @@ public class GTFSReader extends MatsimXmlParser {
 
 	private final static String LINKGTFS = "linkgtfs";
 	private final static String GTF = "gtf";
+	private static final Logger log = Logger.getLogger(GTFSReader.class);
 
 	private TreeMap<Id<Link>, LinkGTF> greentimefractions = new TreeMap<Id<Link>, LinkGTF>();
 	private LinkGTF currlinkgtf = null;
@@ -44,6 +46,8 @@ public class GTFSReader extends MatsimXmlParser {
 			startLinkGTFS(atts);
 		} else if (GTF.equals(name)) {
 			startGTF(atts);
+		} else {
+			log.info(name);
 		}
 	}
 
