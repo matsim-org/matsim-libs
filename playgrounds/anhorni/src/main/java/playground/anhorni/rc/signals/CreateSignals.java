@@ -54,14 +54,14 @@ public class CreateSignals {
 	public void run(String configFile, String outfolder, String greentimesXMLFile, String signalgroupsFile) {
 		log.info("greentimesXMLFile: "  + greentimesXMLFile);
 		log.info("signalgroupsFile: "  + signalgroupsFile);
-		this.createSignals(signalgroupsFile, greentimesXMLFile);		
+		SignalsData signalsData = this.createSignals(signalgroupsFile, greentimesXMLFile);		
 		
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, configFile);
-		this.writeSignals(config, outfolder);
+		this.writeSignals(config, signalsData, outfolder);
 	}
 	
-	private void createSignals(String signalgroupsFile, String greentimesXMLFile) {
+	private SignalsData createSignals(String signalgroupsFile, String greentimesXMLFile) {
 		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		
 		// read file and 
@@ -77,6 +77,7 @@ public class CreateSignals {
 //		}
 		
 		this.createSignalControl(signalsData, greentimefractions);
+		return signalsData;
 	}
 	
 	private List<Intersection>  readIntersections(String signalgroupsFile) {
@@ -150,10 +151,10 @@ public class CreateSignals {
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 									
 			for (int h = 0; h < 24; h++) {	
-				SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("0", SignalPlan.class));
+				SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create(h, SignalPlan.class));
 				controller.addSignalPlanData(plan);
 				plan.setStartTime(h * 3600.0);
-				plan.setEndTime((h + 1) * 3600.0);
+				plan.setEndTime((h + 1) * 3600 - 1.0);
 				
 				Map<Id<Signal>, SignalData> signals = signalsystem.getSignalData();
 				this.addCycleValues2Plan(signals, greentimefractions, h, plan, control);					
@@ -199,9 +200,9 @@ public class CreateSignals {
 		
 	}
 	
-	private void writeSignals(Config config, String outfolder) {	
-		Scenario scenario = ScenarioUtils.loadScenario(config);		
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+	private void writeSignals(Config config, SignalsData signalsData, String outfolder) {	
+		//Scenario scenario = ScenarioUtils.loadScenario(config);		
+		//SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		String signalSystemsFile = outfolder + "/signal_systems.xml";
 		String signalGroupsFile = outfolder + "/signal_groups.xml";
