@@ -1,5 +1,10 @@
 package playground.balac.freefloating.qsim;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -7,13 +12,22 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -28,11 +42,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
 
-import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.List;
+import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
 
 public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent{
 

@@ -1,5 +1,9 @@
 package playground.balac.freefloating.qsimParkingModule;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
@@ -20,11 +24,8 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 
 
 public class FreeFloatingQsimFactory implements MobsimFactory{

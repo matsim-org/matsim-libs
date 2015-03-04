@@ -1,16 +1,15 @@
 package playground.balac.carsharing.preprocess;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.balac.carsharing.preprocess.membership.MembershipAssigner;
 import playground.balac.retailers.RetailerGA.RetailerGA;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 
 public class FitnessFunction

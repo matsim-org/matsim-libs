@@ -19,6 +19,9 @@
 
 package playground.balac.retailers;
 
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -32,6 +35,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
 import playground.balac.retailers.IO.FileRetailerReader;
 import playground.balac.retailers.IO.LinksRetailerReaderV2;
 import playground.balac.retailers.IO.RetailersSummaryWriter;
@@ -40,9 +44,6 @@ import playground.balac.retailers.data.Retailers;
 import playground.balac.retailers.utils.CountFacilityCustomers;
 import playground.balac.retailers.utils.ReRoutePersons;
 import playground.balac.retailers.utils.Utils;
-
-import java.util.Iterator;
-import java.util.Map;
 
 
 

@@ -1,5 +1,8 @@
 package playground.balac.avignon;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -14,9 +17,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 
 public class DistanceControlerListener implements StartupListener, IterationEndsListener {

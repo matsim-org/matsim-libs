@@ -8,12 +8,10 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.balac.allcsmodestest.scoring.DesiresAndOpenTimesActivityScoring;
 import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
 
 

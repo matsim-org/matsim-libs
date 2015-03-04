@@ -1,5 +1,9 @@
 package playground.balac.allcsmodestest.controler.listeneronlymembers;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -16,10 +20,6 @@ import playground.balac.allcsmodestest.controler.listener.NoVehicleEventHandler.
 import playground.balac.allcsmodestest.controler.listeneronlymembers.FFEventsHandler.RentalInfoFF;
 import playground.balac.allcsmodestest.controler.listeneronlymembers.OWEventsHandler.RentalInfoOW;
 import playground.balac.allcsmodestest.controler.listeneronlymembers.RTEventsHandler.RentalInfo;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class CarsharingListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	RTEventsHandler cshandler;

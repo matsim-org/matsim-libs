@@ -1,24 +1,5 @@
 package playground.balac.allcsmodestest.qsim;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
-import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
-
 import java.io.IOException;
 /*
  * 
@@ -26,9 +7,26 @@ import java.io.IOException;
  * 
  */
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+
+import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
+import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
+import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
+
 public class AllCSModesQsimFactory implements MobsimFactory{
 
-	private final static Logger log = Logger.getLogger(QSimFactory.class);
 
 	private final Scenario scenario;
 	private final Controler controler;	
@@ -80,7 +78,7 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 			owvehiclesLocationqt = new OneWayCarsharingRDWithParkingVehicleLocation
 					(this.controler, this.carSharingVehicles.getOneWayVehicles());
 			twvehiclesLocationqt = new TwoWayCSVehicleLocation
-					(this.controler, this.carSharingVehicles.getRoundTripVehicles());
+					(sc, this.carSharingVehicles.getRoundTripVehicles());
 		
 		agentFactory = new AllCSModesAgentFactory(qSim, scenario, controler, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);
 		

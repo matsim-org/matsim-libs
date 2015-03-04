@@ -1,15 +1,15 @@
 package playground.balac.freefloating.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class FreeFloatingVehiclesLocation {
 	

@@ -1,5 +1,12 @@
 package playground.balac.retailers.IO;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -8,17 +15,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.Retailer;
 import playground.balac.retailers.data.Retailers;
 import playground.balac.retailers.utils.Utils;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.TreeMap;
 
 public class LinksRetailerReader
 {

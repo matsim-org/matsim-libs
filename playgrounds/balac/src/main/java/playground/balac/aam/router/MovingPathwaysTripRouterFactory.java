@@ -13,8 +13,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.balac.aam.router.TransitMultiModalAccessRoutingModule.InitialNodeRouter;
-
 
 public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 

@@ -1,5 +1,12 @@
 package playground.balac.retailers.models;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -21,13 +28,6 @@ import playground.balac.retailers.data.FacilityRetailersImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.PersonPrimaryActivity;
 import playground.balac.retailers.utils.Utils;
-
-import javax.inject.Provider;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class MaxPotentialCustomersModel extends RetailerModelImpl {
 

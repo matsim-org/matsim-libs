@@ -12,10 +12,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.population.routes.RouteUtils;
 
 public class TravelDistanceGrocery {
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());

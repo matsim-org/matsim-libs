@@ -3,7 +3,7 @@ package playground.balac.carsharing.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
 

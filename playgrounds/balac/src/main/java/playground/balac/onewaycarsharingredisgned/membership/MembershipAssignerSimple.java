@@ -1,7 +1,6 @@
 package playground.balac.onewaycarsharingredisgned.membership;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;

@@ -2,7 +2,6 @@ package playground.balac.utils;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;

@@ -1,5 +1,9 @@
 package playground.balac.onewaycarsharingredisgned.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -10,10 +14,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
 
 
 public class OneWayCarsharingRDVehicleLocation {

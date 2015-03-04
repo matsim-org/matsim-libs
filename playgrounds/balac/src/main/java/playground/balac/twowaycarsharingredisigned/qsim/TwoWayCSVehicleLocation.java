@@ -1,31 +1,31 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
 
 public class TwoWayCSVehicleLocation {
 
 	
 	private QuadTree<TwoWayCSStation> vehicleLocationQuadTree;	
 	
-	public TwoWayCSVehicleLocation(String inputFilePath, Controler controler) throws IOException {
+	public TwoWayCSVehicleLocation(String inputFilePath, Scenario scenario) throws IOException {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
-        LinkUtils linkUtils = new LinkUtils(controler.getScenario().getNetwork());
-        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
+        LinkUtils linkUtils = new LinkUtils(scenario.getNetwork());
+        for (Link l : scenario.getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();
@@ -49,7 +49,7 @@ public class TwoWayCSVehicleLocation {
 	    	//Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
 			ArrayList<String> vehIDs = new ArrayList<String>();
 	    	
-	    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
+	    	for (int k = 0; k < Integer.parseInt(arr[6]); k++) {
 	    		vehIDs.add(Integer.toString(i));
 	    		i++;
 	    	}
@@ -62,13 +62,13 @@ public class TwoWayCSVehicleLocation {
 	    
 	   
 	  }
-	public TwoWayCSVehicleLocation(Controler controler, ArrayList<TwoWayCSStation> stations) {
+	public TwoWayCSVehicleLocation(Scenario scenario, ArrayList<TwoWayCSStation> stations) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
 	    double maxy = (-1.0D / 0.0D);
 
-        for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
+        for (Link l : scenario.getNetwork().getLinks().values()) {
 	      if (l.getCoord().getX() < minx) minx = l.getCoord().getX();
 	      if (l.getCoord().getY() < miny) miny = l.getCoord().getY();
 	      if (l.getCoord().getX() > maxx) maxx = l.getCoord().getX();

@@ -3,15 +3,11 @@ package playground.balac.carsharing.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
-import org.matsim.population.algorithms.ChooseRandomSingleLegMode;
-import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author balacm

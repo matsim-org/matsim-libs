@@ -1,5 +1,10 @@
 package playground.balac.freefloating.controler;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -11,20 +16,20 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.*;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
+
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FreeFloatingWithParkingControler extends Controler{

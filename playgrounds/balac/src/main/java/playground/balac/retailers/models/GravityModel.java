@@ -1,5 +1,8 @@
 package playground.balac.retailers.models;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -16,9 +19,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import playground.balac.retailers.data.PersonRetailersImpl;
 import playground.balac.retailers.data.RetailZone;
 import playground.balac.retailers.data.RetailZones;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 public class GravityModel extends RetailerModelImpl
 {

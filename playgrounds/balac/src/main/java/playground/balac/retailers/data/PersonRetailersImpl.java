@@ -1,13 +1,11 @@
 package playground.balac.retailers.data;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 
 import playground.balac.retailers.RetailersLocationListener;

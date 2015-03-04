@@ -1,10 +1,10 @@
 package playground.balac.onewaycarsharingredisgned.qsimparking;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.QuadTree;
-
-import java.util.ArrayList;
 
 
 public class OneWayCarsharingRDWithParkingVehicleLocation {

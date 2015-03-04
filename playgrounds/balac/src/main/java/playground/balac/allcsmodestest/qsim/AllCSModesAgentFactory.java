@@ -1,5 +1,7 @@
 package playground.balac.allcsmodestest.qsim;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
@@ -8,11 +10,10 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
+
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
-
-import javax.inject.Provider;
 
 public class AllCSModesAgentFactory implements AgentFactory{
 	private final Netsim simulation;

@@ -1,5 +1,10 @@
 package playground.balac.taxiservice.router;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,10 +20,6 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-
-import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TaxiserviceRoutingModule implements RoutingModule {
 

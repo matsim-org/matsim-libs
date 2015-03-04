@@ -1,6 +1,7 @@
 package playground.balac.retailers.data;
 
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.population.Desires;
 

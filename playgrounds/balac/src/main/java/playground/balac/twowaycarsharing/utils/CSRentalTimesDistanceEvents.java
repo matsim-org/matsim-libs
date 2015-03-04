@@ -1,22 +1,12 @@
 package playground.balac.twowaycarsharing.utils;
 
-import java.util.HashMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 

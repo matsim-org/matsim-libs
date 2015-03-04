@@ -1,5 +1,9 @@
 package playground.balac.onewaycarsharingredisgned.controler;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -7,11 +11,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import playground.balac.onewaycarsharingredisgned.controler.OWEventsHandler.RentalInfoFF;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+import playground.balac.onewaycarsharingredisgned.controler.OWEventsHandler.RentalInfoFF;
 
 
 public class OWListener implements StartupListener, IterationEndsListener, IterationStartsListener{

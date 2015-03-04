@@ -1,5 +1,9 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -25,11 +29,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 
 
 public class TwoWayCSQsimFactory implements MobsimFactory{
@@ -115,7 +116,7 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 			qSim.addMobsimEngine(transitEngine);
 		} else {
 			
-				twvehiclesLocationqt = new TwoWayCSVehicleLocation(controler, twvehiclesLocation);
+				twvehiclesLocationqt = new TwoWayCSVehicleLocation(scenario, twvehiclesLocation);
 				agentFactory = new TwoWayCSAgentFactory(qSim, scenario, controler, twvehiclesLocationqt);
 			
 		}

@@ -19,7 +19,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTime.DayType;
 
 import playground.balac.retailers.IO.FileRetailerReader;
 import playground.balac.retailers.preprocess.ModifyDesires;

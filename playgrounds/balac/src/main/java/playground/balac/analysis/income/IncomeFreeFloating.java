@@ -3,7 +3,6 @@ package playground.balac.analysis.income;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-
 import org.matsim.core.utils.io.IOUtils;
 
 public class IncomeFreeFloating {

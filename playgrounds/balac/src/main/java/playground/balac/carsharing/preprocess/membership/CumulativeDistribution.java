@@ -3,10 +3,9 @@ package playground.balac.carsharing.preprocess.membership;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
-import java.io.PrintStream;
-import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;

@@ -1,12 +1,21 @@
 package playground.balac.retailers.models;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -26,11 +35,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 
 

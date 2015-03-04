@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;

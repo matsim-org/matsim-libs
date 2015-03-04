@@ -1,15 +1,14 @@
 package playground.balac.retailers.RetailerGA;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.balac.retailers.models.RetailerModel;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class MyFitnessFunction
 {

@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;

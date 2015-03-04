@@ -12,7 +12,7 @@ public class RentalStatistcsOW {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSOW_Stats.txt");
+		final BufferedReader readLink = IOUtils.getBufferedReader("P:/_TEMP/Balac/IATBR2015/1.150.OW_CS");
 		int[] rentalTimes = new int[30];
 		int[] distance = new int[50];
 

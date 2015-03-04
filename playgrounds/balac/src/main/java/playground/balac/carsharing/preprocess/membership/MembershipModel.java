@@ -1,10 +1,8 @@
 package playground.balac.carsharing.preprocess.membership;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.balac.carsharing.data.FlexTransPersonImpl;

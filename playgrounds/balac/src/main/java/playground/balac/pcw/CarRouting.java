@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -19,7 +18,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -36,8 +34,6 @@ import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
-import playground.balac.carsharing.preprocess.membership.MyLinkUtils;
-import playground.balac.utils.CarTravelTimes;
 import playground.balac.utils.Events2TTCalculator;
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;

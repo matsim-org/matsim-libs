@@ -30,12 +30,12 @@ public class SubpopulationMembers {
 		Object[] arr = scenario.getPopulation().getPersons().values().toArray();
 		
 		for (int i = 1; i < size; i++) {
-			if (bla.getAttribute(((Person)arr[i]).getId().toString(), "OW_CARD").equals("false")) {				
+			if (bla.getAttribute(((Person)arr[i]).getId().toString(), "RT_CARD").equals("false")) {				
 				scenario.getPopulation().getPersons().remove(((Person)arr[i]).getId());
 			}			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[3] + "/plans_only_ow_members.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[3] + "/plans_only_rt_members.xml.gz");		
 		
 		
 		

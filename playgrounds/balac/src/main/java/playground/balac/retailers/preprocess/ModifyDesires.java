@@ -1,8 +1,6 @@
 package playground.balac.retailers.preprocess;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 

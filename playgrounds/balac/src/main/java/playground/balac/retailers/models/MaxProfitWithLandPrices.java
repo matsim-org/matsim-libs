@@ -1,5 +1,10 @@
 package playground.balac.retailers.models;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -15,11 +20,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.data.PersonPrimaryActivity;
 import playground.balac.retailers.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 
 

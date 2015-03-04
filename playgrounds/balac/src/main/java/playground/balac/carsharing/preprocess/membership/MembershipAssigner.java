@@ -4,10 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -220,7 +220,8 @@ public class MembershipAssigner
       assignCarSharingMembership(person);
     }
     log.info("number of Mobility members = " + this.counter);
-    MatsimRandom.reset(RandomUtils.nextLong());
+    Random r = new Random();;
+    MatsimRandom.reset(r.nextLong());
   }
 
   private void assignCarSharingMembership(PersonImpl pi)

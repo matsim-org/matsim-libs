@@ -19,6 +19,10 @@
 
 package playground.balac.retailers.strategies;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,10 +34,6 @@ import playground.balac.retailers.RetailerGA.RunRetailerGA;
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.models.MaxProfitWithLandPrices;
 import playground.balac.retailers.utils.Utils;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
 
 
 public class MinTravelingCostsRetailerStrategy extends RetailerStrategyImpl
