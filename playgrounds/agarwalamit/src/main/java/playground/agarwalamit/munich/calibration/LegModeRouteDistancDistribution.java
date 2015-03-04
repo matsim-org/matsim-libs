@@ -31,32 +31,33 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class LegModeRouteDistancDistribution {
 
-	private final static String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/";
-	private final static String [] runs = {"c0"};
+	private final static String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
+	private final static String [] runs = {"bau","ei","ci","eci","10ei"};
 
 	public static void main(String[] args) {
 		LegModeRouteDistancDistribution ms= new LegModeRouteDistancDistribution();
 
 		for(String str:runs){
 			String configFile = runDir+str+"/output_config.xml";
-			int lastIteration = LoadMyScenarios.getLastIteration(configFile);
 			String networkFile = runDir+str+"/output_network.xml.gz";
-			String eventsFile = runDir+str+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
-			ms.runRoutesDistance(str, networkFile, eventsFile);
+			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile,configFile);
+			sc.getConfig().controler().setOutputDirectory(runDir+str);
+			ms.runRoutesDistance(str, sc);
 		}
 	}
 	
 	/**
 	 * It will write route distance distribution from events	
 	 */
-	private void runRoutesDistance(String runNr,String networkFile, String eventsFile){
+	private void runRoutesDistance(String runNr, Scenario sc){
 		UserGroup ug =  UserGroup.URBAN;
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-		LegModeRouteDistanceDistributionAnalyzer	lmdfed = new LegModeRouteDistanceDistributionAnalyzer(null);
+		int lastIteration = sc.getConfig().controler().getLastIteration();
+		String eventsFile = sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+		LegModeRouteDistanceDistributionAnalyzer lmdfed = new LegModeRouteDistanceDistributionAnalyzer(/*ug*/);
 		lmdfed.init(sc,eventsFile);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
 		new File(runDir+"/analysis/legModeDistributions/").mkdirs();
-		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+"_it.0_"+".");
+		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+"_it."+lastIteration+"_"+".");
 	}
 }
