@@ -30,56 +30,51 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.util.array2d.Array2DReader;
 import playground.michalm.util.matrices.MatrixUtils;
+import playground.michalm.util.visum.VisumODMatrixReader;
 import playground.michalm.zone.*;
 
 
 public class PoznanSimpleDemandGeneration
 {
-    public static void main(String[] args)
+    public void generate(String inputDir, String plansFile, String transportMode)
     {
-        String dirName = "D:\\eTaxi\\Poznan_MATSim\\";
-        String networkFile = dirName + "network.xml";
-        String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones.SHP";
+        String networkFile = inputDir + "Matsim_2013_06/network-cleaned-extra-lanes.xml";
+        String zonesXmlFile = inputDir + "Matsim_2013_06/zones.xml";
+        String zonesShpFile = inputDir + "Osm_2013_06/zones.SHP";
 
-        String odMatrixFilePrefix = dirName + "odMatrices\\odMatrix";
-        String plansFile = dirName + "plans.xml.gz";
+        String odMatrixFilePrefix = inputDir + "Visum_2012/Total_PrT_Veh_odMatrices/Total_PrT_Veh_";
+
         int randomSeed = RandomUtils.DEFAULT_SEED;
-
-        // String taxiFile = dirName + "taxiCustomers_07_pc.txt";
-
-        // double hours = 2;
-        // double flowCoeff = 1;
-        // double taxiProbability = 0;
-
-        // double[] hours = { 1, 1, 1, 1, 1, 1, 1 };
-        // double[] flowCoeff = { 0.2, 0.4, 0.8, 1.0, 0.6, 0.4, 0.2 };
-        // double[] taxiProbability = { 0, 0, 0, 0, 0, 0, 0 };
+        RandomUtils.reset(randomSeed);
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
         Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
-        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, true);
-
-        RandomUtils.reset(randomSeed);
+        ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, false);
 
         for (int i = 0; i < 24; i++) {
-            String timePeriod = i + "-" + (i + 1);
-            System.out.println("Generation for " + timePeriod);
-            String odMatrixFile = odMatrixFilePrefix + timePeriod + ".dat";
-            double[][] odMatrixFromFile = Array2DReader.getDoubleArray(new File(odMatrixFile),
-                    zones.size());
-            Matrix odMatrix = MatrixUtils.createSparseMatrix("m" + i, zones.keySet(),
-                    odMatrixFromFile);
+            String odMatrixFile = odMatrixFilePrefix + i + "-" + (i + 1) + ".gz";
+            System.out.println("Generation for " + odMatrixFile);
 
-            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", TransportMode.car, i * 3600, 3600,
-                    1);
+            double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
+            Matrix odMatrix = MatrixUtils
+                    .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
+
+            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", transportMode, i * 3600, 3600, 1);
         }
 
         dg.write(plansFile);
-        // dg.writeTaxiCustomers(taxiFile);
+
+    }
+
+
+    public static void main(String[] args)
+    {
+        String inputDir = "d:/GoogleDrive/Poznan/";
+        String plansFile = "d:/PP-rad/matsim-poznan/test/plans.xml.gz";
+        String transportMode = TransportMode.car;
+        new PoznanSimpleDemandGeneration().generate(inputDir, plansFile, transportMode);
     }
 }

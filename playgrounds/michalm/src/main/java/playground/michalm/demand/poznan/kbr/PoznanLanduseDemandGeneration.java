@@ -140,6 +140,8 @@ public class PoznanLanduseDemandGeneration
     private Map<Id<Zone>, Zone> zones;
     private Map<Id<Zone>, ZoneLanduseValidation> zoneLanduseValidation;
     private EnumMap<ActivityPair, Double> prtCoeffs;
+    
+    private String transportMode;
 
     private Map<Id<Zone>, List<Polygon>> forestByZone;
     private Map<Id<Zone>, List<Polygon>> industrialByZone;
@@ -155,8 +157,10 @@ public class PoznanLanduseDemandGeneration
     private WeightedRandomSelectionTable<Id<Zone>, ActivityType, Polygon> selectionTable;
 
 
-    public void generate(String inputDir, String plansFile)
+    public void generate(String inputDir, String plansFile, String transportMode)
     {
+        this.transportMode = transportMode;
+        
         String networkFile = inputDir + "Matsim_2013_06/network-cleaned-extra-lanes.xml";
         String zonesXmlFile = inputDir + "Matsim_2013_06/zones.xml";
         String zonesShpFile = inputDir + "Osm_2013_06/zones.SHP";
@@ -170,11 +174,9 @@ public class PoznanLanduseDemandGeneration
         String zonesWithLanduseFile = inputDir + "Osm_2013_06/zones_with_correct_landuse";
 
         String put2PrtRatiosFile = inputDir + "Visum_2012/PuT_PrT_ratios";
-
         String odMatrixFilePrefix = inputDir + "Visum_2012/odMatricesByType/";
-        
-        int randomSeed = RandomUtils.DEFAULT_SEED;
 
+        int randomSeed = RandomUtils.DEFAULT_SEED;
         RandomUtils.reset(randomSeed);
 
         scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
@@ -305,7 +307,7 @@ public class PoznanLanduseDemandGeneration
         LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy();
         ActivityCreator ac = new DefaultActivityCreator(scenario, strategy, strategy);
         PersonCreator pc = new DefaultPersonCreator(scenario);
-        dg = new ODDemandGenerator(scenario, zones, true, ac, pc);
+        dg = new ODDemandGenerator(scenario, zones, false, ac, pc);
 
         for (ActivityPair ap : ActivityPair.values()) {
             generate(odMatrixFilePrefix, ap);
@@ -313,20 +315,21 @@ public class PoznanLanduseDemandGeneration
     }
 
 
-    private void generate(String filePrefix, ActivityPair actPair)
+    private void generate(String odMatrixFilePrefix, ActivityPair actPair)
     {
         double flowCoeff = prtCoeffs.get(actPair);
         String actTypeFrom = actPair.from.name();
         String actTypeTo = actPair.to.name();
 
         for (int i = 0; i < 24; i++) {
-            String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1) + ".gz";
+            String odMatrixFile = odMatrixFilePrefix + actPair.name() + "_" + i + "-" + (i + 1)
+                    + ".gz";
             System.out.println("Generation for " + odMatrixFile);
+
             double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
             Matrix odMatrix = MatrixUtils
                     .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
-
-            dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, TransportMode.car, i * 3600,
+            dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, transportMode, i * 3600,
                     3600, flowCoeff);
         }
     }
@@ -342,6 +345,7 @@ public class PoznanLanduseDemandGeneration
     {
         String inputDir = "d:/GoogleDrive/Poznan/";
         String plansFile = "d:/PP-rad/matsim-poznan/test/plans.xml.gz";
-        new PoznanLanduseDemandGeneration().generate(inputDir, plansFile);
+        String transportMode = TransportMode.car;
+        new PoznanLanduseDemandGeneration().generate(inputDir, plansFile, transportMode);
     }
 }
