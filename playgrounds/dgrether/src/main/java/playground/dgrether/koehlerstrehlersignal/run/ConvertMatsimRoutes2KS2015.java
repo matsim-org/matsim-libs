@@ -219,13 +219,13 @@ public class ConvertMatsimRoutes2KS2015 {
 
 	public static void main(String[] args) {
 		
-		String runNumber = "2039";
+		String runNumber = "2033";
 		String runDescription = "optimized";
 		Integer lastIteration = 1400;
 		
 		String ksModelDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/cb2ks2010/"
-				+ "2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
+				+ "2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml";
 		String outputFile = "routeComparison/2015-03-03_matsimRoutes_" + runNumber + ".xml";
 		
