@@ -58,6 +58,6 @@ public class LegModeRouteDistancDistribution {
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
 		new File(runDir+"/analysis/legModeDistributions/").mkdirs();
-		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+"_it."+lastIteration+"_"+".");
+		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+"_it."+lastIteration+"_");
 	}
 }

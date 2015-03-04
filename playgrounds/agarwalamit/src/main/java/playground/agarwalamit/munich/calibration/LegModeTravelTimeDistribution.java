@@ -52,7 +52,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 	private List<String> travelModes;
 	private SortedMap<String, SortedMap<Integer, Integer>> mode2TravelTimeClasses2LegCount;
 	private String eventsFile;
-	private UserGroup userGroup;
+	private UserGroup userGroup = null;
 
 	public LegModeTravelTimeDistribution(String eventsFile, UserGroup userGroup) {
 		super(LegModeTravelTimeDistribution.class.getSimpleName());
@@ -64,10 +64,20 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 		this.lmth.reset(0);
 		this.userGroup = userGroup;
 	}
+	
+	public LegModeTravelTimeDistribution(String eventsFile) {
+		super(LegModeTravelTimeDistribution.class.getSimpleName());
+
+		this.eventsFile = eventsFile;
+		this.travelTimeClasses=new ArrayList<Integer>();
+		this.travelModes = new ArrayList<String>();
+		this.lmth=new LegModeTravelTimeHandler();
+		this.lmth.reset(0);
+	}
 
 	public static void main(String[] args) {
-		String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/";
-		String [] runs = {"c0","c4"};
+		String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
+		String [] runs = {"bau","ei","ci","eci","10ei"};
 
 		for(String run:runs){
 		
@@ -76,10 +86,10 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
 			UserGroup ug = UserGroup.COMMUTER;
 			
-			LegModeTravelTimeDistribution lmttd = new LegModeTravelTimeDistribution(eventsFile,ug);
+			LegModeTravelTimeDistribution lmttd = new LegModeTravelTimeDistribution(eventsFile/*,ug*/);
 			lmttd.preProcessData();
 			lmttd.postProcessData();
-			lmttd.writeResults(runDir+"/analysis/legModeDistributions/"+run+"_"+ug);
+			lmttd.writeResults(runDir+"/analysis/legModeDistributions/"+run+"_it."+lastItr+"_");
 		}
 	}
 
