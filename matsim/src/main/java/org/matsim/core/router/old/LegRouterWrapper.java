@@ -1,4 +1,5 @@
 /* *********************************************************************** *
+
  * project: org.matsim.*
  * LegRouterWrapper.java
  *                                                                         *
@@ -45,7 +46,8 @@ import org.matsim.core.router.StageActivityTypes;
  *
  * @author thibautd
  */
- final class LegRouterWrapper implements RoutingModule {
+@Deprecated // implement RoutingModule directly. This class here is only a backwards adapter (and for that reason not public). kai, mar'15
+final class LegRouterWrapper implements RoutingModule {
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -58,6 +60,7 @@ import org.matsim.core.router.StageActivityTypes;
 	 * @param populationFactory the factory to use to create the return leg instance
 	 * @param toWrap the {@link LegRouter} to wrap
 	 */
+	@Deprecated // implement RoutingModule directly.  this class here is only a backwards adapter (and for that reason not public). kai, mar'15
 	 LegRouterWrapper(
 			final String mode,
 			final PopulationFactory populationFactory,

@@ -40,12 +40,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
  *
  * @author mrieser
  */
+@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
  public final class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
 	private final ModeRouteFactory routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
+	@Deprecated // use TripRouter (with RoutingModule) instead. kai, mar'15
 	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;

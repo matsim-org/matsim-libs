@@ -34,6 +34,10 @@ import org.matsim.core.router.util.LinkToLinkTravelTime;
  *
  */
 public final class DefaultRoutingModules {
+	// despite the fact that this class is in "old", I actually think that it is ok, providing a public interface to functionality that could be changed
+	// underneath.  Have to keep in in the "old" package in order to package-protect the infrastructure that is used underneath. kai, mar'15
+	
+	
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
