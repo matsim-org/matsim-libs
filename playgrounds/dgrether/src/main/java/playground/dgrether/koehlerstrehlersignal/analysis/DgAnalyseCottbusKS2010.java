@@ -72,7 +72,6 @@ import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.InMemoryEventsManager;
 import playground.dgrether.events.filters.TimeEventFilter;
-import playground.dgrether.koehlerstrehlersignal.run.Cottbus2KS2010;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -267,7 +266,7 @@ public class DgAnalyseCottbusKS2010 {
 		
 		Network n = baseResult.runLoader.getNetwork();
 		Population pop = baseResult.runLoader.getPopulation();
-		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/diffs/";
+		String outDir = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/diffs/";
 		File out = IOUtils.createDirectory(outDir + baseResult.runInfo.runId + "_vs_" + r.runInfo.runId + "_plans_base_case_disattracted/");
 		Population newPop = this.getFilteredPopulation(pop, disattractedPersonsIds);
 		DgSelectedPlans2ESRIShape sps = new DgSelectedPlans2ESRIShape(newPop, n, DgAnalyseCottbusKS2010.crs, out.getAbsolutePath());
@@ -473,18 +472,18 @@ public class DgAnalyseCottbusKS2010 {
 		//		l.add(e);
 
 		filterFeatureFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
+				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
 		//		filterFeatureFilename = "C:/Users/Atany/Desktop/SHK/SVN/"
 		//				+ "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
 //		featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
 //		env = getTransformedEnvelope(featureTuple);
 
-		String signalsBBNet = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
+		String signalsBBNet = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
 		Scenario scSignalsBoundingBox = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox);
 		netReader.readFile(signalsBBNet);
 
-		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/cottbus_scenario/signal_systems_no_13.xml";
+		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		SignalSystemsReader20 signalsReader = new SignalSystemsReader20(signalSystems);
 		signalsReader.readFile(signalSystemsFile);
@@ -502,7 +501,7 @@ public class DgAnalyseCottbusKS2010 {
 //		l.add(e);
 		
 		
-		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
+		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2);
 		netReader2.readFile(cityNetwork);
@@ -601,6 +600,8 @@ public class DgAnalyseCottbusKS2010 {
 //		CottbusRuns.addBaseCaseOptAndRandomIt1400Runs(l, 2026, 2027, 2028, 2029, 2030, 2031);
 //		CottbusRuns.addBaseCaseOptAndRandomIt1400Runs(l, 2032, 2033, 2034, 2035, 2036, 2037);
 //		CottbusRuns.addBaseCaseOptAndRandomAndAnotherIt1400Runs(l, 2032, 2033, 2034, 2035, 2036, 2037, 2038);
+		
+//		CottbusRuns.addBaseCaseAndOptIt1400Runs(l, 2042, 2039);
 		CottbusRuns.addBaseCaseOptAndOptFixed(l, 2042, 2039, 2040, 2041);
 		
 		return l;
@@ -610,13 +611,13 @@ public class DgAnalyseCottbusKS2010 {
 	public static void main(String[] args) {
 		List<RunInfo> runIds = createRunsIdList();
 		String runIdsString = createRunIdIterationString(runIds);
-		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/" 
+		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/data/optimization/cb2ks2010/" 
 				+ "2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/results/";
 		List<TimeConfig> times = createTimeConfig();
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2015-03-02_analysis" + runIdsString + "_" +  timesString;
+		String outputFilename = outputDirectory + "2015-03-04_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
 		ana.setUseInMemoryEvents(false);
