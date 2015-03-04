@@ -64,10 +64,12 @@ public class CreatePoznanPT
 
     public static void main(String[] args)
     {
-        String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
-        String transitScheduleWithNetworkFile = "d:/transitSchedule.xml";
-        String transitNetworkFile = "d:/pt_network.xml";
-        String vehicleFile = "d:/pt_vehicles.xml";
+        //String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
+        String visumFile = "d:/GoogleDrive/Poznan/network_ver.5 (33N).net";
+        String outDir = "d:/PP-rad/matsim-poznan/test/";
+        String transitScheduleWithNetworkFile = outDir + "transitSchedule.xml";
+        String transitNetworkFile = outDir + "pt_network.xml";
+        String vehicleFile = outDir + "pt_vehicles.xml";
 
         go(visumFile, transitScheduleWithNetworkFile, transitNetworkFile, vehicleFile);
     }

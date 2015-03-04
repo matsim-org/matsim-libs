@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand.poznan;
+package playground.michalm.demand.poznan.kbr;
 
 import java.io.*;
 import java.util.*;

@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand.poznan;
+package playground.michalm.demand.poznan.kbr;
 
 import java.io.*;
 import java.lang.reflect.Array;
 import java.util.Map;
 
-import playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityPair;
+import playground.michalm.demand.poznan.kbr.PoznanLanduseDemandGeneration.ActivityPair;
 import playground.michalm.util.visum.VisumODMatrixReader;
 
 

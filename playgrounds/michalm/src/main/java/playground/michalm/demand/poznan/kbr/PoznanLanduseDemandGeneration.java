@@ -17,9 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.demand.poznan;
+package playground.michalm.demand.poznan.kbr;
 
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.*;
+import static playground.michalm.demand.poznan.kbr.PoznanLanduseDemandGeneration.ActivityType.*;
 
 import java.io.*;
 import java.util.*;
@@ -155,24 +155,24 @@ public class PoznanLanduseDemandGeneration
     private WeightedRandomSelectionTable<Id<Zone>, ActivityType, Polygon> selectionTable;
 
 
-    public void generate(String dirName)
+    public void generate(String inputDir, String plansFile)
     {
-        String networkFile = dirName + "network.xml";
-        String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones.SHP";
+        String networkFile = inputDir + "Matsim_2013_06/network-cleaned-extra-lanes.xml";
+        String zonesXmlFile = inputDir + "Matsim_2013_06/zones.xml";
+        String zonesShpFile = inputDir + "Osm_2013_06/zones.SHP";
 
-        String forestShpFile = dirName + "GIS\\forests.SHP";
-        String industrialShpFile = dirName + "GIS\\industrial.SHP";
-        String residentialShpFile = dirName + "GIS\\residential.SHP";
-        String schoolShpFile = dirName + "GIS\\school.SHP";
-        String shopShpFile = dirName + "GIS\\shop.SHP";
+        String forestShpFile = inputDir + "Osm_2013_06/forests.SHP";
+        String industrialShpFile = inputDir + "Osm_2013_06/industrial.SHP";
+        String residentialShpFile = inputDir + "Osm_2013_06/residential.SHP";
+        String schoolShpFile = inputDir + "Osm_2013_06/school.SHP";
+        String shopShpFile = inputDir + "Osm_2013_06/shop.SHP";
 
-        String zonesWithLanduseFile = dirName + "GIS\\zones_with_correct_landuse";
+        String zonesWithLanduseFile = inputDir + "Osm_2013_06/zones_with_correct_landuse";
 
-        String put2PrtRatiosFile = dirName + "PuT_PrT_ratios";
+        String put2PrtRatiosFile = inputDir + "Visum_2012/PuT_PrT_ratios";
 
-        String odMatrixFilePrefix = dirName + "odMatricesByType\\";
-        String plansFile = dirName + "plans.xml.gz";
+        String odMatrixFilePrefix = inputDir + "Visum_2012/odMatricesByType/";
+        
         int randomSeed = RandomUtils.DEFAULT_SEED;
 
         RandomUtils.reset(randomSeed);
@@ -320,7 +320,7 @@ public class PoznanLanduseDemandGeneration
         String actTypeTo = actPair.to.name();
 
         for (int i = 0; i < 24; i++) {
-            String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1);
+            String odMatrixFile = filePrefix + actPair.name() + "_" + i + "-" + (i + 1) + ".gz";
             System.out.println("Generation for " + odMatrixFile);
             double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
             Matrix odMatrix = MatrixUtils
@@ -340,6 +340,8 @@ public class PoznanLanduseDemandGeneration
 
     public static void main(String[] args)
     {
-        new PoznanLanduseDemandGeneration().generate("d:\\michalm\\eTaxi\\Poznan_MATSim\\");
+        String inputDir = "d:/GoogleDrive/Poznan/";
+        String plansFile = "d:/PP-rad/matsim-poznan/test/plans.xml.gz";
+        new PoznanLanduseDemandGeneration().generate(inputDir, plansFile);
     }
 }

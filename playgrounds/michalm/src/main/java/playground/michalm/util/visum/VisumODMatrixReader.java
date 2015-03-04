@@ -21,44 +21,30 @@ package playground.michalm.util.visum;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.text.*;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 
 public class VisumODMatrixReader
 {
     public static double[][] readMatrixFile(File file)
     {
-        try (Scanner scanner = new Scanner(file)) {
-            scanner.useLocale(Locale.US);
+        try (InputStream gzipStream = new GZIPInputStream(new FileInputStream(file));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(gzipStream))) {
+            NumberReader nr = new NumberReader(reader);
 
-            scanner.nextLine(); // $V;D2;Y5
-            scanner.nextLine(); // *
-            scanner.nextLine(); // * time interval
-            scanner.nextLine(); // 0.00 0.00
-            scanner.nextLine(); // * factor
-            scanner.nextLine(); // 1.000000
-            scanner.nextLine(); // * Number of zones
-            int nZones = scanner.nextInt(); // 417
+            nr.nextDouble();// time interval - from
+            nr.nextDouble();// time interval - to
+            nr.nextDouble();// factor
+
+            int nZones = nr.nextInt(); // number of zones
 
             // =================
-
-            scanner.next(); // *
-            scanner.next(); // Zone
-            scanner.next(); // numbers
 
             // Id[] zoneIds = new Id[nZones];
-
             for (int i = 0; i < nZones; i++) {
-                // zoneIds[i] = scenario.createId(scanner.next());
-                scanner.next();
-            }
-
-            // =================
-
-            for (int i = 0; i < nZones;) {
-                if (scanner.next().charAt(0) != '*') {
-                    i++;
-                }
+                nr.nextInt();
             }
 
             // =================
@@ -66,25 +52,80 @@ public class VisumODMatrixReader
             double[][] odMatrix = (double[][])Array.newInstance(double.class, nZones, nZones);
 
             for (int i = 0; i < nZones; i++) {
-                scanner.next(); // *
-                scanner.next(); // 1
-                scanner.next(); // 0.00
-
                 for (int j = 0; j < nZones; j++) {
-                    odMatrix[i][j] = scanner.nextDouble();
+                    odMatrix[i][j] = nr.nextDouble();
                 }
             }
 
             return odMatrix;
         }
-        catch (FileNotFoundException e) {
+        catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    public static void main(String[] args)
+    private static class NumberReader
     {
-        readMatrixFile(new File("d:\\eTaxi\\Poznan_MATSim\\odMatricesByType\\D_I_0-1"));
+        private final BufferedReader reader;
+        private final NumberFormat nf = NumberFormat.getInstance(Locale.US);
+        private StringTokenizer st;
+
+
+        private NumberReader(BufferedReader reader)
+            throws IOException
+        {
+            this.reader = reader;
+            moveToNextValidLine();
+        }
+
+
+        public double nextDouble()
+            throws IOException, ParseException
+        {
+            return nextNumber().doubleValue();
+        }
+
+
+        public int nextInt()
+            throws IOException, ParseException
+        {
+            return nextNumber().intValue();
+        }
+
+
+        public Number nextNumber()
+            throws IOException, ParseException
+        {
+            if (!st.hasMoreTokens()) {
+                moveToNextValidLine();
+            }
+
+            return nf.parse(st.nextToken());
+        }
+
+
+        private void moveToNextValidLine()
+            throws IOException
+        {
+            String line;
+            do {
+                line = reader.readLine();
+            }
+            while (!isValidLine(line));
+
+            st = new StringTokenizer(line);
+        }
+
+
+        private boolean isValidLine(String line)
+        {
+            if (line.trim().isEmpty()) {
+                return false;
+            }
+
+            char firstChar = line.charAt(0);
+            return firstChar != '*' && firstChar != '$';
+        }
     }
 }
