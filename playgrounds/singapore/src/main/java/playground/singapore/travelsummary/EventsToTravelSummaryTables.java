@@ -1,14 +1,8 @@
 package playground.singapore.travelsummary;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -51,7 +45,6 @@ import org.supercsv.prefs.CsvPreference;
 import playground.singapore.travelsummary.travelcomponents.Activity;
 import playground.singapore.travelsummary.travelcomponents.Journey;
 import playground.singapore.travelsummary.travelcomponents.Transfer;
-import playground.singapore.travelsummary.travelcomponents.TravelComponent;
 import playground.singapore.travelsummary.travelcomponents.TravellerChain;
 import playground.singapore.travelsummary.travelcomponents.Trip;
 import playground.singapore.travelsummary.travelcomponents.Wait;
