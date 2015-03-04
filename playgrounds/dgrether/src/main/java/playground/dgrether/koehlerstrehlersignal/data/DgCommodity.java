@@ -95,7 +95,7 @@ public class DgCommodity {
 	}
 
 	public List<Id<DgStreet>> getRoute() {
-		return route;
+		return this.route;
 	}
 
 	public Id<DgCrossingNode> getDrainNodeId(){
