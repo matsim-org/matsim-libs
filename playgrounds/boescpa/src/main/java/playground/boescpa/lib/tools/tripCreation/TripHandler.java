@@ -45,7 +45,7 @@ import playground.boescpa.lib.obj.BoxedHashMap;
 public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 	
-	// TODO-boescpa create "path" for pt and transit_walk too! {Will have to adapt TestMainTripCreator if this is done...}
+	// TODO-boescpa create "path" for pt and transit_walk too! {Possibly will have to adapt TestScenarioAnalyzer and TestTopdadTripProcessor if this is done...}
 	
 	BoxedHashMap<Id,Id> startLink;
 	BoxedHashMap<Id,Double> startTime;
@@ -91,18 +91,18 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 
 	@Override
 	public void reset(int iteration) {
-		startLink = new BoxedHashMap<Id, Id>();
-		startTime = new BoxedHashMap<Id, Double>();
-		mode = new BoxedHashMap<Id, String>();
-		purpose = new BoxedHashMap<Id, String>();
-		path = new BoxedHashMap<Id, LinkedList<Id>>();
-		endLink = new BoxedHashMap<Id, Id>();
-		endTime = new BoxedHashMap<Id, Double>();
-		ptStageEndLinkId = new HashMap<Id, Id>();
-		ptStageEndTime = new HashMap<Id, Double>();
-		ptTripList = new HashSet<Id>();
-		transitWalkList = new HashSet<Id>();
-		endInitialisedList = new HashSet<Id>();
+		startLink = new BoxedHashMap<>();
+		startTime = new BoxedHashMap<>();
+		mode = new BoxedHashMap<>();
+		purpose = new BoxedHashMap<>();
+		path = new BoxedHashMap<>();
+		endLink = new BoxedHashMap<>();
+		endTime = new BoxedHashMap<>();
+		ptStageEndLinkId = new HashMap<>();
+		ptStageEndTime = new HashMap<>();
+		ptTripList = new HashSet<>();
+		transitWalkList = new HashSet<>();
+		endInitialisedList = new HashSet<>();
 	}
 
 	@Override
@@ -122,60 +122,63 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		// handle pt trips
-		if (event.getLegMode().equals("pt")) {
-			// do not add a transit walk trip if it's only a stage
-			if (!ptTripList.contains(event.getPersonId())) {
+		switch (event.getLegMode()) {
+			case "pt":
+				// do not add a pt trip if it's only a stage
+				if (!ptTripList.contains(event.getPersonId())) {
+					// add person to pt trip list
+					ptTripList.add(event.getPersonId());
+					if (transitWalkList.contains(event.getPersonId())) {
+						transitWalkList.remove(event.getPersonId());
+					}
+					// initialize pt trip
+					startLink.put(event.getPersonId(), event.getLinkId());
+					startTime.put(event.getPersonId(), event.getTime());
+					mode.put(event.getPersonId(), event.getLegMode());
+					path.put(event.getPersonId(), new LinkedList<Id>());
+					// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
+					if (!endInitialisedList.contains(event.getPersonId())) {
+						endLink.put(event.getPersonId(), null);
+						endTime.put(event.getPersonId(), null);
+						purpose.put(event.getPersonId(), null);
+						endInitialisedList.add(event.getPersonId());
+					}
+				} else {
+					//replace transit walk mode with pt
+					ArrayList<String> personModes = mode.getValues(event.getPersonId());
+					if (!personModes.get(personModes.size() - 1).equals("pt")) {
+						personModes.set((personModes.size() - 1), "pt");
+					}
+				}
+				break;
+			// handle transit walk trips
+			case "transit_walk":
+				if (!transitWalkList.contains(event.getPersonId())) {
+					transitWalkList.add(event.getPersonId());
+				}
+				// do not add a transit walk trip if it's only a stage
+				if (!ptTripList.contains(event.getPersonId())) {
+					startLink.put(event.getPersonId(), event.getLinkId());
+					startTime.put(event.getPersonId(), event.getTime());
+					mode.put(event.getPersonId(), event.getLegMode());
+					path.put(event.getPersonId(), new LinkedList<Id>());
+					// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
+					if (!endInitialisedList.contains(event.getPersonId())) {
+						endLink.put(event.getPersonId(), null);
+						endTime.put(event.getPersonId(), null);
+						purpose.put(event.getPersonId(), null);
+						endInitialisedList.add(event.getPersonId());
+					}
+				}
+				break;
+			// handle other trips
+			default:
 				startLink.put(event.getPersonId(), event.getLinkId());
 				startTime.put(event.getPersonId(), event.getTime());
 				mode.put(event.getPersonId(), event.getLegMode());
 				path.put(event.getPersonId(), new LinkedList<Id>());
-				// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
-				if (!endInitialisedList.contains(event.getPersonId())) {
-					endLink.put(event.getPersonId(), null);
-					endTime.put(event.getPersonId(), null);
-					purpose.put(event.getPersonId(), null);
-					endInitialisedList.add(event.getPersonId());
-				}
-				
-			}
-			else {
-				//replace transit walk mode with pt
-				ArrayList<String> personModes = mode.getValues(event.getPersonId());
-				if (!personModes.get(personModes.size()-1).equals("pt")) {
-					personModes.set((personModes.size()-1), "pt");
-				}
-			}
-
-
+				break;
 		}
-		// handle transit walk trips
-		else if (event.getLegMode().equals("transit_walk")) {
-			if (!transitWalkList.contains(event.getPersonId())) {
-				transitWalkList.add(event.getPersonId());
-			}
-			// do not add a transit walk trip if it's only a stage
-			if (!ptTripList.contains(event.getPersonId())) {
-				startLink.put(event.getPersonId(), event.getLinkId());
-				startTime.put(event.getPersonId(), event.getTime());
-				mode.put(event.getPersonId(), event.getLegMode());
-				path.put(event.getPersonId(), new LinkedList<Id>());
-				// set endLink and endTime to null (in case an agent enters a pt vehicle and the pt vehicle is stuck in the end)
-				if (!endInitialisedList.contains(event.getPersonId())) {
-					endLink.put(event.getPersonId(), null);
-					endTime.put(event.getPersonId(), null);
-					purpose.put(event.getPersonId(), null);
-					endInitialisedList.add(event.getPersonId());
-				}
-			}
-		}
-		// handle other trips
-		else {
-			startLink.put(event.getPersonId(), event.getLinkId());
-			startTime.put(event.getPersonId(), event.getTime());
-			mode.put(event.getPersonId(), event.getLegMode());
-			path.put(event.getPersonId(), new LinkedList<Id>());
-		}
-
 	}
 
 	@Override
