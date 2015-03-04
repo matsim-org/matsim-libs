@@ -55,10 +55,10 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			FileOutputStream os = new FileOutputStream(outputRoute);
 			super.openOutputStream(os);
 			super.writeStartTag("routes", null);
-			writeVTypes();	
-			System.out.println("writing vTypes completed");
-			writeVehicles();
-			System.out.println("writing Vehicles completed");
+//			writeVTypes();	
+//			System.out.println("writing vTypes completed");
+//			writeVehicles();
+//			System.out.println("writing Vehicles completed");
 			writePersons();
 			System.out.println("writing Persons completed");
 			super.writeEndTag("routes");
@@ -68,8 +68,12 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			FileOutputStream add = new FileOutputStream(outputAdditional);
 			this.writer = new BufferedWriter(new OutputStreamWriter(add));
 			super.writeStartTag("additional", null);
+			writeVTypes();	
+			System.out.println("writing vTypes completed");
 			writeBusStops();
 			System.out.println("writing busStops completed");
+			writeVehicles();
+			System.out.println("writing Vehicles completed");
 			super.writeEndTag("additional");
 			super.writer.close();
 			
@@ -95,6 +99,10 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			super.writeStartTag("vType", vType, true);
 			vType.clear();
 		}
+		vType.add(new Tuple<String, String>("id", "pedestrian"));
+		vType.add(new Tuple<String, String>("vClass", "pedestrian")); // defaultValues -> http://sumo.dlr.de/wiki/Vehicle_Type_Parameter_Defaults		
+		super.writeStartTag("vType", vType, true);
+		vType.clear();
 	}
 	
 	public void writeBusStops(){
@@ -103,7 +111,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			Id<TransitStopFacility> id = transStop.getId();
 			String lane = transStop.getLinkId().toString();
 			list.add(new Tuple<String, String>("id", id.toString()));
-			list.add(new Tuple<String, String>("lane", lane + "_0"));
+			list.add(new Tuple<String, String>("lane", lane + "_1"));
 //			list.add(new Tuple<String, String>("startPos", "20"));
 //			list.add(new Tuple<String, String>("endPos", "40"));
 			super.writeStartTag("busStop", list, true);
@@ -137,6 +145,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					super.writeStartTag("ride", list, true);
 				}else 
 					if (leg.getMode().contains("walk")){
+						list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
 						super.writeStartTag("walk", list, true);
 					}else 
 						if (leg.getMode().equals("pt")){ //add pt
@@ -162,11 +171,11 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.clear();
 				
 				if (nextAct != lastAct){
-					list.add(new Tuple<String, String>("lane", nextAct.getLinkId().toString() + "_0"));
+					list.add(new Tuple<String, String>("lane", nextAct.getLinkId().toString() + "_1"));
 					if (nextAct.getEndTime() > 0)
 						list.add(new Tuple<String, String>("until", String.valueOf(nextAct.getEndTime())));
 					else
-						list.add(new Tuple<String, String>("duration", "20"));
+						list.add(new Tuple<String, String>("duration", "0"));
 					list.add(new Tuple<String, String>("actType", nextAct.getType()));
 					super.writeStartTag("stop", list, true);
 					list.clear();
@@ -187,7 +196,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			VehicleInformation vehInfo = vehicles2BSorted.get(vehicleId);
 			if (vehicles2BSorted.get(vehicleId).getType().getId().toString().equals("car")){
 				list.add(new Tuple<String, String>("id", vehicleId.toString()));
-				list.add(new Tuple<String, String>("depart", Double.toString(vehInfo.getDeparture()) /*"triggered"*/));
+				list.add(new Tuple<String, String>("depart", /*Double.toString(vehInfo.getDeparture())*/ "triggered"));
 				list.add(new Tuple<String, String>("type", vehInfo.getType().getId().toString()));
 				list.add(new Tuple<String, String>("departLane", "best"));
 				super.writeStartTag("vehicle", list);
