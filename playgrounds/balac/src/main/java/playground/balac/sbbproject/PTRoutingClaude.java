@@ -40,6 +40,7 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;
 import playground.balac.utils.TransitRouterImplFactory;
+import playground.balac.utils.TransitRouterNetworkReaderMatsimV1;
 
 public class PTRoutingClaude {
 
@@ -143,17 +144,22 @@ public class PTRoutingClaude {
 		config.global().setNumberOfThreads(16);	// for parallel population reading
 	
 		
-		config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/mmNetwork.xml.gz");
+		config.network().setInputFile("./network_multimodal.xml.gz");
 
-	    //config.facilities().setInputFile("./facilities.xml.gz");
-	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/mmSchedule.xml.gz");
-	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/mmVehicles.xml.gz");
+	    config.facilities().setInputFile("./facilities.xml.gz");
+	    config.transit().setTransitScheduleFile("./schedule.20120117.ch-edited.xml.gz");
+	    config.transit().setVehiclesFile("./transitVehicles.ch.xml.gz");
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+				
+		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
+	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
+		
+		
 		
 		Set<String> vehicles = new TreeSet<String>();
 		vehicles.add("S");
@@ -169,7 +175,6 @@ public class PTRoutingClaude {
 		vehicles.add("D");
 		vehicles.add("VAE");
 		
-		TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 100.0);
 		
 
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
@@ -177,14 +182,14 @@ public class PTRoutingClaude {
 		
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/coord_"+args[0] +".txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("./coord_"+args[0] +".txt");
 
 //		    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
-			final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPT_"+args[0]+".txt");
-			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/travelTimesPTFr_"+args[0]+".txt");
+			final BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0]+".txt");
+			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("./travelTimesPTFr_"+args[0]+".txt");
 
-			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/frequency_"+args[0]+".txt");
+			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("./frequency_"+args[0]+".txt");
 			((TransitRouterConfigGroup) config.getModule("transitRouter")).setSearchRadius(1000.0);
 
 		
@@ -212,7 +217,7 @@ public class PTRoutingClaude {
 		ReadSBBData sbbData = new ReadSBBData(args[1], args[2]);
 		sbbData.read();
 		
-		
+		int countNoDidok = 0;
 		int countTrainSeg = 0;
 		
 		while(s != null) {
@@ -349,10 +354,8 @@ public class PTRoutingClaude {
 						
 					lastArrival +=  ((Leg) pe1).getTravelTime();
 					Collection<Departure> dep = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values();
-					Departure d = (Departure) dep.toArray()[0];
-					String vehId = d.getVehicleId().toString().split("_")[0];
-					if (vehicles.contains(vehId)) {
-						ArrayList<TrainDataPerSegment> trainData = sbbData.getTrainData(Integer.toString((int)Double.parseDouble(tr1.getRouteId().toString().split("_")[0])));
+					if (tr1.getStartLinkId().toString().startsWith("rail") || tr1.getEndLinkId().toString().startsWith("rail")) {
+						ArrayList<TrainDataPerSegment> trainData = sbbData.getTrainData(Integer.toString((int)Double.parseDouble(tr1.getRouteId().toString())));
 						countTrainSeg++;
 						if (trainData == null)
 							System.out.println("train data je null! " + (tr1.getRouteId().toString()));
@@ -372,7 +375,7 @@ public class PTRoutingClaude {
 							
 							if (trainData != null &(!countDidokFrom || !countDidokTo)) {
 								System.out.println(tr1.getRouteId().toString() +" " + tr1.getAccessStopId().toString() + " " + tr1.getEgressStopId().toString());
-								
+								countNoDidok++;
 							}
 						}
 					}
@@ -466,7 +469,7 @@ public class PTRoutingClaude {
 			
 		}	
 		
-		
+		System.out.println(countNoDidok);
 		System.out.println(countTrainSeg);
 		outFrequency.flush();
 		outFrequency.close();
