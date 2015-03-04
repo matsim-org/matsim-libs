@@ -3,7 +3,6 @@ package playground.artemc.hits;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -27,8 +26,8 @@ public class AssignStopsToHITS {
 	
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	public  AssignStopsToHITS(){	
-		new NetworkReaderMatsimV1(scenario).parse("C:/Work/MATSim/singapore7.xml");
+	public  AssignStopsToHITS(){
+		//new NetworkReaderMatsimV1(scenario).parse("C:/Work/MATSim/singapore7.xml");
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("C:/Work/MATSim/transitScheduleWAM.xml");		
 	}
