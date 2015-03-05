@@ -98,9 +98,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 
 		// the sequence of the modes defines their priority from high to low when determining the main mode of a multi-stage trip:
 		this.modePriorities = new ArrayList<>();
-		this.modePriorities.add(TransportMode.pt);
 		this.modePriorities.add(TransportMode.car);
 		this.modePriorities.add(TransportMode.ride);
+		this.modePriorities.add(TransportMode.pt);
 		this.modePriorities.add(TransportMode.bike);
 		this.modePriorities.add(TransportMode.walk);
 		this.modePriorities.add(TransportMode.transit_walk);
