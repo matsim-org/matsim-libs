@@ -1,10 +1,16 @@
-package org.matsim.contrib.analysis.vsp;
+package org.matsim.contrib.analysis.vsp.qgis;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRenderer;
+import org.matsim.core.utils.io.IOUtils;
 
 public abstract class QGisLayer {
 	
@@ -54,7 +60,7 @@ public abstract class QGisLayer {
 			
 		} else{
 			
-			throw new RuntimeException("Invalid input type! Cannot create layer.");
+			throw new RuntimeException("Unsupported input type! Cannot create layer.");
 			
 		}
 		

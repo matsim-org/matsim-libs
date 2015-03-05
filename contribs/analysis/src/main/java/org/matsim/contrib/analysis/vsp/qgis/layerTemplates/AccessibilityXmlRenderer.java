@@ -1,6 +1,6 @@
 package org.matsim.contrib.analysis.vsp.qgis.layerTemplates;
 
-import org.matsim.contrib.analysis.vsp.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRasterRenderer;
 
 public class AccessibilityXmlRenderer extends QGisRasterRenderer {

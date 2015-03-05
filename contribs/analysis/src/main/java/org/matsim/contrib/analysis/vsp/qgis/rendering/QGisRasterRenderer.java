@@ -1,6 +1,6 @@
 package org.matsim.contrib.analysis.vsp.qgis.rendering;
 
-import org.matsim.contrib.analysis.vsp.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 
 /**
  * Renderer for QGis raster layers.

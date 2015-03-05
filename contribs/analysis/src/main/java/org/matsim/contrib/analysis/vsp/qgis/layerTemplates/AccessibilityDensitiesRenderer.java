@@ -2,9 +2,9 @@ package org.matsim.contrib.analysis.vsp.qgis.layerTemplates;
 
 import java.awt.Color;
 
-import org.matsim.contrib.analysis.vsp.QGisConstants;
-import org.matsim.contrib.analysis.vsp.QGisPointSymbolLayer;
-import org.matsim.contrib.analysis.vsp.Range;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
+import org.matsim.contrib.analysis.vsp.qgis.Range;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {

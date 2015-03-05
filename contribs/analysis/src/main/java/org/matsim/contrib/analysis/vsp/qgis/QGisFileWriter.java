@@ -1,4 +1,4 @@
-package org.matsim.contrib.analysis.vsp;
+package org.matsim.contrib.analysis.vsp.qgis;
 
 import java.io.BufferedWriter;
 import java.io.File;

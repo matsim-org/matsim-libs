@@ -1,7 +1,7 @@
 package org.matsim.contrib.analysis.vsp.qgis.rendering;
 
-import org.matsim.contrib.analysis.vsp.QGisConstants;
-import org.matsim.contrib.analysis.vsp.Range;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.Range;
 
 /**
  * Template class for a renderer that draws graduated symbols.

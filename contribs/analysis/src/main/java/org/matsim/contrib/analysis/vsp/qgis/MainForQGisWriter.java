@@ -1,4 +1,4 @@
-package org.matsim.contrib.analysis.vsp;
+package org.matsim.contrib.analysis.vsp.qgis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
@@ -102,8 +102,8 @@ public class MainForQGisWriter {
 		
 		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
 				QGisConstants.geometryType.Point);
-		layer.setXField("xCoord");
-		layer.setYField("yCoord");
+		layer.setXField(1);
+		layer.setYField(2);
 		layer.setDelimiter(",");
 		NoiseRenderer renderer = new NoiseRenderer();
 		renderer.setRenderingAttribute("immission_16:00:00");

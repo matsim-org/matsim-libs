@@ -1,7 +1,13 @@
-package org.matsim.contrib.analysis.vsp;
+package org.matsim.contrib.analysis.vsp.qgis;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.core.utils.io.IOUtils;
 
 public class VectorLayer extends QGisLayer {
 
@@ -43,7 +49,7 @@ public class VectorLayer extends QGisLayer {
 	 * @param path path to the input file
 	 * @param geometryType type of geometry within the file
 	 */
-	public VectorLayer(String name, String path, org.matsim.contrib.analysis.vsp.QGisConstants.geometryType geometryType) {
+	public VectorLayer(String name, String path, org.matsim.contrib.analysis.vsp.qgis.QGisConstants.geometryType geometryType) {
 		
 		super(name, path);
 		
@@ -62,6 +68,75 @@ public class VectorLayer extends QGisLayer {
 				this.setLayerClass(QGisConstants.layerClass.SimpleMarker);
 				
 			}
+			
+		}
+		
+		checkConsistency();
+		
+	}
+	
+	private void checkConsistency(){
+		
+		File file = new File(this.getPath());
+		
+		if(file.exists()){
+			
+			if(this.getInputType().equals(QGisConstants.inputType.csv)){
+				
+				try {
+					
+					BufferedReader reader = IOUtils.getBufferedReader(this.getPath());
+					
+					String header = reader.readLine();
+					
+					String[] headerParts = header.split(",").length < 1 ? header.split(";") : header.split(",");
+
+					for(String s : headerParts){
+						
+						if(!s.contains(" ")){
+							
+							if(s.contains(".")||s.contains(",")){
+								
+								if(s.contains("")){
+									
+									this.useHeader = true;
+									break;
+									
+								} else{
+									
+									this.useHeader = false;
+									
+								}
+								
+							} else{
+								
+								this.useHeader = false;
+								
+							}
+							
+						} else{
+							
+							this.useHeader = false;
+							
+						}
+
+					}
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+					
+				}
+				
+			}
+			
+		} else{
+			
+			throw new RuntimeException("File " + this.getPath() + " cannot be found! Please check input path!");
 			
 		}
 		
@@ -91,8 +166,17 @@ public class VectorLayer extends QGisLayer {
 	 * @param columnIndex the column that contains the x coordinates of the geometries
 	 */
 	public void setXField(int columnIndex){
-		this.xField = "field_" + Integer.valueOf(columnIndex);
-		this.useHeader = false;
+		
+		if(!this.useHeader){
+			
+			this.xField = "field_" + Integer.valueOf(columnIndex);
+			
+		} else{
+			
+			throw new RuntimeException("The file " + this.getPath() + " has a header! Use the method \"setXField(String xField)\" instead!");
+			
+		}
+		
 	}
 	
 	/**
@@ -103,8 +187,17 @@ public class VectorLayer extends QGisLayer {
 	 * @param xField the header field name of the column that contains the x coordinates of the geometries
 	 */
 	public void setXField(String xField){
-		this.xField = xField;
-		this.useHeader = true;
+		
+		if(this.useHeader){
+			
+			this.xField = xField;
+			
+		} else{
+			
+			throw new RuntimeException("The file " + this.getPath() + " has no header! Use the method \"setXField(int xField)\" instead!");
+			
+		}
+		
 	}
 	
 	/**
@@ -126,13 +219,31 @@ public class VectorLayer extends QGisLayer {
 	 * @param yField the header field name of the column that contains the x coordinates of the geometries
 	 */
 	public void setYField(int columnIndex){
-		this.yField = "field_" + Integer.valueOf(columnIndex);
-		this.useHeader = false;
+		
+		if(!this.useHeader){
+			
+			this.yField = "field_" + Integer.valueOf(columnIndex);
+			
+		} else{
+			
+			throw new RuntimeException("The file " + this.getPath() + " has a header! Use the method \"setYField(String yField)\" instead!");
+			
+		}
+		
 	}
 	
 	public void setYField(String yField){
-		this.yField = yField;
-		this.useHeader = true;
+		
+		if(this.useHeader){
+			
+			this.yField = yField;
+			
+		} else{
+			
+			throw new RuntimeException("The file " + this.getPath() + " has no header! Use the method \"setYField(int yField)\" instead!");
+			
+		}
+		
 	}
 	
 	public String getYField(){

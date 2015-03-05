@@ -3,8 +3,8 @@ package org.matsim.contrib.analysis.vsp.qgis.rendering;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.analysis.vsp.QGisConstants;
-import org.matsim.contrib.analysis.vsp.QGisSymbolLayer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisSymbolLayer;
 
 /**
  * 
