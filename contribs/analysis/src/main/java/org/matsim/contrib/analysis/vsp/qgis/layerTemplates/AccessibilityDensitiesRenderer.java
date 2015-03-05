@@ -10,10 +10,9 @@ import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 
 	private Range[] ranges;
-	private String renderingAttribute;
 	
-	public AccessibilityDensitiesRenderer() {
-		super();
+	public AccessibilityDensitiesRenderer(boolean useHeader) {
+		super(useHeader);
 		init();
 	}
 	
@@ -81,16 +80,6 @@ public class AccessibilityDensitiesRenderer extends GraduatedSymbolRenderer {
 	@Override
 	public Range[] getRanges() {
 		return this.ranges;
-	}
-
-	@Override
-	public String getRenderingAttribute() {
-		return this.renderingAttribute;
-	}
-
-	@Override
-	public void setRenderingAttribute(String attr) {
-		this.renderingAttribute = attr;
 	}
 
 }

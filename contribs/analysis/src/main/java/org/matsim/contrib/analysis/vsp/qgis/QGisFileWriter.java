@@ -3,6 +3,8 @@ package org.matsim.contrib.analysis.vsp.qgis;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRasterRenderer;
@@ -179,7 +181,7 @@ public class QGisFileWriter {
 		
 		if(isCsvDataLayer(vlayer)){
 			
-			String datasource = "file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.getUseHeader() + "&amp;";
+			String datasource = "file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.headerUsed() + "&amp;";
 			
 			if(vlayer.getDelimiter() != null){
 				

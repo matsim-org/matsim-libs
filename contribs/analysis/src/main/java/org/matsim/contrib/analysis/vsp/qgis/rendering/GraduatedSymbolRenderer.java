@@ -15,16 +15,54 @@ import org.matsim.contrib.analysis.vsp.qgis.Range;
  */
 public abstract class GraduatedSymbolRenderer extends QGisRenderer {
 
-	public GraduatedSymbolRenderer() {
+	private String renderingAttribute;
+	private boolean useHeader;
+	
+	public GraduatedSymbolRenderer(boolean useHeader) {
 		
 		super(QGisConstants.renderingType.graduatedSymbol);
+		this.useHeader = useHeader;
 		
 	}
 
 	public abstract Range[] getRanges();
 
-	public abstract String getRenderingAttribute();
+	public String getRenderingAttribute(){
+		
+		return this.renderingAttribute;
+		
+	}
 
-	public abstract void setRenderingAttribute(String attr);
+	public void setRenderingAttribute(String attr){
+		
+		if(this.useHeader){
+			
+			this.renderingAttribute = attr;
+			
+		} else{
+			
+			throw new RuntimeException("The input file for this renderer has no header. Use method \"setRenderingAttribute(int columnIndex)\" instead!");
+			
+		}
+		
+	}
+	
+	public void setRenderingAttribute(int columnIndex){
+		
+		if(!this.useHeader){
+			
+			this.renderingAttribute = "field_" + Integer.toString(columnIndex);
+			
+		} else{
+			
+			throw new RuntimeException("The input file for this renderer has a header. Use method \"setRenderingAttribute(String attr)\" instead!");
+			
+		}
+		
+	}
+
+	public boolean isUseHeader() {
+		return useHeader;
+	}
 
 }

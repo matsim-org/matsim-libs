@@ -9,12 +9,11 @@ import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class NoiseRenderer extends GraduatedSymbolRenderer {
 	
-	private String renderingAttribute;
 	private Range[] ranges;
 	
-	public NoiseRenderer() {
+	public NoiseRenderer(boolean useHeader) {
 
-		super();
+		super(useHeader);
 		
 		this.init();
 		
@@ -136,16 +135,6 @@ public class NoiseRenderer extends GraduatedSymbolRenderer {
 	@Override
 	public Range[] getRanges(){
 		return this.ranges;
-	}
-	
-	@Override
-	public String getRenderingAttribute(){
-		return this.renderingAttribute;
-	}
-	
-	@Override
-	public void setRenderingAttribute(String attr){
-		this.renderingAttribute = attr;
 	}
 	
 }

@@ -52,12 +52,12 @@ public class MainForQGisWriter {
 //		noiseLayer.setDelimiter(";");
 //		noiseLayer.setXField("xCoord");
 //		noiseLayer.setYField("yCoord");
-//		NoiseRenderer renderer = new NoiseRenderer();
+//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer.isUsingHeader());
 //		renderer.setRenderingAttribute("immissions_3600_Immission 11:00:00");
 //		noiseLayer.setRenderer(renderer);
 //		writer.addLayer(noiseLayer);
 //		
-//		VectorLayer joinLayer = new VectorLayer("immissions_3600", "C:/Users/Daniel/Desktop/MATSimQGisIntegration/testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
+//		VectorLayer joinLayer = new VectorLayer("immissions_3600", workingDirectory + "testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
 //				QGisConstants.geometryType.No_geometry);
 //		writer.addLayer(joinLayer);
 //
@@ -76,10 +76,10 @@ public class MainForQGisWriter {
 //		writer.addLayer(0,mapnikLayer);
 //
 //		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
-//		densityLayer.setXField("field_1");
-//		densityLayer.setYField("field_2");
-//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer();
-//		dRenderer.setRenderingAttribute("field_8");
+//		densityLayer.setXField(1);
+//		densityLayer.setYField(2);
+//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer.isUsingHeader());
+//		dRenderer.setRenderingAttribute(8);
 //		densityLayer.setRenderer(dRenderer);
 //		writer.addLayer(1,densityLayer);
 //		
@@ -88,10 +88,10 @@ public class MainForQGisWriter {
 //		//there are two ways to set x and y fields for csv geometry files
 //		//1) if there is a header, you can set the members xField and yField to the name of the column headers
 //		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-//		accessibilityLayer.setXField("field_1");
-//		accessibilityLayer.setYField("field_2");
-//		AccessibilityRenderer renderer = new AccessibilityRenderer();
-//		renderer.setRenderingAttribute("field_3"); // choose column/header to visualize
+//		accessibilityLayer.setXField(1);
+//		accessibilityLayer.setYField(2);
+//		AccessibilityRenderer renderer = new AccessibilityRenderer(densityLayer.isUsingHeader());
+//		renderer.setRenderingAttribute(3); // choose column/header to visualize
 //		accessibilityLayer.setRenderer(renderer);
 //		writer.addLayer(2,accessibilityLayer);
 
@@ -102,10 +102,10 @@ public class MainForQGisWriter {
 		
 		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
 				QGisConstants.geometryType.Point);
-		layer.setXField(1);
-		layer.setYField(2);
+		layer.setXField("xCoord");
+		layer.setYField("yCoord");
 		layer.setDelimiter(",");
-		NoiseRenderer renderer = new NoiseRenderer();
+		NoiseRenderer renderer = new NoiseRenderer(layer.isUsingHeader());
 		renderer.setRenderingAttribute("immission_16:00:00");
 		layer.setRenderer(renderer);
 		

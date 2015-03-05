@@ -9,11 +9,10 @@ import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
-	private String renderingAttribute;
 	private Range[] ranges;
 
-	public AccessibilityRenderer() {
-		super();
+	public AccessibilityRenderer(boolean useHeader) {
+		super(useHeader);
 		init();
 	}
 
@@ -146,16 +145,6 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	@Override
 	public Range[] getRanges(){
 		return this.ranges;
-	}
-	
-	@Override
-	public String getRenderingAttribute(){
-		return this.renderingAttribute;
-	}
-	
-	@Override
-	public void setRenderingAttribute(String attr){
-		this.renderingAttribute = attr;
 	}
 	
 }

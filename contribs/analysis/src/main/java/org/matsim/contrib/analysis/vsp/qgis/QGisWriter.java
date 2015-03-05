@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 
 /**
@@ -88,6 +89,13 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 	@Override
 	public void write(String filename) {
 		
+		OutputDirectoryLogging.catchLogEntries();
+		try {
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(this.workingDirectory);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
 		log.info("Writing QuantumGIS project file (*.qgs) to " + this.workingDirectory + filename + "...");
 		log.info("Make sure all your input files exist. This writer will do absolutely no file writing except for the project file.");
 		
@@ -136,19 +144,21 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 		
 		log.info("...Done.");
 		
+		OutputDirectoryLogging.closeOutputDirLogging();
+		
 	}
 
 	private void printQGisProjectSettings() {
 		
-		System.out.println("\nQGis project uses the following configuration:\n");
+		log.info("QGis project uses the following configuration:");
 		
-		System.out.println("PROJECT VERSION:\t\t\t" + QGisConstants.currentVersion);
-		System.out.println("EXTENT (MINX, MINY, MAXX, MAXY):\t" + this.extent[0] + ", " + this.extent[1] + ", " + this.extent[2] + ", " + this.extent[3]);
-		System.out.println("SPATIAL REFERENCE SYSTEM:\t\t" + this.srs.getDescription());
-		System.out.println("NUMBER OF LAYERS:\t\t\t" + this.layers.size());
-		System.out.println("LAYERS (IN DRAWING ORDER):");
+		log.info("PROJECT VERSION:\t\t\t" + QGisConstants.currentVersion);
+		log.info("EXTENT (MINX, MINY, MAXX, MAXY):\t" + this.extent[0] + ", " + this.extent[1] + ", " + this.extent[2] + ", " + this.extent[3]);
+		log.info("SPATIAL REFERENCE SYSTEM:\t\t" + this.srs.getDescription());
+		log.info("NUMBER OF LAYERS:\t\t\t" + this.layers.size());
+		log.info("LAYERS (IN DRAWING ORDER):");
 		
-		System.out.println("############################################################");
+		log.info("############################################################");
 		
 		String srs = null;
 		
@@ -156,17 +166,28 @@ public class QGisWriter extends AbstractMatsimWriter implements MatsimWriter {
 			
 			srs = layer.getSrs() != null ? layer.getSrs().getDescription() : "[project]";
 			
-			System.out.println("name:\t\t\t\t\t" + layer.getName());
-			System.out.println("layer type:\t\t\t\t" + layer.getType().toString());
-			System.out.println("layer class:\t\t\t\t" + layer.getLayerClass().toString());
-			System.out.println("rendering type:\t\t\t\t" + layer.getRenderer().getRenderingType().toString());
-			System.out.println("spatial reference system:\t\t" + srs);
+			log.info("name:\t\t\t\t" + layer.getName());
+			log.info("input type:\t\t\t" + layer.getInputType().toString());
+			log.info("layer type:\t\t\t" + layer.getType().toString());
 			
-			System.out.println("############################################################");
+			if(layer.getLayerClass() != null){
+				
+				log.info("layer class:\t\t\t" + layer.getLayerClass().toString());
+				
+			}
+			
+			if(layer.getRenderer() != null){
+				
+				log.info("rendering type:\t\t\t" + layer.getRenderer().getRenderingType().toString());
+				log.info("renderer:\t\t\t\t" + layer.getRenderer().getClass().getSimpleName());
+				
+			}
+			
+			log.info("spatial reference system:\t\t" + srs);
+			
+			log.info("############################################################");
 			
 		}
-		
-		System.out.println("");
 		
 	}
 
