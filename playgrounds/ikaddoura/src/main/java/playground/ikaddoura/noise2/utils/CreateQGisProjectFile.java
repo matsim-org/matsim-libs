@@ -52,9 +52,11 @@ public static void main(String args[]){
 		noiseLayer.setDelimiter(",");
 		noiseLayer.setXField("xCoord");
 		noiseLayer.setYField("yCoord");
-		NoiseRenderer renderer = new NoiseRenderer();
+		
+		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
 		renderer.setRenderingAttribute("immission_" + time);
-		noiseLayer.setRenderer(renderer);
+		
+//		noiseLayer.setRenderer(renderer);
 		writer.addLayer(noiseLayer);
 		
 // ################################################################################################################################################
