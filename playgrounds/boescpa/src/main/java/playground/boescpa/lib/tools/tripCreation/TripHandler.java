@@ -22,11 +22,8 @@ package playground.boescpa.lib.tools.tripCreation;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -43,7 +40,9 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 	
 	// TODO-boescpa create "path" for pt and transit_walk too! {Possibly will have to adapt TestScenarioAnalyzer and TestTopdadTripProcessor if this is done...}
-	
+
+	private List<String> modePriorities;
+
 	BoxedHashMap<Id,Id> startLink;
 	BoxedHashMap<Id,Double> startTime;
 	BoxedHashMap<Id,String> mode;
@@ -55,7 +54,6 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	HashSet<Id> currentTripList;
 	HashMap<Id,Id> stageEndLinkId;
 	HashMap<Id,Double> stageEndTime;
-	HashSet<Id> endInitialisedList;
 
 	public BoxedHashMap<Id, Id> getStartLink() {
 		return startLink;
@@ -97,7 +95,16 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 		stageEndLinkId = new HashMap<>();
 		stageEndTime = new HashMap<>();
 		currentTripList = new HashSet<>();
-		endInitialisedList = new HashSet<>();
+
+		// the sequence of the modes defines their priority from high to low when determining the main mode of a multi-stage trip:
+		this.modePriorities = new ArrayList<>();
+		this.modePriorities.add(TransportMode.pt);
+		this.modePriorities.add(TransportMode.car);
+		this.modePriorities.add(TransportMode.ride);
+		this.modePriorities.add(TransportMode.bike);
+		this.modePriorities.add(TransportMode.walk);
+		this.modePriorities.add(TransportMode.transit_walk);
+		this.modePriorities.add(TransportMode.other);
 	}
 
 	@Override
@@ -117,20 +124,20 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 			mode.put(event.getPersonId(), event.getLegMode());
 			path.put(event.getPersonId(), new LinkedList<Id>());
 			// set endLink and endTime to null (in case an agent is stuck in the end)
-			if (!endInitialisedList.contains(event.getPersonId())) {
-				endLink.put(event.getPersonId(), null);
-				endTime.put(event.getPersonId(), null);
-				purpose.put(event.getPersonId(), null);
-				endInitialisedList.add(event.getPersonId());
-			}
+			endLink.put(event.getPersonId(), null);
+			endTime.put(event.getPersonId(), null);
+			purpose.put(event.getPersonId(), null);
 		}
 		// if pt but not noted as such yet, set it as a pt-trip now
-		if (event.getLegMode().equals("pt")) {
-			//replace transit walk mode with pt
-			ArrayList<String> personModes = mode.getValues(event.getPersonId());
-			if (!personModes.get(personModes.size() - 1).equals("pt")) {
-				personModes.set((personModes.size() - 1), "pt");
-			}
+		replaceModeIfEventModeDominant(event);
+	}
+
+	private void replaceModeIfEventModeDominant(PersonDepartureEvent event) {
+		ArrayList<String> personModes = mode.getValues(event.getPersonId());
+		int priorityEventMode = modePriorities.indexOf(event.getLegMode());
+		int priorityCurrentMode = modePriorities.indexOf(personModes.get(personModes.size() - 1));
+		if (priorityEventMode < priorityCurrentMode) {
+			personModes.set((personModes.size() - 1), event.getLegMode());
 		}
 	}
 
@@ -138,16 +145,15 @@ public class TripHandler implements PersonDepartureEventHandler, PersonArrivalEv
 	public void handleEvent(ActivityStartEvent event) {
 		// do not add activity if it's a pt interaction
 		if (!event.getActType().equals("pt interaction")) {
-			if (endInitialisedList.contains(event.getPersonId())) {
-				endLink.removeLast(event.getPersonId());
-				endTime.removeLast(event.getPersonId());
-				purpose.removeLast(event.getPersonId());
-			}
+			// remove the nulls set for the situation when a person is stuck
+			endLink.removeLast(event.getPersonId());
+			endTime.removeLast(event.getPersonId());
+			purpose.removeLast(event.getPersonId());
+			// add the true values:
 			endLink.put(event.getPersonId(), stageEndLinkId.get(event.getPersonId()));
 			endTime.put(event.getPersonId(), stageEndTime.get(event.getPersonId()));
 			purpose.put(event.getPersonId(), event.getActType());
 			// clean up:
-			endInitialisedList.remove(event.getPersonId());
 			currentTripList.remove(event.getPersonId());
 		}
 	}
