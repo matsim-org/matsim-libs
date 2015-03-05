@@ -44,7 +44,19 @@ public class CreatePtZonesFromTransitStopCoordinates {
 	public static final String NAME_IDENTIFIER = "zoneId";
 
 	public static void createPtZonesFromTransitStopCoordinates(String transitStopListFilename, String zoneShapeFilename){
-		Map<String, List<Coord>> ptZoneId2TransitStopCoordinates = ReadStopTable.readGenericCSV(transitStopListFilename);
+		Map<String, List<StopTableEntry>> ptZoneId2StopTableEntries = ReadStopTable2013.readGenericCSV(transitStopListFilename);
+		
+		
+		Map<String, List<Coord>> ptZoneId2TransitStopCoordinates = new HashMap<String, List<Coord>>();
+		for (String zoneId : ptZoneId2StopTableEntries.keySet()) {
+			ptZoneId2TransitStopCoordinates.put(zoneId, new ArrayList<Coord>());
+			
+			for (StopTableEntry stopTableEntry : ptZoneId2StopTableEntries.get(zoneId)) {
+				ptZoneId2TransitStopCoordinates.get(zoneId).add(stopTableEntry.coordCartesian);
+			}
+		}
+		
+		
 		Map<String, Geometry> ptZoneId2MultiPointGeometry = createMulitipointGeometriesFromTransitStopCoordinates(ptZoneId2TransitStopCoordinates);
 		
 		Map<String, Polygon> ptZoneId2Polygon = createPolygonFromMultiPointGeometry(ptZoneId2MultiPointGeometry);
@@ -115,8 +127,8 @@ public class CreatePtZonesFromTransitStopCoordinates {
 	public static void main(String[] args) throws Exception {
 		
 		final String directory = "e:/_shared-svn/_data/santiago_pt_demand_matrix/";
-		final String transitStopListFilename = directory + "/raw_data/Diccionario paradero-zona777.csv.gz";
-		final String zoneShapeFilename = directory + "converted_data/pt_zones.shp";
+		final String transitStopListFilename = directory + "/raw_data_2013/redparadasAbr2013.csv.gz";
+		final String zoneShapeFilename = directory + "pt_stops_schedule_2013/pt_zones.shp";
 		
 		CreatePtZonesFromTransitStopCoordinates.createPtZonesFromTransitStopCoordinates(transitStopListFilename, zoneShapeFilename);
 	}

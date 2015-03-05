@@ -71,29 +71,30 @@ public class SantiagoPopulationCreator {
 			log.info(" 3 - output plans file");
 			
 			final String directory = "e:/_shared-svn/_data/santiago_pt_demand_matrix/";
-			ptZones = directory + "converted_data/pt_zones.shp";
-			tripTable = directory + "raw_data/MatrizODviajes_zona777_mediahora_abr2012.csv.gz";
-			outputPlansFile = directory + "converted_data/plans.xml.gz";
+			ptZones = directory + "pt_stops_schedule_2013/pt_zones.shp";
+			tripTable = directory + "raw_data_2013/MatrizODviajes_zonas777_mediahora_web_abr2013.csv.gz";
+			outputPlansFile = directory + "pt_stops_schedule_2013/santiago.xml.gz";
 		}
 		
 		SantiagoPopulationCreator populationSantiago = new SantiagoPopulationCreator();
-		Population population = populationSantiago.run(ptZones, tripTable);
-		populationSantiago.writePlans(population, outputPlansFile);
+		populationSantiago.run(ptZones, tripTable, outputPlansFile);
 	}
 
-	public Population run(String ptZones, String tripTable) {
+	public Population run(String ptZones, String tripTable, String outputPlansFile) {
 		
 		// read pt zones
 		Map<String, Geometry> ptZoneId2Geometry = readShapeFile(ptZones);
 		
 		// read the tripTable
-		List<TripTableEntry> tripTableEntries = ReadTripTable.readGenericCSV(tripTable);
+		List<TripTableEntry> tripTableEntries = ReadTripTable2013.readGenericCSV(tripTable);
 
 		// create population from trip table entries
 		Population population = createPopulation(ptZoneId2Geometry, tripTableEntries);
+		writePlans(population, outputPlansFile);
 
 		// merge persons if feasible
 		population = findPersonPairs(population);
+		writePlans(population, outputPlansFile.replace(".xml.gz", "_paired.xml.gz"));
 		
 		return population;
 	}
@@ -127,7 +128,7 @@ public class SantiagoPopulationCreator {
 					
 					// first
 					activity = population.getFactory().createActivityFromCoord("firstAct", homeLocation);
-					activity.setEndTime(getRandomTimeWithinInterval(random, tripTableEntry.timeOfBoarding, ReadTripTable.TIME_INTERVAL));
+					activity.setEndTime(getRandomTimeWithinInterval(random, tripTableEntry.timeOfBoarding, ReadTripTable2012.TIME_INTERVAL));
 					plan.addActivity(activity);
 					
 					plan.addLeg(population.getFactory().createLeg(TransportMode.pt));
@@ -219,6 +220,9 @@ public class SantiagoPopulationCreator {
 	}
 
 	
+	/**
+	 * For educational purposes...
+	 */
 	private Population findPersonPairsList(Population population) {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -382,6 +386,12 @@ public class SantiagoPopulationCreator {
 		
 		PopulationWriter populationWriter10pct = new PopulationWriter(population, null, 0.1);
 		populationWriter10pct.write(outputPlansFile.replace(".xml.gz", "_10pct.xml.gz"));
+
+		PopulationWriter populationWriter5pct = new PopulationWriter(population, null, 0.05);
+		populationWriter5pct.write(outputPlansFile.replace(".xml.gz", "_05pct.xml.gz"));
+		
+		PopulationWriter populationWriter2pct = new PopulationWriter(population, null, 0.02);
+		populationWriter2pct.write(outputPlansFile.replace(".xml.gz", "_02pct.xml.gz"));
 		
 		PopulationWriter populationWriter1pct = new PopulationWriter(population, null, 0.01);
 		populationWriter1pct.write(outputPlansFile.replace(".xml.gz", "_01pct.xml.gz"));

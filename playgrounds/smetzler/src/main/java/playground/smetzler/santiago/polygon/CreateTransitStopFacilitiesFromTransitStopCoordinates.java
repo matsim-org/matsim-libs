@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,29 +49,31 @@ public class CreateTransitStopFacilitiesFromTransitStopCoordinates {
 	private static final Logger log = Logger.getLogger(CreateTransitStopFacilitiesFromTransitStopCoordinates.class);
 	
 	public static void createTransitStopFacilitiesFromTransitStopCoordinates(String networkFilename, String transitStopListFilename, String transitScheduleFilename){
-		Map<String, List<Coord>> ptZoneId2TransitStopCoordinates = ReadStopTable.readGenericCSV(transitStopListFilename);
+		Map<String, List<StopTableEntry>> ptZoneId2StopTableEntries = ReadStopTable2013.readGenericCSV(transitStopListFilename);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		
-		TransitSchedule transitSchedule = createTransitStopFacilitiesFromTransitStopCoordinates(scenario, ptZoneId2TransitStopCoordinates);
+		TransitSchedule transitSchedule = createTransitStopFacilitiesFromStopTableEntries(scenario, ptZoneId2StopTableEntries);
 		transitSchedule = filterTransitStopFacilities(scenario, transitSchedule);
 		
 		new TransitScheduleWriter(transitSchedule).writeFile(transitScheduleFilename);
 	}		
 
-	private static TransitSchedule createTransitStopFacilitiesFromTransitStopCoordinates(Scenario scenario, Map<String, List<Coord>> ptZoneId2TransitStopCoordinates) {
+	private static TransitSchedule createTransitStopFacilitiesFromStopTableEntries(Scenario scenario, Map<String, List<StopTableEntry>> ptZoneId2StopTableEntries) {
 
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		int numberOfStopsCreated = 0;
 		
-		for (List<Coord> transitStopCoords : ptZoneId2TransitStopCoordinates.values()) {
-			for (Coord transitStopCoord : transitStopCoords) {
+		for (List<StopTableEntry> stopTableEntries : ptZoneId2StopTableEntries.values()) {
+			for (StopTableEntry stopTableEntry : stopTableEntries) {
 				numberOfStopsCreated++;
-				Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), transitStopCoord);
+				Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), stopTableEntry.coordCartesian);
 				Id<TransitStopFacility> stopId = Id.create(numberOfStopsCreated, TransitStopFacility.class);
-				TransitStopFacility transitStop = transitSchedule.getFactory().createTransitStopFacility(stopId, transitStopCoord, false);
+				TransitStopFacility transitStop = transitSchedule.getFactory().createTransitStopFacility(stopId, stopTableEntry.coordCartesian, false);
 				transitStop.setLinkId(link.getId());
+				transitStop.setName(stopTableEntry.name);
+				transitStop.setStopPostAreaId(stopTableEntry.stopArea);
 				transitSchedule.addStopFacility(transitStop);
 			}
 		}
@@ -125,9 +126,9 @@ public class CreateTransitStopFacilitiesFromTransitStopCoordinates {
 	public static void main(String[] args) throws Exception {
 		
 		final String directory = "e:/_shared-svn/_data/santiago_pt_demand_matrix/";
-		final String transitStopListFilename = directory + "/raw_data/Diccionario paradero-zona777.csv.gz";
-		final String networkFilename = directory + "network/santiago_tiny_transformed.xml.gz";
-		final String transitScheduleFilename = directory + "converted_data/transitSchedule_tiny.xml.gz";
+		final String transitStopListFilename = directory + "/raw_data_2013/redparadasAbr2013.csv.gz";
+		final String networkFilename = directory + "network/santiago_primary_transformed.xml.gz";
+		final String transitScheduleFilename = directory + "pt_stops_schedule_2013/transitSchedule_primary.xml.gz";
 		
 		CreateTransitStopFacilitiesFromTransitStopCoordinates.createTransitStopFacilitiesFromTransitStopCoordinates(networkFilename, transitStopListFilename, transitScheduleFilename);
 	}

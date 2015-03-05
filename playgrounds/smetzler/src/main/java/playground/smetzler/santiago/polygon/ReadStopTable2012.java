@@ -33,22 +33,22 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  * @author aneumann
  *
  */
-public class ReadStopTable implements TabularFileHandler {
+public class ReadStopTable2012 implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadStopTable.class);
+	private static final Logger log = Logger.getLogger(ReadStopTable2012.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private Map<String, List<Coord>> ptZoneId2TransitStopCoordinates = new HashMap<>();
 	private int linesRejected = 0;
 
-	private ReadStopTable(String filename) {
+	private ReadStopTable2012(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
 		tabFileParserConfig.setDelimiterTags(new String[] {","}); // \t
 	}
 
 	protected static Map<String, List<Coord>> readGenericCSV(String filename) {
-		ReadStopTable reader = new ReadStopTable(filename);
+		ReadStopTable2012 reader = new ReadStopTable2012(filename);
 		log.info("Start parsing " + filename);
 		reader.parse();
 		log.info("Finished parsing " + filename);

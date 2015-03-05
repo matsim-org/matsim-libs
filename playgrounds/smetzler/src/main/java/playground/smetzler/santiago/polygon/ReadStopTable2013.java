@@ -16,46 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.smetzler.santiago.demand;
+package playground.smetzler.santiago.polygon;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.core.utils.misc.Time;
 
 /**
- * Read trip table with header "diseno777subida|diseno777bajada|mediahora|viaje_laboral_promedio|viajes_adulto|viajes_estudiante|viajes_1_etapa|viajes_2_etapas|viajes_3_etapas|viajes_4_o_mas_etapas|viajes_usan_metro|viajes_solo_metro " 
+ * Read transit stop table with header
+ * 
+ * Codigo|CodigoUsuario|Comuna|Nombre|Sentido|FilaSuperior|FilaInferior|GrupoParada|X|Y|Latitud|Longitud|censal_1992|comunas|diseno_563|diseno_777|eod_2001|eod_2006|estraus_264|estraus_404|estraus_410|estraus_618|zonas_6
  * 
  * @author aneumann
  *
  */
-public class ReadTripTable implements TabularFileHandler {
+public class ReadStopTable2013 implements TabularFileHandler {
 	
-	private static final Logger log = Logger.getLogger(ReadTripTable.class);
-	static final double TIME_INTERVAL = 30 * 60; // 30 minutes
+	private static final Logger log = Logger.getLogger(ReadStopTable2013.class);
 
 	private TabularFileParserConfig tabFileParserConfig;
-	private List<TripTableEntry> tripTableEntries = new LinkedList<>();
+	private Map<String, List<StopTableEntry>> ptZoneId2TransitStopCoordinates = new HashMap<>();
 	private int linesRejected = 0;
 
-	private ReadTripTable(String filename) {
+	private ReadStopTable2013(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
 		tabFileParserConfig.setDelimiterTags(new String[] {"|"}); // \t
 	}
 
-	protected static List<TripTableEntry> readGenericCSV(String filename) {
-		ReadTripTable reader = new ReadTripTable(filename);
+	protected static Map<String, List<StopTableEntry>> readGenericCSV(String filename) {
+		ReadStopTable2013 reader = new ReadStopTable2013(filename);
 		log.info("Start parsing " + filename);
 		reader.parse();
 		log.info("Finished parsing " + filename);
 		log.info("Rejected " + reader.linesRejected + " lines");
-		log.info("Imported " + reader.tripTableEntries.size() + " lines");
-		return reader.tripTableEntries;		
+		log.info("Imported " + reader.ptZoneId2TransitStopCoordinates.size() + " zones");
+		return reader.ptZoneId2TransitStopCoordinates;		
 	}	
 
 	private void parse() {
@@ -64,51 +65,57 @@ public class ReadTripTable implements TabularFileHandler {
 	
 	@Override
 	public void startRow(String[] row) {
-		if (row.length != 12) {
+		if (row.length != 23) {
 			log.warn("Wrong length of row. Skipping: " + rowToString(row));
 			return;
 		}
-		if(!row[0].trim().contains("diseno777")){
-			// valid entry - parse it
+		if(!row[0].trim().contains("Codigo")){
 			
 			try {
-				final String boardingZone = row[0];
-				final String alightingZone = row[1];
+				String stopId = row[0];
+				String stopIdPublic = row[1];
+				String comuna = row[2];
+				String name = row[3];
+				String orientation = row[4];
+				String crossingStreetA = row[5];
+				String crossingStreetB = row[6];
+				String stopArea = row[7];
 				
-				// TODO pruefe problem mit den zonen 847 und 29!!!!
-				if (boardingZone.equalsIgnoreCase("847") || alightingZone.equalsIgnoreCase("847") || boardingZone.equalsIgnoreCase("29") || alightingZone.equalsIgnoreCase("29")) {
-					log.warn("Skipping line because there is no geometry for zone 847 or 29.: " + rowToString(row));
-					linesRejected++;
-					return;
+				Coord coordCartesian = new CoordImpl(row[8], row[9]);
+				
+				Coord coordLatLong = new CoordImpl(row[10], row[11]);
+				
+				String censal1992 = row[12];
+				String comunas = row[13];
+				String diseno563 = row[14];
+				String diseno777 = row[15];
+				String eod2001 = row[16];
+				String eod2006 = row[17];
+				String estraus264 = row[18];
+				String estraus404 = row[19];
+				String estraus410 = row[20];
+				String estraus618 = row[21];
+				String zonas6 = row[22];
+				
+				StopTableEntry stopTableEntry = new StopTableEntry(stopId, stopIdPublic, comuna, name, orientation, crossingStreetA, crossingStreetB, stopArea, coordCartesian, coordLatLong, censal1992, comunas, diseno563, diseno777, eod2001, eod2006, estraus264, estraus404, estraus410, estraus618, zonas6);
+				
+				if (ptZoneId2TransitStopCoordinates.get(stopTableEntry.diseno777) == null) {
+					ptZoneId2TransitStopCoordinates.put(stopTableEntry.diseno777, new ArrayList<StopTableEntry>());
 				}
 				
-				final double timeOfBoarding = Time.parseTime(row[2]);
-				final double avgNumberOfTripsPerWorkingDay = Double.parseDouble(row[3]);
-				final double avgNumberOfTripsOfAdults = Double.parseDouble(row[4]);
-				final double avgNumberOfTripsOfPupils = Double.parseDouble(row[5]);
-				final double avgNumberOfTripsWith0Transfers = Double.parseDouble(row[6]);
-				final double avgNumberOfTripsWith1Transfers = Double.parseDouble(row[7]);
-				final double avgNumberOfTripsWith2Transfers = Double.parseDouble(row[8]);
-				final double avgNumberOfTripsWith3Transfers = Double.parseDouble(row[9]);
-				final double avgNumberOfTripsIncludingSubway = Double.parseDouble(row[10]);
-				final double avgNumberOfTripsWithSubwayOnly = Double.parseDouble(row[11]);
-				
-				TripTableEntry tripTableEntry = new TripTableEntry(boardingZone, alightingZone, timeOfBoarding, avgNumberOfTripsPerWorkingDay, avgNumberOfTripsOfAdults, avgNumberOfTripsOfPupils, avgNumberOfTripsWith0Transfers, avgNumberOfTripsWith1Transfers, avgNumberOfTripsWith2Transfers, avgNumberOfTripsWith3Transfers, avgNumberOfTripsIncludingSubway, avgNumberOfTripsWithSubwayOnly);
-				this.tripTableEntries.add(tripTableEntry);
+				ptZoneId2TransitStopCoordinates.get(stopTableEntry.diseno777).add(stopTableEntry);
 				
 			} catch (Exception e) {
 				log.warn("Parsing failed for entry " + rowToString(row));
 				linesRejected++;
 				return;
 			}
-			
-			
 		} else {
 			this.linesRejected++;
 			log.info("Ignoring: " + rowToString(row));
 		}
 	}
-
+	
 	private String rowToString(String[] row) {
 		StringBuffer tempBuffer = new StringBuffer();
 		for (String string : row) {

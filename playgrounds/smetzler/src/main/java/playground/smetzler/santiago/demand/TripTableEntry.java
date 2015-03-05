@@ -19,7 +19,6 @@
 
 package playground.smetzler.santiago.demand;
 
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Container holding the data of one single line entry
@@ -39,6 +38,7 @@ public class TripTableEntry {
 	final double avgNumberOfTripsWith1Transfers;
 	final double avgNumberOfTripsWith2Transfers;
 	final double avgNumberOfTripsWith3Transfers;
+	final double avgNumberOfTripsWith4orMoreTransfers;
 	final double avgNumberOfTripsIncludingSubway;
 	final double avgNumberOfTripsWithSubwayOnly;
 	
@@ -52,6 +52,7 @@ public class TripTableEntry {
 			final double avgNumberOfTripsWith1Transfers,
 			final double avgNumberOfTripsWith2Transfers,
 			final double avgNumberOfTripsWith3Transfers,
+			final double avgNumberOfTripsWith4orMoreTransfers,
 			final double avgNumberOfTripsIncludingSubway,
 			final double avgNumberOfTripsWithSubwayOnly) {
 
@@ -65,6 +66,7 @@ public class TripTableEntry {
 		this.avgNumberOfTripsWith1Transfers = avgNumberOfTripsWith1Transfers;
 		this.avgNumberOfTripsWith2Transfers = avgNumberOfTripsWith2Transfers;
 		this.avgNumberOfTripsWith3Transfers = avgNumberOfTripsWith3Transfers;
+		this.avgNumberOfTripsWith4orMoreTransfers = avgNumberOfTripsWith4orMoreTransfers;
 		this.avgNumberOfTripsIncludingSubway = avgNumberOfTripsIncludingSubway;
 		this.avgNumberOfTripsWithSubwayOnly = avgNumberOfTripsWithSubwayOnly;
 		
