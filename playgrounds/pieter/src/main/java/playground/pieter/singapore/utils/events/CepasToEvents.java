@@ -262,7 +262,7 @@ public class CepasToEvents {
                 LinkedList<Integer> dwellEventsAsStopIndexList = new LinkedList<>();
                 for (CepasVehicleDwellEvent de : dwellEventsList) {
                     dwellEventsAsStopIndexList.add(stopIds.indexOf(de.stopId));
-                    de.stopIndex=dwellEventsAsStopIndexList.getLast();
+                    de.stopIndex = dwellEventsAsStopIndexList.getLast();
                 }
                 // boolean success = true;
                 for (int i = 1; i < dwellEventsAsStopIndexList.size(); i++) {
@@ -290,7 +290,7 @@ public class CepasToEvents {
                         ArrayList<Id> stopsToVisit = new ArrayList<>();
                         ArrayList<Double> travelDistancesBetweenStops = new ArrayList<>();
                         ArrayList<Double> timeWeights = new ArrayList<>();
-                        int startIdx=j;
+                        int startIdx = j;
                         while (++j < i) {
                             stopsToVisit.add(stopIds.get(j));
                             double interStopDistance = getInterStopDistance(stopIds.get(j - 1), stopIds.get(j));
@@ -334,8 +334,8 @@ public class CepasToEvents {
 
                 }
                 //for cirular routes
-                if(dwellEventsAsStopIndexList.getLast()==0){
-                    dwellEventsList.get(dwellEventsAsStopIndexList.size()-1).stopIndex=stopIds.size()-1;
+                if (dwellEventsAsStopIndexList.getLast() == 0) {
+                    dwellEventsList.get(dwellEventsAsStopIndexList.size() - 1).stopIndex = stopIds.size() - 1;
                 }
             }
 
@@ -345,7 +345,7 @@ public class CepasToEvents {
             int arrivalTime;
             int departureTime;
             final Id stopId;
-            int stopIndex=0;
+            int stopIndex = 0;
 
 			/*
              * if the arrival event is triggered by alighting event, mark the
@@ -354,16 +354,18 @@ public class CepasToEvents {
 			 */
 
             final ArrayList<CepasTransaction> cepasTransactions = new ArrayList<>();
-            public int getBoardings(){
+
+            public int getBoardings() {
                 int boardings = 0;
-                for(CepasTransaction t: this.cepasTransactions)
-                boardings += t.type.equals(CepasTransactionType.boarding)?1:0;
+                for (CepasTransaction t : this.cepasTransactions)
+                    boardings += t.type.equals(CepasTransactionType.boarding) ? 1 : 0;
                 return boardings;
             }
-            public int getAlightings(){
+
+            public int getAlightings() {
                 int alightings = 0;
-                for(CepasTransaction t: this.cepasTransactions)
-                    alightings += t.type.equals(CepasTransactionType.alighting)?1:0;
+                for (CepasTransaction t : this.cepasTransactions)
+                    alightings += t.type.equals(CepasTransactionType.alighting) ? 1 : 0;
                 return alightings;
             }
 
@@ -413,7 +415,8 @@ public class CepasToEvents {
                     departureTime = (int) (avgtime + minDwellTime / 2);
                 }
             }
-//TODO: short loop lines like service 284, refer line 284 bus reg 2738 on 13/4/2011. two dwell events can merge into one because transactions from one umlauf
+
+            //TODO: short loop lines like service 284, refer line 284 bus reg 2738 on 13/4/2011. two dwell events can merge into one because transactions from one umlauf
             //overlap with the second
             public void findTrueDwellTime() {
                 if (getDwellTime() < minDwellTime) {
@@ -434,7 +437,7 @@ public class CepasToEvents {
                     simpleDwellTimeAdjustment();
                     return;
                 }
-				/*
+                /*
 				 * cluster the transactions based on the deltaTapTimeLimit
 				 */
                 int deltaTime = 0;
@@ -473,7 +476,7 @@ public class CepasToEvents {
                         //with stricter boarding policies, a driver will probably wait before departing if more than one
                         //passenger is fumbling for their card, so all transactions following the biggest cluster found so far
                         //have to be added to that cluster, except for the last lone boarding, which is the fumbler.
-                        if (targetCluster != null && (transactionClusters.indexOf(cluster) < transactionClusters.size() - 1 || cluster.size()>=2)) {
+                        if (targetCluster != null && (transactionClusters.indexOf(cluster) < transactionClusters.size() - 1 || cluster.size() >= 2)) {
                             targetCluster.addAll(cluster);
                             maxSize = targetCluster.size();
                         }
@@ -577,8 +580,8 @@ public class CepasToEvents {
             CepasTransaction previoustransaction = null;
             Random random = MatsimRandom.getRandom();
             while (resultSet.next()) {
-                CepasTransaction boardingTransaction = null;
-                CepasTransaction alightingTransaction = null;
+                CepasTransaction boardingTransaction;
+                CepasTransaction alightingTransaction;
                 CepasVehiclePassenger passenger;
                 int boardingTime = resultSet.getInt("boarding_time");
                 Id boardingStop = cepasStoptoMatsimStopLookup.get(resultSet.getString("boarding_stop_stn"));
@@ -601,8 +604,8 @@ public class CepasToEvents {
                 }
                 int alightingTime = resultSet.getInt("alighting_time");
                 Id personId = Id.createPersonId(resultSet.getLong("card_id"));
-                passenger = new CepasVehiclePassenger(personId, boardingStop, alightingStop, boardingTime,
-                        alightingTime);
+                passenger = new CepasVehiclePassenger(personId
+                );
 
                 boardingTransaction = new CepasTransaction(passenger, CepasTransactionType.boarding, boardingTime
                         + random.nextDouble(), boardingStop);
@@ -743,7 +746,7 @@ public class CepasToEvents {
 //                            dwellEventsList.get(i).stopIndex = stopIds.size() - 1;
                         }
                     }
-                } else if (dwellEventsAsStopIndexList.get(i) == dwellEventsAsStopIndexList.get(i - 1)) {
+                } else if (Objects.equals(dwellEventsAsStopIndexList.get(i), dwellEventsAsStopIndexList.get(i - 1))) {
                     // merge two consecutive dwellevents at the same stop into
                     // the first
                     dwellEventsList.get(i - 1).departureTime = dwellEventsList.get(i).departureTime;
@@ -822,12 +825,12 @@ public class CepasToEvents {
                                 "%s\t%s\t%s\t%s\t%s\t%06d\tarrival\t%f\t%d\t%d\t%d\t%s\n%s\t%s\t%s\t%s\t%s\t%06d\tdeparture\t%f\t%d\t%d\t%d\t%s\n",
                                 this.cepasLine.lineId.toString(), this.cepasRoute.direction, this.vehicleId.toString(),
                                 this.dwellEventClusters.indexOf(dec), stopEvent.stopId, stopEvent.arrivalTime,
-                                getInterDwellEventSpeed(prevStop, stopEvent), 0,0,stopEvent.stopIndex,dec.routeId.toString(),
+                                getInterDwellEventSpeed(prevStop, stopEvent), 0, 0, stopEvent.stopIndex, dec.routeId.toString(),
 
                                 this.cepasLine.lineId.toString(),
                                 this.cepasRoute.direction, this.vehicleId.toString(),
                                 this.dwellEventClusters.indexOf(dec), stopEvent.stopId, stopEvent.departureTime, 0.0,
-                                stopEvent.getBoardings(),stopEvent.getAlightings(),stopEvent.stopIndex,dec.routeId.toString()
+                                stopEvent.getBoardings(), stopEvent.getAlightings(), stopEvent.stopIndex, dec.routeId.toString()
                         ));
                         prevStop = stopEvent;
                     }
@@ -836,9 +839,9 @@ public class CepasToEvents {
                     sb.append(String.format(
                             "%s\t%s\t%s\t%s\t%s\t%06d\tarrival\t%f\n%s\t%s\t%s\t%s\t%06d\tdeparture\t%f\t%d\t%d\t%d\t%s\n",
                             this.cepasLine.lineId.toString(), this.cepasRoute.direction, this.vehicleId.toString(),
-                            this.dwellEventClusters.indexOf(dec), "-1", -1, -1.0, -1,-1,-1,"-1",
+                            this.dwellEventClusters.indexOf(dec), "-1", -1, -1.0, -1, -1, -1, "-1",
                             this.cepasLine.lineId.toString(), this.cepasRoute.direction, this.vehicleId.toString(),
-                            "-1", -1, -1.0,-1,-1,-1,"-1"));
+                            "-1", -1, -1.0, -1, -1, -1, "-1"));
                 }
 
             }
@@ -1488,8 +1491,7 @@ public class CepasToEvents {
     private class CepasVehiclePassenger implements Comparable<CepasVehiclePassenger> {
         final Id personId;
 
-        public CepasVehiclePassenger(Id personId, Id boardingStopId, Id alightingStopId, int boardingTime,
-                                     int alightingTime) {
+        public CepasVehiclePassenger(Id personId) {
             super();
             this.personId = personId;
         }
@@ -1661,8 +1663,8 @@ public class CepasToEvents {
                 if (ptVehicle.possibleMatsimRoutes == null || ptVehicle.possibleMatsimRoutes.size() < 1) {
                     // TODO: if we don't have this transit line in the schedule,
                     // ignore
-                    System.err.printf("The vehicle with id %s has no possible Matsim route, not firing events for it\n", ptVehicle.vehicleId,
-                            minimumNumberOfDwellEventsForProcessing);
+                    System.err.printf("The vehicle with id %s has no possible Matsim route, not firing events for it\n", ptVehicle.vehicleId
+                            );
                     BufferedWriter emptyXML = IOUtils.getBufferedWriter(outputEventsPath + "/" + ptVehicle.vehicleId.toString()
                             + ".xml");
                     emptyXML.close();
