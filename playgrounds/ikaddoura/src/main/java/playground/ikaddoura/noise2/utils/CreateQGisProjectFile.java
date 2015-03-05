@@ -22,12 +22,13 @@
  */
 package playground.ikaddoura.noise2.utils;
 
+import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
+import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.ExeRunner;
 
-import playground.dhosse.qgis.QGisConstants;
-import playground.dhosse.qgis.QGisWriter;
-import playground.dhosse.qgis.VectorLayer;
-import playground.dhosse.qgis.layerTemplates.NoiseRenderer;
 
 /**
  * @author ikaddoura
@@ -39,17 +40,15 @@ public static void main(String args[]){
 		
 		String time = "16:00:00";
 		String workingDirectory =  "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/ITERS/it.100/immissions/";
-		String qGisProjectFile = "immission" + time + ".qgs";
+		String qGisProjectFile = "immission_test2_" + time + ".qgs";
 		
 		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 			
 // ################################################################################################################################################
-		
-		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
+		double[] extent = {4568808,5803042,4622772,5844280};
 		writer.setExtent(extent);
 				
-		VectorLayer noiseLayer = new VectorLayer("noise", workingDirectory + "immission_merged.csv",
-				QGisConstants.geometryType.Point);
+		VectorLayer noiseLayer = new VectorLayer("noise", workingDirectory + "immission_merged.csv", QGisConstants.geometryType.Point);
 		noiseLayer.setDelimiter(",");
 		noiseLayer.setXField("xCoord");
 		noiseLayer.setYField("yCoord");
@@ -61,6 +60,18 @@ public static void main(String args[]){
 // ################################################################################################################################################
 		
 		writer.write(qGisProjectFile);
+			
+		if ( System.getProperty("os.name").contains("Mac") || System.getProperty("os.name").contains("mac") ) {
+			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + qGisProjectFile +
+					" --snapshot " + workingDirectory + qGisProjectFile + "_snapshot.png";
+			
+			int timeout = 99999;
+			String stdoutFileName = workingDirectory + qGisProjectFile + "_snapshot.log";
+			ExeRunner.run(cmd, stdoutFileName, timeout);
+			
+		} else {
+			// ...
+		}
 
 	}
 	
