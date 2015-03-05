@@ -17,14 +17,16 @@ public abstract class GraduatedSymbolRenderer extends QGisRenderer {
 
 	private String renderingAttribute;
 	private boolean useHeader;
+	private String fileHeader;
 	
-	public GraduatedSymbolRenderer(boolean useHeader) {
+	public GraduatedSymbolRenderer(String header) {
 		
 		super(QGisConstants.renderingType.graduatedSymbol);
-		this.useHeader = useHeader;
+		this.useHeader = header != null ? true : false;
+		this.fileHeader = header;
 		
 	}
-
+	
 	public abstract Range[] getRanges();
 
 	public String getRenderingAttribute(){
@@ -37,7 +39,15 @@ public abstract class GraduatedSymbolRenderer extends QGisRenderer {
 		
 		if(this.useHeader){
 			
-			this.renderingAttribute = attr;
+			if(this.fileHeader.contains(attr)){
+				
+				this.renderingAttribute = attr;
+				
+			} else{
+				
+				throw new RuntimeException("Rendering attribute " + attr + " does not exist in header!");
+				
+			}
 			
 		} else{
 			
@@ -59,10 +69,6 @@ public abstract class GraduatedSymbolRenderer extends QGisRenderer {
 			
 		}
 		
-	}
-
-	public boolean isUseHeader() {
-		return useHeader;
 	}
 
 }

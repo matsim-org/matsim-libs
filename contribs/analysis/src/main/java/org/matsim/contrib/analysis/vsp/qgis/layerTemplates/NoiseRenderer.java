@@ -5,21 +5,24 @@ import java.awt.Color;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
 import org.matsim.contrib.analysis.vsp.qgis.Range;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class NoiseRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
 	
-	public NoiseRenderer(boolean useHeader) {
+	public NoiseRenderer(VectorLayer layer) {
 
-		super(useHeader);
+		super(layer.getHeader());
+		layer.setRenderer(this);
 		
 		this.init();
 		
 	}
 	
-	private void init(){
+	@Override
+	public void init(){
 		
 		this.ranges = new Range[8];
 		this.ranges[0] = new Range(0, 45, " 45");

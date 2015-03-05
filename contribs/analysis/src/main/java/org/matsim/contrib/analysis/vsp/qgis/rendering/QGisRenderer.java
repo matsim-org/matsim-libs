@@ -25,8 +25,10 @@ public abstract class QGisRenderer {
 	private List<QGisSymbolLayer> symbolLayers;
 	
 	public QGisRenderer(QGisConstants.renderingType renderingType){
+		
 		this.setRenderingType(renderingType);
 		this.symbolLayers = new ArrayList<QGisSymbolLayer>();
+		
 	}
 	
 	public QGisConstants.renderingType getRenderingType() {
@@ -44,5 +46,7 @@ public abstract class QGisRenderer {
 	public void addSymbolLayer(QGisSymbolLayer sl){
 		this.symbolLayers.add(sl);
 	}
+
+	public abstract void init();
 	
 }

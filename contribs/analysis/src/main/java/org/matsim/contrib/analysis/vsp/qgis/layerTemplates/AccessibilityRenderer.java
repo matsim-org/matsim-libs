@@ -5,18 +5,21 @@ import java.awt.Color;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
 import org.matsim.contrib.analysis.vsp.qgis.Range;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
 
-	public AccessibilityRenderer(boolean useHeader) {
-		super(useHeader);
+	public AccessibilityRenderer(VectorLayer layer) {
+		super(layer.getHeader());
+		layer.setRenderer(this);
 		init();
 	}
 
-	private void init() {
+	@Override
+	public void init() {
 		
 		this.ranges = new Range[9];
 		this.ranges[0] = new Range(-67.38258, 2, " 2");

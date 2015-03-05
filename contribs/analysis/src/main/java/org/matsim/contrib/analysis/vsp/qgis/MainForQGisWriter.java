@@ -20,21 +20,24 @@ public class MainForQGisWriter {
 		String workingDirectory =  "C:/Users/Daniel/Desktop/MATSimQGisIntegration/";
 		String qGisProjectFile = "testWithMergedImmissionsCSV.qgs";
 		
-		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
 
 // ################################################################################################################################################
 		
-		// use case 1: nodes		
-//		VecorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point);
-//		nodesLayer.setRenderer(new SingleSymbolRenderer(nodesLayer.getGeometryType()));
-//		nodesLayer.addAttribute("id");
+		// use case 1: nodes
+//		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
+//		writer.setExtent(extent);
+//		VectorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point);
+//		new SimpleNetworkRenderer(nodesLayer);
 //		writer.addLayer(nodesLayer);
 		
 // ################################################################################################################################################
 		
 //		// use case 2: links
-//		VectorLayer linksLayer = new VecorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
-//		linksLayer.setRenderer(new SingleSymbolRenderer(linksLayer.getGeometryType()));
+//		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
+//		writer.setExtent(extent);
+//		VectorLayer linksLayer = new VectorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
+//		new SimpleNetworkRenderer(linksLayer);
 //		writer.addLayer(linksLayer);
 	
 // ################################################################################################################################################
@@ -44,7 +47,7 @@ public class MainForQGisWriter {
 //		writer.setExtent(extent);
 //		
 //		VectorLayer networkLayer = new VectorLayer("network", workingDirectory + "testFiles/network_detail/network.shp", QGisConstants.geometryType.Line);
-//		networkLayer.setRenderer(new SimpleNetworkRenderer(networkLayer.getGeometryType()));
+//		new SimpleNetworkRenderer(networkLayer);
 //		writer.addLayer(networkLayer);
 //		
 //		VectorLayer noiseLayer = new VectorLayer("receiverPoints", workingDirectory + "testFiles/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv",
@@ -52,36 +55,36 @@ public class MainForQGisWriter {
 //		noiseLayer.setDelimiter(";");
 //		noiseLayer.setXField("xCoord");
 //		noiseLayer.setYField("yCoord");
-//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer.isUsingHeader());
-//		renderer.setRenderingAttribute("immissions_3600_Immission 11:00:00");
-//		noiseLayer.setRenderer(renderer);
+//		
 //		writer.addLayer(noiseLayer);
 //		
 //		VectorLayer joinLayer = new VectorLayer("immissions_3600", workingDirectory + "testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
 //				QGisConstants.geometryType.No_geometry);
 //		writer.addLayer(joinLayer);
-//
-//		noiseLayer.addVectorJoin(joinLayer, "Receiver Point Id", "receiverPointId");
+//		
+//		noiseLayer.addVectorJoin(joinLayer, "Receiver Point Id", "receiverPointId", "Immission 11:00:00");
+//		
+//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
+//		renderer.setRenderingAttribute("immissions_3600_Immission 11:00:00");
 		
 // ################################################################################################################################################
 		
 		//use case 4: accessibility
-//		double[] extent = {100000,-3720000,180000,-3675000};
+//		double[] extent = {2790381,-4035858, 2891991,-3975105};
 //		writer.setExtent(extent);
 //		
 //		//example for adding a raster layer
 //		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
-//		mapnikLayer.setRenderer(new AccessibilityXmlRenderer());
+//		new AccessibilityXmlRenderer(mapnikLayer);
 //		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
-//		writer.addLayer(0,mapnikLayer);
+//		writer.addLayer(mapnikLayer);
 //
 //		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
 //		densityLayer.setXField(1);
 //		densityLayer.setYField(2);
-//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer.isUsingHeader());
+//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
 //		dRenderer.setRenderingAttribute(8);
-//		densityLayer.setRenderer(dRenderer);
-//		writer.addLayer(1,densityLayer);
+//		writer.addLayer(densityLayer);
 //		
 //		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
 //				QGisConstants.geometryType.Point);
@@ -90,10 +93,9 @@ public class MainForQGisWriter {
 //		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 //		accessibilityLayer.setXField(1);
 //		accessibilityLayer.setYField(2);
-//		AccessibilityRenderer renderer = new AccessibilityRenderer(densityLayer.isUsingHeader());
+//		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
 //		renderer.setRenderingAttribute(3); // choose column/header to visualize
-//		accessibilityLayer.setRenderer(renderer);
-//		writer.addLayer(2,accessibilityLayer);
+//		writer.addLayer(accessibilityLayer);
 
 // ################################################################################################################################################
 		
@@ -105,9 +107,9 @@ public class MainForQGisWriter {
 		layer.setXField("xCoord");
 		layer.setYField("yCoord");
 		layer.setDelimiter(",");
-		NoiseRenderer renderer = new NoiseRenderer(layer.isUsingHeader());
+		
+		NoiseRenderer renderer = new NoiseRenderer(layer);
 		renderer.setRenderingAttribute("immission_16:00:00");
-		layer.setRenderer(renderer);
 		
 		writer.addLayer(layer);
 		

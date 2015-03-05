@@ -33,6 +33,11 @@ public class QGisRasterRenderer extends QGisRenderer {
 		
 	}
 	
+	@Override
+	public void init() {
+		
+	}
+	
 	public double getOpacity() {
 		return opacity;
 	}

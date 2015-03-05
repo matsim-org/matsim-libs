@@ -27,7 +27,7 @@ public class VectorLayer extends QGisLayer {
 	private String delimiter; // by default: null
 	private String xField;
 	private String yField;
-	private String[] header;
+	private String header;
 	
 	/**
 	 * Instantiates a new qgis layer that contains vector data (can still be geometry OR data).
@@ -95,7 +95,7 @@ public class VectorLayer extends QGisLayer {
 						
 						if(containsCharacters(s)){
 							
-							this.header = headerParts;
+							this.header = header;
 							break;
 							
 						}
@@ -138,17 +138,17 @@ public class VectorLayer extends QGisLayer {
 		
 	}
 	
-	private boolean headerContainsField(String s){
-		
-		for(String c : this.header){
-		
-			if(c.equals(s)) return true;
-			
-		}
-		
-		return false;
-		
-	}
+//	private boolean headerContainsField(String s){
+//		
+//		for(String c : this.header){
+//		
+//			if(c.equals(s)) return true;
+//			
+//		}
+//		
+//		return false;
+//		
+//	}
 
 	public QGisConstants.geometryType getGeometryType() {
 		return geometryType;
@@ -198,7 +198,7 @@ public class VectorLayer extends QGisLayer {
 		
 		if(this.header != null){
 			
-			if(headerContainsField(xField)){
+			if(this.header.contains(xField)){
 				
 				this.xField = xField;
 				
@@ -252,7 +252,7 @@ public class VectorLayer extends QGisLayer {
 		
 		if(this.header != null){
 			
-			if(headerContainsField(yField)){
+			if(this.header.contains(yField)){
 				
 				this.yField = yField;
 				
@@ -295,9 +295,13 @@ public class VectorLayer extends QGisLayer {
 	 * @param layer the layer that contains the data (not the geometry)
 	 * @param joinFieldName attribute name of the data layer
 	 * @param targetFieldName attribute name of the geometry layer
+	 * @param zField 
 	 */
-	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName ){
+	public void addVectorJoin(QGisLayer layer, String joinFieldName, String targetFieldName, String zField){
+		
 		this.vectorJoins.add(new VectorJoin(layer.getId(), joinFieldName, targetFieldName));
+		this.header += this.delimiter + layer.getName() + "_" + zField;
+		
 	}
 	
 	public boolean isUsingHeader(){
@@ -319,6 +323,10 @@ public class VectorLayer extends QGisLayer {
 		} else{
 			return "Yes";
 		}
+	}
+	
+	public String getHeader(){
+		return this.header;
 	}
 
 }
