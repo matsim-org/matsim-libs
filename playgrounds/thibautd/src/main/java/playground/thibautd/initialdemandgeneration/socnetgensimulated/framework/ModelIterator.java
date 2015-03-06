@@ -106,7 +106,7 @@ public class ModelIterator {
 
 			final SocialNetwork sn = generate( runner , move.getChild() );
 
-			final boolean isImproving =  function( move.getChild() ) < function( move.getParent() );
+			final boolean isImproving =  function( move.getChild() ) <= function( move.getParent() );
 			if ( isImproving ) {
 				d.gotSucess = true;
 				d.totalMovement += d.stepSize;
