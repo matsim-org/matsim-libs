@@ -33,6 +33,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84 = "WGS84";
 	public final static String ATLANTIS = "Atlantis";
 	public final static String CH1903_LV03 = "CH1903_LV03"; // switzerland
+	public final static String CH1903_LV03_Plus = "CH1903_LV03_Plus"; // switzerland new
 	public final static String GK4 = "GK4"; // berlin/germany, own implementation
 	public final static String WGS84_UTM47S = "WGS84_UTM47S"; // indonesia
 	public final static String WGS84_UTM48N = "WGS84_UTM48N"; // Singapore
@@ -44,6 +45,7 @@ public abstract class TransformationFactory {
 	public final static String DHDN_GK4 = "DHDN_GK4"; // berlin/germany, for GeoTools
 	public final static String WGS84_UTM29N = "WGS84_UTM29N"; // coimbra/portugal
 	public final static String CH1903_LV03_GT = "CH1903_LV03_GT"; //use geotools also for swiss coordinate system
+	public final static String CH1903_LV03_Plus_GT = "CH1903_LV03_Plus_GT"; //use geotools also for swiss coordinate system
 	public final static String WGS84_SVY21 = "WGS84_SVY21"; //Singapore2
 	public final static String NAD83_UTM17N = "NAD83_UTM17N"; //Toronto, Canada
 	public static final String WGS84_TM = "WGS84_TM"; //Singapore3
@@ -62,10 +64,12 @@ public abstract class TransformationFactory {
 		if (fromSystem.equals(toSystem)) return new IdentityTransformation();
 		if (WGS84.equals(fromSystem)) {
 			if (CH1903_LV03.equals(toSystem)) return new WGS84toCH1903LV03();
+			if (CH1903_LV03_Plus.equals(toSystem)) return new WGS84toCH1903LV03Plus();
 			if (ATLANTIS.equals(toSystem)) return new WGS84toAtlantis();
 		}
 		if (WGS84.equals(toSystem)) {
 			if (CH1903_LV03.equals(fromSystem)) return new CH1903LV03toWGS84();
+			if (CH1903_LV03_Plus.equals(fromSystem)) return new CH1903LV03PlustoWGS84();
 			if (GK4.equals(fromSystem)) return new GK4toWGS84();
 			if (ATLANTIS.equals(fromSystem)) return new AtlantisToWGS84();
 		}

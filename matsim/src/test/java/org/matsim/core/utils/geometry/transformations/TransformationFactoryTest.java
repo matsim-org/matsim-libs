@@ -105,6 +105,16 @@ public class TransformationFactoryTest extends TestCase {
 		assertTrue(transformation instanceof CH1903LV03toWGS84);
 	}
 
+	public final void testToCH1903LV03Plus() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03_Plus);
+		assertTrue(transformation instanceof WGS84toCH1903LV03Plus);
+	}
+
+	public final void testFromCH1903LV03Plus() {
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03_Plus, TransformationFactory.WGS84);
+		assertTrue(transformation instanceof CH1903LV03PlustoWGS84);
+	}
+
 	public final void testFromAtlantis() {
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.ATLANTIS, TransformationFactory.WGS84);
 		assertTrue(transformation instanceof AtlantisToWGS84);
