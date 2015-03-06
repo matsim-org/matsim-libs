@@ -200,49 +200,67 @@ public class KS2010ModelWriter {
 	}
 
 	private void writeCommodities(DgCommodities coms, TransformerHandler hd) throws SAXException {
-		AttributesImpl atts = new AttributesImpl();
-		hd.startElement("", "", COMMODITIES, atts);
+		hd.startElement("", "", COMMODITIES, new AttributesImpl());
 		for (DgCommodity co : coms.getCommodities().values()) {
-			atts.clear();
-			atts.addAttribute("", "", ID, CDATA, co.getId().toString());
-			hd.startElement("", "", COMMODITY, atts);
-			atts.clear();
-			hd.startElement("", "", SOURCES, atts);
-
-			atts.clear();
-			atts.addAttribute("", "", ID, CDATA, co.getSourceNodeId().toString());
-			atts.addAttribute("", "", FLOW, CDATA, Double.toString(co.getFlow()));
-			hd.startElement("", "", NODE, atts);
-			hd.endElement("", "", NODE);
-
-			hd.endElement("", "", SOURCES);
-			atts.clear();
-			hd.startElement("", "", DRAINS, atts);
-
-			atts.clear();
-			atts.addAttribute("", "", ID, CDATA, co.getDrainNodeId().toString());
-			hd.startElement("", "", NODE, atts);
-			hd.endElement("", "", NODE);
-
-			hd.endElement("", "", DRAINS);
-			
-			if (co.hasRoute()){
-				atts.clear();
-				hd.startElement("", "", PERMITTED_ROADS, atts);
-
-				for (Id<DgStreet> street : co.getRoute()){
-					atts.clear();
-					atts.addAttribute("", "", ID, CDATA, street.toString());
-					hd.startElement("", "", PERMIT, atts);
-					hd.endElement("", "", PERMIT);
+			if (co.hasPaths()){
+				// create a new commodity for each path and write permitted roads
+				for (TtPath path : co.getPaths().values()){
+					// path id is unique
+					writeCommodity(path.getId().toString(), co.getSourceNodeId().toString(), 
+							co.getDrainNodeId().toString(), co.getFlow(), path, hd);
 				}
-				
-				hd.endElement("", "", PERMITTED_ROADS);				
 			}
-			
-			hd.endElement("", "", COMMODITY);
+			else {
+				// add a single commodity without permitted roads
+				writeCommodity(co.getId().toString(), co.getSourceNodeId().toString(), 
+						co.getDrainNodeId().toString(), co.getFlow(), null, hd);
+			}
 		}
 		hd.endElement("", "", COMMODITIES);
+	}
+	
+	private void writeCommodity(String comId, String sourceId, String drainId, 
+			double flow, TtPath path, TransformerHandler hd) throws SAXException {
+		AttributesImpl atts = new AttributesImpl();
+		
+		atts.clear();
+		atts.addAttribute("", "", ID, CDATA, comId);
+		hd.startElement("", "", COMMODITY, atts);
+		atts.clear();
+		hd.startElement("", "", SOURCES, atts);
+
+		atts.clear();
+		atts.addAttribute("", "", ID, CDATA, sourceId);
+		atts.addAttribute("", "", FLOW, CDATA, Double.toString(flow));
+		hd.startElement("", "", NODE, atts);
+		hd.endElement("", "", NODE);
+
+		hd.endElement("", "", SOURCES);
+		atts.clear();
+		hd.startElement("", "", DRAINS, atts);
+
+		atts.clear();
+		atts.addAttribute("", "", ID, CDATA, drainId);
+		hd.startElement("", "", NODE, atts);
+		hd.endElement("", "", NODE);
+
+		hd.endElement("", "", DRAINS);
+		
+		if (!(path == null)){
+			atts.clear();
+			hd.startElement("", "", PERMITTED_ROADS, atts);
+
+			for (Id<DgStreet> street : path.getPath()){
+				atts.clear();
+				atts.addAttribute("", "", ID, CDATA, street.toString());
+				hd.startElement("", "", PERMIT, atts);
+				hd.endElement("", "", PERMIT);
+			}
+			
+			hd.endElement("", "", PERMITTED_ROADS);				
+		}
+		
+		hd.endElement("", "", COMMODITY);
 	}
 
 	private void writeStreets(DgKSNetwork network, TransformerHandler hd)

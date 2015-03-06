@@ -29,6 +29,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
 import playground.dgrether.koehlerstrehlersignal.data.TtCrossingType;
+import playground.dgrether.koehlerstrehlersignal.data.TtPath;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015NetworkXMLParser;
@@ -39,8 +40,6 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015Network
 public class ConvertMatsimRoutes2KS2015 {
 
 	private static final Logger log = Logger.getLogger(ConvertMatsimRoutes2KS2015.class);
-	
-	private Map<Id<DgCommodity>, Integer> numberOfDifferentPathsPerCommodity = new HashMap<>();
 
 	private Map<Id<Person>, List<Id<Link>>> matsimRoutes = new HashMap<>();
 	private DgCommodities comsWithRoutes = new DgCommodities();
@@ -84,7 +83,7 @@ public class ConvertMatsimRoutes2KS2015 {
 	}
 
 	/**
-	 * create a commodity for each new path and save them in comsWithRoutes.
+	 * create a commodity for each new path and save them in this.comsWithRoutes.
 	 * this converts the matsim routes into ks model format.
 	 * 
 	 * @param ksModelDirectory
@@ -133,18 +132,21 @@ public class ConvertMatsimRoutes2KS2015 {
 				ksDrainNodeId = idConverter.convertLinkId2ToCrossingNodeId(matsimLastLink);
 			}
 
-			// convert matsim route into ks format
-			List<Id<DgStreet>> ksRoute = new ArrayList<>();
+			// convert matsim route into ks path
+			List<Id<DgStreet>> ksPath = new ArrayList<>();
 			for (Id<Link> linkId : matsimRoute) {
 				Id<DgStreet> streetId = idConverter
 						.convertLinkId2StreetId(linkId);
-				ksRoute.add(streetId);
+				ksPath.add(streetId);
 			}
 			// delete the first link of the matsim route.
-			// in ks format the route starts at the end node of the link
-			ksRoute.remove(0);
+			// in ks format the path starts at the end node of the link
+			ksPath.remove(0);
 
-			addNewCommodityOrIncreaseFlow(ksSourceNodeId, ksDrainNodeId, comId, ksRoute);
+			// create the path id which depends on the street ids
+			Id<TtPath> pathId = idConverter.convertPathInfo2PathId(ksPath, ksSourceNodeId, ksDrainNodeId);
+			
+			addRouteToCommodity(ksSourceNodeId, ksDrainNodeId, comId, ksPath, pathId);
 		}
 	}
 
@@ -161,72 +163,35 @@ public class ConvertMatsimRoutes2KS2015 {
 	 * @param ksRoute
 	 *            the route of the specific agent in the ks format
 	 */
-	private void addNewCommodityOrIncreaseFlow(Id<DgCrossingNode> sourceNode,
+	private void addRouteToCommodity(Id<DgCrossingNode> sourceNode,
 			Id<DgCrossingNode> drainNode, Id<DgCommodity> comId,
-			List<Id<DgStreet>> ksRoute) {
+			List<Id<DgStreet>> ksRoute, Id<TtPath> pathId) {
 
-		// check whether route exists already
-		if (!(ksRoute == null) && !ksRoute.isEmpty()) {
-			boolean routesEqual = false;
-			for (DgCommodity comWithRoute : this.comsWithRoutes
-					.getCommodities().values()) {
-				List<Id<DgStreet>> comRoute = comWithRoute.getRoute();
-				// routes can't be equal with different sizes
-				if (comRoute.size() == ksRoute.size()) {
-					routesEqual = true;
-					for (int i = 0; i < comRoute.size(); i++) {
-						// switch boolean if different streetIds found
-						if (!comRoute.get(i).equals(ksRoute.get(i))) {
-							routesEqual = false;
-							break;
-						}
-					}
-					if (routesEqual) {
-						// same route exists already. increase its flow value
-						comWithRoute.setFlow(comWithRoute.getFlow() + 1.0);
-						break;
-					}
-				}
-			}
-			if (!routesEqual) {
-				// the route doesn't exist already
-				this.comsWithRoutes.addCommodity(new DgCommodity(
-						createId(comId), sourceNode, drainNode, 1.0, ksRoute));
-			}
+		// check whether the commodity already exists
+		if (!this.comsWithRoutes.getCommodities().containsKey(comId)){
+			this.comsWithRoutes.addCommodity(new DgCommodity(comId, sourceNode, drainNode, 0.0));
 		}
+		DgCommodity currentCom = this.comsWithRoutes.getCommodities().get(comId);
+		
+		// add the route to the commodity routes
+		if (!currentCom.containsPath(pathId)){
+			currentCom.addPath(pathId, ksRoute, 0.0);
+		}
+		// increase the flow values (total flow and specific path flow)
+		currentCom.increaseFlowOfPath(pathId, 1.0);
 	}
-
-	/**
-	 * creates an id for the sub-commodity of comId, where all agents travel
-	 * along the same path
-	 * 
-	 * @param comId
-	 *            the remaining commodity id
-	 * @return an unique id for the sub-commodity where all agents travel along
-	 *         the same path
-	 */
-	private Id<DgCommodity> createId(Id<DgCommodity> comId) {
-		if (!this.numberOfDifferentPathsPerCommodity.containsKey(comId))
-			this.numberOfDifferentPathsPerCommodity.put(comId, -1);
-		// increase the number of different paths per commodity by one
-		this.numberOfDifferentPathsPerCommodity.put(comId,
-				this.numberOfDifferentPathsPerCommodity.get(comId) + 1);
-
-		return Id.create(comId.toString()
-				+ this.numberOfDifferentPathsPerCommodity.get(comId),
-				DgCommodity.class);
-	}
+	
 
 	public static void main(String[] args) {
 		
-		String runNumber = "2033";
-		String runDescription = "optimized";
+		String runNumber = "2034";
+		String runDescription = "new2_optimum"; // please use btu name here
 		Integer lastIteration = 1400;
 		
 		String ksModelDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/cb2ks2010/"
+				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/"
 				+ "2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
-		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml";
+		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml"; // TODO include opt signals
 		String outputFile = "routeComparison/2015-03-03_matsimRoutes_" + runNumber + ".xml";
 		
 		String description = "matsim routes with " + runDescription + " offsets";

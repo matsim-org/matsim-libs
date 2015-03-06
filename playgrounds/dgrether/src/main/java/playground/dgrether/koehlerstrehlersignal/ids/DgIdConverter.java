@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.ids;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,6 +32,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
+import playground.dgrether.koehlerstrehlersignal.data.TtPath;
 
 
 /**
@@ -204,6 +207,20 @@ public class DgIdConverter {
 	public Id<DgCommodity> convertLinkToLinkPair2CommodityId(Id<Link> fromLinkId, Id<Link> toLinkId){
 		String idString = fromLinkId + "33" + toLinkId;
 		return idPool.createId(idString, DgCommodity.class);
+	}
+
+	public Id<TtPath> convertPathInfo2PathId(List<Id<DgStreet>> ksPath, Id<DgCrossingNode> ksSourceNodeId, Id<DgCrossingNode> ksDrainNodeId) {
+		// add source node id
+		String idString = ksSourceNodeId.toString() + "22";
+		// add street ids
+		for (Id<DgStreet> streetId : ksPath){
+			idString += streetId.toString() + "44";
+		}
+		// delete last "44"
+		idString.substring(0,idString.length()-3);
+		// add drain node id
+		idString += "22" + ksDrainNodeId.toString();
+		return idPool.createId(idString, TtPath.class);
 	}
 	
 }

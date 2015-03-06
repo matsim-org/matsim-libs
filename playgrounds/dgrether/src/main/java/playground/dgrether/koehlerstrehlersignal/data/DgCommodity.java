@@ -19,25 +19,31 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class DgCommodity {
+
+	private static final Logger log = Logger.getLogger(DgCommodity.class);
 
 	private Id<DgCommodity> id;
 	private Id<DgCrossingNode> sourceNode; 
 	private Id<DgCrossingNode> drainNode;
 	private Id<Link> sourceLink;
 	private Id<Link> drainLink;
-	private double flow;
-	private List<Id<DgStreet>> route; 
+	private double totalFlow;
+	private Map<Id<TtPath>, TtPath> paths = new HashMap<>();
 	
 	public DgCommodity(Id<DgCommodity> id){
 		this.id = id;
@@ -48,16 +54,7 @@ public class DgCommodity {
 		this.id = id;
 		this.sourceNode = sourceNode;
 		this.drainNode = drainNode;
-		this.flow = flow;
-	}
-	
-	public DgCommodity(Id<DgCommodity> id, Id<DgCrossingNode> sourceNode,
-			Id<DgCrossingNode> drainNode, double flow, List<Id<DgStreet>> route) {
-		this.id = id;
-		this.sourceNode = sourceNode;
-		this.drainNode = drainNode;
-		this.flow = flow;
-		this.route = route;
+		this.totalFlow = flow;
 	}
 
 	public Id<DgCommodity> getId() {
@@ -65,8 +62,8 @@ public class DgCommodity {
 	}
 
 	
-	public boolean hasRoute(){
-		if (this.route == null || this.route.isEmpty())
+	public boolean hasPaths(){
+		if (this.paths == null || this.paths.isEmpty())
 			return false;
 		return true;
 	}
@@ -74,7 +71,7 @@ public class DgCommodity {
 	public void setSourceNode(Id<DgCrossingNode> fromNodeId, Id<Link> fromLinkId, double flow) {
 		this.sourceNode = fromNodeId;
 		this.sourceLink = fromLinkId;
-		this.flow = flow;
+		this.totalFlow = flow;
 	}
 	
 	public void setDrainNode(Id<DgCrossingNode> toNodeId, Id<Link> toLinkId){
@@ -83,19 +80,42 @@ public class DgCommodity {
 	}
 	
 	public void setFlow(double flow){
-		this.flow = flow;
+		this.totalFlow = flow;
 	}
 	
-	public void setRoute(List<Id<DgStreet>> route) {
-		this.route = route;
+	/**
+	 * Adds the path to the collection of paths or add its flow value, if it already exists.
+	 * Also increases the total flow value of the commodity.
+	 * 
+	 * @param pathId
+	 * @param flowValue
+	 * @param route
+	 */
+	public void addPath(Id<TtPath> pathId, List<Id<DgStreet>> path, double flowValue){
+		this.totalFlow+= flowValue;
+		if (!this.paths.containsKey(pathId)){
+			this.paths.put(pathId, new TtPath(pathId, path, 0.0));
+		}
+		this.paths.get(pathId).increaseFlow(flowValue);
 	}
 	
-	public void addStreetToRoute(Id<DgStreet> street){
-		this.route.add(street);
+	/**
+	 * Increases the flow value of the single path AND the total flow value of the commodity
+	 * 
+	 * @param pathId
+	 * @param flow the value to increase
+	 */
+	public void increaseFlowOfPath(Id<TtPath> pathId, double flow){
+		this.totalFlow+= flow;
+		this.paths.get(pathId).increaseFlow(flow);
 	}
-
-	public List<Id<DgStreet>> getRoute() {
-		return this.route;
+	
+	public boolean containsPath (Id<TtPath> pathId){
+		return this.paths.containsKey(pathId);
+	}
+	
+	public Map<Id<TtPath>, TtPath> getPaths (){
+		return this.paths;
 	}
 
 	public Id<DgCrossingNode> getDrainNodeId(){
@@ -115,7 +135,7 @@ public class DgCommodity {
 	}
 
 	public double getFlow(){
-		return this.flow;
+		return this.totalFlow;
 	}
 	
 }
