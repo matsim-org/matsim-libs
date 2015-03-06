@@ -135,10 +135,15 @@ public class ModelIterator {
 						xMov,
 						yMov,
 						newStepSize );
+				// Movement in second direction, minus its projection on the new first
+				// new direction
+				final double scalarProduct = d1.x * d2.getXTotalMovement() +
+							d1.y * d2.getYTotalMovement();
 				d2 = new Direction(
-						-(d2.getYTotalMovement() * yMov) / xMov,
-						d2.getYTotalMovement(),
+						d2.getXTotalMovement() - scalarProduct * d1.x,
+						d2.getYTotalMovement() - scalarProduct * d1.y,
 						newStepSize );
+				assert Math.abs( d1.getXStep() * d2.getXStep() + d1.getYStep() * d2.getYStep() ) < 1E-9 : d1+" ; "+d2;
 			}
 		}
 
@@ -177,8 +182,8 @@ public class ModelIterator {
 	}
 
 	private double function( Thresholds t ) {
-		return Math.pow( distDegree( t ) , exponent ) +
-			Math.pow( (precisionDegree / precisionClustering) * distClustering( t ) , exponent );
+		return Math.pow( distDegree( t ) / precisionDegree , exponent ) +
+			Math.pow( distClustering( t ) / precisionClustering , exponent );
 	}
 
 	public static class Move {
@@ -247,6 +252,11 @@ public class ModelIterator {
 
 		public double getYStep() {
 			return y * stepSize;
+		}
+
+		@Override
+		public String toString() {
+			return "( "+x+" , "+y+" )";
 		}
 	}
 
