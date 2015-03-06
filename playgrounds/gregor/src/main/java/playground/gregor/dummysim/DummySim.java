@@ -43,7 +43,6 @@ import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim;
 import playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinished;
 import playground.gregor.proto.ProtoMATSimInterface.ExternSimStepFinishedReceived;
 import playground.gregor.proto.ProtoMATSimInterface.ExternalConnect;
-import playground.gregor.proto.ProtoMATSimInterface.ExternalConnectConfirmed;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpace;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent.Agent;
@@ -128,8 +127,7 @@ public class DummySim {
 
 		ExternalConnect connectReq = ExternalConnect.newBuilder().build();
 		// request connection
-		ExternalConnectConfirmed connect = this.service.reqExternalConnect(
-				this.cntr, connectReq);
+		this.service.reqExternalConnect(this.cntr, connectReq);
 		// connection established
 		while (true) {
 

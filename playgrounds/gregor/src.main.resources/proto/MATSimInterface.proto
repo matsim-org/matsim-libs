@@ -10,7 +10,7 @@ message MATSim2ExternPutAgent {
 		repeated string nodes = 3;
 	}
 
-	required Agent agent = 15;
+	required Agent agent = 1;
 }
 
 message MATSim2ExternHasSpace {

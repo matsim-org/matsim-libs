@@ -51,7 +51,7 @@ public class External {
 	private static String inputDir = "/Users/laemmel/devel/external/input";
 	private static String outputDir = "/Users/laemmel/devel/external/output";
 
-	private static final int nrAgents = 800;
+	private static final int nrAgents = 8000;
 
 	public static void main(String[] args) {
 		Config c = ConfigUtils.createConfig();
