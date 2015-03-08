@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.contrib.analysis.filters.population;
 
 import java.util.List;
 import java.util.Map;

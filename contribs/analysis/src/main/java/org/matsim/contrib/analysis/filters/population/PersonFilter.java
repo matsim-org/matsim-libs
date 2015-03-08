@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Filter.java
+ * PersonFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.contrib.analysis.filters.population;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.filters.Filter;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
 /**
- * basic interface for implementing Filters
- * 
+ * Interface for filtering persons.
+ *
  * @author ychen
  */
-public interface Filter {
+public interface PersonFilter extends Filter, PersonAlgorithm {
 	/**
-	 * Counts, how many objects (e.g. {@link org.matsim.core.population.PersonImpl}s, 
-	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+	 * judges whether the Person will be selected or not
+	 *
+	 * @param person person being judged
+	 * @return true if the Person meets the criterion of the filter
 	 */
-	void count();
+	boolean judge(Person person);
 
 	/**
-	 * @return the number of objects (e.g. {@link org.matsim.core.population.PersonImpl}s, 
-	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+	 * sends the person to the next PersonAlgorithm, which could be another filter.
+	 *
+	 * @param person person to be handled
 	 */
-	int getCount();
+	@Override
+	void run(Person person);
+
 }

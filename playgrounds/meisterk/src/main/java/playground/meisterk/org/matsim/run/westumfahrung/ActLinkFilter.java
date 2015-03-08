@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.analysis.filters.population.AbstractPlanFilter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.filters.AbstractPlanFilter;
 
 /**
  * Filters all plans where activities of the same type take place at the same link or set of links.

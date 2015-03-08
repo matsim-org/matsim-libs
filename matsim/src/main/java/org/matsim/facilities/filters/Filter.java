@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RouteLinkFilter.java
+ * Filter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,45 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.facilities.filters;
 
-import java.util.HashSet;
-import java.util.Set;
+/**
+ * basic interface for implementing Filters
+ * 
+ * @author ychen
+ */
+public interface Filter {
+	/**
+	 * Counts, how many objects (e.g. {@link org.matsim.core.population.PersonImpl}s, 
+	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+	 */
+	void count();
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.population.algorithms.PlanAlgorithm;
-
-public class RouteLinkFilter extends AbstractPlanFilter {
-
-	private final Set<Id<Link>> linkIds;
-
-	public RouteLinkFilter(final PlanAlgorithm nextAlgo) {
-		this.nextAlgorithm = nextAlgo;
-		this.linkIds = new HashSet<Id<Link>>();
-	}
-
-	public void addLink(final Id<Link> linkId) {
-		this.linkIds.add(linkId);
-	}
-
-	@Override
-	public boolean judge(final Plan plan) {
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
-					if (this.linkIds.contains(linkId)) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-
+	/**
+	 * @return the number of objects (e.g. {@link org.matsim.core.population.PersonImpl}s, 
+	 * {@link org.matsim.api.core.v01.events.Event Events}) were selected by the filter.
+	 */
+	int getCount();
 }

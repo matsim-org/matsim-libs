@@ -38,7 +38,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author knagel
  */
-public class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
+public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
 	private final StageActivityTypes blackList;
 	private final double mutationRange;

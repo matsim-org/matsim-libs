@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.population.filters.AbstractPersonFilter;
+import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 
 /**
  * @author droeder

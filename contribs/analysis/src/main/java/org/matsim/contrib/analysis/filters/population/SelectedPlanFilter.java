@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractPlanFilter.java.java
+ * SelectedPlanFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,35 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.contrib.analysis.filters.population;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public abstract class AbstractPlanFilter implements PlanFilter, PlanAlgorithm {
+public class SelectedPlanFilter extends AbstractPersonFilter {
 
-	protected PlanAlgorithm nextAlgorithm = null;
-	private int count = 0;
+	private final PlanAlgorithm nextAlgo;
 
-	@Override
-	abstract public boolean judge(Plan plan);
-
-	@Override
-	public void run(final Plan plan) {
-		if (judge(plan)) {
-			count();
-			this.nextAlgorithm.run(plan);
-		}
+	public SelectedPlanFilter(final PlanAlgorithm nextAlgo) {
+		this.nextAlgo = nextAlgo;
 	}
 
 	@Override
-	public void count() {
-		this.count++;
+	public boolean judge(final Person person) {
+		return true;
 	}
 
 	@Override
-	public int getCount() {
-		return this.count;
+	public void run(final Person person) {
+		count();
+		this.nextAlgo.run(person.getSelectedPlan());
 	}
+
 
 }

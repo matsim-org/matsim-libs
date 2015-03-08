@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.population.filters.AbstractPersonFilter;
+import org.matsim.contrib.analysis.filters.population.AbstractPersonFilter;
 
 import playground.mmoyo.utils.DataLoader;
 

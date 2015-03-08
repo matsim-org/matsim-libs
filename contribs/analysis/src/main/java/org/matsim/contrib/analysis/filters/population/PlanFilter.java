@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonFilter.java
+ * PlanFilter.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,31 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.population.filters;
+package org.matsim.contrib.analysis.filters.population;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.facilities.filters.Filter;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
-/**
- * Interface for filtering persons.
- *
- * @author ychen
- */
-public interface PersonFilter extends Filter, PersonAlgorithm {
+public interface PlanFilter extends PlanAlgorithm, Filter {
+
 	/**
-	 * judges whether the Person will be selected or not
+	 * Judges whether the plan will be selected or not.
 	 *
-	 * @param person person being judged
-	 * @return true if the Person meets the criterion of the filter
+	 * @param plan
+	 * @return true if the plan meets the criterion of the filter.
 	 */
-	boolean judge(Person person);
+	boolean judge(Plan plan);
 
 	/**
-	 * sends the person to the next PersonAlgorithm, which could be another filter.
+	 * Sends the person to the next algorithm
 	 *
-	 * @param person person to be handled
+	 * @param plan
 	 */
 	@Override
-	void run(Person person);
+	void run(Plan plan);
 
 }

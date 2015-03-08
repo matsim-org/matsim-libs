@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public class PlanMutateTimeAllocation implements PlanAlgorithm {
+public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final double mutationRange;
 	private final Random random;

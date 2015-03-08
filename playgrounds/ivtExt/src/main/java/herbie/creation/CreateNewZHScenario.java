@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -37,7 +38,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.population.filters.PersonIntersectAreaFilter;
 
 import utils.BuildTrees;
 

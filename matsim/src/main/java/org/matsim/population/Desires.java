@@ -28,6 +28,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.misc.Time;
 
+@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 public class Desires implements MatsimToplevelContainer {
 	// yyyy this is an unfinished matsim toplevel container since
 	// (1) the factory method is not there
@@ -47,6 +48,7 @@ public class Desires implements MatsimToplevelContainer {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public Desires(final String desc) {
 		this.desc = desc;
 	}
@@ -55,6 +57,7 @@ public class Desires implements MatsimToplevelContainer {
 	// accumulate methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final boolean accumulateActivityDuration(final String act_type, final double duration) {
 		if (this.act_durs == null) { return this.putActivityDuration(act_type,duration); }
 		if (this.act_durs.get(act_type) == null)  { return this.putActivityDuration(act_type,duration); }
@@ -68,6 +71,7 @@ public class Desires implements MatsimToplevelContainer {
 	// put methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final boolean putActivityDuration(final String act_type, final double duration) {
 		if (duration <= 0.0) { log.fatal("duration=" + duration + " not allowed!"); return false; }
 		if (this.act_durs == null) { this.act_durs = new HashMap<String, Double>(); }
@@ -75,6 +79,7 @@ public class Desires implements MatsimToplevelContainer {
 		return true;
 	}
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final boolean putActivityDuration(final String act_type, final String duration) {
 		double dur = Time.parseTime(duration);
 		return this.putActivityDuration(act_type,dur);
@@ -84,6 +89,7 @@ public class Desires implements MatsimToplevelContainer {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final boolean removeActivityDuration(final String act_type) {
 		if (this.act_durs.remove(act_type) == null) { return false; }
 		if (this.act_durs.isEmpty()) { this.act_durs = null; }
@@ -94,14 +100,17 @@ public class Desires implements MatsimToplevelContainer {
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public void setDesc(String desc) {
 		this.desc = desc;
 	}
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final String getDesc() {
 		return this.desc;
 	}
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final double getActivityDuration(final String act_type) {
 		if (this.act_durs == null) { return Time.UNDEFINED_TIME; }
 		Double d = this.act_durs.get(act_type);
@@ -109,6 +118,7 @@ public class Desires implements MatsimToplevelContainer {
 		return d;
 	}
 
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final Map<String,Double> getActivityDurations() {
 		return this.act_durs;
 	}
@@ -118,6 +128,7 @@ public class Desires implements MatsimToplevelContainer {
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
+	@Deprecated // The "Desires" matsim toplevel container was never properly finished.
 	public final String toString() {
 		return "[desc=" + this.desc + "]" + "[nof_act_durs=" + this.act_durs.size() + "]";
 	}
