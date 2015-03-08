@@ -241,8 +241,9 @@ public class Controler extends AbstractController {
 		// yyyy this should go away somehow. :-)
 		
 		log.info("setting up transit simulation");
-		if (!this.config.scenario().isUseVehicles()) {
-			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
+//		if (!this.config.scenario().isUseVehicles()) {
+		if ( this.config.transit().getVehiclesFile()==null ) {
+			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
 		}
 
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);

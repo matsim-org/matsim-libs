@@ -963,6 +963,11 @@ public class AccessibilityCalculator {
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToShopping(Person person){
+		Logger.getLogger( this.getClass() ).fatal("other than stated in the javadoc of this method, the code "
+				+ "actually returns the same result as getTravelTimeToHealthcare(...).  kai/dz, mar'15") ;
+		System.exit(-1);
+		
+		
 		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		

@@ -198,7 +198,6 @@ public class KNFreight4 {
 
 	}
 
-
 	private static Config createConfig(String[] args) {
 		Config config = ConfigUtils.createConfig() ;
 		
