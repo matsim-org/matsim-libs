@@ -34,7 +34,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 
 /**
@@ -94,7 +93,7 @@ public class ModeActivityDurationAnalyser {
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl act = (ActivityImpl) pe;
 					try {
-						durTemp = DeprecatedStaticMethod.calculateSomeDuration(act);
+						durTemp = DeprecatedStaticMethods.calculateSomeDuration(act);
 						if (act.getType().equalsIgnoreCase("h")) {
 							if (((PlanImpl) p).getType().equals(TransportMode.car)) {
 								homeActivityDurationsCar += durTemp;

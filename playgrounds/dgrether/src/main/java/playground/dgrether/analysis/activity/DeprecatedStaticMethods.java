@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.deprecated;
+package playground.dgrether.analysis.activity;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.Time;
@@ -30,9 +30,9 @@ import org.matsim.core.utils.misc.Time;
  * 
  * @author nagel
  */
-public class DeprecatedStaticMethod {
+class DeprecatedStaticMethods {
 	
-	private DeprecatedStaticMethod() {}
+	private DeprecatedStaticMethods() {}
 
 	//	/**
 	//	 * This method calculates the duration of the activity from the start and endtimes if set.
@@ -72,7 +72,7 @@ public class DeprecatedStaticMethod {
 	//		}
 	//	}
 		@Deprecated
-		public static double calculateSomeDuration(Activity act) {
+		 static double calculateSomeDuration(Activity act) {
 			if ((act.getStartTime() == Time.UNDEFINED_TIME) && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 				if (act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 					return act.getMaximumDuration();
