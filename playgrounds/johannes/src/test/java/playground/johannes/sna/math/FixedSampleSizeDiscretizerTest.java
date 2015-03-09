@@ -35,13 +35,13 @@ public class FixedSampleSizeDiscretizerTest extends TestCase {
 		Discretizer d = FixedSampleSizeDiscretizer.create(samples, 3);
 		
 		assertEquals(7.0, d.discretize(3.4));
-		assertEquals(10.0, d.discretize(10.0));
+		assertEquals(12.0, d.discretize(10.0));
 		assertEquals(12.0, d.discretize(11.0));
 		assertEquals(3.0, d.discretize(1.0));
 		
 		assertEquals(2.0, d.binWidth(1.0), 0.0001);
 		assertEquals(4.0, d.binWidth(4.5), 0.0001);
-		assertEquals(2.0, d.binWidth(12.0), 0.0001);
+		assertEquals(5.0, d.binWidth(12.0), 0.0001);
 		assertEquals(Double.POSITIVE_INFINITY, d.binWidth(100.0));
 	}
 }
