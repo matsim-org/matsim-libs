@@ -1,5 +1,12 @@
 package org.matsim.integration.daily.accessibility;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,13 +29,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class AccessibilityRuns {
 	public static final Logger log = Logger.getLogger( AccessibilityRuns.class ) ;
@@ -179,6 +179,26 @@ public class AccessibilityRuns {
 			e.printStackTrace();
 			throw new RuntimeException( "writing Mapnik file did not work") ;
 		}
+		
+		
+		
+////		String workingDirectory =  "C:/Users/Daniel/Desktop/MATSimQGisIntegration/";
+//		String workingDirectory =  config.controler().getOutputDirectory();
+////		String qGisProjectFile = "testWithMergedImmissionsCSV.qgs";
+//		
+//		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+//		
+//		
+//		//use case 4: accessibility
+//		double[] extent = {100000,-3720000,180000,-3675000};
+//		writer.setExtent(extent);
+//		
+//		//example for adding a raster layer
+//		//RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
+//		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
+//		mapnikLayer.setRenderer(new AccessibilityXmlRenderer());
+//		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+//		writer.addLayer(0,mapnikLayer);
 
 
 		// two loops over activity types and modes to produce one QGIs project file for each combination
@@ -209,7 +229,13 @@ public class AccessibilityRuns {
 					//					handler.writeProjectLayer(writer, key, geometry, claz, type);
 
 					//TODO Should be split up into (customizable) modules later, so far just a big collection of everything
-					qgisWriter.writeEverything(writer, "../../"+mapnikFileName);
+					if (actType.equals("w")) {
+						qgisWriter.writeEverythingWork(writer, "../../"+mapnikFileName);
+					} else if (actType.equals("e")){
+						qgisWriter.writeEverythingEdu(writer, "../../"+mapnikFileName);						
+					} else {
+						qgisWriter.writeEverythingOther(writer, "../../"+mapnikFileName);
+					}
 
 					//					handler.endProjectLayers(writer);
 					//					handler.writeProperties(writer);
@@ -221,6 +247,35 @@ public class AccessibilityRuns {
 					e.printStackTrace();
 					throw new RuntimeException( "writing QGis project file did not work") ;
 				}
+				
+				
+				
+				
+				
+		
+//				// VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
+//				VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "/" + actType 
+//						+ "/" + mode + "/accessibilities.csv", QGisConstants.geometryType.Point);
+//				densityLayer.setXField("field_1");
+//				densityLayer.setYField("field_2");
+//				AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer();
+//				dRenderer.setRenderingAttribute("field_8");
+//				densityLayer.setRenderer(dRenderer);
+//				writer.addLayer(1,densityLayer);
+//				
+////				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
+//				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "/" + actType 
+//						+ "/" + mode + "t/accessibilities.csv", QGisConstants.geometryType.Point);
+//				
+//				//there are two ways to set x and y fields for csv geometry files
+//				//1) if there is a header, you can set the members xField and yField to the name of the column headers
+//				//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+//				accessibilityLayer.setXField("field_1");
+//				accessibilityLayer.setYField("field_2");
+//				AccessibilityRenderer renderer = new AccessibilityRenderer();
+//				renderer.setRenderingAttribute("field_3"); // choose column/header to visualize
+//				accessibilityLayer.setRenderer(renderer);
+//				writer.addLayer(2,accessibilityLayer);
 				
 				
 				// now creating a snapshot based on above-created project file
