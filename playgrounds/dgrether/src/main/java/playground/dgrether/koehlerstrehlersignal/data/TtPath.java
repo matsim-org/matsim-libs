@@ -30,15 +30,15 @@ public class TtPath {
 
 	
 	public Id<TtPath> getId() {
-		return id;
+		return this.id;
 	}
 
 	public List<Id<DgStreet>> getPath() {
-		return path;
+		return this.path;
 	}
 
 	public double getFlow() {
-		return flow;
+		return this.flow;
 	}	
 	
 }
