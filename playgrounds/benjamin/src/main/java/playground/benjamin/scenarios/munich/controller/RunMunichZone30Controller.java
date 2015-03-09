@@ -54,7 +54,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -182,7 +182,7 @@ public class RunMunichZone30Controller extends AbstractController {
 
 
 		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
+		final TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
 		//
 		//final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 

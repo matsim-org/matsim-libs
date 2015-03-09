@@ -46,7 +46,9 @@ public class ControlerDefaults {
 	}
 
 	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
-		return new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		final TravelTimeAndDistanceBasedTravelDisutilityFactory builder = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		builder.setSigma(0.); // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
+		return builder;
 	}
 
 }

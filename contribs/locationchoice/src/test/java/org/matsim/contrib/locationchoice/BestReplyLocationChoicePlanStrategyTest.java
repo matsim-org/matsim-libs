@@ -35,7 +35,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -88,7 +88,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
-			this.travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());			
+			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());			
 			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork());
 			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		}

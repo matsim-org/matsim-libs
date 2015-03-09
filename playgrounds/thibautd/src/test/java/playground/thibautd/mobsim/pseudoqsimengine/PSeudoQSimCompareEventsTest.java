@@ -44,7 +44,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -120,7 +120,7 @@ public class PSeudoQSimCompareEventsTest {
 					new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).instantiateAndConfigureTripRouter(
 							new RoutingContextImpl(
-								new TravelTimeAndDistanceBasedTravelDisutility(
+								new RandomizingTimeDistanceTravelDisutility(
 									travelTime.getLinkTravelTimes(),
 									scenario.getConfig().planCalcScore() ),
 								travelTime.getLinkTravelTimes() ) ) ),

@@ -23,6 +23,7 @@ package org.matsim.roadpricing;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +35,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
@@ -44,6 +47,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -65,6 +70,57 @@ import org.matsim.testcases.MatsimTestUtils;
 public class TollTravelCostCalculatorTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+	public void testDisutilityResults() {
+		Config config = ConfigUtils.createConfig() ;
+        RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
+		Fixture.createNetwork2((ScenarioImpl)scenario);
+		Network net = scenario.getNetwork() ;
+		
+		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+		scheme.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
+		final Id<Link> link5Id = Id.create("5", Link.class);
+		scheme.addLink(link5Id);
+		final Id<Link> link11Id = Id.create("11", Link.class);
+		scheme.addLink(link11Id);
+		scheme.addCost(0, 10*3600, 0.0007); 
+
+
+		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+
+		double margUtlOfMoney = 1. ;
+        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
+        
+		TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+				defaultDisutilityFactory, scheme, margUtlOfMoney );
+//        travelDisutilityFactory.setSigma( 0. ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator, config.planCalcScore() ) ;
+		
+		PopulationFactory pf = scenario.getPopulation().getFactory() ;
+		
+		double[] results = {0.06678174427374567,0.06723862746529602,0.06666671672366475,0.09362901704565804,0.06701542218998154,
+				0.06668312397557824,0.06750047010988,0.06669740530590448,0.4069154594253435} ;
+		double delta = Double.MIN_VALUE * 100. ;
+		
+		for ( int ii=0 ; ii<results.length ; ii++ ) {
+			Person person = pf.createPerson( Id.createPersonId(ii)  ) ;
+
+			{
+				double value = travelDisutility.getLinkTravelDisutility(net.getLinks().get(link5Id),10., person, null ) ;
+				System.out.println( "value=" + value ) ;
+//				Assert.assertEquals( results[ii], value, delta);
+			}
+			{
+				double value = travelDisutility.getLinkTravelDisutility(net.getLinks().get(link11Id), 10, person, null ) ;
+				System.out.println( "value=" + value ) ;
+//				Assert.assertEquals( results[ii], value, delta);
+			}
+		}
+		
+	}
 
 	@Test
 	public void testDistanceTollRouter() {
@@ -301,7 +357,7 @@ public class TollTravelCostCalculatorTest {
 	 *
 	 * @param population
 	 */
-	private void clearRoutes(final Population population) {
+	private static void clearRoutes(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {

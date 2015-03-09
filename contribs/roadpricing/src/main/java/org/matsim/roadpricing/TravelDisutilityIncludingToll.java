@@ -25,14 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Random;
 
 /**
  * Calculates the travel disutility for links, including tolls. Currently supports distance, cordon and area tolls.
@@ -48,15 +46,11 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
 	private final double marginalUtilityOfMoney;
-	private Random random = null ;
-	private final double normalization ;
+//	private Random random = null ;
+//	private final double normalization ;
 	private final double sigma ;
 
-	private Person prevPerson;
-
-	private double logNormalRnd;
 	private static int utlOfMoneyWrnCnt = 0 ;
-	private static int normalisationWrnCnt = 0 ;
 
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory{
@@ -74,6 +68,13 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		}
 		@Override
 		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+			if ( this.sigma != 0. ) {
+				if ( previousTravelDisutilityFactory instanceof TravelTimeAndDistanceBasedTravelDisutilityFactory ) {
+					((TravelTimeAndDistanceBasedTravelDisutilityFactory) previousTravelDisutilityFactory).setSigma( this.sigma );
+				} else {
+					throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
+				}
+			}
             if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())
                     || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())
                     || RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) ) {
@@ -130,47 +131,22 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		}
 
 		this.sigma = sigma ;
-		if ( sigma != 0. ) {
-			this.random = MatsimRandom.getLocalInstance() ;
-			this.normalization = 1./Math.exp( this.sigma*this.sigma/2 );
-			if ( normalisationWrnCnt < 10 ) {
-				normalisationWrnCnt++ ;
-				log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
-			}
-		} else {
-			this.normalization = 1. ;
-		}
-
 	}
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
 	{
+		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+
+		double logNormalRnd = 1. ;
 		// randomize if applicable:
 		if ( sigma != 0. ) {
-			if ( person != prevPerson ) {
-				prevPerson = person ;
-
-				logNormalRnd = Math.exp( sigma * random.nextGaussian() ) ;
-				logNormalRnd *= normalization ;
-				// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
-				// parameter mu, I rather just normalize (which should be the same, see next). kai, nov'13
-
-				/* The argument is something like this:<ul> 
-				 * <li> exp( mu + sigma * Z) with Z = Gaussian generates lognormal with mu and sigma.
-				 * <li> The mean of this is exp( mu + sigma^2/2 ) .  
-				 * <li> If we set mu=0, the expectation value is exp( sigma^2/2 ) .
-				 * <li> So in order to set the expectation value to one (which is what we want), we need to divide by exp( sigma^2/2 ) .
-				 * </ul>
-				 * Should be tested. kai, jan'14 */
-			}
-		} else {
-			logNormalRnd = 1. ;
+			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
 		}
 		// end randomize
 
-		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
 		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
+		
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}

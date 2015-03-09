@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -116,7 +116,7 @@ public class Events2TTMatrix {
 		new MatsimNetworkReader(scenario).readFile(networkfile);
 
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network,3600,30*3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(),new TravelTimeAndDistanceBasedTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(),new RandomizingTimeDistanceTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig().planCalcScore()));
 		TTimeMatrixCalculator ttmc = new TTimeMatrixCalculator(parseL2ZMapping(mapfile),hours,st,network);
 
 		// creating events object and assign handlers

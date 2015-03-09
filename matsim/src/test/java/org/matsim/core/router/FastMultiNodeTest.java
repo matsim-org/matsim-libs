@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -57,7 +57,7 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(travelTime, config.planCalcScore());
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory().
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -112,7 +112,7 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(travelTime, config.planCalcScore());
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -200,7 +200,7 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(travelTime, config.planCalcScore());
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		

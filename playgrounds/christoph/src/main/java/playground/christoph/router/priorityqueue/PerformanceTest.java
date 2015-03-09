@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -58,7 +58,7 @@ public class PerformanceTest {
 //		int numRoutes = 16384;
 		
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(travelTime, config.planCalcScore());
 //		LeastCostPathCalculatorFactory factory = new DijkstraFactory(); 
 //		LeastCostPathCalculatorFactory factory = new AStarEuclideanFactory(scenario.getNetwork(), travelDisutility);
 //		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), travelDisutility);

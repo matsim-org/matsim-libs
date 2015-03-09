@@ -28,11 +28,17 @@ import org.matsim.core.router.util.TravelTime;
  * @author dgrether
  *
  */
-public class TravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class TravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
+
+	private double sigma = 0. ;
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new TravelTimeAndDistanceBasedTravelDisutility(timeCalculator, cnScoringGroup);
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
+	}
+	
+	public final void setSigma( double val ) {
+		this.sigma = val ;
 	}
 
 }

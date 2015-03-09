@@ -40,7 +40,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -225,7 +225,7 @@ public class BikeSharingScenarioUtils {
 							final TravelTime timeCalculator,
 							final PlanCalcScoreConfigGroup cnScoringGroup ) {
 						final ModeParams pars = cnScoringGroup.getModes().get( mode );
-						return new TravelTimeAndDistanceBasedTravelDisutility(
+						return new RandomizingTimeDistanceTravelDisutility(
 									timeCalculator,
 									(-pars.getMarginalUtilityOfTraveling() / 3600.) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0),
 									-pars.getMarginalUtilityOfDistance()  );

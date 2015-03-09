@@ -64,7 +64,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	/** Creates a simple network consisting of 5 equal links in a row. */
-	protected static void createNetwork1(final ScenarioImpl scenario) {
+	static void createNetwork1(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -89,7 +89,7 @@ import org.matsim.core.utils.misc.Time;
 	}
 
 	/** Creates a simple network with route alternatives in 2 places. */
-	protected static void createNetwork2(final ScenarioImpl scenario) {
+	static void createNetwork2(final ScenarioImpl scenario) {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -99,8 +99,8 @@ import org.matsim.core.utils.misc.Time;
 		 *  |1                                   |
 		 *  |                                    |
 		 * (0)                                   |
-     *                                     7 |
-     * (11)                                  |
+		 *                                     7 |
+		 * (11)                                  |
 		 *  |                                    |
 		 *  |13                                  |
 		 *  |    12          11             8    |
@@ -143,7 +143,7 @@ import org.matsim.core.utils.misc.Time;
 	 * Creates a population for network1
 	 * @param network the network returned by {@link #createNetwork1()}
 	 **/
-	protected static void createPopulation1(final ScenarioImpl scenario) {
+	static void createPopulation1(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
@@ -172,7 +172,7 @@ import org.matsim.core.utils.misc.Time;
 	 * Creates a population for network2
 	 * @param network the network returned by {@link #createNetwork2()}
 	 **/
-	protected static void createPopulation2(final ScenarioImpl scenario) {
+	static void createPopulation2(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
 

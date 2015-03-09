@@ -36,7 +36,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.mobsim.CompareEventsUtils;
@@ -89,7 +89,7 @@ public class JointPseudoSimTest {
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
-											new TravelTimeAndDistanceBasedTravelDisutility(
+											new RandomizingTimeDistanceTravelDisutility(
 												travelTime.getLinkTravelTimes(),
 												scenario.getConfig().planCalcScore() ), 
 											travelTime.getLinkTravelTimes() ) );
@@ -130,7 +130,7 @@ public class JointPseudoSimTest {
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
-											new TravelTimeAndDistanceBasedTravelDisutility(
+											new RandomizingTimeDistanceTravelDisutility(
 												travelTime.getLinkTravelTimes(),
 												scenario.getConfig().planCalcScore() ), 
 											travelTime.getLinkTravelTimes() ) );
