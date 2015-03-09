@@ -103,10 +103,10 @@ public class LeastCostPathTree {
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 
-        /*package*/ void visit(final Id<Node> comingFromNodeId, final double cost, final double time) {
+        /*package*/ void visit(final Id<Node> comingFromNodeId, final double cost1, final double time1) {
 			this.prevId = comingFromNodeId;
-			this.cost = cost;
-			this.time = time;
+			this.cost = cost1;
+			this.time = time1;
 		}
 
 		public double getCost() {
