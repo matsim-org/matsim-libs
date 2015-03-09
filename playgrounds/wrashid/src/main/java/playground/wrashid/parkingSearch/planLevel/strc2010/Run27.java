@@ -2,8 +2,8 @@ package playground.wrashid.parkingSearch.planLevel.strc2010;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.RunLib;

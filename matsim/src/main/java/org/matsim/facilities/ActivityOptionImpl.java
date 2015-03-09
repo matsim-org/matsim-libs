@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
 public class ActivityOptionImpl implements ActivityOption {
 
 	private final String type;

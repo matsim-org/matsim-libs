@@ -30,7 +30,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 
 public class AnalyzeRemovedFacilities {

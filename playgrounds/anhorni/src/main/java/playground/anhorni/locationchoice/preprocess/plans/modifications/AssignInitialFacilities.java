@@ -24,10 +24,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacility;
 
 
 public class AssignInitialFacilities {

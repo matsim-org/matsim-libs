@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
@@ -38,6 +37,7 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.facilities.Facility;
 
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;

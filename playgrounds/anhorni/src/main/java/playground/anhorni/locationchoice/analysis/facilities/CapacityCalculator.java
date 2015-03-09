@@ -22,8 +22,8 @@ package playground.anhorni.locationchoice.analysis.facilities;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 
 public class CapacityCalculator {

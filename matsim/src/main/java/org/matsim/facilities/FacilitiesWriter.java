@@ -20,7 +20,6 @@
 
 package org.matsim.facilities;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.internal.MatsimWriter;
 
 /**

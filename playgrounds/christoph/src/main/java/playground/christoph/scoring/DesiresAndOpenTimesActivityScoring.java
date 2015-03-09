@@ -23,12 +23,12 @@ package playground.christoph.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.Desires;
 
 /**

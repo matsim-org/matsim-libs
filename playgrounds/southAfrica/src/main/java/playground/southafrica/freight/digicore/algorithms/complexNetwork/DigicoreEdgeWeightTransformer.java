@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.collections15.Transformer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import edu.uci.ics.jung.graph.util.Pair;
 

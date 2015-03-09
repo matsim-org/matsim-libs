@@ -23,14 +23,15 @@ package playground.staheale.preprocess;
 //import input.FacilitiesCreation;
 
 import java.io.IOException;
+
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 //import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 //import org.apache.log4j.Logger;
+import org.matsim.facilities.ActivityFacility;
 
 public class CreateFacilityAttributes {
 	

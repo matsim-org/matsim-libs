@@ -44,9 +44,9 @@ import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.facilities.ActivityFacilities;
 
 /**
  * This class should work both with jdeqsim and mobsim.

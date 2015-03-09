@@ -20,10 +20,10 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
 
 public class GenerateParkingFacilitiesTest extends MatsimTestCase {

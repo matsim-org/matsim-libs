@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 

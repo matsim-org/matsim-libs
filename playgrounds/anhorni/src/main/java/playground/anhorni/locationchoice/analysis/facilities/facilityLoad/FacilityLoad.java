@@ -21,7 +21,7 @@ package playground.anhorni.locationchoice.analysis.facilities.facilityLoad;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 public class FacilityLoad {
 	

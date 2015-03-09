@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacilities;
 
 public class FacilitiesV3Modifier extends Modifier {
 

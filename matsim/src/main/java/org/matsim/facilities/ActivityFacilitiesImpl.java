@@ -28,9 +28,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**

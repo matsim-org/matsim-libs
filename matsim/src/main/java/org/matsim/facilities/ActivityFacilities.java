@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,21 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.facilities;
+package org.matsim.facilities;
 
-import org.matsim.api.core.v01.BasicLocation;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.customize.Customizable;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
- * A Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").
+ * Root class for activity facilities.
  *
- * @author (of javadoc) nagel
+ * Maintainer: mrieser / Senozon AG
  */
-public interface Facility<T extends Facility<?>> extends BasicLocation<T>, Identifiable<T>, Customizable {
+public interface ActivityFacilities extends MatsimToplevelContainer {
 
-	public Id<Link> getLinkId();
+	public String getName();
 
+	public void setName(String name);
+	
+	@Override
+	public ActivityFacilitiesFactory getFactory();
+
+	public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
+
+	public void addActivityFacility(ActivityFacility facility);
+
+	public ObjectAttributes getFacilityAttributes();
+
+	/* not sure if this method should be in the interface, but too many users seem to use and like it,
+	 * so there seems to be a need for it...   mrieser/jul13
+	 */
+	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
+	
 }

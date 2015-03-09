@@ -1,6 +1,6 @@
 package playground.vsp.demandde.pendlermatrix;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 public interface TripFlowSink {
 	

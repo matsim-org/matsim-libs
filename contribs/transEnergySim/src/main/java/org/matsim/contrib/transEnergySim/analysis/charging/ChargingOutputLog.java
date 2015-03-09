@@ -28,7 +28,7 @@ import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkEvent;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkValueChangeEvent;
 import org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads.LinkVisualizationQueue;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilities;
 
 public abstract class ChargingOutputLog {
 	

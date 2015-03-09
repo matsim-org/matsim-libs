@@ -27,8 +27,8 @@ import javax.management.loading.PrivateClassLoader;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;

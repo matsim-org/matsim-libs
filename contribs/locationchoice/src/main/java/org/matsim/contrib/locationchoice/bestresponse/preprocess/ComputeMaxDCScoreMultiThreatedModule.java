@@ -28,8 +28,8 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {	

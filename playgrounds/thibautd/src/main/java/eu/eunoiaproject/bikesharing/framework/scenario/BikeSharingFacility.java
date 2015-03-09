@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
-import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.facilities.Facility;
 
 /**
  * Defines a bike sharing station: something with an Id,

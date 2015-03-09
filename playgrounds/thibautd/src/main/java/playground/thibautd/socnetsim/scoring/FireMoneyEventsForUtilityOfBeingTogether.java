@@ -41,11 +41,11 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;

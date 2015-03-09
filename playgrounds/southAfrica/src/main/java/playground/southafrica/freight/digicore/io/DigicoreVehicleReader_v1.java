@@ -26,9 +26,9 @@ import java.util.Stack;
 import java.util.TimeZone;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 

@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.sna.graph.Vertex;

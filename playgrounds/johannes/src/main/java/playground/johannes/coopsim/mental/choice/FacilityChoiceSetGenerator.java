@@ -22,7 +22,7 @@ package playground.johannes.coopsim.mental.choice;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

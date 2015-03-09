@@ -21,9 +21,9 @@
 package playground.balmermi.modules;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
 public class FacilitiesRandomizeHectareCoordinates {

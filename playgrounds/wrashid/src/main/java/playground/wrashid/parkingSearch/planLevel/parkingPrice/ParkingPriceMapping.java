@@ -1,7 +1,7 @@
 package playground.wrashid.parkingSearch.planLevel.parkingPrice;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 /**
  * As there are not that many parking schemes in the network, we can define a mapping from facility to a ParkingPrice(Scheme).

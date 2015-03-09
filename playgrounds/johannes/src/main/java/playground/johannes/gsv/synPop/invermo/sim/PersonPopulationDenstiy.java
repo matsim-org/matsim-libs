@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo.sim;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;

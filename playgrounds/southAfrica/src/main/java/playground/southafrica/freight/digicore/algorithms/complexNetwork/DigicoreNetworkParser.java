@@ -25,11 +25,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 import edu.uci.ics.jung.graph.util.Pair;

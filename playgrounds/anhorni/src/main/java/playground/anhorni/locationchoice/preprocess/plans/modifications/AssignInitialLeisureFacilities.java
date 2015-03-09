@@ -22,10 +22,10 @@ package playground.anhorni.locationchoice.preprocess.plans.modifications;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.anhorni.locationchoice.run.replanning.LeisureFacilityExtractor;
 

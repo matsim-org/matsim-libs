@@ -22,9 +22,10 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacility;
+
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.ParkingGeneralLib;

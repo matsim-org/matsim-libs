@@ -10,8 +10,9 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
+import org.matsim.facilities.ActivityFacility;
+
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;

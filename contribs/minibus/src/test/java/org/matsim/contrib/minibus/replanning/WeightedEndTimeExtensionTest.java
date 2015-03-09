@@ -36,7 +36,7 @@ import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.operator.TimeProvider;
 import org.matsim.contrib.minibus.replanning.WeightedEndTimeExtension;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 

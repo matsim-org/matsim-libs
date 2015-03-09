@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.router;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;

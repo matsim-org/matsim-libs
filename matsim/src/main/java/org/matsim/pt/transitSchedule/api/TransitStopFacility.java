@@ -22,7 +22,7 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.facilities.Facility;
 
 /**
  * A facility (infrastructure) describing a public transport stop.

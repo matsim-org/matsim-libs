@@ -2,8 +2,8 @@ package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.defin
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.MobsimStatus;

@@ -32,10 +32,10 @@ import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 import playground.southafrica.utilities.Header;

@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
 
 
 /**

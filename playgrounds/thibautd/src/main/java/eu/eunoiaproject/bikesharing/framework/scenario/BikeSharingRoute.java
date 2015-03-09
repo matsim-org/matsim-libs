@@ -24,10 +24,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 /**

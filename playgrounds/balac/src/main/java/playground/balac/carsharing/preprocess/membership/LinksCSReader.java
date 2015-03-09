@@ -14,11 +14,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.balac.carsharing.router.CarSharingStation;
 import playground.balac.carsharing.router.CarSharingStations;

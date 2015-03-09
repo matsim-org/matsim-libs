@@ -38,7 +38,6 @@ import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.Travel
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -48,6 +47,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.roadpricing.RoadPricingScheme;

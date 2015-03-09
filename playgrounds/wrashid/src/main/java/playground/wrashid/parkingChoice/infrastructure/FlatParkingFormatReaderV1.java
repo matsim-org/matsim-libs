@@ -6,10 +6,10 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.facilities.ActivityFacility;
 import org.xml.sax.Attributes;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;

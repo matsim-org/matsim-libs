@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 /**
  * When ActivityFacilities are not used, use this class

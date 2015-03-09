@@ -20,8 +20,8 @@
 package playground.thibautd.socnetsim.replanning.modules.randomlocationchoice;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;

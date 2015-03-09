@@ -22,10 +22,10 @@ package playground.wrashid.parkingChoice;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;

@@ -21,8 +21,8 @@ package org.matsim.api.core.v01;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;

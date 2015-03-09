@@ -24,13 +24,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.balmermi.modules.PersonFacility2Link;
 

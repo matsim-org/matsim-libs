@@ -20,9 +20,9 @@
 package playground.pieter.pseudosimulation.replanning.modules;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 

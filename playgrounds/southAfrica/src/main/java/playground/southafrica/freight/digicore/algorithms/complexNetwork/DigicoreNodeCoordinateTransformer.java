@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.commons.collections15.Transformer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 public class DigicoreNodeCoordinateTransformer implements Transformer<Id<ActivityFacility>, String> {
 	private Map<Id<ActivityFacility>, Coord> map;

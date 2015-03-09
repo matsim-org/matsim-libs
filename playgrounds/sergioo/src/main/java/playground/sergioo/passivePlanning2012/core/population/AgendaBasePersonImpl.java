@@ -10,10 +10,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.api.population.AgendaBasePerson;

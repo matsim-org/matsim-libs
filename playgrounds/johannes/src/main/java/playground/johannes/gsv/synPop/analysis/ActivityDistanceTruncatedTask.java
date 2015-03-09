@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.analysis;
 import java.util.Collection;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilities;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 

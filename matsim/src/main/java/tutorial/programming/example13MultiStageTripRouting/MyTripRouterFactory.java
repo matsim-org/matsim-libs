@@ -21,11 +21,11 @@ package tutorial.programming.example13MultiStageTripRouting;
 
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd

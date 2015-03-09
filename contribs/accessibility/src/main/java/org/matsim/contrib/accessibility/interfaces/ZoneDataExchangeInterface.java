@@ -3,7 +3,7 @@ package org.matsim.contrib.accessibility.interfaces;
 import java.util.Map;
 
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 public interface ZoneDataExchangeInterface {
 	

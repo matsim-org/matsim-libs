@@ -31,9 +31,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.matsim4urbansim.analysis.DanielAnalysisListenerEvents;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.facilities.ActivityFacilities;
 
 
 

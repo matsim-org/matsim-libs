@@ -22,9 +22,9 @@ package playground.christoph.evacuation.mobsim.decisiondata;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 

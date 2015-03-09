@@ -1,8 +1,8 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers.types;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.facilities.ActivityFacility;
 
 public interface TypeOfActivityFacilityDecisionMaker extends DecisionMaker {
 

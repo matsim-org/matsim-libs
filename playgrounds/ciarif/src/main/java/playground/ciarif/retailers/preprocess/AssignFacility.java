@@ -1,11 +1,12 @@
 package playground.ciarif.retailers.preprocess;
 
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.ciarif.retailers.utils.ActivityDifferentiator;
 

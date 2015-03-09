@@ -7,12 +7,13 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.ActivityFacility;
+
 import playground.vbmh.controler.VMConfig;
 import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.RemoveDuplicate;
@@ -21,6 +22,7 @@ import playground.vbmh.vmEV.EVControl;
 import playground.vbmh.vmParking.AdvancedParkingChoice.Option;
 
 import javax.xml.bind.JAXB;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;

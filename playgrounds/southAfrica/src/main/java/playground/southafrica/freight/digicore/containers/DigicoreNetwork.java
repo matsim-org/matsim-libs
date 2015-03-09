@@ -29,9 +29,9 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.facilities.ActivityFacility;
 
 import edu.uci.ics.jung.algorithms.util.WeightedChoice;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;

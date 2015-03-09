@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo.sim;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;

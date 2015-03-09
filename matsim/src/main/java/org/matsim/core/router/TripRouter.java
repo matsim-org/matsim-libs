@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 
 /**
  * Class acting as an intermediate between clients needing to

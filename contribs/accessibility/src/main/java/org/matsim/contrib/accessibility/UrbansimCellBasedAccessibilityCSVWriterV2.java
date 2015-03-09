@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
 
 // urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
 // yy move to matsim4urbansim

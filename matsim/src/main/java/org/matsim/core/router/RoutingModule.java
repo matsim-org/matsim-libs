@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.facilities.Facility;
 
 /**
  * Defines classes responsible for routing for a given

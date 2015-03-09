@@ -28,9 +28,9 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
 
 
 /**

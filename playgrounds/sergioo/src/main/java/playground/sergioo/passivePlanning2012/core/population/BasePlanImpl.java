@@ -1,7 +1,6 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -10,7 +9,9 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;

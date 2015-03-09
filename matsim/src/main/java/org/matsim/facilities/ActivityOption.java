@@ -21,7 +21,6 @@ package org.matsim.facilities;
 
 import java.util.SortedSet;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFacilitiesObject;
 
 /**

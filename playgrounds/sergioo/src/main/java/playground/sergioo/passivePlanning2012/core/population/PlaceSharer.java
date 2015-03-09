@@ -11,8 +11,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.sergioo.weeklySimulation.util.misc.Time;
 

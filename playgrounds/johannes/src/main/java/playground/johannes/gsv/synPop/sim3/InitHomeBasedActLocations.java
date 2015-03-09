@@ -24,7 +24,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.misc.QuadTree;
 import playground.johannes.gsv.synPop.CommonKeys;
