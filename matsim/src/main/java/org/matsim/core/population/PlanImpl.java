@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
+import org.matsim.utils.customize.CustomizableUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,7 +363,7 @@ public class PlanImpl implements Plan {
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
-			this.customizableDelegate = new CustomizableImpl();
+			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}

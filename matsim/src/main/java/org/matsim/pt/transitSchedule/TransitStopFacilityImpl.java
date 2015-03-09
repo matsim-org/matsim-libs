@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
+import org.matsim.utils.customize.CustomizableUtils;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -104,7 +104,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
-			this.customizableDelegate = new CustomizableImpl();
+			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}

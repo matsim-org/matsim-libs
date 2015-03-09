@@ -10,7 +10,8 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
+import org.matsim.utils.customize.CustomizableUtils;
+
 import playground.pieter.distributed.scoring.PlanScoreComponent;
 import playground.pieter.distributed.scoring.ScoreComponentType;
 
@@ -365,7 +366,7 @@ public class PlanGenome implements Plan {
     @Override
     public Map<String, Object> getCustomAttributes() {
         if (this.customizableDelegate == null) {
-            this.customizableDelegate = new CustomizableImpl();
+            this.customizableDelegate = CustomizableUtils.createCustomizable();
         }
         return this.customizableDelegate.getCustomAttributes();
     }

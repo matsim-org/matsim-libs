@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
+import org.matsim.utils.customize.CustomizableUtils;
 
 /**
  * maintainer: mrieser / Senozon AG
@@ -122,7 +122,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
-			this.customizableDelegate = new CustomizableImpl();
+			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}

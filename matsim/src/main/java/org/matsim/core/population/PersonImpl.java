@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
+import org.matsim.utils.customize.CustomizableUtils;
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -250,7 +250,7 @@ public class PersonImpl implements Person {
 	@Override
 	public Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
-			this.customizableDelegate = new CustomizableImpl();
+			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}
 		return this.customizableDelegate.getCustomAttributes();
 	}

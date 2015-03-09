@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * Person.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.pieter.distributed.plans;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+package org.matsim.utils.customize;
 
 /**
- * Default implementation of {@link org.matsim.api.core.v01.population.Person} interface.
+ * @author nagel
+ *
  */
-public class PersonForPlanGenomes extends PersonImpl implements Person {
+public class CustomizableUtils {
+	private CustomizableUtils(){} // do not instantiate
 
-	private final static Logger log = Logger.getLogger(PersonForPlanGenomes.class);
-
-    public PersonForPlanGenomes(Id<Person> id) {
-        super(id);
-    }
-
-    @Override
-	public Plan createCopyOfSelectedPlanAndMakeSelected() {
-		PlanGenome oldPlan = (PlanGenome) this.getSelectedPlan();
-		if (oldPlan == null) {
-			return null;
-		}
-		PlanGenome newPlan = new PlanGenome(oldPlan.getPerson());
-		newPlan.copyFrom(oldPlan);
-        newPlan.setGenome(oldPlan.getGenome());
-        newPlan.setpSimScore(oldPlan.getpSimScore());
-        newPlan.setAltScoreComponents(oldPlan.getAltScoreComponents());
-		this.getPlans().add(newPlan);
-		this.setSelectedPlan(newPlan);
-		return newPlan;
+	public static Customizable createCustomizable() {
+		return new CustomizableImpl();
 	}
-
-
 
 }
