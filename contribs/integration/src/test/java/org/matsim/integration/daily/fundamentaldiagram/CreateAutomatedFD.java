@@ -61,6 +61,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -101,22 +102,25 @@ public class CreateAutomatedFD {
 	private final Logger log = Logger.getLogger(CreateAutomatedFD.class);
 	
 	@Test
+	public void holesExperiment(){
+		run(LinkDynamics.PassingQ.name(),true);
+	}
+	
+	@Test
 	public void fifo(){
-		run(LinkDynamics.FIFO.name());
+		run(LinkDynamics.FIFO.name(), false);
 	}
 
 	@Test
 	public void passing(){
-		run(LinkDynamics.PassingQ.name());
+		run(LinkDynamics.PassingQ.name(), false);
 	}
 	
-	private void run(String linkDynamics) {
+	private void run(String linkDynamics, final boolean useHoles) {
+		
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		createNetwork();
 		
-		//config
-//		scenario.getConfig().qsim().setUseDefaultVehicles(false);
-//		((ScenarioImpl)scenario).createVehicleContainer();
 		storeVehicleTypeInfo();
 		
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
@@ -124,19 +128,26 @@ public class CreateAutomatedFD {
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics);
 		scenario.getConfig().vspExperimental().addParam("vspDefaultsCheckingLevel",VspExperimentalConfigGroup.ABORT);
 
+		if(useHoles){
+			scenario.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES.toString());
+		} 
+		
 		//equal modal split run
 		Map<String, Integer> minSteps = new HashMap<String, Integer>();
 		minSteps.put(travelModes[0], 1);
 		minSteps.put(travelModes[1], 4);
 
+		int reduceNoOfDataPointsInPlot = 4; // 4 times less points are sufficient to see the plot
+		
 		double networkDensity = 3*(1000/7.5);
-		int numberOfPoints = (int) Math.ceil(networkDensity/(2.))+5;
+		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * 2.))+5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
+		
 		for (int m=1; m<numberOfPoints; m++){
 			Map<String,Integer> pointToRun = new HashMap<>();
 			for (String mode:travelModes){
-				pointToRun.put(mode,minSteps.get(mode)*m);
+				pointToRun.put(mode,minSteps.get(mode)*m*reduceNoOfDataPointsInPlot);
 			}
 			System.out.println("Number of Agents - \t"+pointToRun.toString());
 			points2Run.add(pointToRun);
@@ -192,6 +203,8 @@ public class CreateAutomatedFD {
 				outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 			}
 		}
+		
+		//plotting data
 		scatterPlot(outData,helper.getOutputDirectory()+linkDynamics+".png");
 	}
 
@@ -224,10 +237,6 @@ public class CreateAutomatedFD {
 
 				p.addPlan(plan);
 				pop.addPerson(p);
-//				Id<Vehicle> vehId = Id.create(p.getId(),Vehicle.class);
-//				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, modeVehicleTypes.get(mode));
-//				scenario.getVehicles().getVehicles().remove(veh); // removing pre-existing veh /
-//				scenario.getVehicles().addVehicle(veh);
 			}
 		}
 	}
@@ -242,7 +251,6 @@ public class CreateAutomatedFD {
 		modeVehicleTypes.put("car", car);
 		TravelModesFlowDynamicsUpdator modeUpdator = new TravelModesFlowDynamicsUpdator(car);
 		mode2FlowData.put(car.getId(), modeUpdator);
-//		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
 		bike.setMaximumVelocity(4.167);
@@ -250,7 +258,6 @@ public class CreateAutomatedFD {
 		modeVehicleTypes.put("bike", bike);
 		modeUpdator = new TravelModesFlowDynamicsUpdator(bike);
 		mode2FlowData.put(bike.getId(), modeUpdator);
-//		scenario.getVehicles().addVehicleType(bike);
 	}
 
 	private void createNetwork(){
@@ -665,7 +672,7 @@ public class CreateAutomatedFD {
 		}
 
 		@Override
-		public final void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+		public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		}
 
@@ -697,7 +704,7 @@ public class CreateAutomatedFD {
 		}
 
 		@Override
-		public void notifyMoveOverNode(Id newLinkId) {
+		public void notifyMoveOverNode(Id<Link> newLinkId) {
 			delegate.notifyMoveOverNode(newLinkId);
 		}
 

@@ -138,14 +138,14 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
 		this.currentLinkId = Id.createLinkId(linkId);
 		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
 		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
-	public final void notifyMoveOverNode(Id newLinkId) {
+	public final void notifyMoveOverNode(Id<Link> newLinkId) {
 		if (expectedLinkWarnCount < 10 && !newLinkId.equals(this.cachedNextLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
 					"anyway ... This warning is suppressed after the first 10 warnings.") ;
