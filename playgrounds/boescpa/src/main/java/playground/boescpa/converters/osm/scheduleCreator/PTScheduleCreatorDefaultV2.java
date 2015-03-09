@@ -270,6 +270,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				posMaxFNumber = i;
 			}
 		}
+		log.info("Selected HAFAS-4day-block: " + posMaxFNumber);
 		return posMaxFNumber;
 	}
 
@@ -322,7 +323,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 					} else if (newLine.charAt(1) == 'T') {
 						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
 						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
-					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V') {
+					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V' && newLine.charAt(4) == 'E') {
 						/*Spalte Typ Bedeutung
 						1-5 CHAR *A VE
 						7-13 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten.
