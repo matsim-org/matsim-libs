@@ -35,8 +35,12 @@ public class FixedSampleSizeDiscretizer {
 
 	/**
 	 * Creates a new discretizer with bin borders defined such that each bin
-	 * would contain approximately contain <tt>size</tt> samples from
-	 * <tt>samples</tt>.
+	 * would contain approximately <tt>size</tt> samples from <tt>samples</tt>.
+	 * 
+	 * Samples are sorted into bins in ascending order. If there are not
+	 * sufficient (less than <tt>size</tt>) samples to fill a further bin, the
+	 * remaining samples are sorted into the last bin. That is, the last bin is
+	 * the only bin that may contain more than <tt>size</tt> samples.
 	 * 
 	 * @param samples
 	 *            an array with samples.
@@ -46,7 +50,8 @@ public class FixedSampleSizeDiscretizer {
 	 */
 	public static FixedBordersDiscretizer create(double[] samples, int size) {
 		TDoubleArrayList borders;
-		Arrays.sort(samples); // I think it is sufficient to get the min and max value.
+		Arrays.sort(samples); // I think it is sufficient to get the min and max
+								// value.
 		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
 		for (int i = 0; i < samples.length; i++) {
 			hist.adjustOrPutValue(samples[i], 1, 1);
@@ -64,8 +69,11 @@ public class FixedSampleSizeDiscretizer {
 			int nBin = hist.get(keys[i]);
 			binsize += nBin;
 			n += nBin;
-			if (binsize >= size && i > 0) { // sufficient samples for the current bin
-				if (samples.length - n >= binsize) { // sufficient remaining samples to fill the next bin
+			if (binsize >= size && i > 0) { // sufficient samples for the
+											// current bin
+				if (samples.length - n >= binsize) { // sufficient remaining
+														// samples to fill the
+														// next bin
 					borders.add(keys[i]);
 					binsize = 0;
 				}
