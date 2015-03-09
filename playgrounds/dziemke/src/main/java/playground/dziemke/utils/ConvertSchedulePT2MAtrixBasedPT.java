@@ -20,6 +20,7 @@ public class ConvertSchedulePT2MAtrixBasedPT {
 		String outputFileName = "/Users/dominik/Workspace/data/nmbm/transitSchedule/minibusTransitSchedule.csv";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		scenario.getConfig().scenario().setUseTransit(true);
 		
 		TransitScheduleReader reader = new TransitScheduleReader(scenario);
 		
@@ -45,6 +46,8 @@ public class ConvertSchedulePT2MAtrixBasedPT {
 			writer.writeNewLine();
 			i++;
 		}
+		
+		writer.close();
 
 	}
 
