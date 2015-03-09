@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

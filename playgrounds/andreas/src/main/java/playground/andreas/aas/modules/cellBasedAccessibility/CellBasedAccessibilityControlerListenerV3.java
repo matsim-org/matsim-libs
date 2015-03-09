@@ -12,7 +12,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import playground.andreas.aas.modules.cellBasedAccessibility.constants.InternalConstants;
 import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.FreeSpeedTravelTimeCostCalculator;

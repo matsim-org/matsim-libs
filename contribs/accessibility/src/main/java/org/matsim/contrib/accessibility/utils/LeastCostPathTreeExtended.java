@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 /**
  * This runs the normal LeastCostPathTree, with whatever TravelDisutility object it is using (e.g. including distance and/or toll).

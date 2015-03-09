@@ -19,8 +19,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.LeastCostPathTree;
-import org.matsim.utils.LeastCostPathTree.NodeData;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 
 public class LeastCostPathTreeTest extends MatsimTestCase{
 	

@@ -13,7 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import playground.andreas.aas.modules.cellBasedAccessibility.config.AccessibilityParameterConfigModule;
 import playground.andreas.aas.modules.cellBasedAccessibility.config.ConfigurationModule;

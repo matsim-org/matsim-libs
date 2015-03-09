@@ -17,7 +17,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import java.util.Map;
 

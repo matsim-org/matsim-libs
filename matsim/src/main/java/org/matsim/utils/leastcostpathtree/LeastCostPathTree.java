@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils;
+package org.matsim.utils.leastcostpathtree;
 
 import java.util.Comparator;
 import java.util.HashMap;

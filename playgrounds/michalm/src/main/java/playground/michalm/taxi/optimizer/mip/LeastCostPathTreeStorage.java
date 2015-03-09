@@ -27,7 +27,8 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.utils.*;
-import org.matsim.utils.LeastCostPathTree.NodeData;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 
 
 public class LeastCostPathTreeStorage

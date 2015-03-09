@@ -35,7 +35,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Geometry;
 

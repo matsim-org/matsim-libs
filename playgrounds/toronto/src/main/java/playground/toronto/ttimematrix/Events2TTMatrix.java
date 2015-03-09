@@ -38,7 +38,7 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import playground.balmermi.world.Zone;
 
