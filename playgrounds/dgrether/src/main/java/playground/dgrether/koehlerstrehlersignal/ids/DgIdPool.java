@@ -91,15 +91,24 @@ public class DgIdPool {
 			br = IOUtils.getBufferedReader(filename);
 			String line = br.readLine();
 			line = br.readLine();
+			Integer maxInt = Integer.MIN_VALUE;
+			
 			while (line != null) {
 				String[] s = line.split("\t");
 				String idString = s[0].trim();
 				Integer idInt = Integer.valueOf(s[1].trim());
+				
+				if (maxInt < idInt){
+					maxInt = idInt;
+				}
+				
 				pool.ids.put(idString, idInt);
 				pool.intStringMap.put(idInt, idString);
 				line = br.readLine();
 			}
 			br.close();
+			
+			pool.currentId = maxInt++;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
