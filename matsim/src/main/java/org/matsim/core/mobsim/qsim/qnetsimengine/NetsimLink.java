@@ -21,10 +21,10 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.utils.customize.Customizable;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {

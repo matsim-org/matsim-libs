@@ -19,7 +19,7 @@
 
 package org.matsim.api.core.v01.population;
 
-import org.matsim.utils.customize.Customizable;
+import org.matsim.api.core.v01.Customizable;
 
 /**
  * @author dgrether

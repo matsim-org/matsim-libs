@@ -18,59 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.customize;
+package org.matsim.api.core.v01;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Standard implementation of the <tt>Customizable</tt> interface.
+ * An interface to customize any class in <tt>org.matsim</tt> for
+ * experiments only.
  * 
  * <p>In an experiment---implemented in the <tt>playground</tt>---it can be
  * useful to add additional information, objects or complex structures to
- * MATSim core classes. Therefore, it is allowed to extend 
- * any class given in <tt>org.matsim</tt> and assign additional information
+ * MATSim core classes. Therefore, it is allowed to implement this interface
+ * for any class given in <tt>org.matsim</tt> and assign additional information
  * from the <tt>playground</tt> only.</p>
  * 
- * <p><b>BUT:</b> is is strictly prohibited to call methods defined and implemented
- * in this class from any point inside the MATSim core (<tt>org.matsim</tt>).</p>
- * 
- * @see Customizable
+ * <p><b>BUT:</b> is is strictly prohibited to call methods defined in this interface
+ * from any point inside the MATSim core (<tt>org.matsim</tt>).</p>
  * 
  * @author balmermi
  */
-final class CustomizableImpl implements Customizable {
-	
-	CustomizableImpl() {} 
+public interface Customizable {
 
 	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Container for custom attributes
-	 */
-	private Map<String,Object> custom_attributes = null;
-
-	//////////////////////////////////////////////////////////////////////
-	// interface implementation
+	// methods
 	//////////////////////////////////////////////////////////////////////
 
 	/**
 	 * returns a container for adding arbitrary additional information to
-	 * a MATSim core object. The Container will be created on demand.
+	 * a MATSim core object.
 	 * 
 	 * <p>IMPORTANT NOTE: This container is meant to use for experiments only.
 	 * Therefore, do NOT call this method from the core (<tt>org.matsim</tt>).</p>
-	 * 
-	 * @see Customizable
+
 	 * @return map for storing custom attributes
 	 */
-	@Override
-	public final Map<String,Object> getCustomAttributes() {
-		if (this.custom_attributes == null) {
-			this.custom_attributes = new HashMap<String,Object>();
-		}
-		return this.custom_attributes;
-	}
+	public Map<String,Object> getCustomAttributes();
 }

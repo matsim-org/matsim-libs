@@ -27,13 +27,13 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.population.Desires;
-import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableUtils;
 /**
  * Default implementation of {@link Person} interface.
  */

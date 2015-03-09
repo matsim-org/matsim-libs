@@ -16,7 +16,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.utils.customize;
+package org.matsim.core.scenario;
+
+import org.matsim.api.core.v01.Customizable;
 
 /**
  * @author nagel

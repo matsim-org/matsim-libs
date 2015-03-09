@@ -23,11 +23,11 @@ package org.matsim.pt.transitSchedule;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableUtils;
 
 /**
  * A facility (infrastructure) describing a public transport stop.

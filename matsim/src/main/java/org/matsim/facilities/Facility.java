@@ -21,10 +21,10 @@
 package org.matsim.facilities;
 
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.utils.customize.Customizable;
 
 /**
  * A Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").

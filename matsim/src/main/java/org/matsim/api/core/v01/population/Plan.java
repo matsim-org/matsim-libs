@@ -20,8 +20,8 @@
 
 package org.matsim.api.core.v01.population;
 
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.core.api.internal.MatsimPopulationObject;
-import org.matsim.utils.customize.Customizable;
 
 import java.util.List;
 

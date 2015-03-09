@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableUtils;
 
 /**
  * maintainer: mrieser / Senozon AG
