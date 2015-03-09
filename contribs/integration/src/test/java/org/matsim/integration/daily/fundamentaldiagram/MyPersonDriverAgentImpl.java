@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.flowDynamics.fd;
+package org.matsim.integration.daily.fundamentaldiagram;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

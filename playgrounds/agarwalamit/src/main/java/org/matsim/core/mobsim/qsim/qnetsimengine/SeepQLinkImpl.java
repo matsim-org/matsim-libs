@@ -89,7 +89,7 @@ public final class SeepQLinkImpl extends AbstractQLink implements SignalizeableI
 	public SeepQLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
 		super(link2, network) ;
 		//--
-		MyQueueWithBuffer.Builder builder = new MyQueueWithBuffer.Builder(this) ;
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this) ;
 		builder.setVehicleQueue(vehicleQueue);
 		this.road = builder.build() ;
 		//--
@@ -335,7 +335,7 @@ public final class SeepQLinkImpl extends AbstractQLink implements SignalizeableI
 
 			VisData roadVisData = road.getVisData() ;
 			if (visLink != null) {
-				((MyQueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
+				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 			}
 

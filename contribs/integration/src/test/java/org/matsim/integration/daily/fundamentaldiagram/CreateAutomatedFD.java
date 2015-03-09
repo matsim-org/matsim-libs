@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.flowDynamics.fd;
+package org.matsim.integration.daily.fundamentaldiagram;
 
 import java.awt.Color;
 import java.awt.Font;
