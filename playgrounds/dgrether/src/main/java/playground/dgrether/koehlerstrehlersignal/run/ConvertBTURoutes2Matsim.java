@@ -249,8 +249,7 @@ public class ConvertBTURoutes2Matsim {
 		String btuRoutesFilename = "routeComparison/paths.xml";
 		String networkFilename = "network_small_simplified.xml.gz";
 
-		// TODO prüfen ob sinnvoll. lieber alle auf einen zeitpunkt und von da
-		// verschieben lassen?
+		// TODO change this? create same activity end time for all agents and enable time choice
 		double startTimeSec = 5.5 * 3600.0;
 		double endTimeSec = 9.5 * 3600.0;
 
