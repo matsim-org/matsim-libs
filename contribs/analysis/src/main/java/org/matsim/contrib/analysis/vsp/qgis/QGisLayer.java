@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRenderer;
 import org.matsim.core.utils.io.IOUtils;
 
 public abstract class QGisLayer {
@@ -86,7 +85,7 @@ public abstract class QGisLayer {
 		return renderer;
 	}
 
-	public void setRenderer(QGisRenderer renderer) {
+	protected void setRenderer(QGisRenderer renderer) {
 		this.renderer = renderer;
 	}
 

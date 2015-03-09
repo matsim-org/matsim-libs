@@ -1,6 +1,5 @@
-package org.matsim.contrib.analysis.vsp.qgis.rendering;
+package org.matsim.contrib.analysis.vsp.qgis;
 
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 
 /**
  * Renderer for QGis raster layers.
@@ -20,9 +19,9 @@ public class QGisRasterRenderer extends QGisRenderer {
 	
 	private QGisConstants.rasterRendererType type;
 	
-	public QGisRasterRenderer(double opacity, int alpha, int blue, int green, QGisConstants.rasterRendererType type, int red){
+	public QGisRasterRenderer(double opacity, int alpha, int blue, int green, QGisConstants.rasterRendererType type, int red, QGisLayer layer){
 		
-		super(QGisConstants.renderingType.singleSymbol);
+		super(QGisConstants.renderingType.singleSymbol, layer);
 		
 		this.opacity = opacity;
 		this.alphaBand = alpha;

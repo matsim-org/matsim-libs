@@ -6,7 +6,6 @@ import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.SimpleNetworkRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRasterRenderer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -70,48 +69,48 @@ public class MainForQGisWriter {
 // ################################################################################################################################################
 		
 		//use case 4: accessibility
-//		double[] extent = {2790381,-4035858, 2891991,-3975105};
-//		writer.setExtent(extent);
-//		
-//		//example for adding a raster layer
-//		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
-//		new AccessibilityXmlRenderer(mapnikLayer);
-//		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
-//		writer.addLayer(mapnikLayer);
-//
-//		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
-//		densityLayer.setXField(1);
-//		densityLayer.setYField(2);
-//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
-//		dRenderer.setRenderingAttribute(8);
-//		writer.addLayer(densityLayer);
-//		
-//		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
-//				QGisConstants.geometryType.Point);
-//		//there are two ways to set x and y fields for csv geometry files
-//		//1) if there is a header, you can set the members xField and yField to the name of the column headers
-//		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-//		accessibilityLayer.setXField(1);
-//		accessibilityLayer.setYField(2);
-//		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
-//		renderer.setRenderingAttribute(3); // choose column/header to visualize
-//		writer.addLayer(accessibilityLayer);
+		double[] extent = {2790381,-4035858, 2891991,-3975105};
+		writer.setExtent(extent);
+		
+		//example for adding a raster layer
+		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
+		new AccessibilityXmlRenderer(mapnikLayer);
+		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+		writer.addLayer(mapnikLayer);
+
+		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
+		densityLayer.setXField(1);
+		densityLayer.setYField(2);
+		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+		dRenderer.setRenderingAttribute(8);
+		writer.addLayer(densityLayer);
+		
+		VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",
+				QGisConstants.geometryType.Point);
+		//there are two ways to set x and y fields for csv geometry files
+		//1) if there is a header, you can set the members xField and yField to the name of the column headers
+		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+		accessibilityLayer.setXField(1);
+		accessibilityLayer.setYField(2);
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
+		renderer.setRenderingAttribute(3); // choose column/header to visualize
+		writer.addLayer(accessibilityLayer);
 
 // ################################################################################################################################################
 		
-		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
-		writer.setExtent(extent);
-		
-		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
-				QGisConstants.geometryType.Point);
-		layer.setXField("xCoord");
-		layer.setYField("yCoord");
-		layer.setDelimiter(",");
-		
-		NoiseRenderer renderer = new NoiseRenderer(layer);
-		renderer.setRenderingAttribute("immission_16:00:00");
-		
-		writer.addLayer(layer);
+//		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
+//		writer.setExtent(extent);
+//		
+//		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
+//				QGisConstants.geometryType.Point);
+//		layer.setXField("xCoord");
+//		layer.setYField("yCoord");
+//		layer.setDelimiter(",");
+//		
+//		NoiseRenderer renderer = new NoiseRenderer(layer);
+//		renderer.setRenderingAttribute("immission_16:00:00");
+//		
+//		writer.addLayer(layer);
 		
 		writer.write(qGisProjectFile);
 

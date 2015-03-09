@@ -5,8 +5,8 @@ import java.awt.Color;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisLineSymbolLayer;
 import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRenderer;
 
 public class SimpleNetworkRenderer extends QGisRenderer {
 
@@ -20,8 +20,7 @@ public class SimpleNetworkRenderer extends QGisRenderer {
 	 */
 	public SimpleNetworkRenderer(VectorLayer layer) {
 		
-		super(QGisConstants.renderingType.singleSymbol);
-		layer.setRenderer(this);
+		super(QGisConstants.renderingType.singleSymbol,layer);
 		this.geometryType = layer.getGeometryType();
 		
 		init();

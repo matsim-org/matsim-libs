@@ -1,7 +1,5 @@
-package org.matsim.contrib.analysis.vsp.qgis.rendering;
+package org.matsim.contrib.analysis.vsp.qgis;
 
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.Range;
 
 /**
  * Template class for a renderer that draws graduated symbols.
@@ -19,9 +17,9 @@ public abstract class GraduatedSymbolRenderer extends QGisRenderer {
 	private boolean useHeader;
 	private String fileHeader;
 	
-	public GraduatedSymbolRenderer(String header) {
+	public GraduatedSymbolRenderer(String header, QGisLayer layer) {
 		
-		super(QGisConstants.renderingType.graduatedSymbol);
+		super(QGisConstants.renderingType.graduatedSymbol, layer);
 		this.useHeader = header != null ? true : false;
 		this.fileHeader = header;
 		

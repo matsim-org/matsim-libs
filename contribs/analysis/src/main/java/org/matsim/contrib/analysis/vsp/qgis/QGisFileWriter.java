@@ -6,10 +6,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRasterRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.QGisRenderer;
-
 /**
  * This class does the actual "writing" of the qgis project file.
  * 

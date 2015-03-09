@@ -1,10 +1,7 @@
-package org.matsim.contrib.analysis.vsp.qgis.rendering;
+package org.matsim.contrib.analysis.vsp.qgis;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisSymbolLayer;
 
 /**
  * 
@@ -24,10 +21,11 @@ public abstract class QGisRenderer {
 
 	private List<QGisSymbolLayer> symbolLayers;
 	
-	public QGisRenderer(QGisConstants.renderingType renderingType){
+	public QGisRenderer(QGisConstants.renderingType renderingType, QGisLayer layer){
 		
 		this.setRenderingType(renderingType);
 		this.symbolLayers = new ArrayList<QGisSymbolLayer>();
+		layer.setRenderer(this);
 		
 	}
 	

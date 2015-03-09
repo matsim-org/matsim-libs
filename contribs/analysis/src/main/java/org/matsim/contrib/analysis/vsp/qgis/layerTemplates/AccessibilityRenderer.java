@@ -2,19 +2,18 @@ package org.matsim.contrib.analysis.vsp.qgis.layerTemplates;
 
 import java.awt.Color;
 
+import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisPointSymbolLayer;
 import org.matsim.contrib.analysis.vsp.qgis.Range;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.rendering.GraduatedSymbolRenderer;
 
 public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
 
 	public AccessibilityRenderer(VectorLayer layer) {
-		super(layer.getHeader());
-		layer.setRenderer(this);
+		super(layer.getHeader(),layer);
 		init();
 	}
 
