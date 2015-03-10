@@ -33,12 +33,11 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.run.NetworkCleaner;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorSimple;
+import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorRectangleAroundSwitzerland;
 import playground.boescpa.converters.osm.ptRouter.PTLineRouterDefaultV2;
 import playground.boescpa.converters.osm.ptRouter.PseudoNetworkCreatorV2;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
@@ -204,7 +203,7 @@ public class OSM2MixedV2 {
 
 	protected static void convertOSMNetwork(String osmFile, String networkPath) {
 		final Network network = getEmptyScenario().getNetwork();
-		new MultimodalNetworkCreatorSimple(network).createMultimodalNetwork(osmFile);
+		new MultimodalNetworkCreatorRectangleAroundSwitzerland(network).createMultimodalNetwork(osmFile);
 		new NetworkWriter(network).write(networkPath);
 		new NetworkCleaner().run(networkPath, networkPath);
 	}

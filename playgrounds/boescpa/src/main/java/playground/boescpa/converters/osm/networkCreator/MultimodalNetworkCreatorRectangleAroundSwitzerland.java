@@ -21,37 +21,36 @@
 
 package playground.boescpa.converters.osm.networkCreator;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * A version of MultimodalNetworkCreator that creates a simple street network from the OSM file.
  *
  * @author boescpa
  */
-public class MultimodalNetworkCreatorSimple extends MultimodalNetworkCreator {
+public class MultimodalNetworkCreatorRectangleAroundSwitzerland extends MultimodalNetworkCreator {
 
 	private final Network streetNetwork;
 	private final Network highwayNetwork;
 
-	public MultimodalNetworkCreatorSimple(Network network) {
+	public MultimodalNetworkCreatorRectangleAroundSwitzerland(Network network) {
 		super(network);
-		streetNetwork = getEmptyNetwork();
-		highwayNetwork = getEmptyNetwork();
+		streetNetwork = NetworkUtils.createNetwork();
+		highwayNetwork = NetworkUtils.createNetwork();
 	}
 
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
 		OsmNetworkReader reader =
 				new OsmNetworkReader(this.network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
-		reader.setHierarchyLayer(47.811547,5.936507,45.834786,10.517806,6); // Rectangle around Switzerland
-		reader.setHierarchyLayer(48.811547,4.936507,44.834786,11.517806,2); // Rectangle around Switzerland + 1 degree distance in each direction
+		// Rectangle around Switzerland
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
+		// Rectangle around Switzerland + 1 degree distance in each direction
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
 		reader.parse(osmFile);
 	}
 
@@ -59,7 +58,8 @@ public class MultimodalNetworkCreatorSimple extends MultimodalNetworkCreator {
 		// Create Street Network
 		OsmNetworkReader reader =
 				new OsmNetworkReader(streetNetwork, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
-		reader.setHierarchyLayer(47.811547,5.936507,45.834786,10.517806,6); // Rectangle around Switzerland
+		// Rectangle around Switzerland
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
 		reader.parse(osmFile);
 
 		// Merge networks:
@@ -69,18 +69,12 @@ public class MultimodalNetworkCreatorSimple extends MultimodalNetworkCreator {
 	public void addHighwayNetwork(final String osmFile) {
 		// Create Highway Network
 		OsmNetworkReader reader = new OsmNetworkReader(highwayNetwork, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
-		reader.setHierarchyLayer(48.811547,4.936507,44.834786,11.517806,2); // Rectangle around Switzerland + 1 degree distance in each direction
+		// Rectangle around Switzerland + 1 degree distance in each direction
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
 		reader.parse(osmFile);
 
 		// Merge networks:
 		NetworkMerger.integrateNetwork(this.network, highwayNetwork, "", "hw");
-	}
-
-	protected Network getEmptyNetwork() {
-		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
-		return scenario.getNetwork();
 	}
 
 }

@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
- * The default implementation of MultimodalNetworkCreator.
+ * A version of MultimodalNetworkCreator that retains the pt tags in the mode tag of the network.
  *
  * @author boescpa
  */
-public class MultimodalNetworkCreatorDefault extends MultimodalNetworkCreator {
+public class MultimodalNetworkCreatorRetainingPTTagsFullNetwork extends MultimodalNetworkCreator {
 
-	public MultimodalNetworkCreatorDefault(Network network) {
+	public MultimodalNetworkCreatorRetainingPTTagsFullNetwork(Network network) {
 		super(network);
 	}
 
