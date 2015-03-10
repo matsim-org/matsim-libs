@@ -181,6 +181,7 @@ public class KS2010ModelWriter {
 					atts.clear();
 					atts.addAttribute("", "", ID, CDATA, program.getId().toString());
 					atts.addAttribute("", "", CYCLE, CDATA, Integer.toString(program.getCycle()));
+					atts.addAttribute("", "", OFFSET, CDATA, Integer.toString(program.getOffset()));
 					hd.startElement("", "", PROGRAM, atts);
 					for (DgGreen g : program.getGreensByLightId().values()) {
 						atts.clear();
@@ -207,7 +208,7 @@ public class KS2010ModelWriter {
 				for (TtPath path : co.getPaths().values()){
 					// path id is unique
 					writeCommodity(path.getId().toString(), co.getSourceNodeId().toString(), 
-							co.getDrainNodeId().toString(), co.getFlow(), path, hd);
+							co.getDrainNodeId().toString(), path.getFlow(), path, hd);
 				}
 			}
 			else {

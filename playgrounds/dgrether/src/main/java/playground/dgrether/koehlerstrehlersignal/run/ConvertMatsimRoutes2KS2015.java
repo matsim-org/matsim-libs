@@ -26,12 +26,15 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
 import playground.dgrether.koehlerstrehlersignal.data.TtCrossingType;
 import playground.dgrether.koehlerstrehlersignal.data.TtPath;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015NetworkXMLParser;
 
 /**
@@ -48,8 +51,8 @@ public class ConvertMatsimRoutes2KS2015 {
 	private DgKSNetwork ksNet;
 	
 	private void convertRoutes(String runNumber, Integer lastIteration,
-			String ksModelDirectory, String ksModelFile, String outputFile,
-			String description) {
+			String ksModelDirectory, String ksModelFile, String ksOptFile, 
+			String outputFile, String description) {
 
 		// init
 		String runsDirectory = DgPaths.REPOS + "runs-svn/cottbus/run"
@@ -62,6 +65,19 @@ public class ConvertMatsimRoutes2KS2015 {
 		KS2015NetworkXMLParser ksNetworkReader = new KS2015NetworkXMLParser();
 		ksNetworkReader.readFile(ksModelDirectory + ksModelFile);
 		this.ksNet = ksNetworkReader.getKsNet();
+		
+		// read offset of ks opt signals
+		KS2014SolutionXMLParser solutionParser = new KS2014SolutionXMLParser();
+		solutionParser.readFile(ksModelDirectory + ksOptFile);
+		List<KS2010CrossingSolution> crossingSolutions = solutionParser.getCrossingSolutions();
+		// write them into ksNet
+		for (KS2010CrossingSolution solution : crossingSolutions){
+			DgCrossing relevantCrossing = ksNet.getCrossings().get(solution.getCrossingId());
+			for (DgProgram program : relevantCrossing.getPrograms().values()){
+				int offset = solution.getProgramIdOffsetMap().get(program.getId());
+				program.setOffset(offset);
+			}
+		}
 		
 		// read matsim routes from events
 		EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -76,7 +92,7 @@ public class ConvertMatsimRoutes2KS2015 {
 		// create commodities for this routes
 		createCommodities(ksModelDirectory);
 
-		// write matsim routes together with ks network as ks model
+		// write matsim routes together with ks network and opt offsets as ks model
 		new KS2010ModelWriter().write(ksNet, this.comsWithRoutes,
 				outputFile.split("/")[1], description, ksModelDirectory
 						+ outputFile);
@@ -184,20 +200,21 @@ public class ConvertMatsimRoutes2KS2015 {
 
 	public static void main(String[] args) {
 		
-		String runNumber = "2034";
-		String runDescription = "new2_optimum"; // please use btu name here
+		String runNumber = "2038";
+		String runDescription = "new_optimum"; // please use btu name here
 		Integer lastIteration = 1400;
 		
 		String ksModelDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/"
 				+ "2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
-		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml"; // TODO include opt signals
-		String outputFile = "routeComparison/2015-03-03_matsimRoutes_" + runNumber + ".xml";
+		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml";
+		String ksOptFile = "btu/" + runDescription + ".xml";
+		String outputFile = "routeComparison/2015-03-10_matsimRoutes_" + runDescription + ".xml";
 		
 		String description = "matsim routes with " + runDescription + " offsets";
 
 		new ConvertMatsimRoutes2KS2015().convertRoutes(runNumber,
-				lastIteration, ksModelDirectory, ksModelFile, outputFile,
+				lastIteration, ksModelDirectory, ksModelFile, ksOptFile, outputFile,
 				description);
 	}
 

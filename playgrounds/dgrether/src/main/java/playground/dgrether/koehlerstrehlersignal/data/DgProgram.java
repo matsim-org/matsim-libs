@@ -25,13 +25,18 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-
+/**
+ * @author dgrether
+ * @author tthunig
+ *
+ */
 public class DgProgram {
 	
 	private static final Logger log = Logger.getLogger(DgProgram.class);
 	
 	private Id<DgProgram> id;
 	private int cycle = 0;
+	private int offset = 0;
 	private Map<Id<DgGreen>, DgGreen> green = new HashMap<>();
 	
 	
@@ -63,6 +68,14 @@ public class DgProgram {
 	
 	public Id<DgProgram> getId() {
 		return id;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public void setOffset(int offset) {
+		this.offset = offset;
 	}
 	
 }
