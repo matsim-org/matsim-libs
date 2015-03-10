@@ -94,6 +94,7 @@ public class ConvertBTURoutes2Matsim {
 	private void createMatsimPlans() {
 		log.info("lights will be skipped in the matsim route");
 
+		int maxNumberOfPlans = Integer.MIN_VALUE;
 		for (DgCommodity com : this.btuComsWithRoutes.getCommodities().values()) {
 			// note: btu routes don't contain the first link of the matsim
 			// route, because they were converted to the end-node of the link
@@ -172,6 +173,7 @@ public class ConvertBTURoutes2Matsim {
 
 				if (!this.createRouteChoice) {
 					// create agents with one single leg
+					maxNumberOfPlans = 1;
 
 					if ((path.getFlow() % 1.0) == 0.0) {
 						log.warn("Some flow values are non integer. To many agents were created. "
@@ -199,7 +201,10 @@ public class ConvertBTURoutes2Matsim {
 			}
 			if (this.createRouteChoice) {
 				// create different routes for each agent as a choice set
-
+				
+				if (legs.size() > maxNumberOfPlans)
+					maxNumberOfPlans = legs.size();
+				
 				for (int i = 0; i < com.getFlow(); i++) {
 					// note: com.getFlow() is integer in contrast to
 					// path.getFlow() (because of conversion)
@@ -225,6 +230,7 @@ public class ConvertBTURoutes2Matsim {
 				}
 			}
 		}
+		log.info("The maximal number of plans per agent is " + maxNumberOfPlans);
 	}
 
 	// create uniformly distributed activity end time in the given time interval
@@ -240,7 +246,7 @@ public class ConvertBTURoutes2Matsim {
 		// depending on the flow value in the btu model
 		// note: if this flow value is non integer, it rounds up to the next
 		// integer. i.e. you'll get a different number of agents in total!
-		boolean createRouteChoice = false;
+		boolean createRouteChoice = true;
 
 		String directory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/"
@@ -254,7 +260,7 @@ public class ConvertBTURoutes2Matsim {
 		double endTimeSec = 9.5 * 3600.0;
 
 		String[] filenameAttributes = btuRoutesFilename.split("/");
-		String outputFilename = directory + "routeComparison/2015-03-09_";
+		String outputFilename = directory + "routeComparison/2015-03-10_";
 		if (createRouteChoice)
 			outputFilename += "ksOptRouteChoice_";
 		else
