@@ -895,14 +895,34 @@ public class CottbusRuns {
 		ri = new RunInfo();
 		ri.runId = Integer.toString(optFixedRoutesAndTimeId);
 		ri.iteration = 1001;
-		ri.remark = "optimized fixed routes and time";
+		ri.remark = "fixed opt routes and time";
 		l.add(ri);
 		
 		ri = new RunInfo();
 		ri.runId = Integer.toString(optFixedRoutesId);
 		ri.iteration = 1400;
-		ri.remark = "optimized fixed routes";
-		l.add(ri);		
+		ri.remark = "fixed opt routes";
+		l.add(ri);
+	}
+	
+	public static void addBaseCaseOptAndOptFixedAndOptChoice(List<RunInfo> l,
+			int baseCaseRunId, int optRunId, int optFixedRoutesAndTimeId,
+			int optFixedRoutesId, int optChoiceRoutesFixedTimeId, int optChoiceRoutesId) {
+
+		CottbusRuns.addBaseCaseOptAndOptFixed(l, baseCaseRunId, optRunId, optFixedRoutesAndTimeId, optFixedRoutesId);
+		
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optChoiceRoutesFixedTimeId);
+		ri.iteration = 1400;
+		ri.remark = "choice set opt routes. fixed time";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optChoiceRoutesId);
+		ri.iteration = 1400;
+		ri.remark = "choice set opt routes";
+		l.add(ri);
 	}
 
 }
