@@ -603,7 +603,10 @@ public class DgAnalyseCottbusKS2010 {
 		
 //		CottbusRuns.addBaseCaseAndOptIt1400Runs(l, 2042, 2039);
 //		CottbusRuns.addBaseCaseOptAndOptFixed(l, 2042, 2039, 2040, 2041);
-		CottbusRuns.addBaseCaseOptAndOptFixedAndOptChoice(l, 2042, 2039, 2040, 2041, 2043, 2044);
+//		CottbusRuns.addBaseCaseOptAndOptFixedAndOptChoice(l, 2042, 2039, 2040, 2041, 2043, 2044);
+		
+//		CottbusRuns.addBaseCaseOptAndRouteChoice1400(l, 2042, 2039, 2043);
+		CottbusRuns.addBaseCaseOptAndRouteChoice1400(l, 2046, 2045, 2044);
 		
 		return l;
 	}
