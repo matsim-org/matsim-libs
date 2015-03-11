@@ -585,17 +585,8 @@ public class M2KS2010NetworkConverter {
 				for (Id<Lane> laneId : signal.getLaneIds()) {
 					LaneData20 lane = l2l.getLanes().get(laneId);
 					if (signal.getTurningMoveRestrictions() == null
-							|| signal.getTurningMoveRestrictions().isEmpty()) { // no
-																				// turning
-																				// move
-																				// restrictions
-																				// for
-																				// signal
-																				// ->
-																				// outlinks
-																				// come
-																				// from
-																				// lane
+							|| signal.getTurningMoveRestrictions().isEmpty()) { 
+						// no turning move restrictions for signal -> outlinks come from lane
 						for (Id<Link> outLinkId : lane.getToLinkIds()) {
 							log.debug("    outLinkId: " + outLinkId);
 							lightId = this.createLights(link.getId(), laneId,
