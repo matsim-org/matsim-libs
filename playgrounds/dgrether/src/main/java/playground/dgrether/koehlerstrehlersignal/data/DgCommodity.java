@@ -31,18 +31,21 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dgrether
  * @author tthunig
- *
  */
 public class DgCommodity {
 
 	private static final Logger log = Logger.getLogger(DgCommodity.class);
 
 	private Id<DgCommodity> id;
+	// source and drain in the ks model
 	private Id<DgCrossingNode> sourceNode; 
 	private Id<DgCrossingNode> drainNode;
+	// source and drain in the matsim model
 	private Id<Link> sourceLink;
 	private Id<Link> drainLink;
+	// total flow of the commodity (sum of all path flows)
 	private double totalFlow;
+	// container for the paths. Can stay empty.
 	private Map<Id<TtPath>, TtPath> paths = new HashMap<>();
 	
 	public DgCommodity(Id<DgCommodity> id){
