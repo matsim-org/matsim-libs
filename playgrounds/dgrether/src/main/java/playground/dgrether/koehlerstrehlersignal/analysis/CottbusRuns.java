@@ -948,5 +948,23 @@ public class CottbusRuns {
 		ri.remark = "opt routes";
 		l.add(ri);
 	}
+	
+	public static void addOptAndRouteChoice1400(List<RunInfo> l,
+			int optRunId, int optRouteChoice) {
+
+		RunInfo ri = null;
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optRunId);
+		ri.iteration = 1400;
+		ri.baseCase = true;
+		ri.remark = "optimized";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = Integer.toString(optRouteChoice);
+		ri.iteration = 1400;
+		ri.remark = "opt routes";
+		l.add(ri);
+	}
 
 }
