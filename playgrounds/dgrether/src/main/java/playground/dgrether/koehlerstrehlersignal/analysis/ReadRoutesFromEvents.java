@@ -18,8 +18,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
 /**
- * reads matsim routes per person from the events file to convert them into ks format.
- * requires an event file with a single trip per agent (dummy-dummy trip)
+ * Class to read selected MATSim routes per agent from the events file 
+ * to convert them into KS format.
+ * Requires an event file with a single trip per agent (dummy-dummy trip).
  * 
  * @author tthunig
  */
