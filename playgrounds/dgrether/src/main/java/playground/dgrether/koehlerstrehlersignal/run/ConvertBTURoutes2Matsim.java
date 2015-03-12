@@ -41,6 +41,34 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015RouteXMLParser;
 
 /**
+ * Class to convert commodities with paths given by the BTU model to MATSim 
+ * agents with routes.
+ * 
+ * The routes are expected in the format
+ * 
+ * <commodityPaths>
+ *   <commodity drain="???" id="???" source="???">
+ *     <path flow="???">
+ *       <edge id="???"/>     
+ *       <edge id="???"/>
+ *       ...
+ *     </path>
+ *     ...
+ *   </commodity> 
+ *   ...
+ * </commodityPaths> 
+ * 
+ * The BTU model splits the commodities into different paths which might have 
+ * fractional flow values. To solve the assignment problem of BTU paths and
+ * MATSim agents, this class assigns all the paths of a commodity to its agents
+ * as a route choice set. The idea is to switch of rerouting and let the agents
+ * find the best of this routes.
+ * 
+ * To be able to compare the simulation results of this route choice set with a 
+ * free route choice, the same agent departure times are used. Therefore the 
+ * conversion takes a while to look for the corresponding agent and his 
+ * departure time in the former MATSim population.
+ * 
  * @author tthunig
  */
 public class ConvertBTURoutes2Matsim {
@@ -58,47 +86,67 @@ public class ConvertBTURoutes2Matsim {
 	private Population popWithRoutes;
 	private Network network;
 
-	
-	private void convertRoutes(String directory, String inputFile,
-			String networkFile,	String outputFile, String populationFile) {
+	/**
+	 * Starts the conversion of BTU paths into MATSim routes.
+	 * 
+	 * @param directory the directory of the BTU scenario
+	 * @param inputFile the filename of the BTU paths 
+	 * (directory + inputFile should give the correct path)
+	 * @param networkFile the filename of the MATSim network 
+	 * (directory + networkFile should give the correct path)
+	 * @param populationFile the filename of the MATSim population 
+	 * (directory + networkFile should give the correct path)
+	 * @param outputFile the filename for the output MATSim population file 
+	 * (directory + networkFile should give the correct path)
+	 */
+	private void startConversion(String directory, String inputFile,
+			String networkFile,	String populationFile, String outputFile) {
 
+		// prepare id conversation between btu and matsim model
 		this.idPool = DgIdPool.readFromFile(directory + "id_conversions.txt");
 		this.idConverter = new DgIdConverter(idPool);
 
-		// parse btu routes from xml file
+		// parse btu paths from xml file
 		KS2015RouteXMLParser routeParser = new KS2015RouteXMLParser(
 				this.idConverter);
 		routeParser.readFile(directory + inputFile);
 		this.btuComsWithRoutes = routeParser.getComsWithRoutes();
 
-		// some more preparation
+		// read the matsim files
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
+		// save network in scenario
 		(new MatsimNetworkReader(scenario)).readFile(directory + networkFile);
-		// network saved in scenario
 		this.network = scenario.getNetwork();
+		// save former population (without routes) in scenario
 		(new MatsimPopulationReader(scenario)).readFile(directory
 				+ populationFile);
-		// population (without routes) saved in scenario
 		this.population = scenario.getPopulation();
 		// create container for the population with routes
 		this.popWithRoutes = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig()).getPopulation();
 		
-		// convert routes and write them into this.population
-		addRoutesToPlans();
+		// convert routes from btu to matsim 
+		// and write them into this.popWithRoutes
+		convertAndAddRoutesToPlans();
 
-		// write population as plans file
+		// write population with routes as plans file
 		MatsimWriter popWriter = new PopulationWriter(this.popWithRoutes,
 				this.network);
 		popWriter.write(outputFile);
 		log.info("plans file with btu routes written to " + outputFile);
 	}
 
-	// add the btu routes to the orignal matsim agents
-	private void addRoutesToPlans() {
-		log.info("lights will be skipped in the matsim routes");
-
+	/**
+	 * Converts the BTU paths into MATSim links, looks for the corresponding
+	 * agent in the MATSim population (an arbitrary one with the same start
+	 * and end link) and gives him all paths of his commodity as route choice set.
+	 * 
+	 * Note: BTU paths contain lights and streets. In the MATSim route all lights
+	 * are skipped.
+	 */
+	private void convertAndAddRoutesToPlans() {
+		// determine the maximal number of plans as additional information output
 		int maxNumberOfPlans = Integer.MIN_VALUE;
 		
 		for (DgCommodity com : this.btuComsWithRoutes.getCommodities().values()) {
@@ -112,58 +160,135 @@ public class ConvertBTURoutes2Matsim {
 			// convert btu paths into matsim legs
 			List<Leg> legs = convertPathsToLegs(com, matsimStartLinkId,
 					matsimEndLinkId);
+			if (legs.size() > maxNumberOfPlans)
+				maxNumberOfPlans = legs.size();
 
-				// create route choice set for each agent with btu routes
-
-				if (legs.size() > maxNumberOfPlans)
-					maxNumberOfPlans = legs.size();
-
-				// commodity flow values should be integer because of conversion.
-				// regarding to rounding issues of single path flow values in the btu model, 
-				// the sum of all path flow values might be non integer, though.
-				// -> round it to the next integer.
-				int roundedFlow = (int) Math.round(com.getFlow());
+			// commodity flow values should be integer because of conversion.
+			// regarding to rounding issues of single path flow values in the btu model, 
+			// the sum of all path flow values might be non integer, though.
+			// -> round it to the next integer.
+			int roundedFlow = (int) Math.round(com.getFlow());
 				
-				for (int i = 0; i < roundedFlow; i++) {
-					// note: com.getFlow() is integer in contrast to
-					// path.getFlow() (because of conversion)
+			// create a route choice set for each agent of the commodity			
+			for (int i = 0; i < roundedFlow; i++) {
+				
+				// look for a matsim agent with the same start and end link
+				// (remove him from this.population)
+				Person correspondingPerson = getCorrespondingMatsimAgent(
+					matsimStartLinkId, matsimEndLinkId);
+				// remove his former plan
+				correspondingPerson.getPlans().clear();
 
-					// look for a matsim agent with the same start and end link
-					// (remove's it from this.population)
-					Person correspondingPerson = getCorrespondingMatsimAgent(
-							matsimStartLinkId, matsimEndLinkId);
-					// remove it's former plan
-					correspondingPerson.getPlans().clear();
-
-					// add all btu routes of the commodity as plans
-					for (Leg leg : legs) {
-						Plan plan = this.population.getFactory().createPlan();
-						Activity start = this.population.getFactory().
-								createActivityFromLinkId("dummy", 
-										matsimStartLinkId);
-						start.setEndTime(this.currentDepartureTime);
-						plan.addActivity(start);
-						plan.addLeg(leg);
-						Activity end = this.population.getFactory().
-								createActivityFromLinkId("dummy", 
-										matsimEndLinkId);
-						plan.addActivity(end);
-						correspondingPerson.addPlan(plan);
-					}
-					
-					// add the agent to this.popWithRoutes
-					this.popWithRoutes.addPerson(correspondingPerson);
+				// add all btu routes of the commodity as plans
+				for (Leg leg : legs) {
+					Plan plan = this.population.getFactory().createPlan();
+					Activity start = this.population.getFactory().
+						createActivityFromLinkId("dummy", matsimStartLinkId);
+					start.setEndTime(this.currentDepartureTime);
+					plan.addActivity(start);
+					plan.addLeg(leg);
+					Activity end = this.population.getFactory().
+						createActivityFromLinkId("dummy", matsimEndLinkId);
+					plan.addActivity(end);
+					correspondingPerson.addPlan(plan);
 				}
+					
+				// add the agent to this.popWithRoutes
+				this.popWithRoutes.addPerson(correspondingPerson);
+			}
 			
 		}
 		log.info("The maximal number of plans per agent is " + maxNumberOfPlans);
 
 		// check whether all agents have routes
 		if (!this.population.getPersons().isEmpty()) {
-				log.error("There are " + this.population.getPersons().size() + " persons left with no route.");
+			throw new RuntimeException("There are " + this.population.
+				getPersons().size() + " persons left with no route.");
 		}
 	}
 
+	/**
+	 * Finds the corresponding MATSim link, which ends in the given 
+	 * crossing node. If the crossing node is expanded, the unique 
+	 * MATSim link ID is given by the crossing node ID. If not, this
+	 * method returns the ingoing link of the crossing, if there is
+	 * only one. If there are more than one ingoing links, it return 
+	 * the one which corresponds to the given commodity ID (which 
+	 * contains the start and end link ID). Therefore the additional 
+	 * information is needed, whether the MATSim link should be a 
+	 * start or an end link.
+	 * 
+	 * @param toCrossingNodeId the ID of the crossing node, where the 
+	 * MATSim link ends
+	 * @param comId the ID of the commodity, of which the MATSim link 
+	 * is either the start or the end link
+	 * @param startLink true, if the MATSim link is the start link of 
+	 * the commodity. false, if it is the end link
+	 * @return the ID of the corresponding MATSim link, where the 
+	 * commodity ends or starts at
+	 */
+	private Id<Link> createMatsimLink(Id<DgCrossingNode> toCrossingNodeId,
+			Id<DgCommodity> comId, boolean startLink) {
+		
+		Id<Link> matsimLinkId = null;
+		
+		// try to get the link from the crossing node
+		// (only works, if it is expanded)
+		try {
+			matsimLinkId = this.idConverter
+					.convertToCrossingNodeId2LinkId(toCrossingNodeId);
+		} catch (IllegalStateException e) {
+			// the source crossing node is not expanded
+	
+			// use the inLink if there is only one
+			Id<Node> matsimNodeId = this.idConverter
+					.convertNotExpandedCrossingNodeId2NodeId(toCrossingNodeId);
+			Map<Id<Link>, ? extends Link> inLinks = this.network.getNodes()
+					.get(matsimNodeId).getInLinks();
+			if (inLinks.size() == 1) {
+				for (Id<Link> linkId : inLinks.keySet()) {
+					matsimLinkId = linkId;
+				}
+			} else {
+				// use the inLink which corresponds to the commodity id
+	
+				for (Id<Link> linkId : inLinks.keySet()) {
+					Integer comIntId = Integer.parseInt(comId.toString());
+					String comStringId = this.idPool.getStringId(comIntId);
+	
+					int checkMatches = 0;
+					if ((startLink && comStringId.startsWith(linkId.toString()))
+							|| (!startLink && comStringId.endsWith(linkId
+									.toString()))) {
+						matsimLinkId = linkId;
+						checkMatches++;
+					}
+					if (checkMatches > 1) {
+						throw new RuntimeException(
+								"Number of inLinks that corresponds to the commodity id "
+										+ comIntId + " = " + comStringId
+										+ " should not be greater than one here!");
+					}
+					if (checkMatches == 0) {
+						throw new RuntimeException(
+								"No matsim link for commodity " + comIntId
+										+ " = " + comStringId + " was found.");
+					}
+				}
+			}
+		}
+		return matsimLinkId;
+	}
+
+	/**
+	 * Converts the BTU paths of the given commodity into MATSim legs.
+	 * 
+	 * @param com the commodity
+	 * @param matsimStartLinkId the MATSim start link of the commodity
+	 * @param matsimEndLinkId the MATSim end link of the commodity
+	 * @return a list of MATSim legs which contain all BTU paths of 
+	 * the commodity
+	 */
 	private List<Leg> convertPathsToLegs(DgCommodity com,
 			Id<Link> matsimStartLinkId, Id<Link> matsimEndLinkId) {
 		
@@ -211,123 +336,76 @@ public class ConvertBTURoutes2Matsim {
 		return legs;
 	}
 
+	/**
+	 * Looks for a MATSim agent with the given start and end link.
+	 * 
+	 * Note: This method takes a long time... (depending on the 
+	 * number of agents in the population)
+	 * 
+	 * @param matsimStartLinkId
+	 * @param matsimEndLinkId
+	 * @return an agent with this start and end link
+	 */
 	private Person getCorrespondingMatsimAgent(Id<Link> matsimStartLinkId,
 			Id<Link> matsimEndLinkId) {
 
 		Person correspondingPerson = null;
 		for (Person person : this.population.getPersons().values()) {
 			
-				int checkerPlan = 0;
-				Activity startAct = null;
-				Activity endAct = null;
+			int checkPlan = 0;
+			Activity startAct = null;
+			Activity endAct = null;
 				
-				// persons in this population were created with only one plan
-				for (Plan plan : person.getPlans()) {
-					int checkerStartAct = 0;
-					int checkerEndAct = 0;
+			// persons in this population were created with only one plan
+			for (Plan plan : person.getPlans()) {
+				int checkStartAct = 0;
+				int checkEndAct = 0;
 					
-					for (PlanElement plEl : plan.getPlanElements()) {
-						// plans were created with exactly two activities
-						if (plEl instanceof Activity) {
-							if (((Activity) plEl).getEndTime() == Time.UNDEFINED_TIME) {
-								// plEl is end activity (without end time)
-								checkerEndAct++;
-								endAct = (Activity) plEl;
-							} else {
-								// plEl is start activity (with end time)
-								checkerStartAct++;
-								startAct = (Activity) plEl;
-							}
+				for (PlanElement plEl : plan.getPlanElements()) {
+					// plans were created with exactly two activities
+					if (plEl instanceof Activity) {
+						if (((Activity) plEl).getEndTime() == Time.UNDEFINED_TIME) {
+							// plEl is end activity (without end time)
+							checkEndAct++;
+							endAct = (Activity) plEl;
+						} else {
+							// plEl is start activity (with end time)
+							checkStartAct++;
+							startAct = (Activity) plEl;
 						}
 					}
-					checkerPlan++;
-					if (!(checkerStartAct == 1) || !(checkerEndAct == 1)) {
-						throw new RuntimeException(
-								"Number of activities should be 2 here.");
-					}
 				}
-				if (!(checkerPlan == 1)) {
-					throw new RuntimeException(
-							"Number of plans should be 1 here.");
+				checkPlan++;
+				if (!(checkStartAct == 1) || !(checkEndAct == 1)) {
+					throw new RuntimeException("Number of activities should be 2 here.");
 				}
+			}
+			if (!(checkPlan == 1)) {
+				throw new RuntimeException("Number of plans should be 1 here.");
+			}
 
+			// check correspondence
+			if (startAct.getLinkId().equals(matsimStartLinkId)
+					&& endAct.getLinkId().equals(matsimEndLinkId)) {
 				// remove person from the population without routes 
-				// to touch every person only once
-				if (startAct.getLinkId().equals(matsimStartLinkId)
-						&& endAct.getLinkId().equals(matsimEndLinkId)) {
-					
-					correspondingPerson = this.population.getPersons().remove(person.getId());
-					this.currentDepartureTime = startAct.getEndTime();
-					break;
-				}
+				// to touch every person only once	
+				correspondingPerson = this.population.getPersons().remove(person.getId());
+				this.currentDepartureTime = startAct.getEndTime();
+				break;
+			}
 		}
 		if (correspondingPerson == null) {
-			throw new RuntimeException("No agent with start link "
-					+ matsimStartLinkId + " and end link " + matsimEndLinkId
-					+ " was found.");
+			throw new RuntimeException("No agent with start link " + matsimStartLinkId 
+				+ " and end link " + matsimEndLinkId + " was found.");
 		}
 		return correspondingPerson;
 	}
 
-	private Id<Link> createMatsimLink(Id<DgCrossingNode> toCrossingNodeId,
-			Id<DgCommodity> comId, boolean startLink) {
-		Id<Link> matsimLinkId = null;
-		// try to get the fromLink from the source crossingNode
-		// (only works, if it is expanded)
-		try {
-			matsimLinkId = this.idConverter
-					.convertToCrossingNodeId2LinkId(toCrossingNodeId);
-		} catch (IllegalStateException e) {
-			// the source crossing node is not expanded
-
-			// use the inLink if there is only one
-			Id<Node> matsimNodeId = this.idConverter
-					.convertNotExpandedCrossingNodeId2NodeId(toCrossingNodeId);
-			Map<Id<Link>, ? extends Link> inLinks = this.network.getNodes()
-					.get(matsimNodeId).getInLinks();
-			if (inLinks.size() == 1) {
-				int checker = 0;
-				for (Id<Link> linkId : inLinks.keySet()) {
-					matsimLinkId = linkId;
-					checker++;
-				}
-				if (checker > 1) {
-					throw new RuntimeException(
-							"Number of inLinks should not be greater than one here!");
-				}
-			} else {
-				// use the inLink which corresponds to the commodity id
-
-				for (Id<Link> linkId : inLinks.keySet()) {
-					Integer comIntId = Integer.parseInt(comId.toString());
-					String comStringId = this.idPool.getStringId(comIntId);
-
-					int checker = 0;
-					if ((startLink && comStringId.startsWith(linkId.toString()))
-							|| (!startLink && comStringId.endsWith(linkId
-									.toString()))) {
-						matsimLinkId = linkId;
-						checker++;
-					}
-					if (checker > 1) {
-						throw new RuntimeException(
-								"Number of inLinks that corresponds to the commodity id "
-										+ comIntId
-										+ " = "
-										+ comStringId
-										+ " should not be greater than one here!");
-					}
-					if (checker == 0) {
-						throw new RuntimeException(
-								"No matsim link for commodity " + comIntId
-										+ " = " + comStringId + " was found.");
-					}
-				}
-			}
-		}
-		return matsimLinkId;
-	}
-
+	/**
+	 * Main method to run the conversion.
+	 * 
+	 * @param args is not used
+	 */
 	public static void main(String[] args) {
 
 		String directory = DgPaths.REPOS
@@ -343,9 +421,9 @@ public class ConvertBTURoutes2Matsim {
 				+ "routeComparison/2015-03-10_sameEndTimes_ksOptTripPlans_" 
 				+ filenameAttributes[filenameAttributes.length - 1];
 		
-		new ConvertBTURoutes2Matsim().convertRoutes(directory,
-				btuRoutesFilename, networkFilename,
-				outputFilename, populationFile);
+		new ConvertBTURoutes2Matsim().startConversion(directory,
+				btuRoutesFilename, networkFilename, populationFile, 
+				outputFilename);
 	}
 
 }
