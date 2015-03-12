@@ -21,6 +21,9 @@ import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
 /**
+ * Class to parse a scenario from a KS model file.
+ * Parses only the information about the network (crossings and streets).
+ * 
  * @author tthunig
  */
 public class KS2015NetworkXMLParser extends MatsimXmlParser {
@@ -116,6 +119,11 @@ public class KS2015NetworkXMLParser extends MatsimXmlParser {
 		}
 	}
 	
+	/**
+	 * Getter for the parsed network.
+	 * 
+	 * @return the ks network with all crossings and streets.
+	 */
 	public DgKSNetwork getKsNet(){
 		return this.ksNet;
 	}
