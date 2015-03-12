@@ -23,6 +23,9 @@ import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 
 /**
+ * Class to convert the Cottbus scenario into KS format.
+ * Uses the general conversion tool TtMatsim2KS2015.
+ * 
  * @author dgrether
  * @author tthunig
  * 
