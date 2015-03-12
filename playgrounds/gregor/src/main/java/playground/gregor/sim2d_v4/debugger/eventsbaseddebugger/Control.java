@@ -81,10 +81,11 @@ public class Control implements KeyListener, MouseWheelListener {
 
 	// zoom:1389.2476:778.86145x2.0789281794113688 at key 0
 	// 2683.7285:1353.723x3.7334563223415764
+	//zoom: 22.704667199218342 at: 11619.073,8703.7
 	private static final Zoom z = new Zoom();
 	static {
-		z.z = 3.7334563223415764;
-		z.o = new PVector(2683.7285f, 1353.723f);
+		z.z = 22.704667199218342;
+		z.o = new PVector(11619.073f, 8703.7f);
 	}
 
 	public Control(ZoomPan zoomer, int cameraTrackFrameSkip, FrameSaver fs) {

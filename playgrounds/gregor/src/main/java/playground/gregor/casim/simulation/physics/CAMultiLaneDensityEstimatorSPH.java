@@ -28,7 +28,7 @@ public class CAMultiLaneDensityEstimatorSPH implements
 	private static Logger log = Logger
 			.getLogger(CAMultiLaneDensityEstimatorSPH.class);
 	private int misses = 0;
-	private AbstractCANetwork net;
+	private final AbstractCANetwork net;
 	public static int H = 6;
 
 	public CAMultiLaneDensityEstimatorSPH(AbstractCANetwork net) {
@@ -39,7 +39,10 @@ public class CAMultiLaneDensityEstimatorSPH implements
 	public double estRho(CAMoveableEntity e) {
 		CANetworkEntity ett = e.getCurrentCANetworkEntity();
 		if (ett instanceof CAMultiLaneNode) {
-			return e.getRho();
+//			return e.getRho();
+			return getRho((CAMultiLaneNode) ett,e);
+			
+			
 		}
 		CAMultiLaneLink l = (CAMultiLaneLink) ett;
 		int lane = e.getLane();
@@ -50,7 +53,7 @@ public class CAMultiLaneDensityEstimatorSPH implements
 		int dir = e.getDir();
 		if (parts[pos] != e) {
 			// agent on link?
-			misses++;
+			this.misses++;
 			return e.getRho();
 		}
 
@@ -75,6 +78,29 @@ public class CAMultiLaneDensityEstimatorSPH implements
 
 		return rho / cnt;
 
+	}
+
+	private double getRho(CAMultiLaneNode ett, CAMoveableEntity e) {
+		int lane = e.getLane();
+		double bS0 = ett.peekForAgentInSlot(lane) == null ? 0 : bSplinesKernel(0);
+		double[] traRho = { 0., bS0 };
+		Id<Link> nextId = e.getNextLinkId();
+		CAMultiLaneLink next = (CAMultiLaneLink) this.net
+				.getCALink(nextId);
+
+		CAMoveableEntity[] nextParts = next.getParticles(0);
+		CANode nn = next.getUpstreamCANode();
+		int nextDir;
+		int nextPos;
+		if (ett == nn) {
+			nextDir = 1;
+			nextPos = 0;
+		} else {
+			nextDir = -1;
+			nextPos = nextParts.length - 1;
+		}
+		traverseLink(nextParts, nextDir, nextPos, traRho);
+		return AbstractCANetwork.RHO_HAT * traRho[1];
 	}
 
 	private double getRho(CAMoveableEntity[] parts, int dir, int pos,

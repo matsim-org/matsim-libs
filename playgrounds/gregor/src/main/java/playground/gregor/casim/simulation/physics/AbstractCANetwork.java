@@ -45,7 +45,9 @@ import org.matsim.core.gbl.Gbl;
 import playground.gregor.casim.monitoring.Monitor;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.vis.VisRequestHandler;
 
 /**
@@ -84,9 +86,9 @@ abstract public class AbstractCANetwork implements CANetwork {
 	protected final Map<Id<Link>, CALink> caLinks = new HashMap<Id<Link>, CALink>();
 	private final EventsManager em;
 
-	private List<Monitor> monitors = new ArrayList<>();
+	private final List<Monitor> monitors = new ArrayList<>();
 
-	private Set<CAMoveableEntity> agents = new HashSet<CAMoveableEntity>();
+	private final Set<CAMoveableEntity> agents = new HashSet<CAMoveableEntity>();
 
 	// private CANetsimEngine engine;
 
@@ -120,8 +122,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	private void init() {
 		for (int i = 0; i < NR_THREADS; i++) {
-			Worker w = new Worker(barrier1, barrier2);
-			workers[i] = w;
+			Worker w = new Worker(this.barrier1, this.barrier2);
+			this.workers[i] = w;
 			Thread t = new Thread(w);
 			t.setDaemon(true);
 			t.setName(Worker.class.toString() + i);
@@ -154,7 +156,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 		while (this.events.peek() != null
 				&& this.events.peek().getEventExcexutionTime() < time + 1) {
 
-			double timeFrameEnd = Math.min(events.peek()
+			double timeFrameEnd = Math.min(this.events.peek()
 					.getEventExcexutionTime()
 					+ this.tFreeMin
 					/ this.eventChunkSizeCoefficient, time + 1);
@@ -171,12 +173,12 @@ abstract public class AbstractCANetwork implements CANetwork {
 				this.workers[thread].add(e);
 			}
 			int avgPerThread = cnt / NR_THREADS;
-			if (avgPerThread > desiredChunkSizeAvgPerThread + 100) {
+			if (avgPerThread > this.desiredChunkSizeAvgPerThread + 100) {
 				this.eventChunkSizeCoefficient /= .9;
 				// log.info("everage events per thread: " + avgPerThread
 				// + " events chunk size  coefficient set to: "
 				// + this.eventChunkSizeCoefficient);
-			} else if (avgPerThread < desiredChunkSizeAvgPerThread - 50
+			} else if (avgPerThread < this.desiredChunkSizeAvgPerThread - 50
 					&& this.eventChunkSizeCoefficient > 1) {
 				this.eventChunkSizeCoefficient *= .9;
 				// log.info("everage events per thread: " + avgPerThread
@@ -251,8 +253,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 			CAEvent e = this.events.poll();
 
-			if (e.getEventExcexutionTime() > time2) {
-				time2 = e.getEventExcexutionTime();
+			if (e.getEventExcexutionTime() > this.time2) {
+				this.time2 = e.getEventExcexutionTime();
 				for (Monitor monitor : this.monitors) {
 					monitor.trigger(e.getEventExcexutionTime());
 				}
@@ -277,6 +279,11 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	private void draw2(double time) {
+//		if (time < 2*3600) {
+//			if (((int)time)%60 != 0) {
+//				return;
+//			}
+//		}
 		for (CALink ll : this.caLinks.values()) {
 			if (ll instanceof CASingleLaneLink) {
 				drawCALinkDynamic((CASingleLaneLink) ll, time);
@@ -356,6 +363,21 @@ abstract public class AbstractCANetwork implements CANetwork {
 		for (int lane = 0; lane < l.getNrLanes(); lane++) {
 			double x = x0 + lane * hx;
 			double y = y0 + lane * hy;
+			
+			double lx0 = x - hx/2;
+			double ly0 = y - hy/2;
+			double lx1 = l.getLink().getToNode().getCoord().getX() - hx * lanes
+					/ 2  + dx / 2 + lane*hx;
+			double ly1 = l.getLink().getToNode().getCoord().getY() - hy * lanes
+					/ 2  + dy / 2 + lane*hy;
+			LineSegment ls = new LineSegment();
+			ls.x0 = lx0;
+			ls.x1 = lx1;
+			ls.y0 = ly0;
+			ls.y1 = ly1;
+			LineEvent le = new LineEvent(time,ls,false,0,0,0,128,0);
+			this.em.processEvent(le);
+			
 			for (int i = 0; i < l.getNumOfCells(); i++) {
 				if (l.getParticles(lane)[i] != null) {
 					double ddx = 1;
@@ -366,6 +388,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 							l.getParticles(lane)[i].getId(), x, y, ldx * ddx,
 							ldy * ddx, time);
 					this.em.processEvent(e);
+					
 				}
 				x += dx;
 				y += dy;
@@ -444,6 +467,10 @@ abstract public class AbstractCANetwork implements CANetwork {
 		// log.info("==> " + event);
 		// }
 
+//		if (event.toString().equals("time:36.85267143895816 type:SWAP obsolete:false agent:r2316 pos:0 entity:2 thread:main")) {
+//			log.info("Gotcha!");
+//		}
+		
 		event.getCAAgent().setCurrentEvent(event);
 		// this.events.add(event);
 		Worker w = this.workerMap.get(Thread.currentThread().getName());
@@ -492,8 +519,8 @@ abstract public class AbstractCANetwork implements CANetwork {
 		private final Queue<CAEvent> local = new PriorityQueue<>();
 		private final Queue<CAEvent> cache = new ArrayDeque<>();
 
-		private CyclicBarrier barrier2;
-		private CyclicBarrier barrier1;
+		private final CyclicBarrier barrier2;
+		private final CyclicBarrier barrier1;
 
 		private int cnt = 0;
 		private int handled = 0;
@@ -521,19 +548,19 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 			try {
 				while (true) {
-					CAEvent event = queue.take();
-					cnt++;
+					CAEvent event = this.queue.take();
+					this.cnt++;
 					boolean gotLock = true;
-					while (local.peek() != null
-							&& local.peek().getEventExcexutionTime() < event
+					while (this.local.peek() != null
+							&& this.local.peek().getEventExcexutionTime() < event
 									.getEventExcexutionTime()) {
-						CAEvent levent = local.poll();
-						cnt++;
+						CAEvent levent = this.local.poll();
+						this.cnt++;
 						int state = levent.tryLock();
 						if (state != -1) {
 							// this.locks.push(levent);
 							if (!levent.isObsolete()) {
-								handled++;
+								this.handled++;
 								levent.getCANetworkEntity().handleEvent(levent);
 								levent.setObsolete();
 							}
@@ -541,14 +568,14 @@ abstract public class AbstractCANetwork implements CANetwork {
 								levent.unlock();
 							}
 						} else {
-							local.add(levent);
+							this.local.add(levent);
 							gotLock = false;
 							break;
 						}
 					}
 					if (!gotLock) {
 						if (event.getCAEventType() != CAEventType.END_OF_FRAME) {
-							local.add(event);
+							this.local.add(event);
 						}
 						endFrame();
 						continue;
@@ -568,7 +595,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 					if (state != -1) {
 						// locks.push(event);
 						if (!event.isObsolete()) {
-							handled++;
+							this.handled++;
 							event.getCANetworkEntity().handleEvent(event);
 							event.setObsolete();
 						}
@@ -576,7 +603,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 							event.unlock();
 						}
 					} else {
-						local.add(event);
+						this.local.add(event);
 						// log.info("global event lock failed");
 						endFrame();
 					}
@@ -592,16 +619,16 @@ abstract public class AbstractCANetwork implements CANetwork {
 		private void endFrame() {
 			// log.info("events polled: " + cnt + " events handled:" + handled
 			// + "\t\t:" + Thread.currentThread().getName());
-			cnt = 0;
-			handled = 0;
+			this.cnt = 0;
+			this.handled = 0;
 			waitBarrier1();
 			unlockAll();
 			waitBarrier2();
 		}
 
 		private void unlockAll() {
-			while (locks.size() > 0) {
-				locks.pop().unlock();
+			while (this.locks.size() > 0) {
+				this.locks.pop().unlock();
 			}
 		}
 
@@ -656,7 +683,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	@Override
 	public List<Monitor> getMonitors() {
-		return monitors;
+		return this.monitors;
 	}
 
 	public Network getNetwork() {
@@ -665,6 +692,15 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	public CANetsimEngine getEngine() {
 		return this.engine;
+	}
+
+	public CAMoveableEntity getCAMovableEntity(Id id) {
+		for (CAMoveableEntity a : this.agents) { //this is slow --> for testing only!!
+			if (a.getId() == id) {
+				return a;
+			}
+		}
+		return null;
 	}
 
 }

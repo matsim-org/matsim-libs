@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
+import playground.gregor.casim.monitoring.LaneSpeedObserver;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 
@@ -48,13 +49,19 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
  *
  */
 public class CAMultiLaneLink implements CANetworkEntity, CALink {
+	
+	//TESTING only
+	public static LaneSpeedObserver obs;
+	
 
 	private static final Logger log = Logger.getLogger(CAMultiLaneLink.class);
 
-	static final double LANESWITCH_TS_TTA = 1.8;
+	static final double LANESWITCH_TS_TTA = 0;
 	private static final double LANESWITCH_TS_SWAP = 0;
 	// private static final double LANESWITCH_TS_TTA = 1111.8;
 	// private static final double LANESWITCH_TS_SWAP = 1111;
+
+	static final int LANESWITCH_HEADWAY_TS = 6;
 
 	private final Link dsl;
 	private final Link usl;
@@ -73,14 +80,18 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	// private final double cellLength;
 
-	private double width;
+	public AbstractCANetwork getNet() {
+		return this.net;
+	}
+
+	private final double width;
 
 	private final double tFree;
 
-	private double ratio;
+	private final double ratio;
 	private final double epsilon; // TODO check if this is still needed [GL Nov.
-									// '14] // Yes, it is needed - w/o epsilon
-									// agents get stuck [GL Jan. 14]
+	// '14] // Yes, it is needed - w/o epsilon
+	// agents get stuck [GL Jan. 14]
 
 	final ReentrantLock lock = new ReentrantLock();
 
@@ -88,9 +99,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private final int lanes;
 
-	private double laneWidth;
+	private final double laneWidth;
 
-	private double laneCellLength;
+	private final double laneCellLength;
 
 	private final double x;
 
@@ -111,10 +122,10 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 				AbstractCANetwork.NR_THREADS);
 
 		this.width = dsl.getCapacity();// TODO this is a misuse of the link's
-										// capacity attribute. Needs to be
-										// fixed!
+		// capacity attribute. Needs to be
+		// fixed!
 		this.lanes = (int) (this.width / (AbstractCANetwork.PED_WIDTH / 1) + 0.5);
-		this.laneWidth = this.width / lanes;
+		this.laneWidth = this.width / this.lanes;
 		this.ratio = AbstractCANetwork.PED_WIDTH / this.laneWidth;
 		this.laneCellLength = this.ratio
 				/ (AbstractCANetwork.RHO_HAT * AbstractCANetwork.PED_WIDTH);
@@ -122,17 +133,17 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		this.dsl = dsl;
 		this.usl = usl;
-		this.particles = new CAMoveableEntity[lanes][this.size];
-		this.lastLeftDsTimes = new double[lanes][this.size];
-		this.lastLeftUsTimes = new double[lanes][this.size];
+		this.particles = new CAMoveableEntity[this.lanes][this.size];
+		this.lastLeftDsTimes = new double[this.lanes][this.size];
+		this.lastLeftUsTimes = new double[this.lanes][this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.laneCellLength / AbstractCANetwork.V_HAT;
-		this.epsilon = tFree / 1000;
+		this.epsilon = this.tFree / 1000;
 		this.net = net;
 
-		x = this.getLink().getToNode().getCoord().getX();
-		y = this.getLink().getToNode().getCoord().getY();
+		this.x = this.getLink().getToNode().getCoord().getX();
+		this.y = this.getLink().getToNode().getCoord().getY();
 		this.k = k;
 	}
 
@@ -141,7 +152,13 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	}
 
 	public double getLaneWidth() {
-		return laneWidth;
+		return this.laneWidth;
+	}
+
+	/* package */static int getIntendedLane(int current, int fromSz, int toSz) {
+		double ratio = (double)toSz/fromSz;
+		int ret = (int)(current*ratio);
+		return ret;
 	}
 
 	/* package */static double getD(CAMoveableEntity a) {
@@ -158,6 +175,106 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 				+ d;
 		// double z = this.tFree + d;
 		return z;
+	}
+
+	/*package */static int getHeadway(CAMoveableEntity a){
+		if (true) {
+			double avgTT = obs.getLaneAvgTT(a.getLane());
+			return -((int)avgTT*1000);
+		}
+		
+		
+		CANetworkEntity current = a.getCurrentCANetworkEntity();
+		if (current instanceof CAMultiLaneLink) {
+			int lane = a.getLane();
+			int dir = a.getDir();
+			int pos = a.getPos();
+			return getHeadway((CAMultiLaneLink)current,a,lane,dir,pos);
+		} else if (current instanceof CAMultiLaneNode){
+			int lane = a.getLane();
+			return getHeadway((CAMultiLaneNode)current,a,lane);
+		}else {
+			log.warn("not implemented yet, assuming headway of 0");
+			return 0;
+		}
+
+	}
+
+	private static int getHeadway(CAMultiLaneNode n, CAMoveableEntity a, int lane) {
+		if (true) {
+			double avgTT = obs.getLaneAvgTT(a.getLane());
+			if (MatsimRandom.getRandom().nextDouble() < 10.001){
+				avgTT = obs.getLaneAvgTT(lane);
+			}
+			return -((int)avgTT*100);
+		}
+		int headway = 0;
+		if (n.peekForAgentInSlot(lane) == null) {
+			headway++;
+			Id<Link> id = a.getNextLinkId();
+			if (id == null) {//end of trip
+				return headway;
+			}
+			CAMultiLaneLink l = (CAMultiLaneLink) n.getNet().getCALink(id);
+			if (l.getNrLanes() != n.getNRLanes()) {
+				log.warn("not implemented yet, returning what we have thus far");
+			}
+			int pos;
+			int dir;
+			if (n == l.getUpstreamCANode()) {
+				pos =- 1;
+				dir = 1;
+			} else {
+				pos = l.getSize();
+				dir = -1;
+			}
+			headway += getHeadway(l, a, lane, dir, pos);
+		}
+
+		return headway;
+	}
+
+	/*package */ static int getHeadway(CAMultiLaneLink l, CAMoveableEntity a, int lane, int dir, int pos) {
+		if (true) {
+			double avgTT = obs.getLaneAvgTT(a.getLane());
+			if (MatsimRandom.getRandom().nextDouble() < 10.001){
+				avgTT = obs.getLaneAvgTT(lane);
+			}
+			return -((int)avgTT*1000);
+		}
+		int headwayLookAheadCutoff = 30;
+		int headway = 0;
+		CAMoveableEntity[] parts = l.particles[lane];
+		int breakCond = -1;
+		if (dir == 1) {
+			breakCond = parts.length;
+		}
+		pos += dir;
+		while (pos != breakCond && headway < headwayLookAheadCutoff) {
+			if (parts[pos] != null) {
+				break;
+			}
+			headway++;
+			pos += dir;
+		}
+
+		
+		if (pos==breakCond && headway < headwayLookAheadCutoff) {
+			CAMultiLaneNode n;
+			if (dir == 1) {
+				n = (CAMultiLaneNode) l.getDownstreamCANode();
+			} else {
+				n = (CAMultiLaneNode) l.getUpstreamCANode();
+			}
+			if (n.getNRLanes() != l.getNrLanes()) {
+				log.warn("not implemented yet");
+				return headway;
+			}
+			return headway + getHeadway(n,a,lane);
+			//			heaway
+		}
+
+		return headway;
 	}
 
 	@Override
@@ -196,7 +313,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			desiredPos = 0;
 		}
 		List<Integer> cands = new ArrayList<>();
-		for (int lane = 0; lane < lanes; lane++) {
+		for (int lane = 0; lane < this.lanes; lane++) {
 			if (this.particles[lane][desiredPos] == null) {
 				cands.add(lane);
 			}
@@ -283,51 +400,30 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int dir = a.getDir();
 
 		// check pre-condition
-		int newLane = this.particles[lane][idx + dir] == null ? lane : -1;
 		double z = getZ(a);
 		z *= this.ratio;
-		z -= epsilon;
-
-		if (a.getRho() >= LANESWITCH_TS_TTA) {
-			newLane = -1;
-			int from = lane > 0 ? lane - 1 : lane;
-			int to = lane < (this.lanes - 1) ? lane + 1 : lane;
-			// 1. collect candidates
-			List<Integer> cands = new ArrayList<>();// maybe gnu trove
-													// collections
-													// would helpful here to
-													// speed
-													// things up a bit
-			for (int i = from; i <= to; i++) {
-				if (this.particles[i][idx + dir] == null) {
-					double timeGap = time - this.lastLeftDsTimes[i][idx + dir];
-					if (timeGap >= z) {// candidate
-						cands.add(i);
+		z -= this.epsilon;
+		int newLane = this.particles[lane][idx + dir] == null && this.lastLeftDsTimes[lane][idx+dir] < time-z ? lane : -1;
+		int currentHeadway = getHeadway(a);
+		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && currentHeadway < LANESWITCH_HEADWAY_TS) {
+			boolean found = false;
+			if (lane > 0) {
+				if (this.particles[lane-1][idx+dir] == null && this.lastLeftDsTimes[lane-1][idx+dir] < time -z) {
+					int headway = getHeadway(this, a, lane-1, dir, idx);
+					if (headway > currentHeadway) {
+						newLane = lane-1;
+						currentHeadway = headway;
+						found = true;
 					}
 				}
 			}
-
-			// 2. choose the one with the largest free space
-			int bestTr = 0;
-			for (int cand : cands) {
-				int tr = dir;
-				;
-				while (tr < 10) { // figure this out, something like 1/rhoHat
-									// [GL,
-									// Jan '15]
-					if (this.particles[cand][idx + tr] == null) {
-						tr += dir;
-					} else {
-						break;
+			if (lane < this.lanes-1) {
+				if (this.particles[lane+1][idx+dir] == null && this.lastLeftDsTimes[lane+1][idx+dir] < time -z) {
+					int headway = getHeadway(this, a, lane+1, dir, idx);
+					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
+						newLane = lane+1;
+						currentHeadway = headway;
 					}
-					if (idx + tr >= this.size - 1) {
-						break;
-					}
-				}
-
-				if (tr > bestTr) {
-					bestTr = tr;
-					newLane = cand;
 				}
 			}
 		}
@@ -369,7 +465,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 				triggerTTE(el, this, time);// move wait first
 			}
 			this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(),
-					time);
+					time,lane);
 		} else {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx - 1];
 			if (toBeTriggered != null) {
@@ -408,43 +504,54 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForAgentOnDownStreamAdvanceWhoIsInFrontOfNode(
 			CAMoveableEntity a, double time) {
 
-		// See discussion in
-		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
-		// and adapt accordingly [GL Nov '14]
 
-		// count options (SWAP and TTA) and make choice
-		// according to the shares of SWAP and TTA
-		int optTTA = 0;
-		int optSWAP = 0;
-
-		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
-			CAMoveableEntity cand = ds.peekForAgentInSlot(slot);
-			if (cand == null) {
-				optTTA++;
-			} else if (this.usl != null
-					&& cand.getNextLinkId().equals(this.usl.getId())) {
-				optSWAP++;
-			}
-		}
-
-		if (optTTA + optSWAP == 0) {
-			return;
-		}
-
-		// There are likely situations where TTA and SWAP are possible. The
-		// action should be chosen so that the overall flow composition gets not
-		// disturbed. For now the option with most opportunities is chosen to
-		// increase the likelihood that it is still valid when the create event
-		// will be executed. If this does not work out well we could try making
-		// this probabilistic. [GL Nov '14]
-
-		if (optSWAP >= optTTA) {
+		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.ds.getNRLanes());
+		CAMoveableEntity cand;
+		if ((cand = this.ds.peekForAgentInSlot(intendedSlot)) == null){
+			triggerTTA(a, this, time + this.tFree);	
+		} else if (cand.getNextLinkId().equals(this.usl.getId())){
 			double d = CAMultiLaneLink.getD(a);
 			d *= this.ds.getNodeRatio();
 			triggerSWAP(a, this, time + d + this.tFree);
-		} else {
-			triggerTTA(a, this, time + this.tFree);
 		}
+
+		//		// See discussion in
+		//		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
+		//		// and adapt accordingly [GL Nov '14]
+		//
+		//		// count options (SWAP and TTA) and make choice
+		//		// according to the shares of SWAP and TTA
+		//		int optTTA = 0;
+		//		int optSWAP = 0;
+		//
+		//		for (int slot = 0; slot < this.ds.getNRLanes(); slot++) {
+		//			CAMoveableEntity cand = this.ds.peekForAgentInSlot(slot);
+		//			if (cand == null) {
+		//				optTTA++;
+		//			} else if (this.usl != null
+		//					&& cand.getNextLinkId().equals(this.usl.getId())) {
+		//				optSWAP++;
+		//			}
+		//		}
+		//
+		//		if (optTTA + optSWAP == 0) {
+		//			return;
+		//		}
+		//
+		//		// There are likely situations where TTA and SWAP are possible. The
+		//		// action should be chosen so that the overall flow composition gets not
+		//		// disturbed. For now the option with most opportunities is chosen to
+		//		// increase the likelihood that it is still valid when the create event
+		//		// will be executed. If this does not work out well we could try making
+		//		// this probabilistic. [GL Nov '14]
+		//
+		//		if (optSWAP >= optTTA) {
+		//			double d = CAMultiLaneLink.getD(a);
+		//			d *= this.ds.getNodeRatio();
+		//			triggerSWAP(a, this, time + d + this.tFree);
+		//		} else {
+		//			triggerTTA(a, this, time + this.tFree);
+		//		}
 
 	}
 
@@ -470,51 +577,30 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int dir = a.getDir();
 
 		// check pre-condition
-		int newLane = this.particles[lane][idx + dir] == null ? lane : -1;
 		double z = getZ(a);
 		z *= this.ratio;
-		z -= epsilon;
-
-		if (a.getRho() >= LANESWITCH_TS_TTA) {
-			newLane = -1;
-			int from = lane > 0 ? lane - 1 : lane;
-			int to = lane < (this.lanes - 1) ? lane + 1 : lane;
-			// 1. collect candidates
-			List<Integer> cands = new ArrayList<>();// maybe gnu trove
-													// collections
-													// would helpful here to
-													// speed
-													// things up a bit
-			for (int i = from; i <= to; i++) {
-				if (this.particles[i][idx - 1] == null) {
-					double timeGap = time - this.lastLeftUsTimes[i][idx - 1];
-					if (timeGap >= z) {// candidate
-						cands.add(i);
+		z -= this.epsilon;
+		int newLane = this.particles[lane][idx + dir] == null && this.lastLeftUsTimes[lane][idx+dir] < time-z ? lane : -1;
+		int currentHeadway = getHeadway(a);
+		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && currentHeadway < LANESWITCH_HEADWAY_TS) {
+			boolean found = false;
+			if (lane > 0) {
+				if (this.particles[lane-1][idx+dir] == null && this.lastLeftUsTimes[lane-1][idx+dir] < time-z) {
+					int headway = getHeadway(this,a,lane-1,dir,idx);
+					if (headway > currentHeadway) {
+						newLane = lane-1;
+						currentHeadway = headway;
+						found = true;
 					}
 				}
 			}
-
-			// 2. choose the one with the largest free space
-			int bestTr = 0;
-			for (int cand : cands) {
-				int tr = dir;
-				;
-				while (tr > -10) { // figure this out, something like 1/rhoHat
-									// [GL,
-									// Jan '15]
-					if (this.particles[cand][idx + tr] == null) {
-						tr += dir;
-					} else {
-						break;
+			if (lane < this.lanes-1) {
+				if (this.particles[lane+1][idx+dir] == null && this.lastLeftUsTimes[lane+1][idx+dir] < time-z) {
+					int headway = getHeadway(this,a,lane+1,dir,idx);
+					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
+						newLane = lane+1;
+						currentHeadway = headway;
 					}
-					if (idx + tr <= 0) {
-						break;
-					}
-				}
-
-				if (tr < bestTr) {
-					bestTr = tr;
-					newLane = cand;
 				}
 			}
 		}
@@ -555,7 +641,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			}
 			if (this.usl != null) {
 				this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(
-						this.usl.getId(), time);
+						this.usl.getId(), time,lane);
 			}
 		} else {
 			CAMoveableEntity toBeTriggered = this.particles[lane][idx + 1];
@@ -594,41 +680,53 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void checkPostConditionForAgentOnUpStreamAdvanceWhoIsInFrontOfNode(
 			CAMoveableEntity a, double time) {
 
-		// See discussion in
-		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
-		// and adapt accordingly [GL Nov '14]
 
-		// count options (SWAP and TTA) and make choice
-		// according to the shares of SWAP and TTA
-		int optTTA = 0;
-		int optSWAP = 0;
-
-		for (int slot = 0; slot < us.getNRLanes(); slot++) {
-			CAMoveableEntity cand = us.peekForAgentInSlot(slot);
-			if (cand == null) {
-				optTTA++;
-			} else if (cand.getNextLinkId().equals(this.dsl.getId())) {
-				optSWAP++;
-			}
-		}
-
-		if (optTTA + optSWAP == 0) {
-			return;
-		}
-		// There are likely situations where TTA and SWAP are possible. The
-		// action should be chosen so that the overall flow composition gets not
-		// disturbed. For now the option with most opportunities is chosen to
-		// increase the likelihood that it is still valid when the create event
-		// will be executed. If this does not work out well we could try making
-		// this probabilistic. [GL Nov '14]
-
-		if (optSWAP >= optTTA) {
+		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.us.getNRLanes());
+		CAMoveableEntity cand;
+		if ((cand = this.us.peekForAgentInSlot(intendedSlot)) == null) {
+			triggerTTA(a, this, time + this.tFree);
+		} else if (cand.getNextLinkId().equals(this.dsl.getId())) {
 			double d = CAMultiLaneLink.getD(a);
 			d *= this.us.getNodeRatio();
 			triggerSWAP(a, this, time + d + this.tFree);
-		} else {
-			triggerTTA(a, this, time + this.tFree);
 		}
+
+
+		//		// See discussion in
+		//		// CANodeParallelQueues.checkPostConditionForAgentSwapedToNodeAndWantsToEnterNextLinkFromUpstreamEnd
+		//		// and adapt accordingly [GL Nov '14]
+		//
+		//		// count options (SWAP and TTA) and make choice
+		//		// according to the shares of SWAP and TTA
+		//		int optTTA = 0;
+		//		int optSWAP = 0;
+		//
+		//		for (int slot = 0; slot < this.us.getNRLanes(); slot++) {
+		//			CAMoveableEntity cand = this.us.peekForAgentInSlot(slot);
+		//			if (cand == null) {
+		//				optTTA++;
+		//			} else if (cand.getNextLinkId().equals(this.dsl.getId())) {
+		//				optSWAP++;
+		//			}
+		//		}
+		//
+		//		if (optTTA + optSWAP == 0) {
+		//			return;
+		//		}
+		//		// There are likely situations where TTA and SWAP are possible. The
+		//		// action should be chosen so that the overall flow composition gets not
+		//		// disturbed. For now the option with most opportunities is chosen to
+		//		// increase the likelihood that it is still valid when the create event
+		//		// will be executed. If this does not work out well we could try making
+		//		// this probabilistic. [GL Nov '14]
+		//
+		//		if (optSWAP >= optTTA) {
+		//			double d = CAMultiLaneLink.getD(a);
+		//			d *= this.us.getNodeRatio();
+		//			triggerSWAP(a, this, time + d + this.tFree);
+		//		} else {
+		//			triggerTTA(a, this, time + this.tFree);
+		//		}
 
 	}
 
@@ -680,31 +778,43 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// check pre-condition
 		double z = CAMultiLaneLink.getZ(a);
-		z *= ds.getNodeRatio();
-		// 1. try to find empty slot with last left time < time - z
-		double[] exitTimes = ds.getLastNodeExitTimeForAgent(a);
-		List<Integer> cands = new ArrayList<Integer>(ds.getNRLanes());
-		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
-			if (ds.peekForAgentInSlot(slot) == null) {
-				if (exitTimes[slot] <= (time - z + epsilon)) {
-					cands.add(slot);
+		z *= this.ds.getNodeRatio();
+		z -= this.epsilon;
+		//1. look whether we can proceed
+
+
+
+		int lane = a.getLane();
+		double[] exitTimes = this.ds.getLastNodeExitTimeForAgent(a);
+		int intendedSlot = getIntendedLane(lane, this.lanes, this.ds.getNRLanes());//simple spreading approach, let's see if it works out [GL March 2015]
+		int newLane = this.ds.peekForAgentInSlot(intendedSlot) == null && exitTimes[intendedSlot] < time-z ? intendedSlot : -1;
+		int currentHeadway = getHeadway(this.ds,a,intendedSlot);
+		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && currentHeadway < LANESWITCH_HEADWAY_TS) {
+			boolean found = false;
+			if (intendedSlot > 0) {
+				if (this.ds.peekForAgentInSlot(intendedSlot-1) == null && exitTimes[intendedSlot-1] < time-z) {
+					int headway = getHeadway(this.ds,a,intendedSlot-1);
+					if (headway > currentHeadway) {
+						newLane = intendedSlot-1;
+						currentHeadway = headway;
+						found = true;
+					}
+				}
+			}
+			if (intendedSlot < this.ds.getNRLanes()-1) {
+				if (this.ds.peekForAgentInSlot(intendedSlot+1) == null && exitTimes[intendedSlot+1] < time-z) {
+					int headway = getHeadway(this.ds,a,intendedSlot+1);
+					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
+						newLane = intendedSlot+1;
+						currentHeadway = headway;
+					}
 				}
 			}
 		}
-		if (cands.size() > 0) {
-			Integer slot = cands.get(MatsimRandom.getRandom().nextInt(
-					cands.size()));
-			handleTTADownStreamNodeOnPreCondition1(a, time, slot);
-			return;
-		}
-		// 2.try to find empty slot with last left time >= time -z
-		// maybe we should look for slow with that minimizes (last left time -
-		// time -z)
-		for (int slot = 0; slot < ds.getNRLanes(); slot++) {
-			if (ds.peekForAgentInSlot(slot) == null) {
-				handleTTANodeOnPreCondition2(a, time, this.ds, slot);
-				return;
-			}
+		if (newLane > -1) {
+			handleTTADownStreamNodeOnPreCondition1(a, time, newLane);
+		} else if (this.ds.peekForAgentInSlot(intendedSlot) == null){
+			handleTTANodeOnPreCondition2(a, time, this.ds, intendedSlot);
 		}
 
 	}
@@ -723,14 +833,14 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		// check post-condition and generate events
 		// first for persons behind or on node
 
-		if (!dsWaitQ.isEmpty()) {
-			CAMoveableEntity el = dsWaitQ.iterator().next();
+		if (!this.dsWaitQ.isEmpty()) {
+			CAMoveableEntity el = this.dsWaitQ.iterator().next();
 			triggerTTE(el, this, time);// move wait first
 		}
 
 		if (this.usl != null) {
 			this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.usl.getId(),
-					time);
+					time,lane);
 		}
 		// || !this.ds.tryTriggerAgentsWhoWantToEnterLaneOnLink(lane,
 		// this.usl.getId(), lanes, time)) {
@@ -777,8 +887,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	}
 
 	private void handleTTAUpStreamNode(CAMoveableEntity a, double time) {
+		int lane = a.getLane();
 		if (a.getNextLinkId() == null) {
-			int lane = a.getLane();
 
 			letAgentArrive(a, time, 0, lane);
 			// check post-condition and generate events
@@ -789,33 +899,41 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// check pre-condition
 		double z = CAMultiLaneLink.getZ(a);
-		z *= us.getNodeRatio();
+		z *= this.us.getNodeRatio();
+		z -= this.epsilon;
 		// 1. try to find empty slot with last left time < time - z
-		double[] exitTimes = us.getLastNodeExitTimeForAgent(a);
-		List<Integer> cands = new ArrayList<Integer>(us.getNRLanes());
-		for (int slot = 0; slot < us.getNRLanes(); slot++) {
-			if (us.peekForAgentInSlot(slot) == null) {
-				if (exitTimes[slot] <= (time - z + epsilon)) {
-					cands.add(slot);
+		double[] exitTimes = this.us.getLastNodeExitTimeForAgent(a);
+
+		int intendedSlot = getIntendedLane(lane, this.lanes, this.us.getNRLanes());//simple spreading approach, let's see if it works out [GL March 2015]
+		int newLane = this.us.peekForAgentInSlot(intendedSlot) == null && exitTimes[intendedSlot] < time-z ? intendedSlot : -1;
+		int currentHeadway = getHeadway(this.us,a,intendedSlot);
+		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && currentHeadway < LANESWITCH_HEADWAY_TS) {
+			boolean found = false;
+			if (intendedSlot > 0) {
+				if (this.us.peekForAgentInSlot(intendedSlot-1) == null && exitTimes[intendedSlot-1] < time-z) {
+					int headway = getHeadway(this.us,a,intendedSlot-1);
+					if (headway > currentHeadway) {
+						newLane = intendedSlot-1;
+						currentHeadway = headway;
+						found = true;
+					}
+				}
+			}
+			if (intendedSlot < this.us.getNRLanes()-1) {
+				if (this.us.peekForAgentInSlot(intendedSlot+1) == null && exitTimes[intendedSlot+1] < time-z) {
+					int headway = getHeadway(this.us,a,intendedSlot+1);
+					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
+						newLane = intendedSlot+1;
+						currentHeadway = headway;
+					}
 				}
 			}
 		}
-		if (cands.size() > 0) {
-			Integer slot = cands.get(MatsimRandom.getRandom().nextInt(
-					cands.size()));
-			handleTTAUpStreamNodeOnPreCondition1(a, time, slot);
-			return;
+		if (newLane > -1) {
+			handleTTAUpStreamNodeOnPreCondition1(a, time, newLane);
+		} else if (this.us.peekForAgentInSlot(intendedSlot) == null){
+			handleTTANodeOnPreCondition2(a, time, this.us, intendedSlot);
 		}
-		// 2.try to find empty slot with last left time >= time -z
-		// maybe we should look for slow with that minimizes (last left time -
-		// time -z)
-		for (int slot = 0; slot < us.getNRLanes(); slot++) {
-			if (us.peekForAgentInSlot(slot) == null) {
-				handleTTANodeOnPreCondition2(a, time, this.us, slot);
-				return;
-			}
-		}
-
 	}
 
 	private void handleTTAUpStreamNodeOnPreCondition1(CAMoveableEntity a,
@@ -838,7 +956,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			triggerTTE(el, this, time);// move wait first
 		}
 
-		this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(), time);
+		this.us.tryTriggerAgentsWhoWantToEnterLaneOnLink(this.dsl.getId(), time,lane);
 		checkPostConditionForPersonBehindOnUpStreamAdvance(0, time, lane);
 		// }
 
@@ -865,19 +983,19 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private void swapWithDownStreamNode(CAMoveableEntity a, double time) {
 
-		if (usl == null) {
+		if (this.usl == null) {
 			log.warn(a);
 		}
 
+		int lane = a.getLane();
 		CAMoveableEntity peek = this.ds
-				.peekForAgentWhoWantsToEnterLaneOnLink(this.usl.getId());
+				.peekForAgentWhoWantsToEnterLaneOnLink(lane,this.usl.getId(),this.getNrLanes());
 		if (peek == null) {
-			// log.info("situation for agent: " + a
-			// + " at downstream node has changed, dropping event.");
+			log.info("situation for agent: " + a
+					+ " at downstream node has changed, dropping event.");
 			return;
 		}
 
-		int lane = a.getLane();
 		int nodeSlot = peek.getLane();
 		CAMoveableEntity swapA = this.ds.pollAgentFromSlot(nodeSlot);
 
@@ -910,17 +1028,17 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private void swapWithUpStreamNode(CAMoveableEntity a, double time) {
 
+		int lane = a.getLane();
 		CAMoveableEntity peek = this.us
-				.peekForAgentWhoWantsToEnterLaneOnLink(dsl.getId());
+				.peekForAgentWhoWantsToEnterLaneOnLink(lane,this.dsl.getId(),getNrLanes());
 
 		// validate situation
 		if (peek == null) {
-			// log.info("situation for: " + a
-			// + " at upstream node has changed, dropping event.");
+			log.info("situation for: " + a
+					+ " at upstream node has changed, dropping event.");
 			return;
 		}
 		int nodeLane = peek.getLane();
-		int lane = a.getLane();
 
 		CAMoveableEntity swapA = this.us.pollAgentFromSlot(nodeLane);
 
@@ -1015,43 +1133,24 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int bestLaneA = lane;
 		// check for lane switch
 		if (a.getRho() >= LANESWITCH_TS_SWAP) {
-
-			int bestTr = 1;
-			for (; bestTr < 10; bestTr++) {
-				int pos = nbIdx + bestTr * a.getDir();
-				if (pos >= this.size || this.particles[lane][pos] != null) {
-					break;
+			boolean found = false;
+			int dir = a.getDir();
+			int currentHeadwayAfterSwap = getHeadway(this,a,lane,dir,idx+dir);
+			if (lane > 0 && this.particles[lane-1][idx+dir] == null) {
+				int headway = getHeadway(this,a,lane-1,dir,idx+dir);
+				if (headway > currentHeadwayAfterSwap) {
+					currentHeadwayAfterSwap = headway;
+					bestLaneA = lane-1;
+					found = true;
 				}
 			}
-			if (lane > 0) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = nbIdx + tr * a.getDir();
-					if (pos >= this.size
-							|| this.particles[lane - 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
-					bestLaneA = lane - 1;
+			if (lane < this.lanes-1 && this.particles[lane+1][idx+dir] == null) {
+				int headway = getHeadway(this,a,lane+1,dir,idx+dir);
+				if (headway > currentHeadwayAfterSwap || found && headway >= (currentHeadwayAfterSwap+MatsimRandom.getRandom().nextDouble()-0.5)) {
+					currentHeadwayAfterSwap = headway;
+					bestLaneA = lane+1;
 				}
 			}
-			if (lane < this.lanes - 1) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = nbIdx + tr * a.getDir();
-					if (pos >= this.size
-							|| this.particles[lane + 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
-					bestLaneA = lane + 1;
-				}
-			}
-
 		}
 		this.particles[bestLaneA][nbIdx] = a;
 		a.setLane(bestLaneA);
@@ -1059,41 +1158,24 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int bestLaneNb = lane;
 		// check for lane switch
 		if (nb.getRho() >= LANESWITCH_TS_SWAP) {
-
-			int bestTr = 1;
-			for (; bestTr < 10; bestTr++) {
-				int pos = idx + bestTr * nb.getDir();
-				if (pos < 0 || this.particles[lane][pos] != null) {
-					break;
-				}
-			}
-			if (lane > 0) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = idx + tr * nb.getDir();
-					if (pos < 0 || this.particles[lane - 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
+			boolean found = false;
+			int dir = nb.getDir();
+			int currentHeadwayAfterSwap = getHeadway(this,nb,lane,dir,idx);
+			if (lane >0 && this.particles[lane-1][idx] == null) {
+				int headway = getHeadway(this,nb,lane-1,dir,idx);
+				if (headway > currentHeadwayAfterSwap) {
 					bestLaneNb = lane - 1;
+					currentHeadwayAfterSwap = headway;
+					found = true;
 				}
 			}
-			if (lane < this.lanes - 1) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = idx + tr * nb.getDir();
-					if (pos < 0 || this.particles[lane + 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
+			if (lane < this.lanes-1 && this.particles[lane+1][idx] == null) {
+				int headway = getHeadway(this,nb,lane+1,dir,idx);
+				if (headway > currentHeadwayAfterSwap || found && headway >= (currentHeadwayAfterSwap+MatsimRandom.getRandom().nextDouble()-0.5)) {
 					bestLaneNb = lane + 1;
+					currentHeadwayAfterSwap = headway;
 				}
 			}
-
 		}
 		this.particles[bestLaneNb][idx] = nb;
 		nb.setLane(bestLaneNb);
@@ -1134,41 +1216,24 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int bestLaneA = lane;
 		// check for lane switch
 		if (a.getRho() >= LANESWITCH_TS_SWAP) {
-
-			int bestTr = 1;
-			for (; bestTr < 10; bestTr++) {
-				int pos = nbIdx + bestTr * a.getDir();
-				if (pos < 0 || this.particles[lane][pos] != null) {
-					break;
+			boolean found = false;
+			int dir = a.getDir();
+			int currentHeadwayAfterSwap = getHeadway(this,a,lane,dir,idx+dir);
+			if (lane > 0 && this.particles[lane-1][idx+dir] == null) {
+				int headway = getHeadway(this,a,lane-1,dir,idx+dir);
+				if (headway > currentHeadwayAfterSwap) {
+					currentHeadwayAfterSwap = headway;
+					bestLaneA = lane-1;
+					found = true;
 				}
 			}
-			if (lane > 0) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = nbIdx + tr * a.getDir();
-					if (pos < 0 || this.particles[lane - 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
-					bestLaneA = lane - 1;
+			if (lane < this.lanes-1 && this.particles[lane+1][idx+dir] == null) {
+				int headway = getHeadway(this,a,lane+1,dir,idx+dir);
+				if (headway > currentHeadwayAfterSwap || found && headway >= (currentHeadwayAfterSwap+MatsimRandom.getRandom().nextDouble()-0.5)) {
+					currentHeadwayAfterSwap = headway;
+					bestLaneA = lane+1;
 				}
 			}
-			if (lane < this.lanes - 1) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = nbIdx + tr * a.getDir();
-					if (pos < 0 || this.particles[lane + 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
-					bestLaneA = lane + 1;
-				}
-			}
-
 		}
 		this.particles[bestLaneA][nbIdx] = a;
 		a.setLane(bestLaneA);
@@ -1176,43 +1241,24 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int bestLaneNb = lane;
 		// check for lane switch
 		if (nb.getRho() >= LANESWITCH_TS_SWAP) {
-
-			int bestTr = 1;
-			for (; bestTr < 10; bestTr++) {
-				int pos = idx + bestTr * nb.getDir();
-				if (pos >= this.size || this.particles[lane][pos] != null) {
-					break;
-				}
-			}
-			if (lane > 0) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = idx + tr * nb.getDir();
-					if (pos >= this.size
-							|| this.particles[lane - 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
+			boolean found = false;
+			int dir = nb.getDir();
+			int currentHeadwayAfterSwap = getHeadway(this,nb,lane,dir,idx);
+			if (lane >0 && this.particles[lane-1][idx] == null) {
+				int headway = getHeadway(this,nb,lane-1,dir,idx);
+				if (headway > currentHeadwayAfterSwap) {
 					bestLaneNb = lane - 1;
+					currentHeadwayAfterSwap = headway;
+					found = true;
 				}
 			}
-			if (lane < this.lanes - 1) {
-				int tr = 0;
-				for (; tr < 10; tr++) {
-					int pos = idx + tr * nb.getDir();
-					if (pos >= this.size
-							|| this.particles[lane + 1][pos] != null) {
-						break;
-					}
-				}
-				if (tr > bestTr) {
-					bestTr = tr;
+			if (lane < this.lanes-1 && this.particles[lane+1][idx] == null) {
+				int headway = getHeadway(this,nb,lane+1,dir,idx);
+				if (headway > currentHeadwayAfterSwap || found && headway >= (currentHeadwayAfterSwap+MatsimRandom.getRandom().nextDouble()-0.5)) {
 					bestLaneNb = lane + 1;
+					currentHeadwayAfterSwap = headway;
 				}
 			}
-
 		}
 		this.particles[bestLaneNb][idx] = nb;
 		nb.setLane(bestLaneNb);
@@ -1356,26 +1402,26 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	public void reset() {
 		for (int i = 0; i < this.lanes; i++) {
 			for (int j = 0; j < this.size; j++) {
-				lastLeftDsTimes[i][j] = 0;
-				lastLeftUsTimes[i][j] = 0;
-				if (particles[i][j] != null) {
-					CAMoveableEntity part = particles[i][j];
+				this.lastLeftDsTimes[i][j] = 0;
+				this.lastLeftUsTimes[i][j] = 0;
+				if (this.particles[i][j] != null) {
+					CAMoveableEntity part = this.particles[i][j];
 					this.net.unregisterAgent(part);
-					particles[i][j] = null;
+					this.particles[i][j] = null;
 					if (part instanceof CAVehicle) {
-						double now = net.getEngine().getMobsim().getSimTimer()
+						double now = this.net.getEngine().getMobsim().getSimTimer()
 								.getTimeOfDay();
 						CAVehicle veh = (CAVehicle) part;
 
 						Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
 								.getId() : this.usl.getId();
-						this.net.getEventsManager().processEvent(
-								new PersonStuckEvent(now, veh.getDriver()
-										.getId(), currentLinkId, veh
-										.getDriver().getMode()));
+								this.net.getEventsManager().processEvent(
+										new PersonStuckEvent(now, veh.getDriver()
+												.getId(), currentLinkId, veh
+												.getDriver().getMode()));
 
-						net.getEngine().getMobsim().getAgentCounter().incLost();
-						net.getEngine().getMobsim().getAgentCounter()
+								this.net.getEngine().getMobsim().getAgentCounter().incLost();
+								this.net.getEngine().getMobsim().getAgentCounter()
 								.decLiving();
 					}
 				}
@@ -1383,6 +1429,9 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		}
 
 	}
+
+
+	//concurrent stuff
 
 	@Override
 	public void lock() {
@@ -1438,17 +1487,20 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		return this.threadNr;
 	}
 
+
+	//other things
+
 	@Override
 	public double getX() {
-		return x;
+		return this.x;
 	}
 
 	@Override
 	public double getY() {
-		return y;
+		return this.y;
 	}
 
 	public MultiLaneDensityEstimator getDensityEstimator() {
-		return k;
+		return this.k;
 	}
 }
