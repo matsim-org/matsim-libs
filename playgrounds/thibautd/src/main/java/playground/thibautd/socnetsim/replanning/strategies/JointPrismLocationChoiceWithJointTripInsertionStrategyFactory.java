@@ -101,6 +101,11 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 					registry.getTripRouterFactory() ) );
 
 		strategy.addStrategyModule(
+				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
+					registry.getScenario().getConfig(),
+					registry.getTripRouterFactory()) );
+
+		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					registry.getScenario().getConfig(),
 					registry.getJointPlans().getFactory(),
