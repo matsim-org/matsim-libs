@@ -38,6 +38,12 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014Solutio
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015NetworkXMLParser;
 
 /**
+ * Class to convert MATSim routes into BTU format.
+ * Therefore all agents with the same route (same links, time unrelevant)
+ * are merged as one commodity with this links as permitted streets.
+ * 
+ * The output is a full BTU scenario with all crossings, streets and commodities.
+ * 
  * @author tthunig
  */
 public class ConvertMatsimRoutes2KS2015 {
@@ -50,6 +56,22 @@ public class ConvertMatsimRoutes2KS2015 {
 	private Network matsimNet;
 	private DgKSNetwork ksNet;
 	
+	private DgIdConverter idConverter;
+	
+	/**
+	 * Starts the conversion of MATSim routes into BTU format.
+	 * 
+	 * @param runNumber the number of the MATSim run, of which the routes should be taken
+	 * @param lastIteration the iteration number, of which the routes should be taken
+	 * @param ksModelDirectory the directory of the BTU scenario
+	 * @param ksModelFile the name of the BTU model file
+	 * (ksModelDirectory + ksModelFile should give the correct path)
+	 * @param ksOptFile the name of the file with the BTU signal control
+	 * (ksModelDirectory + ksOptFile should give the correct path)
+	 * @param outputFile the name of the BTU output model with permitted streets 
+	 * (ksModelDirectory + outputFile should give the correct path)
+	 * @param description the description of the output model
+	 */
 	private void convertRoutes(String runNumber, Integer lastIteration,
 			String ksModelDirectory, String ksModelFile, String ksOptFile, 
 			String outputFile, String description) {
@@ -99,54 +121,36 @@ public class ConvertMatsimRoutes2KS2015 {
 	}
 
 	/**
-	 * create a commodity for each new path and save them in this.comsWithRoutes.
-	 * this converts the matsim routes into ks model format.
+	 * Creates a commodity for each new path and saves it in this.comsWithRoutes.
+	 * This converts the matsim routes into ks model format.
 	 * 
 	 * @param ksModelDirectory
-	 *            the directory with the ks model files like the file
-	 *            'id_conversions.txt'
+	 *            the directory with the ks model files 
 	 */
 	private void createCommodities(String ksModelDirectory) {
 
 		DgIdPool idPool = DgIdPool.readFromFile(ksModelDirectory
 				+ "id_conversions.txt");
-		DgIdConverter idConverter = new DgIdConverter(idPool);
+		this.idConverter = new DgIdConverter(idPool);
 
 		for (Id<Person> personId : matsimRoutes.keySet()) {
 			// id preparations
 			List<Id<Link>> matsimRoute = matsimRoutes.get(personId);
 			Id<Link> matsimFirstLink = matsimRoute.get(0);
 			Id<Link> matsimLastLink = matsimRoute.get(matsimRoute.size() - 1);
-			Id<Node> matsimSourceNodeId = this.matsimNet.getLinks().get(matsimFirstLink).getToNode().getId();
-			Id<Node> matsimDrainNodeId = this.matsimNet.getLinks().get(matsimLastLink).getToNode().getId();
+			Id<Node> matsimSourceNodeId = this.matsimNet.getLinks()
+					.get(matsimFirstLink).getToNode().getId();
+			Id<Node> matsimDrainNodeId = this.matsimNet.getLinks()
+					.get(matsimLastLink).getToNode().getId();
 			
 			Id<DgCommodity> comId = idConverter
 					.convertLinkToLinkPair2CommodityId(matsimFirstLink,
 							matsimLastLink);
 			
-			Id<DgCrossing> ksSourceCrossingId = idConverter.convertNodeId2CrossingId(matsimSourceNodeId);
-			DgCrossing ksSourceCrossing = this.ksNet.getCrossings().get(ksSourceCrossingId);
-			Id<DgCrossingNode> ksSourceNodeId;
-			if (ksSourceCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
-				// source crossing isn't expanded and contains only one crossing node
-				ksSourceNodeId = idConverter.convertNodeId2NotExpandedCrossingNodeId(matsimSourceNodeId);
-			} 
-			else{ 
-				// source crossing is expanded and contains different crossing nodes
-				ksSourceNodeId = idConverter.convertLinkId2ToCrossingNodeId(matsimFirstLink);
-			}
-			
-			Id<DgCrossing> ksDrainCrossingId = idConverter.convertNodeId2CrossingId(matsimDrainNodeId);
-			DgCrossing ksDrainCrossing = this.ksNet.getCrossings().get(ksDrainCrossingId);
-			Id<DgCrossingNode> ksDrainNodeId;
-			if (ksDrainCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
-				// drain crossing isn't expanded and contains only one crossing node
-				ksDrainNodeId = idConverter.convertNodeId2NotExpandedCrossingNodeId(matsimDrainNodeId);
-			} 
-			else{ 
-				// drain crossing is expanded and contains different crossing nodes
-				ksDrainNodeId = idConverter.convertLinkId2ToCrossingNodeId(matsimLastLink);
-			}
+			Id<DgCrossingNode> ksSourceNodeId = getCrossingNodeIdFromNodeAndLink(
+					matsimSourceNodeId, matsimFirstLink);
+			Id<DgCrossingNode> ksDrainNodeId = getCrossingNodeIdFromNodeAndLink(
+					matsimDrainNodeId, matsimLastLink);
 
 			// convert matsim route into ks path
 			List<Id<DgStreet>> ksPath = new ArrayList<>();
@@ -155,37 +159,64 @@ public class ConvertMatsimRoutes2KS2015 {
 						.convertLinkId2StreetId(linkId);
 				ksPath.add(streetId);
 			}
-			// delete the first link of the matsim route.
-			// in ks format the path starts at the end node of the link
+			// delete the first link of the matsim route, because a path in
+			// the btu format starts at the end node of the link
 			ksPath.remove(0);
 
 			// create the path id which depends on the street ids
-			Id<TtPath> pathId = idConverter.convertPathInfo2PathId(ksPath, ksSourceNodeId, ksDrainNodeId);
+			Id<TtPath> pathId = idConverter.convertPathInfo2PathId(
+					ksPath, ksSourceNodeId, ksDrainNodeId);
 			
 			addRouteToCommodity(ksSourceNodeId, ksDrainNodeId, comId, ksPath, pathId);
 		}
 	}
 
 	/**
-	 * add a new commodity to comsWithRoutes or increase its flow value, if it
-	 * already exists.
+	 * Returns the ID of the crossing node corresponding to the given MATSim
+	 * node and link pair. If the node is expanded in the ks format, this
+	 * crossing node comes from the link. If not, it comes from the node.
 	 * 
-	 * @param sourceNode
-	 *            the source node of the commodity in the ks format
-	 * @param drainNode
-	 *            the drain node of the commodity in the ks format
+	 * @param matsimNodeId
+	 * @param matsimLinkId
+	 * @return the corresponding crossing node ID
+	 */
+	private Id<DgCrossingNode> getCrossingNodeIdFromNodeAndLink(Id<Node> matsimNodeId, Id<Link> matsimLinkId) {
+		
+		Id<DgCrossing> ksCrossingId = idConverter.convertNodeId2CrossingId(matsimNodeId);
+		DgCrossing ksCrossing = this.ksNet.getCrossings().get(ksCrossingId);
+		
+		Id<DgCrossingNode> crossingNodeId;
+		if (ksCrossing.getType().equals(TtCrossingType.NOTEXPAND)){
+			// source crossing isn't expanded and contains only one crossing node
+			crossingNodeId = this.idConverter.convertNodeId2NotExpandedCrossingNodeId(matsimNodeId);
+		} 
+		else{ 
+			// source crossing is expanded and contains different crossing nodes
+			crossingNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(matsimLinkId);
+		}
+		return crossingNodeId;
+	}
+
+	/**
+	 * Adds a new commodity to comsWithRoutes or increases its flow value, 
+	 * if it already exists.
+	 * 
+	 * @param sourceNodeId
+	 *            the source node ID of the commodity in the ks format
+	 * @param drainNodeId
+	 *            the drain node ID of the commodity in the ks format
 	 * @param comId
-	 *            the commodity id
+	 *            the commodity ID
 	 * @param ksRoute
 	 *            the route of the specific agent in the ks format
 	 */
-	private void addRouteToCommodity(Id<DgCrossingNode> sourceNode,
-			Id<DgCrossingNode> drainNode, Id<DgCommodity> comId,
+	private void addRouteToCommodity(Id<DgCrossingNode> sourceNodeId,
+			Id<DgCrossingNode> drainNodeId, Id<DgCommodity> comId,
 			List<Id<DgStreet>> ksRoute, Id<TtPath> pathId) {
 
 		// check whether the commodity already exists
 		if (!this.comsWithRoutes.getCommodities().containsKey(comId)){
-			this.comsWithRoutes.addCommodity(new DgCommodity(comId, sourceNode, drainNode, 0.0));
+			this.comsWithRoutes.addCommodity(new DgCommodity(comId, sourceNodeId, drainNodeId, 0.0));
 		}
 		DgCommodity currentCom = this.comsWithRoutes.getCommodities().get(comId);
 		
@@ -198,20 +229,25 @@ public class ConvertMatsimRoutes2KS2015 {
 	}
 	
 
+	/**
+	 * Main method to run the conversion.
+	 * 
+	 * @param args is not used
+	 */
 	public static void main(String[] args) {
 		
 		String runNumber = "2038";
-		String runDescription = "new_optimum"; // please use btu name here
 		Integer lastIteration = 1400;
+		String BTUsignalControl = "new_optimum";
 		
 		String ksModelDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/cb2ks2010/"
 				+ "2015-02-06_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 		String ksModelFile = "ks2010_model_50.0_19800.0_50.0.xml";
-		String ksOptFile = "btu/" + runDescription + ".xml";
-		String outputFile = "routeComparison/2015-03-10_matsimRoutes_" + runDescription + ".xml";
+		String ksOptFile = "btu/" + BTUsignalControl + ".xml";
+		String outputFile = "routeComparison/2015-03-10_matsimRoutes_" + BTUsignalControl + ".xml";
 		
-		String description = "matsim routes with " + runDescription + " offsets";
+		String description = "matsim routes with " + BTUsignalControl + " offsets";
 
 		new ConvertMatsimRoutes2KS2015().convertRoutes(runNumber,
 				lastIteration, ksModelDirectory, ksModelFile, ksOptFile, outputFile,
