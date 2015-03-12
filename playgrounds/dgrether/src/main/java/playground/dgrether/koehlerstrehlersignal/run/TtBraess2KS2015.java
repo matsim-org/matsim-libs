@@ -7,8 +7,10 @@ import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
 
 /**
- * @author tthunig
+ * Class to convert the Braess scenario into KS format.
+ * Uses the general conversion tool TtMatsim2KS2015.
  * 
+ * @author tthunig 
  */
 public class TtBraess2KS2015 {
 
