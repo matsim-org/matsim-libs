@@ -17,6 +17,12 @@ import playground.dgrether.koehlerstrehlersignal.data.TtPath;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 
 /**
+ * Class to parse the BTU format for the path distribution.
+ * The paths are saved in a DgCommodities object.
+ * 
+ * Note: BTU paths don't contain the first link of the MATSim route,
+ * because they were converted to the end node of the MATSim links.
+ * 
  * @author tthunig
  */
 public class KS2015RouteXMLParser extends MatsimXmlParser{
@@ -31,8 +37,6 @@ public class KS2015RouteXMLParser extends MatsimXmlParser{
 	private final static String FROMNODE = "source";
 	private final static String TONODE = "drain";
 	
-	// note: btu routes don't contain the first link, 
-	// because they where converted to the end-node of the link
 	private DgCommodities comsWithRoutes = new DgCommodities();
 	
 	private Id<DgCommodity> currentCommodityId = null;
@@ -93,6 +97,15 @@ public class KS2015RouteXMLParser extends MatsimXmlParser{
 		}
 	}
 	
+	/**
+	 * Getter for the DgCommodities object that contains all parsed 
+	 * commodities with paths
+	 * 
+	 * Note: BTU paths don't contain the first link of the MATSim route,
+	 * because they were converted to the end node of the MATSim links.
+	 * 
+	 * @return the parsed commodities with the BTU paths
+	 */
 	public DgCommodities getComsWithRoutes(){
 		return this.comsWithRoutes;
 	}
