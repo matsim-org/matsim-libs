@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -53,7 +54,7 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
+	private  String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/eci/";/*"./output/run2/";*/
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String configFile = outputDir+"/output_config.xml";
@@ -65,7 +66,7 @@ public class RouteDistancePerUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2RouteDist;
 	private SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;
-	private final String mainMode = "car";
+	private final String mainMode = TransportMode.car;
 	
 	public static void main(String[] args) {
 		RouteDistancePerUserGroup routeDistUG = new RouteDistancePerUserGroup();
