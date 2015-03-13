@@ -20,8 +20,6 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -189,7 +187,9 @@ final class PlanBasedDriverAgentImpl implements DriverAgent {
 
 		this.cachedNextLinkId = null;
 		
-		Assert.assertNotNull( this.basicPlanAgentDelegate.getCurrentPlanElement() );
+		if( this.basicPlanAgentDelegate.getCurrentPlanElement()==null ) {
+			throw new RuntimeException("encountered unexpected null pointer" ) ;
+		}
 
 		if (this.basicPlanAgentDelegate.getCurrentPlanElement() instanceof Leg) {
 			if (basicPlanAgentDelegate.getCurrentLeg().getRoute() == null) {
