@@ -40,6 +40,11 @@
       <artifactId>postgresql</artifactId>
       <version>9.0-801.jdbc4</version>
     </dependency>
+    <dependency>
+      <groupId>net.sf.supercsv</groupId>
+      <artifactId>super-csv</artifactId>
+      <version>2.1.0</version>
+    </dependency>
   </dependencies>
   
   <build>
