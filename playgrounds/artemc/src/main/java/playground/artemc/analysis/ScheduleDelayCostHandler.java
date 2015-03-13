@@ -108,7 +108,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 				journeys.get(personId).mode = event.getLegMode();
 			}
 
-			//Calcualte free flow travel time for the corresponding Leg from the selected plan 
+			//Calculate free flow travel time for the corresponding Leg from the selected plan
 			int numberOfActivities = personActivities.get(personId).size();
             PlanElement planElement = controler.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2*numberOfActivities-1);
 			if(planElement instanceof Leg){
@@ -118,7 +118,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 				journeys.get(personId).currentLeg.setRoute(((Leg) planElement).getRoute());
 			}
 			else{
-				log.error("This shouldn't happen! Something worg with getting current Leg-Element from Selected Plan!");
+				log.error("This shouldn't happen! Something wrong with getting current Leg-Element from Selected Plan!");
 			}		
 
 			//Keep track of transfers and pt-constant (same as CharyparNagelLegScoring.java)

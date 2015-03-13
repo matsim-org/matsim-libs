@@ -1,13 +1,14 @@
 package playground.artemc.calibration;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
 import playground.artemc.calibration.charts.AddSecondChart;
 import playground.artemc.calibration.charts.StackedBarChart;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * CalibrationGraphGenerator generates charts which can be useful for the calibration of the simulation
@@ -71,12 +72,12 @@ public class CalibrationGraphGenerator  {
 	/**
 	 * Creates calibration charts for the simulation and benchmark/survey dataset
 	 *
-	 * @param color scheme (Red_Scheme, Autumn, Muted Rainbow, Lollapalooza, French Girl, M8_Colors)
-	 * @param map of number of trips per distances class, split by mode
-	 * @param map of number of trips per travel time class, split by mode
-	 * @param map of number of trips per iteration, split my mode
-	 * @param path of the iteration folder
-	 * @param survey name
+	 * param color scheme (Red_Scheme, Autumn, Muted Rainbow, Lollapalooza, French Girl, M8_Colors)
+	 * param map of number of trips per distances class, split by mode
+	 * param map of number of trips per travel time class, split by mode
+	 * param map of number of trips per iteration, split my mode
+	 * param path of the iteration folder
+	 * param survey name
 	 */
 
 	public void createCalibrationCharts(String colorScheme, SortedMap<Integer, Integer[]> distanceTripMap, SortedMap<Integer, Integer[]> travelTimeTripMap, SortedMap<Integer, Integer[]> numberTripsPerMode, String path, String surveyName) throws IOException{
@@ -154,7 +155,7 @@ public class CalibrationGraphGenerator  {
 			int i=0;
 			for(Integer key:data.getDataMap().keySet()){			
 				Integer[] shares = data.getDataMap().get(key);
-				modeShareArray[i]= (double) (shares[modeCount] / data.getTotalTripsMap().get(key))*100;				
+				modeShareArray[i]= shares[modeCount] / data.getTotalTripsMap().get(key) *100;
 				i++;
 			}				
 			stackedBarChart.addSeries(mode, modeShareArray);
@@ -276,12 +277,12 @@ public class CalibrationGraphGenerator  {
 			int i=0;
 			for(Integer key:data.getDataMap().keySet()){			
 				Integer[] shares = data.getDataMap().get(key);
-				modeShareArray[i]= (double) (shares[modeCount] / data.getTotalTripsMap().get(key))*100;				
+				modeShareArray[i]= shares[modeCount] / data.getTotalTripsMap().get(key) *100;
 				i++;
 			}	
 			System.out.println(mode+","+surveyData.getTripsPerModeMap().get(mode)+","+surveyData.getTotalTrips());
 			modeShareArray[modeShareArray.length-2]=0.0;
-			modeShareArray[modeShareArray.length-1]=(double)(surveyData.getTripsPerModeMap().get(mode) / (double) surveyData.getTotalTrips())*100;
+			modeShareArray[modeShareArray.length-1]= surveyData.getTripsPerModeMap().get(mode) / (double) surveyData.getTotalTrips() *100;
 			stackedBarChart.addSeries(mode, modeShareArray);
 			modeCount++;
 		}				
