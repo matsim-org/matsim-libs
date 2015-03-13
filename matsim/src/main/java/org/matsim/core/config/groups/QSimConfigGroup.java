@@ -105,6 +105,11 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	private boolean usingThreadpool = false ;
 
 	public static final String LINK_WIDTH = "linkWidth";
+	
+	// ---
+	private final static String FLOW_ACCUMULATION_TO_ZERO = "accumulatingFlowToOne";
+	private boolean accumulatingFlowToZero = false ;
+	// ---
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -206,7 +211,20 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 		map.put(USE_DEFAULT_VEHICLES, "If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
+		map.put(FLOW_ACCUMULATION_TO_ZERO, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
+				+ " with smaller PCEs.  If this switch is set to true, cars can enter a link if the accumulated flow is >=0, and the accumulated flow can go "
+				+ "into negative.  Will probably become the default eventually.") ;
         return map;
+	}
+	
+	@StringSetter(FLOW_ACCUMULATION_TO_ZERO)
+	public final void setAccumulatingFlowToZero( boolean val ) {
+		this.accumulatingFlowToZero = val ;
+	}
+	
+	@StringGetter(FLOW_ACCUMULATION_TO_ZERO)
+	public final boolean isAccumulatingFlowToZero() {
+		return this.accumulatingFlowToZero ;
 	}
 
 	public void setStartTime(final double startTime) {

@@ -20,6 +20,8 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -186,6 +188,8 @@ final class PlanBasedDriverAgentImpl implements DriverAgent {
 		// Compromise: package-private here; making it public in the Withinday class.  kai, nov'10
 
 		this.cachedNextLinkId = null;
+		
+		Assert.assertNotNull( this.basicPlanAgentDelegate.getCurrentPlanElement() );
 
 		if (this.basicPlanAgentDelegate.getCurrentPlanElement() instanceof Leg) {
 			if (basicPlanAgentDelegate.getCurrentLeg().getRoute() == null) {

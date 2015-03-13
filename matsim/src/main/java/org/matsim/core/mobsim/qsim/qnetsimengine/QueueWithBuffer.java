@@ -164,6 +164,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
 
+	private boolean accumulatingFlowToZero;
+
 	static class Builder {
 		private VehicleQ<QVehicle> vehicleQueue = null ;
 		private Id<Lane> id = null ;
@@ -241,8 +243,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.unscaledFlowCapacity_s = flowCapacity_s ;
 		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
-		this.timeStepSize = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getTimeStepSize() ;
+		final QSimConfigGroup qsimConfig = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
 
+		this.timeStepSize = qsimConfig.getTimeStepSize() ;
+		this.accumulatingFlowToZero = qsimConfig.isAccumulatingFlowToZero() ;
+		
 		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
 
 		if(isSeeping != null && isSeeping.equals("true")){
@@ -254,7 +259,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 
 		//following are copied part from QNetSimEngine instead of copying the whole class.
-		QSimConfigGroup qsimConfigGroup = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
+		QSimConfigGroup qsimConfigGroup = qsimConfig;
 		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES=false ;
 		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
