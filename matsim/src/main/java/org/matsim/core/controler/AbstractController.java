@@ -305,7 +305,7 @@ public abstract class AbstractController {
 			// ever called), "hidding" the actual source of the problem.
 			// To avoid this, we log anything thrown during mobsim before executing after mobsim listeners.
 			// td, oct'14
-			log.error(  "Mobsim did not completed normally! afterMobsimListeners will be called anyway." , t  );
+			log.error(  "Mobsim did not complete normally! afterMobsimListeners will be called anyway." , t  );
 
 			// Java 7 seems able to detect which throwables this can be, thus no
 			// need to wrap or anything... Nice!

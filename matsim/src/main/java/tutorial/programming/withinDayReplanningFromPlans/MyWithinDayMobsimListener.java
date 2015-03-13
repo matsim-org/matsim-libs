@@ -129,8 +129,8 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		// now the real work begins. This, as an example, changes the activity (i.e. the destination of the current leg) and then
 		// re-splices the plan
 		
-		Id<Link> linkId = Id.create("22", Link.class) ;
-		Activity newAct = mobsim.getScenario().getPopulation().getFactory().createActivityFromLinkId("w", linkId ) ;
+		Id<Link> newDestinationLinkId = Id.create("22", Link.class) ;
+		Activity newAct = mobsim.getScenario().getPopulation().getFactory().createActivityFromLinkId("w", newDestinationLinkId ) ;
 		newAct.setMaximumDuration(3600);
 		
 		planElements.set( planElementsIndex+1, newAct );
@@ -141,11 +141,11 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		
 		// new Route for current Leg.
 		EditRoutes.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), ((HasPerson) agent).getPerson(), 
-				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), linkId, now, scenario.getNetwork(), tripRouter);
+				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), newDestinationLinkId, now, scenario.getNetwork(), tripRouter);
 		
 		// the route _from_ the modified activity also needs to be replanned:
 		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
-		EditRoutes.relocateFutureLegRoute(futureLeg, linkId, futureLeg.getRoute().getEndLinkId(), ((HasPerson) agent).getPerson(), 
+		EditRoutes.relocateFutureLegRoute(futureLeg, newDestinationLinkId, futureLeg.getRoute().getEndLinkId(), ((HasPerson) agent).getPerson(), 
 				scenario.getNetwork(), tripRouter);
 		
 		// =============================================================================================================
