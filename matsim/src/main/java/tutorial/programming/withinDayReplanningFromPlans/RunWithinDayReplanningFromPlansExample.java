@@ -42,12 +42,14 @@ public class RunWithinDayReplanningFromPlansExample {
 			public void notifyStartup(StartupEvent event) {
 				Controler controler = event.getControler() ;
 				
+				// define the travel time collector (/predictor) that you want to use for routing:
 				Set<String> analyzedModes = new HashSet<String>();
 				analyzedModes.add(TransportMode.car);
 				TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
 				controler.getEvents().addHandler((TravelTimeCollector) travelTime);
 				controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
 				
+				// set the mobsim factory (which insertes the within-day replanning agents):
 				controler.setMobsimFactory(new MyMobsimFactory(new WithinDayTripRouterFactory(event.getControler(), travelTime)));
 			}
 		}) ;

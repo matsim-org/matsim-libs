@@ -107,7 +107,7 @@ public class WithinDayAgentUtils {
 			return ((PersonDriverAgentImpl) agent).getModifiablePlan();
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getSelectedPlan(...). Aborting!");
+					" which does not support getModifiablePlan(...). Aborting!");
 		}
 	}
 	

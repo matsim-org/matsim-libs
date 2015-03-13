@@ -9,11 +9,9 @@
  * This package contains the <i>first</i> variant.  <i>The other one is described in another tutorial package.</i>
  * </p>
  * <b>This package contains (as of dec'10):</b><ul>
- * <li>EquilTest (very short), which contains the main method.
- * <li>MyControlerListener (very short), which tells the Control(l)er at the right time in the initialization sequence to use a certain
- * setup of the mobsim.
- * <li>MyMobsimFactory (short), which defines that mobsim setup.
- * <li>WithinDayMobsimListener, which contains a concrete implementation for withinday replanning of vehicle drivers.  
+ * <li>{@link tutorial.programming.withinDayReplanningFromPlans.RunWithinDayReplanningFromPlansExample} (very short), which contains the main method.
+ * <li>{@link tutorial.programming.withinDayReplanningFromPlans.MyMobsimFactory} (short), which defines that mobsim setup.
+ * <li>{@link tutorial.programming.withinDayReplanningFromPlans.MyWithinDayMobsimListener}, which contains a concrete implementation for withinday replanning of vehicle drivers.  
  * </ul>
  * <p/>
  * </ul>
@@ -21,6 +19,3 @@
  * Please address yourself to Christoph Dobler for support.
  */
 package tutorial.programming.withinDayReplanningFromPlans;
-
-// attaching the above comment to a class would give us WYSIWYG in eclipse.  It means, however, that it does not display any
-// more in the matsim javadoc browser.  kai, mar'11
