@@ -285,8 +285,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
-		flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
 
+		if(this.accumulatingFlowToZero){
+			remainingflowCap = flowCapacityPerTimeStep;
+		} else{
+			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
+		}
+		
 		if ( this.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()<1.) {
 			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
 					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
@@ -303,16 +308,27 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private void addToBuffer(final QVehicle veh, final double now) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
+		
+		if(this.accumulatingFlowToZero){
+			if (remainingflowCap >= 0.0  ) {
+				remainingflowCap -= veh.getSizeInEquivalents();
+			}
+			else {
+				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
+			}
+		} else {
+			if (remainingflowCap >= 1.0  ) {
+				remainingflowCap -= veh.getSizeInEquivalents();
+			}
+			else if (flowcap_accumulate.getValue() >= 1.0) {
+				flowcap_accumulate.setValue(flowcap_accumulate.getValue() - veh.getSizeInEquivalents() );
+			}
+			else {
+				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
+			}
+		}
 
-		if (remainingflowCap >= 1.0) {
-			remainingflowCap -= veh.getSizeInEquivalents();
-		}
-		else if (flowcap_accumulate.getValue() >= 1.0) {
-			flowcap_accumulate.setValue(flowcap_accumulate.getValue() - veh.getSizeInEquivalents() );
-		}
-		else {
-			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
-		}
+		
 		buffer.add(veh);
 		usedBufferStorageCapacity = usedBufferStorageCapacity + veh.getSizeInEquivalents();
 		if (buffer.size() == 1) {
@@ -332,19 +348,35 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
-		return (
-				usedBufferStorageCapacity < bufferStorageCapacity
-				&&
-				((remainingflowCap >= 1.0) || (flowcap_accumulate.getValue() >= 1.0))
-				);
+		
+		if(this.accumulatingFlowToZero){
+
+			return (
+					usedBufferStorageCapacity < bufferStorageCapacity
+					&&
+					((remainingflowCap >= 0.0) )
+					);
+		} else {
+			return (
+					usedBufferStorageCapacity < bufferStorageCapacity
+					&&
+					((remainingflowCap >= 1.0) || this.flowcap_accumulate.getValue() >=1.0)
+					);
+		}
 	}
 
 	@Override
 	public final void updateRemainingFlowCapacity() {
-		remainingflowCap = flowCapacityPerTimeStep;
+		if(this.accumulatingFlowToZero){
+			if (thisTimeStepGreen && remainingflowCap < 0 && isNotOfferingVehicle() ) {
+				remainingflowCap += flowCapacityPerTimeStep;
+			}
+		} else {
+			remainingflowCap = flowCapacityPerTimeStep;
 		if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
 			final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 			flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
+		}
 		}
 	}
 
@@ -500,8 +532,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final boolean isActive() {
-		return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
+		if(this.accumulatingFlowToZero){
+		return (this.remainingflowCap < 0.0) // still accumulating, thus active
 				|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+		} else {
+			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
+					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+		}
 	}
 
 	@Override

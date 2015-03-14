@@ -85,11 +85,11 @@ public class DeparturesOnSameLinkSameTime {
 		Assert.assertEquals("Both car agents should leave at the gap of 1 sec.", 1., Math.abs(diff_carAgents_departureLink_LeaveTimes), MatsimTestUtils.EPSILON );
 		
 		double diff_motorbikeAgents_departureLink_LeaveTimes = motorbikeLinkLeaveTime.get(secondAgent).get(departureLink) - motorbikeLinkLeaveTime.get(firstAgent).get(departureLink);
-//		Assert.assertEquals("Both motorbike agents should leave at the same time.", 0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
+		Assert.assertEquals("Both motorbike agents should leave at the same time.", 0., diff_motorbikeAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
 		
 		// for flow cap more than 3600, both cars also should leave link l_1 at the same time.
 		carLinkLeaveTime = getLinkEnterTime(TransportMode.car,3601);
-		
+	
 		diff_carAgents_departureLink_LeaveTimes = carLinkLeaveTime.get(secondAgent).get(departureLink) - carLinkLeaveTime.get(firstAgent).get(departureLink);
 		Assert.assertEquals("Both car agents should leave at the same time", 0., diff_carAgents_departureLink_LeaveTimes, MatsimTestUtils.EPSILON );
 	}
@@ -112,7 +112,7 @@ public class DeparturesOnSameLinkSameTime {
 
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
-				
+			
 				Id<Person> personId = Id.createPersonId(event.getVehicleId());
 				
 				if(linkLeaveTimes.containsKey(personId)){
@@ -195,6 +195,7 @@ public class DeparturesOnSameLinkSameTime {
 			// Vehicles info			
 			((ScenarioImpl)scenario).createVehicleContainer();
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
+			scenario.getConfig().qsim().setAccumulatingFlowToZero(true);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
 			vt.setMaximumVelocity(20);

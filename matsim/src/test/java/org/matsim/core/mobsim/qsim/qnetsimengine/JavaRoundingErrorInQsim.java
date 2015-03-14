@@ -84,7 +84,7 @@ public class JavaRoundingErrorInQsim {
 	}
 	
 	@Test
-	public void test4WrongTravelTime () {
+	public void testToCheckTravelTime () {
 		// 2 cars depart on same time, central (bottleneck) link allow only 1 agent / 10 sec.
 		PseudoInputs net = new PseudoInputs();
 		net.createNetwork(360);
@@ -101,8 +101,8 @@ public class JavaRoundingErrorInQsim {
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
 		Assert.assertEquals( "Wrong travel time for on link 2 for person 2" , 41.0 , personLinkTravelTimes.get(Id.createPersonId(2))  , MatsimTestUtils.EPSILON);
 
-		// agent 1 should have 1000/25 +1 + 10 = 51 but, it have 52 sec due to rounding errors in java
-		Assert.assertEquals( "Wrong travel time for on link 2 for person 1" , 52.0 , personLinkTravelTimes.get(Id.createPersonId(1))  , MatsimTestUtils.EPSILON);
+		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
+		Assert.assertEquals( "Wrong travel time for on link 2 for person 1" , 51.0 , personLinkTravelTimes.get(Id.createPersonId(1))  , MatsimTestUtils.EPSILON);
 		Logger.getLogger(JavaRoundingErrorInQsim.class).warn("Although the test is passing instead of failing for person 1. This is done intentionally in order to keep this in mind for future.");
 	}
 
@@ -136,7 +136,7 @@ public class JavaRoundingErrorInQsim {
 		public void handleEvent(LinkEnterEvent event) {
 
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-
+			System.out.println(event.toString());
 			if( event.getLinkId().equals(Id.createLinkId(2))){
 				personTravelTime.put(personId, - event.getTime());	
 			}
@@ -146,7 +146,7 @@ public class JavaRoundingErrorInQsim {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-
+			System.out.println(event.toString());
 			if( event.getLinkId().equals(Id.createLinkId(2)) ){
 				personTravelTime.put(personId, personTravelTime.get(personId) + event.getTime());	
 			}
@@ -168,7 +168,7 @@ public class JavaRoundingErrorInQsim {
 
 		public PseudoInputs(){
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+			scenario.getConfig().qsim().setAccumulatingFlowToZero(true);
 			population = scenario.getPopulation();
 		}
 

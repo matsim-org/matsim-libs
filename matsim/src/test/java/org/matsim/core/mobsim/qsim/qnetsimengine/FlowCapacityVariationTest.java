@@ -80,7 +80,7 @@ public class FlowCapacityVariationTest {
 		VehicleLeavingSameTime("motorbike",3601);
 		
 		/*link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-//		VehicleLeavingSameTime("motorbike",1800);
+		VehicleLeavingSameTime("motorbike",1800);
 	}
 	
 	@Test 
@@ -89,7 +89,7 @@ public class FlowCapacityVariationTest {
 		VehicleLeavingSameTime(TransportMode.bike,3601);
 				
 		/* link capacuty higher than 1motorbike/sec = 0.25PCU/sec */
-//		VehicleLeavingSameTime(TransportMode.bike,1800);
+		VehicleLeavingSameTime(TransportMode.bike,1800);
 	}
 	
 	private void VehicleLeavingSameTime(String travelMode, double linkCapacity){
@@ -155,6 +155,7 @@ public class FlowCapacityVariationTest {
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			config = scenario.getConfig();
 			config.qsim().setMainModes(Arrays.asList(travelMode));
+			config.qsim().setAccumulatingFlowToZero(true);
 
 			population = scenario.getPopulation();
 		}
