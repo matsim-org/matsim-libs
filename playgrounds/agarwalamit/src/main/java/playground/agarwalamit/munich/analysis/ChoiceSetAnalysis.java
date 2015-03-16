@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,13 +43,14 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class ChoiceSetAnalysis {
 
-
-
-	PersonFilter pf = new PersonFilter();
-
+	private PersonFilter pf = new PersonFilter();
+	private Map<List<String>, Integer> modeSequence2Count;
+	private Map<List<String>, Double> modeSequence2TotalScore;
+	private Map<List<String>, Double> modeSequence2TotalBestScore;
+	private Map<List<String>, Double> modeSequence2TotalExecutedScore ;
 
 	public static void main(String[] args) {
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 		String [] runCases = {"bau","ei","ci","eci","10ei"};
 
 		for(String runCase :runCases){
@@ -61,15 +63,15 @@ public class ChoiceSetAnalysis {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(sc.getConfig().controler().getOutputDirectory()+"/analysis/"+"choiceSet_stat.txt");
 		try {
-			writer.write("userGroup \t modeSequence \t numberOfSuchPlans \t carsInChoiceSet \t totalScore \n ");
-			String [] userGrous = {UserGroup.COMMUTER.toString(),UserGroup.REV_COMMUTER.toString(),UserGroup.FREIGHT.toString()};
+			writer.write("userGroup \t modeSequence \t numberOfSuchPlans \t carsInChoiceSet \t totalScoreAllPlans \t totalBestScore \t totalExecutedScore \n ");
 			
-			for(String ug :userGrous){
-				processScenario(pf.getPopulation(sc.getPopulation(), UserGroup.valueOf(ug)));
+			for(UserGroup ug :UserGroup.values()){
+				processScenario(pf.getPopulation(sc.getPopulation(), ug));
 
 				for(List<String> modes : modeSequence2Count.keySet()){
 					writer.write(ug+"\t"+modes.toString()+"\t"+modeSequence2Count.get(modes)+"\t"+
-							getCarsInList(modes)+"\t"+modeSequence2TotalScore.get(modes)+"\n");
+							getCarsInList(modes)+"\t"+modeSequence2TotalScore.get(modes)+"\t"+
+						modeSequence2TotalBestScore.get(modes)+"\t"+modeSequence2TotalExecutedScore.get(modes)+"\n");
 				}
 
 			}
@@ -80,9 +82,6 @@ public class ChoiceSetAnalysis {
 		}
 	}
 
-	Map<List<String>, Integer> modeSequence2Count;
-	Map<List<String>, Double> modeSequence2TotalScore;
-
 	private int getCarsInList(List<String> modes){
 		int no =0;
 		for(String mode :modes){
@@ -92,9 +91,13 @@ public class ChoiceSetAnalysis {
 	}
 	
 	private void processScenario(Population pop){
-
+		
+		//initialize maps
 		modeSequence2Count = new HashMap<List<String>, Integer>(); 
 		modeSequence2TotalScore = new HashMap<List<String>, Double>();
+		modeSequence2TotalBestScore = new HashMap<List<String>, Double>();
+		modeSequence2TotalExecutedScore = new HashMap<List<String>, Double>();
+		
 		for(Person p :pop.getPersons().values()){
 			List<String> modes = new ArrayList<String>();
 			double score = 0.;
@@ -106,15 +109,27 @@ public class ChoiceSetAnalysis {
 			if(modeSequence2Count.containsKey(modes)){
 				modeSequence2Count.put(modes, modeSequence2Count.get(modes)+1);
 				modeSequence2TotalScore.put(modes, modeSequence2TotalScore.get(modes)+score);
+				modeSequence2TotalExecutedScore.put(modes, modeSequence2TotalExecutedScore.get(modes)+p.getSelectedPlan().getScore());
+				modeSequence2TotalBestScore.put(modes, modeSequence2TotalBestScore.get(modes)+getBestScore(p));
 			} else {
 				modeSequence2Count.put(modes, 1);
 				modeSequence2TotalScore.put(modes, score);
+				modeSequence2TotalExecutedScore.put(modes, p.getSelectedPlan().getScore());
+				modeSequence2TotalBestScore.put(modes, getBestScore(p));
 			}
-			
-			
 		}
 	}
 
+	private double getBestScore(Person person) {
+		double bestScore = Double.NEGATIVE_INFINITY ;
+		for ( Plan plan : person.getPlans() ) {
+			if ( plan.getScore() > bestScore ) {
+				bestScore = plan.getScore() ;
+			}
+		}
+		return bestScore ;
+	}
+	
 	private String getTravelMode(Plan plan){
 		String mode = "NA";
 		for(PlanElement pe :plan.getPlanElements()){
@@ -122,7 +137,8 @@ public class ChoiceSetAnalysis {
 				mode = ((Leg)pe).getMode();
 			}
 		}
-		return mode;
+		
+		if (!mode.equals(TransportMode.car)) return "nonCar";
+		else return mode;
 	}
-
 }
