@@ -78,7 +78,7 @@ public class SpatialDataInputs {
 	int initialCaseLastIteration; 
 	public String initialCaseEmissionEventsFile;
 	public String initialCaseEventsFile;
-	String initialCasePlansFile;
+	public String initialCasePlansFile;
 	
 	public boolean isComparing = false;
 	
@@ -92,7 +92,7 @@ public class SpatialDataInputs {
 	int compareToCaseLastIteration ; 
 	public String compareToCaseEmissionEventsFile;
 	public String compareToCaseEventsFile;
-	String compareToCasePlans; 
+	public String compareToCasePlans; 
 	
 	public static String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	public CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");

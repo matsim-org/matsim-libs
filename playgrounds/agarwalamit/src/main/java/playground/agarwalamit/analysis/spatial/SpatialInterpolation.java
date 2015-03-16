@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
@@ -118,6 +119,59 @@ public class SpatialInterpolation {
 			} else throw new RuntimeException("Averaging method for weight is not recongnized. Use 'line' or 'point'.");
 
 			this.cellWeights.put(p, weightNow+weightSoFar);
+		}
+	}
+	
+	/**
+	 * @param act actType
+	 * @param intensityOfPoint (userWelfare etc) intensity for 100% sample.
+	 */
+	public void processHomeLocation(Activity act, double intensityOfPoint){
+
+		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
+		Point actLocation = gf.createPoint(actCoordinate);
+		
+		if(!boundingBoxPolygon.covers(actLocation)) return;
+
+		for(Point p: this.cellWeights.keySet()){
+
+			Coordinate pointCoord = p.getCoordinate();
+
+			double cellArea = this.grid.getCellGeometry(p).getArea();
+			double area_smoothingCircle = Math.PI * inputs.getSmoothingRadius() *inputs.getSmoothingRadius();
+			double normalizationFactor = cellArea/area_smoothingCircle;
+			double weightSoFar = this.cellWeights.get(p);
+			double weightNow;
+
+
+			if(inputs.linkWeigthMethod.equals("point")) {
+
+				weightNow = intensityOfPoint * calculateWeightFromPoint(actCoordinate, pointCoord) * normalizationFactor;
+
+			} else throw new RuntimeException("Averaginh method other than point method is not possible for a point intensity. Aborting ...");
+
+			this.cellWeights.put(p, weightNow+weightSoFar);
+		}
+	}
+	
+	/**
+	 * @param point
+	 * <p> No normalization, simple count in each cell, made specially for population density count.
+	 */
+	public void processLocationForDensityCount(Activity act){
+
+		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
+		Point actLocation = gf.createPoint(actCoordinate);
+		
+		if(!boundingBoxPolygon.covers(actLocation)) return;
+
+		for(Point p: this.cellWeights.keySet()){
+
+			if(this.grid.getCellGeometry(p).covers(actLocation)){
+				double weightSoFar = this.cellWeights.get(p);
+				this.cellWeights.put(p, weightSoFar+1);
+				return;
+			} 
 		}
 	}
 

@@ -25,14 +25,20 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
+import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -41,28 +47,114 @@ import com.vividsolutions.jts.geom.Point;
  */
 
 public class MunichSpatialPlots {
-	
-	String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-	String bau = runDir+"/baseCaseCtd";
-	String policyScenario = runDir+"/ci";
+
+	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
+	String bau = runDir+"/bau";
+	String policyScenario = runDir+"/ei";
+	private double countScaleFactor = 100;
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-		plots.writeCongestionCells();
-//		plots.writeEmissionCells();
+//		plots.writeCongestionToCells();
+//		plots.writeEmissionToCells();
+		plots.writeUserWelfareToCells();
+		plots.writePopulationDensityCountToCells();
 	}
 
-	public void writeCongestionCells(){
+	public void writePopulationDensityCountToCells(){
+
+		SpatialDataInputs inputs = new SpatialDataInputs("point",bau);
+		inputs.setGridInfo(GridType.HEX, 500);
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
+
+		for(Person p : sc.getPopulation().getPersons().values()){
+			
+			Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
+			
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if(pe instanceof Activity){
+					act = (Activity) pe;
+					break;
+				}
+			}
+			plot.processLocationForDensityCount(act); //this is only for sample population, others are already 
+		}
+
+		plot.writeRData("popDensity");
+
+	}
+
+	public void writeUserWelfareToCells(){
+
+		Map<Id<Person>, Double> person_userWElfare_money_Bau = new HashMap<>();
+		Map<Id<Person>, Double> person_userWElfare_money_policy = new HashMap<>();
+
+		// setting of input data
+		SpatialDataInputs inputs = new SpatialDataInputs("point",bau,policyScenario);
+		inputs.setGridInfo(GridType.HEX, 500);
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
+
+		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
+		userBenefitsAnalyzer.init((ScenarioImpl)sc, WelfareMeasure.SELECTED, false);
+		userBenefitsAnalyzer.preProcessData();
+		userBenefitsAnalyzer.postProcessData();
+
+		person_userWElfare_money_Bau = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+
+		if(inputs.isComparing){
+			userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
+			Scenario sc_policy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
+			userBenefitsAnalyzer.init((ScenarioImpl)sc_policy, WelfareMeasure.SELECTED, false);
+			userBenefitsAnalyzer.preProcessData();
+			userBenefitsAnalyzer.postProcessData();
+			person_userWElfare_money_policy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+		}
+
+		for(Person p : sc.getPopulation().getPersons().values()){
+			Id<Person> id = p.getId();
+
+			if(inputs.isComparing){
+
+				Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
+				for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+					if(pe instanceof Activity){
+						act = (Activity) pe;
+						break;
+					}
+				}
+
+				double userWelfare_diff ;
+
+				userWelfare_diff = person_userWElfare_money_policy.get(id) - person_userWElfare_money_Bau.get(id);
+
+				plot.processHomeLocation(act, userWelfare_diff*countScaleFactor);
+
+			}
+		}
+
+		plot.writeRData("userWelfare_"+WelfareMeasure.SELECTED);
+
+	}
+
+	public void writeCongestionToCells(){
 		Map<Double, Map<Id<Link>, Double>> linkDelaysBau = new HashMap<>();
 		Map<Double, Map<Id<Link>, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
 		inputs.setGridInfo(GridType.HEX, 500);
-		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
-		
+
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 
 		CongestionLinkAnalyzer emsLnkAna = new CongestionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEventsFile, 1); 
@@ -94,18 +186,18 @@ public class MunichSpatialPlots {
 						double linkDelayPolicy =0;
 
 						if(linkDelaysBau.get(time).containsKey(id) && linkDelaysPolicy.get(time).containsKey(id)) {
-							linkDelayBau = 100 * linkDelaysBau.get(time).get(id);
-							linkDelayPolicy = 100 * linkDelaysPolicy.get(time).get(id);
+							linkDelayBau = countScaleFactor * linkDelaysBau.get(time).get(id);
+							linkDelayPolicy = countScaleFactor * linkDelaysPolicy.get(time).get(id);
 						} else if(linkDelaysBau.get(time).containsKey(id)){
-							linkDelayBau = 100 * linkDelaysBau.get(time).get(id);
+							linkDelayBau = countScaleFactor * linkDelaysBau.get(time).get(id);
 						} else if(linkDelaysPolicy.get(time).containsKey(id)){
-							linkDelayPolicy = 100 * linkDelaysPolicy.get(time).get(id);
+							linkDelayPolicy = countScaleFactor * linkDelaysPolicy.get(time).get(id);
 						}
 						delays = linkDelayPolicy - linkDelayBau;
 
 					} else {
 
-						if(linkDelaysBau.get(time).containsKey(id)) delays = 100 * linkDelaysBau.get(time).get(id);
+						if(linkDelaysBau.get(time).containsKey(id)) delays = countScaleFactor * linkDelaysBau.get(time).get(id);
 						else delays =0;
 					}
 
@@ -126,15 +218,15 @@ public class MunichSpatialPlots {
 
 	}
 
-	
-	public void writeEmissionCells(){
+
+	public void writeEmissionToCells(){
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsBau = new HashMap<>();
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
-		
+
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
 		inputs.setGridInfo(GridType.HEX, 500);
-		inputs.setShapeFile("/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		// set bounding box, smoothing radius and targetCRS if different.
 		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
@@ -175,18 +267,18 @@ public class MunichSpatialPlots {
 						double linkEmissionPolicy =0;
 
 						if(linkEmissionsBau.get(time).containsKey(id) && linkEmissionsPolicy.get(time).containsKey(id)) {
-							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
-							linkEmissionPolicy = 100 * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionBau = countScaleFactor * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionPolicy = countScaleFactor * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
 						} else if(linkEmissionsBau.get(time).containsKey(id)){
-							linkEmissionBau = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionBau = countScaleFactor * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
 						} else if(linkEmissionsPolicy.get(time).containsKey(id)){
-							linkEmissionPolicy = 100 * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
+							linkEmissionPolicy = countScaleFactor * linkEmissionsPolicy.get(time).get(id).get(WarmPollutant.NO2.toString());
 						}
 						emiss = linkEmissionPolicy - linkEmissionBau;
 
 					} else {
 
-						if(linkEmissionsBau.get(time).containsKey(id)) emiss = 100 * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
+						if(linkEmissionsBau.get(time).containsKey(id)) emiss = countScaleFactor * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
 						else emiss =0;
 					}
 

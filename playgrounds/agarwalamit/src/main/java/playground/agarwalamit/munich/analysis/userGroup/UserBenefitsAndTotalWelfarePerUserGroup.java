@@ -70,7 +70,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private int lastIteration;
 	private boolean considerAllPersonsInSumOfTolls;
 
-	private final WelfareMeasure wm = WelfareMeasure.LOGSUM;
+	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 
 	public static void main(String[] args) {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
