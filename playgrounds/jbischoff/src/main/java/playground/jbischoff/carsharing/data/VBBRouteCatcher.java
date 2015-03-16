@@ -37,7 +37,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
+
+
+
+
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.PostMethod;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -126,81 +131,77 @@ public class VBBRouteCatcher {
 		    				  + "</Dest>"
 		    				  + "</ConReq>"
 		    				  + "</ReqC>";
-		    		  
-		    		  Logger.getLogger( this.getClass() ).fatal("commenting out non-compiling code (some entry missing in pom.xml). kai, mar'15") ;
-		    		  System.exit(-1) ;
-		    		  
-//		    		PostMethod post = new PostMethod("http://demo.hafas.de/bin/pub/vbb/extxml.exe/");
-//			    	post.setRequestBody(text);
-//			    	post.setRequestHeader(
-//			                "Content-type", "text/xml; charset=ISO-8859-1");
-//			        HttpClient httpclient = new HttpClient();
-//			        try {
-//			            
-//			            int result = httpclient.executeMethod(post);
-//			            
-//			            
-//			            // Display status code
-////			            System.out.println("Response status code: " + result);
-//			            
-//			            // Display response
-////			            System.out.println("Response body: ");
-////			            System.out.println(post.getResponseBodyAsString());
-//			            
-//			            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//			            DocumentBuilder builder = factory.newDocumentBuilder();
-//			            Document document = builder.parse(post.getResponseBodyAsStream());
-//			            
-//			            if (writeOutput){
-//			            	BufferedWriter writer =	IOUtils.getBufferedWriter(filename);
-//			            	Transformer transformer = TransformerFactory.newInstance().newTransformer();
-//			            	transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-//			            	//initialize StreamResult with File object to save to file
-//			            	StreamResult res = new StreamResult(writer);
-//			            	DOMSource source = new DOMSource(document);
-//			            	transformer.transform(source, res);
-//			            	writer.flush();
-//			            	writer.close();
-//			        		
-//			            }
-//			            
-//			            Node connectionList = document.getFirstChild().getFirstChild().getFirstChild();
-//			            NodeList connections =  connectionList.getChildNodes();
-//			            int amount = connections.getLength();
-//			            for (int i = 0; i<amount; i++){
-//			        	   Node connection = connections.item(i);
-//			        	   Node overview = connection.getFirstChild();;
-//			        	   
-//			        	   while (!overview.getNodeName().equals("Overview"))
-//			        	   { 
-//			        		   overview = overview.getNextSibling();
-//			        	   }
-//			        	   
-//			        	   System.out.println(  overview.getChildNodes().item(3).getTextContent());
-//			        	   int transfers = Integer.parseInt(   overview.getChildNodes().item(3).getTextContent());
-//			        	   String time = overview.getChildNodes().item(4).getFirstChild().getTextContent().substring(3);
-//			        	   System.out.println(time);
-//			        	   Date rideTime = VBBDATE.parse(time);
-//			        	   int seconds = rideTime.getHours()*3600+rideTime.getMinutes()*60+rideTime.getSeconds();
-//			        	   System.out.println( seconds +"s; transfers: "+ transfers);
-//			        	   if (seconds<this.bestRideTime){
-//			        		   this.bestRideTime = seconds;
-//			        		   this.bestTransfers = transfers;
-//			        	   }
-//			           } 
-//			        }
-//			        catch (Exception e){
-//			        	this.bestRideTime = -1;
-//			        	this.bestTransfers = -1;
-//			        }
-//			        
-//			        finally {
-//			            // Release current connection to the connection pool 
-//			            // once you are done
-//			            post.releaseConnection();
-//			            post.abort();
-//			         
-//			        }
+		    		PostMethod post = new PostMethod("http://demo.hafas.de/bin/pub/vbb/extxml.exe/");
+			    	post.setRequestBody(text);
+			    	post.setRequestHeader(
+			                "Content-type", "text/xml; charset=ISO-8859-1");
+			        HttpClient httpclient = new HttpClient();
+			        try {
+			            
+			            int result = httpclient.executeMethod(post);
+			            
+			            
+			            // Display status code
+//			            System.out.println("Response status code: " + result);
+			            
+			            // Display response
+//			            System.out.println("Response body: ");
+//			            System.out.println(post.getResponseBodyAsString());
+			            
+			            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			            DocumentBuilder builder = factory.newDocumentBuilder();
+			            Document document = builder.parse(post.getResponseBodyAsStream());
+			            
+			            if (writeOutput){
+			            	BufferedWriter writer =	IOUtils.getBufferedWriter(filename);
+			            	Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			            	transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			            	//initialize StreamResult with File object to save to file
+			            	StreamResult res = new StreamResult(writer);
+			            	DOMSource source = new DOMSource(document);
+			            	transformer.transform(source, res);
+			            	writer.flush();
+			            	writer.close();
+			        		
+			            }
+			            
+			            Node connectionList = document.getFirstChild().getFirstChild().getFirstChild();
+			            NodeList connections =  connectionList.getChildNodes();
+			            int amount = connections.getLength();
+			            for (int i = 0; i<amount; i++){
+			        	   Node connection = connections.item(i);
+			        	   Node overview = connection.getFirstChild();;
+			        	   
+			        	   while (!overview.getNodeName().equals("Overview"))
+			        	   { 
+			        		   overview = overview.getNextSibling();
+			        	   }
+			        	   
+			        	   System.out.println(  overview.getChildNodes().item(3).getTextContent());
+			        	   int transfers = Integer.parseInt(   overview.getChildNodes().item(3).getTextContent());
+			        	   String time = overview.getChildNodes().item(4).getFirstChild().getTextContent().substring(3);
+			        	   System.out.println(time);
+			        	   Date rideTime = VBBDATE.parse(time);
+			        	   int seconds = rideTime.getHours()*3600+rideTime.getMinutes()*60+rideTime.getSeconds();
+			        	   System.out.println( seconds +"s; transfers: "+ transfers);
+			        	   if (seconds<this.bestRideTime){
+			        		   this.bestRideTime = seconds;
+			        		   this.bestTransfers = transfers;
+			        	   }
+			           } 
+			        }
+			        catch (Exception e){
+			        	this.bestRideTime = -1;
+			        	this.bestTransfers = -1;
+			        }
+			        
+			        finally {
+			            // Release current connection to the connection pool 
+			            // once you are done
+			            post.releaseConnection();
+			            post.abort();
+			         
+			        }
 			    
 			        
 		    	}

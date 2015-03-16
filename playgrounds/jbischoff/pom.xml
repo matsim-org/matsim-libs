@@ -32,6 +32,11 @@
 			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
 <dependency>
+   <groupId>org.apache.tuscany.sca.aggregation</groupId>
+   <artifactId>tuscany-binding-ws-runtime-axis2-aggregation</artifactId>
+   <version>2.0.1</version>
+</dependency> 
+<dependency>
 	<groupId>com.googlecode.json-simple</groupId>
 	<artifactId>json-simple</artifactId>
 	<version>1.1.1</version>
