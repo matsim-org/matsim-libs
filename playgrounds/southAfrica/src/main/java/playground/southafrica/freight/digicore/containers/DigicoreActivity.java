@@ -1,5 +1,6 @@
 package playground.southafrica.freight.digicore.containers;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -123,7 +124,7 @@ public class DigicoreActivity implements Activity {
 
 	@Override
 	public double getStartTime() {
-		return this.startTime.getTimeInMillis() / 1000.0;
+		return (double)this.startTime.getTimeInMillis() / 1000.0;
 	}
 	
 
@@ -138,5 +139,36 @@ public class DigicoreActivity implements Activity {
 		this.maximumDuration = seconds;
 	}
 	
+	
+	/**
+	 * Returns the number of seconds since midnight. This method does
+	 * <b>not</b> consider the position of the activity in the activity
+	 * chain. The consequence is that activities that run over 24:00:00
+	 * must be manually corrected if they appear in an activity chain. 
+	 * 
+	 * @return
+	 */
+	public double getStartTimeInSecondsFromMidnight(){
+		int hour = startTime.get(Calendar.HOUR_OF_DAY);
+		int minute = startTime.get(Calendar.MINUTE);
+		int second = startTime.get(Calendar.SECOND);
+		return hour*60*60 + minute*60 + second;
+	}
+	
+	
+	/**
+	 * Returns the number of seconds since midnight. This method does
+	 * <b>not</b> consider the position of the activity in the activity
+	 * chain. The consequence is that activities that run over 24:00:00
+	 * must be manually corrected if they appear in an activity chain. 
+	 * 
+	 * @return
+	 */
+	public double getEndTimeInSecondsFromMidnight(){
+		int hour = endTime.get(Calendar.HOUR_OF_DAY);
+		int minute = endTime.get(Calendar.MINUTE);
+		int second = endTime.get(Calendar.SECOND);
+		return hour*60*60 + minute*60 + second;
+	}
 	
 }

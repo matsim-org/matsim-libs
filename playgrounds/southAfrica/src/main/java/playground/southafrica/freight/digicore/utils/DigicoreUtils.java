@@ -126,6 +126,7 @@ public class DigicoreUtils {
 			}
 		}
 		
+		LOG.info("Total number of vehicles returned: " + listOfVehicleFiles.size());
 		return listOfVehicleFiles;
 	}
 
