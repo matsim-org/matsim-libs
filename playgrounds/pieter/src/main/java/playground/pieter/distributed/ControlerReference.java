@@ -8,8 +8,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
-import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
+import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
@@ -24,18 +24,20 @@ public class ControlerReference {
     private ControlerReference(String[] args) throws ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
-        options.addOption("c", true, "Config file location");
-        options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. special scoring function");
-        options.addOption("g", false, "Track plan genomes");
-        options.addOption("x", false, "Intelligent routers");
-        CommandLineParser parser = new BasicParser();
+        options.addOption("c", "config", true, "Config file location");
+        options.addOption("s", "singapore", false, "Switch to indicate if this is the Singapore scenario, i.e. special scoring function");
+        options.addOption("g", "genomeTracking", false, "Track plan genomes");
+        options.addOption("I", "IntelligentRouters", false, "Intelligent routers");
+//        CommandLineParser parser = new BasicParser();
+        CommandLineParser parser = new GnuParser();
         CommandLine commandLine = parser.parse(options, args);
 
 
         Config config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"), new DestinationChoiceConfigGroup());
 
-        boolean trackGenome = commandLine.hasOption("g");
-        boolean singapore = commandLine.hasOption("s");
+        boolean trackGenome = commandLine.hasOption("genomeTracking") || commandLine.hasOption("g");
+        boolean singapore = commandLine.hasOption("singapore") || commandLine.hasOption("s");
+        boolean intelligentRouters = commandLine.hasOption("IntelligentRouters") || commandLine.hasOption("I");
         if (trackGenome) {
 
             DistributedPlanStrategyTranslationAndRegistration.TrackGenome = true;
@@ -78,7 +80,7 @@ public class ControlerReference {
 //        });
 //        delegate.setMobsimFactory(new PTQSimFactory());
         }
-        if (commandLine.hasOption("x")) {
+        if (intelligentRouters) {
             logger.warn("Smart routing");
             StopStopTimeCalculatorSerializable stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
@@ -95,15 +97,14 @@ public class ControlerReference {
             delegate.addOverridingModule(new RandomizedTransitRouterModule());
         }
         if (trackGenome) {
-
             delegate.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            delegate.addControlerListener(new GenomeAnalysis(false,false,false));
+            delegate.addControlerListener(new GenomeAnalysis(false, false, false));
         }
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_ref" +
-                (commandLine.hasOption("g") ? "_g" : "") +
-                (commandLine.hasOption("s") ? "_s" : "") +
-                (commandLine.hasOption("x") ? "_x" : "");
+                (trackGenome ? "_g" : "") +
+                (singapore ? "_s" : "") +
+                (intelligentRouters ? "_x" : "");
         config.controler().setOutputDirectory(outputDirectory);
     }
 

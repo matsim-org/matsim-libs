@@ -13,6 +13,8 @@ import org.matsim.core.population.routes.RouteFactory;
 
 /**
  * Created by fouriep on 1/30/15.
+ * can't just extend PopulationFactoryImpl because its constructor is non-public.
+ * Consequently, lots of code needs replicating because of casts to PopulationFactoryImpl by the triprouter etc.
  */
 public class PopulationFactoryForPlanGenomes implements PopulationFactory {
 
@@ -24,7 +26,7 @@ public class PopulationFactoryForPlanGenomes implements PopulationFactory {
 
     @Override
     public Person createPerson(final Id<Person> id) {
-        return new PersonImpl(id);
+        return new PersonForPlanGenomes(id);
     }
 
     @Override
