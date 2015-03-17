@@ -96,8 +96,8 @@ public final class QSim implements VisMobsim, Netsim {
 	/** time since last "info" */
 	private double infoTime = 0;
 
-//	private static final int INFO_PERIOD = 3600;
-	private static final int INFO_PERIOD = 10;
+	private static final int INFO_PERIOD = 3600;
+//	private static final int INFO_PERIOD = 10;
 
 	private final EventsManager events;
 
