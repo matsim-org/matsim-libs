@@ -21,6 +21,7 @@
 package playground.southafrica.utilities.analysis;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -68,42 +69,48 @@ public class VktEstimator {
 				Activity act = (Activity)pe;
 				if(lastActivity == null){
 					lastActivity = act;
-					Point p = gf.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
-					if(envelope.covers(p)){
-						if(geom.covers(p)){
-							lastActivityInside = true;
+					Coord c = act.getCoord();
+					if(c != null){
+						Point p = gf.createPoint(new Coordinate(c.getX(), c.getY()));
+						if(envelope.covers(p)){
+							if(geom.covers(p)){
+								lastActivityInside = true;
+							}
 						}
 					}
 				} else{
 					/* Check if current activity is inside. */
 					boolean inside = false;
-					Point p = gf.createPoint(new Coordinate(act.getCoord().getX(), act.getCoord().getY()));
-					if(envelope.covers(p)){
-						if(geom.covers(p)){
-							inside = true;
+					Coord c = act.getCoord();
+					if(c != null){
+						Point p = gf.createPoint(new Coordinate(c.getX(), c.getY()));
+						if(envelope.covers(p)){
+							if(geom.covers(p)){
+								inside = true;
+							}
 						}
-					}
-					
-					/* Do something with the activity pair. */
-					Coordinate c1 = new Coordinate(lastActivity.getCoord().getX(), lastActivity.getCoord().getY());
-					Coordinate c2 = new Coordinate(act.getCoord().getX(), act.getCoord().getY());
-					Coordinate[] ca = {c1, c2};
-					LineString ls = gf.createLineString(ca);
-					
-					if(lastActivityInside && inside){
-						/* Both are inside and we can use the entire segment. */
-						vktAct += ls.getLength()*DISTANCE_MULTIPLIER;
-					} else if(lastActivityInside && !inside /* Entry */ ||
-							!lastActivityInside && inside   /* Exit  */){ 
-						/* It is an exit. Calculate vkt accordingly. */
-						Geometry intersection = geom.intersection(ls);
-						if(intersection instanceof LineString){
-							vktAct += ((LineString)intersection).getLength()*DISTANCE_MULTIPLIER;
+						
+						/* Do something with the activity pair. */
+						Coordinate c1 = new Coordinate(lastActivity.getCoord().getX(), lastActivity.getCoord().getY());
+						Coordinate c2 = new Coordinate(act.getCoord().getX(), act.getCoord().getY());
+						Coordinate[] ca = {c1, c2};
+						LineString ls = gf.createLineString(ca);
+						
+						if(lastActivityInside && inside){
+							/* Both are inside and we can use the entire segment. */
+							vktAct += ls.getLength()*DISTANCE_MULTIPLIER;
+						} else if(lastActivityInside && !inside /* Entry */ ||
+								!lastActivityInside && inside   /* Exit  */){ 
+							/* It is an exit. Calculate vkt accordingly. */
+							Geometry intersection = geom.intersection(ls);
+							if(intersection instanceof LineString){
+								vktAct += ((LineString)intersection).getLength()*DISTANCE_MULTIPLIER;
+							} else{
+								LOG.warn("Don't know what to do if the intersection is of type " + intersection.getClass().getName());
+							}
 						} else{
-							LOG.warn("Don't know what to do if the intersection is of type " + intersection.getClass().getName());
+							LOG.warn("Activity pair outside geometry.");
 						}
-					} else{
-						LOG.warn("Activity pair outside geometry.");
 					}
 					
 					/* Update the last activity. */
