@@ -24,6 +24,7 @@ package playground.boescpa.converters.osm.networkCreator;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
 
@@ -34,6 +35,7 @@ import playground.boescpa.lib.tools.merger.NetworkMerger;
  */
 public class MultimodalNetworkCreatorRectangleAroundSwitzerland extends MultimodalNetworkCreator {
 
+	private final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	private final Network streetNetwork;
 	private final Network highwayNetwork;
 
@@ -46,20 +48,26 @@ public class MultimodalNetworkCreatorRectangleAroundSwitzerland extends Multimod
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
 		OsmNetworkReader reader =
-				new OsmNetworkReader(this.network, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
+				new OsmNetworkReader(this.network, transformation);
 		// Rectangle around Switzerland
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
+		//reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(
+				transformation.transform(new CoordImpl(5.936507,47.811547)), transformation.transform(new CoordImpl(10.517806,45.834786)), 6));
 		// Rectangle around Switzerland + 1 degree distance in each direction
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
+		//reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(
+				transformation.transform(new CoordImpl(4.936507,48.811547)), transformation.transform(new CoordImpl(11.517806,44.834786)), 2));
 		reader.parse(osmFile);
 	}
 
 	public void addStreetNetwork(String osmFile) {
 		// Create Street Network
 		OsmNetworkReader reader =
-				new OsmNetworkReader(streetNetwork, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
+				new OsmNetworkReader(streetNetwork, transformation);
 		// Rectangle around Switzerland
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
+		//reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(47.811547,5.936507), new CoordImpl(45.834786,10.517806), 6));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(
+				transformation.transform(new CoordImpl(5.936507,47.811547)), transformation.transform(new CoordImpl(10.517806,45.834786)), 6));
 		reader.parse(osmFile);
 
 		// Merge networks:
@@ -68,9 +76,11 @@ public class MultimodalNetworkCreatorRectangleAroundSwitzerland extends Multimod
 
 	public void addHighwayNetwork(final String osmFile) {
 		// Create Highway Network
-		OsmNetworkReader reader = new OsmNetworkReader(highwayNetwork, TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03"));
+		OsmNetworkReader reader = new OsmNetworkReader(highwayNetwork, transformation);
 		// Rectangle around Switzerland + 1 degree distance in each direction
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
+		//reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(new CoordImpl(48.811547,4.936507), new CoordImpl(44.834786,11.517806), 2));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterRectangle(
+				transformation.transform(new CoordImpl(4.936507,48.811547)), transformation.transform(new CoordImpl(11.517806,44.834786)), 2));
 		reader.parse(osmFile);
 
 		// Merge networks:

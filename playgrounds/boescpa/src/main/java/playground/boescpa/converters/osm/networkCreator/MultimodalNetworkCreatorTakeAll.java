@@ -33,13 +33,13 @@ import playground.boescpa.lib.tools.merger.NetworkMerger;
  *
  * @author boescpa
  */
-public class MultimodalNetworkCreatorEllipseAroundSwitzerland extends MultimodalNetworkCreator {
+public class MultimodalNetworkCreatorTakeAll extends MultimodalNetworkCreator {
 
 	private final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	private final Network streetNetwork;
 	private final Network highwayNetwork;
 
-	public MultimodalNetworkCreatorEllipseAroundSwitzerland(Network network) {
+	public MultimodalNetworkCreatorTakeAll(Network network) {
 		super(network);
 		streetNetwork = NetworkUtils.createNetwork();
 		highwayNetwork = NetworkUtils.createNetwork();
@@ -50,9 +50,7 @@ public class MultimodalNetworkCreatorEllipseAroundSwitzerland extends Multimodal
 		OsmNetworkReader reader =
 				new OsmNetworkReader(this.network, transformation);
 		// Ellipse around Switzerland
-		//reader.setHierarchyLayer(new OsmFilter.OsmFilterEllipse(new CoordImpl(46.7976954,8.2363579), 150000, 200000, 0.71577, 6));
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterEllipse(
-				transformation.transform(new CoordImpl(8.2363579,46.7976954)), 150000, 200000, 0.71577, 6));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(6));
 		// Take all highway links...
 		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(2));
 		reader.parse(osmFile);
@@ -63,9 +61,7 @@ public class MultimodalNetworkCreatorEllipseAroundSwitzerland extends Multimodal
 		OsmNetworkReader reader =
 				new OsmNetworkReader(streetNetwork, transformation);
 		// Ellipse around Switzerland
-		//reader.setHierarchyLayer(new OsmFilter.OsmFilterEllipse(new CoordImpl(46.7976954,8.2363579), 150000, 200000, 0.71577, 6));
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterEllipse(
-				transformation.transform(new CoordImpl(8.2363579,46.7976954)), 150000, 200000, 0.71577, 6));
+		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(6));
 		reader.parse(osmFile);
 		// Merge networks:
 		NetworkMerger.integrateNetwork(this.network, streetNetwork, "", "st");
