@@ -44,7 +44,7 @@ import java.util.*;
  */
 public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 
-	private CoordinateTransformation transformWGS84toCH1903_LV03 = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03");
+	private CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private final Set<Integer> bitfeldNummern = new HashSet<>();
 
@@ -141,7 +141,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
 				double xCoord = Double.parseDouble(newLine.substring(8, 18));
 				double yCoord = Double.parseDouble(newLine.substring(19, 29));
-				Coord coord = this.transformWGS84toCH1903_LV03.transform(new CoordImpl(xCoord, yCoord));
+				Coord coord = this.transformation.transform(new CoordImpl(xCoord, yCoord));
 				String stopName = newLine.substring(39, newLine.length());
 				createStop(stopId, coord, stopName);
 				newLine = readsLines.readLine();
