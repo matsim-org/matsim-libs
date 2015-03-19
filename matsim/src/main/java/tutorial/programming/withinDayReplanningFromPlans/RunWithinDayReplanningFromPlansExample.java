@@ -36,7 +36,7 @@ import java.util.Set;
 public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){		
-		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithindayReplanning/withinday-config.xml");
+		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml");
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
