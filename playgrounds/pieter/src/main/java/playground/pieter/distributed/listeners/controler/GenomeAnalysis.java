@@ -146,7 +146,7 @@ public class GenomeAnalysis implements IterationEndsListener {
             }
             if (charSplit.length == 1) {
                 String simpleGene = "I0000";
-                strategyMutationCount.put("I0000", fullGeneCount.get(s));
+                strategyMutationCount.put("I", fullGeneCount.get(s));
                 simpleGeneCount.put(simpleGene, fullGeneCount.get(s));
                 simpleGeneScore.put(simpleGene, fullGeneScore.get(s));
                 simpleGeneAltScore.put(simpleGene, fullGeneAltScore.get(s));

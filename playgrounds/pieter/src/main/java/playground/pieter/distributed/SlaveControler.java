@@ -100,14 +100,25 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private boolean isOkForNextIter = true;
     private Map<Id<Person>, Double> selectedPlanScoreMemory;
     private TransitPerformance transitPerformance;
+    private void printHelp(Options options){
+        String header = "The MasterControler takes the following options:\n\n";
+        String footer = "";
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("MasterControler", header, options, footer, true);
+    }
     public SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
         lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
-        options.addOption("c", true, "Config file location");
-        options.addOption("h", true, "Host name or IP");
-        options.addOption("p", true, "Port number of MasterControler");
-        options.addOption("t", true, "Number of threads for parallel events handling.");
+        options.addOption(OptionBuilder.withLongOpt("config")
+                .withDescription("Config file location")
+                .hasArg(true)
+                .withArgName("CONFIG.XML")
+                .isRequired(true)
+                .create("c"));
+        options.addOption("h","host", true, "Host name or IP");
+        options.addOption("p", "port", true, "Port number of MasterControler");
+        options.addOption("t","threads", true, "Number of threads for parallel events handling.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
 
@@ -118,7 +129,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
             } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
-                System.out.println(options.toString());
+                printHelp(options);
                 System.exit(1);
             }
         } else {
@@ -226,7 +237,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 include(new CharyparNagelScoringFunctionModule());
                 include(new ScenarioElementsModule());
                 include(new StrategyManagerModule());
-                if (!IntelligentRouters)
+                if (IntelligentRouters)
                     include(new TravelDisutilityModule());
                 else
                     include(new RandomizedCarRouterTravelTimeAndDisutilityModule());

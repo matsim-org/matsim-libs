@@ -18,8 +18,9 @@ import playground.pieter.distributed.plans.PersonForPlanGenomes;
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
 
-    public PersonSerializable(PersonImpl person) {
-        this.id = person.getId().toString();
+    public PersonSerializable(Person p) {
+        this.id = p.getId().toString();
+        PersonImpl person = (PersonImpl) p;
         this.sex = person.getSex();
         this.age = person.getAge();
         this.hasLicense = person.getLicense();
@@ -30,7 +31,6 @@ public class PersonSerializable implements Serializable {
             if (plan.equals(person.getSelectedPlan()))
                 this.selectedPlan = planSerializable;
         }
-
     }
 
     protected String id;
@@ -45,7 +45,7 @@ public class PersonSerializable implements Serializable {
     private Boolean isEmployed;
 
     public Person getPerson() {
-        PersonForPlanGenomes person = new PersonForPlanGenomes(Id.createPersonId(id));
+        PersonImpl person = new PersonForPlanGenomes(Id.createPersonId(id));
         person.setAge(age);
         person.setCarAvail(carAvail);
 

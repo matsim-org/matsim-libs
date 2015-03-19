@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.misc.Time;
@@ -178,8 +179,8 @@ public class PlanGenome implements Plan {
     }
 
     @Override
-    public final PersonForPlanGenomes getPerson() {
-        return (PersonForPlanGenomes) this.person;
+    public final Person getPerson() {
+        return  this.person;
     }
 
     //////////////////////////////////////////////////////////////////////

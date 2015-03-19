@@ -104,7 +104,7 @@ public class ControlerReference {
         outputDirectory += "_ref" +
                 (trackGenome ? "_g" : "") +
                 (singapore ? "_s" : "") +
-                (intelligentRouters ? "_x" : "");
+                (intelligentRouters ? "_I" : "");
         config.controler().setOutputDirectory(outputDirectory);
     }
 
