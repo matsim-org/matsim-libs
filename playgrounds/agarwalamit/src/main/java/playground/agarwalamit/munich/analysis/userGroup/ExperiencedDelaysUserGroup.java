@@ -39,10 +39,10 @@ import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
- * A class to get absolute delays and delays costs per user group.
+ * A class to get absolute experienced delays and delays costs per user group.
  * @author amit
  */
-public class DelaysUserGroup {
+public class ExperiencedDelaysUserGroup {
 
 	private  double marginal_Utl_money;
 	private  double marginal_Utl_performing_sec;
@@ -50,12 +50,12 @@ public class DelaysUserGroup {
 	private  double marginalUtlOfTravelTime ;
 	private  double vtts_car ;
 
-	public DelaysUserGroup(String outputDir) {
+	public ExperiencedDelaysUserGroup(String outputDir) {
 		this.outputDir = outputDir;
 	}
 
 	private int lastIteration;
-	public static Logger logger = Logger.getLogger(DelaysUserGroup.class);
+	public static Logger logger = Logger.getLogger(ExperiencedDelaysUserGroup.class);
 	private String outputDir;
 
 	private SortedMap<UserGroup, Double> userGroupToDelays;
@@ -66,7 +66,7 @@ public class DelaysUserGroup {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
 		String [] runCases = {"bau","ei","ci","eci","10ei"};
 
-		new DelaysUserGroup(outputDir).run(runCases);
+		new ExperiencedDelaysUserGroup(outputDir).run(runCases);
 	}
 
 	private void init(String runCase){
@@ -99,7 +99,7 @@ public class DelaysUserGroup {
 			this.time2linkIdDelays = personAnalyzer.getCongestionPerPersonTimeInterval();
 
 			getTotalDelayPerUserGroup(this.time2linkIdDelays);
-			writeTotalDelaysPerUserGroup(this.outputDir+runCase+"/analysis/userGrpDelays.txt");
+			writeTotalDelaysPerUserGroup(this.outputDir+runCase+"/analysis/userGrpExperiencedDelays.txt");
 		}
 	}
 

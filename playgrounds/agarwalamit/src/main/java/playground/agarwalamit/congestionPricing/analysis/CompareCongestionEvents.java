@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.events.CongestionEventsReader;
