@@ -44,7 +44,7 @@ public class CausedDelayUserGroup {
 	public CausedDelayUserGroup(String outputDir) {
 		this.outputDir = outputDir;
 	}
-	
+
 	private String outputDir;
 	private  double marginal_Utl_money;
 	private  double marginal_Utl_performing_sec;
@@ -54,44 +54,47 @@ public class CausedDelayUserGroup {
 	private SortedMap<UserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
 	private Scenario scenario;
-	
+
 	public static void main(String[] args) {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
-		String [] runCases = {"ei","ci","eci","10ei"};
+		String [] runCases = {"ci","eci"};
 
 		for (String runCase : runCases){
 			int lastIteration = LoadMyScenarios.getLastIteration(outputDir+runCase+"/output_config.xml.gz");
 			String eventFile = outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";//"/events.xml";//
 			new CausedDelayUserGroup(outputDir).run(runCase,eventFile);
 		}
-		
-		// for bau there is no congestion events. Writing them externally.
-		String bau = "bau";
-		String congestionImpl = "implV3";
-		Scenario bauSc = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+bau);
-		new CrossMarginalCongestionEventsWriter(bauSc).readAndWrite(congestionImpl);
 
-		// now read this events file.
-		int bauLastIt = bauSc.getConfig().controler().getLastIteration();
-		String eventFileBAU = bauSc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+bauLastIt+"/"+bauLastIt+".events_"+congestionImpl+".xml.gz";
-		new CausedDelayUserGroup(outputDir).run(bau, eventFileBAU);
+		// for bau and ei there is no congestion events. Writing them externally.
+		runCases = new String [] {"bau","ei","10ei"};
+		String congestionImpl = "implV3";
+
+		for(String runCase : runCases){
+			Scenario runCaseSc = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+runCase);
+			new CrossMarginalCongestionEventsWriter(runCaseSc).readAndWrite(congestionImpl);
+
+			// now read this events file.
+			int lastIt = runCaseSc.getConfig().controler().getLastIteration();
+			String eventFileBAU = runCaseSc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".events_"+congestionImpl+".xml.gz";
+			new CausedDelayUserGroup(outputDir).run(runCase, eventFileBAU);
+		}
 	}
-	
+
 	private void run(String runCase, String eventsFile){
 		init(runCase);
 		CausedDelayAnalyzer analyzer = new CausedDelayAnalyzer(eventsFile);
 		analyzer.run();
 		personId2CausingDelay = analyzer.getPersonId2DelayCaused();
-		
+
 		for(Id<Person> p : personId2CausingDelay.keySet()){
 			UserGroup ug = getUserGrpFromPersonId(p);
 			double delaySoFar = this.userGroupToDelays.get(ug);
 			this.userGroupToDelays.put(ug, delaySoFar+this.personId2CausingDelay.get(p));
 		}
-		
+
 		writeTotalDelaysPerUserGroup(this.outputDir+runCase+"/analysis/userGrpCausedDelays.txt");
 	}
-	
+
 	private void writeTotalDelaysPerUserGroup(String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
@@ -104,24 +107,24 @@ public class CausedDelayUserGroup {
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
 	}
-	
+
 	private void init(String runCase){
 		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
 		this.personId2CausingDelay = new HashMap<Id<Person>, Double>();
-		
+
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		
+
 		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+runCase);
-		
+
 		this.marginal_Utl_money = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		this.marginal_Utl_performing_sec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
 		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getTraveling_utils_hr()/3600;
 		this.marginalUtlOfTravelTime = this.marginal_Utl_traveling_car_sec + this.marginal_Utl_performing_sec;
 		this.vtts_car = this.marginalUtlOfTravelTime / this.marginal_Utl_money;
 	}
-	
+
 	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
 		PersonFilter pf = new PersonFilter();
 		UserGroup outUG = UserGroup.URBAN;
