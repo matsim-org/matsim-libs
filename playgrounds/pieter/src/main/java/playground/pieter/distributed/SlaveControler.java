@@ -294,7 +294,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
         if (TrackGenome) {
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(),scenario, SingaporeScenario));
+//            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(),scenario, SingaporeScenario));
 //            matsimControler.addControlerListener(new GenomeAnalysis(false, false,false));
         }
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.

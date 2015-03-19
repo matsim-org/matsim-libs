@@ -11,6 +11,7 @@ import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -98,6 +99,7 @@ public class ControlerReference {
         }
         if (trackGenome) {
             delegate.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
+//            delegate.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(), scenario, singapore));
             delegate.addControlerListener(new GenomeAnalysis(false, false, false));
         }
         String outputDirectory = config.controler().getOutputDirectory();

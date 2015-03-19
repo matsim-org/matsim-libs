@@ -362,7 +362,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         if (TrackGenome) {
             matsimControler.addControlerListener(new GenomeAnalysis(true, true, true));
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
-            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(), scenario, SingaporeScenario));
+//            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(), scenario, SingaporeScenario));
         }
 
     }
