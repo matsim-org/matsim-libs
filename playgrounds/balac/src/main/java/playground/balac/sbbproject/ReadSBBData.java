@@ -34,7 +34,7 @@ public class ReadSBBData {
 			if (arr[13].equals("1")) {
 				if (this.trainDataMap.containsKey(arr[1])) {
 					
-					TrainDataPerSegment newTrainData = new TrainDataPerSegment(Integer.parseInt(arr[1]), arr[3], arr[6], arr[7], arr[11], arr[12]);
+					TrainDataPerSegment newTrainData = new TrainDataPerSegment(Integer.parseInt(arr[1]), arr[3], arr[6], arr[7], arr[11], arr[12], arr[14], arr[15]);
 					ArrayList<TrainDataPerSegment> previousSegment = this.trainDataMap.get(arr[1]);
 
 					if (!previousSegment.get(previousSegment.size() - 1).getDidokFrom().equals(newTrainData.getDidokFrom()) ||
@@ -46,7 +46,7 @@ public class ReadSBBData {
 					
 					ArrayList<TrainDataPerSegment> newElement = new ArrayList<TrainDataPerSegment>();
 					
-					TrainDataPerSegment newTrainData = new TrainDataPerSegment(Integer.parseInt(arr[1]), arr[3], arr[6], arr[7], arr[11], arr[12]);
+					TrainDataPerSegment newTrainData = new TrainDataPerSegment(Integer.parseInt(arr[1]), arr[3], arr[6], arr[7], arr[11], arr[12], arr[14], arr[15]);
 
 					newElement.add(newTrainData);
 					
@@ -73,7 +73,7 @@ public class ReadSBBData {
 				
 				if (this.trainDataMap.containsKey(number[0])) {
 					
-					TrainDataPerSegment newTrainData = new TrainDataPerSegment((int)Double.parseDouble(arr[1]), arr[3], (arr[6].split("\\."))[0], (arr[7].split("\\."))[0], arr[11], arr[12]);
+					TrainDataPerSegment newTrainData = new TrainDataPerSegment((int)Double.parseDouble(arr[1]), arr[3], (arr[6].split("\\."))[0], (arr[7].split("\\."))[0], arr[11], arr[12], arr[14], arr[15]);
 					ArrayList<TrainDataPerSegment> previousSegment = this.trainDataMap.get(number[0]);
 					if (!previousSegment.get(previousSegment.size() - 1).getDidokFrom().equals(newTrainData.getDidokFrom()) ||
 							!previousSegment.get(previousSegment.size() - 1).getDidokTo().equals(newTrainData.getDidokTo()))
@@ -85,7 +85,7 @@ public class ReadSBBData {
 					
 					ArrayList<TrainDataPerSegment> newElement = new ArrayList<TrainDataPerSegment>();
 					
-					TrainDataPerSegment newTrainData = new TrainDataPerSegment((int)Double.parseDouble(arr[1]), arr[3], (arr[6].split("\\."))[0], (arr[7].split("\\."))[0], arr[11], arr[12]);
+					TrainDataPerSegment newTrainData = new TrainDataPerSegment((int)Double.parseDouble(arr[1]), arr[3], (arr[6].split("\\."))[0], (arr[7].split("\\."))[0], arr[11], arr[12], arr[14], arr[15]);
 
 					newElement.add(newTrainData);
 					

@@ -29,6 +29,7 @@ public class ModifyNetworkHomogenized {
 		networkReader.readFile(networkFilePath);
 		
 		for(Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().contains("car")) {
 			if (link.getFreespeed() < 5)
 				link.setFreespeed(link.getFreespeed());
 			else if (link.getFreespeed() * 3.6 < 21)
@@ -59,10 +60,10 @@ public class ModifyNetworkHomogenized {
 				link.setFreespeed(70.0/3.6);
 			else  if (link.getFreespeed() * 3.6 < 121)
 				link.setFreespeed(80.0/3.6);
-			
+			}
 		}
 		
-		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network_" + freeSpeedFactor +"_fsf_homogenization_new.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network_" + "homogenization.xml");
 	}
 	
 	

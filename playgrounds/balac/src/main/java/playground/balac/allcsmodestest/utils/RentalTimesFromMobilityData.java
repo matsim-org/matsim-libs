@@ -59,7 +59,7 @@ public class RentalTimesFromMobilityData {
 								double rental = starth*60 +startmin - endh*60 - endmin;
 								if (rental < 0) {
 									fahrzugIDs.add(Double.parseDouble(arr[1]));
-									if ( Double.parseDouble(arr[6]) <= 100.0 ) {
+									if ( Double.parseDouble(arr[6]) <= 60.0 ) {
 										if (timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] < -rental) {
 											timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] = -rental;
 											
@@ -80,46 +80,7 @@ public class RentalTimesFromMobilityData {
 						}
 						
 					}
-					else if (arr3[1].equals(arr4[1]) && Integer.parseInt(arr3[1]) >= 12 && Integer.parseInt(arr3[1]) <= 12 && arr1.length == arr2.length) {
-						if (true) {
-							
-							String[] arr5 = arr1[1].split(":");
-							String[] arr6 = arr2[1].split(":");
-							
-							int starth = Integer.parseInt(arr5[0]);
-							startTimes[starth]++;
-							startCount++;
-							int startmin = Integer.parseInt(arr5[1]);
-							
-							int endh = Integer.parseInt(arr6[0]);
-							int endmin = Integer.parseInt(arr6[1]);
-							if (endh >= starth ){//&& !arr[2].equals("Combi") && !arr[2].equals("Transport")) {
-								double rental = starth*60 +startmin - endh*60 - endmin;
-								if (rental < 0) {
-									fahrzugIDs.add(Double.parseDouble(arr[1]));
-									if ( Double.parseDouble(arr[6]) <= 100.0 ) {
-										if (timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] < -rental) {
-											timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] = -rental;
-											
-										}
-										distanceTraveled[(int)((Double.parseDouble(arr[6])) / 5.0)]++;	
-										//timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] += (-rental);
-										//countBla[(int)((Double.parseDouble(arr[6])) / 5.0)] ++;
-									distance += Double.parseDouble(arr[6]);
-									
-									if (bla.contains(arr[0]))
-										bla1.add(arr[0]);
-									rentalTimes[(int)((-rental) / 60)]++;
-									count++;
-									}
-									//bla.add(Double.parseDouble(arr[2]));
-								}
-							}
-							
-
-						}
-						
-					}
+					
 				
 				}
 			}
@@ -136,17 +97,17 @@ public class RentalTimesFromMobilityData {
 		for (int i = 0; i < startTimes.length; i++) 
 			System.out.println((double)startTimes[i]/(double)startCount * 100.0);
 		
-		System.out.println(distance/count);
+		System.out.println(distance/count1);
 		
 		System.out.println("rentals: " + count1);
 		
 		for (int i = 0; i < rentalTimes.length; i++) 
-			System.out.println((double)rentalTimes[i]/(double)count * 100.0);
+			System.out.println((double)rentalTimes[i]/(double)count1 * 100.0);
 		
 		System.out.println();
 
 		for (int i = 0; i < distanceTraveled.length; i++) 
-			System.out.println((double)distanceTraveled[i]/(double)count * 100.0);
+			System.out.println((double)distanceTraveled[i]/(double)count1 * 100.0);
 		
 		for (int i = 0; i < timeBla.length; i++) 
 			System.out.println(timeBla[i]);

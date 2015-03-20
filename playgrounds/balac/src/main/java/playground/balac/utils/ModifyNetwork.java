@@ -29,16 +29,19 @@ public class ModifyNetwork {
 		networkReader.readFile(networkFilePath);
 		
 		for(Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().contains("car")) {
+				
+				if (link.getFreespeed() < 5)
+					link.setFreespeed(link.getFreespeed());
+				
+				else
+					link.setFreespeed(link.getFreespeed() * 0.85);
+				
+			}
 			
-			/*if (link.getFreespeed() < 5)
-				link.setFreespeed(link.getFreespeed());
-			else if (link.getFreespeed() < 6 )
-				link.setFreespeed(15.0 / 3.6);
-			else*/
-				link.setFreespeed(55.0 / 3.6);
 		}
 		
-		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_super_homogenized.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_reduced_15perc.xml");
 	}
 	
 	

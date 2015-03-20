@@ -72,11 +72,11 @@ public class PurposeCSFromEvents {
 						purposeSplit[3]++;
 						count++; 
 						}
-				/*else if (event.getActType().startsWith("home")) {
+				else if (event.getActType().startsWith("home")) {
 						purposeSplit[4]++;
 				
 				count++; 
-				}*/
+				}
 				
 			}
 			
