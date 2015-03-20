@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.analysis;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
@@ -60,7 +60,7 @@ public class OriginCompare {
 		reader.parse(refFile);
 		KeyMatrix m1 = reader.getMatrix();
 
-		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
+		MatrixOperations.applyFactor(m1, 1 / 365.0);
 
 		/*
 		 * load simulated matrix
@@ -68,8 +68,8 @@ public class OriginCompare {
 		reader.parse(simFile);
 		KeyMatrix m2 = reader.getMatrix();
 
-		MatrixOpertaions.applyFactor(m2, 22.0);
-		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
+		MatrixOperations.applyFactor(m2, 22.0);
+		MatrixOperations.applyDiagonalFactor(m2, 1.3);
 		/*
 		 * load zones
 		 */

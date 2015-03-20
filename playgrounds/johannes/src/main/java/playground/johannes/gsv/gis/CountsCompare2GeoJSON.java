@@ -43,6 +43,7 @@ import org.wololo.jts2geojson.GeoJSONWriter;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
+import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 
@@ -50,7 +51,7 @@ import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class CountsCompare2GeoJSON {
 
@@ -61,58 +62,61 @@ public class CountsCompare2GeoJSON {
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-		
+
 		GeoJSONWriter jsonWriter = new GeoJSONWriter();
 		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
-		
-		for(Count count : obsCounts.getCounts().values()) {
-			Id<Link> linkId = count.getLocId();
-			Link link = network.getLinks().get(linkId);
-			
-			double simVal = simCounts.getOccupancy(linkId) * factor;
-			double obsVal = 0;
-			for(Volume vol : count.getVolumes().values()) {
-				obsVal += vol.getValue();
-			}
-			
-			double relErr = (simVal - obsVal)/obsVal;
-			
-			Coord simPos = link.getCoord();
-			Coord obsPos = count.getCoord();
-			
-			Point simPoint = MatsimCoordUtils.coordToPoint(simPos);
-			Point obsPoint = MatsimCoordUtils.coordToPoint(obsPos);
-			
-			simPoint = CRSUtils.transformPoint(simPoint, transform);
-			obsPoint = CRSUtils.transformPoint(obsPoint, transform);
-			
-			Map<String, Object> properties = new HashMap<>();
 
-			properties.put("simulation", simVal);
-			properties.put("observation", obsVal);
-			properties.put("error", relErr);
-			properties.put("color", "#" + String.format("%06x", ColorUtils.getRedGreenColor(Math.min(1, Math.abs(relErr))).getRGB() & 0x00FFFFFF));
-			
-			Feature obsFeature = new Feature(jsonWriter.write(obsPoint), properties);
-			Feature simFeature = new Feature(jsonWriter.write(simPoint), properties);
-			
-			simFeatures.add(simFeature);
-			obsFeatures.add(obsFeature);
+		for (Count count : obsCounts.getCounts().values()) {
+			Id<Link> linkId = count.getLocId();
+			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
+				Link link = network.getLinks().get(linkId);
+
+				double simVal = simCounts.getOccupancy(linkId) * factor;
+				double obsVal = 0;
+				for (Volume vol : count.getVolumes().values()) {
+					obsVal += vol.getValue();
+				}
+
+				double relErr = (simVal - obsVal) / obsVal;
+
+				Coord simPos = link.getCoord();
+				Coord obsPos = count.getCoord();
+
+				Point simPoint = MatsimCoordUtils.coordToPoint(simPos);
+				Point obsPoint = MatsimCoordUtils.coordToPoint(obsPos);
+
+				simPoint = CRSUtils.transformPoint(simPoint, transform);
+				obsPoint = CRSUtils.transformPoint(obsPoint, transform);
+
+				Map<String, Object> properties = new HashMap<>();
+
+				properties.put("simulation", simVal);
+				properties.put("observation", obsVal);
+				properties.put("error", relErr);
+				properties
+						.put("color", "#" + String.format("%06x", ColorUtils.getRedGreenColor(Math.min(1, Math.abs(relErr))).getRGB() & 0x00FFFFFF));
+
+				Feature obsFeature = new Feature(jsonWriter.write(obsPoint), properties);
+				Feature simFeature = new Feature(jsonWriter.write(simPoint), properties);
+
+				simFeatures.add(simFeature);
+				obsFeatures.add(obsFeature);
+			}
 		}
-		
+
 		FeatureCollection simFCollection = jsonWriter.write(simFeatures);
 		FeatureCollection obsFCollection = jsonWriter.write(obsFeatures);
-		
+
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/simCounts.json", outDir)));
 			writer.write(simFCollection.toString());
 			writer.close();
-			
+
 			writer = new BufferedWriter(new FileWriter(String.format("%s/obsCounts.json", outDir)));
 			writer.write(obsFCollection.toString());
 			writer.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

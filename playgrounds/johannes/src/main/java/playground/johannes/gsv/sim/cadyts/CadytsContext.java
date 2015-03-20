@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
@@ -80,12 +79,14 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	
 	private final Config config;
 	
+	private ODCalibrator odCalibrator;
+	
 	public CadytsContext(Config config, Counts counts, LinkOccupancyCalculator occupancy) {
 		this.config = config;
 		this.scale = config.counts().getCountsScaleFactor();
 		this.occupancy = occupancy;
 //		this.countsScaleFactor = config.counts().getCountsScaleFactor();
-		
+				
 		this.cadytsConfig = new CadytsConfigGroup();
 		config.addModule(cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
@@ -94,7 +95,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		if ( counts==null ) {
 			this.counts = new Counts();
 			String occupancyCountsFilename = config.counts().getCountsFileName();
+			if(occupancyCountsFilename != null) {
 			new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
+			} else {
+				log.warn("No counts file specified.");
+			}
 		} else {
 			this.counts = counts ;
 		}
@@ -138,14 +143,22 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			reader.parse(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
 			KeyMatrix m = reader.getMatrix();
 			
+			double distThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
+			double countThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
+			String aggKey = config.findParam(Simulator.GSV_CONFIG_MODULE_NAME, "aggregationKey");
 			String data;
 			try {
 				data = new String(Files.readAllBytes(Paths.get(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
 				ZoneCollection zones = new ZoneCollection();
 				zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 				
-				ODCalibrator odCalibrartor = new ODCalibrator(event.getControler().getScenario().getNetwork(), this, m, zones);
-				event.getControler().getEvents().addHandler(odCalibrartor);
+				odCalibrator = new ODCalibrator(event.getControler().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
+				event.getControler().getEvents().addHandler(odCalibrator);
+				
+				ODCountsAnalyzer odAnalyzer = new ODCountsAnalyzer(counts, simResults);
+				event.getControler().addControlerListener(odAnalyzer);
+				
+//				log.info(String.format("Setting %s candidates for simulation.", odCalibrator.getCandidates().size()));
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -155,9 +168,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		
 		
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		Logger.getRootLogger().setLevel(Level.FATAL);
+//		Logger.getRootLogger().setLevel(Level.INFO);
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
-		Logger.getRootLogger().setLevel(Level.DEBUG);
+//		Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	
 	@Override
@@ -183,6 +196,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		}
 	}
 
+	public ODCalibrator getODCalibrator() {
+		return odCalibrator;
+	}
 	/**
 	 * for testing purposes only
 	 */

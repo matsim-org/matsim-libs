@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,39 +23,61 @@ import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
  * 
  */
-public class ActivityTypePredicate implements Predicate {
+public class WeCommuterPredicate implements Predicate {
 
-	private final String type;
+	private final double threshold;
 
-	public ActivityTypePredicate(String type) {
-		this.type = type;
+	public WeCommuterPredicate(double threshold) {
+		this.threshold = threshold;
 	}
-
+	
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
-			return true;
-		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
-			return true;
-		} else if (!ActivityType.HOME.equalsIgnoreCase(nextType) && !ActivityType.HOME.equalsIgnoreCase(prevType)) {
-			/*
-			 * count only to activity
-			 */
-			if(type.equalsIgnoreCase(nextType)) {
-				return true;
-			} else {
-				return false;
+		boolean result = false;
+
+		String day = person.getAttribute(CommonKeys.DAY);
+		if (day != null) {
+			if (day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day.equalsIgnoreCase(CommonKeys.SATURDAY)
+					|| day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
+				
+				ProxyPlan plan = person.getPlans().get(0);
+				ProxyObject weLeg = null;
+				
+				int cnt = 0;
+				for (int i = 0; i < plan.getLegs().size(); i++) {
+					ProxyObject leg2 = plan.getLegs().get(i);
+					ProxyObject prev2 = plan.getActivities().get(i);
+					ProxyObject next2 = plan.getActivities().get(i + 1);
+
+					String val = leg2.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+					if (val != null) {
+						double d = Double.parseDouble(val);
+						if (d > threshold) {
+							if (ActivityType.WORK.equalsIgnoreCase(prev2.getAttribute(CommonKeys.ACTIVITY_TYPE))
+									|| ActivityType.WORK.equalsIgnoreCase(next2.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
+								cnt++;
+								weLeg = leg2;
+							}
+						}
+					}
+				}
+
+				if (cnt == 1) {
+					if(weLeg == leg) {
+						return true;
+					}
+				}
+
 			}
-		} else {
-			return false;
 		}
+
+		return result;
 	}
 
 }

@@ -40,6 +40,7 @@ import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
+import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
 
@@ -57,13 +58,16 @@ public class NetworkLoad2GeoJSON {
 		double minVolume = Double.MAX_VALUE;
 
 		for (Link link : network.getLinks().values()) {
-			double vol = linkVols.getOccupancy(link.getId()) * factor;
-			double load = vol / (link.getCapacity() * 24);
-			volumes.put(link, vol);
-			loads.put(link, load);
+			String linkId = link.getId().toString();
+			if (!(linkId.startsWith(ODCalibrator.VIRTUAL_ID_PREFIX) || linkId.contains(".l"))) {
+				double vol = linkVols.getOccupancy(link.getId()) * factor;
+				double load = vol / (link.getCapacity() * 24);
+				volumes.put(link, vol);
+				loads.put(link, load);
 
-			maxVolume = Math.max(maxVolume, vol);
-			minVolume = Math.min(minVolume, vol);
+				maxVolume = Math.max(maxVolume, vol);
+				minVolume = Math.min(minVolume, vol);
+			}
 		}
 
 		MathTransform transform = null;
@@ -76,7 +80,7 @@ public class NetworkLoad2GeoJSON {
 		GeoJSONWriter jsonWriter = new GeoJSONWriter();
 		List<Feature> features = new ArrayList<>(network.getLinks().size());
 
-		for (Link link : network.getLinks().values()) {
+		for (Link link : volumes.keySet()) {
 			double coord1[] = new double[] {link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()};
 			double coord2[] = new double[] {link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY()};
 			

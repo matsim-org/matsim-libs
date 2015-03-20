@@ -118,7 +118,7 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 
 	private class Strategy implements PlanStrategy, IterationStartsListener {
 
-		private GenericPlanStrategy<Plan, Person> delegate;
+		private ActivityLocationStrategy delegate;
 
 		private int iteration;
 
@@ -128,7 +128,7 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 
 		// private Controler controler;
 
-		public Strategy(GenericPlanStrategy<Plan, Person> delegate) {
+		public Strategy(ActivityLocationStrategy delegate) {
 			this.delegate = delegate;
 		}
 
@@ -152,7 +152,8 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 		@Override
 		public void finish() {
 			delegate.finish();
-			logger.info(String.format("Replanned %s persons.", replannedPersons.size()));
+			int replanned = delegate.getAndResetReplanCount();
+			logger.info(String.format("%s persons requested for replanning, %s persons replaned.", replannedPersons.size(), replanned));
 
 			String file = controler.getControlerIO().getIterationFilename(iteration, "replannedPersons.txt");
 			try {

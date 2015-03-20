@@ -17,30 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class ODMatrix2KeyMatrix {
+public class RestoreActTypes implements ProxyPlanTask {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		ODMatrixXMLReader reader = new ODMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
-		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m1, "/home/johannes/gsv/matrices/refmatrices/itp.xml");
+	@Override
+	public void apply(ProxyPlan plan) {
+		for(ProxyObject act : plan.getActivities()) {
+			String orig = act.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
+			if(orig != null) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, orig);
+			}
+		}
 
 	}
-	
+
 }

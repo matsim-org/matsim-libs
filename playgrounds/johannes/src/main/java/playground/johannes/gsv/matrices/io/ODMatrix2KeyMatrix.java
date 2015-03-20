@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid.run;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 
 /**
  * @author johannes
  *
  */
-public class ExtractStatePopulation {
+public class ODMatrix2KeyMatrix {
 
-	private static final Logger logger = Logger.getLogger(ExtractStatePopulation.class);
-	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String infile = args[0];
-		String outfile = args[1];
-		String state = args[2];
+		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
+		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
 		
-		XMLParser parser = new XMLParser();
-		parser.setValidating(false);
-	
-		logger.info("Loading persons...");
-		parser.parse(infile);
-		Set<ProxyPerson> persons = parser.getPersons();
-		logger.info(String.format("Loaded %s persons.", persons.size()));
-		
-		logger.info("Applying filter...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeletePersonKeyValue("state", state), persons);
-		logger.info(String.format("Population size: %s", persons.size()));
-		
-		XMLWriter writer = new XMLWriter();
-		writer.write(outfile, persons);
-	}
+		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		writer.write(m1, "/home/johannes/gsv/matrices/refmatrices/itp.xml");
 
+	}
+	
 }

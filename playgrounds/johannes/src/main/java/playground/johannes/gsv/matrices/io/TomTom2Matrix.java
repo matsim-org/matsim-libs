@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,11 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -32,75 +35,53 @@ import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author johannes
  * 
  */
-public class BVWP2Matrix {
+public class TomTom2Matrix {
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		Matrix mA = new Matrix("A", null);
-		VisumMatrixReader reader = new VisumMatrixReader(mA);
-		reader.readFile("/home/johannes/gsv/matrices/IV_EKL_A.fma");
+		Matrix m = new Matrix("tomtom", null);
+		VisumMatrixReader reader = new VisumMatrixReader(m);
 
-		Matrix mG = new Matrix("G", null);
-		reader = new VisumMatrixReader(mG);
-		reader.readFile("/home/johannes/gsv/matrices/IV_EKL_G.fma");
+		reader.readFile("/home/johannes/gsv/matrices/raw/TomTom/TTgrob_gesamt_aus_zeitunabhängig.txt");
 
-		Matrix mP = new Matrix("P", null);
-		reader = new VisumMatrixReader(mP);
-		reader.readFile("/home/johannes/gsv/matrices/IV_EKL_P.fma");
-
-		Matrix mU = new Matrix("U", null);
-		reader = new VisumMatrixReader(mU);
-		reader.readFile("/home/johannes/gsv/matrices/IV_EKL_U.fma");
-		
 		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
+		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
+		data = null;
 		
-		KeyMatrix m = new KeyMatrix();
-		
-		for(Zone i : zones.zoneSet()) {
-			for(Zone j : zones.zoneSet()) {
-				double sum = 0;
-				
-				String id_i = i.getAttribute("gsvId");
-				String id_j = j.getAttribute("gsvId");
-				
-				Entry eA = mA.getEntry(id_i, id_j);
-				if(eA != null) {
-					sum += eA.getValue();
-				}
-				
-				Entry eG = mG.getEntry(id_i, id_j);
-				if(eG != null) {
-					sum += eG.getValue();
-				}
-				
-				Entry eP = mP.getEntry(id_i, id_j);
-				if(eP != null) {
-					sum += eP.getValue();
-				}
-				
-				Entry eU = mU.getEntry(id_i, id_j);
-				if(eU != null) {
-					sum += eU.getValue();
-				}
-				
-				m.set(id_i, id_j, sum);
-			}
-			
+		Set<Entry> all = new HashSet<>();
+		for (List<Entry> entries : m.getFromLocations().values()) {
+			all.addAll(entries);
 		}
-		
+
+		for (List<Entry> entries : m.getToLocations().values()) {
+			all.addAll(entries);
+		}
+
+		KeyMatrix km = new KeyMatrix();
+
+		ProgressLogger.init(all.size(), 2, 10);
+		for (Entry e : all) {
+			ProgressLogger.step();
+			Zone zi = zones.get(e.getFromLocation());
+			Zone zj = zones.get(e.getToLocation());
+			if(zi != null && zj != null) {
+			km.set(e.getFromLocation(), e.getToLocation(), e.getValue());
+			}
+		}
+
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, "/home/johannes/gsv/matrices/bmbv2010.xml");
+		writer.write(km, "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 	}
 
 }

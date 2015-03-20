@@ -19,27 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.johannes.coopsim.analysis.ActTypeShareTask;
@@ -47,44 +41,27 @@ import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ActivityLoadTask;
 import playground.johannes.coopsim.analysis.AgeTripCorrelationTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
-import playground.johannes.coopsim.analysis.CoordinationComplexityTask;
-import playground.johannes.coopsim.analysis.DesiredTimeDiffTask;
 import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
 import playground.johannes.coopsim.analysis.DistanceVisitorsTask;
 import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
 import playground.johannes.coopsim.analysis.GenderTripCorrelationTask;
 import playground.johannes.coopsim.analysis.JointActivityTask;
 import playground.johannes.coopsim.analysis.LegLoadTask;
-import playground.johannes.coopsim.analysis.ScoreTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.coopsim.analysis.TripDistanceDegreeTask;
 import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
 import playground.johannes.coopsim.analysis.TripDurationTask;
+import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
-import playground.johannes.coopsim.analysis.VisitorsAccessibilityTask;
-import playground.johannes.coopsim.eval.ActivityEvaluator2;
-import playground.johannes.coopsim.eval.EvalEngine;
-import playground.johannes.coopsim.eval.EvaluatorComposite;
-import playground.johannes.coopsim.eval.JointActivityEvaluator2;
-import playground.johannes.coopsim.eval.LegEvaluator;
-import playground.johannes.coopsim.mental.ActivityDesires;
-import playground.johannes.coopsim.pysical.ParallelPseudoSim;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
-import playground.johannes.coopsim.pysical.PseudoSim;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
-import playground.johannes.studies.mz2005.TripAcceptanceProba;
 
 /**
  * @author illenberger

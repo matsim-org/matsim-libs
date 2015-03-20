@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
 import java.io.IOException;
 import java.util.HashMap;

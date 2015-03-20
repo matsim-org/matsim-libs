@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

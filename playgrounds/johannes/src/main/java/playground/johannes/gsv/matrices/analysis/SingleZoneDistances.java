@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,10 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.analysis;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,61 +28,60 @@ import java.nio.file.Paths;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class IVV2Matrix {
+public class SingleZoneDistances {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.695.xml");
+		KeyMatrix m = reader.getMatrix();
+
 		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
+		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
+		data = null;
+
+		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 		
-		KeyMatrix m = new KeyMatrix();
-		
-		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrices/raw/ivv/Matrix2005_PS_Mobility.txt"));
-		
-		String line = reader.readLine();
-		
-		int nozone = 0;
-		
-		while((line = reader.readLine()) != null) {
-			String tokens[] = line.split("\t");
-			String id_i = tokens[0];
-			String id_j = tokens[1];
-			String val = tokens[4];
-			
-			Zone z_i = zones.get(id_i);
-			Zone z_j = zones.get(id_j);
-			
-			if(z_i != null && z_j != null) {
-				Double value = m.get(id_i, id_j);
-				if(value == null) value = 0.0;
-				
-				double v = Double.parseDouble(val);
-				
-				m.set(id_i, id_j, v+value);
-			} else {
-				nozone++;
+		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+		String i = "11000";
+		Zone source = zones.get(i);
+		for (String j : m.keys()) {
+			Double val = m.get(i, j);
+			if (val != null) {
+				Zone target = zones.get(j);
+				if(target != null) {
+					Point pi = source.getGeometry().getCentroid();
+					Point pj = target.getGeometry().getCentroid();
+					
+					double d = dCalc.distance(pi, pj);
+					stats.addValue(d, 1/val);
+				}
 			}
 		}
-		if(nozone > 0) {
-			System.out.println(String.format("%s zones not found.", nozone));
-		}
-		
-		reader.close();
-		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, "/home/johannes/gsv/matrices/raw/ivv/ivv.xml");
+
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(20000), true);
+		TXTWriter.writeMap(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
 	}
 
 }

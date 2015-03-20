@@ -19,11 +19,13 @@
 
 package playground.johannes.gsv.synPop;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -44,16 +46,22 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
  */
 public class Matsim2Proxy {
 
-	public static void main(String args[]) {
+	private static final Logger logger = Logger.getLogger(Matsim2Proxy.class);
+	
+	public static void main(String args[]) throws IOException {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
+		logger.info("Loading matsim population...");
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(args[0]);
+		logger.info(String.format("Loaded %s matsim persons.", scenario.getPopulation().getPersons().size()));
 		
+		logger.info("Loading proxy persons...");
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		parser.parse(args[1]);
+		logger.info(String.format("Loaded %s proxy persons.", parser.getPersons().size()));
 		
 		Map<Id<Person>, ? extends Person> matsimPersons = scenario.getPopulation().getPersons();
 		Map<String, ProxyPerson> proxyPresons = new HashMap<>(matsimPersons.size());
@@ -64,12 +72,22 @@ public class Matsim2Proxy {
 		
 		Set<ProxyPerson> newProxyPersons = new HashSet<>(matsimPersons.size());
 		
+		int cntReplan = 0;
+		
+		logger.info("Converting persons...");
 		for(Person matsimPerson : matsimPersons.values()) {
 			ProxyPerson proxyPerson = proxyPresons.get(matsimPerson.getId().toString());
 			newProxyPersons.add(proxyPerson);
 			
 			ProxyPlan proxyPlan = proxyPerson.getPlans().get(0);
+			
+			if (matsimPerson.getPlans().size() > 1) {
+				matsimPerson.removePlan(matsimPerson.getSelectedPlan());
+				cntReplan++;
+			}
+			
 			Plan matsimPlan = matsimPerson.getSelectedPlan();
+			
 			for(int i = 0; i < matsimPlan.getPlanElements().size(); i++) {
 				if(i % 2 == 0) {
 					Activity matsimAct = (Activity) matsimPlan.getPlanElements().get(i);
@@ -88,7 +106,11 @@ public class Matsim2Proxy {
 			
 		}
 		
+		logger.info(String.format("Removed selected plan for %s replanned persons.", cntReplan));
+		
+		logger.info("Writing proxy persons...");
 		XMLWriter writer = new XMLWriter();
 		writer.write(args[2], newProxyPersons);
+		logger.info("Done.");
 	}
 }

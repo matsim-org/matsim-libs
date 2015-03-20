@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.analysis;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,21 +31,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.linear.MatrixIndexException;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.GeoJSON;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -63,34 +68,26 @@ public class RelationsDiffPlot {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "700";
+		String runId = "819";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
-		String refFile2 = "/home/johannes/gsv/matrices/refmatrices/bmbv2010.xml";
-		String refFile1 = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
+//		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/763/miv2.sym.nuts3.xml";
+		String tomtomFile = "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml";
+		String itpFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
 		 * load ref matrix
 		 */
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse(refFile1);
-		KeyMatrix reference1 = reader.getMatrix();
+		reader.parse(itpFile);
+		KeyMatrix itp = reader.getMatrix();
 
-		MatrixOpertaions.applyFactor(reference1, 1 / 365.0);
+		reader.parse(tomtomFile);
+		KeyMatrix tomtom = reader.getMatrix();
 
-		reader.parse(refFile2);
-		KeyMatrix reference2 = reader.getMatrix();
-
-		MatrixOpertaions.applyFactor(reference2, 1 / 365.0);
-		
-		/*
-		 * load simulated matrix
-		 */
 		reader.parse(simFile);
 		KeyMatrix simulation = reader.getMatrix();
-
-		MatrixOpertaions.sysmetrize(simulation);
-		MatrixOpertaions.applyFactor(simulation, 11.0);
-		MatrixOpertaions.applyDiagonalFactor(simulation, 1.3);
+//		MatrixOperations.symetrize(simulation);
+//		MatrixOperations.applyFactor(simulation, 11.8);
 		/*
 		 * load zones
 		 */
@@ -98,19 +95,51 @@ public class RelationsDiffPlot {
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
+		data = null;
+		
+		MatrixOperations.applyFactor(itp, 1 / 365.0);
+
+		ODUtils.cleanDistances(tomtom, zones, 100000, new WGS84DistanceCalculator());
+		ODUtils.cleanVolumes(tomtom, zones, 1500);
+		double c = ODUtils.calcNormalization(tomtom, simulation);
+		MatrixOperations.applyFactor(tomtom, c);
+		MatrixOperations.symetrize(tomtom);
+
 		/*
 		 * compare
 		 */
-		data = writeGeoJSON(zones, urbanZones(zones.zoneSet()), simulation, reference1, reference2);
-		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/matrixdiff."+runId+".json"), data.getBytes(), StandardOpenOption.CREATE);
+		Collection<Zone> studyZones = urbanZones(zones.zoneSet());
+		data = writeGeoJSON(zones, studyZones, simulation, itp, tomtom);
+		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/relations/matrixdiff."+runId+".json"), data.getBytes(), StandardOpenOption.CREATE);
+		/*
+		 * write centroids
+		 */
+		data = writeStudyZones(studyZones);
+		Files.write(Paths.get(String.format("/home/johannes/gsv/matrices/analysis/relations/zones.%s.json", runId)), data.getBytes(), StandardOpenOption.CREATE);
+		
 	}
 
+	private static String writeStudyZones(Collection<Zone> zones) {
+		GeoJSONWriter jsonWriter = new GeoJSONWriter();
+		List<Feature> features = new ArrayList<>();
+		for(Zone zone : zones) {
+			GeoJSON json = jsonWriter.write(zone.getGeometry().getCentroid());
+			Geometry geom = (Geometry) GeoJSONFactory.create(json.toString());
+
+			Map<String, Object> atts = new HashMap<>();
+			atts.put("name", zone.getAttribute("nuts3_name"));
+			features.add(new Feature(geom, atts));
+		}
+		
+		return jsonWriter.write(features).toString();
+	}
+	
 	private static String writeGeoJSON(ZoneCollection zones, Collection<Zone> relationZones, KeyMatrix m1, KeyMatrix m2, KeyMatrix m3) {
 		StringBuilder builder = new StringBuilder();
 		/*
 		 * write zone polygons
 		 */
-		// builder.append(Zone2GeoJSON.toJson(zones.zoneSet()));
+		//builder.append(Zone2GeoJSON.toJson(zones.zoneSet()));
 		/*
 		 * create a line string for each relation
 		 */
@@ -118,8 +147,26 @@ public class RelationsDiffPlot {
 		GeoJSONWriter jsonWriter = new GeoJSONWriter();
 		List<Feature> features = new ArrayList<>();
 
-		for (Zone i : relationZones) {
-			for (Zone j : relationZones) {
+		double sum2 = 0;
+		double sum3 = 0;
+		
+		MathTransform transform = null;
+		
+		try {
+			transform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, CRSUtils.getCRS(31467));
+		} catch (FactoryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		List<Zone> zoneList = new ArrayList<>(relationZones);
+//		for (Zone i : relationZones) {
+//			for (Zone j : relationZones) {
+		for(int idxI = 0; idxI < zoneList.size(); idxI++) {
+			for(int idxJ = (idxI + 1); idxJ < zoneList.size(); idxJ++) {
+				Zone i = zoneList.get(idxI);
+				Zone j = zoneList.get(idxJ);
+				
 				if (i != j) {
 					Double val1 = m1.get(i.getAttribute("gsvId"), j.getAttribute("gsvId"));
 					if (val1 == null)
@@ -132,6 +179,9 @@ public class RelationsDiffPlot {
 					if (val3 == null)
 						val3 = 0.0;
 					
+					sum2 += val2;
+					sum3 += val3;
+					
 					double err1 = (val1 - val2) / val2;
 					double err2 = (val1 - val3) / val3;
 
@@ -141,26 +191,31 @@ public class RelationsDiffPlot {
 					Coordinate[] coords = new Coordinate[2];
 					coords[0] = start.getCoordinate();
 					coords[1] = end.getCoordinate();
-
+					
 					double deltaX = coords[1].x - coords[0].x;
 					double deltaY = coords[1].y - coords[0].y;
 					
-					double rotation = Math.atan(deltaY/deltaX) * 180/Math.PI;
-					
-					coords[1].x = coords[0].x + deltaX/2.0;
-					coords[1].y = coords[0].y + deltaY/2.0;
+//					coords[1].x = coords[0].x + deltaX/2.0;
+//					coords[1].y = coords[0].y + deltaY/2.0;
 					
 //					double labelX = coords[0].x + deltaX/4.0;
 //					double labelY = coords[0].y + deltaY/4.0;
 					
-					double labelX = coords[0].x + deltaX/2.0;
-					double labelY = coords[0].y + deltaY/2.0;
+					double labelX = coords[0].x + deltaX/2;
+					double labelY = coords[0].y + deltaY/2;
 					
 					LineString line = factory.createLineString(coords);
 
+					
 					GeoJSON json = jsonWriter.write(line);
 					Geometry geom = (Geometry) GeoJSONFactory.create(json.toString());
 
+					CRSUtils.transformCoordinate(coords[0], transform);
+					CRSUtils.transformCoordinate(coords[1], transform);
+					deltaX = coords[1].x - coords[0].x;
+					deltaY = coords[1].y - coords[0].y;
+					double rotation = Math.atan(deltaY/deltaX) * 180/Math.PI;
+					
 					Map<String, Object> atts = new HashMap<>();
 					atts.put("volume", val1);
 					atts.put("error1", err1);
@@ -175,6 +230,7 @@ public class RelationsDiffPlot {
 
 		builder.append(jsonWriter.write(features).toString());
 
+		System.out.println(String.format("sum2 = %s, sum3 = %s, f = %s", sum2, sum3, sum3/sum2));
 		return builder.toString();
 	}
 
@@ -185,9 +241,9 @@ public class RelationsDiffPlot {
 
 		for (Zone zone : zones) {
 			double pop = Double.parseDouble(zone.getAttribute("inhabitants"));
-			double a = zone.getGeometry().getArea();
+//			double a = zone.getGeometry().getArea();
 
-			double rho = pop / a;
+//			double rho = pop / a;
 
 			if (pop > threshold) {
 				urbanZones.add(zone);

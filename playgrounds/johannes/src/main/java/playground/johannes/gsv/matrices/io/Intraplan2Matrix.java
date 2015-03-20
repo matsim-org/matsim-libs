@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.ODMatrix;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
@@ -201,7 +201,7 @@ public class Intraplan2Matrix {
 //		writer.writeFile("/home/johannes/gsv/matrices/itp.fma");
 //		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
 		ODMatrixXMLWriter writer = new ODMatrixXMLWriter();
-		System.out.println("Sum = " + MatrixOpertaions.sum(m.toKeyMatrix("gsvId")));
+		System.out.println("Sum = " + MatrixOperations.sum(m.toKeyMatrix("gsvId")));
 		writer.write(m, "/home/johannes/gsv/matrices/itp.xml");
 	}
 

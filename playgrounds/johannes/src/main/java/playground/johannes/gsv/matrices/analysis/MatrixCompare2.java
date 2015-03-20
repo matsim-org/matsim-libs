@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 
@@ -34,11 +34,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.Histogram;
@@ -64,8 +63,9 @@ public class MatrixCompare2 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "629";
-		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String runId = "744";
+//		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/779-780/miv.sym.xml";
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
 		 * load ref matrix
@@ -75,7 +75,7 @@ public class MatrixCompare2 {
 		reader.parse(refFile);
 		KeyMatrix m1 = reader.getMatrix();
 
-		MatrixOpertaions.applyFactor(m1, 1 / 365.0);
+		MatrixOperations.applyFactor(m1, 1 / 365.0);
 
 		/*
 		 * load simulated matrix
@@ -87,20 +87,20 @@ public class MatrixCompare2 {
 		KeyMatrix m2 = reader.getMatrix();
 //		KeyMatrix simulation = reader2.getMatrix().toKeyMatrix("gsvId");
 
-		MatrixOpertaions.applyFactor(m2, 11.0);
-		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
+//		MatrixOperations.applyFactor(m2, 11.8);
+//		MatrixOperations.applyDiagonalFactor(m2, 1.3);
 		/*
 		 * load zones
 		 */
 		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/de.nuts3.json")));
+		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 
-		System.out.println(String.format("Intraplan sum: %s", MatrixOpertaions.sum(m1)));
-		System.out.println(String.format("%s sum: %s", runId, MatrixOpertaions.sum(m2)));
+		System.out.println(String.format("Intraplan sum: %s", MatrixOperations.sum(m1)));
+		System.out.println(String.format("%s sum: %s", runId, MatrixOperations.sum(m2)));
 
-		KeyMatrix mErr = MatrixOpertaions.errorMatrix(m1, m2);
+		KeyMatrix mErr = MatrixOperations.errorMatrix(m1, m2);
 		writeErrorRank(mErr, m1, m2, zones);
 
 		KeyMatrix itp_d = distanceMatrix(m1, zones);
@@ -109,7 +109,7 @@ public class MatrixCompare2 {
 
 		KeyMatrix m_d = distanceMatrix(m2, zones);
 		hist = writeDistanceHist(m2, m_d);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.txt");
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.stat.txt");
 		
 		System.out.println(String.format("PKM Intraplan (> 100 KM): %s", pkm(m1, itp_d)));
 		System.out.println(String.format("PKM matsim (> 100 KM): %s", pkm(m2, m_d)));
@@ -224,8 +224,8 @@ public class MatrixCompare2 {
 					Coordinate pj = ls.getCoordinateN(1);
 //					double d = dia.getLength();
 					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
-					m_d.set(i, j, d/2.0);
-//					m_d.set(i, j, -1.0);
+//					m_d.set(i, j, d/2.0);
+					m_d.set(i, j, -1.0);
 				} else {
 				Point pi = zones.get(i).getGeometry().getCentroid();
 				Point pj = zones.get(j).getGeometry().getCentroid();

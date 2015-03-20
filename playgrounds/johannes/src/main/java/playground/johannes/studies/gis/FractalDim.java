@@ -38,10 +38,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.sna.util.TXTWriter;

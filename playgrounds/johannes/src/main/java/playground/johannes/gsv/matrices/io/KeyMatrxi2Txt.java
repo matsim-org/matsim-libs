@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Set;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.ODMatrixXMLReader;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
  *
  */
-public class AverageMatrices {
+public class KeyMatrxi2Txt {
 
-	public static void main(String[] args) {
-		ODMatrixXMLReader reader = new ODMatrixXMLReader();
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/miv.512.xml");
-		KeyMatrix m1 = reader.getMatrix().toKeyMatrix("gsvId");
+		reader.parse("/home/johannes/sge/prj/synpop/run/753/output/miv.work.xml");
+		KeyMatrix m = reader.getMatrix();
+
+		playground.johannes.gsv.zones.MatrixOperations.applyFactor(m, 11);
+		playground.johannes.gsv.zones.MatrixOperations.applyDiagonalFactor(m, 1.25);
 		
-		reader = new ODMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/miv.521.xml");
-		KeyMatrix m2 = reader.getMatrix().toKeyMatrix("gsvId");
-		
-		List<KeyMatrix> list = new ArrayList<>(2);
-		list.add(m1);
-		list.add(m2);
-		
-		KeyMatrix avr = MatrixOpertaions.average(list);
-		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(avr, "/home/johannes/gsv/matrices/miv.avr.xml");
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/sge/prj/synpop/run/753/output/miv.work.txt"));
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					writer.write(i);
+					writer.write(" ");
+					writer.write(j);
+					writer.write(" ");
+					writer.write(String.valueOf(val));
+					writer.newLine();
+				}
+			}
+		}
+		writer.close();
 	}
+
 }

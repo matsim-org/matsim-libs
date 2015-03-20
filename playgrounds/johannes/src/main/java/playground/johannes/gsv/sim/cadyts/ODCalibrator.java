@@ -19,13 +19,20 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -34,82 +41,117 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 /**
  * @author johannes
  * 
  */
 public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+	
+	public static final String VIRTUAL_ID_PREFIX = "virtual";
 
+	public static final String ZONE_ID_KEY = "gsvId";
+	
 	private static final Logger logger = Logger.getLogger(ODCalibrator.class);
 
 	private final Network network;
 
-	private final Map<Node, Node> real2virtual;
+//	private final Map<Node, Node> real2virtual;
 
 	private final PlanToPlanStepBasedOnEvents p2p;
 
 	private final SimResultsAdaptor adaptor;
 
-	private final Map<Id<Person>, Node> person2Node;
+//	private final Map<Id<Person>, Node> person2Node;
 
 	private final double scaleFactor;
+	
+	private ZoneCollection zones;
+	
+	private Set<Person> candidates;
+	
+	private final Map<Id<Person>, Integer> person2LegIndex = new ConcurrentHashMap<>();
+	
+	private Map<Id<ActivityFacility>, Node> facility2Node = new IdentityHashMap<>();
+	
+	private final Population population;
 
-	public ODCalibrator(Network network, CadytsContext cadytsContext, KeyMatrix odMatrix, ZoneCollection zones) {
-		this.network = network;
+	public ODCalibrator(Scenario scenario, CadytsContext cadytsContext, KeyMatrix odMatrix, ZoneCollection zones, double distThreshold, double countThreshold, String aggKey) {
+		this.network = scenario.getNetwork();
 		this.p2p = (PlanToPlanStepBasedOnEvents) cadytsContext.getPlansTranslator();
 		this.adaptor = cadytsContext.getSimResultsAdaptor();
 		this.scaleFactor = cadytsContext.getScalingFactor();
 
-		this.person2Node = new IdentityHashMap<>();
-		this.real2virtual = new IdentityHashMap<>();
-
-		buildVirtualNetwork(odMatrix, zones, cadytsContext.getCounts());
+//		this.person2Node = new IdentityHashMap<>();
+//		this.real2virtual = new IdentityHashMap<>();
+		this.zones = zones;
+		this.population = scenario.getPopulation();
+		
+		this.zones.setPrimaryKey(ZONE_ID_KEY);
+		odMatrix = buildCalibrationMatrix(odMatrix, scenario, distThreshold, countThreshold, aggKey);
+		buildVirtualNetwork(odMatrix, cadytsContext.getCounts(), scenario.getActivityFacilities());
+		determineCandidates(zones, scenario.getPopulation(), distThreshold);
 	}
 
-	private void buildVirtualNetwork(KeyMatrix odMartix, ZoneCollection zones, Counts counts) {
-		zones.setPrimaryKey("gsvId");
+	private void buildVirtualNetwork(KeyMatrix odMartix, Counts counts, ActivityFacilities facilities) {
+		logger.info("Building virutal network...");
+		
 		Set<String> keys = odMartix.keys();
 		Map<String, Node> key2Node = new HashMap<String, Node>();
 
 		for (String key : keys) {
 			Zone zone = zones.get(key);
-			Id<Node> nodeId = Id.createNodeId(String.format("virtual.%s", zone.getAttribute("nuts3_name")));
+			Id<Node> nodeId = Id.createNodeId(String.format("%s.%s", VIRTUAL_ID_PREFIX, zone.getAttribute(ZONE_ID_KEY)));
 			Node node = network.getFactory().createNode(nodeId, MatsimCoordUtils.pointToCoord(zone.getGeometry().getCentroid()));
 			network.addNode(node);
 			key2Node.put(key, node);
-		}
 
+		}
+		logger.info(String.format("Created %s virtual nodes.", keys.size()));
+
+		int cnt = 0;
 		for (String i : keys) {
 			for (String j : keys) {
 				if (i != j) {
 					Double volume = odMartix.get(i, j);
-					if (volume == null)
-						volume = 0.0;
-					
-					if (Math.floor(volume / scaleFactor) > 5.0) {
+					if (volume != null) {
 						Node ni = key2Node.get(i);
 						Node nj = key2Node.get(j);
-						Id<Link> linkId = Id.createLinkId(String.format("virtual.%s.%s", i, j));
+						Id<Link> linkId = Id.createLinkId(String.format("%s.%s.%s", VIRTUAL_ID_PREFIX, i, j));
 						Link link = network.getFactory().createLink(linkId, ni, nj);
 						network.addLink(link);
-
+						cnt++;
+						
 						p2p.addCalibratedItem(link.getId());
 
 						Count count = counts.createAndAddCount(link.getId(), link.getId().toString());
 
-						volume = volume / scaleFactor;
 						volume = volume / 24.0;
 						for (int h = 1; h < 25; h++) {
 							count.createVolume(h, volume);
@@ -118,55 +160,343 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 				}
 			}
 		}
-
+		logger.info(String.format("Created %s virtual links.", cnt));
 		
-		int cnt = 0;
-		for (Node node : network.getNodes().values()) {
-			Zone zone = zones.get(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
+		logger.info("Assigning facilities to virtual node.");
+		ProgressLogger.init(facilities.getFacilities().size(), 2, 10);
+		cnt = 0;
+		for (ActivityFacility fac : facilities.getFacilities().values()) {
+			Coordinate c = new Coordinate(fac.getCoord().getX(), fac.getCoord().getY());
+			Zone zone = zones.get(c);
 			if (zone != null) {
-				Node vNode = key2Node.get(zone.getAttribute("gsvId"));
-				real2virtual.put(node, vNode);
+				Node vNode = key2Node.get(zone.getAttribute(ZONE_ID_KEY));
+				facility2Node.put(fac.getId(), vNode);
 			} else {
 				cnt++;
 			}
+			ProgressLogger.step();
 		}
-
-		if (cnt > 0) {
-			logger.warn(String.format("%s nodes cannot be assigned to a virtual node.", cnt));
+		ProgressLogger.termiante();
+		
+		if(cnt > 0) {
+			logger.warn(String.format("%s facilities cannot be assigned to a virtual node.", cnt));
 		}
+//		
+//		for (Node node : network.getNodes().values()) {
+//			Zone zone = zones.get(new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
+//			if (zone != null) {
+//				Node vNode = key2Node.get(zone.getAttribute(ZONE_ID_KEY));
+//				real2virtual.put(node, vNode);
+//			} else {
+//				cnt++;
+//			}
+//		}
+//
+//		if (cnt > 0) {
+//			logger.warn(String.format("%s nodes cannot be assigned to a virtual node.", cnt));
+//		}
 	}
 
 	@Override
 	public void reset(int iteration) {
 		adaptor.resetVirtualCounts();
-		person2Node.clear();
+//		person2Node.clear();
+		person2LegIndex.clear();
 
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Node startNode = person2Node.remove(event.getPersonId());
-		Node endNode = network.getLinks().get(event.getLinkId()).getToNode();
+		Integer idx = person2LegIndex.get(event.getPersonId());
+		if(idx != null) {
+			if(event.getLegMode().equalsIgnoreCase("car")) {
+				Person person = population.getPersons().get(event.getPersonId());
+				Plan plan = person.getSelectedPlan();
+				Activity from = (Activity) plan.getPlanElements().get(idx - 1);
+				Activity to = (Activity) plan.getPlanElements().get(idx + 1);
+				
+//				Node startNode = person2Node.remove(event.getPersonId());
+//				Node endNode = network.getLinks().get(event.getLinkId()).getToNode();
 
-		Node vStart = real2virtual.get(startNode);
-		Node vEnd = real2virtual.get(endNode);
+//				Node vStart = real2virtual.get(startNode);
+//				Node vEnd = real2virtual.get(endNode);
 
-		if (vStart != null && vEnd != null) {
-			Link vLink = NetworkUtils.getConnectingLink(vStart, vEnd);
-			if (vLink != null) {
-				p2p.handleEvent(new PersonDepartureEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
-				p2p.handleEvent(new LinkLeaveEvent(event.getTime(), event.getPersonId(), vLink.getId(), null));
-				p2p.handleEvent(new PersonArrivalEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
+				Node vStart = facility2Node.get(from.getFacilityId());
+				Node vEnd = facility2Node.get(to.getFacilityId());
+				
+				if (vStart != null && vEnd != null) {
+					Link vLink = NetworkUtils.getConnectingLink(vStart, vEnd);
+					if (vLink != null) {
+						p2p.handleEvent(new PersonDepartureEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
+						p2p.handleEvent(new LinkLeaveEvent(event.getTime(), event.getPersonId(), vLink.getId(), null));
+						p2p.handleEvent(new PersonArrivalEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
 
-				adaptor.addVirtualCount(vLink);
+						adaptor.addVirtualCount(vLink);
+					}
+				}
+				
 			}
+		} else {
+			logger.error(String.format("No departure event for person %s found.", event.getPersonId()));
 		}
+		
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Node startNode = network.getLinks().get(event.getLinkId()).getFromNode();
-		person2Node.put(event.getPersonId(), startNode);
+		Integer idx = person2LegIndex.get(event.getPersonId());
+		if(idx == null) {
+			idx = 1;
+		} else {
+			idx += 2;
+		}
+		person2LegIndex.put(event.getPersonId(), idx);
+		
+//		if (event.getLegMode().equalsIgnoreCase("car")) {
+//			Node startNode = network.getLinks().get(event.getLinkId()).getFromNode();
+//			person2Node.put(event.getPersonId(), startNode);
+//		}
+	}
+	
+	private KeyMatrix buildCalibrationMatrix(KeyMatrix refMatrix, Scenario scenario, double distThreshold, double countThreshold, String aggKey) {
+		/*
+		 * remove reference relations below distance threshold
+		 */
+		logger.info(String.format("Removing entries below %.2f KM in reference matrix.", distThreshold/1000.0));
+		removeEntries(refMatrix, zones, distThreshold);
+		/*
+		 * aggregated if specified
+		 */
+		if(aggKey != null) {
+			refMatrix = MatrixOperations.aggregate(refMatrix, zones, aggKey);
+			zones = aggregateZones(zones, aggKey);
+		}
+		/*
+		 * build matrix from simulated plans
+		 */
+		logger.info("Building matrix from simulated plans...");
+		KeyMatrix simMatrix = plans2Matrix(scenario.getPopulation(), zones, scenario.getActivityFacilities(), distThreshold);
+		/*
+		 * calculate normalization
+		 */
+		double c_sim = MatrixOperations.sum(simMatrix);
+		double c_ref = MatrixOperations.sum(refMatrix);
+		double f = c_sim/c_ref;
+		logger.info(String.format("Trip sum simulated matrix = %s, trip sum reference matrix = %s, factor = %s", c_sim, c_ref, f));
+		/*
+		 * remove reference relations below count threshold
+		 */
+		int cnt = 0;
+		Set<String> keys = refMatrix.keys();
+		for (String i : keys) {
+			for (String j : keys) {
+				Double val = refMatrix.get(i, j);
+				if(val != null && val < countThreshold) {
+					refMatrix.set(i, j, null);
+					cnt++;
+				}
+			}
+		}
+		logger.info(String.format("Removed %s relations with less than %s trips.", cnt, countThreshold));
+		/*
+		 * normalize
+		 */
+		MatrixOperations.applyFactor(refMatrix, f);
+		MatrixOperations.applyFactor(refMatrix, scaleFactor);
+		/*
+		 * some statistics
+		 */
+		double min = Double.MAX_VALUE;
+		double max = 0;
+		for (String i : keys) {
+			for (String j : keys) {
+				Double val = refMatrix.get(i, j);
+				if(val != null) {
+					min = Math.min(min, val);
+					max = Math.max(max, val);
+				}
+			}
+		}
+		logger.info(String.format("Matrix entry stats: min = %s, max = %s", min, max));
+		
+		return refMatrix;
+	}
+	
+	private void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+		Set<String> keys = m.keys();
+		int cnt = 0;
+		for (String i : keys) {
+			for (String j : keys) {
+				Zone zone_i = zones.get(i);
+				Zone zone_j = zones.get(j);
 
+				if (zone_i != null && zone_j != null) {
+					Point pi = zone_i.getGeometry().getCentroid();
+					Point pj = zone_j.getGeometry().getCentroid();
+
+					double d = dCalc.distance(pi, pj);
+
+					if (d < distThreshold) {
+						Double val = m.get(i, j);
+						if (val != null) {
+							m.set(i, j, null);
+							cnt++;
+						}
+					}
+				}
+			}
+		}
+		
+		logger.info(String.format("Removed %s trips with less than %s KM.", cnt, distThreshold/1000.0));
+	}
+	
+	private KeyMatrix plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold) {
+		KeyMatrix m = new KeyMatrix();
+		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+//		candidates = new LinkedHashSet<>();
+		
+//		double minDist = Double.MAX_VALUE;
+		
+		ProgressLogger.init(pop.getPersons().size(), 2, 10);
+		
+		for(Person person : pop.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			for (int i = 1; i < plan.getPlanElements().size(); i += 2) {
+				Leg leg = (Leg) plan.getPlanElements().get(i);
+			
+				if (leg.getMode().equalsIgnoreCase("car")) {
+				
+					Activity orig = (Activity) plan.getPlanElements().get(i - 1);
+					Activity dest = (Activity) plan.getPlanElements().get(i + 1);
+
+					Id<ActivityFacility> origId = Id.create(orig.getFacilityId(), ActivityFacility.class);
+					ActivityFacility origFac = facilities.getFacilities().get(origId);
+
+					Id<ActivityFacility> destId = Id.create(dest.getFacilityId(), ActivityFacility.class);
+					ActivityFacility destFac = facilities.getFacilities().get(destId);
+
+					Point origPoint = MatsimCoordUtils.coordToPoint(origFac.getCoord());
+					Point destPoint = MatsimCoordUtils.coordToPoint(destFac.getCoord());
+					
+					Zone origZone = zones.get(origPoint.getCoordinate());
+					Zone destZone = zones.get(destPoint.getCoordinate());
+
+					if (origZone != null && destZone != null) {
+						double d = dCalc.distance(origPoint, destPoint);
+						if (d >= distThreshold) {
+							String id_i = origZone.getAttribute(ZONE_ID_KEY);
+							String id_j = destZone.getAttribute(ZONE_ID_KEY);
+							Double val = m.get(id_i, id_j);
+							if (val == null)
+								val = 0.0;
+							val++;
+							m.set(id_i, id_j, val);
+							
+//							candidates.add(person);
+							
+						}
+					}
+				}
+			}
+			ProgressLogger.step();
+		}
+		
+		ProgressLogger.termiante();
+		
+		return m;
+	}
+	
+	private ZoneCollection aggregateZones(ZoneCollection zones, String key) {
+		/*
+		 * collect zones according key
+		 */
+		Map<String, Set<Zone>> zonesMap = new HashMap<>();
+		for(Zone zone : zones.zoneSet()) {
+			String code = zone.getAttribute(key);
+			Set<Zone> set = zonesMap.get(code);
+			if(set == null) {
+				set = new HashSet<>();
+				zonesMap.put(code, set);
+			}
+			set.add(zone);
+		}
+		
+		ZoneCollection mergedZones = new ZoneCollection();
+		
+		for(Entry<String, Set<Zone>> entry : zonesMap.entrySet()) {
+			Set<Zone> set = entry.getValue();
+			Geometry refGeo = null;
+			for(Zone zone : set) {
+				if(refGeo != null) {
+					Geometry geo = zone.getGeometry();
+					refGeo  = refGeo.union(geo);
+				} else {
+					refGeo = zone.getGeometry();
+				}
+			}
+			
+			Zone zone = new Zone(refGeo);
+			zone.setAttribute(key, entry.getKey());
+			zone.setAttribute(ZONE_ID_KEY, entry.getKey());
+			mergedZones.add(zone);
+		}
+		mergedZones.setPrimaryKey(key);
+		
+		return mergedZones;
+	}
+	
+	public Set<Person> getCandidates() {
+		return candidates;
+	}
+	
+	private void determineCandidates(ZoneCollection zones, Population pop, double distThreshold) {
+		List<Zone> zoneList = new ArrayList<>(zones.zoneSet());
+		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+		double minZoneDist = Double.MAX_VALUE;
+		
+		logger.info("Calculating minimal zone distance...");
+		ProgressLogger.init(zoneList.size(), 2, 10);
+		for(int i = 0; i < zoneList.size(); i++) {
+			for(int j = i+1; j < zoneList.size(); j++) {
+				Zone zi = zoneList.get(i);
+				Zone zj = zoneList.get(j);
+				
+				double controidDist = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+				if(controidDist >= distThreshold) {
+					double d = DistanceOp.distance(zi.getGeometry(), zj.getGeometry());
+					minZoneDist = Math.min(minZoneDist, d);
+				}
+			}
+			ProgressLogger.step();
+		}
+		ProgressLogger.termiante();
+		
+		logger.info("Determining simulation candidates...");
+		candidates = new LinkedHashSet<>();
+		
+		ProgressLogger.init(pop.getPersons().size(), 2, 10);
+		for (Person person : pop.getPersons().values()) {
+			ObjectAttributes oatts = pop.getPersonAttributes();
+
+			List<Double> atts = (List<Double>) oatts.getAttribute(person.getId().toString(), CommonKeys.LEG_GEO_DISTANCE);
+			if (atts != null) {
+				for (Double d : atts) {
+					if (d != null && d >= minZoneDist) {
+						/*
+						 * do not add the foreign dummy persons
+						 */
+						if (!person.getId().toString().startsWith("foreign")) {
+							candidates.add(person);
+							break;
+						}
+					}
+				}
+			}
+			ProgressLogger.step();
+		}
+		ProgressLogger.termiante();
+		
+		logger.info(String.format("Determined %s simulation candidates.", candidates.size()));
 	}
 }

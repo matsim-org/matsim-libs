@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,56 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.Set;
+import java.util.List;
 
+import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixWriter;
+import org.matsim.visum.VisumMatrixReader;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ODMatrix2Visum {
+public class Visum2KeyMatrix {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Matrix m1 = new Matrix("1", null);
-
-		KeyMatrixXMLReader reader2 = new KeyMatrixXMLReader();
-		reader2.setValidating(false);
-		reader2.parse("/home/johannes/gsv/matrices/miv.avr.xml");
-		KeyMatrix m2 = reader2.getMatrix();
-
-		MatrixOpertaions.applyFactor(m2, 11.0);
-		MatrixOpertaions.applyDiagonalFactor(m2, 1.3);
+		Matrix visumMatrix = new Matrix("1", null);
+		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
+		reader.readFile("/home/johannes/gsv/matrices/analysis/marketShares/Split_IV_Modell.mtx");
 		
-		MatrixOpertaions.sysmetrize(m2);
+		KeyMatrix keyMatrix = new KeyMatrix();
 		
-		
-		Set<String> keys = m2.keys();
-		for (String i : keys) {
-			for (String j : keys) {
-				Double val = m2.get(i, j);
-				if (val != null) {
-					m1.createEntry(i, j, val);
-				}
+		for(List<Entry> entries : visumMatrix.getFromLocations().values()) {
+			for(Entry entry : entries) {
+				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
 			}
 		}
-
-		VisumMatrixWriter writer = new VisumMatrixWriter(m1);
-		writer.writeFile("/home/johannes/gsv/matrices/miv.avr.fma");
 		
-		KeyMatrixXMLWriter xmlWriter = new KeyMatrixXMLWriter();
-		xmlWriter.write(m2, "/home/johannes/gsv/matrices/miv.avr2.xml");
+//		for(List<Entry> entries : visumMatrix.getToLocations().values()) {
+//			for(Entry entry : entries) {
+//				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
+//			}
+//		}
+		
+		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		writer.write(keyMatrix, "/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
 	}
 
 }

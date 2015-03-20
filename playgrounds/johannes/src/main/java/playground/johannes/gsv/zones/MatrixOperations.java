@@ -25,14 +25,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
  * 
  */
-public class MatrixOpertaions {
+public class MatrixOperations {
 
 	public static KeyMatrix errorMatrix(KeyMatrix m1, KeyMatrix m2) {
 		KeyMatrix mErr = new KeyMatrix();
@@ -45,28 +47,53 @@ public class MatrixOpertaions {
 				Double val1 = m1.get(i, j);
 				Double val2 = m2.get(i, j);
 
-				if (!(val1 == null && val2 == null)) {
-					if (val1 == null)
-						val1 = new Double(0);
-					if (val2 == null)
-						val2 = new Double(0);
+				if (val1 == null)
+					val1 = new Double(0);
 
+				if (val2 == null)
+					val2 = new Double(0);
+
+				if (val1 == 0 && val2 == 0)
+					mErr.set(i, j, 0.0);
+				else if (val1 == 0) {
+					// do nothing
+				} else {
+//					if(val2 > 15) {
 					Double err = (val2 - val1) / val1;
-
-					if (val1 == 0 && val2 == 0)
-						err = new Double(0);
-
-					if (Double.isNaN(err)) {
-						System.out.println();
-					}
 					mErr.set(i, j, err);
+//					}
 				}
+
 			}
 		}
 
 		return mErr;
 	}
 
+	public static KeyMatrix diffMatrix(KeyMatrix m1, KeyMatrix m2) {
+		KeyMatrix mErr = new KeyMatrix();
+
+		Set<String> zones = new HashSet<>(m1.keys());
+		zones.addAll(m2.keys());
+
+		for (String i : zones) {
+			for (String j : zones) {
+				Double val1 = m1.get(i, j);
+				Double val2 = m2.get(i, j);
+
+				if (val1 == null)
+					val1 = new Double(0);
+
+				if (val2 == null)
+					val2 = new Double(0);
+				
+				mErr.set(i, j, val2 - val1);
+			}
+		}
+		
+		return mErr;
+	}
+	
 	public static void applyFactor(KeyMatrix m, double factor) {
 		Set<String> keys = m.keys();
 		for (String i : keys) {
@@ -102,6 +129,19 @@ public class MatrixOpertaions {
 			}
 		}
 
+		return sum;
+	}
+	
+	public static double diagonalSum(KeyMatrix m) {
+		double sum = 0;
+		Set<String> keys = m.keys();
+		for(String key : keys) {
+			Double val = m.get(key, key);
+			if(val != null) {
+				sum += val;
+			}
+		}
+		
 		return sum;
 	}
 
@@ -162,16 +202,18 @@ public class MatrixOpertaions {
 			}
 		}
 
-		for (String i : keys) {
-			for (String j : keys) {
-				avr.applyFactor(i, j, 1 / (double) matrices.size());
-			}
-		}
+//		for (String i : keys) {
+//			for (String j : keys) {
+//				avr.applyFactor(i, j, 1 / (double) matrices.size());
+//			}
+//		}
 
+		applyFactor(avr, 1/(double)matrices.size());
+		
 		return avr;
 	}
 
-	public static void sysmetrize(KeyMatrix m) {
+	public static void symetrize(KeyMatrix m) {
 		List<String> keys = new ArrayList<>(m.keys());
 
 		for (int i = 0; i < keys.size(); i++) {
@@ -187,30 +229,15 @@ public class MatrixOpertaions {
 					val2 = 0.0;
 
 				double sum = val1 + val2;
-				// double p = Math.random() - 0.5;
-				//
-				// double f = 0.5 + (p * 0.1);
-				//
-				// double maxf = Math.max(f, 1-f);
-				//
-				// double v1;
-				// double v2;
-				//
-				// if(val1 < val2) {
-				// v1 = sum * maxf;
-				// v2 = sum * (1 - maxf);
-				// } else {
-				// v1 = sum * (1 - maxf);
-				// v2 = sum * maxf;
-				// }
-
-				m.set(key1, key2, sum / 2.0);
-				m.set(key2, key1, sum / 2.0);
+				if (sum > 0) {
+					m.set(key1, key2, sum / 2.0);
+					m.set(key2, key1, sum / 2.0);
+				}
 			}
 		}
 	}
 
-	public static KeyMatrix aggregate(KeyMatrix m, Map<String, Zone> zones, String key) {
+	public static KeyMatrix aggregate(KeyMatrix m, ZoneCollection zones, String key) {
 		KeyMatrix newM = new KeyMatrix();
 
 		Set<String> keys = m.keys();
@@ -221,14 +248,52 @@ public class MatrixOpertaions {
 					Zone zone_i = zones.get(i);
 					Zone zone_j = zones.get(j);
 
-					String att_i = zone_i.getAttribute(key);
-					String att_j = zone_j.getAttribute(key);
+					if (zone_i != null && zone_j != null) {
+						String att_i = zone_i.getAttribute(key);
+						String att_j = zone_j.getAttribute(key);
 
-					newM.add(att_i, att_j, val);
+						newM.add(att_i, att_j, val);
+					}
+				}
+			}
+		}
+
+		return newM;
+	}
+	
+	public static KeyMatrix merge(Collection<KeyMatrix> matrices) {
+		KeyMatrix sum = new KeyMatrix();
+		
+		for(KeyMatrix m : matrices) {
+			Set<String> keys = m.keys();
+			for(String i : keys) {
+				for(String j : keys) {
+					Double val = m.get(i, j);
+					if(val != null) {
+						Double sumVal = sum.get(i, j);
+						if(sumVal == null) sumVal = 0.0;
+						
+						sum.set(i, j, sumVal + val);
+					}
 				}
 			}
 		}
 		
-		return newM;
+		return sum;
+	}
+	
+	public static void randomize(KeyMatrix m, double fraction) {
+		Set<String> keys = m.keys();
+		Random random = new XORShiftRandom();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					double f = (random.nextDouble() - 1) * 2 * fraction;
+					double v = val + (val * f);
+					m.set(i, j, v);
+				}
+			}
+		}
 	}
 }

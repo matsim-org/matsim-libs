@@ -63,7 +63,8 @@ public class CopyAttributes {
 		int cnt = 0;
 		ProgressLogger.init(persons.size(), 2, 10);
 		for (ProxyPerson person : persons) {
-			String id = person.getId();//extractId(person);
+//			String id = person.getId();
+			String id = extractId(person);
 			ProxyPerson template = templates.get(id);
 
 			if (template != null) {

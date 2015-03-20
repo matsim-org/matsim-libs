@@ -55,10 +55,24 @@ public class ChoiceSet<T> {
 	}
 	
 	public void addChoice(T choice, double weight) {
+		if(weight < 0) throw new IllegalArgumentException("Negative weight not allowed.");
+		
 		options.add(choice);
 		weights.add(weight);
 		
 		weightSum += weight;
+	}
+	
+	public boolean removeChoice(T choice) {
+		int idx = options.indexOf(choice);
+		if(idx >= 0) {
+			options.remove(idx);
+			double w = weights.remove(idx);
+			weightSum -= w;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public List<T> getChoices() {

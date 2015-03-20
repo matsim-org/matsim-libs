@@ -19,65 +19,70 @@
 
 package playground.johannes.gsv.zones;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author johannes
  * 
  */
-public class KeyMatrix extends ObjectKeyMatrix<Double> {
+public class ObjectKeyMatrix<T> {
 
-//	private Map<String, Map<String, Double>> matrix;
+	private Map<String, Map<String, T>> matrix;
 	
-//	public KeyMatrix() {
-//		matrix = new HashMap<>();
-//	}
-	
-//	public Double set(String key1, String key2, Double value) {
-//		Map<String, Double> col = matrix.get(key1);
-//		if(col == null) {
-//			col = new HashMap<String, Double>();
-//			matrix.put(key1, col);
-//		}
-//		
-//		return col.put(key2, value);
-//	}
-	
-	public Double add(String key1, String key2, double value) {
-		Double val = get(key1, key2);
-		if(val == null) {
-			return set(key1, key2, value);
-		} else {
-			return set(key1, key2, val + value);
-		}
+	public ObjectKeyMatrix() {
+		matrix = new HashMap<>();
 	}
-
-//	public Double get(String key1, String key2) {
-////		Map<String, Double> row = matrix.get(key1);
-//		Map<String, Double> row = getRow(key1);
-//		if(row == null) {
-//			return null;
+	
+	public T set(String key1, String key2, T value) {
+		Map<String, T> col = matrix.get(key1);
+		if(col == null) {
+			col = new HashMap<String, T>();
+			matrix.put(key1, col);
+		}
+		
+		return col.put(key2, value);
+	}
+	
+//	public T add(String key1, String key2, T value) {
+//		T val = get(key1, key2);
+//		if(val == null) {
+//			return set(key1, key2, value);
 //		} else {
-//			return row.get(key2);
+//			return set(key1, key2, val + value);
 //		}
 //	}
-	
-//	public Map<String, Double> getRow(String key) {
-//		return matrix.get(key);
-//	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
-		if(val != null) {
-			set(i, j, val * factor);
+
+	public T get(String key1, String key2) {
+//		Map<String, Double> row = matrix.get(key1);
+		Map<String, T> row = getRow(key1);
+		if(row == null) {
+			return null;
+		} else {
+			return row.get(key2);
 		}
 	}
 	
-//	public Set<String> keys() {
-//		Set<String> keys = new HashSet<>(matrix.keySet());
-//		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-//			keys.addAll(entry.getValue().keySet());
+	public Map<String, T> getRow(String key) {
+		return matrix.get(key);
+	}
+	
+//	public void applyFactor(String i, String j, T factor) {
+//		Double val = get(i, j);
+//		if(val != null) {
+//			set(i, j, val * factor);
 //		}
-//		
-//		return keys;
 //	}
+	
+	public Set<String> keys() {
+		Set<String> keys = new HashSet<>(matrix.keySet());
+		for(Entry<String, Map<String, T>> entry : matrix.entrySet()) {
+			keys.addAll(entry.getValue().keySet());
+		}
+		
+		return keys;
+	}
 }

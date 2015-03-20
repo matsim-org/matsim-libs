@@ -47,7 +47,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOpertaions;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
@@ -105,8 +105,8 @@ public class AdjustFacilitiesFromMatrix {
 		logger.info("Adjusting facilitites...");
 		
 		Random random = new XORShiftRandom();
-		double c = MatrixOpertaions.sum(m) / scenario.getActivityFacilities().getFacilities().size();
-		TObjectDoubleHashMap<String> marginals = MatrixOpertaions.marginalsCol(m);
+		double c = MatrixOperations.sum(m) / scenario.getActivityFacilities().getFacilities().size();
+		TObjectDoubleHashMap<String> marginals = MatrixOperations.marginalsCol(m);
 
 		for (Zone zone : zones.zoneSet()) {
 			String name = zone.getAttribute("nuts3_name");

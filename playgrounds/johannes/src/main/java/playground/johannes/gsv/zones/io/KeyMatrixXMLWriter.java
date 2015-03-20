@@ -21,6 +21,7 @@ package playground.johannes.gsv.zones.io;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -45,8 +46,9 @@ public class KeyMatrixXMLWriter extends MatsimXmlWriter {
 	
 	
 	protected void writeEntries(KeyMatrix m) {
-		for(String i : m.keys()) {
-			for(String j : m.keys()) {
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
 				Double val = m.get(i, j);
 				if(val != null) {
 					List<Tuple<String, String>> atts = new ArrayList<>(3);

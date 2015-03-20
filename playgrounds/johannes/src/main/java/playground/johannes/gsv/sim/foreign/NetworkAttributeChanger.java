@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.mid.run;
+package playground.johannes.gsv.sim.foreign;
 
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author johannes
  *
  */
-public class ExtractStatePopulation {
+public class NetworkAttributeChanger {
 
-	private static final Logger logger = Logger.getLogger(ExtractStatePopulation.class);
-	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String infile = args[0];
-		String outfile = args[1];
-		String state = args[2];
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		XMLParser parser = new XMLParser();
-		parser.setValidating(false);
-	
-		logger.info("Loading persons...");
-		parser.parse(infile);
-		Set<ProxyPerson> persons = parser.getPersons();
-		logger.info(String.format("Loaded %s persons.", persons.size()));
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		reader.parse("/home/johannes/sge/prj/matsim/run/632/output/network.xml");
 		
-		logger.info("Applying filter...");
-		persons = ProxyTaskRunner.runAndDeletePerson(new DeletePersonKeyValue("state", state), persons);
-		logger.info(String.format("Population size: %s", persons.size()));
+		for(Link link : scenario.getNetwork().getLinks().values()) {
+			if(link.getId().toString().contains(".l")) {
+				link.setFreespeed(30/3.6);
+//				link.setLength(9999999);
+			}
+		}
 		
-		XMLWriter writer = new XMLWriter();
-		writer.write(outfile, persons);
+		NetworkWriter writer = new NetworkWriter(scenario.getNetwork());
+		writer.write("/home/johannes/sge/prj/matsim/run/632/output/network2.xml");
 	}
 
 }

@@ -186,14 +186,18 @@ public class NetworkExtender {
 		Id<Link> linkId = Id.createLinkId(String.format("%s.l%s", id, 0));
 		Link fLink1 = network.getFactory().createLink(linkId, centroidNode, neighbourNode);
 		fLink1.setLength(1);
+//		fLink1.setLength(9999999);
 		fLink1.setCapacity(99999);
 		fLink1.setFreespeed(120 / 3.6);
+//		fLink1.setFreespeed(1);
 
 		linkId = Id.createLinkId(String.format("%s.l%s", id, 1));
 		Link fLink2 = network.getFactory().createLink(linkId, neighbourNode, centroidNode);
 		fLink2.setLength(1);
+		fLink2.setLength(9999999);
 		fLink2.setCapacity(99999);
 		fLink2.setFreespeed(120 / 3.6);
+//		fLink2.setFreespeed(1);
 
 		network.addLink(fLink1);
 		network.addLink(fLink2);

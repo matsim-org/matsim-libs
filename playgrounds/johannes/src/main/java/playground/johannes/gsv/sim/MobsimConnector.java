@@ -27,14 +27,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.Vehicle;
+
+import playground.johannes.gsv.sim.cadyts.CadytsContext;
+import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 
 /**
  * @author johannes
@@ -52,11 +53,18 @@ public class MobsimConnector implements Mobsim {
 	
 	private final TravelTime roadTravelTimes;
 	
-	public MobsimConnector(Scenario scenario, EventsManager eventsManager) {
+	private CadytsContext cadytsContext;
+	
+	private boolean replanCandidates;
+	
+	public MobsimConnector(Scenario scenario, EventsManager eventsManager, CadytsContext cadytsContext, boolean replanCanditates) {
 		sim = new ParallelPseudoSim(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		roadTravelTimes = MobsimConnectorFactory.getTravelTimeCalculator(1.5);
+		
+		this.cadytsContext = cadytsContext;
+		this.replanCandidates = replanCanditates;
 	}
 	
 	/* (non-Javadoc)
@@ -66,14 +74,20 @@ public class MobsimConnector implements Mobsim {
 	public void run() {
 		logger.info("Running pseudo mobility simulation...");
 		Population pop = scenario.getPopulation();
+		
 		Set<Plan> plans = new LinkedHashSet<Plan>(pop.getPersons().size());
 		
-		for(Person person : pop.getPersons().values()) {
-			plans.add(person.getSelectedPlan());
+		if (cadytsContext.getODCalibrator() != null && replanCandidates) {
+			logger.info(String.format("ODCalibrator active, simulating %s persons.", cadytsContext.getODCalibrator().getCandidates().size()));
+			for (Person person : cadytsContext.getODCalibrator().getCandidates()) {
+				plans.add(person.getSelectedPlan());
+			}
+		} else {
+			for (Person person : pop.getPersons().values()) {
+				plans.add(person.getSelectedPlan());
+			}
 		}
 		
 		sim.run(plans, scenario.getNetwork(), roadTravelTimes, eventsManager);
 	}
-
-	
 }

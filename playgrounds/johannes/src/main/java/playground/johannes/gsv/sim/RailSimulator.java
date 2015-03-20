@@ -22,6 +22,10 @@
  */
 package playground.johannes.gsv.sim;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -45,11 +49,12 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.gsv.analysis.*;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import playground.johannes.gsv.analysis.KMLRailCountsWriter;
+import playground.johannes.gsv.analysis.LineSwitchTask;
+import playground.johannes.gsv.analysis.ModeShareTask;
+import playground.johannes.gsv.analysis.PKmAnalyzer;
+import playground.johannes.gsv.analysis.RailCounts;
+import playground.johannes.gsv.analysis.TransitLineAttributes;
 
 /**
  * @author johannes

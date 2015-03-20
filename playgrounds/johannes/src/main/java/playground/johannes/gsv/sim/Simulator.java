@@ -51,6 +51,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -84,6 +85,7 @@ import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
+import playground.johannes.gsv.sim.cadyts.ODAdjustorListener;
 import playground.johannes.gsv.synPop.Proxy2Matsim;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -101,7 +103,10 @@ public class Simulator {
 		Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
-		controler.setMobsimFactory(new MobsimConnectorFactory());
+		
+		boolean replanCandidates = Boolean.parseBoolean(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "replanCandidates"));
+		MobsimConnectorFactory mobSimFac = new MobsimConnectorFactory(replanCandidates);
+		controler.setMobsimFactory(mobSimFac);
 		
 		/*
 		 * setup mutation module
@@ -149,6 +154,7 @@ public class Simulator {
 		controler.getEvents().addHandler(calculator);
 		if (!disableCadyts) {
 			CadytsContext context = new CadytsContext(controler.getScenario().getConfig(), null, calculator);
+			mobSimFac.setCadytsContext(context);
 			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getScenario().getNetwork()));
 
 			controler.addControlerListener(context);
@@ -227,8 +233,8 @@ public class Simulator {
 			logger.info("Setting up analysis modules...");
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
-			task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
-			task.addTask(new ScoreTask());
+//			task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
+//			task.addTask(new ScoreTask());
 			task.addTask(new PkmGeoTask(controler.getScenario().getActivityFacilities()));
 			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0));
 			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0.5));
@@ -237,17 +243,24 @@ public class Simulator {
 			// task.addTask(new ActivityDurationTask());
 			// task.addTask(new ActivityLoadTask());
 			// task.addTask(new LegLoadTask());
-			task.addTask(new TripDurationTask());
-			task.addTask(new TripPurposeShareTask());
+//			task.addTask(new TripDurationTask());
+//			task.addTask(new TripPurposeShareTask());
 			// task.addTask(new LegFrequencyTask());
 			task.addTask(new TripCountTask());
 
 			AnalyzerListiner listener = new AnalyzerListiner();
 			listener.task = task;
 			listener.controler = controler;
+			listener.interval = 5;
 			listener.notifyStartup(event);
 
 			controler.addControlerListener(listener);
+			/*
+			 * Setup ODAdjustor
+			 */
+			logger.info("Setting up ODAdjustor...");
+			ODAdjustorListener odAdjustor = new ODAdjustorListener(controler);
+			controler.addControlerListener(odAdjustor);
 		}
 
 	}
@@ -301,11 +314,15 @@ public class Simulator {
 		private TrajectoryAnalyzerTask task;
 
 		private TrajectoryEventsBuilder builder;
+		
+		private int interval;
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
-				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+				if (event.getIteration() % interval == 0) {
+					TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+				}
 
 			} catch (IOException e) {
 				e.printStackTrace();

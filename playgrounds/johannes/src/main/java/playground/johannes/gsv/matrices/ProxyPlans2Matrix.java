@@ -45,6 +45,8 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
@@ -66,6 +68,8 @@ public class ProxyPlans2Matrix {
 	private Predicate predicate;
 
 	private MathTransform transform;
+	
+//	private int validTrips;
 
 	public ProxyPlans2Matrix(Predicate predicate) {
 		setPredicate(predicate);
@@ -130,6 +134,7 @@ public class ProxyPlans2Matrix {
 							}
 
 							m.set(key1, key2, ++val);
+//							validTrips++;
 						} else {
 							noZones++;
 						}
@@ -147,12 +152,13 @@ public class ProxyPlans2Matrix {
 
 		logger.info(String.format("Processed %s legs.", legs));
 		logger.info(String.format("Processed %s car trips.", trips));
+//		logger.info(String.format("Processed %s car trips.", trips));
 
 		return m;
 	}
 
 	public static void main(String args[]) throws IOException {
-		String key = "gsvId";
+		String key = args[3];
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -172,20 +178,19 @@ public class ProxyPlans2Matrix {
 		parser.parse(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-//		Set<ProxyPlan> plans = new HashSet<>(parser.getPersons().size());
-//		for (ProxyPerson person : parser.getPersons()) {
-//			plans.add(person.getPlans().get(0));
-//		}
 		Set<ProxyPerson> persons = parser.getPersons();
 
-		String outdir = args[3];
+		logger.info("Restoring original activity types...");
+		ProxyTaskRunner.run(new RestoreActTypes(), persons, true);
+		
+		String outdir = args[4];
 
 		ModePredicate modePred = new ModePredicate("car");
 		ProxyPlans2Matrix p2m = new ProxyPlans2Matrix(modePred);
 		/*
 		 * all car
 		 */
-		logger.info("Extraction total matrix...");
+		logger.info("Extracting total matrix...");
 		KeyMatrix m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
 		writer.write(m, String.format("%s/miv.xml", outdir));
@@ -207,7 +212,7 @@ public class ProxyPlans2Matrix {
 		/*
 		 * one-day leisure
 		 */
-		logger.info("Extracting matrix private...");
+		logger.info("Extracting matrix leisure...");
 		types = new String[] { "leisure", "visit", "gastro", "culture", "private", "pickdrop", "sport" };
 		PredicateORComposite predOR = new PredicateORComposite();
 		for (String type : types) {
@@ -223,24 +228,39 @@ public class ProxyPlans2Matrix {
 
 		writer.write(m, String.format("%s/miv.leisure.xml", outdir));
 		/*
+		 * wecommuter
+		 */
+		logger.info("Extracting matrix wecommuter...");
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(new WeCommuterPredicate(100000));
+		p2m.setPredicate(pred);
+		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+		writer.write(m, String.format("%s/miv.wecommuter.xml", outdir));
+		/*
 		 * days
 		 */
 		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY};
 		for(String day : days) {
 			logger.info(String.format("Extracting matrix %s...", day));
-			DayPredicate dayPred = new DayPredicate(day);
-			p2m.setPredicate(dayPred);
+			pred = new PredicateANDComposite();
+			pred.addComponent(modePred);
+			pred.addComponent(new DayPredicate(day));
+			p2m.setPredicate(pred);
 			m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 			writer.write(m, String.format("%s/miv.%s.xml", outdir, day));
 			
 		}
 		
 		logger.info("Extracting matrix di-mi-do...");
+		pred = new PredicateANDComposite();
 		predOR = new PredicateORComposite();
 		predOR.addComponent(new DayPredicate(CommonKeys.TUESDAY));
 		predOR.addComponent(new DayPredicate(CommonKeys.WEDNESDAY));
 		predOR.addComponent(new DayPredicate(CommonKeys.THURSDAY));
-		p2m.setPredicate(predOR);
+		pred.addComponent(modePred);
+		pred.addComponent(predOR);
+		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.dimido.xml", outdir));
 		/*
@@ -252,7 +272,10 @@ public class ProxyPlans2Matrix {
 		for(String month : months) {
 			predOR.addComponent(new MonthPredicate(month));
 		}
-		p2m.setPredicate(predOR);
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(predOR);
+		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.summer.xml", outdir));
 		
@@ -262,19 +285,28 @@ public class ProxyPlans2Matrix {
 		for(String month : months) {
 			predOR.addComponent(new MonthPredicate(month));
 		}
-		p2m.setPredicate(predOR);
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(predOR);
+		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.winter.xml", outdir));
 		/*
 		 * directions
 		 */
 		logger.info("Extracting matrix from home...");
-		p2m.setPredicate(new FromHomePredicate());
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(new FromHomePredicate());
+		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.fromHome.xml", outdir));
 		
 		logger.info("Extracting matrix to home...");
-		p2m.setPredicate(new ToHomePredicate());
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(new ToHomePredicate());
+		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.toHome.xml", outdir));
 	}

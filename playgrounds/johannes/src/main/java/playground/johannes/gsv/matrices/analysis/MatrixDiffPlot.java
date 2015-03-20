@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.analysis;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,6 +30,7 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 
+import playground.johannes.gsv.matrices.MatrixOperations;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -39,76 +40,77 @@ import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
  * @author johannes
  * 
  */
-public class MatrixPlot {
+public class MatrixDiffPlot {
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
-		Matrix m = new Matrix("1", null);
-		VisumMatrixReader reader = new VisumMatrixReader(m);
-		reader.readFile("/home/johannes/gsv/matrices/miv.319.fma");
-
-		ZoneLayer<Map<String, Object>> zonelayer = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+	public static ZoneLayer<Map<String, Object>> diffLayer(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zonelayer) {
 		zonelayer.overwriteCRS(CRSUtils.getCRS(4326));
 		Set<Zone<Map<String, Object>>> zones = new HashSet<>();
-		
-		double minS = Double.MAX_VALUE;
-		double maxS = Double.MIN_VALUE;
-		
-		double minT = Double.MAX_VALUE;
-		double maxT = Double.MIN_VALUE;
-		
+
 		for (Zone<Map<String, Object>> zone : zonelayer.getZones()) {
 			String code = zone.getAttribute().get("ISO_CODE").toString();
 			if (code.equalsIgnoreCase("DE")) {
 				String id = zone.getAttribute().get("NO").toString();
 
-				List<Entry> entries = m.getFromLocEntries(id);
-				double sum = 0;
-				if (entries != null) {
-					for (Entry e : entries) {
-//						if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
-							sum += e.getValue();
-//						}
-					}
-				}
-				minS = Math.min(minS, sum);
-				maxS = Math.max(maxS, sum);
-				
+				double fromSum1 = sum(m1.getFromLocEntries(id), false);
+				double fromSum2 = sum(m2.getFromLocEntries(id), false);
+
 				Zone<Map<String, Object>> newZone = new Zone<>(zone.getGeometry());
 				zones.add(newZone);
 				newZone.setAttribute(new HashMap<String, Object>());
-				newZone.getAttribute().put("SOURCE_VOL", sum);
-
-				entries = m.getToLocEntries(id);
-				sum = 0;
-				if (entries != null) {
-					for (Entry e : entries) {
-//						if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
-							sum += e.getValue();
-//						}
-					}
-				}
-				minT = Math.min(minT, sum);
-				maxT = Math.max(maxT, sum);
+				double err = (fromSum2 - fromSum1) / fromSum1;
+				newZone.getAttribute().put("SOURCE_ERR", err);
 				
-				newZone.getAttribute().put("TARGET_VOL", sum);
+
+				double toSum1 = sum(m1.getToLocEntries(id), false);
+				double toSum2 = sum(m2.getToLocEntries(id), false);
+				err = (toSum2 - toSum1) / toSum1;
+
+				newZone.getAttribute().put("TARGET_ERR", err);
+				newZone.getAttribute().put("LABEL", String.format("%.2f / %.2f / %.2f", err, toSum1, toSum2));
+				
+				zones.add(newZone);
 			}
 		}
-		for(Zone<Map<String, Object>> zone : zones) {
-			double val = (Double) zone.getAttribute().get("SOURCE_VOL");
-			zone.getAttribute().put("SOURCE_VOL", val/maxS);
-			
-			val = (Double) zone.getAttribute().get("TARGET_VOL");
-			zone.getAttribute().put("TARGET_VOL", val/maxT);
-		}
-		
+
 		ZoneLayer<Map<String, Object>> newLayer = new ZoneLayer<>(zones);
 		newLayer.overwriteCRS(CRSUtils.getCRS(4326));
-		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/marginals.319.shp");
 
+		return newLayer;
 	}
 
+	private static double sum(List<Entry> entries, boolean ignoreIntracell) {
+		double sum = 0;
+		if (entries != null) {
+			for (Entry e : entries) {
+				if (ignoreIntracell) {
+					if (!e.getFromLocation().equalsIgnoreCase(e.getToLocation())) {
+						sum += e.getValue();
+					}
+				} else {
+					sum += e.getValue();
+				}
+			}
+		}
+		return sum;
+	}
+
+	public static void main(String args[]) throws IOException {
+		Matrix m1 = new Matrix("2", null);
+		VisumMatrixReader reader = new VisumMatrixReader(m1);
+		reader.readFile("/home/johannes/gsv/matrices/itp.fma");
+
+		Matrix m2 = new Matrix("2", null);
+		reader = new VisumMatrixReader(m2);
+		reader.readFile("/home/johannes/gsv/matrices/miv.365.fma");
+
+		MatrixOperations.applyFactor(m1, 1 / 365.0);
+		MatrixOperations.applyFactor(m2, 12);
+		MatrixOperations.applyIntracellFactor(m2, 1.3);
+
+		ZoneLayer<Map<String, Object>> zonelayer = ZoneLayerSHP.read("/home/johannes/gsv/matrices/zones_zone.SHP");
+
+		ZoneLayer<Map<String, Object>> newLayer = diffLayer(m1, m2, zonelayer);
+
+		ZoneLayerSHP.writeWithAttributes(newLayer, "/home/johannes/gsv/matrices/diff.itp.365.shp");
+	}
 }

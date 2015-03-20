@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -83,6 +84,8 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 	private final Map<Person, double[]> targetDistances = new ConcurrentHashMap<>();
 	
 	private final Population population;
+	
+	private final AtomicInteger replanCnt;
 
 	public ActivityLocationStrategy(ActivityFacilities facilities, Population population, Random random, int numThreads, String blacklist, double mutationError) {
 		this.random = random;
@@ -92,6 +95,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 		this.population = population;
 		executor = Executors.newFixedThreadPool(numThreads);
 
+		replanCnt = new AtomicInteger(0);
 	}
 
 	@Override
@@ -175,6 +179,12 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 	@Override
 	protected void finalize() {
 		executor.shutdown();
+	}
+	
+	public int getAndResetReplanCount() {
+		int cnt = replanCnt.intValue();
+		replanCnt.set(0);
+		return cnt;
 	}
 
 	private class Task implements Runnable {
@@ -278,6 +288,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 						plan.getPlanElements().set(idx + 1, stages.get(0));
 					}
 					releaseTripRouter(router);
+					replanCnt.incrementAndGet();
 				}
 			}
 		}
