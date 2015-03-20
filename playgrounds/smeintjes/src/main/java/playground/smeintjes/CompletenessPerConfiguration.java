@@ -10,9 +10,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.ActivityFacility;
 
 import playground.southafrica.freight.digicore.algorithms.complexNetwork.DigicoreNetworkParser;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -94,15 +94,11 @@ public class CompletenessPerConfiguration {
 		//If it does, check if it lies in NMBM
 		//Change the boolean inArea accordingly
 		if (boundingBox.covers(activityPoint)) {
-//			LOG.info("Activity lies in the envelope of NMBM.");
 			if (area.covers(activityPoint)) {
-//				LOG.info("Activity lies in NMBM and should be included in the analysis.");
 				inArea = true;
 			} else {
-//				LOG.info("Activity lies in envelope but outside of NMBM.");
 			} 
 		} 
-//		else LOG.info("Activity not in envelope.");
 		
 			
 		return inArea;
@@ -127,15 +123,10 @@ public class CompletenessPerConfiguration {
 		
 		ArrayList<Tuple<Tuple<Double,Integer>, Double>> completenessResults = new ArrayList<Tuple<Tuple<Double,Integer>, Double>>();
 		double completeness = 1000.0; //initialise to a large value 
-//		boolean activityInList = false;
-//		Run for all combinations once code has been tested and is confirmed to work
-		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {1, 5, 10, 15, 20, 25};
 		
-		//For testing purposes
-//		double[] radii = {1};
-//		int[] pmins = {1, 5, 10, 15, 20, 25};
-//		
+		double[] radii = {10.0};
+		int[] pmins = {10};
+		
 		DigicoreVehicleReader dvr = new DigicoreVehicleReader();
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
@@ -159,24 +150,19 @@ public class CompletenessPerConfiguration {
 					List<DigicoreChain> digicoreChains = dv.getChains();
 					for (DigicoreChain digicoreChain : digicoreChains) {
 						List<DigicoreActivity> digicoreActivities = digicoreChain.getAllActivities();
-//						LOG.info("There are " + digicoreActivities.size() + " activities in this chain number" + digicoreChains.indexOf(digicoreChain));
 						for (DigicoreActivity digicoreActivity : digicoreActivities) {
 							boolean inArea = checkActivityInArea(area, digicoreActivity);
 							if (inArea == true) {
 								if (facilityIdList.contains(digicoreActivity.getFacilityId())) {
 									in++;
-									LOG.info("IN counter: " + in);
 								} 
 								total++;
-								LOG.info("TOTAL counter: " + total);
 							} 
 						} 
 						
 					}
 				
 				}
-				LOG.info("IN is " + in);
-				LOG.info("TOTAL is " + total);
 				completeness = (double) in/total;
 				LOG.info("Completeness for radius " + thisRadius + " and " + thisPmin + " is " + completeness);
 				Tuple<Double, Integer> combinationTuple = new Tuple<Double, Integer>(thisRadius, thisPmin);
