@@ -38,8 +38,15 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
-public class CheckPopulationPlans {
-	final private static Logger LOG = Logger.getLogger(CheckPopulationPlans.class);
+/**
+ * Class to analyse a given population for the purpose of evaluating the plans
+ * generation procedure. The results are used in the Joubert & Meintjes working
+ * paper #049 on activity chain generation. 
+ *
+ * @author jwjoubert
+ */
+public class PopulationPlanChecker {
+	final private static Logger LOG = Logger.getLogger(PopulationPlanChecker.class);
 	private static Geometry SA = null;
 	private static Geometry SA_ENVELOPE = null;
 	private static Geometry GAUTENG = null;
@@ -50,7 +57,7 @@ public class CheckPopulationPlans {
 	private static Geometry CAPETOWN_ENVELOPE = null;
 
 	public static void main(String[] args) {
-		Header.printHeader(CheckPopulationPlans.class.toString(), args);
+		Header.printHeader(PopulationPlanChecker.class.toString(), args);
 		
 		String population = args[0];
 		String shapefileFolder = args[1];
@@ -80,13 +87,13 @@ public class CheckPopulationPlans {
 		
 		setUpAreaGeometries(shapefileFolder);
 		
-		CheckPopulationPlans ctsa = new CheckPopulationPlans();
+		PopulationPlanChecker ctsa = new PopulationPlanChecker();
 		ctsa.processVehicles(sc.getPopulation(), outputFile, numberOfThreads);
 		
 		Header.printFooter();
 	}
 	
-	public CheckPopulationPlans() {
+	public PopulationPlanChecker() {
 
 	}
 	

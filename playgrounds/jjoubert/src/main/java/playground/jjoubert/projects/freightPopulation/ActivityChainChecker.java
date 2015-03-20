@@ -16,8 +16,6 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,8 +36,17 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
-public class CheckTestSetActivityChains {
-	final private static Logger LOG = Logger.getLogger(CheckTestSetActivityChains.class);
+/**
+ * Class to analyse a Digicore activity chains for the purpose of evaluating 
+ * the plans generation procedure. The results are used in the Joubert & 
+ * Meintjes working paper #049 on activity chain generation. This class is 
+ * meant to be executed for two subsets: the training and the test set of
+ * vehicles. 
+ *
+ * @author jwjoubert
+ */
+public class ActivityChainChecker {
+	final private static Logger LOG = Logger.getLogger(ActivityChainChecker.class);
 	private static List<String> ABNORMAL_LIST = null;
 	private static Geometry SA = null;
 	private static Geometry SA_ENVELOPE = null;
@@ -51,10 +58,10 @@ public class CheckTestSetActivityChains {
 	private static Geometry CAPETOWN_ENVELOPE = null;
 
 	public static void main(String[] args) {
-		Header.printHeader(CheckTestSetActivityChains.class.toString(), args);
+		Header.printHeader(ActivityChainChecker.class.toString(), args);
 		
 		String vehicleFolder = args[0];
-		String testSetIds = args[1];
+		String vehicleIds = args[1];
 		String abnormalDaysFile = args[2];
 		String shapefileFolder = args[3];
 		String outputFile = args[4];
@@ -64,7 +71,7 @@ public class CheckTestSetActivityChains {
 		FileUtils.delete(new File(outputFile));
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
-			bw.write("Id,day,hour,activities,extent,vkt");
+			bw.write("Id,day,dayType,hour,activities,extent,vkt");
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -80,7 +87,7 @@ public class CheckTestSetActivityChains {
 		
 		List<File> vehicles = null;
 		try {
-			vehicles = DigicoreUtils.readDigicoreVehicleIds(testSetIds, vehicleFolder);
+			vehicles = DigicoreUtils.readDigicoreVehicleIds(vehicleIds, vehicleFolder);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not read vehicle ids in test set.");
@@ -90,13 +97,13 @@ public class CheckTestSetActivityChains {
 		ABNORMAL_LIST = DigicoreUtils.readAbnormalDays(abnormalDaysFile);
 		setUpAreaGeometries(shapefileFolder);
 		
-		CheckTestSetActivityChains ctsa = new CheckTestSetActivityChains();
-		ctsa.processVehicles(vehicles, outputFile, numberOfThreads);
+		ActivityChainChecker acc = new ActivityChainChecker();
+		acc.processVehicles(vehicles, outputFile, numberOfThreads);
 		
 		Header.printFooter();
 	}
 	
-	public CheckTestSetActivityChains() {
+	public ActivityChainChecker() {
 
 	}
 	
@@ -288,6 +295,16 @@ public class CheckTestSetActivityChains {
 		return valid;
 	}
 	
+	private int getDayType(GregorianCalendar cal){
+		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		String s = DigicoreUtils.getShortDate(cal);
+		if(ABNORMAL_LIST.contains(s)){
+			dayOfWeek = 8;
+		}
+		
+		return dayOfWeek;
+	}
+	
 	
 	private class ProcessorCallable implements Callable<List<String>>{
 		private List<String> outputList = new ArrayList<String>();
@@ -310,23 +327,24 @@ public class CheckTestSetActivityChains {
 			/* Check each chain start date. */
 			for(DigicoreChain chain : dv.getChains()){
 				GregorianCalendar chainStart = chain.get(0).getEndTimeGregorianCalendar();
-				boolean isValid = isValidDay(chainStart);
-				if(isValid){
-					/* Get start hour. */
-					int hour = chainStart.get(Calendar.HOUR_OF_DAY);
-					
-					/* Get number of minor activities. */
-					int numberOfActivities = chain.getNumberOfMinorActivities();
-					
-					/* Evaluate the chain's geographic extent. */
-					String extent = evaluateExtent(chain);
+				
+				/* Get the day of the week, with '8' denoting an abnormal day. */
+				int dayOfWeek = getDayType(chainStart);
 
-					/* Get the estimated vehicle kilometers travelled. */
-					double vkt = estimateVkt(chain)/1000.0;
-
-					this.outputList.add(String.format("%s,%s,%d,%d,%s,%.2f\n", 
-							dv.getId().toString(), DigicoreUtils.getShortDate(chainStart), hour, numberOfActivities, extent, vkt));
-				}
+				/* Get start hour. */
+				int hour = chainStart.get(Calendar.HOUR_OF_DAY);
+				
+				/* Get number of minor activities. */
+				int numberOfActivities = chain.getNumberOfMinorActivities();
+				
+				/* Evaluate the chain's geographic extent. */
+				String extent = evaluateExtent(chain);
+				
+				/* Get the estimated vehicle kilometers travelled. */
+				double vkt = estimateVkt(chain)/1000.0;
+				
+				this.outputList.add(String.format("%s,%s,%d,%d,%d,%s,%.2f\n", 
+						dv.getId().toString(), DigicoreUtils.getShortDate(chainStart), dayOfWeek, hour, numberOfActivities, extent, vkt));
 			}
 			
 			counter.incCounter();
