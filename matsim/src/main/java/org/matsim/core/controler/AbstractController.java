@@ -30,8 +30,9 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractController {
-
-    private static class InterruptAndJoin extends Thread {
+	private static boolean dirtyShutdown = false ;
+	
+	private static class InterruptAndJoin extends Thread {
         private final Thread controllerThread;
         private AtomicBoolean unexpectedShutdown;
 
@@ -43,16 +44,23 @@ public abstract class AbstractController {
         @Override
         public void run() {
             log.error("received unexpected shutdown request.");
-            // Interrupt the controllerThread.
             unexpectedShutdown.set(true);
+            log.info("sending innterrupt request to controllerThread");
             controllerThread.interrupt();
-            try {
-                // Wait until it has shut down.
-                controllerThread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+            
+            if (!dirtyShutdown) {
+                // for me, the following code just makes the shutdown hang indefinitely (on mac, tested mostly with otfvis).
+            	// Therefore, now providing a switch.  kai, mar'15
+            	try {
+            		// Wait until it has shut down.
+            		log.info("waiting for controllerThread to terminate") ;
+            		controllerThread.join();
+            		log.info("controllerThread terminated") ;
+            	} catch (InterruptedException e) {
+            		throw new RuntimeException(e);
+            	}
+            	// The JVM will exit when this method returns.
             }
-            // The JVM will exit when this method returns.
         }
     }
 
@@ -355,6 +363,12 @@ public abstract class AbstractController {
 
 	public final Integer getIterationNumber() {
 		return this.thisIteration;
+	}
+
+
+	@SuppressWarnings("static-method")
+	public final void setDirtyShutdown(boolean dirtyShutdown) {
+		AbstractController.dirtyShutdown = dirtyShutdown;
 	}
 
 
