@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
@@ -96,7 +97,8 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+//		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.resetCaches( withinDayAgent );
 		return true;
 	}
 }

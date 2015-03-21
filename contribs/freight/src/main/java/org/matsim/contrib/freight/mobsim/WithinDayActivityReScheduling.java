@@ -76,7 +76,8 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 //						"[timeWindow="+ plannedActivity.getTimeWindow() + "][plannedActEnd="+ Time.writeTime(act.getEndTime()) + "][newActEnd="+Time.writeTime(newEndTime)+"]");
 				act.setMaximumDuration(Time.UNDEFINED_TIME);
 				act.setEndTime(newEndTime);
-				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
+//				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
+				WithinDayAgentUtils.resetCaches( mobsimAgent );
 				internalInterface.rescheduleActivityEnd(mobsimAgent);
 				encounteredActivities.add(act);
 				return true ;

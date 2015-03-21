@@ -101,7 +101,7 @@ public class QLinkTest extends MatsimTestCase {
 
 	/**
 	 * Tests that vehicles driving on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllDrivingVehicles()}.
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -126,22 +126,22 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull(f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(0, f.qlink1.getAllVehicles().size());
 
 		// add a vehicle, it should be now in the vehicle queue
 		f.qlink1.addFromUpstream(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
-		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
 		// time step 2, vehicle leaves link
 		f.qlink1.doSimStep(2.0);
@@ -149,12 +149,12 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
 	/**
 	 * Tests that vehicles parked on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllDrivingVehicles()}.
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -170,25 +170,25 @@ public class QLinkTest extends MatsimTestCase {
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
-		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(0, f.qlink1.getAllVehicles().size());
 
 		f.qlink1.addParkedVehicle(veh);
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in parking list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
-		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
 		assertEquals("removed wrong vehicle.", veh, f.qlink1.removeParkedVehicle(veh.getId()));
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle not found in parking list.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
 	/**
 	 * Tests that vehicles departing on a link are found with {@link NetsimLink#getVehicle(Id)}
-	 * and {@link NetsimLink#getAllDrivingVehicles()}.
+	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
 	 */
@@ -216,29 +216,29 @@ public class QLinkTest extends MatsimTestCase {
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		driver.endActivityAndComputeNextState(0);
 		f.queueNetwork.simEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
-		assertEquals(veh, f.qlink1.getAllDrivingVehicles().iterator().next());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
+		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep(1.0);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// vehicle leaves link
 		assertEquals(veh, f.qlink1.popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.road).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
-		assertEquals(0, f.qlink1.getAllDrivingVehicles().size());
+		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
 	/**
@@ -263,22 +263,15 @@ public class QLinkTest extends MatsimTestCase {
         QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
 		QVehicle v1 = new QVehicle(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
-		PersonImpl p = new PersonImpl(Id.create("1", Person.class));
-		PlanImpl plan = p.createAndAddPlan(true);
-		plan.createAndAddActivity("h", link1.getId());
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link1.getId(), link2.getId());
-		leg.setRoute(route);
-		route.setLinkIds(link1.getId(), null, link2.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", link2.getId());
+		PersonImpl p = createPerson(Id.createPersonId(1), scenario, link1, link2);
 		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.endActivityAndComputeNextState(0);
 
 		QVehicle v2 = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
-		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p, qsim);
+		PersonImpl p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
+		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
 		pa2.endActivityAndComputeNextState(0);
@@ -321,18 +314,22 @@ public class QLinkTest extends MatsimTestCase {
 		assertTrue(qlink.isNotOfferingVehicle());
 	}
 
+
+	private static PersonImpl createPerson(Id<Person> personId, ScenarioImpl scenario, Link link1, Link link2) {
+		PersonImpl p = new PersonImpl( personId );
+		PlanImpl plan = p.createAndAddPlan(true);
+		plan.createAndAddActivity("h", link1.getId());
+		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link1.getId(), link2.getId());
+		leg.setRoute(route);
+		route.setLinkIds(link1.getId(), null, link2.getId());
+		leg.setRoute(route);
+		plan.createAndAddActivity("w", link2.getId());
+		return p;
+	}
+
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
-		PersonImpl p = new PersonImpl(Id.create(5, Person.class));
-		Plan plan = new PlanImpl();
-		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
-		route.setVehicleId(f.basicVehicle.getId());
-		leg.setRoute(route);
-		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 
 		VehicleType defaultVehType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
 		VehicleType mediumVehType = new VehicleTypeImpl(Id.create("mediumVehicleType", VehicleType.class));
@@ -340,17 +337,20 @@ public class QLinkTest extends MatsimTestCase {
 		VehicleType largeVehType = new VehicleTypeImpl(Id.create("largeVehicleType", VehicleType.class));
 		largeVehType.setPcuEquivalents(5);
 		QVehicle veh1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
-		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p, f.sim);
+		PersonImpl p1 = createPerson2(Id.createPersonId(5), f);
+		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim);
 		veh1.setDriver(driver1);
 		driver1.setVehicle(veh1);
 		driver1.endActivityAndComputeNextState(0.0);
 		QVehicle veh25 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
-		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p, f.sim);
+		PersonImpl p2 = createPerson2(Id.createPersonId(6), f);
+		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim);
 		veh25.setDriver(driver25);
 		driver25.setVehicle(veh25);
 		driver25.endActivityAndComputeNextState(0.0);
 		QVehicle veh5 = new QVehicle(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
-		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p, f.sim);
+		PersonImpl p3 = createPerson2(Id.createPersonId(7), f);
+		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim);
 		veh5.setDriver(driver5);
 		driver5.setVehicle(veh5);
 		driver5.endActivityAndComputeNextState(0.0);
@@ -381,6 +381,21 @@ public class QLinkTest extends MatsimTestCase {
 		f.qlink2.addFromUpstream(veh25); // used vehicle equivalents: 9.0
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 10.0
 		assertFalse(f.qlink2.isAcceptingFromUpstream());
+	}
+
+
+	private PersonImpl createPerson2(Id<Person> personId, Fixture f) {
+		PersonImpl p = new PersonImpl( personId );
+		Plan plan = new PlanImpl();
+		p.addPlan(plan);
+		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
+		Leg leg = new LegImpl(TransportMode.car);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
+		route.setVehicleId(f.basicVehicle.getId());
+		leg.setRoute(route);
+		plan.addLeg(leg);
+		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
+		return p;
 	}
 
 	public void testStuckEvents() {

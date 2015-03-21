@@ -164,7 +164,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+//		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.resetCaches( withinDayAgent );
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

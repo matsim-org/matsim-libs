@@ -34,12 +34,10 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	protected ActivityReplanningMap activityReplanningMap;
-	protected WithinDayAgentUtils withinDayAgentUtils;
 	
 	// use the Factory!
 	/*package*/ ActivityEndIdentifier(ActivityReplanningMap activityReplanningMap) {
 		this.activityReplanningMap = activityReplanningMap;
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override

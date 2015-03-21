@@ -196,9 +196,11 @@ final class PlanBasedDriverAgentImpl implements DriverAgent {
 				log.error("The agent " + this.getId() + " has no route in its leg. Setting agent state to abort." );
 				this.basicPlanAgentDelegate.setState(MobsimAgent.State.ABORT) ;
 			}
-		} else {			
-			this.basicPlanAgentDelegate.calculateAndSetDepartureTime((Activity) this.basicPlanAgentDelegate.getCurrentPlanElement());
-		}
+		} 
+//		else {			
+//			this.basicPlanAgentDelegate.calculateAndSetDepartureTime((Activity) this.basicPlanAgentDelegate.getCurrentPlanElement());
+//		}
+		this.basicPlanAgentDelegate.resetCaches(); 
 	}
 
 	@Override

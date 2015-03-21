@@ -42,63 +42,57 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author cdobler
  */
-public class MobsimDataProvider implements MobsimInitializedListener {
+public final class MobsimDataProvider implements MobsimInitializedListener {
 
-	private final Map<Id<Person>, MobsimAgent> agents = new HashMap<>(); 
 	private final Map<Id<Vehicle>, MobsimVehicle> vehicles = new HashMap<Id<Vehicle>, MobsimVehicle>();
 
 	private NetsimNetwork netsimNetwork;
+	private QSim qSim;
 	
 	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
-		QSim sim = (QSim) e.getQueueSimulation();
-		this.netsimNetwork = sim.getNetsimNetwork();
-		
-		// collect all agents
-		this.agents.clear();
-		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			this.agents.put(mobsimAgent.getId(), mobsimAgent);
-		}
+		qSim = (QSim) e.getQueueSimulation();
+		this.netsimNetwork = qSim.getNetsimNetwork();
 		
 		// collect all vehicles
 		this.vehicles.clear();
 		for (NetsimLink netsimLink : netsimNetwork.getNetsimLinks().values()) {
-			for (MobsimVehicle mobsimVehicle : netsimLink.getAllDrivingVehicles()) {
+			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
 				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
 			}
 		}
 	}
 
-	public Map<Id<Person>, MobsimAgent> getAgents() {
-		return this.agents;
+	public final Map<Id<Person>, MobsimAgent> getAgents() {
+		return this.qSim.getAgentMap() ;
 	}
 	
-	public MobsimAgent getAgent(Id<Person> agentId) {
-		return this.agents.get(agentId);
+	public final MobsimAgent getAgent(Id<Person> agentId) {
+		return this.getAgents().get(agentId);
 	}
 	
-	public Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
+	public final Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
 		return this.vehicles;
 	}
 	
-	public MobsimVehicle getVehicle(Id<Vehicle> vehicleId) {
+	public final MobsimVehicle getVehicle(Id<Vehicle> vehicleId) {
 		return this.vehicles.get(vehicleId);
 	}
 	
-	public Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
+	public final Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
 		return this.netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
-	public MobsimVehicle getDriversVehicle(Id<Person> driverId) {
-		MobsimAgent mobsimAgent = this.agents.get(driverId);
+	public final MobsimVehicle getDriversVehicle(Id<Person> driverId) {
+		MobsimAgent mobsimAgent = this.getAgents().get(driverId);
 		if (mobsimAgent == null) return null;
 		
 		DriverAgent driver = (DriverAgent) mobsimAgent;
 		return driver.getVehicle();
 	}
 	
-	public MobsimAgent getVehiclesDriver(Id<Vehicle> vehicleId) {
+	public final MobsimAgent getVehiclesDriver(Id<Vehicle> vehicleId) {
 		MobsimVehicle mobsimVehicle = this.vehicles.get(vehicleId);
 		if (mobsimVehicle == null) return null;
 		else return mobsimVehicle.getDriver();

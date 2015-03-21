@@ -599,7 +599,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final Collection<MobsimVehicle> getAllDrivingVehicles() {
+	final Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
 		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);
@@ -807,7 +807,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			// vehicles:
 			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {
 				// vehicle positions are computed in snapshotInfoBuilder as a service:
-				snapshotInfoBuilder.positionVehiclesAlongLine(positions, now, getAllDrivingVehicles(), length, storageCapacity
+				snapshotInfoBuilder.positionVehiclesAlongLine(positions, now, getAllVehicles(), length, storageCapacity
 						+ bufferStorageCapacity, ((LinkImpl) link).getEuklideanDistance(), link.getFromNode().getCoord(), link
 						.getToNode().getCoord(), inverseFlowCapacityPerTimeStep, link.getFreespeed(now), NetworkUtils
 						.getNumberOfLanesAsInt(now, link));

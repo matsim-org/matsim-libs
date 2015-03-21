@@ -93,7 +93,8 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		 * the activityEndsList has to be updated.
 		 */
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
-		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+//		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.resetCaches( withinDayAgent );
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}	

@@ -224,7 +224,7 @@ public final class SeepQLinkImpl extends AbstractQLink implements SignalizeableI
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
 		vehicles.addAll(this.transitQLink.getTransitVehicleStopQueue());
 		vehicles.addAll(this.waitingList);
-		vehicles.addAll( road.getAllDrivingVehicles() ) ;
+		vehicles.addAll( road.getAllVehicles() ) ;
 		return vehicles;
 	}
 

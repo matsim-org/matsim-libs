@@ -37,7 +37,7 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 
 
 	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles();
+	public Collection<MobsimVehicle> getAllVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
 
 	Collection<MobsimVehicle> getAllNonParkedVehicles();

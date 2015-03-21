@@ -413,10 +413,16 @@ public class GfipQueuePassingControler_v2 extends Controler{
 				
 				/* Get the entry time and estimated leave time. */
 				double entryTime = event.getTime();
-				QVehicle vehicle = this.qsim.getQNetsimEngine().getVehicles().get(event.getVehicleId());
+
+//				QVehicle vehicle = this.qsim.getQNetsimEngine().getVehicles().get(event.getVehicleId());
+//				GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
+				// Johan, you don't need qnetsim engine for this (or am I overlooking something?): kai, mar'15
+				Vehicle vehicle = this.sc.getVehicles().getVehicles().get( event.getVehicleId() ) ;
+				GfipMode mode = GfipMode.valueOf( vehicle.getType().getId().toString().toUpperCase() ) ;
+				
 				Link link = this.sc.getNetwork().getLinks().get(event.getLinkId());
 				
-				GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
+
 				double velocity = this.calculator.estimateModalVelocityFromDensity(rho, mode);
 				
 				double t = link.getLength() / velocity;

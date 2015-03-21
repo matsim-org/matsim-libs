@@ -45,7 +45,7 @@ public class VisLinkImpl implements VisLink {
 	}
 
 	@Override
-	public Collection<? extends VisVehicle> getAllDrivingVehicles() {
+	public Collection<? extends VisVehicle> getAllVehicles() {
 		throw new UnsupportedOperationException();
 	}
 

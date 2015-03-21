@@ -52,6 +52,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
  * @author cdobler
  */
 public class WithinDayAgentUtils {
+//	private WithinDayAgentUtils(){} // do not instantiate: static methods only
 
 	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
@@ -71,14 +72,14 @@ public class WithinDayAgentUtils {
 		}
 	}
 
-	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support calculateAndSetDepartureTime(...). Aborting!");
-		}
-	}
+//	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
+//		if (agent instanceof PersonDriverAgentImpl) {
+//			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
+//		} else {
+//			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+//					" which does not support calculateAndSetDepartureTime(...). Aborting!");
+//		}
+//	}
 
 	public static final void resetCaches(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {

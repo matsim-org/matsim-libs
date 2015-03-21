@@ -185,9 +185,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final Plan getModifiablePlan() {
 		return basicAgentDelegate.getModifiablePlan() ;
 	}
-	final void calculateAndSetDepartureTime( Activity act ) {
-		basicAgentDelegate.calculateAndSetDepartureTime(act);
-	}
+//	final void calculateAndSetDepartureTime( Activity act ) {
+//		basicAgentDelegate.calculateAndSetDepartureTime(act);
+//	}
 	final void resetCaches() {
 		basicAgentDelegate.resetCaches();
 		driverAgentDelegate.resetCaches(); 

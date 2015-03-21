@@ -134,7 +134,7 @@ final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<P
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
-	final void calculateAndSetDepartureTime(Activity act) {
+	private final void calculateAndSetDepartureTime(Activity act) {
 		ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
 		double now = this.getSimTimer().getTimeOfDay() ;
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
@@ -161,7 +161,10 @@ final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<P
 	}
 	
 	final void resetCaches() {
-		// currently does not do anything
+		if ( this.getCurrentPlanElement() instanceof Activity ) {
+			Activity act = (Activity) this.getCurrentPlanElement() ;
+			this.calculateAndSetDepartureTime(act);
+		}
 	}
 
 	// ============================================================================

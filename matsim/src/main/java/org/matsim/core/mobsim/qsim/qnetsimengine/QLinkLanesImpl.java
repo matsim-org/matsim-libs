@@ -423,7 +423,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	public final Collection<MobsimVehicle> getAllNonParkedVehicles() {
 		Collection<MobsimVehicle> ret = new ArrayList<MobsimVehicle>(this.waitingList);
 		for  (QLaneI lane : this.laneQueues.values()){
-			ret.addAll(lane.getAllDrivingVehicles());
+			ret.addAll(lane.getAllVehicles());
 		}
 		return ret;
 	}

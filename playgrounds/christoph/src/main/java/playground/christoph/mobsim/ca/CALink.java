@@ -414,7 +414,7 @@ public class CALink implements NetsimLink {
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles() {
+	public Collection<MobsimVehicle> getAllVehicles() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -340,7 +340,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	public final Collection<MobsimVehicle> getAllDrivingVehicles() {
+	public final Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = this.getAllNonParkedVehicles();
 		vehicles.addAll(this.parkedVehicles.values());
 		return vehicles;

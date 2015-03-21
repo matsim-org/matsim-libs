@@ -51,8 +51,8 @@ public class CAQTransitionLink extends QLinkInternalI{
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles() {
-		return this.ql.getAllDrivingVehicles();
+	public Collection<MobsimVehicle> getAllVehicles() {
+		return this.ql.getAllVehicles();
 	}
 
 	@Override

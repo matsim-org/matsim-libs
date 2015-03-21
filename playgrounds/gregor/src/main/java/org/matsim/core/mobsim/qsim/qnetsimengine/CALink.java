@@ -181,7 +181,7 @@ public class CALink extends QLinkInternalI {
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles() {
+	public Collection<MobsimVehicle> getAllVehicles() {
 		// TODO Auto-generated method stub
 		return null;
 	}

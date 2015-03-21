@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mzilske.teach;
+package tutorial.programming.createNetworkSHP;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class CreateNetworkSHP {
+public class RunCreateNetworkSHP {
 
 	public static void main(String[] args) throws Exception {
 

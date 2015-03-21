@@ -55,11 +55,9 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	
 	private TripRouter tripRouter;
 	private Scenario scenario;
-	private WithinDayAgentUtils withinDayAgentUtils;
 
 	MyWithinDayMobsimListener(TripRouter tripRouter) {
 		this.tripRouter = tripRouter;
-		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 
 	@Override
@@ -79,7 +77,7 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 		List<MobsimAgent> set = new ArrayList<MobsimAgent>();
 
-		// don't handle the agent, if time != 12 o'clock
+		// don't do anything for most time steps:
 		if (Math.floor(mobsim.getSimTimer().getTimeOfDay()) !=  22000.0) {
 			return set;
 		}

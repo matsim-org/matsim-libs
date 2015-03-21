@@ -24,8 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -120,7 +121,8 @@ public final class QSim implements VisMobsim, Netsim {
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final AgentCounter agentCounter;
-	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
+//	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
+	private final Map<Id<Person>,MobsimAgent> agents = new LinkedHashMap<>();
 	private final List<AgentSource> agentSources = new ArrayList<>();
 	private TransitQSimEngine transitEngine;
 
@@ -158,6 +160,10 @@ public final class QSim implements VisMobsim, Netsim {
 
 		@Override
 		public void rescheduleActivityEnd(MobsimAgent agent) {
+			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
+			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
+			// done internally is to move the agents between the engines, e.g. around endActivity and endLeg.  In consequence, 
+			// "arrangeNextAgentState" and "(un)registerAgentOnLink" need to be protected.  But not this one.  kai, mar'15
 			QSim.this.activityEngine.rescheduleActivityEnd(agent);
 		}
 
@@ -202,23 +208,15 @@ public final class QSim implements VisMobsim, Netsim {
 		// (can be located somewhere) before you execute a sim step.
         // Agents can abort in this loop already, so we iterate over
         // a defensive copy of the agent collection.
-		for (MobsimAgent agent : new ArrayList<>(this.agents)) {
+		for (MobsimAgent agent : new ArrayList<>(this.agents.values())) {
 			arrangeNextAgentAction(agent);
 		}
 		
 		// do iterations
 		boolean doContinue = true;
-		double time = this.simTimer.getTimeOfDay();
-		while (doContinue) {
-			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-			doContinue = doSimStep(time);
-			this.events.afterSimStep(time);
-			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
-			if (doContinue) {
-				time = this.simTimer.incrementTime();
-			}
+		while ( doContinue ) {
+			doContinue = doSimStep();
 		}
-		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		cleanupSim();
 	}
 
@@ -266,7 +264,8 @@ public final class QSim implements VisMobsim, Netsim {
         }
 	}
 
-	private void cleanupSim() {
+	void cleanupSim() {
+		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.afterSim();
 		}
@@ -275,11 +274,12 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Do one step of the simulation run.
 	 *
-	 * @param time
-	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	/*package*/ boolean doSimStep(final double time) {
+	/*package*/ boolean doSimStep() {
+		final double time = this.getSimTimer().getTimeOfDay() ;
+		
+		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 
 		/*
 		 * The WithinDayEngine has to perform its replannings before
@@ -298,14 +298,23 @@ public final class QSim implements VisMobsim, Netsim {
 
 		// console printout:
 		this.printSimLog(time);
-		return (this.agentCounter.isLiving() && (this.stopTime > time));
+		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > time));
+		this.events.afterSimStep(time);
+		this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
+		if (doContinue) {
+			this.simTimer.incrementTime();
+		}
+		return doContinue ;
 	}
 
 	public void insertAgentIntoMobsim( MobsimAgent agent ) {
-		if ( this.agents.contains(agent) ) {
-			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
+		if ( this.agents.containsKey( agent.getId() ) ) {
+			throw new RuntimeException( "agent with same ID already in mobsim; aborting ... ") ;
 		}
-		agents.add(agent);
+//		if ( this.agents.contains(agent) ) {
+//			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
+//		}
+		agents.put(agent.getId(),agent);
 		this.agentCounter.incLiving();
 	}
 
@@ -391,7 +400,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private double calculateFirstAgentStartTime() {
 		double firstAgentStartTime = Double.POSITIVE_INFINITY;
-		for (MobsimAgent agent : agents) {
+		for (MobsimAgent agent : agents.values()) {
 			firstAgentStartTime = Math.min(firstAgentStartTime, agent.getActivityEndTime());
 		}
 		return firstAgentStartTime;
@@ -513,7 +522,11 @@ public final class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public Collection<MobsimAgent> getAgents() {
-		return Collections.unmodifiableCollection(this.agents);
+		return Collections.unmodifiableCollection(this.agents.values());
+	}
+	
+	public Map< Id<Person>, MobsimAgent> getAgentMap() {
+		return Collections.unmodifiableMap( this.agents ) ;
 	}
 
 	public void addAgentSource(AgentSource agentSource) {

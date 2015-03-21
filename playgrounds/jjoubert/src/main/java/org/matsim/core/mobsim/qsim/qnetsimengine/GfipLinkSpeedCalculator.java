@@ -71,7 +71,7 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		Id<VehicleType> vehicleType = vehicle.getVehicle().getType().getId();
 		
-		int numberOfVehiclesAhead = this.qsim.getNetsimNetwork().getNetsimLink(link.getId()).getAllDrivingVehicles().size();
+		int numberOfVehiclesAhead = this.qsim.getNetsimNetwork().getNetsimLink(link.getId()).getAllVehicles().size();
 		
 		/* Get the current consumed capacity of the link (in pcu equivalents) */
 		NetsimLink thisLink = this.qsim.getNetsimNetwork().getNetsimLink(link.getId());

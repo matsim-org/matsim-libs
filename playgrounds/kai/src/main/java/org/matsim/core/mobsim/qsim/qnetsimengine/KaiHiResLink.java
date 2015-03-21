@@ -164,7 +164,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles() {
+	public Collection<MobsimVehicle> getAllVehicles() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

@@ -39,7 +39,10 @@ public final class DefaultAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
+
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
+		// ( As of today, PersonDriverAgentImpl also makes the plan unmodifiable.  If that holds, the command here can be removed. kai, mar'15)
+		
 		return agent;
 	}
 

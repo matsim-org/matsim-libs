@@ -196,7 +196,8 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+//		WithinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		WithinDayAgentUtils.resetCaches( withinDayAgent );
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

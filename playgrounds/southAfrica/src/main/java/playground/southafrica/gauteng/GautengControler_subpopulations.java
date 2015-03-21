@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -57,6 +58,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.vehicles.*;
+
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.utilities.Header;
@@ -248,9 +250,10 @@ public class GautengControler_subpopulations {
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 		
 		// ROAD PRICING:
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule(new RoadPricingSchemeUsingTollFactor(
+        final AbstractModule module = new ControlerDefaultsWithRoadPricingModule(new RoadPricingSchemeUsingTollFactor(
                 roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
-        )));
+        ));
+		controler.setModules(module);
 
         // PLANS REMOVAL
 		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
@@ -264,7 +267,7 @@ public class GautengControler_subpopulations {
 		
 		// ADDITIONAL ANALYSIS:
 		controler.addControlerListener(new KaiAnalysisListener());
-
+		
 		// RUN:
 		controler.run();
 

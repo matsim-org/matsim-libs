@@ -164,16 +164,6 @@ public final class QSim implements VisMobsim, Netsim {
 	};
 	
 	/**
-	 * FIXME This must be removed once I (JWJ, Feb '15) am done with the 
-	 * passing code.
-	 * 
-	 * @return
-	 */
-	public QNetsimEngine getQNetsimEngine(){
-		return this.netEngine;
-	}
-
-	/**
 	 * Constructs an instance of this simulation which does not do anything by itself, but accepts handlers for Activities and Legs.
 	 * Use this constructor if you want to plug together your very own simulation, i.e. you are writing some of the simulation
 	 * logic yourself.
@@ -221,7 +211,7 @@ public final class QSim implements VisMobsim, Netsim {
 		double time = this.simTimer.getTimeOfDay();
 		while (doContinue) {
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-			doContinue = doSimStep(time);
+			doContinue = doSimStep();
 			this.events.afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (doContinue) {
@@ -285,11 +275,9 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Do one step of the simulation run.
 	 *
-	 * @param time
-	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	/*package*/ boolean doSimStep(final double time) {
+	/*package*/ boolean doSimStep() {
 
 		/*
 		 * The WithinDayEngine has to perform its replannings before

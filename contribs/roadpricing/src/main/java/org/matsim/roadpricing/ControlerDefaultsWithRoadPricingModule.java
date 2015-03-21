@@ -54,27 +54,27 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         // This is not optimal yet. Modules should not need to have parameters.
         // But I am not quite sure yet how to best handle custom scenario elements. mz
         if (this.roadPricingScheme != null) {
-            bindToInstance(RoadPricingScheme.class, this.roadPricingScheme);
+            this.bindToInstance(RoadPricingScheme.class, this.roadPricingScheme);
         } else {
-            bindToProviderAsSingleton(RoadPricingScheme.class, RoadPricingSchemeProvider.class);
+            this.bindToProviderAsSingleton(RoadPricingScheme.class, RoadPricingSchemeProvider.class);
         }
 
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
         include(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
             public void install() {
-            bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncludingTollFactoryProvider.class);
+            	this.bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncludingTollFactoryProvider.class);
             }
         }));
 
-        addControlerListener(RoadPricingControlerListener.class);
+        this.addControlerListener(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
-        bindAsSingleton(CalcPaidToll.class);
-        addEventHandler(CalcPaidToll.class);
+        this.bindAsSingleton(CalcPaidToll.class);
+        this.addEventHandler(CalcPaidToll.class);
 
-        bindAsSingleton(CalcAverageTolledTripLength.class);
-        addEventHandler(CalcAverageTolledTripLength.class);
+        this.bindAsSingleton(CalcAverageTolledTripLength.class);
+        this.addEventHandler(CalcAverageTolledTripLength.class);
     }
 
     private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
