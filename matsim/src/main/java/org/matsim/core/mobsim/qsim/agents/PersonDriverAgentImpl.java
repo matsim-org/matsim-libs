@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -39,15 +40,17 @@ import org.matsim.vehicles.Vehicle;
  */
 public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
 	// yy cannot make this final since it is overridden at 65 locations
-	// (but since all methods are final, it seems that all of these can be solved by delegation).
+	// (but since all methods are final, it seems that all of these could be solved by delegation).
 	// kai, nov'14
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 	
 	private BasicPlanAgentImpl basicAgentDelegate ;
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
 
-	public PersonDriverAgentImpl(final Plan plan, final Netsim simulation) {
+	public PersonDriverAgentImpl(final Plan plan1, final Netsim simulation) {
+		Plan plan = PopulationUtils.unmodifiablePlan(plan1) ;
 		basicAgentDelegate = new BasicPlanAgentImpl(plan, simulation.getScenario(), simulation.getEventsManager(), 
 				simulation.getSimTimer() ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl(basicAgentDelegate) ;
@@ -56,7 +59,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
-	public void endLegAndComputeNextState(double now) {
+	public final void endLegAndComputeNextState(double now) {
 		basicAgentDelegate.endLegAndComputeNextState(now);
 	}
 
