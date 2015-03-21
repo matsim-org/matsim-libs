@@ -19,6 +19,9 @@
 package org.matsim.core.controler;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -49,6 +52,14 @@ public class ControlerDefaults {
 		final TravelTimeAndDistanceBasedTravelDisutilityFactory builder = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		builder.setSigma(0.); // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
 		return builder;
+	}
+
+	// not sure if the following is annoying from the MobsimRegistrar perspective.  It does, however, make script writing much easier. kai, mar'15
+	public static MobsimFactory createDefaultQSimFactory() {
+		return new QSimFactory() ;
+	}
+	public static MobsimFactory createDefaultJDEQSimFactory() {
+		return new JDEQSimulationFactory() ;
 	}
 
 }
