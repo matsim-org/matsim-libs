@@ -370,17 +370,6 @@ public class Controler extends AbstractController {
 		});
 	}
 
-	/**
-	 * Initializes the Controler with the parameters from the configuration.
-	 * This method is called after the configuration is loaded, after the
-	 * scenario data (network, population) is read, and after all ControlerListeners
-	 * have processed their startup event.
-	 * <p/>
-	 * Design comments/questions:<ul>
-	 * <li> "from the configuration" sounds too narrow.  Should be something like "from everything that is there at this point,
-	 * including, say, factories."  kai, dec'12
-	 * </ul>
-	 */
 	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
 	protected void setUp() {}
 
